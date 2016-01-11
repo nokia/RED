@@ -50,8 +50,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.ElementAddingToken;
-import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.StructuredContentProvider;
 import org.robotframework.red.viewers.Viewers;
 
@@ -151,9 +151,9 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
                     final List<VariableMapping> mappings = (List<VariableMapping>) viewer.getInput();
                     if (!mappings.contains(mapping)) {
                         editorInput.getProjectConfiguration().addVariableMapping(mapping);
+                        setDirty(true);
                     }
 
-                    setDirty(true);
                     return mapping;
                 }
                 return null;
