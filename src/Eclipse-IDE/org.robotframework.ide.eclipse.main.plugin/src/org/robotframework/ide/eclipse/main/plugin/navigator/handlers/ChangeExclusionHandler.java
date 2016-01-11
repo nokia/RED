@@ -8,17 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Named;
-
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbenchPartSite;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
@@ -37,9 +33,7 @@ import com.google.common.collect.Multimap;
  */
 abstract class ChangeExclusionHandler {
 
-    @Execute
-    public Object changeExclusion(final IWorkbenchPartSite site, final IEventBroker eventBroker,
-            final @Named(Selections.SELECTION) IStructuredSelection selection) {
+    public Object changeExclusion(final IEventBroker eventBroker, final IStructuredSelection selection) {
         final List<IFolder> foldersToChange = Selections.getElements(selection, IFolder.class);
         final Multimap<IProject, IPath> groupedPaths = groupByProject(foldersToChange);
 
