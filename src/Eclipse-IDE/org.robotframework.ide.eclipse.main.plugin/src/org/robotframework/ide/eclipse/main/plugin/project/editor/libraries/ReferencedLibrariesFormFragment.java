@@ -194,14 +194,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                             libs.add(lib);
                         }
                     }
-                    for (final ReferencedLibrary library : libs) {
-                        editorInput.getProjectConfiguration().addReferencedLibrary(library);
-                    }
-                    if (!libs.isEmpty()) {
-                        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                                editorInput.getRobotProject().getConfigurationFile(), libs);
-                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
-                    }
+                    addLibraries(libs);
                 }
             }
         });
@@ -229,14 +222,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                             libs.add(lib);
                         }
                     }
-                    for (final ReferencedLibrary library : libs) {
-                        editorInput.getProjectConfiguration().addReferencedLibrary(library);
-                    }
-                    if (!libs.isEmpty()) {
-                        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                                editorInput.getRobotProject().getConfigurationFile(), libs);
-                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
-                    }
+                    addLibraries(libs);
                 }
             }
         });
@@ -262,17 +248,25 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                             libs.add(lib);
                         }
                     }
-                    for (final ReferencedLibrary library : libs) {
-                        editorInput.getProjectConfiguration().addReferencedLibrary(library);
-                    }
-                    if (!libs.isEmpty()) {
-                        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                                editorInput.getRobotProject().getConfigurationFile(), libs);
-                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
-                    }
+                    addLibraries(libs);
                 }
             }
         });
+    }
+
+    private void addLibraries(final List<ReferencedLibrary> libs) {
+        final List<ReferencedLibrary> added = new ArrayList<>();
+        for (final ReferencedLibrary library : libs) {
+            final boolean wasAdded = editorInput.getProjectConfiguration().addReferencedLibrary(library);
+            if (wasAdded) {
+                added.add(library);
+            }
+        }
+        if (!added.isEmpty()) {
+            final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
+                    editorInput.getRobotProject().getConfigurationFile(), added);
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+        }
     }
 
     private FileDialog createReferencedLibFileDialog() {
