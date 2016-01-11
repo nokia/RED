@@ -1,0 +1,82 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _rNY3QJKkEeWGA6GsgqW2Mw
+Element-Name: VariableMappingForVariableCaseSensitivity
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _8foS4Lg6EeWCL6HwBALbRw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 1/11/16 10:16 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// check if variable mapping is case insensitive on variable name part
+
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/TestSuite.robot" | double-click
+// comment resource declaration as it is easier to comment old one and enter new one
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 7 1
+    type-text "#"
+    set-caret-pos 8 1
+    type-text	"Resource    ${path}/res_1.robot"
+}
+
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 10 16
+    key-type "M1+s"
+}
+
+// add variable mappping for resource path
+get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
+get-editor "ProjectWithResource/red.xml" | get-section "Variables mappings" | get-table | select "...add new mapping" 
+    | key-type Enter
+    
+
+    
+with [get-window "Add variable mapping"] {
+    with [get-editbox -after [get-label Name]] {
+        key-type Right
+        key-type Left
+        set-text "${path}"
+    }
+    get-editbox -after [get-label Value] | set-text resource_folder
+    get-button OK | click
+}
+
+with [get-editor "ProjectWithResource/red.xml"] {
+    with [get-section "Variables mappings" | get-table] {
+        select "${path}" | activate-cell-edit
+        get-editbox | key-type "M1+s"
+        apply-cell-edit -deactivate
+    }
+    //close red.xml
+
+}
+    
+//verify that variable mapping works - there should be no problems
+get-tab-folder -index 1 | get-tab-item "TestSuite.robot" | click
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 5 1
+    key-type Enter
+    key-type "M1+s"
+    wait	1000
+}
+get-tab-folder -index 4 | get-tab-item Problems | click
+
+
+// change variable path to upper case to check if there is no issue with variable name case sensitivity 
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+with [get-editor "TestSuite.robot" | get-text-viewer] {
+    set-caret-pos 9 16
+    key-type BackSpace
+    type-text P
+    key-type "M1+s"
+}
+
+// should work thus no problems
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
