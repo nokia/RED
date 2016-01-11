@@ -35,11 +35,13 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ImagesManager;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public abstract class InputLoadingFormComposite extends Composite {
 
     private final String title;
 
-    private final FormToolkit formToolkit = new FormToolkit(Display.getCurrent());
+    private FormToolkit formToolkit = new FormToolkit(Display.getCurrent());
     private Form form;
     private Composite innerComposite;
 
@@ -50,6 +52,11 @@ public abstract class InputLoadingFormComposite extends Composite {
     public InputLoadingFormComposite(final Composite parent, final int style, final String title) {
         super(parent, style);
         this.title = title;
+    }
+
+    @VisibleForTesting
+    Form getForm() {
+        return form;
     }
 
     protected Control getControl() {
@@ -70,6 +77,7 @@ public abstract class InputLoadingFormComposite extends Composite {
             @Override
             public void widgetDisposed(final DisposeEvent e) {
                 formToolkit.dispose();
+                formToolkit = null;
             }
         });
         setBackground(getDisplay().getSystemColor(SWT.COLOR_WHITE));
