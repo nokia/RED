@@ -49,7 +49,7 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
                 buf.append(whitespacesFromPreviousLine);
                 final String commandLineContent = DocumentUtilities
                         .lineContentBeforeCurrentPosition(document, command.offset).trim().toLowerCase();
-                if (commandLineContent.startsWith(":for") || commandLineContent.startsWith("\\")) {
+                if (isForLoop(commandLineContent)) {
                     buf.append('\\');
                 }
             }
@@ -58,6 +58,11 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
         } catch (final BadLocationException e) {
             // stop work
         }
+    }
+
+    private boolean isForLoop(final String commandLineContent) {
+        return commandLineContent.startsWith(":for") || commandLineContent.startsWith(": for")
+                || commandLineContent.startsWith("\\");
     }
 
     private int findEndOfWhiteSpace(final IDocument document, final int start, final int end)
