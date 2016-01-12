@@ -94,6 +94,6 @@ public class VariableFileArgumentsEditingSupport extends ElementsAddingEditingSu
     }
 
     private IEventBroker getEventBroker() {
-        return PlatformUI.getWorkbench().getService(IEventBroker.class);
+        return (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 }
