@@ -9,13 +9,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.red.junit.ShellProvider;
 
-@Ignore
 public class ViewersCombiningSelectionProviderTest {
 
     @Rule
@@ -54,13 +55,7 @@ public class ViewersCombiningSelectionProviderTest {
         viewer1.setSelection(newSelection("viewer1_a"));
         viewer2.setSelection(newSelection("viewer2_y"));
 
-        assertThat(viewer1.getTable().isFocusControl()).isFalse();
-        assertThat(viewer2.getTable().isFocusControl()).isFalse();
-
-        viewer1.getTable().forceFocus();
-
-        assertThat(viewer1.getTable().isFocusControl()).isTrue();
-        assertThat(viewer2.getTable().isFocusControl()).isFalse();
+        viewer1.getTable().notifyListeners(SWT.FocusIn, new Event());
         
         assertThat(provider.getSelection()).isEqualTo(newSelection("viewer1_a"));
     }
@@ -74,13 +69,7 @@ public class ViewersCombiningSelectionProviderTest {
         viewer1.setSelection(newSelection("viewer1_a"));
         viewer2.setSelection(newSelection("viewer2_y"));
 
-        assertThat(viewer1.getTable().isFocusControl()).isFalse();
-        assertThat(viewer2.getTable().isFocusControl()).isFalse();
-
-        viewer2.getTable().forceFocus();
-
-        assertThat(viewer1.getTable().isFocusControl()).isFalse();
-        assertThat(viewer2.getTable().isFocusControl()).isTrue();
+        viewer2.getTable().notifyListeners(SWT.FocusIn, new Event());
 
         assertThat(provider.getSelection()).isEqualTo(newSelection("viewer2_y"));
     }
