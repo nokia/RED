@@ -12,7 +12,6 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.red.junit.ShellProvider;
