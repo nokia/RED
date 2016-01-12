@@ -17,7 +17,10 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
@@ -31,7 +34,6 @@ public class ViewersTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
-    @Ignore
     @Test
     public void contextIsActivated_whenViewerWithBoundedContextGetsFocused() {
         final IContextService contextService = mock(IContextService.class);
@@ -39,16 +41,16 @@ public class ViewersTest {
         final IWorkbenchSite site = mock(IWorkbenchSite.class);
         when(site.getService(IContextService.class)).thenReturn(contextService);
 
-        final ColumnViewer viewer = new TreeViewer(shellProvider.getShell());
+        final TableViewer viewer = new TableViewer(shellProvider.getShell());
         Viewers.boundViewerWithContext(viewer, site, "contextId");
-
+        
+        viewer.getControl().notifyListeners(SWT.FocusIn, new Event());
         final boolean focused = viewer.getControl().forceFocus();
         assertThat(focused).isTrue();
 
         verify(contextService, times(1)).activateContext("contextId");
     }
 
-    @Ignore
     @Test
     public void contextIsDeactivated_whenFocusIsLostToOtherControl() {
         final IContextActivation activationToken = mock(IContextActivation.class);
@@ -64,11 +66,13 @@ public class ViewersTest {
 
         Viewers.boundViewerWithContext(viewer, site, "contextId");
 
+        viewer.getControl().notifyListeners(SWT.FocusIn, new Event());
         boolean focused = viewer.getControl().forceFocus();
         assertThat(focused).isTrue();
-
-        focused = label.forceFocus();
-        assertThat(focused).isTrue();
+        
+        viewer.getControl().notifyListeners(SWT.FocusOut, new Event());
+        label.notifyListeners(SWT.FocusIn, new Event());
+        label.forceFocus();
 
         verify(contextService, times(1)).activateContext("contextId");
         verify(contextService, times(1)).deactivateContext(activationToken);
