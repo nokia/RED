@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.red.junit.ShellProvider;
@@ -23,7 +22,6 @@ public class RobotPopupDialogTest {
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
 
-    @Ignore
     @Test
     public void whenDialogIsCreated_theParentCompositeHasFillLayoutAndControlsAreCreated() {
         final RobotPopupDialog dialog = prepareDialogToTest(shellProvider.getShell());
