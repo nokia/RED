@@ -78,7 +78,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
                     new RobotProjectConfigReader().readConfigurationWithLines(file));
             installResourceListener();
         } else {
-            final IStorage storage = input.getAdapter(IStorage.class);
+            final IStorage storage = (IStorage) input.getAdapter(IStorage.class);
             if (storage != null) {
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
@@ -116,7 +116,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
     }
 
     private IEclipseContext prepareContext() {
-        final IEclipseContext context = getEditorSite().getService(IEclipseContext.class).getActiveLeaf();
+        final IEclipseContext context = ((IEclipseContext) getEditorSite().getService(IEclipseContext.class))
+                .getActiveLeaf();
         context.set(RedProjectEditorInput.class, editorInput);
         context.set(IEditorSite.class, getEditorSite());
         context.set(RedProjectEditor.class, this);
@@ -302,7 +303,8 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
     @Override
     public void dispose() {
-        final IEclipseContext context = getEditorSite().getService(IEclipseContext.class).getActiveLeaf();
+        final IEclipseContext context = ((IEclipseContext) getEditorSite().getService(IEclipseContext.class))
+                .getActiveLeaf();
         for (final IEditorPart part : parts) {
             ContextInjectionFactory.uninject(part, context);
         }
