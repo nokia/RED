@@ -87,8 +87,8 @@ public class SuiteSourceEditor extends TextEditor {
         super.doSetInput(input);
         if (input instanceof IStorageEditorInput) {
             fileModel.reparseEverything(getDocument().get());
-            PlatformUI.getWorkbench().getService(IEventBroker.class).post(RobotModelEvents.REPARSING_DONE,
-                    fileModel);
+            final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+            eventBroker.post(RobotModelEvents.REPARSING_DONE, fileModel);
         }
     }
 
@@ -204,7 +204,7 @@ public class SuiteSourceEditor extends TextEditor {
     }
 
     private void activateContext() {
-        final IContextService service = getSite().getService(IContextService.class);
+        final IContextService service = (IContextService) getSite().getService(IContextService.class);
         service.activateContext(SOURCE_PART_CONTEXT_ID);
     }
 
@@ -282,12 +282,12 @@ public class SuiteSourceEditor extends TextEditor {
         if (sourceViewer.getDocument() != null) {
             final ISelectionProvider provider = sourceViewer.getSelectionProvider();
             final ISelection selection = provider.getSelection();
-            int topIndex = sourceViewer.getTopIndex();
+            final int topIndex = sourceViewer.getTopIndex();
 
             final StyledText styledText = sourceViewer.getTextWidget();
             Control parent = styledText;
             if (sourceViewer instanceof ITextViewerExtension) {
-                ITextViewerExtension extension = (ITextViewerExtension) sourceViewer;
+                final ITextViewerExtension extension = (ITextViewerExtension) sourceViewer;
                 parent = extension.getControl();
             }
             parent.setRedraw(false);
@@ -303,7 +303,7 @@ public class SuiteSourceEditor extends TextEditor {
             sourceViewer.setTopIndex(topIndex);
 
             if (parent instanceof Composite) {
-                Composite composite = (Composite) parent;
+                final Composite composite = (Composite) parent;
                 composite.layout(true);
             }
             parent.setRedraw(true);
