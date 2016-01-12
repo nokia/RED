@@ -1,0 +1,88 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: AddingLoopWithNoContentAssist
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _3DFlELkTEeWzJthH3JoEWQ
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 1/12/16 11:58 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/TestFile.robot" | double-click
+}
+
+
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 1 19
+        key-type "NUMPAD_ENTER" "\\u000D"
+        type-text "test 1"
+        key-type Enter
+        type-text ":For  ${x}  In range  10"
+        key-type Enter
+        type-text "  Log  5"
+        key-type Enter
+        key-type BackSpace
+        type-text ": FOR  ${y}  in range  1  5"
+        key-type Enter
+        type-text "  LOG  ${y}"
+        key-type "M1+s"
+    }
+}
+
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    :For  ${x}  In range  10\n"
+    + "    \\  Log  5\n"
+    + "    : FOR  ${y}  in range  1  5\n"
+    + "    \\  LOG  ${y}" | verify-true
+    
+    
+//add tsv
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Test Suite" 
+    | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text "tsv_file"
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+
+with [get-editor "tsv_file.tsv" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type Enter
+    type-text "test 2"
+    key-type Enter
+    type-text ":for\t${z}\tIN\t 855"
+    key-type Enter
+    key-type Tab
+    type-text Sho
+    key-type "M1+SPACE"
+    wait 300
+    key-type Enter
+    type-text "${z}"
+    key-type Enter
+    key-type BackSpace
+    type-text ": fOR\t${i}\tIn Range\t700\t750"
+    key-type Enter
+    key-type Tab
+    type-text "Log"
+    key-type Tab
+    type-text 66
+    key-type "M1+s"
+}
+
+get-editor "tsv_file.tsv" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 2\n"
+    + "\t:for\t${z}\tIN\t 855\n"
+    + "\t\\\tShould Be Empty\t${z}\n"
+    + "\t: fOR\t${i}\tIn Range\t700\t750\n"
+    + "\t\\\tLog\t66" | verify-true
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
