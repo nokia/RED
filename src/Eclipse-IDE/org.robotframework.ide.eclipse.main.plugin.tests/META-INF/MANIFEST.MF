@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: RED Robot Editor Tests
-Bundle-SymbolicName: org.robotframework.ide.eclipse.main.plugin.tests
+Bundle-SymbolicName: org.robotframework.ide.eclipse.main.plugin.tests;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Fragment-Host: org.robotframework.ide.eclipse.main.plugin;bundle-version="1.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
