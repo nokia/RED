@@ -104,7 +104,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         toolkit = createToolkit(parent);
 
         final IEditorSite site = editorPart.getEditorSite();
-        context = site.getService(IEclipseContext.class).getActiveLeaf();
+        context = ((IEclipseContext) site.getService(IEclipseContext.class)).getActiveLeaf();
         context.set(RobotEditorCommandsStack.class, commandsStack);
         context.set(RedFormToolkit.class, toolkit);
         context.set(IEditorSite.class, site);
@@ -252,7 +252,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     protected abstract ISelectionProvider getSelectionProvider();
 
     private void prepareCommandsContext(final IWorkbenchPartSite site) {
-        final IContextService service = site.getService(IContextService.class);
+        final IContextService service = (IContextService) site.getService(IContextService.class);
         service.activateContext(SECTION_EDITOR_PART_CONTEXT_ID);
         service.activateContext(getContextId());
     }
