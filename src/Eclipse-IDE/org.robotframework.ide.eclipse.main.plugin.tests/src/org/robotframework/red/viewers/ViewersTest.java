@@ -17,14 +17,11 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchSite;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.red.junit.ShellProvider;
@@ -45,8 +42,6 @@ public class ViewersTest {
         Viewers.boundViewerWithContext(viewer, site, "contextId");
         
         viewer.getControl().notifyListeners(SWT.FocusIn, new Event());
-        final boolean focused = viewer.getControl().forceFocus();
-        assertThat(focused).isTrue();
 
         verify(contextService, times(1)).activateContext("contextId");
     }
@@ -67,12 +62,8 @@ public class ViewersTest {
         Viewers.boundViewerWithContext(viewer, site, "contextId");
 
         viewer.getControl().notifyListeners(SWT.FocusIn, new Event());
-        boolean focused = viewer.getControl().forceFocus();
-        assertThat(focused).isTrue();
-        
         viewer.getControl().notifyListeners(SWT.FocusOut, new Event());
         label.notifyListeners(SWT.FocusIn, new Event());
-        label.forceFocus();
 
         verify(contextService, times(1)).activateContext("contextId");
         verify(contextService, times(1)).deactivateContext(activationToken);
