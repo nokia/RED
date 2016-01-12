@@ -64,7 +64,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
     }
 
     private static IEventBroker getEventBroker() {
-        return PlatformUI.getWorkbench().getService(IEventBroker.class);
+        return (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     static class VariableFileCreator extends NewElementsCreator<ReferencedVariableFile> {
