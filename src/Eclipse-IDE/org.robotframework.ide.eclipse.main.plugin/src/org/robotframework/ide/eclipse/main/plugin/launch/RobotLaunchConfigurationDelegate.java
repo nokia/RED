@@ -84,7 +84,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     public RobotLaunchConfigurationDelegate() {
         launchManager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = launchManager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
+        robotEventBroker = new RobotEventBroker((IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
         
     }
 
