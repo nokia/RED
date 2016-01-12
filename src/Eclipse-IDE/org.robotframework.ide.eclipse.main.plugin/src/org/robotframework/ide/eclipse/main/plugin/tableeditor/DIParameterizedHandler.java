@@ -26,7 +26,7 @@ public class DIParameterizedHandler<C> extends AbstractHandler {
     }
 
     private static IEclipseContext getParentContext() {
-        return PlatformUI.getWorkbench().getService(IEclipseContext.class);
+        return (IEclipseContext) PlatformUI.getWorkbench().getService(IEclipseContext.class);
     }
 
     @Override
