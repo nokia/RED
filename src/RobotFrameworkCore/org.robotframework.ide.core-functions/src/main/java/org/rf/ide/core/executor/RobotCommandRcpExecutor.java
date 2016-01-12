@@ -253,12 +253,16 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             final Boolean wasGenerated = (Boolean) client.execute("createLibdoc",
                     newArrayList(resultFilePath, libName, libPath));
             if (!wasGenerated) {
-                throw new RobotEnvironmentException("Unable to generate library specification file for library "
-                        + libName + ", for library path " + libPath + " and result file " + resultFilePath);
+                final String additional = libPath.isEmpty() ? ""
+                        : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
+                throw new RobotEnvironmentException(
+                        "Unable to generate library specification file for library " + libName + additional);
             }
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to generate library specification file for library " + libName
-                    + ", for library path " + libPath + " and result file " + resultFilePath, e);
+            final String additional = libPath.isEmpty() ? ""
+                    : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
+            throw new RobotEnvironmentException(
+                    "Unable to generate library specification file for library " + libName + additional, e);
         }
     }
 
