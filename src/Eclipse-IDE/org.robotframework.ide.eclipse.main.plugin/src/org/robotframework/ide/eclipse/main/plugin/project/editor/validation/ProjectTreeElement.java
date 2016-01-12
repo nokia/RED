@@ -142,7 +142,7 @@ public class ProjectTreeElement implements IWorkbenchAdapter {
 
     @Override
     public ImageDescriptor getImageDescriptor(final Object object) {
-        return resource.getAdapter(IWorkbenchAdapter.class).getImageDescriptor(resource);
+        return ((IWorkbenchAdapter) resource.getAdapter(IWorkbenchAdapter.class)).getImageDescriptor(resource);
     }
 
     ImageDescriptor getImageDescriptor() {
