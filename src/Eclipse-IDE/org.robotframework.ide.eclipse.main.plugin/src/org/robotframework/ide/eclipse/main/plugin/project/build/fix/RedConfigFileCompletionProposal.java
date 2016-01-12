@@ -58,7 +58,8 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
         this.shortDescription = shortDescritption;
         this.detailedDescription = detailedDescription;
 
-        final IEclipseContext context = PlatformUI.getWorkbench().getService(IEclipseContext.class).getActiveLeaf();
+        final IEclipseContext context = ((IEclipseContext) PlatformUI.getWorkbench().getService(IEclipseContext.class))
+                .getActiveLeaf();
         ContextInjectionFactory.inject(this, context);
     }
 
