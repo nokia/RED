@@ -1,0 +1,74 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _FA5wUKfoEeWg6OFh_tHgTw
+Element-Name: LinksToLibWithDotToClass
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _WZVa8LkvEeWzhqlyblQz1g
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 1/12/16 3:32 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// check handling libs with class thus checking notation  libName.class
+
+get-view "Project Explorer" | get-tree | select "RobotProject/additional libs" | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    with [get-editbox -after [get-label "File name:"]] {
+        set-text "new_test"
+    }
+    get-button Finish | click
+}
+// create a file and populate it
+with [get-editor "new_test.robot" | get-text-viewer] {
+    key-type Enter
+    key-type Up
+    type-text "***Settings***"
+    key-type Enter
+    type-text "Library  lib1.Fruits"
+    key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+set-dialog-result File "platform:/resource/RobotProject/additional libs/lib1.py"
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+with [get-window "Select library class"] {
+    get-table | select "lib1.Fruits"
+    get-button OK | click
+}
+
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" 
+    | key-type "M1+s"
+
+// check if libdoc is generated
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries/lib1.Fruits RobotProject\\/additional libs \\(2\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals "Do Nothing" | verify-true
+    get-item "RobotProject/Robot Referenced libraries/lib1.Fruits RobotProject\\/additional libs \\(2\\)" 
+        | get-property "getItems().TreeItem[1].getText()" | equals "Do Nothing Again" | verify-true
+}
+
+// enter KW from lib without prefix and with
+get-tab-folder -index 1 | get-tab-item "new_test.robot" | click
+with [get-editor "new_test.robot" | get-text-viewer] {
+    set-caret-pos 3 19
+    key-type Enter
+    type-text test
+    key-type Enter
+    type-text "Do Nothing"
+    key-type Enter
+    type-text "Do Nothing Again"
+    key-type Enter
+    type-text "lib1.Fruits.Do Nothing Again"
+    key-type Enter
+    key-type "M1+s"
+}
+
+// there should be no errors
+get-tab-folder -index 4 | get-tab-item Problems | click
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
