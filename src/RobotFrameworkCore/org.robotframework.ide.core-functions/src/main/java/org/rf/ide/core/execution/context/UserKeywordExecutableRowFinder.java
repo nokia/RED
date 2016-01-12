@@ -101,7 +101,9 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         if (nameElements.length > 0) {
             final String resourceName = extractIfNameIsFromVariableDeclaration(nameElements[0]);
             final List<ResourceImportReference> referencesByFileName = new ArrayList<>();
-            findImportReferencesByFileName(resourceName, resourceImportReferences, referencesByFileName);
+            if(resourceImportReferences != null) {
+                findImportReferencesByFileName(resourceName, resourceImportReferences, referencesByFileName);
+            }
             return findImportReferenceByKeywordName(keywordContext.getName(), referencesByFileName);
         }
         return null;
@@ -177,20 +179,25 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
     }
     
     private UserKeyword findKeywordByName(final List<UserKeyword> keywords, final String name) {
-        for (final UserKeyword userKeyword : keywords) {
-            final Optional<String> keywordName = GherkinStyleSupport.firstNameTransformationResult(name,
-                    new NameTransformation<String>() {
+        if (keywords != null) {
+            for (final UserKeyword userKeyword : keywords) {
+                final Optional<String> keywordName = GherkinStyleSupport.firstNameTransformationResult(name,
+                        new NameTransformation<String>() {
 
-                        @Override
-                        public Optional<String> transform(final String gherkinNameVariant) {
-                            if (userKeyword.getKeywordName().getText().toString().equalsIgnoreCase(gherkinNameVariant))
-                                return Optional.fromNullable(gherkinNameVariant);
-                            else
-                                return Optional.absent();
-                        }
-                    });
-            if (keywordName.isPresent()) {
-                return userKeyword;
+                            @Override
+                            public Optional<String> transform(final String gherkinNameVariant) {
+                                if (userKeyword.getKeywordName()
+                                        .getText()
+                                        .toString()
+                                        .equalsIgnoreCase(gherkinNameVariant))
+                                    return Optional.fromNullable(gherkinNameVariant);
+                                else
+                                    return Optional.absent();
+                            }
+                        });
+                if (keywordName.isPresent()) {
+                    return userKeyword;
+                }
             }
         }
         return null;
