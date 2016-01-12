@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: RED Robot Editor Tests
 Bundle-SymbolicName: org.robotframework.ide.eclipse.main.plugin.tests;singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Fragment-Host: org.robotframework.ide.eclipse.main.plugin;bundle-version="1.0.0"
+Fragment-Host: org.robotframework.ide.eclipse.main.plugin;bundle-version="0.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Nokia Networks
 Require-Bundle: org.junit;bundle-version="4.11.0"
