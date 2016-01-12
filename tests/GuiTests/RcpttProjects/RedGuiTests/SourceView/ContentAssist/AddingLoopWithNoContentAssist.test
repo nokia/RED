@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3DFlELkTEeWzJthH3JoEWQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 1/12/16 11:58 AM
+Save-Time: 1/12/16 2:43 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,12 +17,13 @@ with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFile.robot" | double-click
 }
 
-
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
         set-caret-pos 1 19
         key-type "NUMPAD_ENTER" "\\u000D"
         type-text "test 1"
+        key-type Enter
+        type-text "Log  12"
         key-type Enter
         type-text ":For  ${x}  In range  10"
         key-type Enter
@@ -36,13 +37,31 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
+wait 1000
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "test 1\n"
+    + "    Log  12\n"
     + "    :For  ${x}  In range  10\n"
     + "    \\  Log  5\n"
     + "    : FOR  ${y}  in range  1  5\n"
     + "    \\  LOG  ${y}" | verify-true
     
+//check outline   
+get-view Outline | get-tree | get-item "TestFile.robot/Test Cases/test 1/Log" | get-property index | equals 0 
+    | verify-true
+wait 500     
+with [get-view Outline | get-tree] {
+    get-item "TestFile.robot/Test Cases/test 1" | get-property childCount | equals 3 | verify-true
+    get-item "TestFile.robot/Test Cases/test 1" | get-property "getItems().TreeItem[0].getText()" | equals Log 
+        | verify-true
+    get-item "TestFile.robot/Test Cases/test 1" | get-property "getItems().TreeItem[1].getText()" | equals ":For" 
+        | verify-true
+    get-item "TestFile.robot/Test Cases/test 1" | get-property "getItems().TreeItem[2].getText()" | equals ": FOR" 
+        | verify-true
+    get-item "TestFile.robot/Test Cases/test 1/Log" | get-property childCount | equals 0 | verify-true
+    get-item "TestFile.robot/Test Cases/test 1/:For" | get-property childCount | equals 0 | verify-true
+    get-item "TestFile.robot/Test Cases/test 1/: FOR" | get-property childCount | equals 0 | verify-true
+}   
     
 //add tsv
 get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Test Suite" 
@@ -74,15 +93,41 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     type-text "Log"
     key-type Tab
     type-text 66
+    key-type Enter
+    key-type BackSpace
+    type-text SH
+    key-type "M1+SPACE"
+    wait 300
+    key-type Down
+    key-type Enter
+    type-text "${SPACE}"
     key-type "M1+s"
 }
-
+wait 1000
 get-editor "tsv_file.tsv" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "test 2\n"
     + "\t:for\t${z}\tIN\t 855\n"
     + "\t\\\tShould Be Empty\t${z}\n"
     + "\t: fOR\t${i}\tIn Range\t700\t750\n"
-    + "\t\\\tLog\t66" | verify-true
+    + "\t\\\tLog\t66\n"
+    + "\tShould Be Equal\t${SPACE}" | verify-true
     
+//check that outline has only for commands
+get-view Outline | get-tree | get-item "tsv_file.tsv/Test Cases/test 2/:for" | get-property index | equals 0 
+    | verify-true
+wait 2000    
+with [get-view Outline | get-tree] {
+    get-item "tsv_file.tsv/Test Cases/test 2" | get-property "getText()" | equals "test 2" | verify-true
+    get-item "tsv_file.tsv/Test Cases/test 2/:for" | get-property childCount | equals 0 | verify-true
+    get-item "tsv_file.tsv/Test Cases/test 2/: fOR" | get-property childCount | equals 0 | verify-true
     
+    get-item "tsv_file.tsv/Test Cases/test 2" | get-property childCount | equals 3 | verify-true
+    get-item "tsv_file.tsv/Test Cases/test 2" | get-property "getItems().TreeItem[0].getText()" | equals ":for" 
+        | verify-true
+    get-item "tsv_file.tsv/Test Cases/test 2" | get-property "getItems().TreeItem[1].getText()" | equals ": fOR" 
+        | verify-true
+    get-item "tsv_file.tsv/Test Cases/test 2" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "Should Be Equal" | verify-true
+
+}  
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
