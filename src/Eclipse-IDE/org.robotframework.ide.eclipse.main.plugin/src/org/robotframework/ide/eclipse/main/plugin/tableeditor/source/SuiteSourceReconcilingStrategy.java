@@ -84,7 +84,8 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     private void reparseModel() {
         final RobotSuiteFile suiteModel = getSuiteModel();
         suiteModel.reparseEverything(document.get());
-        PlatformUI.getWorkbench().getService(IEventBroker.class).post(RobotModelEvents.REPARSING_DONE, suiteModel);
+        final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        eventBroker.post(RobotModelEvents.REPARSING_DONE, suiteModel);
     }
 
     private void updateFoldingStructure() {
