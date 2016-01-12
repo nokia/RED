@@ -24,6 +24,7 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -86,24 +87,13 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
             return groupedChildren(children).toArray();
         } else if (parentElement instanceof RobotCodeHoldingElement) {
             final List<? extends RobotElement> children = ((RobotElement) parentElement).getChildren();
-            return newArrayList(Iterables.filter(children, new Predicate<RobotElement>() {
-
-                @Override
-                public boolean apply(final RobotElement element) {
-                    if (element instanceof RobotKeywordCall) {
-                        final AModelElement<?> linkedElement = ((RobotKeywordCall) element).getLinkedElement();
-                        return linkedElement != null && linkedElement instanceof RobotExecutableRow<?>
-                                && ((RobotExecutableRow<?>) linkedElement).isExecutable();
-                    }
-                    return false;
-                }
-            })).toArray();
+            return filteredRobotKeywordCalls(children).toArray();
         } else if (parentElement instanceof RobotElement) {
             return ((RobotElement) parentElement).getChildren().toArray();
         }
         return new Object[0];
     }
-
+	
     private List<RobotElement> groupedChildren(final List<? extends RobotElement> children) {
         final List<RobotElement> grouped = new ArrayList<>(children);
         final Multimap<SettingsGroup, RobotSetting> removedElements = LinkedHashMultimap.create();
@@ -122,6 +112,24 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
             grouped.add(new ArtificialGroupingRobotElement(key, new ArrayList<>(removedElements.get(key))));
         }
         return grouped;
+    }
+    
+    private List<RobotElement> filteredRobotKeywordCalls(final List<? extends RobotElement> children) {
+        return newArrayList(Iterables.filter(children, new Predicate<RobotElement>() {
+
+            @Override
+            public boolean apply(final RobotElement element) {
+                if (element instanceof RobotKeywordCall) {
+                    final AModelElement<?> linkedElement = ((RobotKeywordCall) element).getLinkedElement();
+                    if (linkedElement != null && linkedElement instanceof RobotExecutableRow<?>) {
+                        final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
+                        //TODO: checking row type should be done without building line description 
+                        return row.isExecutable() && row.buildLineDescription().getRowType() != ERowType.FOR_CONTINUE;
+                    }
+                }
+                return false;
+            }
+        }));
     }
 
     @Override
