@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _bbykIIlLEeWHhtZu19MBKw
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/9/15 5:28 PM
+Runtime-Version: 2.0.1.201508250612
+Save-Time: 1/13/16 4:25 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -29,10 +29,15 @@ exec-with-options -disableJobWaiting -command {
 	wait 5000
 	
 	//check test name
+	with [get-tab-folder -index 1] {
+    double-click
+   
+}
 	get-view Variables | get-tree | select "${TEST_NAME}"
 	with [get-view Variables | get-tree] {
-	    get-item "${TEST_NAME}" | get-property "values['Name']" | equals "${TEST_NAME}" | verify-true
-	    get-item "${TEST_NAME}" | get-property "values['Value']" | equals "set new variable as global" | verify-true
+	    get-item "${TEST_NAME}" | get-property index | equals 8 | verify-true
+	    get-item "${TEST_NAME}" | get-property "columns[0]" | equals "${TEST_NAME}" | verify-true
+	    get-item "${TEST_NAME}" | get-property "columns[1]" | equals "set new variable as global" | verify-true
 	}
 	//check if in first run background color is white
 	with [get-view Variables | get-tree] {
@@ -68,6 +73,8 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "@{list_for_res}" | get-property "getItems().TreeItem[2].getData().getValue().getValueString()" | equals 3 
 	        | verify-true
 	}
+	get-view Variables | get-tree | select "@{list_from_test}" | double-click
+	wait 500
 	
 	with [get-view Variables | get-tree] {
 	    get-item "@{list_from_test}" | get-property "getItems().TreeItem[0].getText()" | equals "[0]" | verify-true
@@ -195,8 +202,8 @@ exec-with-options -disableJobWaiting -command {
 	with [get-button "Step Into (F5)"] {
 	    click
 	    wait 2000
-	    click
-	    wait 2000
+	    click   //go to 8 line
+	    wait 5000
 	}
 	//varaible replace with new value from main test
 	with [get-view Variables | get-tree] {
@@ -205,10 +212,19 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "${a}" | get-property "values['Name']" | equals "${a}" | verify-true
 	    get-item "${a}" | get-property "values['Value']" | equals "from test" | verify-true
 	}
-	
+	with [get-tab-folder -index 2] {
+	    double-click
+	    get-tab-item Variables | click
+		}
 	//new test
 	get-button "Step Into (F5)" | click
-	wait 1000
+	wait 2000
+	with [get-tab-folder -index 6] {
+	    double-click
+	    get-tab-item Variables | click
+	}
+    
+    get-view Variables | get-tree | select "${TEST_NAME}"
 	with [get-view Variables | get-tree] {
 	    get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[0]" | equals "#FFFF00" | verify-true
 	    get-item "${TEST_NAME}" | get-property "columnsBackgroundColor[1]" | equals "#FFFF00" | verify-true
@@ -248,8 +264,6 @@ exec-with-options -disableJobWaiting -command {
 	with [get-view Variables | get-tree] {
 	    get-item "@{list_from_test}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{list_from_test}/\\[0\\]" | get-property "values['Value']" | equals 7 | verify-true
-	    get-item "@{list_from_test}/\\[0\\]" | get-property "columnsForegroundColor[0]" | equals "#000000" | verify-true
-	    get-item "@{list_from_test}/\\[0\\]" | get-property "columnsForegroundColor[1]" | equals "#000000" | verify-true
 	}
 
 }
