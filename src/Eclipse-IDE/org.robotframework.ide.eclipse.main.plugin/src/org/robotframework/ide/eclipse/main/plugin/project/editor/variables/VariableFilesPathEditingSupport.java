@@ -57,14 +57,14 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
         if (element instanceof ReferencedVariableFile) {
             final VariableFileCreator variableFileCreator = (VariableFileCreator) creator;
             scheduleViewerRefreshAndEditorActivation(
-                    variableFileCreator.modifyExisting((ReferencedVariableFile) element), getColumnShift());
+                    variableFileCreator.modifyExisting((ReferencedVariableFile) element));
         } else {
             super.setValue(element, value);
         }
     }
 
     private static IEventBroker getEventBroker() {
-        return (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        return PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     static class VariableFileCreator extends NewElementsCreator<ReferencedVariableFile> {
