@@ -10,10 +10,13 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+
+import com.google.common.base.Optional;
 
 /**
  * @author mmarzec
@@ -59,14 +62,29 @@ public class VariableNamesSupport {
     
     public static boolean isDefinedVariable(final VariableDeclaration variableDeclaration,
             final Set<String> definedVariablesWithUnifiedNames) {
+        return isDefinedVariable(variableDeclaration.getVariableName().getText(),
+                variableDeclaration.getTypeIdentificator().getText(), definedVariablesWithUnifiedNames);
+    }
 
-        final List<String> possibleVariableDefinitions = extractPossibleVariableDefinitions(variableDeclaration.getVariableName()
-                .getText());
-        final String varTypeIdentificator = variableDeclaration.getTypeIdentificator().getText();
+    public static boolean isDefinedVariable(final String variableName, final String variableTypeIdentificator,
+            final Set<String> definedVariablesWithUnifiedNames) {
+
+        final List<String> possibleVariableDefinitions = extractPossibleVariableDefinitions(variableName);
         for (final String variableDefinition : possibleVariableDefinitions) {
-            if (containsVariable(definedVariablesWithUnifiedNames, varTypeIdentificator, variableDefinition)) {
+            if (containsVariable(definedVariablesWithUnifiedNames, variableTypeIdentificator, variableDefinition)) {
                 return true;
             }
+        }
+        return false;
+    }
+    
+    public static boolean isDefinedVariableInsideComputation(final VariableDeclaration variableDeclaration,
+            final Set<String> definedVariables) {
+        final Optional<TextPosition> variableWithoutComputation = variableDeclaration.getTextWithoutComputation();
+        if (variableWithoutComputation.isPresent()
+                && isDefinedVariable(variableWithoutComputation.get().getText(),
+                        variableDeclaration.getTypeIdentificator().getText(), definedVariables)) {
+            return true;
         }
         return false;
     }
