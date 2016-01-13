@@ -20,6 +20,7 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.Number;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
@@ -230,9 +231,16 @@ class TestCasesTableValidator implements ModelUnitValidator {
                 final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
 
                 for (final VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
-                    if (!variableDeclaration.isDynamic() && !VariableNamesSupport.isDefinedVariable(variableDeclaration, definedVariables)) {
+                    if (!variableDeclaration.isDynamic() 
+                            && !VariableNamesSupport.isDefinedVariable(variableDeclaration, definedVariables)) {
+                        
+                        if (variableDeclaration.getVariableType() instanceof Number
+                                || VariableNamesSupport.isDefinedVariableInsideComputation(variableDeclaration, definedVariables)) {
+                            continue;
+                        }
+                        
                         final String variableName = variableDeclaration.getVariableName().getText();
-                        final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
+                        RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
                                 .formatMessageWith(variableName);
                         final int variableOffset = variableDeclaration.getStartFromFile().getOffset();
                         final ProblemPosition position = new ProblemPosition(variableDeclaration.getStartFromFile()
@@ -247,5 +255,4 @@ class TestCasesTableValidator implements ModelUnitValidator {
             }
         }
     }
-
 }
