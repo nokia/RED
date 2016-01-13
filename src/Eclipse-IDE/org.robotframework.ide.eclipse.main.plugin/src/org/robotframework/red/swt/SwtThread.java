@@ -58,10 +58,6 @@ public class SwtThread {
 
         private boolean isDone = false;
 
-        T getResult() {
-            return result;
-        }
-
         @Override
         public final void run() {
             result = runCalculation();
@@ -96,7 +92,7 @@ public class SwtThread {
 
         @Override
         public T get() throws InterruptedException, ExecutionException {
-            while (!evaluation.isDone) {
+            while (!isDone()) {
                 Thread.sleep(500);
             }
             return evaluation.result;
@@ -109,7 +105,7 @@ public class SwtThread {
             final long start = System.currentTimeMillis();
 
             while (timeoutIsNotReached(start, timeoutInMs)) {
-                if (evaluation.isDone) {
+                if (isDone()) {
                     return evaluation.result;
                 }
                 Thread.sleep(500);
