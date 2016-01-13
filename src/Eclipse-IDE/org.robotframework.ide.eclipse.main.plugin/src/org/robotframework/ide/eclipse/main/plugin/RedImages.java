@@ -5,14 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
 @SuppressWarnings("PMD.GodClass")
 public class RedImages {
+
+    private static final Map<ImageDescriptor, ImageDescriptor> GRAY_IMAGES = new HashMap<>(0);
 
     public static ImageDescriptor getFilterImage() {
         return RedPlugin.getImageDescriptor("resources/filter.png");
@@ -275,11 +278,14 @@ public class RedImages {
      * @return Gray version of image from parameter.
      */
     public static ImageDescriptor getGreyedImage(final ImageDescriptor descriptor) {
-        final Image image = descriptor.createImage();
-        final Image gray = new Image(Display.getCurrent(), image, SWT.IMAGE_GRAY);
-        final ImageDescriptor grayDescriptor = ImageDescriptor.createFromImageData(gray.getImageData());
-        image.dispose();
-        gray.dispose();
-        return grayDescriptor;
+        if (descriptor == null) {
+            return null;
+        }
+        ImageDescriptor grayImage = GRAY_IMAGES.get(descriptor);
+        if (grayImage == null) {
+            grayImage = ImageDescriptor.createWithFlags(descriptor, SWT.IMAGE_GRAY);
+            GRAY_IMAGES.put(descriptor, grayImage);
+        }
+        return grayImage;
     }
 }
