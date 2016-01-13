@@ -16,7 +16,6 @@ import org.robotframework.red.viewers.StructuredContentProvider;
 
 class ImportSettingsContentProvider extends StructuredContentProvider {
 
-    private ElementAddingToken elementAddingToken;
     private final boolean editable;
 
     ImportSettingsContentProvider(final boolean editable) {
@@ -24,18 +23,11 @@ class ImportSettingsContentProvider extends StructuredContentProvider {
     }
 
     @Override
-    public void dispose() {
-        if (elementAddingToken != null) {
-            elementAddingToken.dispose();
-        }
-    }
-
-    @Override
     public Object[] getElements(final Object inputElement) {
         final RobotSettingsSection section = (RobotSettingsSection) inputElement;
         final Object[] elements = getImportElements(section).toArray();
         final Object[] newElements = Arrays.copyOf(elements, elements.length + 1, Object[].class);
-        elementAddingToken = new ElementAddingToken("import", editable);
+        final ElementAddingToken elementAddingToken = new ElementAddingToken("import", editable);
         newElements[elements.length] = elementAddingToken;
         return newElements;
     }
