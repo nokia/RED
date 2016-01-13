@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,6 +18,11 @@ public class ColorsManagerTest {
 
     @Before
     public void beforeTest() {
+        ColorsManager.disposeColors();
+    }
+
+    @After
+    public void afterTest() {
         ColorsManager.disposeColors();
     }
 
