@@ -6,7 +6,8 @@ Bundle-Version: 1.0.0.qualifier
 Fragment-Host: org.robotframework.ide.eclipse.main.plugin;bundle-version="0.5.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-Vendor: Nokia Networks
-Require-Bundle: org.junit;bundle-version="4.11.0"
+Require-Bundle: org.junit;bundle-version="4.11.0",
+ org.eclipse.equinox.event
 Bundle-ClassPath: .,
  lib/assertj-core-2.0.0.jar,
  lib/memoryfilesystem-0.6.4.jar,
