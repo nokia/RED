@@ -10,7 +10,9 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
@@ -45,9 +47,7 @@ public abstract class ElementsAddingEditingSupport extends EditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof ElementAddingToken) {
-            final int indexToActivate = index + getColumnShift();
-            scheduleViewerRefreshAndEditorActivation(creator.createNew(((ElementAddingToken) element).getParent()),
-                    indexToActivate);
+            scheduleViewerRefreshAndEditorActivation(creator.createNew(((ElementAddingToken) element).getParent()));
         }
     }
 
@@ -57,17 +57,26 @@ public abstract class ElementsAddingEditingSupport extends EditingSupport {
 
     // refresh and cell editor activation has to be done in GUI thread but after
     // current cell editor was properly deactivated
-    protected final void scheduleViewerRefreshAndEditorActivation(final Object value, final int cellColumnToActivate) {
-        getViewer().getControl().getDisplay().asyncExec(new Runnable() {
+    protected final void scheduleViewerRefreshAndEditorActivation(final Object value) {
+        final Display display = getViewer().getControl().getDisplay();
+        display.asyncExec(refreshAndEdit(value));
+    }
 
+    @VisibleForTesting
+    Runnable refreshAndEdit(final Object value) {
+        return new Runnable() {
             @Override
             public void run() {
-                getViewer().refresh();
+                final ColumnViewer viewer = getViewer();
+                if (viewer.getControl() != null && viewer.getControl().isDisposed()) {
+                    return;
+                }
+                viewer.refresh();
                 if (value != null) {
-                    getViewer().editElement(value, cellColumnToActivate);
+                    viewer.editElement(value, index + getColumnShift());
                 }
             }
-        });
+        };
     }
 
     public abstract static class NewElementsCreator<T> {
