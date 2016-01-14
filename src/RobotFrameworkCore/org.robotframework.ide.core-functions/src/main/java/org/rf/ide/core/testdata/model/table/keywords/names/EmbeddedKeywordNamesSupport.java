@@ -14,8 +14,10 @@ import java.util.regex.PatternSyntaxException;
  */
 public class EmbeddedKeywordNamesSupport {
 
-    public static boolean matches(final String definitionName, final String potentialUsageName) {
-        return matchesWithLowerCase(definitionName.toLowerCase(), potentialUsageName.toLowerCase());
+    public static boolean matches(final String definitionName, final String occurrenceNameInNormalForm,
+            final String occurrenceNameInEmbeddedForm) {
+        return matchesWithLowerCase(definitionName.toLowerCase(), occurrenceNameInNormalForm.toLowerCase(),
+                occurrenceNameInEmbeddedForm.toLowerCase());
     }
 
     public static boolean startsWith(final String definitionName, final String potentialUsageName) {
@@ -30,8 +32,9 @@ public class EmbeddedKeywordNamesSupport {
         return false;
     }
 
-    private static boolean matchesWithLowerCase(final String definitionName, final String potentialUsageName) {
-        if (definitionName.equals(potentialUsageName)) {
+    private static boolean matchesWithLowerCase(final String definitionName, final String occurrenceNameInNormalForm,
+            final String occurrenceNameInEmbeddedForm) {
+        if (definitionName.equals(occurrenceNameInNormalForm)) {
             return true;
         }
         if (definitionName.indexOf('$') == -1) {
@@ -39,7 +42,7 @@ public class EmbeddedKeywordNamesSupport {
         }
         final String regex = "^" + substituteVariablesWithRegex(definitionName) + "$";
         try {
-            return Pattern.matches(regex, potentialUsageName);
+            return Pattern.matches(regex, occurrenceNameInEmbeddedForm);
         } catch (final PatternSyntaxException e) {
             return false;
         }
@@ -65,6 +68,10 @@ public class EmbeddedKeywordNamesSupport {
         wholeRegex.append(Pattern.quote(definitionName.substring(previousIndex)));
 
         return wholeRegex.toString();
+    }
+    
+    public static boolean hasEmbeddedArguments(final String definitionName) {
+        return Pattern.compile("\\$\\{([^\\}]+)\\}").matcher(definitionName).find();
     }
 
 }

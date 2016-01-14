@@ -16,6 +16,7 @@ import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddPrefixToKeywordUsage;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeKeywordNameFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateKeywordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
@@ -137,6 +138,29 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "There is no keyword to execute specified";
+        }
+    },
+    KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION {
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Given keyword name '%s' is not consistent with keyword definition: %s";
+        }
+        
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new ChangeKeywordNameFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, null),
+                    marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null), marker.getAttribute(
+                            AdditionalMarkerAttributes.SOURCES, "")));
         }
     };
 

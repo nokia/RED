@@ -66,8 +66,9 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final String libraryAlias,
                     final boolean isFromNestedLibrary) {
-                if (QualifiedKeywordName.from(keywordName)
-                        .matchesIgnoringCase(QualifiedKeywordName.create(kwSpec.getName(), libSpec.getName()))) {
+                if (QualifiedKeywordName.fromOccurrence(keywordName).matchesIgnoringCase(
+                        QualifiedKeywordName.create(QualifiedKeywordName.unifyDefinition(kwSpec.getName()),
+                                libSpec.getName()))) {
                     libs.add(libSpec.getName());
                 }
                 return ContinueDecision.CONTINUE;
