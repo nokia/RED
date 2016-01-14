@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IProject;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -177,20 +178,22 @@ public class ValidationContext {
 
                 final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY : KeywordScope.STD_LIBRARY;
                 final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(scope,
-                        libSpec.getName(), libraryAlias, kwSpec.isDeprecated(), isFromNestedLibrary);
-                addAccessibleKeyword(kwSpec.getName().toLowerCase(), keywordValidationContext);
+                        libSpec.getName(), kwSpec.getName(), libraryAlias, kwSpec.isDeprecated(), isFromNestedLibrary);
+                addAccessibleKeyword(QualifiedKeywordName.unifyDefinition(kwSpec.getName()), keywordValidationContext);
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile suiteFile,
-                    final RobotKeywordDefinition keyword) {
+                    final RobotKeywordDefinition kwDefinition) {
                 final KeywordScope scope = file.equals(suiteFile.getFile()) ? KeywordScope.LOCAL
                         : KeywordScope.RESOURCE;
 
                 final KeywordValidationContext keywordValidationContext = new KeywordValidationContext(scope,
-                        Files.getNameWithoutExtension(suiteFile.getName()), "", keyword.isDeprecated(), false);
-                addAccessibleKeyword(keyword.getName().toLowerCase(), keywordValidationContext);
+                        Files.getNameWithoutExtension(suiteFile.getName()), kwDefinition.getName(), "",
+                        kwDefinition.isDeprecated(), false);
+                addAccessibleKeyword(QualifiedKeywordName.unifyDefinition(kwDefinition.getName()),
+                        keywordValidationContext);
                 return ContinueDecision.CONTINUE;
             }
 

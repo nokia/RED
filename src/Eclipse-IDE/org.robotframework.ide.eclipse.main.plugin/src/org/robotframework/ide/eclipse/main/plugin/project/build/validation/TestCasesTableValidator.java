@@ -39,6 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -209,6 +210,17 @@ class TestCasesTableValidator implements ModelUnitValidator {
             reporter.handleProblem(
                     RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY).formatMessageWith(name),
                     file, position);
+        }
+        
+        final KeywordValidationContext keywordValidationContext = validationContext.checkIfKeywordOccurrenceIsEqualToDefinition(name);
+        if (keywordValidationContext != null) {
+            reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
+                    .formatMessageWith(name, keywordValidationContext.getNameFromKeywordDefinition()), file, position,
+                    ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, name,
+                            AdditionalMarkerAttributes.ORIGINAL_NAME,
+                            keywordValidationContext.getNameFromKeywordDefinition(),
+                            AdditionalMarkerAttributes.SOURCES, keywordValidationContext.getSourceNameInUse()));
+
         }
     }
 
