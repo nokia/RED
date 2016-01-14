@@ -199,11 +199,12 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     private String getKeywordHoverInfo(final String keywordName) {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteFile);
         final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
-        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.from(keywordName);
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(keywordName);
 
         for (final RedKeywordProposal proposal : keywordProposals) {
             if (hasEqualSources(qualifiedName.getKeywordSource(), proposal.getSourcePrefix())
-                    && EmbeddedKeywordNamesSupport.matches(proposal.getLabel(), qualifiedName.getKeywordName())) {
+                    && EmbeddedKeywordNamesSupport.matches(QualifiedKeywordName.unifyDefinition(proposal.getLabel()),
+                            qualifiedName.getKeywordName(), qualifiedName.getEmbeddedKeywordName())) {
                 return proposal.getDocumentation();
             }
         }
