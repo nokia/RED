@@ -18,7 +18,7 @@ import com.google.common.base.Optional;
 public class VariableDeclaration extends AContainerOperation {
 
     private final static Pattern COMPUTATION_PATTERN = Pattern
-            .compile("((?!\\s).)+(\\s)*([+]|[-]|[*]|[/]|[:]|[>]|[<])[=]*(\\s)*((?!\\s).)+");
+            .compile("((?!\\s).)+(\\s)*([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|\\^|\\!|[|])+[=]*(\\s)*((?!\\s).)+");
 
     private final static Pattern NUMBER_PATTERN = Pattern.compile("^(//s)*([+]|[-])?(([0-9])+)([.]([0-9])+)?(//s)*$");
 
