@@ -18,7 +18,7 @@ import com.google.common.base.Optional;
 public class VariableComputationHelper {
 
     public final static Pattern COMPUTATION_OPERATION_PATTERN = Pattern
-            .compile("([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|\\^|\\!|[|])+");
+            .compile("([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])+");
 
     public final static Pattern BRACKETS = Pattern.compile("(\\[|\\(|\\)|\\])");
 
