@@ -16,26 +16,53 @@ public final class QualifiedKeywordName {
     private final String name;
 
     private final String source;
+    
+    private String embeddedName;
 
     private QualifiedKeywordName(final String name, final String source) {
         this.name = name;
         this.source = source;
+    }
+    
+    private QualifiedKeywordName(final String name, final String embeddedName, final String source) {
+        this(name, source);
+        this.embeddedName = embeddedName;
     }
 
     public static QualifiedKeywordName create(final String name, final String sourceName) {
         return new QualifiedKeywordName(name, sourceName);
     }
 
-    public static QualifiedKeywordName from(final String wholeName) {
-        final List<String> splitted = Splitter.on('.').splitToList(wholeName);
+    public static QualifiedKeywordName fromOccurrence(final String givenWholeName) {
+        final List<String> splitted = Splitter.on('.').splitToList(givenWholeName);
         final String name = splitted.get(splitted.size() - 1).trim();
         final String source = Joiner.on('.').join(splitted.subList(0, splitted.size() - 1)).trim();
-        return new QualifiedKeywordName(name, source);
+        return new QualifiedKeywordName(unifyDefinition(name), name.toLowerCase(), source);
     }
 
+    public static String unifyDefinition(final String keywordDefinition) {
+        if (keywordDefinition != null) {
+            return EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordDefinition) ? keywordDefinition.toLowerCase()
+                    : keywordDefinition.toLowerCase().replaceAll("_", "").replaceAll(" ", "");
+        }
+        return "";
+    }
+    
+    public static boolean isOccurrenceEqualToDefinition(final String keywordOccurrence, final String keywordDefinition) {
+        if(EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordDefinition)) { // ignore embedded keyword names 
+            return true;
+        }
+        final List<String> splittedOccurrence = Splitter.on('.').splitToList(keywordOccurrence);
+        final String nameInOccurrence = splittedOccurrence.get(splittedOccurrence.size() - 1).trim();
+        return nameInOccurrence.equalsIgnoreCase(keywordDefinition);
+    }
 
     public String getKeywordName() {
         return name;
+    }
+    
+    public String getEmbeddedKeywordName() {
+        return embeddedName;
     }
 
     public String getKeywordSource() {

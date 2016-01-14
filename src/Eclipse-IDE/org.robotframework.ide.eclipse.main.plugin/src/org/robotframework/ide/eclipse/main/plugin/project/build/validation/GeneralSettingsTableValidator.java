@@ -34,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Function;
@@ -190,6 +191,18 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
                 }
+                final KeywordValidationContext keywordValidationContext = validationContext.checkIfKeywordOccurrenceIsEqualToDefinition(keywordName);
+                if (keywordValidationContext != null) {
+                    reporter.handleProblem(
+                            RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
+                                    .formatMessageWith(keywordName,
+                                            keywordValidationContext.getNameFromKeywordDefinition()), file,
+                            keywordToken, ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                                    keywordName, AdditionalMarkerAttributes.ORIGINAL_NAME,
+                                    keywordValidationContext.getNameFromKeywordDefinition(),
+                                    AdditionalMarkerAttributes.SOURCES, keywordValidationContext.getSourceNameInUse()));
+
+                }
             }
         }
     }
@@ -239,6 +252,18 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY)
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
+                }
+                final KeywordValidationContext keywordValidationContext = validationContext.checkIfKeywordOccurrenceIsEqualToDefinition(keywordName);
+                if (keywordValidationContext != null) {
+                    reporter.handleProblem(
+                            RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
+                                    .formatMessageWith(keywordName,
+                                            keywordValidationContext.getNameFromKeywordDefinition()), file,
+                            keywordToken, ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                                    keywordName, AdditionalMarkerAttributes.ORIGINAL_NAME,
+                                    keywordValidationContext.getNameFromKeywordDefinition(),
+                                    AdditionalMarkerAttributes.SOURCES, keywordValidationContext.getSourceNameInUse()));
+
                 }
             }
             if (!template.getUnexpectedTrashArguments().isEmpty()) {

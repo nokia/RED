@@ -91,9 +91,10 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
                     final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
 
-                final QualifiedKeywordName qualifiedName = QualifiedKeywordName.from(name);
+                final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(name);
                 if (hasEqualSources(libSpec, libraryAlias, qualifiedName.getKeywordSource())
-                        && EmbeddedKeywordNamesSupport.matches(kwSpec.getName(), qualifiedName.getKeywordName())) {
+                        && EmbeddedKeywordNamesSupport.matches(QualifiedKeywordName.unifyDefinition(kwSpec.getName()),
+                                qualifiedName.getKeywordName(), qualifiedName.getEmbeddedKeywordName())) {
                     hyperlinks.add(new LibrarySourceHyperlink(fromRegion, suiteFile.getFile().getProject(), libSpec));
                     if (canShowMultipleHyperlinks) {
                         hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
@@ -114,14 +115,16 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             }
 
             @Override
-            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
+            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition kwDefinition) {
 
-                final QualifiedKeywordName qualifiedName = QualifiedKeywordName.from(name);
+                final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(name);
                 if (hasEqualSources(file, qualifiedName.getKeywordSource())
-                        && EmbeddedKeywordNamesSupport.matches(keyword.getName(), qualifiedName.getKeywordName())) {
+                        && EmbeddedKeywordNamesSupport.matches(
+                                QualifiedKeywordName.unifyDefinition(kwDefinition.getName()),
+                                qualifiedName.getKeywordName(), qualifiedName.getEmbeddedKeywordName())) {
 
-                    final KeywordSpecification kwSpec = keyword.createSpecification();
-                    final Position position = keyword.getDefinitionPosition();
+                    final KeywordSpecification kwSpec = kwDefinition.createSpecification();
+                    final Position position = kwDefinition.getDefinitionPosition();
                     final IRegion destination = new Region(position.getOffset(), position.getLength());
 
                     final IHyperlink definitionHyperlink = file == suiteFile

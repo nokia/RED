@@ -112,12 +112,22 @@ public class FileValidationContext {
         final KeywordValidationContext keywordValidationContext = findKeywordValidationContext(keywordName);
         return keywordValidationContext != null && keywordValidationContext.isFromNestedLibrary();
     }
+    
+    public KeywordValidationContext checkIfKeywordOccurrenceIsEqualToDefinition(final String keywordName) {
+        final KeywordValidationContext keywordValidationContext = findKeywordValidationContext(keywordName);
+        if (keywordValidationContext != null
+                && !QualifiedKeywordName.isOccurrenceEqualToDefinition(keywordName,
+                        keywordValidationContext.getNameFromKeywordDefinition())) {
+            return keywordValidationContext;
+        }
+        return null;
+    }
 
     private KeywordValidationContext findKeywordValidationContext(final String name) {
         final Collection<KeywordValidationContext> keywordsContexts = getPossibleContexts(name);
 
         if (keywordsContexts != null) {
-            final QualifiedKeywordName qualifedName = QualifiedKeywordName.from(name);
+            final QualifiedKeywordName qualifedName = QualifiedKeywordName.fromOccurrence(name);
             for (final KeywordValidationContext context : keywordsContexts) {
                 final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
                         .create(qualifedName.getKeywordName(), context.getSourceNameInUse());
@@ -134,7 +144,7 @@ public class FileValidationContext {
 
         final List<KeywordValidationContext> matchingContexts = new ArrayList<>();
         if (keywordsContexts != null) {
-            final QualifiedKeywordName qualifedName = QualifiedKeywordName.from(name);
+            final QualifiedKeywordName qualifedName = QualifiedKeywordName.fromOccurrence(name);
             for (final KeywordValidationContext context : keywordsContexts) {
                 final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
                         .create(qualifedName.getKeywordName(), context.getSourceNameInUse());
@@ -147,25 +157,25 @@ public class FileValidationContext {
     }
 
     private Collection<KeywordValidationContext> getPossibleContexts(final String name) {
-        final QualifiedKeywordName qualifedName = QualifiedKeywordName.from(name);
-        final Collection<KeywordValidationContext> keywordsContexts = getAccessibleKeywords()
-                .get(qualifedName.getKeywordName().toLowerCase());
+        final QualifiedKeywordName qualifedName = QualifiedKeywordName.fromOccurrence(name);
+        final Collection<KeywordValidationContext> keywordsContexts = getAccessibleKeywords().get(
+                qualifedName.getKeywordName());
         if (keywordsContexts != null) {
             final LinkedHashSet<KeywordValidationContext> result = newLinkedHashSet(keywordsContexts);
-            result.addAll(tryWithEmbeddedArguments(qualifedName.getKeywordName()));
+            result.addAll(tryWithEmbeddedArguments(qualifedName.getKeywordName(), qualifedName.getEmbeddedKeywordName()));
             return result;
         } else {
-            return tryWithEmbeddedArguments(qualifedName.getKeywordName());
+            return tryWithEmbeddedArguments(qualifedName.getKeywordName(), qualifedName.getEmbeddedKeywordName());
         }
     }
     
-    private Collection<KeywordValidationContext> tryWithEmbeddedArguments(final String keywordName) {
+    private Collection<KeywordValidationContext> tryWithEmbeddedArguments(final String keywordName, final String embeddedKeywordName) {
         for (final Entry<String, Collection<KeywordValidationContext>> entry : getAccessibleKeywords().entrySet()) {
-            if (EmbeddedKeywordNamesSupport.matches(entry.getKey(), keywordName)) {
+            if (EmbeddedKeywordNamesSupport.matches(entry.getKey(), keywordName, embeddedKeywordName)) {
                 return entry.getValue();
             }
         }
-        return null;
+        return newArrayList();
     }
 
     static final class KeywordValidationContext {
@@ -173,17 +183,20 @@ public class FileValidationContext {
         private final KeywordScope scope;
 
         private final String sourceName;
+        
+        private final String keywordName;
 
         private final String alias;
 
         private final boolean isDeprecated;
 
         private final boolean isFromNestedLibrary;
-
-        KeywordValidationContext(final KeywordScope scope, final String sourceName, final String alias,
+        
+        KeywordValidationContext(final KeywordScope scope, final String sourceName, final String keywordName, final String alias,
                 final boolean isDeprecated, final boolean isFromNestedLibrary) {
             this.scope = scope;
             this.sourceName = sourceName;
+            this.keywordName = keywordName;
             this.alias = alias;
             this.isDeprecated = isDeprecated;
             this.isFromNestedLibrary = isFromNestedLibrary;
@@ -191,6 +204,10 @@ public class FileValidationContext {
 
         String getSourceNameInUse() {
             return alias.isEmpty() ? sourceName : alias;
+        }
+        
+        String getNameFromKeywordDefinition() {
+            return keywordName;
         }
 
         boolean isDeprecated() {
