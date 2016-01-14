@@ -18,7 +18,7 @@ import com.google.common.base.Optional;
 public class VariableComputationHelper {
 
     public final static Pattern COMPUTATION_OPERATION_PATTERN = Pattern
-            .compile("([+]|[-]|[*]|[/]|[:]|[>][=]?|[<][=]?)");
+            .compile("([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[\\^]|[\\!]|[|])+");
 
     public final static Pattern BRACKETS = Pattern.compile("(\\[|\\(|\\)|\\])");
 
@@ -41,8 +41,11 @@ public class VariableComputationHelper {
                             break;
                         }
                     } else {
-                        text = Optional.of(new TextPosition(variableName.getFullText(), variableName.getStart(),
-                                variableName.getStart() + lastReadCharacter + s.length() - 1));
+                        int firstNotWhiteSpace = getFirstNotWhitespaceCharacter(s, 0);
+                        int textLength = s.trim().length();
+                        text = Optional.of(new TextPosition(variableName.getFullText(),
+                                variableName.getStart() + firstNotWhiteSpace,
+                                variableName.getStart() + firstNotWhiteSpace + textLength - 1));
                     }
                 }
 
@@ -51,6 +54,21 @@ public class VariableComputationHelper {
         }
 
         return text;
+    }
+
+    @VisibleForTesting
+    protected int getFirstNotWhitespaceCharacter(final String text, int beginChar) {
+        int index = -1;
+        char[] chars = text.toCharArray();
+        for (int i = beginChar; i < chars.length; i++) {
+            char c = chars[i];
+            if (c != ' ' && c != '\t') {
+                index = i;
+                break;
+            }
+        }
+
+        return index;
     }
 
     @VisibleForTesting
