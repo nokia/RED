@@ -19,13 +19,12 @@ import com.google.common.base.Optional;
 public class DocumentUtilitiesTest {
 
     @Test
-    public void whenOffsetHitsTheVariable_thenItsRegionIsReturned() throws BadLocationException {
-        final IDocument document = new Document("cell  ${var}  cell");
+    public void whenOffsetHitsOutsideTheCell_nothingIsReturned() throws BadLocationException {
+        final IDocument document = new Document("cell   ${var}   cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 9);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 14);
 
-        assertThat(variableRegion.isPresent()).isTrue();
-        assertThat(variableRegion.get()).isEqualTo(new Region(6, 6));
+        assertThat(variableRegion.isPresent()).isFalse();
     }
 
     @Test
@@ -35,6 +34,34 @@ public class DocumentUtilitiesTest {
         final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 8);
 
         assertThat(variableRegion.isPresent()).isFalse();
+    }
+
+    @Test
+    public void whenOffsetHitsInvalidVariable_nothingIsReturned_1() throws BadLocationException {
+        final IDocument document = new Document("cell  ${var  cell");
+
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 9);
+
+        assertThat(variableRegion.isPresent()).isFalse();
+    }
+
+    @Test
+    public void whenOffsetHitsInvalidVariable_nothingIsReturned_2() throws BadLocationException {
+        final IDocument document = new Document("cell  var}  cell");
+
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 7);
+
+        assertThat(variableRegion.isPresent()).isFalse();
+    }
+
+    @Test
+    public void whenOffsetHitsTheVariable_thenItsRegionIsReturned() throws BadLocationException {
+        final IDocument document = new Document("cell  ${var}  cell");
+
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 9);
+
+        assertThat(variableRegion.isPresent()).isTrue();
+        assertThat(variableRegion.get()).isEqualTo(new Region(6, 6));
     }
 
     @Test
@@ -86,4 +113,83 @@ public class DocumentUtilitiesTest {
         assertThat(variableRegion.get()).isEqualTo(new Region(17, 6));
     }
 
+    @Test
+    public void snippetIsAbsentWhenTryingToGetNegativeNumberOfLines() throws BadLocationException {
+        final IDocument document = new Document("line1", "line2", "line3", "line4", "line5");
+
+        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 12, -1);
+
+        assertThat(snippet.isPresent()).isFalse();
+    }
+
+    @Test
+    public void snippetIsAbsentWhenTryingToGetLinesBeforeContent() throws BadLocationException {
+        final IDocument document = new Document("line1", "line2", "line3", "line4", "line5");
+
+        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, -10, 1);
+
+        assertThat(snippet.isPresent()).isFalse();
+    }
+
+    @Test
+    public void snippetIsAbsentWhenTryingToGetLinesAfterContent() throws BadLocationException {
+        final IDocument document = new Document("line1", "line2", "line3", "line4", "line5");
+
+        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 50, 1);
+
+        assertThat(snippet.isPresent()).isFalse();
+    }
+
+    @Test
+    public void snippetContainsLinesAroundGivenOne_1() throws BadLocationException {
+        final IDocument document = new Document("line1", "line2", "line3", "line4", "line5");
+
+        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 12, 0);
+
+        assertThat(snippet.isPresent()).isTrue();
+        assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength())).isEqualTo("line3");
+    }
+
+    @Test
+    public void snippetContainsLinesAroundGivenOne_2() throws BadLocationException {
+        final IDocument document = new Document("line1", "line2", "line3", "line4", "line5");
+
+        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 12, 1);
+
+        assertThat(snippet.isPresent()).isTrue();
+        assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength())).isEqualTo("line2\nline3\nline4");
+    }
+
+    @Test
+    public void snippetContainsLinesAroundGivenOne_3() throws BadLocationException {
+        final IDocument document = new Document("line1", "line2", "line3", "line4", "line5");
+
+        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 7, 2);
+
+        assertThat(snippet.isPresent()).isTrue();
+        assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength()))
+                .isEqualTo("line1\nline2\nline3\nline4");
+    }
+
+    @Test
+    public void snippetContainsLinesAroundGivenOne_4() throws BadLocationException {
+        final IDocument document = new Document("line1", "line2", "line3", "line4", "line5");
+
+        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 17, 2);
+
+        assertThat(snippet.isPresent()).isTrue();
+        assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength()))
+                .isEqualTo("line2\nline3\nline4\nline5");
+    }
+
+    @Test
+    public void cellSeparatorNumber_isProperlyCounted() {
+        assertThat(DocumentUtilities.getNumberOfCellSeparators("")).isEqualTo(0);
+        assertThat(DocumentUtilities.getNumberOfCellSeparators("  c")).isEqualTo(1);
+        assertThat(DocumentUtilities.getNumberOfCellSeparators("\tc")).isEqualTo(1);
+        assertThat(DocumentUtilities.getNumberOfCellSeparators("| c")).isEqualTo(1);
+        assertThat(DocumentUtilities.getNumberOfCellSeparators("c | c")).isEqualTo(1);
+        assertThat(DocumentUtilities.getNumberOfCellSeparators("c\tc\tc\t")).isEqualTo(3);
+        assertThat(DocumentUtilities.getNumberOfCellSeparators("cell content")).isEqualTo(0);
+    }
 }
