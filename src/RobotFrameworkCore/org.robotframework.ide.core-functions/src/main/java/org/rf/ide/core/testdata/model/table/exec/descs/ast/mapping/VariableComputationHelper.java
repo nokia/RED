@@ -12,11 +12,12 @@ import java.util.regex.Pattern;
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.GeneralVariableType;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 public class VariableComputationHelper {
 
-    private final static Pattern COMPUTATION_OPERATION_PATTERN = Pattern
+    public final static Pattern COMPUTATION_OPERATION_PATTERN = Pattern
             .compile("([+]|[-]|[*]|[/]|[:]|[>][=]?|[<][=]?)");
 
     public Optional<TextPosition> extractVariableName(final VariableDeclaration variableDec) {
@@ -38,8 +39,8 @@ public class VariableComputationHelper {
                             break;
                         }
                     } else {
-                        text = Optional.of(new TextPosition(variableName.getFullText(),
-                                variableName.getFullText().indexOf('{') + 1, lastReadCharacter + s.length() + 1));
+                        text = Optional.of(new TextPosition(variableName.getFullText(), variableName.getStart(),
+                                variableName.getStart() + lastReadCharacter + s.length() - 1));
                     }
                 }
 
@@ -50,7 +51,8 @@ public class VariableComputationHelper {
         return text;
     }
 
-    private boolean isBracketToken(final String s) {
+    @VisibleForTesting
+    protected boolean isBracketToken(final String s) {
         return "[".equals(s) || "]".equals(s) || "(".equals(s) || ")".equals(s);
     }
 }
