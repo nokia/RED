@@ -1,0 +1,182 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Qxs1YJ2WEeWVv_UItyy1RQ,_u8fMELqtEeW29Kbu_epUIA
+Element-Name: ContentAssistForPythonVariables
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _88Mx8J2SEeWVv_UItyy1RQ
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 1/14/16 12:40 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "VariableProject/tsv_test.tsv" | double-click
+
+//adding Settings
+with [get-editor "tsv_test.tsv" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type "M1+a"
+    key-type Del
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    type-text Va
+    key-type "M1+SPACE"
+    key-type Enter
+    wait 500
+}
+//check list of files
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "VariableProject/var.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "VariableProject/var 3.py" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "VariableProject/var 2.py" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "VariableProject/space in name/var here .py" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "VariableProject/space in name/after  .py" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "VariableProject/space in name/ def.py" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "VariableProject/space in name/ abc.py" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "VariableProject/getVar.py" | verify-true
+    
+    //check variables below
+    get-property "getItems().TableItem[8].getText()" | equals "${a}" | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals "${sumof2digit}" | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals "&{mapfromvar3}" | verify-true
+    
+
+}
+//check if autmatic var ar in list
+check-automatic-variables -start_index 11
+
+get-eclipse-window | key-type "TRAVERSE_ESCAPE"
+get-eclipse-window | key-type ESC
+
+
+//add Varibale files
+with [get-editor "tsv_test.tsv" | get-text-viewer] {
+    set-caret-pos 2 13
+    key-type "M1+SPACE"
+}
+//var.py
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "VariableProject\\/var.py" 
+    | click -default
+with [get-editor "tsv_test.tsv" | get-text-viewer] {
+	//var3.py
+    key-type Enter
+    type-text var
+    key-type "M1+SPACE"
+    key-type Enter
+    wait 500
+    key-type Down
+    key-type Enter -times 2
+    
+    //space in name/var here .py
+    type-text Var
+    key-type "M1+SPACE"
+    key-type Enter
+    wait 500
+    key-type Down -times 3
+    key-type Enter -times 2
+    
+    //space in name/ def.py
+    type-text Var
+    key-type "M1+SPACE"
+    key-type Enter
+}
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "VariableProject\\/space in name\\/ def.py" | click -default
+
+//wait for adding variables to content assist
+wait 3000
+    
+//adding test case    
+with [get-editor "tsv_test.tsv" | get-text-viewer] {
+    key-type "NUMPAD_ENTER" "\\u000D" -times 2
+    key-type "M1+SPACE"
+    wait 500
+    key-type Down -times 2
+    key-type Enter
+    type-text "test 1"
+    key-type Enter
+    type-text "Log  $"
+    key-type "M1+SPACE"
+}
+
+
+//check varibales (double var are becasue "var 3.py" is in red.xml)
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "${aerosmith}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "${a}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${a}" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "${a}" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "${b}" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "${nirvava}" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "${sumof2digit}" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "${sumof2digit}" | verify-true
+}
+
+check-automatic-variables -start_index 8
+
+
+//check yellow window
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${a}"
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals "Source: var.py\n"
+    + "Value: 5" | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select [get-item "${a}" -index 1]
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals "Source: var 3.py\n"
+    + "Value: from var 3" | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select [get-item "${a}" -index 2]
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals "Source: VariableProject/var 3.py\n"
+    + "Value: from var 3" | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${sumof2digit}"
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals "Source: var 3.py\n"
+    + "Value: 12" | verify-true   
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select [get-item "${sumof2digit}" 
+    -index 1]
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals "Source: VariableProject/var 3.py\n"
+    + "Value: 12" | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${aerosmith}"
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals "Source: space in name/ def.py\n"
+    + "Value: 9" | verify-true
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "${nirvava}"
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals "Source: space in name/var here .py\n"
+    + "Value: 99" | verify-true
+
+
+with [get-editor "tsv_test.tsv"] {
+    get-canvas | key-type "TRAVERSE_ESCAPE"
+    with [get-text-viewer] {
+        key-type ESC
+        key-type BackSpace
+        type-text "@"
+        key-type "M1+SPACE"
+    }
+}
+
+//check lists
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 4 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "@{doors}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "@{listfromvar}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "@{EMPTY}" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "@{TEST_TAGS}" | verify-true
+}
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
