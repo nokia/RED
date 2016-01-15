@@ -14,10 +14,9 @@ import java.util.regex.PatternSyntaxException;
  */
 public class EmbeddedKeywordNamesSupport {
 
-    public static boolean matches(final String definitionName, final String occurrenceNameInNormalForm,
-            final String occurrenceNameInEmbeddedForm) {
-        return matchesWithLowerCase(definitionName.toLowerCase(), occurrenceNameInNormalForm.toLowerCase(),
-                occurrenceNameInEmbeddedForm.toLowerCase());
+    public static boolean matches(final String definitionName, final QualifiedKeywordName occurrenceQualifiedName) {
+        return matchesWithLowerCase(definitionName.toLowerCase(), occurrenceQualifiedName.getKeywordName()
+                .toLowerCase(), occurrenceQualifiedName.getEmbeddedKeywordName().toLowerCase());
     }
 
     public static boolean startsWith(final String definitionName, final String potentialUsageName) {
