@@ -157,21 +157,21 @@ public class FileValidationContext {
     }
 
     private Collection<KeywordValidationContext> getPossibleContexts(final String name) {
-        final QualifiedKeywordName qualifedName = QualifiedKeywordName.fromOccurrence(name);
+        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(name);
         final Collection<KeywordValidationContext> keywordsContexts = getAccessibleKeywords().get(
-                qualifedName.getKeywordName());
+                qualifiedName.getKeywordName());
         if (keywordsContexts != null) {
             final LinkedHashSet<KeywordValidationContext> result = newLinkedHashSet(keywordsContexts);
-            result.addAll(tryWithEmbeddedArguments(qualifedName.getKeywordName(), qualifedName.getEmbeddedKeywordName()));
+            result.addAll(tryWithEmbeddedArguments(qualifiedName));
             return result;
         } else {
-            return tryWithEmbeddedArguments(qualifedName.getKeywordName(), qualifedName.getEmbeddedKeywordName());
+            return tryWithEmbeddedArguments(qualifiedName);
         }
     }
     
-    private Collection<KeywordValidationContext> tryWithEmbeddedArguments(final String keywordName, final String embeddedKeywordName) {
+    private Collection<KeywordValidationContext> tryWithEmbeddedArguments(final QualifiedKeywordName qualifiedName) {
         for (final Entry<String, Collection<KeywordValidationContext>> entry : getAccessibleKeywords().entrySet()) {
-            if (EmbeddedKeywordNamesSupport.matches(entry.getKey(), keywordName, embeddedKeywordName)) {
+            if (EmbeddedKeywordNamesSupport.matches(entry.getKey(), qualifiedName)) {
                 return entry.getValue();
             }
         }

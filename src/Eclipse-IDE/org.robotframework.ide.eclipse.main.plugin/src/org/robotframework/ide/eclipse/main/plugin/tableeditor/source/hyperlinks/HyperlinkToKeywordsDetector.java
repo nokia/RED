@@ -94,7 +94,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                 final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(name);
                 if (hasEqualSources(libSpec, libraryAlias, qualifiedName.getKeywordSource())
                         && EmbeddedKeywordNamesSupport.matches(QualifiedKeywordName.unifyDefinition(kwSpec.getName()),
-                                qualifiedName.getKeywordName(), qualifiedName.getEmbeddedKeywordName())) {
+                                qualifiedName)) {
                     hyperlinks.add(new LibrarySourceHyperlink(fromRegion, suiteFile.getFile().getProject(), libSpec));
                     if (canShowMultipleHyperlinks) {
                         hyperlinks.add(new LibraryKeywordHyperlink(fromRegion, kwSpec));
@@ -120,8 +120,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                 final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(name);
                 if (hasEqualSources(file, qualifiedName.getKeywordSource())
                         && EmbeddedKeywordNamesSupport.matches(
-                                QualifiedKeywordName.unifyDefinition(kwDefinition.getName()),
-                                qualifiedName.getKeywordName(), qualifiedName.getEmbeddedKeywordName())) {
+                                QualifiedKeywordName.unifyDefinition(kwDefinition.getName()), qualifiedName)) {
 
                     final KeywordSpecification kwSpec = kwDefinition.createSpecification();
                     final Position position = kwDefinition.getDefinitionPosition();
