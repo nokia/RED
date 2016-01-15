@@ -1,0 +1,22 @@
+#Test Name, Text Input, Variable Name Start Position, Variable Name Output, Is computation
+only_variable_without_computation,${var},2,var,false
+variable_minus_one,${value - 1},2,value,true
+variable_times_ten,${SPACE * 10},2,SPACE,true
+variable_minus_square_operation,${value-(1-1)},2,value,true
+variable_plus_one,${value+1},2,value,true
+variable_div_one,${value/1},2,value,true
+variable_xor_one,${value^1},2,value,true
+variable_slash_slash_three,${value//3},2,value,true
+variable_pipe_ten,${value | 10},2,value,true
+variable_square_three,${value ** 3},2,value,true
+variable_shift_left,${value<<3},2,value,true
+variable_modulo_three,${value%3},2,value,true
+variable_shift_right,${value>>3},2,value,true
+variable_check_is_greater,${value>3},2,value,true
+variable_check_is_less,${value<3},2,value,true
+variable_check_is_greater_eq,${value>=3},2,value,true
+variable_check_is_less_eq,${value<=3},2,value,true
+variable_check_is_eq,${value==3},2,value,true
+only_computation_without_variable,${2-2},0,,false
+variable_as_bracket,${(-2-3)},2,(,true
+variable_computation_with_spaces_check,${var + (2+2)},2,var,true
