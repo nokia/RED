@@ -20,7 +20,7 @@ public class VariableComputationHelper {
     public final static Pattern COMPUTATION_OPERATION_PATTERN = Pattern
             .compile("([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])+");
 
-    public final static Pattern BRACKETS = Pattern.compile("(\\[|\\(|\\)|\\])");
+    public final static Pattern BRACKETS = Pattern.compile("(\\[|\\(|\\)|\\])+");
 
     public Optional<TextPosition> extractVariableName(final VariableDeclaration variableDec) {
         Optional<TextPosition> text = Optional.absent();
@@ -75,10 +75,14 @@ public class VariableComputationHelper {
     protected boolean isBracketDecorated(final String s) {
         List<String> bracket = Arrays.asList(BRACKETS.split(s));
         boolean result = !bracket.isEmpty();
+        if (!result) {
+            result = BRACKETS.matcher(s).matches();
+        }
         for (final String value : bracket) {
             try {
-                if (!value.isEmpty()) {
-                    Double.parseDouble(value);
+                String checkValue = value.trim();
+                if (!checkValue.isEmpty()) {
+                    Double.parseDouble(checkValue);
                 }
             } catch (final NumberFormatException nfe) {
                 result = false;
