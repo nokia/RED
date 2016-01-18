@@ -24,6 +24,8 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
 
     private final List<RobotToken> arguments = new ArrayList<>();
 
+    private final List<RobotToken> comments = new ArrayList<>();
+
     public RobotExecutableRow() {
         this.action = new RobotToken();
     }
@@ -42,6 +44,14 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
 
     public void addArgument(final RobotToken argument) {
         arguments.add(argument);
+    }
+
+    public List<RobotToken> getComment() {
+        return Collections.unmodifiableList(comments);
+    }
+
+    public void addComment(final RobotToken commentWord) {
+        this.comments.add(commentWord);
     }
 
     @Override
@@ -78,6 +88,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
         final List<RobotToken> tokens = new ArrayList<>();
         tokens.add(getAction());
         tokens.addAll(getArguments());
+        tokens.addAll(getComment());
 
         return tokens;
     }
