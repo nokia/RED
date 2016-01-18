@@ -12,8 +12,8 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
 
 public class SettingResourceCommentMapper implements IHashCommentMapper {
 
@@ -22,10 +22,9 @@ public class SettingResourceCommentMapper implements IHashCommentMapper {
         return (state == ParsingState.SETTING_RESOURCE_IMPORT);
     }
 
-
     @Override
-    public void map(RobotToken rt, ParsingState currentState,
-            RobotFile fileModel) {
+    public void map(final RobotLine currentLine, final RobotToken rt, final ParsingState currentState,
+            final RobotFile fileModel) {
         List<AImported> imports = fileModel.getSettingTable().getImports();
         if (!imports.isEmpty()) {
             AImported aImported = imports.get(imports.size() - 1);

@@ -48,12 +48,12 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class HashCommentMapper implements IParsingMapper {
 
     private final ParsingStateHelper stateHelper;
 
     private static final List<IHashCommentMapper> COMMENT_MAPPERS = new ArrayList<>();
+
     static {
         COMMENT_MAPPERS.add(new TableHeaderCommentMapper());
         COMMENT_MAPPERS.add(new SettingLibraryCommentMapper());
@@ -84,17 +84,13 @@ public class HashCommentMapper implements IParsingMapper {
         COMMENT_MAPPERS.add(new UserKeywordSettingTimeoutCommentMapper());
     }
 
-
     public HashCommentMapper() {
         this.stateHelper = new ParsingStateHelper();
     }
 
-
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         boolean addToStack = false;
         rt.setRaw(text);
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
@@ -108,7 +104,7 @@ public class HashCommentMapper implements IParsingMapper {
         final RobotFile fileModel = robotFileOutput.getFileModel();
         final IHashCommentMapper commentMapper = findApplicableMapper(commentHolder);
         if (commentHolder != ParsingState.TRASH || commentMapper != null) {
-            commentMapper.map(rt, commentHolder, fileModel);
+            commentMapper.map(currentLine, rt, commentHolder, fileModel);
         }
 
         if (addToStack) {
@@ -117,7 +113,6 @@ public class HashCommentMapper implements IParsingMapper {
 
         return rt;
     }
-
 
     @VisibleForTesting
     public IHashCommentMapper findApplicableMapper(final ParsingState state) {
@@ -132,15 +127,12 @@ public class HashCommentMapper implements IParsingMapper {
         return mapperApplicable;
     }
 
-
     @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
 
-        final ParsingState nearestState = stateHelper
-                .getCurrentStatus(processingState);
+        final ParsingState nearestState = stateHelper.getCurrentStatus(processingState);
         if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             if (isInsideTestCase(nearestState) || isInsideKeyword(nearestState)) {
                 result = false;
@@ -156,24 +148,20 @@ public class HashCommentMapper implements IParsingMapper {
         return result;
     }
 
-
     @VisibleForTesting
     protected boolean isInsideTestCase(final ParsingState state) {
-        return (state == ParsingState.TEST_CASE_INSIDE_ACTION
-                || state == ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT || state == ParsingState.TEST_CASE_DECLARATION);
+        return (state == ParsingState.TEST_CASE_INSIDE_ACTION || state == ParsingState.TEST_CASE_INSIDE_ACTION_ARGUMENT
+                || state == ParsingState.TEST_CASE_DECLARATION);
     }
-
 
     @VisibleForTesting
     protected boolean isInsideKeyword(final ParsingState state) {
-        return (state == ParsingState.KEYWORD_INSIDE_ACTION
-                || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT || state == ParsingState.KEYWORD_DECLARATION);
+        return (state == ParsingState.KEYWORD_INSIDE_ACTION || state == ParsingState.KEYWORD_INSIDE_ACTION_ARGUMENT
+                || state == ParsingState.KEYWORD_DECLARATION);
     }
 
-
     @VisibleForTesting
-    protected ParsingState findNearestCommentDeclaringModelElement(
-            final Stack<ParsingState> processingState) {
+    protected ParsingState findNearestCommentDeclaringModelElement(final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.TRASH;
 
         final int capacity = processingState.size();
