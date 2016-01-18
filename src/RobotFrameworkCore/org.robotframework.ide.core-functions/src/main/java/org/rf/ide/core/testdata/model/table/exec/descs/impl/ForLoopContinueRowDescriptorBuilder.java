@@ -29,7 +29,8 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
     @Override
     public <T> AcceptResult acceptable(final RobotExecutableRow<T> execRowLine) {
         AcceptResult result = new AcceptResult(false);
-        final String text = execRowLine.getAction().getText().toString();
+        RobotToken action = execRowLine.getAction();
+        final String text = action.getText().toString();
         if (text != null) {
             final String trimmed = text.trim();
             if (RobotTokenType.FOR_CONTINUE_TOKEN.getRepresentation().get(0).equalsIgnoreCase(trimmed)
@@ -44,7 +45,8 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
 
     private <T> boolean isTsv(final RobotExecutableRow<T> execRowLine) {
         @SuppressWarnings("unchecked")
-        final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> keywordOrTest = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) execRowLine.getParent();
+        final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> keywordOrTest = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) execRowLine
+                .getParent();
         AModelElement<? extends ARobotSectionTable> keywordOrTestAsTableElement = keywordOrTest.getHolder();
         ARobotSectionTable table = keywordOrTestAsTableElement.getParent();
         RobotFile model = table.getParent();
@@ -97,11 +99,21 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         rowWithoutLoopContinue.setAction(lineElements.get(1));
         rowWithoutLoopContinue.setParent(execRowLine.getParent());
         final int size = lineElements.size();
+        boolean mapToComment = false;
         for (int index = 2; index < size; index++) {
-            rowWithoutLoopContinue.addArgument(lineElements.get(index));
+            RobotToken lineElement = lineElements.get(index);
+            if (lineElement.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                mapToComment = true;
+            }
+
+            if (mapToComment) {
+                rowWithoutLoopContinue.addComment(lineElement);
+            } else {
+                rowWithoutLoopContinue.addArgument(lineElement);
+            }
         }
-        final IExecutableRowDescriptor<T> buildDescription = new SimpleRowDescriptorBuilder().buildDescription(
-                rowWithoutLoopContinue, new AcceptResult(true));
+        final IExecutableRowDescriptor<T> buildDescription = new SimpleRowDescriptorBuilder()
+                .buildDescription(rowWithoutLoopContinue, new AcceptResult(true));
         forContinueDesc.setKeywordAction(buildDescription.getAction());
         forContinueDesc.addCreatedVariables(buildDescription.getCreatedVariables());
         forContinueDesc.addMessages(buildDescription.getMessages());
@@ -113,13 +125,17 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
     private <T> int getForLoopDeclarationLine(final RobotExecutableRow<T> execRowLine) {
         int forLine = -1;
 
-        final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> keywordOrTest = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) execRowLine.getParent();
-        final List<RobotExecutableRow<AModelElement<? extends ARobotSectionTable>>> executionContext = keywordOrTest.getExecutionContext();
+        final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> keywordOrTest = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) execRowLine
+                .getParent();
+        final List<RobotExecutableRow<AModelElement<? extends ARobotSectionTable>>> executionContext = keywordOrTest
+                .getExecutionContext();
         final int myLineNumber = getMyLineIndex(executionContext, execRowLine);
         if (myLineNumber >= 0) {
             for (int lineNumber = myLineNumber - 1; lineNumber >= 0; lineNumber--) {
-                final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> row = executionContext.get(lineNumber);
-                final IExecutableRowDescriptor<AModelElement<? extends ARobotSectionTable>> lineDescription = row.buildLineDescription();
+                final RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> row = executionContext
+                        .get(lineNumber);
+                final IExecutableRowDescriptor<AModelElement<? extends ARobotSectionTable>> lineDescription = row
+                        .buildLineDescription();
                 final IRowType rowType = lineDescription.getRowType();
                 if (rowType == ERowType.FOR) {
                     forLine = lineNumber;

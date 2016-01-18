@@ -55,7 +55,13 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
         }
 
         RobotExecutableRow<TestCase> row = new RobotExecutableRow<TestCase>();
-        row.setAction(rt);
+        if (text.startsWith("#")) {
+            types.remove(RobotTokenType.TEST_CASE_ACTION_NAME);
+            types.add(0, RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
+            row.addComment(rt);
+        } else {
+            row.setAction(rt);
+        }
         testCase.addTestExecutionRow(row);
 
         processingState.push(ParsingState.TEST_CASE_INSIDE_ACTION);
