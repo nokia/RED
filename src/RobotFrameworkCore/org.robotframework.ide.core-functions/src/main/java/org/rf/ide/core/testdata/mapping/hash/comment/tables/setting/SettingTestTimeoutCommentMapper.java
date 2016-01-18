@@ -11,23 +11,21 @@ import org.rf.ide.core.testdata.mapping.IHashCommentMapper;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
 
 public class SettingTestTimeoutCommentMapper implements IHashCommentMapper {
 
     @Override
     public boolean isApplicable(ParsingState state) {
-        return (state == ParsingState.SETTING_TEST_TIMEOUT
-                || state == ParsingState.SETTING_TEST_TIMEOUT_VALUE || state == ParsingState.SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS);
+        return (state == ParsingState.SETTING_TEST_TIMEOUT || state == ParsingState.SETTING_TEST_TIMEOUT_VALUE
+                || state == ParsingState.SETTING_TEST_TIMEOUT_MESSAGE_ARGUMENTS);
     }
 
-
     @Override
-    public void map(RobotToken rt, ParsingState currentState,
-            RobotFile fileModel) {
-        List<TestTimeout> testTimeouts = fileModel.getSettingTable()
-                .getTestTimeouts();
+    public void map(final RobotLine currentLine, final RobotToken rt, final ParsingState currentState,
+            final RobotFile fileModel) {
+        List<TestTimeout> testTimeouts = fileModel.getSettingTable().getTestTimeouts();
         if (!testTimeouts.isEmpty()) {
             TestTimeout testTimeout = testTimeouts.get(testTimeouts.size() - 1);
             testTimeout.addCommentPart(rt);
