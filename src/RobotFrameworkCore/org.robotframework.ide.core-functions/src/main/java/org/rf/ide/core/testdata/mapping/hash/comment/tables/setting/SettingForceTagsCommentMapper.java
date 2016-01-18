@@ -11,8 +11,8 @@ import org.rf.ide.core.testdata.mapping.IHashCommentMapper;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
 
 public class SettingForceTagsCommentMapper implements IHashCommentMapper {
 
@@ -21,12 +21,10 @@ public class SettingForceTagsCommentMapper implements IHashCommentMapper {
         return (state == ParsingState.SETTING_FORCE_TAGS || state == ParsingState.SETTING_FORCE_TAGS_TAG_NAME);
     }
 
-
     @Override
-    public void map(RobotToken rt, ParsingState currentState,
-            RobotFile fileModel) {
-        List<ForceTags> suiteForceTags = fileModel.getSettingTable()
-                .getForceTags();
+    public void map(final RobotLine currentLine, final RobotToken rt, final ParsingState currentState,
+            final RobotFile fileModel) {
+        List<ForceTags> suiteForceTags = fileModel.getSettingTable().getForceTags();
         if (!suiteForceTags.isEmpty()) {
             ForceTags forceTags = suiteForceTags.get(suiteForceTags.size() - 1);
             forceTags.addCommentPart(rt);

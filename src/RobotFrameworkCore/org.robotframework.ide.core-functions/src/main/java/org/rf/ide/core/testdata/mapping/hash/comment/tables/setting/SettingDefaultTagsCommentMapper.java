@@ -11,8 +11,8 @@ import org.rf.ide.core.testdata.mapping.IHashCommentMapper;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
 
 public class SettingDefaultTagsCommentMapper implements IHashCommentMapper {
 
@@ -21,15 +21,12 @@ public class SettingDefaultTagsCommentMapper implements IHashCommentMapper {
         return (state == ParsingState.SETTING_DEFAULT_TAGS || state == ParsingState.SETTING_DEFAULT_TAGS_TAG_NAME);
     }
 
-
     @Override
-    public void map(RobotToken rt, ParsingState currentState,
-            RobotFile fileModel) {
-        List<DefaultTags> suiteDefaultTags = fileModel.getSettingTable()
-                .getDefaultTags();
+    public void map(final RobotLine currentLine, final RobotToken rt, final ParsingState currentState,
+            final RobotFile fileModel) {
+        List<DefaultTags> suiteDefaultTags = fileModel.getSettingTable().getDefaultTags();
         if (!suiteDefaultTags.isEmpty()) {
-            DefaultTags defaultTags = suiteDefaultTags.get(suiteDefaultTags
-                    .size() - 1);
+            DefaultTags defaultTags = suiteDefaultTags.get(suiteDefaultTags.size() - 1);
             defaultTags.addCommentPart(rt);
         } else {
             // FIXME: errors internal
