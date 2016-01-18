@@ -96,10 +96,16 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
     private <T> void mapRestOfForLoopContinue(final RobotExecutableRow<T> execRowLine,
             final ForLoopContinueRowDescriptor<T> forContinueDesc, final List<RobotToken> lineElements) {
         final RobotExecutableRow<T> rowWithoutLoopContinue = new RobotExecutableRow<>();
-        rowWithoutLoopContinue.setAction(lineElements.get(1));
+        boolean mapToComment = false;
+        RobotToken robotToken = lineElements.get(1);
+        if (robotToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+            mapToComment = true;
+            rowWithoutLoopContinue.addComment(robotToken);
+        } else {
+            rowWithoutLoopContinue.setAction(robotToken);
+        }
         rowWithoutLoopContinue.setParent(execRowLine.getParent());
         final int size = lineElements.size();
-        boolean mapToComment = false;
         for (int index = 2; index < size; index++) {
             RobotToken lineElement = lineElements.get(index);
             if (lineElement.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {

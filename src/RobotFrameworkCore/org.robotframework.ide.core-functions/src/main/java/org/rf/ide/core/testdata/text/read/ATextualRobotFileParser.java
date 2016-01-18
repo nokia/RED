@@ -47,7 +47,12 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.exec.ExecutableUnitsFixer;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -79,6 +84,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     private final LibraryAliasFixer libraryFixer;
 
+    private final ExecutableUnitsFixer execUnitFixer;
+
     private final PreviousLineHandler previousLineHandler;
 
     private final CommonVariableHelper variableHelper;
@@ -94,6 +101,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         this.variableHelper = new CommonVariableHelper();
         this.parsingStateHelper = new ParsingStateHelper();
         this.libraryFixer = new LibraryAliasFixer(utility, parsingStateHelper);
+        this.execUnitFixer = new ExecutableUnitsFixer();
         this.previousLineHandler = new PreviousLineHandler();
         this.positionResolvers = new ElementPositionResolver();
 
@@ -124,8 +132,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         try {
             parse(parsingOutput, robotFile, new InputStreamReader(inputStream, Charset.forName("UTF-8")));
         } catch (final Exception e) {
-            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage("Unknown problem during reading file "
-                    + robotFile + ".\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Unknown problem during reading file " + robotFile + ".\nStack:" + e, "File " + robotFile));
             // FIXME: stack trace adding
             e.printStackTrace();
             wasProcessingError = true;
@@ -147,13 +155,13 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             final FileInputStream fis = new FileInputStream(robotFile);
             parse(parsingOutput, fis, robotFile);
         } catch (final FileNotFoundException e) {
-            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage("File " + robotFile
-                    + " was not found.\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(BuildMessage
+                    .createErrorMessage("File " + robotFile + " was not found.\nStack:" + e, "File " + robotFile));
             wasProcessingError = true;
             // FIXME: position should be more descriptive
         } catch (final Exception e) {
-            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage("Unknown problem during reading file "
-                    + robotFile + ".\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Unknown problem during reading file " + robotFile + ".\nStack:" + e, "File " + robotFile));
             // FIXME: stack trace adding
             e.printStackTrace();
             wasProcessingError = true;
@@ -216,14 +224,13 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                             // {$a} | {$b} in this case we check if {$a} was
                             // before
                             // '|' pipe separator
-                            if (remainingData > 0
-                                    || utility.shouldGiveEmptyToProcess(parsingOutput, separator, currentSeparator,
-                                            line, processingState)) {
+                            if (remainingData > 0 || utility.shouldGiveEmptyToProcess(parsingOutput, separator,
+                                    currentSeparator, line, processingState)) {
                                 final String rawText = text.substring(lastColumnProcessed, startColumn);
 
-                                rt = processLineElement(line, processingState, parsingOutput, new FilePosition(
-                                        lineNumber, lastColumnProcessed, currentOffset), rawText, robotFile.getName(),
-                                        isNewLine);
+                                rt = processLineElement(line, processingState, parsingOutput,
+                                        new FilePosition(lineNumber, lastColumnProcessed, currentOffset), rawText,
+                                        robotFile.getName(), isNewLine);
 
                                 rt.setStartOffset(currentOffset);
                                 currentOffset += rt.getRaw().length();
@@ -247,8 +254,9 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
                             final String rawText = text.substring(lastColumnProcessed);
 
-                            rt = processLineElement(line, processingState, parsingOutput, new FilePosition(lineNumber,
-                                    lastColumnProcessed, currentOffset), rawText, robotFile.getName(), isNewLine);
+                            rt = processLineElement(line, processingState, parsingOutput,
+                                    new FilePosition(lineNumber, lastColumnProcessed, currentOffset), rawText,
+                                    robotFile.getName(), isNewLine);
                             rt.setStartOffset(currentOffset);
                             currentOffset += rt.getRaw().length();
                             line.addLineElement(rt);
@@ -296,17 +304,18 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 isNewLine = true;
             }
         } catch (final FileNotFoundException e) {
-            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage("File " + robotFile
-                    + " was not found.\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(BuildMessage
+                    .createErrorMessage("File " + robotFile + " was not found.\nStack:" + e, "File " + robotFile));
             wasProcessingError = true;
             // FIXME: position should be more descriptive
         } catch (final IOException e) {
-            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage("Problem during file " + robotFile
-                    + " reading.\nStack:" + e.getLocalizedMessage(), "File " + robotFile));
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Problem during file " + robotFile + " reading.\nStack:" + e.getLocalizedMessage(),
+                    "File " + robotFile));
             wasProcessingError = true;
         } catch (final Exception e) {
-            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage("Unknown problem during reading file "
-                    + robotFile + ".\nStack:" + e, "File " + robotFile));
+            parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Unknown problem during reading file " + robotFile + ".\nStack:" + e, "File " + robotFile));
             // FIXME: stack trace adding
             e.printStackTrace();
             wasProcessingError = true;
@@ -319,6 +328,9 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             }
         }
 
+        parsingOutput.setProcessedFile(robotFile);
+        fixIssueRelatedToForContinueForItem(parsingOutput);
+
         if (wasProcessingError) {
             parsingOutput.setStatus(Status.FAILED);
         } else {
@@ -326,6 +338,44 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         }
 
         return parsingOutput;
+    }
+
+    /**
+     * fix issue with test cases like below:
+     * 
+     * <pre>
+    T1
+    :FOR  ${x}  IN  1
+    ...  2  3  4
+    \    ...  ${x}
+    
+    T2
+    :FOR  ${x}  IN  1
+    ...  2  3  4
+    \    Log
+    \    ...  ${x}
+     * </pre>
+     * 
+     * @param parsingOutput
+     */
+    private void fixIssueRelatedToForContinueForItem(final RobotFileOutput parsingOutput) {
+        final RobotFile fileModel = parsingOutput.getFileModel();
+        final TestCaseTable testCaseTable = fileModel.getTestCaseTable();
+        final KeywordTable keywordTable = fileModel.getKeywordTable();
+
+        if (testCaseTable.isPresent()) {
+            final List<TestCase> testCases = testCaseTable.getTestCases();
+            for (final TestCase execUnit : testCases) {
+                execUnitFixer.applyFix(execUnit);
+            }
+        }
+
+        if (keywordTable.isPresent()) {
+            final List<UserKeyword> keywords = keywordTable.getKeywords();
+            for (final UserKeyword execUnit : keywords) {
+                execUnitFixer.applyFix(execUnit);
+            }
+        }
     }
 
     @VisibleForTesting
@@ -427,8 +477,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             useMapper = useMapper & !robotToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE);
 
             if (useMapper) {
-                robotToken = mapToCorrectTokenAndPutInCorrectPlaceInModel(currentLine, processingState,
-                        robotFileOutput, fp, text, fileName, robotToken);
+                robotToken = mapToCorrectTokenAndPutInCorrectPlaceInModel(currentLine, processingState, robotFileOutput,
+                        fp, text, fileName, robotToken);
             }
         }
 
@@ -461,8 +511,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         if (size == 1) {
             robotToken = matchedMappers.get(0).map(currentLine, processingState, robotFileOutput, robotToken, fp, text);
         } else {
-            robotFileOutput.addBuildMessage(BuildMessage.createErrorMessage("Unknown data \'" + text + "\' appears in "
-                    + fp + ", during state: " + processingState, fileName));
+            robotFileOutput.addBuildMessage(BuildMessage.createErrorMessage(
+                    "Unknown data \'" + text + "\' appears in " + fp + ", during state: " + processingState, fileName));
         }
         return robotToken;
     }
