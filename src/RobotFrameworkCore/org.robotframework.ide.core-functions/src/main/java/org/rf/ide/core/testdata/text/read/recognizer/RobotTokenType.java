@@ -458,7 +458,8 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     FOR_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation(": FOR").build()),
+            VersionAvailabilityInfoBuilder.create().addRepresentation(": FOR").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation(":FOR").build()),
     /**
      */
     IN_TOKEN(

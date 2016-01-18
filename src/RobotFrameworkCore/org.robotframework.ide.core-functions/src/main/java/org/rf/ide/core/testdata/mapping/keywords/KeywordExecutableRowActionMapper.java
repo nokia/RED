@@ -55,7 +55,13 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
         }
 
         RobotExecutableRow<UserKeyword> row = new RobotExecutableRow<UserKeyword>();
-        row.setAction(rt);
+        if (text.startsWith("#")) {
+            types.remove(RobotTokenType.KEYWORD_ACTION_NAME);
+            types.add(0, RobotTokenType.KEYWORD_ACTION_ARGUMENT);
+            row.addComment(rt);
+        } else {
+            row.setAction(rt);
+        }
         keyword.addKeywordExecutionRow(row);
 
         processingState.push(ParsingState.KEYWORD_INSIDE_ACTION);
@@ -71,8 +77,8 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
             if (posResolver.isCorrectPosition(PositionExpected.KEYWORD_EXEC_ROW_ACTION_NAME,
                     robotFileOutput.getFileModel(), currentLine, rt)) {
                 result = true;
-            } else if (posResolver.isCorrectPosition(PositionExpected.USER_KEYWORD_NAME,
-                    robotFileOutput.getFileModel(), currentLine, rt)) {
+            } else if (posResolver.isCorrectPosition(PositionExpected.USER_KEYWORD_NAME, robotFileOutput.getFileModel(),
+                    currentLine, rt)) {
                 if (text.trim().startsWith(RobotTokenType.START_HASH_COMMENT.getRepresentation().get(0))) {
                     if (!rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
                         rt.getTypes().add(RobotTokenType.START_HASH_COMMENT);
