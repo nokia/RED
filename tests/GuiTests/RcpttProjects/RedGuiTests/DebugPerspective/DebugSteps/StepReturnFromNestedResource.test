@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _SdNGkIMLEeW3Y6KfPyHe6A
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/2/15 12:34 PM
+Runtime-Version: 2.0.1.201508250612
+Save-Time: 1/18/16 6:28 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -64,6 +64,7 @@ exec-with-options -disableJobWaiting -command {
 	with [get-view Debug | get-tree] {
 		    get-item "TestWithNestedResources.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount 
 		        | equals 3 | verify-true
+		    wait 1500
 		    get-item "TestWithNestedResources.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
 		        | get-property "getItems().TreeItem[0].getText()" | equals "BuiltIn.Log [line:3]" | verify-true
 		        
