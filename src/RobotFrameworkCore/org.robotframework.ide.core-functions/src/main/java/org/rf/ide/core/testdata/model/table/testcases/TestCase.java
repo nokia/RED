@@ -20,7 +20,7 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class TestCase extends AModelElement<TestCaseTable> implements IExecutableStepsHolder<TestCase> {
+public class TestCase extends AModelElement<TestCaseTable>implements IExecutableStepsHolder<TestCase> {
 
     private RobotToken testName;
 
@@ -60,6 +60,10 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     public void addTestExecutionRow(final RobotExecutableRow<TestCase> executionRow) {
         executionRow.setParent(this);
         this.testContext.add(executionRow);
+    }
+
+    public void removeAllTestExecutionRows() {
+        this.testContext.clear();
     }
 
     public List<RobotExecutableRow<TestCase>> getTestExecutionRows() {

@@ -18,17 +18,17 @@ import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.IRowType;
 import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.base.Optional;
 
 public class ExecutableUnitsFixer {
 
-    public <T extends AModelElement<? extends ARobotSectionTable>> void applyFix(
+    public <T extends AModelElement<? extends ARobotSectionTable>> List<RobotExecutableRow<T>> applyFix(
             final IExecutableStepsHolder<T> execUnit) {
         final List<RobotExecutableRow<T>> newExecutionContext = new ArrayList<>(0);
 
         List<RobotExecutableRow<T>> executionContext = execUnit.getExecutionContext();
-        System.out.println(execUnit.getHolder().getDeclaration());
         List<IExecutableRowDescriptor<T>> preBuildDescriptors = preBuildDescriptors(executionContext);
 
         int lastForIndex = -1;
@@ -38,7 +38,6 @@ public class ExecutableUnitsFixer {
             IExecutableRowDescriptor<T> currentExecLine = preBuildDescriptors.get(lineId);
             IRowType rowType = currentExecLine.getRowType();
 
-            System.out.println(rowType);
             if (rowType == ERowType.FOR) {
                 if (lastForIndex > -1 && lastForExecutableIndex > -1) {
                     applyArtifactalForLineContinue(newExecutionContext, lastForIndex, lastForExecutableIndex);
@@ -48,10 +47,9 @@ public class ExecutableUnitsFixer {
             } else {
                 RobotExecutableRow<T> row = currentExecLine.getRow();
                 if (rowType == ERowType.FOR_CONTINUE) {
-                    Optional<RobotToken> previousLineContinue = getPreviouseLineContinueToken(
-                            row.getElementTokens());
+                    Optional<RobotToken> previousLineContinue = getPreviouseLineContinueToken(row.getElementTokens());
                     if (previousLineContinue.isPresent()) {
-                        merge(newExecutionContext, currentExecLine, previousLineContinue.get());
+                        merge(newExecutionContext, preBuildDescriptors, lineId, previousLineContinue.get());
                     } else {
                         newExecutionContext.add(row);
                     }
@@ -63,7 +61,7 @@ public class ExecutableUnitsFixer {
                         Optional<RobotToken> previousLineContinue = getPreviouseLineContinueToken(
                                 row.getElementTokens());
                         if (previousLineContinue.isPresent()) {
-                            merge(newExecutionContext, currentExecLine, previousLineContinue.get());
+                            merge(newExecutionContext, preBuildDescriptors, lineId, previousLineContinue.get());
                         } else {
                             newExecutionContext.add(row);
                         }
@@ -84,14 +82,45 @@ public class ExecutableUnitsFixer {
             }
         }
 
-        System.out.println("\n\n");
+        return newExecutionContext;
     }
 
     private <T extends AModelElement<? extends ARobotSectionTable>> void merge(
-            List<RobotExecutableRow<T>> newExecutionContext, IExecutableRowDescriptor<T> currentExecLine,
-            RobotToken robotToken) {
-        // TODO Auto-generated method stub
+            final List<RobotExecutableRow<T>> newExecutionContext,
+            final List<IExecutableRowDescriptor<T>> preBuildDescriptors, final int currentLine,
+            final RobotToken previousLineContinueToken) {
+        final IExecutableRowDescriptor<T> rowDesc = preBuildDescriptors.get(currentLine);
 
+        RobotExecutableRow<T> toUpdate = null;
+        if (newExecutionContext.isEmpty()) {
+            toUpdate = new RobotExecutableRow<>();
+            newExecutionContext.add(toUpdate);
+        } else {
+            toUpdate = newExecutionContext.get(newExecutionContext.size() - 1);
+        }
+
+        boolean wasComment = false;
+        boolean shouldMerge = false;
+        final List<RobotToken> elementTokens = rowDesc.getRow().getElementTokens();
+        for (final RobotToken rt : elementTokens) {
+            if (rt == previousLineContinueToken) {
+                shouldMerge = true;
+                continue;
+            }
+
+            if (shouldMerge) {
+                if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || wasComment) {
+                    wasComment = true;
+                    toUpdate.addComment(rt);
+                } else {
+                    if (toUpdate.getAction().getFilePosition().isNotSet()) {
+                        toUpdate.setAction(rt);
+                    } else {
+                        toUpdate.addArgument(rt);
+                    }
+                }
+            }
+        }
     }
 
     private <T extends AModelElement<? extends ARobotSectionTable>> void applyArtifactalForLineContinue(
@@ -103,6 +132,21 @@ public class ExecutableUnitsFixer {
 
     private Optional<RobotToken> getPreviouseLineContinueToken(final List<RobotToken> tokens) {
         Optional<RobotToken> token = Optional.absent();
+        for (final RobotToken rt : tokens) {
+            String text = rt.getRaw();
+            if (text != null) {
+                text = text.trim();
+            }
+            if (rt.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+                token = Optional.of(rt);
+            } else if (text != null) {
+                if (text.equals("\\") || text.isEmpty()) {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+        }
 
         return token;
     }
