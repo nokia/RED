@@ -83,6 +83,10 @@ public class ExecutableUnitsFixer {
             }
         }
 
+        if (lastForIndex > -1 && lastForExecutableIndex > -1) {
+            applyArtifactalForLineContinue(newExecutionContext, lastForIndex, lastForExecutableIndex);
+        }
+
         return newExecutionContext;
     }
 
