@@ -38,14 +38,15 @@ public class ExecutableUnitsFixer {
             IExecutableRowDescriptor<T> currentExecLine = preBuildDescriptors.get(lineId);
             IRowType rowType = currentExecLine.getRowType();
 
+            RobotExecutableRow<T> row = currentExecLine.getRow();
             if (rowType == ERowType.FOR) {
                 if (lastForIndex > -1 && lastForExecutableIndex > -1) {
                     applyArtifactalForLineContinue(newExecutionContext, lastForIndex, lastForExecutableIndex);
                 }
-                lastForIndex = lineId;
+                lastForIndex = newExecutionContext.size();
+                newExecutionContext.add(row);
                 lastForExecutableIndex = -1;
             } else {
-                RobotExecutableRow<T> row = currentExecLine.getRow();
                 if (rowType == ERowType.FOR_CONTINUE) {
                     Optional<RobotToken> previousLineContinue = getPreviouseLineContinueToken(row.getElementTokens());
                     if (previousLineContinue.isPresent()) {
@@ -126,7 +127,6 @@ public class ExecutableUnitsFixer {
     private <T extends AModelElement<? extends ARobotSectionTable>> void applyArtifactalForLineContinue(
             final List<RobotExecutableRow<T>> newExecutionContext, final int lastForIndex,
             final int lastForExecutableIndex) {
-        // TODO Auto-generated method stub
 
     }
 
