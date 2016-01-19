@@ -41,6 +41,7 @@ import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -93,7 +94,8 @@ public class HashCommentMapper implements IParsingMapper {
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         boolean addToStack = false;
         rt.setRaw(text);
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                || RobotExecutableRow.isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
             addToStack = true;
         } else {
             rt.getTypes().remove(RobotTokenType.START_HASH_COMMENT);
