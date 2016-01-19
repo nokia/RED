@@ -49,23 +49,15 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
     public RobotExecutableRow<?> findExecutableRow(final List<KeywordContext> currentKeywords) {
 
         if (forLoopExecutableRows.isEmpty()) {
-            currentKeywordsSizeAtLoopStart = currentKeywords.size();
-            KeywordContext parentKeywordContext = null;
-            final int forLoopParentKeywordContextPosition = getForLoopParentKeywordContextPosition(currentKeywords);
-            if (forLoopParentKeywordContextPosition >= 0) {
-                parentKeywordContext = currentKeywords.get(forLoopParentKeywordContextPosition);
-            }
+            final KeywordContext parentKeywordContext = getForLoopParentKeywordContext(currentKeywords);
             fillForLoopExecutableRows(parentKeywordContext);
-            if(forLoopExecutableRows.isEmpty()) {
-                return null;
-            }
-            return forLoopExecutableRows.get(0);
+            return forLoopExecutableRows.isEmpty() ? null : forLoopExecutableRows.get(0);
         }
 
         if (currentKeywords.size() > (currentKeywordsSizeAtLoopStart + 1)) { // step into the keyword placed inside a for loop
             return findExecutableRowForUserKeywordNestedInForLoop(currentKeywords);
         }
-        nestedForLoopExecutableRowFinder = null;
+        resetNestedForLoopExecutableRowFinder();
 
         forLoopExecutableRowsCounter++;
         if (hasReachedNextForLoopIteration()) {
@@ -76,11 +68,19 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
         return forLoopExecutableRows.get(forLoopExecutableRowsCounter);
     }
 
-
     public void clear() {
         forLoopExecutableRows.clear();
         forLoopExecutableRowsCounter = 0;
         currentKeywordsSizeAtLoopStart = 0;
+    }
+    
+    private KeywordContext getForLoopParentKeywordContext(final List<KeywordContext> currentKeywords) {
+        currentKeywordsSizeAtLoopStart = currentKeywords.size();
+        final int forLoopParentKeywordContextPosition = getForLoopParentKeywordContextPosition(currentKeywords);
+        if (forLoopParentKeywordContextPosition >= 0) {
+            return currentKeywords.get(forLoopParentKeywordContextPosition);
+        }
+        return null;
     }
     
     private int getForLoopParentKeywordContextPosition(
@@ -158,7 +158,10 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
     private boolean hasReachedNextForLoopIteration() {
         return forLoopExecutableRowsCounter == forLoopExecutableRows.size();
     }
-
+    
+    private void resetNestedForLoopExecutableRowFinder() {
+        nestedForLoopExecutableRowFinder = null;
+    }
 
     public void setCurrentTestCase(final TestCase currentTestCase) {
         this.currentTestCase = currentTestCase;
