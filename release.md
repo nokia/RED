@@ -41,6 +41,7 @@ Open Help -> Installation Details, select old RED feature and perform unistall
 - File support: .robot, .txt, .tsv
 
 ## Known issues
+- Eclipse does not have UTF-8 support in editors by default. Check Preferences and RED help to get how to change it.
 - Table editors edits are not persistent, changes done in Table editors will not be visible in source nor saved to file. Sync is done from Source -> Table only.
 - Discovery and validation of local library without extension in the same directory as testcase is problematic. For now workaround is to add library extension to library setup in test case or add library to Python path. 
 - Library auto-discovery is not yet supported thus user needs to add any external library to red.xml by themselves, if not then validation will show unknown library error. Either you add it in red.xml or invoke option Quick Fix on item in Source editor or in Problems view.  
