@@ -472,7 +472,8 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     FOR_CONTINUE_TOKEN(
             TableType.NOT_STRICTLY_BELONGS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build());
+            VersionAvailabilityInfoBuilder.create().addRepresentation("\\").build()),
+    FOR_CONTINUE_ARTIFACTAL_TOKEN(TableType.NOT_STRICTLY_BELONGS);
 
     private final List<String> text = new ArrayList<>(0);
 
