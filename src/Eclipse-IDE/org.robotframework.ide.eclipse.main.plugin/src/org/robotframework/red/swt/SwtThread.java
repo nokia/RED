@@ -18,6 +18,10 @@ import org.eclipse.swt.widgets.Display;
  */
 public class SwtThread {
 
+    public static boolean isSwtThread() {
+        return Display.getCurrent() != null;
+    }
+
     public static void syncExec(final Runnable runnable) {
         syncExec(Display.getDefault(), runnable);
     }

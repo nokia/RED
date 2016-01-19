@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
+import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 @SuppressWarnings("PMD.GodClass")
@@ -21,8 +22,20 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/filter.png");
     }
 
+    public static ImageDescriptor getStopImage() {
+        return RedPlugin.getImageDescriptor("resources/stop.png");
+    }
+
     public static ImageDescriptor getCloseImage() {
         return RedPlugin.getImageDescriptor("resources/close.png");
+    }
+
+    public static ImageDescriptor getCloseAllImage() {
+        return RedPlugin.getImageDescriptor("resources/close_all.png");
+    }
+
+    public static ImageDescriptor getSaveImage() {
+        return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_SAVE_EDIT);
     }
 
     public static ImageDescriptor getRefreshImage() {
@@ -255,6 +268,14 @@ public class RedImages {
 
     public static ImageDescriptor getChangeImage() {
         return RedPlugin.getImageDescriptor("resources/change.png");
+    }
+
+    public static ImageDescriptor getActivateOnStdOutImage() {
+        return RedPlugin.getImageDescriptor("resources/activate_stdout.png");
+    }
+
+    public static ImageDescriptor getActivateOnStdErrImage() {
+        return RedPlugin.getImageDescriptor("resources/activate_stderr.png");
     }
 
     public static ImageDescriptor getRemoteConnectedImage() {
