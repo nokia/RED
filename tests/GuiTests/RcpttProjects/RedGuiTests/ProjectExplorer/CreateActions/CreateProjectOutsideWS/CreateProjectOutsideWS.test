@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _XYaQ4GayEeWtd9WfYYPSCg
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 9/29/15 5:17 PM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 1/19/16 5:18 PM
 Testcase-Type: ecl
 Verifications: _Kns9gGa9EeWtd9WfYYPSCg
 
@@ -72,4 +72,8 @@ get-java-property "user.home" |let [val user_home -input]{
 
 get-tab-folder -index 3 | get-tab-item Problems | click
 get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder" | double-click
+
+wait 2000
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
