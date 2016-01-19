@@ -27,5 +27,7 @@
     </topic>
 	<topic href="doc/user_guide/validation.html" label="Validation - limiting the scope">
     </topic>
+    <topic href="doc/user_guide/unicode.html" label="Unicode - handling language specific chars in Eclipse">
+    </topic>
  </topic>
 </toc>
