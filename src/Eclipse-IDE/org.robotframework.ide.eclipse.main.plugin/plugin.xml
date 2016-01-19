@@ -198,6 +198,21 @@
           </objectClass>
        </enablement>
     </decorator>
+    <decorator
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.RobotVersionDecorator"
+          id="org.robotframework.red.decorator.version"
+          label="Robot Framework Version"
+          lightweight="true"
+          state="true">
+       <description>
+          This decorator adds a suffix describing version of Robot Framework in use
+       </description>
+       <enablement>
+          <objectClass
+                name="org.robotframework.ide.eclipse.main.plugin.navigator.RobotProjectDependencies">
+          </objectClass>
+       </enablement>
+    </decorator>
  </extension>
 
 	<extension
@@ -4153,6 +4168,17 @@
             verticalRulerPreferenceKey="org.robotframework.red.cellHighlighting.verticalVisibility"
             verticalRulerPreferenceValue="false">
       </specification>
+   </extension>
+   <extension
+         point="org.eclipse.ui.console.consolePageParticipants">
+      <consolePageParticipant
+            class="org.robotframework.ide.eclipse.main.plugin.console.RedSessionConsoleParticipant"
+            id="org.robotframework.red.redSessionConsoleParticipant">
+         <enablement>
+            <instanceof
+                  value="org.robotframework.ide.eclipse.main.plugin.console.RedSessionConsole">
+            </instanceof></enablement>
+      </consolePageParticipant>
    </extension>
    <!--<extension
          point="org.eclipse.search.searchPages">
