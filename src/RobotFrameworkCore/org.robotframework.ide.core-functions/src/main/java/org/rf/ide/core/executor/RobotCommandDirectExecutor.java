@@ -48,7 +48,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         try {
             final String normalizedPath = filePath.replace('\\', '/');
 
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("variables.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_variables.py");
             final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-variables",
                     normalizedPath);
             cmdLine.addAll(fileArguments);
@@ -75,7 +75,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public Map<String, Object> getGlobalVariables() {
         try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("variables.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_variables.py");
             if (scriptFile != null) {
                 final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-global");
                 final StringBuilder jsonEncodedOutput = new StringBuilder();
@@ -102,7 +102,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public List<String> getStandardLibrariesNames() {
         try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("std_libraries.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_libraries.py");
             final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-names");
             final List<String> stdLibs = new ArrayList<>();
             final ILineHandler linesHandler = new ILineHandler() {
@@ -121,7 +121,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public String getStandardLibraryPath(final String libraryName) {
         try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("std_libraries.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_libraries.py");
             final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-path",
                     libraryName);
             final StringBuilder path = new StringBuilder();

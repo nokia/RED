@@ -83,32 +83,32 @@ def get_module_path(modulename):
 @encode_result_or_exception
 @logargs
 def get_variables(dir, args):
-    import variables
-    return variables.get_variables(dir, args)
+    import red_variables
+    return red_variables.get_variables(dir, args)
 
 
 @logresult
 @encode_result_or_exception
 @logargs
 def get_global_variables():
-    import variables
-    return variables.get_global_variables()
+    import red_variables
+    return red_variables.get_global_variables()
 
 
 @logresult
 @encode_result_or_exception
 @logargs
 def get_standard_libraries_names():
-    import std_libraries
-    return std_libraries.get_standard_library_names()
+    import red_libraries
+    return red_libraries.get_standard_library_names()
 
 
 @logresult
 @encode_result_or_exception
 @logargs
 def get_standard_library_path(libname):
-    import std_libraries
-    return std_libraries.get_standard_library_path(libname)
+    import red_libraries
+    return red_libraries.get_standard_library_path(libname)
 
 
 @logresult

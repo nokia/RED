@@ -38,8 +38,8 @@ class PythonInterpretersCommandExecutors {
     private PythonInterpretersCommandExecutors() {
         try {
             xmlRpcServerScriptFile = RobotRuntimeEnvironment.copyResourceFile("robot_session_server.py");
-            RobotRuntimeEnvironment.copyResourceFile("std_libraries.py");
-            RobotRuntimeEnvironment.copyResourceFile("variables.py");
+            RobotRuntimeEnvironment.copyResourceFile("red_libraries.py");
+            RobotRuntimeEnvironment.copyResourceFile("red_variables.py");
             RobotRuntimeEnvironment.copyResourceFile("red_modules.py");
         } catch (final IOException e) {
             xmlRpcServerScriptFile = null;
