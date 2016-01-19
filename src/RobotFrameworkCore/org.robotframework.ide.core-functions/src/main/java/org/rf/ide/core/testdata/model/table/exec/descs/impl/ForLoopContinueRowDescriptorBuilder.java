@@ -34,7 +34,8 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         if (text != null) {
             final String trimmed = text.trim();
             if (RobotTokenType.FOR_CONTINUE_TOKEN.getRepresentation().get(0).equalsIgnoreCase(trimmed)
-                    || (trimmed.isEmpty() && isTsv(execRowLine))) {
+                    || (trimmed.isEmpty() && isTsv(execRowLine))
+                    || action.getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN)) {
                 final int forLoopDeclarationLine = getForLoopDeclarationLine(execRowLine);
                 result = new AcceptResultWithParameters(forLoopDeclarationLine >= 0, forLoopDeclarationLine);
             }
@@ -97,7 +98,13 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
             final ForLoopContinueRowDescriptor<T> forContinueDesc, final List<RobotToken> lineElements) {
         final RobotExecutableRow<T> rowWithoutLoopContinue = new RobotExecutableRow<>();
         boolean mapToComment = false;
-        RobotToken robotToken = lineElements.get(1);
+
+        int startIndex = 1;
+        if (execRowLine.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN)) {
+            startIndex = 0;
+        }
+
+        RobotToken robotToken = lineElements.get(startIndex);
         if (robotToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             mapToComment = true;
             rowWithoutLoopContinue.addComment(robotToken);
@@ -106,7 +113,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         }
         rowWithoutLoopContinue.setParent(execRowLine.getParent());
         final int size = lineElements.size();
-        for (int index = 2; index < size; index++) {
+        for (int index = startIndex + 1; index < size; index++) {
             RobotToken lineElement = lineElements.get(index);
             if (lineElement.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
                 mapToComment = true;
