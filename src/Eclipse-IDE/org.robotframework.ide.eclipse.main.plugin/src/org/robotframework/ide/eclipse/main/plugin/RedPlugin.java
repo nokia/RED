@@ -15,6 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments;
 import org.robotframework.red.graphics.ColorsManager;
@@ -43,6 +44,9 @@ public class RedPlugin extends AbstractUIPlugin {
     public void start(final BundleContext context) {
         try {
             super.start(context);
+            if (Boolean.valueOf(System.getProperty("red.showSessionConsole")).booleanValue()) {
+                RobotRuntimeEnvironment.addProcessListener(new RedSessionProcessListener());
+            }
         } catch (final Exception e) {
             throw new IllegalStateException("Unable to start RED plugin", e);
         }
@@ -72,16 +76,12 @@ public class RedPlugin extends AbstractUIPlugin {
     }
 
     public RobotRuntimeEnvironment getRobotInstallation(final File file) {
-        for (final RobotRuntimeEnvironment env : getAllRuntimeEnvironments()) {
-            if (file.equals(env.getFile())) {
-                return env;
-            }
-        }
-        return null;
+        return InstalledRobotEnvironments.getRobotInstallation(new RedPreferences(getPreferenceStore()), file);
     }
 
     public List<RobotRuntimeEnvironment> getAllRuntimeEnvironments() {
-        final List<RobotRuntimeEnvironment> allRobotInstallation = InstalledRobotEnvironments.getAllRobotInstallation(new RedPreferences(getPreferenceStore()));
+        final List<RobotRuntimeEnvironment> allRobotInstallation = InstalledRobotEnvironments
+                .getAllRobotInstallation(new RedPreferences(getPreferenceStore()));
         return allRobotInstallation == null ? new ArrayList<RobotRuntimeEnvironment>() : allRobotInstallation;
     }
 

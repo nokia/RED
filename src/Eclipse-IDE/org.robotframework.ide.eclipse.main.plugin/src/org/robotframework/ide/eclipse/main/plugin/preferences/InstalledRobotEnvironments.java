@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
@@ -49,9 +51,20 @@ public class InstalledRobotEnvironments {
         return active;
     }
 
+    public static RobotRuntimeEnvironment getRobotInstallation(final RedPreferences preferences, final File file) {
+        final String allRuntimes = preferences.getAllRuntimes();
+        final ArrayList<String> paths = newArrayList(allRuntimes.split(";"));
+        for (final String path : paths) {
+            if (new File(path).equals(file)) {
+                return createRuntimeEnvironment(path);
+            }
+        }
+        return null;
+    }
+
     public static List<RobotRuntimeEnvironment> getAllRobotInstallation(final RedPreferences preferences) {
         if (all == null) {
-            all = readALLFromPreferences(preferences);
+            all = readAllFromPreferences(preferences);
         }
         return all;
     }
@@ -60,19 +73,19 @@ public class InstalledRobotEnvironments {
         return createRuntimeEnvironment(preferences.getActiveRuntime());
     }
     
-    private static List<RobotRuntimeEnvironment> readALLFromPreferences(final RedPreferences preferences) {
+    private static List<RobotRuntimeEnvironment> readAllFromPreferences(final RedPreferences preferences) {
         return createRuntimeEnvironments(preferences.getAllRuntimes());
     }
 
-    private static RobotRuntimeEnvironment createRuntimeEnvironment(final String prefValue) {
-        return Strings.isNullOrEmpty(prefValue) ? null : RobotRuntimeEnvironment.create(prefValue);
+    private static RobotRuntimeEnvironment createRuntimeEnvironment(final String path) {
+        return Strings.isNullOrEmpty(path) ? null : RobotRuntimeEnvironment.create(path);
     }
 
-    private static List<RobotRuntimeEnvironment> createRuntimeEnvironments(final String prefValue) {
-        if (Strings.isNullOrEmpty(prefValue)) {
+    private static List<RobotRuntimeEnvironment> createRuntimeEnvironments(final String allPaths) {
+        if (Strings.isNullOrEmpty(allPaths)) {
             return newArrayList();
         }
-        final List<String> all = newArrayList(prefValue.split(";"));
+        final List<String> all = newArrayList(allPaths.split(";"));
         final List<RobotRuntimeEnvironment> envs = newArrayList(Iterables.transform(all, new Function<String, RobotRuntimeEnvironment>() {
             @Override
             public RobotRuntimeEnvironment apply(final String path) {

@@ -20,6 +20,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -88,7 +89,13 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             final RobotRuntimeEnvironment env = project.getRuntimeEnvironment();
             
             final String libPath;
-            final Optional<File> modulePath = env.getModulePath(pathOrName);
+            Optional<File> modulePath = Optional.absent();
+            try {
+                modulePath = env.getModulePath(pathOrName);
+            } catch (final RobotEnvironmentException e) {
+                // that's fine
+            }
+
             if (modulePath.isPresent()) {
                 libName = pathOrName;
                 libPath = modulePath.get().getPath();
