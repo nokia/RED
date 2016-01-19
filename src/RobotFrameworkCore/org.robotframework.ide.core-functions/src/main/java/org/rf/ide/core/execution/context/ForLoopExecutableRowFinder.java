@@ -55,7 +55,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
         }
 
         if (currentKeywords.size() > (currentKeywordsSizeAtLoopStart + 1)) { // step into the keyword placed inside a for loop
-            return findExecutableRowForUserKeywordNestedInForLoop(currentKeywords);
+            return findExecutableRowInUserKeywordNestedInForLoop(currentKeywords);
         }
         resetNestedForLoopExecutableRowFinder();
 
@@ -139,7 +139,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
         return executableRow.buildLineDescription().getRowType() == ERowType.FOR_CONTINUE;
     }
 
-    private RobotExecutableRow<?> findExecutableRowForUserKeywordNestedInForLoop(final List<KeywordContext> currentKeywords) {
+    private RobotExecutableRow<?> findExecutableRowInUserKeywordNestedInForLoop(final List<KeywordContext> currentKeywords) {
         RobotExecutableRow<?> executableRow = null;
         if (userKeywordExecutableRowFinder != null) {
             executableRow = userKeywordExecutableRowFinder.findExecutableRow(currentKeywords);
