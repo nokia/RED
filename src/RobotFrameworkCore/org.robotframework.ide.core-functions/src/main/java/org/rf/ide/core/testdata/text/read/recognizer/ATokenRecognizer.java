@@ -61,6 +61,32 @@ public abstract class ATokenRecognizer {
         return type;
     }
 
+    public static String createUpperLowerCaseWordWithSpacesInside(final String text) {
+        final StringBuilder str = new StringBuilder();
+        if (text != null && text.length() > 0) {
+
+            final char[] ca = text.toCharArray();
+            final int size = ca.length;
+            for (int i = 0; i < size; i++) {
+                str.append('[');
+                final char c = ca[i];
+                if (Character.isLetter(c)) {
+                    str.append(Character.toUpperCase(c)).append('|').append(Character.toLowerCase(c));
+                } else {
+                    str.append(c);
+                }
+
+                str.append(']');
+
+                if (i + 1 < size) {
+                    str.append("([\\s]+)?");
+                }
+            }
+        }
+
+        return str.toString();
+    }
+
     public static String createUpperLowerCaseWord(final String text) {
         final StringBuilder str = new StringBuilder();
         if (text != null && text.length() > 0) {

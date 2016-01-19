@@ -20,51 +20,42 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderRecognizer;
 
-
 @SuppressWarnings({ "PMD.MethodNamingConventions", "PMD.TooManyMethods" })
 public class SettingsTableHeaderRecognizerTest {
 
     @ForClean
     private ATokenRecognizer rec;
 
-
     @Test
     public void test_check_MetadataAllPossibilities_withAsterisks_atTheBeginAndEnd() {
         assertAllCombinations("Metadata");
     }
-
 
     @Test
     public void test_check_SettingsAllPossibilities_withAsterisks_atTheBeginAndEnd() {
         assertAllCombinations("Settings");
     }
 
-
     @Test
     public void test_check_SettingAllPossibilities_withAsterisks_atTheBeginAndEnd() {
         assertAllCombinations("Setting");
     }
 
-
     private void assertAllCombinations(String text) {
-        List<String> combinations = new CombinationGenerator()
-                .combinations(text);
+        List<String> combinations = new CombinationGenerator().combinations(text);
 
         for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder("*** ").append(comb)
-                    .append(" ***");
+            StringBuilder textOfHeader = new StringBuilder("*** ").append(comb).append(" ***");
 
             assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_check_Metadata_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
@@ -80,7 +71,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Metadata_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T * Metadata ***");
@@ -93,7 +83,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" * Metadata ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceMetadata_withAsterisk_atTheBeginAndEnd() {
@@ -108,7 +97,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_Metadata_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("* Metadata ***");
@@ -121,7 +109,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_Metadata_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
@@ -137,7 +124,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Metadata_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *** Metadata ***");
@@ -150,7 +136,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" *** Metadata ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceMetadata_withAsterisks_atTheBeginAndEnd() {
@@ -165,7 +150,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_Metadata_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*** Metadata ***");
@@ -178,7 +162,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_Settings_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
@@ -194,7 +177,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Settings_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T * Settings ***");
@@ -207,7 +189,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" * Settings ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceSettings_withAsterisk_atTheBeginAndEnd() {
@@ -222,7 +203,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_Settings_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("* Settings ***");
@@ -235,7 +215,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_Settings_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
@@ -251,7 +230,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Settings_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *** Settings ***");
@@ -264,7 +242,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" *** Settings ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceSettings_withAsterisks_atTheBeginAndEnd() {
@@ -279,7 +256,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_Settings_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*** Settings ***");
@@ -292,7 +268,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_Setting_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
@@ -308,7 +283,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Setting_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T * Setting ***");
@@ -321,7 +295,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" * Setting ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceSetting_withAsterisk_atTheBeginAndEnd() {
@@ -336,7 +309,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_Setting_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("* Setting ***");
@@ -349,7 +321,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_Setting_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
@@ -365,7 +336,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Setting_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *** Setting ***");
@@ -378,7 +348,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" *** Setting ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceSetting_withAsterisks_atTheBeginAndEnd() {
@@ -393,7 +362,6 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_Setting_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*** Setting ***");
@@ -407,32 +375,23 @@ public class SettingsTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?([*][\\s]*)+[\\s]*("
-                        + ATokenRecognizer.createUpperLowerCaseWord("Settings")
-                        + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Setting")
-                        + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Metadata")
-                        + ")([\\s]*[*])*");
+                "[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Settings") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Setting") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Metadata") + ")([\\s]*[*])*");
     }
-
 
     @Test
     public void test_getProducedType() {
-        assertThat(rec.getProducedType()).isEqualTo(
-                RobotTokenType.SETTINGS_TABLE_HEADER);
+        assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTINGS_TABLE_HEADER);
     }
-
 
     @Before
     public void setUp() {
         rec = new SettingsTableHeaderRecognizer();
     }
-
 
     @After
     public void tearDown() throws Exception {

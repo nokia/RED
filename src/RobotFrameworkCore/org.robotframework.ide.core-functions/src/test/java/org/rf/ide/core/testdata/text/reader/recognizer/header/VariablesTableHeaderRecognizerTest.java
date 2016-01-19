@@ -20,13 +20,11 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 
-
 @SuppressWarnings({ "PMD.MethodNamingConventions", "PMD.TooManyMethods" })
 public class VariablesTableHeaderRecognizerTest {
 
     @ForClean
     private ATokenRecognizer rec;
-
 
     @Test
     public void test_check_Variables_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
@@ -42,7 +40,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Variables_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T * Variables ***");
@@ -55,7 +52,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" * Variables ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceVariables_withAsterisk_atTheBeginAndEnd() {
@@ -70,7 +66,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_Variables_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("* Variables ***");
@@ -83,7 +78,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_Variables_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
@@ -99,7 +93,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Variables_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *** Variables ***");
@@ -112,7 +105,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" *** Variables ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceVariables_withAsterisks_atTheBeginAndEnd() {
@@ -127,7 +119,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_Variables_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*** Variables ***");
@@ -140,7 +131,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_Variable_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
@@ -156,7 +146,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Variable_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T * Variable ***");
@@ -169,7 +158,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" * Variable ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceVariable_withAsterisk_atTheBeginAndEnd() {
@@ -184,7 +172,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_Variable_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("* Variable ***");
@@ -197,7 +184,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_Variable_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
@@ -213,7 +199,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_Variable_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *** Variable ***");
@@ -226,7 +211,6 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" *** Variable ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceVariable_withAsterisks_atTheBeginAndEnd() {
@@ -241,38 +225,31 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_VariablesAllPossibilities_withAsterisks_atTheBeginAndEnd() {
         assertAllCombinations("Variables");
     }
-
 
     @Test
     public void test_check_VariableAllPossibilities_withAsterisks_atTheBeginAndEnd() {
         assertAllCombinations("Variable");
     }
 
-
     private void assertAllCombinations(String text) {
-        List<String> combinations = new CombinationGenerator()
-                .combinations(text);
+        List<String> combinations = new CombinationGenerator().combinations(text);
 
         for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder("*** ").append(comb)
-                    .append(" ***");
+            StringBuilder textOfHeader = new StringBuilder("*** ").append(comb).append(" ***");
 
             assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_check_Variable_withAsterisks_atTheBeginAndEnd() {
@@ -287,30 +264,22 @@ public class VariablesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_getPattern() {
         assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?([*][\\s]*)+[\\s]*("
-                        + ATokenRecognizer
-                                .createUpperLowerCaseWord("Variables") + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Variable")
-                        + ")([\\s]*[*])*");
+                "[ ]?([*][\\s]*)+[\\s]*(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Variables") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Variable") + ")([\\s]*[*])*");
     }
-
 
     @Test
     public void test_getProducedType() {
-        assertThat(rec.getProducedType()).isEqualTo(
-                RobotTokenType.VARIABLES_TABLE_HEADER);
+        assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.VARIABLES_TABLE_HEADER);
     }
-
 
     @Before
     public void setUp() {
         rec = new VariablesTableHeaderRecognizer();
     }
-
 
     @After
     public void tearDown() throws Exception {
