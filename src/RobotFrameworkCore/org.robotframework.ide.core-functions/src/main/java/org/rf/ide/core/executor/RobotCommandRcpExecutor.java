@@ -40,6 +40,8 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 /**
  * @author mmarzec
@@ -67,7 +69,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             final int port = findFreePort();
             serverProcess = createPythonServerProcess(interpreterPath, scriptFile, port);
             client = createClient(port);
-            waitForConnectionToServer(client, CONNECTION_TIMEOUT);
+            waitForConnectionToServer(CONNECTION_TIMEOUT);
         } else {
             throw new RobotCommandExecutorException("Could not setup python server on file: " + interpreterPath);
         }
@@ -76,15 +78,19 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     private Process createPythonServerProcess(final String interpreterPath, final File scriptFile, final int port) {
         try {
             final List<String> command = newArrayList(interpreterPath, scriptFile.getPath(), String.valueOf(port));
-            final Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
-            startOutputReadingThread(process);
+            final Process process = new ProcessBuilder(command).start();
+            for (final PythonProcessListener listener : getListeners()) {
+                listener.processStarted(interpreterPath, process);
+            }
+            startStdOutReadingThread(process);
+            startStdErrReadingThread(process);
             return process;
         } catch (final IOException e) {
             throw new RobotCommandExecutorException("Could not setup python server on file: " + interpreterPath, e);
         }
     }
 
-    private void startOutputReadingThread(final Process process) {
+    private void startStdOutReadingThread(final Process process) {
         new Thread(new Runnable() {
 
             @Override
@@ -93,12 +99,42 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
                 try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                     String line = reader.readLine();
                     while (line != null) {
+                        for (final PythonProcessListener listener : getListeners()) {
+                            listener.lineRead(serverProcess, line);
+                        }
                         line = reader.readLine();
                     }
                 } catch (final IOException e) {
                     // that fine
                 } finally {
+                    for (final PythonProcessListener listener : getListeners()) {
+                        listener.processEnded(serverProcess);
+                    }
                     serverProcess = null;
+                }
+            }
+        }).start();
+    }
+
+    private List<PythonProcessListener> getListeners() {
+        return newArrayList(PythonInterpretersCommandExecutors.getInstance().getListeners());
+    }
+
+    private void startStdErrReadingThread(final Process process) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                final InputStream inputStream = process.getErrorStream();
+                try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+                    String line = reader.readLine();
+                    while (line != null) {
+                        for (final PythonProcessListener listener : getListeners()) {
+                            listener.errorLineRead(serverProcess, line);
+                        }
+                        line = reader.readLine();
+                    }
+                } catch (final IOException e) {
+                    // that fine
                 }
             }
         }).start();
@@ -130,11 +166,11 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         return client;
     }
 
-    private void waitForConnectionToServer(final XmlRpcClient client, final int timeoutInSec) {
+    private void waitForConnectionToServer(final int timeoutInSec) {
         final long start = System.currentTimeMillis();
         while (true) {
             try {
-                client.execute("checkServerAvailability", new Object[] {});
+                callRpcFunction("checkServerAvailability");
                 break;
             } catch (final XmlRpcException e) {
                 try {
@@ -148,6 +184,10 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
                 break;
             }
         }
+    }
+
+    Process getProcess() {
+        return serverProcess;
     }
 
     boolean isAlive() {
@@ -164,27 +204,30 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Map<String, Object> getVariables(final String filePath, final List<String> fileArguments) throws XmlRpcException {
-        final Map<String, Object> variables = new LinkedHashMap<>();
-        final Map<?, ?> varToValueMapping = (Map<?, ?>) client.execute("getVariables",
-                newArrayList(filePath, fileArguments));
-        for (final Entry<?, ?> entry : varToValueMapping.entrySet()) {
-            variables.put((String) entry.getKey(), entry.getValue());
-        }
-        return variables;
-    }
-
-    @Override
-    public Map<String, Object> getGlobalVariables() {
-        final Map<String, Object> variables = new LinkedHashMap<>();
+    public Map<String, Object> getVariables(final String filePath, final List<String> fileArguments) {
         try {
-            final Map<?, ?> varToValueMapping = (Map<?, ?>) client.execute("getGlobalVariables", newArrayList());
+            final Map<String, Object> variables = new LinkedHashMap<>();
+            final Map<?, ?> varToValueMapping = (Map<?, ?>) callRpcFunction("getVariables", filePath, fileArguments);
             for (final Entry<?, ?> entry : varToValueMapping.entrySet()) {
                 variables.put((String) entry.getKey(), entry.getValue());
             }
             return variables;
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getGlobalVariables() {
+        try {
+            final Map<String, Object> variables = new LinkedHashMap<>();
+            final Map<?, ?> varToValueMapping = (Map<?, ?>) callRpcFunction("getGlobalVariables");
+            for (final Entry<?, ?> entry : varToValueMapping.entrySet()) {
+                variables.put((String) entry.getKey(), entry.getValue());
+            }
+            return variables;
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
@@ -192,72 +235,61 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     public List<String> getStandardLibrariesNames() {
         try {
             final List<String> libraries = newArrayList();
-            final Object[] libs = (Object[]) client.execute("getStandardLibrariesNames", newArrayList());
+            final Object[] libs = (Object[]) callRpcFunction("getStandardLibrariesNames");
             for (final Object o : libs) {
                 libraries.add((String) o);
             }
             return libraries;
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
     @Override
     public String getStandardLibraryPath(final String libName) {
         try {
-            return (String) client.execute("getStandardLibraryPath", newArrayList(libName));
+            return (String) callRpcFunction("getStandardLibraryPath", libName);
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
     @Override
     public String getRobotVersion() {
         try {
-            return (String) client.execute("getRobotVersion", newArrayList());
+            return (String) callRpcFunction("getRobotVersion");
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
     @Override
     public String getRunModulePath() {
         try {
-            return (String) client.execute("getRunModulePath", newArrayList());
+            return (String) callRpcFunction("getRunModulePath");
         } catch (final XmlRpcException e) {
-            throw new RobotCommandExecutorException("Unable to communicate with XML-RPC server", e);
+            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
         }
     }
 
     @Override
-    public void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath)
-            throws RobotEnvironmentException {
+    public void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath) {
         createLibdoc(resultFilePath, libName, libPath);
     }
 
     @Override
-    public void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath)
-            throws RobotEnvironmentException {
+    public void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath) {
         createLibdoc(resultFilePath, libName, libPath);
     }
 
     @Override
-    public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath)
-            throws RobotEnvironmentException {
+    public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath) {
         createLibdoc(resultFilePath, libName, libPath);
     }
 
-    private void createLibdoc(final String resultFilePath, final String libName, final String libPath)
-            throws RobotEnvironmentException {
+    private void createLibdoc(final String resultFilePath, final String libName, final String libPath) {
         try {
-            final Boolean wasGenerated = (Boolean) client.execute("createLibdoc",
-                    newArrayList(resultFilePath, libName, libPath));
-            if (!wasGenerated) {
-                final String additional = libPath.isEmpty() ? ""
-                        : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
-                throw new RobotEnvironmentException(
-                        "Unable to generate library specification file for library " + libName + additional);
-            }
+            callRpcFunction("createLibdoc", resultFilePath, libName, libPath);
         } catch (final XmlRpcException e) {
             final String additional = libPath.isEmpty() ? ""
                     : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
@@ -267,10 +299,10 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public List<File> getModulesSearchPaths() throws RobotEnvironmentException {
+    public List<File> getModulesSearchPaths() {
         try {
             final List<File> libraries = newArrayList();
-            final Object[] paths = (Object[]) client.execute("getModulesSearchPaths", newArrayList());
+            final Object[] paths = (Object[]) callRpcFunction("getModulesSearchPaths");
             for (final Object o : paths) {
                 if (!"".equals(o)) {
                     libraries.add(new File((String) o));
@@ -283,13 +315,34 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Optional<File> getModulePath(final String moduleName) throws RobotEnvironmentException {
+    public Optional<File> getModulePath(final String moduleName) {
         try {
-            final String path = (String) client.execute("getModulePath", newArrayList(moduleName));
+            final String path = (String) callRpcFunction("getModulePath", moduleName);
             return Optional.of(new File(path));
         } catch (final XmlRpcException e) {
             throw new RobotEnvironmentException("Unable to path of '" + moduleName + "' module", e);
         }
+    }
+
+    Object callRpcFunction(final String functionName, final Object... arguments) throws XmlRpcException {
+        final Object rpcResult = client.execute(functionName, arguments);
+        return resultOrException(rpcResult);
+    }
+
+    private static Object resultOrException(final Object rpcCallResult) {
+        final Map<?, ?> result = (Map<?, ?>) rpcCallResult;
+        Preconditions.checkArgument(result.size() == 2);
+        Preconditions.checkArgument(result.containsKey("result"));
+        Preconditions.checkArgument(result.containsKey("exception"));
+
+        if (result.get("exception") != null) {
+            final String exception = (String) result.get("exception");
+            final String indent = Strings.repeat(" ", 12);
+            final String indentedException = indent + exception.replaceAll("\n", "\n" + indent);
+            throw new RobotEnvironmentException("RED python session problem. Following exception has been thrown by"
+                    + "python service:\n" + indentedException);
+        }
+        return result.get("result");
     }
 
     @SuppressWarnings("serial")
