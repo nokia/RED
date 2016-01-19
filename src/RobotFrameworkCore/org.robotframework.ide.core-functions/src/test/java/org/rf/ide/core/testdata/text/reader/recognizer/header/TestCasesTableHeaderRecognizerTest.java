@@ -20,45 +20,37 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 
-
 @SuppressWarnings({ "PMD.MethodNamingConventions", "PMD.TooManyMethods" })
 public class TestCasesTableHeaderRecognizerTest {
 
     @ForClean
     private ATokenRecognizer rec;
 
-
     @Test
     public void test_check_TestCasesAllPossibilities_withAsterisks_atTheBeginAndEnd() {
         assertAllCombinations("Test Cases");
     }
-
 
     @Test
     public void test_check_TestCaseAllPossibilities_withAsterisks_atTheBeginAndEnd() {
         assertAllCombinations("Test Case");
     }
 
-
     private void assertAllCombinations(String text) {
-        List<String> combinations = new CombinationGenerator()
-                .combinations(text);
+        List<String> combinations = new CombinationGenerator().combinations(text);
 
         for (String comb : combinations) {
-            StringBuilder textOfHeader = new StringBuilder("*** ").append(comb)
-                    .append(" ***");
+            StringBuilder textOfHeader = new StringBuilder("*** ").append(comb).append(" ***");
 
             assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_check_TestCases_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
@@ -74,7 +66,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_TestCases_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *  Test Cases ***");
@@ -87,7 +78,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" *  Test Cases ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceTestCases_withAsterisk_atTheBeginAndEnd() {
@@ -102,7 +92,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_TestCases_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*  Test Cases ***");
@@ -115,7 +104,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_TestCases_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
@@ -131,7 +119,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_TestCases_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T ***  Test Cases ***");
@@ -141,11 +128,9 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
         assertThat(token.getEndColumn()).isEqualTo(text.length());
-        assertThat(token.getText().toString())
-                .isEqualTo(" ***  Test Cases ***");
+        assertThat(token.getText().toString()).isEqualTo(" ***  Test Cases ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceTestCases_withAsterisks_atTheBeginAndEnd() {
@@ -160,7 +145,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_TestCases_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("***  Test Cases ***");
@@ -173,7 +157,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_TestCase_withAsterisk_atTheBeginAndEnd_spaceLetterT() {
@@ -189,7 +172,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_TestCase_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T * Test Case ***");
@@ -202,7 +184,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" * Test Case ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceTestCase_withAsterisk_atTheBeginAndEnd() {
@@ -217,7 +198,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_TestCase_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("* Test Case ***");
@@ -230,7 +210,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_TestCase_withAsterisks_atTheBeginAndEnd_spaceLetterT() {
@@ -246,7 +225,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_spaceLetterT_and_TestCase_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *** Test Case ***");
@@ -259,7 +237,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(" *** Test Case ***");
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_check_spaceTestCase_withAsterisks_atTheBeginAndEnd() {
@@ -274,7 +251,6 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_check_TestCase_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*** Test Case ***");
@@ -288,32 +264,23 @@ public class TestCasesTableHeaderRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?([*][\\s]*)+[\\s]*"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Test")
-                        + "[\\s]+("
-                        + ATokenRecognizer.createUpperLowerCaseWord("Cases")
-                        + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Case")
-                        + ")([\\s]*[*])*");
+        assertThat(rec.getPattern().pattern())
+                .isEqualTo("[ ]?([*][\\s]*)+[\\s]*" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Test")
+                        + "([\\s]+)?(" + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Cases") + "|"
+                        + ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside("Case") + ")([\\s]*[*])*");
     }
-
 
     @Test
     public void test_getProducedType() {
-        assertThat(rec.getProducedType()).isEqualTo(
-                RobotTokenType.TEST_CASES_TABLE_HEADER);
+        assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.TEST_CASES_TABLE_HEADER);
     }
-
 
     @Before
     public void setUp() {
         rec = new TestCasesTableHeaderRecognizer();
     }
-
 
     @After
     public void tearDown() throws Exception {

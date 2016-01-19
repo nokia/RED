@@ -10,20 +10,16 @@ import java.util.regex.Pattern;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class KeywordsTableHeaderRecognizer extends ATokenRecognizer {
 
     public static final Pattern EXPECTED = Pattern
-            .compile("[ ]?([*][\\s]*)+[\\s]*("
-                    + createUpperLowerCaseWord("User") + "[\\s]+)?("
-                    + createUpperLowerCaseWord("Keywords") + "|"
-                    + createUpperLowerCaseWord("Keyword") + ")([\\s]*[*])*");
-
+            .compile("[ ]?([*][\\s]*)+[\\s]*(" + createUpperLowerCaseWordWithSpacesInside("User") + "[\\s]+)?("
+                    + createUpperLowerCaseWordWithSpacesInside("Keywords") + "|"
+                    + createUpperLowerCaseWordWithSpacesInside("Keyword") + ")([\\s]*[*])*");
 
     public KeywordsTableHeaderRecognizer() {
         super(EXPECTED, RobotTokenType.KEYWORDS_TABLE_HEADER);
     }
-
 
     @Override
     public ATokenRecognizer newInstance() {
