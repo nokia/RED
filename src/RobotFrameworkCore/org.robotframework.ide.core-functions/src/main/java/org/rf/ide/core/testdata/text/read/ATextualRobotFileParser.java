@@ -48,6 +48,7 @@ import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.exec.ExecutableUnitsFixer;
@@ -366,14 +367,22 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         if (testCaseTable.isPresent()) {
             final List<TestCase> testCases = testCaseTable.getTestCases();
             for (final TestCase execUnit : testCases) {
-                execUnitFixer.applyFix(execUnit);
+                List<RobotExecutableRow<TestCase>> fixed = execUnitFixer.applyFix(execUnit);
+                execUnit.removeAllTestExecutionRows();
+                for (RobotExecutableRow<TestCase> tcRowExec : fixed) {
+                    execUnit.addTestExecutionRow(tcRowExec);
+                }
             }
         }
 
         if (keywordTable.isPresent()) {
             final List<UserKeyword> keywords = keywordTable.getKeywords();
             for (final UserKeyword execUnit : keywords) {
-                execUnitFixer.applyFix(execUnit);
+                List<RobotExecutableRow<UserKeyword>> fixed = execUnitFixer.applyFix(execUnit);
+                execUnit.removeAllKeywordExecutionRows();
+                for (RobotExecutableRow<UserKeyword> ukRowExec : fixed) {
+                    execUnit.addKeywordExecutionRow(ukRowExec);
+                }
             }
         }
     }
