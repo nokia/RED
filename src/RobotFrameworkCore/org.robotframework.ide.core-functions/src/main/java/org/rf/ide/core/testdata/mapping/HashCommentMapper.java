@@ -94,8 +94,10 @@ public class HashCommentMapper implements IParsingMapper {
             final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         boolean addToStack = false;
         rt.setRaw(text);
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                || RobotExecutableRow.isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+            addToStack = true;
+        } else if (RobotExecutableRow.isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
+            rt.getTypes().add(0, RobotTokenType.START_HASH_COMMENT);
             addToStack = true;
         } else {
             rt.getTypes().remove(RobotTokenType.START_HASH_COMMENT);
@@ -135,7 +137,8 @@ public class HashCommentMapper implements IParsingMapper {
         boolean result = false;
 
         final ParsingState nearestState = stateHelper.getCurrentStatus(processingState);
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                || RobotExecutableRow.isTsvComment(rt.getText(), robotFileOutput.getFileFormat())) {
             if (isInsideTestCase(nearestState) || isInsideKeyword(nearestState)) {
                 result = false;
             } else if (!processingState.isEmpty()) {
