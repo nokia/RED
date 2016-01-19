@@ -127,7 +127,9 @@ public class ExecutableUnitsFixer {
     private <T extends AModelElement<? extends ARobotSectionTable>> void applyArtifactalForLineContinue(
             final List<RobotExecutableRow<T>> newExecutionContext, final int lastForIndex,
             final int lastForExecutableIndex) {
-
+        for (int line = lastForIndex + 1; line <= lastForExecutableIndex; line++) {
+            newExecutionContext.get(line).getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+        }
     }
 
     private Optional<RobotToken> getPreviouseLineContinueToken(final List<RobotToken> tokens) {
