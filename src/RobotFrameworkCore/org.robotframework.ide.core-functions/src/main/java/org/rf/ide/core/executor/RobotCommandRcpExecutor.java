@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.ws.commons.util.NamespaceContextImpl;
@@ -79,22 +80,24 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         try {
             final List<String> command = newArrayList(interpreterPath, scriptFile.getPath(), String.valueOf(port));
             final Process process = new ProcessBuilder(command).start();
-            for (final PythonProcessListener listener : getListeners()) {
-                listener.processStarted(interpreterPath, process);
-            }
-            startStdOutReadingThread(process);
-            startStdErrReadingThread(process);
+
+            final Semaphore semaphore = new Semaphore(0);
+            startStdOutReadingThread(process, semaphore);
+            startStdErrReadingThread(process, semaphore);
             return process;
         } catch (final IOException e) {
             throw new RobotCommandExecutorException("Could not setup python server on file: " + interpreterPath, e);
         }
     }
 
-    private void startStdOutReadingThread(final Process process) {
+    private void startStdOutReadingThread(final Process process, final Semaphore semaphore) {
         new Thread(new Runnable() {
-
             @Override
             public void run() {
+                for (final PythonProcessListener listener : getListeners()) {
+                    listener.processStarted(interpreterPath, process);
+                }
+                semaphore.release();
                 final InputStream inputStream = process.getInputStream();
                 try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                     String line = reader.readLine();
@@ -120,7 +123,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         return newArrayList(PythonInterpretersCommandExecutors.getInstance().getListeners());
     }
 
-    private void startStdErrReadingThread(final Process process) {
+    private void startStdErrReadingThread(final Process process, final Semaphore semaphore) {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -128,12 +131,13 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
                 try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                     String line = reader.readLine();
                     while (line != null) {
+                        semaphore.acquire();
                         for (final PythonProcessListener listener : getListeners()) {
                             listener.errorLineRead(serverProcess, line);
                         }
                         line = reader.readLine();
                     }
-                } catch (final IOException e) {
+                } catch (final IOException | InterruptedException e) {
                     // that fine
                 }
             }
