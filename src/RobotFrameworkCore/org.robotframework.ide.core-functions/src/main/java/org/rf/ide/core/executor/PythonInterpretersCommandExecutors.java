@@ -7,7 +7,9 @@ package org.rf.ide.core.executor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.rf.ide.core.executor.RobotCommandRcpExecutor.RobotCommandExecutorException;
@@ -29,14 +31,31 @@ class PythonInterpretersCommandExecutors {
 
     private final Map<String, RobotCommandRcpExecutor> executors = new HashMap<>();
 
+    private final List<PythonProcessListener> processListeners = new ArrayList<>(0);
+
     private File xmlRpcServerScriptFile;
 
     private PythonInterpretersCommandExecutors() {
         try {
-            xmlRpcServerScriptFile = RobotRuntimeEnvironment.copyResourceFile("RobotCommandExecutionServer.py");
+            xmlRpcServerScriptFile = RobotRuntimeEnvironment.copyResourceFile("robot_session_server.py");
+            RobotRuntimeEnvironment.copyResourceFile("std_libraries.py");
+            RobotRuntimeEnvironment.copyResourceFile("variables.py");
+            RobotRuntimeEnvironment.copyResourceFile("red_modules.py");
         } catch (final IOException e) {
             xmlRpcServerScriptFile = null;
         }
+    }
+
+    List<PythonProcessListener> getListeners() {
+        return processListeners;
+    }
+
+    void addProcessListener(final PythonProcessListener listener) {
+        processListeners.add(listener);
+    }
+
+    void removeProcessListener(final PythonProcessListener listener) {
+        processListeners.remove(listener);
     }
 
     synchronized void resetExecutorFor(final PythonInstallationDirectory interpreterPath) {

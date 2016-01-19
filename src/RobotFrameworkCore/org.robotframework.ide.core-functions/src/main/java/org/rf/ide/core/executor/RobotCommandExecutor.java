@@ -9,9 +9,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.xmlrpc.XmlRpcException;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
-
 import com.google.common.base.Optional;
 
 /**
@@ -20,11 +17,11 @@ import com.google.common.base.Optional;
  */
 interface RobotCommandExecutor {
 
-    List<File> getModulesSearchPaths() throws RobotEnvironmentException;
+    List<File> getModulesSearchPaths();
 
-    Optional<File> getModulePath(String moduleName) throws RobotEnvironmentException;
+    Optional<File> getModulePath(String moduleName);
 
-    Map<String, Object> getVariables(final String filePath, final List<String> fileArguments) throws XmlRpcException;
+    Map<String, Object> getVariables(final String filePath, final List<String> fileArguments);
 
     Map<String, Object> getGlobalVariables();
 
@@ -36,12 +33,9 @@ interface RobotCommandExecutor {
 
     String getRunModulePath();
 
-    void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath)
-            throws RobotEnvironmentException;
+    void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath);
 
-    void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath)
-            throws RobotEnvironmentException;
+    void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath);
 
-    void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath)
-            throws RobotEnvironmentException;
+    void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath);
 }
