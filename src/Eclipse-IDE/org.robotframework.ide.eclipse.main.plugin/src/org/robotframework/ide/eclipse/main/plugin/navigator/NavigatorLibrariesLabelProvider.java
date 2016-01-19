@@ -48,18 +48,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
         if (element instanceof RobotProjectDependencies) {
             final RobotProjectDependencies dependencies = (RobotProjectDependencies) element;
 
-            final StyledString styled = new StyledString(dependencies.getName());
-            final String additionalInfo = dependencies.getAdditionalInformation();
-            if (!additionalInfo.isEmpty()) {
-                styled.append(" ");
-            }
-            return styled.append(additionalInfo, new Styler() {
-
-                @Override
-                public void applyStyles(final TextStyle textStyle) {
-                    textStyle.foreground = RedTheme.getEclipseDecorationColor();
-                }
-            });
+            return new StyledString(dependencies.getName());
         } else if (element instanceof ErroneousLibrarySpecification) {
             final ErroneousLibrarySpecification libSpec = (ErroneousLibrarySpecification) element;
 
@@ -97,7 +86,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
             }
             styled.append(" ");
             int numberOfKeywords = 0;
-            List<KeywordSpecification> keywords = libSpec.getKeywords();
+            final List<KeywordSpecification> keywords = libSpec.getKeywords();
             if (keywords != null) {
                 numberOfKeywords = keywords.size();
             }
