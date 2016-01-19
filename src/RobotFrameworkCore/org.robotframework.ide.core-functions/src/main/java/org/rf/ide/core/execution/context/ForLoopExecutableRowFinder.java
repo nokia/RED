@@ -11,6 +11,8 @@ import java.util.List;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.TestCaseExecutionRowCounter;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
 
@@ -134,7 +136,7 @@ public class ForLoopExecutableRowFinder implements IRobotExecutableRowFinder {
     }
     
     private boolean isForLoopItem(final RobotExecutableRow<?> executableRow) {
-        return executableRow.getAction().getText().toString().equals("\\");
+        return executableRow.buildLineDescription().getRowType() == ERowType.FOR_CONTINUE;
     }
 
     private RobotExecutableRow<?> findExecutableRowForUserKeywordNestedInForLoop(final List<KeywordContext> currentKeywords) {
