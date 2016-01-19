@@ -17,6 +17,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class RobotExecutableRow<T> extends AModelElement<T> {
 
@@ -94,13 +95,36 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     }
 
     public boolean isExecutable() {
-        final RobotToken action = getAction();
-        return (action != null && !action.getTypes().contains(RobotTokenType.START_HASH_COMMENT))
-                && isNotEmptyForContinoue() && !action.getFilePosition().isNotSet();
-    }
-
-    private boolean isNotEmptyForContinoue() {
-        return getElementTokens().size() > 1 || !"\\".equals(action.getRaw().toString().trim());
+        boolean result = false;
+        if (action != null && !action.getFilePosition().isNotSet()) {
+            if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                String raw = action.getRaw().trim();
+                List<RobotToken> elementTokens = getElementTokens();
+                if (raw.equals("\\")) {
+                    if (elementTokens.size() > 1) {
+                        if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                            result = true;
+                        }
+                    }
+                } else if ("".equals(raw)) {
+                    @SuppressWarnings("unchecked")
+                    IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
+                    FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
+                    if (fileFormat == FileFormat.TSV) {
+                        if (elementTokens.size() > 1) {
+                            if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                                result = true;
+                            }
+                        }
+                    } else {
+                        result = true;
+                    }
+                } else {
+                    result = true;
+                }
+            }
+        }
+        return result;
     }
 
     public IExecutableRowDescriptor<T> buildLineDescription() {
