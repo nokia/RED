@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _COFiUJ2TEeW7B-b6O1LPeg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 1/18/16 10:36 AM
+Save-Time: 1/19/16 10:03 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -45,31 +45,32 @@ get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Se
     + "\t@{list_to_revert}=  Create List  1  2\n"
     + "\tReverse List  ${list_to_revert}\n"
     + "\tLog  ${list_to_revert}" | verify-true
+    
  // collapse each of testcasase 
 with [get-editor "Script.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn] {
     click-ruler -line 12
     click-ruler -line 18
 }
-wait 1500
-// verify if each testcase is collapsed
-get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Library  String\n"
-    + "Library  Collections\n\n\n"
-    + "*** Variables ***\n"
-    + "${x}    5\n"
-    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n"
-    + "*** Test Cases ***\n"
-    + "CAPITAL LETTER\n"
-    + "\t\n"
-    + "\t\n"
-    + "test1\n"
-    + "\tLog   ${long_name_global_value} \n\n"
-    + "*** Keywords ***\n"
-    + "REVERSE MY LIST\n"
-    + "\t@{list_to_revert}=  Create List  1  2\n"
-    + "\tReverse List  ${list_to_revert}\n"
-    + "\tLog  ${list_to_revert}" | verify-true
-    
+try -times 5 -delay 1000 -command{
+	// verify if each testcase is collapsed
+	get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+	    + "Library  String\n"
+	    + "Library  Collections\n\n\n"
+	    + "*** Variables ***\n"
+	    + "${x}    5\n"
+	    + "${long_name_global_value}    I have a space and \\t single tab\n\n\n"
+	    + "*** Test Cases ***\n"
+	    + "CAPITAL LETTER\n"
+	    + "\t\n"
+	    + "\t\n"
+	    + "test1\n"
+	    + "\tLog   ${long_name_global_value} \n\n"
+	    + "*** Keywords ***\n"
+	    + "REVERSE MY LIST\n"
+	    + "\t@{list_to_revert}=  Create List  1  2\n"
+	    + "\tReverse List  ${list_to_revert}\n"
+	    + "\tLog  ${list_to_revert}" | verify-true
+}    
 // uncollapse testcases
 with [get-editor "Script.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn] {
     click-ruler -line 18
