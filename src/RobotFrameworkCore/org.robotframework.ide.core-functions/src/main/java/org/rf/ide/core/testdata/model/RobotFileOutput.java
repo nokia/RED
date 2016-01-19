@@ -88,7 +88,7 @@ public class RobotFileOutput {
         String fileExtension = null;
         if (processedFile != null) {
             String filename = processedFile.getName();
-            int lastDot = filename.indexOf('.');
+            int lastDot = filename.lastIndexOf('.');
             if (lastDot > -1) {
                 fileExtension = filename.substring(lastDot + 1);
             }
