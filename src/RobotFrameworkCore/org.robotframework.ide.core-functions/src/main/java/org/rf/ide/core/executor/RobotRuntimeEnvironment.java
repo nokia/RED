@@ -14,9 +14,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.URI;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.xmlrpc.XmlRpcException;
 import org.rf.ide.core.execution.ExecutionElementsParser;
 import org.rf.ide.core.execution.IExecutionHandler;
 
@@ -48,6 +50,13 @@ public class RobotRuntimeEnvironment {
         return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
     }
 
+    public static void addProcessListener(final PythonProcessListener listener) {
+        PythonInterpretersCommandExecutors.getInstance().addProcessListener(listener);
+    }
+
+    public static void removeProcessListener(final PythonProcessListener listener) {
+        PythonInterpretersCommandExecutors.getInstance().removeProcessListener(listener);
+    }
 
     static int runExternalProcess(final List<String> command,
             final ILineHandler linesHandler) throws IOException {
@@ -171,24 +180,24 @@ public class RobotRuntimeEnvironment {
 
 
     /**
-     * Gets robot framework version as returned by following call:
-     * [interpreter_exec] -m robot.run --version e.g. python -m robot.run
-     * --version pypy -m robot.run --version
+     * Gets robot framework version.
      * 
      * @param pythonLocation
      * @return Robot version as returned by robot
      */
     private static String getRobotFrameworkVersion(
             final PythonInstallationDirectory pythonLocation) {
-        return PythonInterpretersCommandExecutors.getInstance()
-                .getRobotCommandExecutor(pythonLocation).getRobotVersion();
+        final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                .getRobotCommandExecutor(pythonLocation);
+        return executor.getRobotVersion();
     }
 
 
     private static String getRunModulePath(
             final PythonInstallationDirectory pythonLocation) {
-        return PythonInterpretersCommandExecutors.getInstance()
-                .getRobotCommandExecutor(pythonLocation).getRunModulePath();
+        final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                        .getRobotCommandExecutor(pythonLocation);
+        return executor.getRunModulePath();
     }
 
 
@@ -239,18 +248,28 @@ public class RobotRuntimeEnvironment {
 
             @Override
             public void run() {
+                if (temporaryDirectory == null) {
+                    return;
+                }
+                try {
+                    Files.walkFileTree(temporaryDirectory, new SimpleFileVisitor<Path>() {
 
-                if (temporaryDirectory != null) {
-                    final File[] files = new File(temporaryDirectory.toString())
-                            .listFiles();
-                    try {
-                        for (int i = 0; i < files.length; i++) {
-                            Files.delete(files[i].toPath());
+                        @Override
+                        public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
+                                throws IOException {
+                            Files.delete(file);
+                            return FileVisitResult.CONTINUE;
                         }
-                        Files.delete(temporaryDirectory);
-                    } catch (final IOException e) {
-                        e.printStackTrace();
-                    }
+
+                        @Override
+                        public FileVisitResult postVisitDirectory(final Path dir, final IOException exc)
+                                throws IOException {
+                            Files.delete(dir);
+                            return FileVisitResult.CONTINUE;
+                        }
+                    });
+                } catch (final IOException e) {
+                    e.printStackTrace();
                 }
             }
         });
@@ -271,8 +290,7 @@ public class RobotRuntimeEnvironment {
     public static RobotRuntimeEnvironment create(final File pathToPython) {
         try {
             final PythonInstallationDirectory location = checkPythonInstallationDir(pathToPython);
-            return new RobotRuntimeEnvironment(location,
-                    getRobotFrameworkVersion(location));
+            return new RobotRuntimeEnvironment(location, getRobotFrameworkVersion(location));
         } catch (final IllegalArgumentException e) {
             return new RobotRuntimeEnvironment(pathToPython, null);
         }
@@ -302,15 +320,9 @@ public class RobotRuntimeEnvironment {
 
     public List<File> getModuleSearchPaths() {
         if (hasRobotInstalled()) {
-            try {
-                return PythonInterpretersCommandExecutors
-                        .getInstance()
-                        .getRobotCommandExecutor(
-                                (PythonInstallationDirectory) location)
-                        .getModulesSearchPaths();
-            } catch (final RobotEnvironmentException e) {
-                return newArrayList();
-            }
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            return executor.getModulesSearchPaths();
         }
         return newArrayList();
     }
@@ -318,15 +330,9 @@ public class RobotRuntimeEnvironment {
 
     public Optional<File> getModulePath(final String moduleName) {
         if (hasRobotInstalled()) {
-            try {
-                return PythonInterpretersCommandExecutors
-                        .getInstance()
-                        .getRobotCommandExecutor(
-                                (PythonInstallationDirectory) location)
-                        .getModulePath(moduleName);
-            } catch (final RobotEnvironmentException e) {
-                return Optional.absent();
-            }
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            return executor.getModulePath(moduleName);
         }
         return Optional.absent();
     }
@@ -451,11 +457,9 @@ public class RobotRuntimeEnvironment {
 
     public List<String> getStandardLibrariesNames() {
         if (hasRobotInstalled()) {
-            final List<String> libs = PythonInterpretersCommandExecutors
-                    .getInstance()
-                    .getRobotCommandExecutor(
-                            (PythonInstallationDirectory) location)
-                    .getStandardLibrariesNames();
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            final List<String> libs = executor.getStandardLibrariesNames();
             // Remote is a library without keywords and libdoc throws
             // exceptions when trying to generate its specification
             libs.remove("Remote");
@@ -468,11 +472,9 @@ public class RobotRuntimeEnvironment {
 
     public File getStandardLibraryPath(final String libraryName) {
         if (hasRobotInstalled()) {
-            final String pycPath = PythonInterpretersCommandExecutors
-                    .getInstance()
-                    .getRobotCommandExecutor(
-                            (PythonInstallationDirectory) location)
-                    .getStandardLibraryPath(libraryName);
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            final String pycPath = executor.getStandardLibraryPath(libraryName);
             if (pycPath == null) {
                 return null;
             } else if (pycPath.endsWith(".py")) {
@@ -548,9 +550,8 @@ public class RobotRuntimeEnvironment {
 
     public Map<String, Object> getGlobalVariables() {
         if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors
-                    .getInstance().getRobotCommandExecutor(
-                            (PythonInstallationDirectory) location);
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
             return executor.getGlobalVariables();
         }
         return new LinkedHashMap<>();
@@ -559,15 +560,10 @@ public class RobotRuntimeEnvironment {
 
     public Map<String, Object> getVariablesFromFile(final String path, final List<String> args) {
         if (hasRobotInstalled()) {
+            final String normalizedPath = path.replace('\\', '/');
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            final String normalizedPath = path.replace('\\', '/');
-            try {
-                return executor.getVariables(normalizedPath, args);
-            } catch (XmlRpcException e) {
-                System.err.println("XML-RPC server error in file " + path + " with arguments " + args + ". Reason: "
-                        + e.getMessage());
-            }
+            return executor.getVariables(normalizedPath, args);
         }
         return new LinkedHashMap<String, Object>();
     }
@@ -752,12 +748,11 @@ public class RobotRuntimeEnvironment {
     }
 
     @SuppressWarnings("serial")
-    public static class RobotEnvironmentException extends Exception {
+    public static class RobotEnvironmentException extends RuntimeException {
 
         public RobotEnvironmentException(final String message) {
             super(message);
         }
-
 
         public RobotEnvironmentException(final String message,
                 final Throwable cause) {
