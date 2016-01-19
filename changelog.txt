@@ -1,0 +1,48 @@
+RED 0.6.0 - 2016/01/19
+
+Features
+    Validation include/exclude option in red.xml and under right click in Project Explorer
+    Auto two spaces in new line 
+
+Bug fixes
+    Step In/Over is not working in FOR keyword in Debug
+    Debug and variable resolving
+    Code coloring is wrong for string beginning with ${ , @{ &{
+    NPE when no Robot is installed
+    Missing coloring for dynamic parameters and parameter recognition
+    FOR outline shows each item as new keyword
+    Validation error msg - Unable to communicate with XML-RPC server - in file
+    Variable mapping - variable names should be case insensitive
+    Ignore validation and file listings in dot fodlers - .svn
+    Links with ${/} to resources and libs does not generate KW
+    Spaces in path libs - path syntax error popup
+    Using ${/} in lib path will not provide lib KW assist
+    NPE while validating %{ne_type} token
+    Show library source throws exception when library is include as module (by __init__.py)
+    HTML resource - change problem from error to warning as file type is valid but not supported by RED
+    RED Debug feature can't handle test suites with initialization files and Suite Setup inside
+    Content assist does not show proposal for Settings in TSV
+    Content assist is limited when cursor is on the last position in file
+    NPE when Test material contains initialization file with Suite Setup inside [DEBUG]
+    Variable from file with space in name are not recognize
+	Resizing (by width) Variable files in red.xml does strange effects
+
+Enhancements
+    Add X icon (close) to manpage from libspecs
+    Red.xml changes - new look
+    Reload python file after changes to have new variables in content assist
+    Remote debug - check valid port, runner rename, configure timeout
+    LibDoc reload after python lib change - by right click on library
+    For - add backslash \ when moving by enter to new line
+    Change default preference for COMMA for content assist
+    Embedded variables validation - ${SPACE * 10} , hex/dec/bin
+    Handle space before/after dot in lib refix to recognise following usage BuiltIn.<space>KW
+    Support libdoc for notation: library.classname
+    [DEBUG] Possibility to Step Into (F5) keywords inside resource which have dynamic location path or is BuiltIn.Import Resource loaded
+    Possibility to import Python variables file with parameters
+    KW recognition & validation for names with _ space
+	Add to help - activation of content assistance keys
+	Add to help - include/exclude validation
+
+Task
+    Check RED compatibility with new keyword types in Robot 3.0
