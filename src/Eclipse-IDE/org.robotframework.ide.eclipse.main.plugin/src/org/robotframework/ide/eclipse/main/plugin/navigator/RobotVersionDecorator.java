@@ -38,7 +38,9 @@ public class RobotVersionDecorator implements ILightweightLabelDecorator {
             final RobotProjectDependencies dependencies = (RobotProjectDependencies) element;
 
             final String additionalInfo = dependencies.getAdditionalInformation();
-            decoration.addSuffix(" " + additionalInfo);
+            if (!additionalInfo.isEmpty()) {
+                decoration.addSuffix(" " + additionalInfo);
+            }
         }
     }
 }
