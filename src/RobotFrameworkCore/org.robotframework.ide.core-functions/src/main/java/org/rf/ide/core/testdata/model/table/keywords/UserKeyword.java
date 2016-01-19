@@ -18,7 +18,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class UserKeyword extends AModelElement<KeywordTable> implements IExecutableStepsHolder<UserKeyword> {
+public class UserKeyword extends AModelElement<KeywordTable>implements IExecutableStepsHolder<UserKeyword> {
 
     private RobotToken keywordName;
 
@@ -51,6 +51,10 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
     public void addKeywordExecutionRow(final RobotExecutableRow<UserKeyword> executionRow) {
         executionRow.setParent(this);
         this.keywordContext.add(executionRow);
+    }
+
+    public void removeAllKeywordExecutionRows() {
+        keywordContext.clear();
     }
 
     public List<RobotExecutableRow<UserKeyword>> getKeywordExecutionRows() {
