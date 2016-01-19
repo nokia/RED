@@ -180,6 +180,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         boolean wasProcessingError = false;
         previousLineHandler.clear();
 
+        parsingOutput.setProcessedFile(robotFile);
         final LineReader lineHolder = new LineReader(reader);
         final BufferedReader lineReader = new BufferedReader(lineHolder);
         int lineNumber = 1;
@@ -328,7 +329,6 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             }
         }
 
-        parsingOutput.setProcessedFile(robotFile);
         fixIssueRelatedToForContinueForItem(parsingOutput);
 
         if (wasProcessingError) {
