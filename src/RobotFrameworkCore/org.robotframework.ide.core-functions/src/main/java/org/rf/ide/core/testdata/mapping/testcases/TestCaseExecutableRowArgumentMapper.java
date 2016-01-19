@@ -60,7 +60,8 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
         }
 
         if (text.startsWith("#") || commentContinue
-                || robotExecutableRow.isTsvComment(text, robotFileOutput.getFileFormat())) {
+                || RobotExecutableRow.isTsvComment(text, robotFileOutput.getFileFormat())) {
+            types.add(0, RobotTokenType.START_HASH_COMMENT);
             robotExecutableRow.addComment(rt);
         } else {
             if (robotExecutableRow.getAction().getFilePosition().isNotSet()) {
@@ -68,6 +69,7 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
                 types.add(0, RobotTokenType.TEST_CASE_ACTION_NAME);
                 robotExecutableRow.setAction(rt);
             } else {
+                types.add(0, RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
                 robotExecutableRow.addArgument(rt);
             }
         }
