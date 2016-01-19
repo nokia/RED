@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model.table;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -20,6 +21,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
 public class RobotExecutableRow<T> extends AModelElement<T> {
+
+    private final static Pattern TSV_COMMENT = Pattern.compile("(\\s)*\"(\\s)*[#].*\"(\\s)*$");
 
     private RobotToken action;
 
@@ -97,6 +100,10 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     public boolean isExecutable() {
         boolean result = false;
         if (action != null && !action.getFilePosition().isNotSet()) {
+            @SuppressWarnings("unchecked")
+            IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
+            FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
+
             if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
                 String raw = action.getRaw().trim();
                 List<RobotToken> elementTokens = getElementTokens();
@@ -107,9 +114,6 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
                         }
                     }
                 } else if ("".equals(raw)) {
-                    @SuppressWarnings("unchecked")
-                    IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
-                    FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
                     if (fileFormat == FileFormat.TSV) {
                         if (elementTokens.size() > 1) {
                             if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
@@ -125,6 +129,10 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
             }
         }
         return result;
+    }
+
+    public static boolean isTsvComment(final String raw, final FileFormat format) {
+        return (format == FileFormat.TSV && TSV_COMMENT.matcher(raw).matches());
     }
 
     public IExecutableRowDescriptor<T> buildLineDescription() {

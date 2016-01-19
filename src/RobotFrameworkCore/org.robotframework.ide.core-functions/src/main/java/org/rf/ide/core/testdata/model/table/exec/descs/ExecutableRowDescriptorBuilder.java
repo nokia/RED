@@ -19,29 +19,22 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class ExecutableRowDescriptorBuilder {
 
     private final List<IRowDescriptorBuilder> builders = new ArrayList<>();
-
 
     public ExecutableRowDescriptorBuilder() {
         builders.add(new ForLoopDeclarationRowDescriptorBuilder());
         builders.add(new ForLoopContinueRowDescriptorBuilder());
     }
 
-
     @VisibleForTesting
-    public ExecutableRowDescriptorBuilder(
-            final List<IRowDescriptorBuilder> builders) {
+    public ExecutableRowDescriptorBuilder(final List<IRowDescriptorBuilder> builders) {
         this.builders.addAll(builders);
     }
 
-
-    public <T> IExecutableRowDescriptor<T> buildLineDescriptor(
-            final RobotExecutableRow<T> execRowLine) {
-        IExecutableRowDescriptor<T> rowDesc = new SimpleRowDescriptor<T>(
-                execRowLine);
+    public <T> IExecutableRowDescriptor<T> buildLineDescriptor(final RobotExecutableRow<T> execRowLine) {
+        IExecutableRowDescriptor<T> rowDesc = new SimpleRowDescriptor<T>(execRowLine);
 
         if (execRowLine.isExecutable()) {
             List<RobotToken> elementTokens = execRowLine.getElementTokens();
@@ -56,17 +49,14 @@ public class ExecutableRowDescriptorBuilder {
                     }
                 }
 
-                rowDesc = builderToUse.buildDescription(execRowLine,
-                        acceptResult);
+                rowDesc = builderToUse.buildDescription(execRowLine, acceptResult);
             }
         } else {
-            rowDesc = new SimpleRowDescriptorBuilder().buildDescription(
-                    execRowLine, new AcceptResult(true));
+            rowDesc = new SimpleRowDescriptorBuilder().buildDescription(execRowLine, new AcceptResult(true));
         }
 
         return rowDesc;
     }
-
 
     public List<IRowDescriptorBuilder> getBuilders() {
         return Collections.unmodifiableList(builders);
