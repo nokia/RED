@@ -30,6 +30,7 @@ import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.mapping.table.IParsingMapper;
+import org.rf.ide.core.testdata.mapping.table.MetadataOldSyntaxUtility;
 import org.rf.ide.core.testdata.mapping.table.ParsingStateHelper;
 import org.rf.ide.core.testdata.mapping.table.PrettyAlignSpaceUtility;
 import org.rf.ide.core.testdata.mapping.table.SettingsMapperProvider;
@@ -81,6 +82,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
     private final PrettyAlignSpaceUtility alignUtility;
 
+    private final MetadataOldSyntaxUtility metadataUtility;
+
     private final ParsingStateHelper parsingStateHelper;
 
     private final LibraryAliasFixer libraryFixer;
@@ -98,6 +101,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
     public ATextualRobotFileParser(final TokenSeparatorBuilder tokenSeparatorBuilder) {
         this.tokenSeparatorBuilder = tokenSeparatorBuilder;
         this.utility = new ElementsUtility();
+        this.metadataUtility = new MetadataOldSyntaxUtility();
         this.alignUtility = new PrettyAlignSpaceUtility();
         this.variableHelper = new CommonVariableHelper();
         this.parsingStateHelper = new ParsingStateHelper();
@@ -238,6 +242,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                                 currentOffset += rt.getRaw().length();
                                 line.addLineElement(rt);
 
+                                metadataUtility.fixSettingMetadata(parsingOutput, line, rt, processingState);
                                 alignUtility.extractPrettyAlignWhitespaces(line, rt, rawText);
 
                                 isNewLine = false;
@@ -263,6 +268,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                             currentOffset += rt.getRaw().length();
                             line.addLineElement(rt);
 
+                            metadataUtility.fixSettingMetadata(parsingOutput, line, rt, processingState);
                             alignUtility.extractPrettyAlignWhitespaces(line, rt, rawText);
 
                             lastColumnProcessed = textLength;
