@@ -127,17 +127,21 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         new Thread(new Runnable() {
             @Override
             public void run() {
+                try {
+                    semaphore.acquire();
+                } catch (final InterruptedException e) {
+                    // that fine
+                }
                 final InputStream inputStream = process.getErrorStream();
                 try (final BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
                     String line = reader.readLine();
                     while (line != null) {
-                        semaphore.acquire();
                         for (final PythonProcessListener listener : getListeners()) {
                             listener.errorLineRead(serverProcess, line);
                         }
                         line = reader.readLine();
                     }
-                } catch (final IOException | InterruptedException e) {
+                } catch (final IOException e) {
                     // that fine
                 }
             }
