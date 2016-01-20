@@ -16,7 +16,7 @@ def log_error(message):
 
 def encode_result_or_exception(func):
     def inner(*args, **kwargs):
-        result = {'result': None, 'exception' : None} 
+        result = {'result': None, 'exception' : None}
         try:
             result['result'] = func(*args, **kwargs)
             return result
@@ -188,7 +188,7 @@ if __name__ == '__main__':
     red_checking_thread.start()
 
     robot_ver = _get_robot_version()
-    log('# RED session server started')
+    log('# RED session server started @' + str(PORT))
     log('# python version: ' + sys.version)
     log('# robot version: ' + (robot_ver if robot_ver else "<no robot installed>"))
     log('# script path: ' + __file__)
