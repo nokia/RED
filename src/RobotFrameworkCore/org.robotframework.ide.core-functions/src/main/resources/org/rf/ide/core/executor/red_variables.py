@@ -68,7 +68,7 @@ def _wrap_variable_if_needed(varname):
         return '${' + varname + '}'
 
 def get_variables(dir, arguments):
-    import robot.variables as rv
+    import robot
     try:
         from robot.utils.dotdict import DotDict
     except:  # for robot <2.9
@@ -76,7 +76,7 @@ def get_variables(dir, arguments):
             pass
     import inspect
     
-    vars = rv.Variables()
+    vars = robot.variables.Variables()
     try:
         vars.set_from_file(dir, arguments)
     except:
@@ -92,19 +92,20 @@ def get_variables(dir, arguments):
     for k, v in vars_from_file.items():
         try:
             if isinstance(v, DotDict):
-                filtered_vars[k] = _extractDotDict(v)
+                filtered_vars[k] = _extract_dot_dict(v)
             elif not inspect.ismodule(v) and not inspect.isfunction(v) and not inspect.isclass(v):
                 filtered_vars[k] = _escape_unicode(v)
         except Exception as e:
             filtered_vars[k] = 'None'
     return filtered_vars
 
-def _extractDotDict(dict):
+def _extract_dot_dict(dict):
     return {k : _escape_unicode(v) for k, v in dict.items()}
 
 
 def _escape_unicode(data):
     # basestring and long is not defined in python3
+    import sys
     py_version = sys.version_info
     if py_version < (3,0,0) and isinstance(data, unicode):
         import unicodedata
