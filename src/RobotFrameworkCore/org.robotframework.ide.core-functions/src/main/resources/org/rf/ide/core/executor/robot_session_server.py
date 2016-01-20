@@ -10,7 +10,7 @@ def log(message):
     sys.stdout.write(message + '\n')
     sys.stdout.flush()
     
-def logError(message):
+def log_error(message):
     sys.stderr.write(message + '\n')
     sys.stderr.flush()
 
@@ -24,7 +24,7 @@ def encode_result_or_exception(func):
             import traceback
             msg = traceback.format_exc()
             result['exception'] = msg
-            logError(msg)
+            log_error(msg)
             return result
     return inner    
  
