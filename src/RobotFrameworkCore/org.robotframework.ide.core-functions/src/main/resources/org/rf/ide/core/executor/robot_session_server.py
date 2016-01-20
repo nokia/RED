@@ -161,6 +161,9 @@ def __shutdown_server_when_parent_process_becomes_unavailable(server):
 
 
 if __name__ == '__main__':
+    import socket
+    socket._GLOBAL_DEFAULT_TIMEOUT = 20
+    
     import sys
     from threading import Thread
     try:
