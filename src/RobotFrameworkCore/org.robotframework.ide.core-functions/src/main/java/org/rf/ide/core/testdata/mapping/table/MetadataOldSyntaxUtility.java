@@ -5,11 +5,13 @@
  */
 package org.rf.ide.core.testdata.mapping.table;
 
+import java.util.List;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -52,6 +54,10 @@ public class MetadataOldSyntaxUtility {
                 metadataKeyToken.setRaw(metadataKey);
                 metadataKeyToken.setType(RobotTokenType.SETTING_METADATA_KEY);
                 line.addLineElement(metadataKeyToken);
+
+                List<Metadata> metadatas = out.getFileModel().getSettingTable().getMetadatas();
+                Metadata lastMetadata = metadatas.get(metadatas.size() - 1);
+                lastMetadata.setKey(metadataKeyToken);
 
                 processingState.push(ParsingState.SETTING_METADATA_KEY);
             }
