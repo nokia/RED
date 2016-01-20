@@ -197,7 +197,13 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             while ((currentLineText = lineReader.readLine()) != null) {
                 final RobotLine line = new RobotLine(lineNumber, parsingOutput.getFileModel());
                 // removing BOM
+                if (currentLineText.toCharArray().length > 0) {
+                    if (currentLineText.charAt(0) == 0xFEFF) {
+                        currentOffset++;
+                    }
+                }
                 currentLineText = currentLineText.replace("\uFEFF", "");
+
                 final StringBuilder text = new StringBuilder(currentLineText);
                 int lastColumnProcessed = 0;
                 // get separator for this line
