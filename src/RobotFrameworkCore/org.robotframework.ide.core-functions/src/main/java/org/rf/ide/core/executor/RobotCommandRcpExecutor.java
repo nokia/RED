@@ -332,7 +332,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         }
     }
 
-    Object callRpcFunction(final String functionName, final Object... arguments) throws XmlRpcException {
+    private Object callRpcFunction(final String functionName, final Object... arguments) throws XmlRpcException {
         final Object rpcResult = client.execute(functionName, arguments);
         return resultOrException(rpcResult);
     }
