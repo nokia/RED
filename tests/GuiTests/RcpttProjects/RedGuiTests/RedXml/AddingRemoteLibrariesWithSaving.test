@@ -74,15 +74,12 @@ with [get-editor "RobotProject/red.xml" | get-section "Remote library locations"
 get-view Problems | get-tree | select "Errors \\(.*\\)" | double-click
 with [get-view Problems | get-tree] {
     get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
-        | equals "FATAL: Unable to generate library specification file for library Remote::http://158.5.0.1:994/" 
-        | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
         | equals "Unreachable remote server http://127.0.0.1:8270/" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
         | equals "Unreachable remote server http://158.5.0.1:994/" | verify-true
-    get-property "getItems().TreeItem[0].getItems().TreeItem[3].getText()" | equals "Unreachable remote server nothing" 
+    get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" | equals "Unreachable remote server nothing" 
         | verify-true
-    get-property "getItems().TreeItem[0].getText()" | equals "Errors (4 items)" | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Errors (3 items)" | verify-true
 }
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
