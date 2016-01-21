@@ -8,7 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -100,12 +102,21 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     private void validateRemoteLocation(final RemoteLocation location, final Map<Object, ProblemPosition> linesMapping,
             final ProblemsReportingStrategy reporter) throws CoreException {
         final URI uriAddress = location.getUriAddress();
-        try (Socket s = new Socket(uriAddress.getHost(), uriAddress.getPort())) {
-            // that's fine
+        @SuppressWarnings("resource")
+        final Socket s = new Socket();
+        try {
+            final SocketAddress sockaddr = new InetSocketAddress(uriAddress.getHost(), uriAddress.getPort());
+            s.connect(sockaddr, 5000);
         } catch (final IOException | IllegalArgumentException ex) {
             final RobotProblem unreachableHostProblem = RobotProblem.causedBy(ConfigFileProblem.UNREACHABLE_HOST)
                     .formatMessageWith(uriAddress);
             reporter.handleProblem(unreachableHostProblem, configFile, linesMapping.get(location));
+        } finally {
+            try {
+                s.close();
+            } catch (final IOException e) {
+                // fine
+            }
         }
     }
 
