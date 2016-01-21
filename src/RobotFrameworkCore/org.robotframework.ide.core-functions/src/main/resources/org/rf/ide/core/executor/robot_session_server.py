@@ -6,31 +6,33 @@
 # Author: Mateusz Marzec
 #
 
-def log(message):
-    sys.stdout.write(message + '\n')
-    sys.stdout.flush()
     
-def log_error(message):
-    sys.stderr.write(message + '\n')
-    sys.stderr.flush()
+class Logger(object):
+    def log(self, message):
+        sys.stdout.write(message + '\n')
+        sys.stdout.flush()
+        
+    def log_error(self, message):
+        sys.stderr.write(message + '\n')
+        sys.stderr.flush()
 
 def encode_result_or_exception(func):
+    import traceback
     def inner(*args, **kwargs):
         result = {'result': None, 'exception' : None}
         try:
             result['result'] = func(*args, **kwargs)
             return result
         except: 
-            import traceback
             msg = traceback.format_exc()
             result['exception'] = msg
-            log_error(msg)
+            Logger().log_error(msg)
             return result
     return inner    
  
 def logargs(func):
+    from datetime import datetime
     def inner(*args, **kwargs):
-        from datetime import datetime
         current_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
         
         msg = '[' + current_time + '] calling \'' + func.__name__ + '\' function, '
@@ -38,20 +40,20 @@ def logargs(func):
             msg = msg + 'no arguments'
         else:
             msg = msg + 'supplied arguments:\n' + '\n'.join(map(lambda arg : '    > ' + str(arg), args))
-        log(msg)
+        Logger().log(msg)
         return func(*args, **kwargs)
     return inner
 
 def logresult(func):
+    from datetime import datetime
     def inner(*args, **kwargs):
         ret = func(*args, **kwargs)
-        from datetime import datetime
         current_time = datetime.now().strftime('%H:%M:%S.%f')[:-3]
         
         if ret['exception']: 
-            log('[' + current_time + '] call ended with exception, see stderr for details')
+            Logger().log('[' + current_time + '] call ended with exception, see stderr for details')
         else:
-            log('[' + current_time + '] call ended with result:\n    > ' + str(ret['result']))
+            Logger().log('[' + current_time + '] call ended with result:\n    > ' + str(ret['result']))
         return ret
     return inner
 
@@ -162,7 +164,7 @@ def __shutdown_server_when_parent_process_becomes_unavailable(server):
 
 if __name__ == '__main__':
     import socket
-    socket._GLOBAL_DEFAULT_TIMEOUT = 20
+    socket.setdefaulttimeout(10)
     
     import sys
     from threading import Thread
@@ -191,10 +193,11 @@ if __name__ == '__main__':
     red_checking_thread.start()
 
     robot_ver = _get_robot_version()
-    log('# RED session server started @' + str(PORT))
-    log('# python version: ' + sys.version)
-    log('# robot version: ' + (robot_ver if robot_ver else "<no robot installed>"))
-    log('# script path: ' + __file__)
-    log('\n')
+    logger = Logger()
+    logger.log('# RED session server started @' + str(PORT))
+    logger.log('# python version: ' + sys.version)
+    logger.log('# robot version: ' + (robot_ver if robot_ver else "<no robot installed>"))
+    logger.log('# script path: ' + __file__)
+    logger.log('\n')
     
     server.serve_forever()
