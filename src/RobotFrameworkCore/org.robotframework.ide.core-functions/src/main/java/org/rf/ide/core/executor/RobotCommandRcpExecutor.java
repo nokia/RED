@@ -92,6 +92,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
 
     private void startStdOutReadingThread(final Process process, final Semaphore semaphore) {
         new Thread(new Runnable() {
+
             @Override
             public void run() {
                 for (final PythonProcessListener listener : getListeners()) {
@@ -125,6 +126,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
 
     private void startStdErrReadingThread(final Process process, final Semaphore semaphore) {
         new Thread(new Runnable() {
+
             @Override
             public void run() {
                 try {
@@ -221,7 +223,10 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             }
             return variables;
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to communicate with XML-RPC server", e);
+            e.printStackTrace();
+            throw new RobotEnvironmentException(
+                    "Unable to communicate with XML-RPC server. File " + filePath + " with arguments " + fileArguments,
+                    e);
         }
     }
 
