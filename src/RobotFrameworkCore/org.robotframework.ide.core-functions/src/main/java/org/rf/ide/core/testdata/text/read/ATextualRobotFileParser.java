@@ -196,6 +196,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         try {
             while ((currentLineText = lineReader.readLine()) != null) {
                 final RobotLine line = new RobotLine(lineNumber, parsingOutput.getFileModel());
+                currentOffset = handleCRLFcaseSplittedBetweenBuffers(parsingOutput, lineHolder, lineNumber,
+                        currentOffset);
                 // removing BOM
                 if (currentLineText.toCharArray().length > 0) {
                     if (currentLineText.charAt(0) == 0xFEFF) {
@@ -319,6 +321,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 parsingStateHelper.updateStatusesForNewLine(processingState);
                 isNewLine = true;
             }
+
+            currentOffset = handleCRLFcaseSplittedBetweenBuffers(parsingOutput, lineHolder, lineNumber, currentOffset);
         } catch (final FileNotFoundException e) {
             parsingOutput.addBuildMessage(BuildMessage
                     .createErrorMessage("File " + robotFile + " was not found.\nStack:" + e, "File " + robotFile));
@@ -353,6 +357,29 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         }
 
         return parsingOutput;
+    }
+
+    @VisibleForTesting
+    protected int handleCRLFcaseSplittedBetweenBuffers(final RobotFileOutput parsingOutput, final LineReader lineHolder,
+            final int lineNumber, final int currentOffset) {
+        int newOffset = currentOffset;
+        if (lineNumber > 1) {
+            RobotLine prevLine = parsingOutput.getFileModel().getFileContent().get(lineNumber - 2);
+            IRobotLineElement prevEOL = prevLine.getEndOfLine();
+            List<Constant> lineEnd = lineHolder.getLineEnd(prevEOL.getStartOffset());
+            IRobotLineElement buildEOL = EndOfLineBuilder.newInstance()
+                    .setEndOfLines(lineEnd)
+                    .setStartColumn(prevEOL.getStartColumn())
+                    .setStartOffset(prevEOL.getStartOffset())
+                    .setLineNumber(prevEOL.getLineNumber())
+                    .buildEOL();
+            if (prevEOL.getTypes().get(0) != buildEOL.getTypes().get(0)) {
+                prevLine.setEndOfLine(lineEnd, currentOffset, prevEOL.getStartColumn());
+                newOffset++;
+            }
+        }
+
+        return newOffset;
     }
 
     /**
