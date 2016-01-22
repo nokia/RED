@@ -145,7 +145,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     @Override
     public Optional<? extends RobotElement> findElement(final int offset) {
-        if (linkedElement.getBeginPosition().getOffset() <= offset
+        if (!linkedElement.getBeginPosition().isNotSet() && linkedElement.getBeginPosition().getOffset() <= offset
                 && offset <= linkedElement.getEndPosition().getOffset()) {
             return Optional.of(this);
         }
