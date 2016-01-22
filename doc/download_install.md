@@ -2,11 +2,11 @@
 
 ### Get Java
 
-RED is compatible with any Sun Java newer than 1.7 . Java official website: [www.java.com](https://www.java.com)
+RED is compatible with any Oracle Java newer than 1.7 . Java official website: [www.java.com](https://www.java.com)
 
 ### Get Eclipse
 
-Currently RED is tested with Eclipse Luna ( v4.4.x ) release thus we currently recommend Luna to be used. Other Eclipse releases will be supported until further notice. We recommend to download respective OS version of Eclipse SDK Official Eclipse Luna archive: [archive.eclipse.org/eclipse/downloads/drops4/R-4.4.2-201502041700](http://archive.eclipse.org/eclipse/downloads/drops4/R-4.4.2-201502041700/)
+Currently RED is tested with Eclipse Mars ( v4.5.x ) release thus we currently recommend Mars to be used. Eclipse Luna is supported also. We recommend to download respective OS version of Eclipse IDE for Java Developers: [https://www.eclipse.org/downloads/](https://www.eclipse.org/downloads/)
 
 ### Get RED
 
