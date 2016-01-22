@@ -1,0 +1,39 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: NamingSections
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _rLp-cMDyEeWqU8ILayOzQw
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 1/22/16 11:39 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// check if sections written diferently - with/without speces are colored and recognised correctly 
+
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 9
+    key-type Del
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "styles[0].start" | equals 0 | verify-true
+    get-property "styles[0].length" | equals 17 | verify-true
+    get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 10
+    type-text " "
+    set-caret-pos 1 13
+    type-text " "
+    set-caret-pos 1 15
+    type-text " "
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property "styles[0].foregroundColor" | equals "#FF0000" 
+    | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
