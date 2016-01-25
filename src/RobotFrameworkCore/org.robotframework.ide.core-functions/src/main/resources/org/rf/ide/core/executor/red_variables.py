@@ -119,13 +119,15 @@ def _escape_unicode(data):
     if py_version < (3,0,0) and isinstance(data, long):  # for OverflowError in XML-RPC
         return str(data)
     if isinstance(data, dict):
+        data_result = {}
         for key, val in data.items():
             if isinstance(key, tuple):
                 return 'None'
-            data[key] = _escape_unicode(val)
+            data_result[_escape_unicode(str(key))] = _escape_unicode(val)
+        return data_result
     if isinstance(data, list):
         for index, item in enumerate(data):
-         data[index] = _escape_unicode(item)
+            data[index] = _escape_unicode(item)
     if isinstance(data, tuple):   
         tuple_data = ()
         for item in data:
