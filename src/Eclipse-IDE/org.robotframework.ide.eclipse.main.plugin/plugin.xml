@@ -44,7 +44,7 @@
             name="Robot Test Suite">
       </wizard>
    </extension>
-   <extension
+   <!--<extension
          point="org.eclipse.ui.importWizards">
       <category
             id="org.robotframework.red.wizards.import.category"
@@ -60,7 +60,7 @@
             Import folder with Robot files as project into the workspace
          </description>
       </wizard>
-   </extension>
+   </extension>-->
    <extension
          point="org.eclipse.core.contenttype.contentTypes">
       <content-type
