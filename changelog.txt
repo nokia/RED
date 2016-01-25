@@ -6,6 +6,7 @@ Features
 
 Bug fixes
 	TSV specific issues for FOR, multiline, comments which caused NPE 
+	Python server exceptions while processing variables python files
     Step In/Over is not working in FOR keyword in Debug
     Debug and variable resolving
     Code coloring is wrong for string beginning with ${ , @{ &{
