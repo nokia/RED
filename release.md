@@ -4,9 +4,9 @@ RED Robot Editor is Eclipse based editor for RobotFramework test cases.
 Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
 
 ## Requirements 
-Oracle Java 1.7+  https://www.java.com/
-Eclipse Mars (v 4.5) or Luna (v 4.4), preferably IDE foe Java Developers  https://www.eclipse.org/downloads/
-Python & RobotFramework installed
+*  Oracle Java 1.7+  https://www.java.com/
+*  Eclipse Mars (v 4.5) or Luna (v 4.4), preferably IDE foe Java Developers  https://www.eclipse.org/downloads/
+*  Python & RobotFramework installed
 
 ## How to install
 Download RED eclipse feature zip: <link>
