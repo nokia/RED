@@ -1,4 +1,4 @@
-RED 0.6.0 - 2016/01/19
+RED 0.6.0 - 2016/01/26
 
 Features
     Validation include/exclude option in red.xml and under right click in Project Explorer
