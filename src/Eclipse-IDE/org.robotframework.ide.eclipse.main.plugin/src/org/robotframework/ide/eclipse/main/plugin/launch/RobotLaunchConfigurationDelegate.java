@@ -60,6 +60,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
+import org.robotframework.ide.eclipse.main.plugin.views.MessageLogView;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.CaseFormat;
@@ -79,7 +80,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     
     private final AtomicBoolean isConfigurationRunning = new AtomicBoolean(false);
     
-    private boolean isExecutionViewInitialized;
+    private boolean hasViewsInitialized;
     
     public RobotLaunchConfigurationDelegate() {
         launchManager = DebugPlugin.getDefault().getLaunchManager();
@@ -161,7 +162,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             return;
         }
         try {
-            initExecutionView();
+            initViews();
             robotEventBroker.sendClearEventToMessageLogView();
             robotEventBroker.sendClearEventToExecutionView();
             doLaunch(configuration, mode, launch, monitor);
@@ -435,8 +436,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         return isListening;
     }
     
-    private void initExecutionView() {
-        if (!isExecutionViewInitialized) {
+    private void initViews() {
+        if (!hasViewsInitialized) {
             final IWorkbench workbench = PlatformUI.getWorkbench();
             workbench.getDisplay().syncExec(new Runnable() {
 
@@ -444,20 +445,27 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 public void run() {
                     final IWorkbenchPage page = workbench.getActiveWorkbenchWindow().getActivePage();
                     if (page != null) {
-                        final IViewPart executionViewPart = page.findView(ExecutionView.ID);
-                        if (executionViewPart != null && page.isPartVisible(executionViewPart)) {
-                            return;
-                        }
-                        try {
-                            page.showView(ExecutionView.ID);
-                        } catch (final PartInitException e) {
-                            e.printStackTrace();
+                        final IViewPart messageLogViewPart = page.findView(MessageLogView.ID);
+                        if (messageLogViewPart == null || !page.isPartVisible(messageLogViewPart)) {
+                            try {
+                                page.showView(MessageLogView.ID);
+                            } catch (final PartInitException e) {
+                                e.printStackTrace();
+                            }
                         }
 
+                        final IViewPart executionViewPart = page.findView(ExecutionView.ID);
+                        if (executionViewPart == null || !page.isPartVisible(executionViewPart)) {
+                            try {
+                                page.showView(ExecutionView.ID);
+                            } catch (final PartInitException e) {
+                                e.printStackTrace();
+                            }
+                        }
                     }
                 }
             });
-            isExecutionViewInitialized = true;
+            hasViewsInitialized = true;
         }
     }
 }
