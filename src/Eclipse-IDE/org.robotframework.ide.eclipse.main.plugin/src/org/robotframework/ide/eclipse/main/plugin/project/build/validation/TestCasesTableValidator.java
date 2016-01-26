@@ -19,11 +19,13 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
+import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.Number;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -229,13 +231,14 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final Set<String> variables = validationContext.getAccessibleVariables();
 
         for (final TestCase testCase : cases) {
-            reportUnknownVariables(suiteModel.getFile(), reporter, testCase.getTestExecutionRows(), variables);
+            reportUnknownVariables(suiteModel.getFile(), reporter, validationContext, testCase.getTestExecutionRows(), variables);
         }
     }
 
     static void reportUnknownVariables(final IFile file, final ProblemsReportingStrategy reporter,
-            final List<? extends RobotExecutableRow<?>> executables, final Set<String> variables) {
-        
+            final FileValidationContext validationContext, final List<? extends RobotExecutableRow<?>> executables,
+            final Set<String> variables) {
+    
         final Set<String> definedVariables = newHashSet(variables);
 
         for (final RobotExecutableRow<?> row : executables) {
@@ -246,8 +249,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
                     if (!variableDeclaration.isDynamic() 
                             && !VariableNamesSupport.isDefinedVariable(variableDeclaration, definedVariables)) {
                         
-                        if (variableDeclaration.getVariableType() instanceof Number
-                                || VariableNamesSupport.isDefinedVariableInsideComputation(variableDeclaration, definedVariables)) {
+                        if (isSpecificVariableDeclaration(validationContext, lineDescription, definedVariables,
+                                variableDeclaration)) {
                             continue;
                         }
                         
@@ -266,5 +269,42 @@ class TestCasesTableValidator implements ModelUnitValidator {
                 definedVariables.addAll(VariableNamesSupport.extractUnifiedVariableNames(lineDescription.getCreatedVariables()));
             }
         }
+    }
+
+    private static boolean isSpecificVariableDeclaration(final FileValidationContext validationContext,
+            final IExecutableRowDescriptor<?> lineDescription, final Set<String> definedVariables, final VariableDeclaration variableDeclaration) {
+        return variableDeclaration.getVariableType() instanceof Number
+                || VariableNamesSupport.isDefinedVariableInsideComputation(variableDeclaration, definedVariables)
+                || isVariableInSetterOrCommentKeyword(lineDescription, validationContext, definedVariables);
+    }
+    
+    private static boolean isVariableInSetterOrCommentKeyword(final IExecutableRowDescriptor<?> lineDescription,
+            final FileValidationContext validationContext, final Set<String> definedVariables) {
+        final String keywordName = QualifiedKeywordName.fromOccurrence(getKeywordName(lineDescription))
+                .getKeywordName();
+        if (keywordName.equals("settestvariable") && isKeywordFromBuiltin(validationContext, keywordName)) {
+            final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
+            if (!usedVariables.isEmpty()) {
+                definedVariables.add(usedVariables.get(0).asToken().getText());
+                return true;
+            }
+        } else if (keywordName.equals("comment") && isKeywordFromBuiltin(validationContext, keywordName)) {
+            return true;
+        }
+        return false;
+    }
+    
+    private static boolean isKeywordFromBuiltin(final FileValidationContext validationContext, final String keywordName) {
+        return validationContext.findMatchingKeywordValidationContexts(keywordName).size() == 1;
+    }
+
+    private static String getKeywordName(final IExecutableRowDescriptor<?> lineDescription) {
+        RobotAction action = null;
+        if (lineDescription.getRowType() == ERowType.FOR_CONTINUE) {
+            action = ((ForLoopContinueRowDescriptor<?>) lineDescription).getKeywordAction();
+        } else {
+            action = lineDescription.getAction();
+        }
+        return action.getToken().getText();
     }
 }

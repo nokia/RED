@@ -170,8 +170,8 @@ class KeywordTableValidator implements ModelUnitValidator {
             final Set<String> allVariables = newHashSet(variables);
             allVariables.addAll(extractArgumentVariables(keyword, variableExtractor, fileName));
 
-            TestCasesTableValidator.reportUnknownVariables(file, reporter, keyword.getKeywordExecutionRows(),
-                    allVariables);
+            TestCasesTableValidator.reportUnknownVariables(file, reporter, validationContext,
+                    keyword.getKeywordExecutionRows(), allVariables);
         }
     }
 

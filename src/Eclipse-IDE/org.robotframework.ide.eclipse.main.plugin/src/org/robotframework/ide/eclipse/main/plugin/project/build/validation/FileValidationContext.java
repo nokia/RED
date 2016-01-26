@@ -139,7 +139,7 @@ public class FileValidationContext {
         return null;
     }
 
-    private List<KeywordValidationContext> findMatchingKeywordValidationContexts(final String name) {
+    protected List<KeywordValidationContext> findMatchingKeywordValidationContexts(final String name) {
         final Collection<KeywordValidationContext> keywordsContexts = getPossibleContexts(name);
 
         final List<KeywordValidationContext> matchingContexts = new ArrayList<>();
