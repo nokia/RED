@@ -2,6 +2,7 @@ package org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ public class VariableComputationHelperExtractionParametrizedTest {
     @Parameters(name = "${0}")
     public static Iterable<Object[]> data() throws Exception {
         List<String> lines = Files.readAllLines(Paths.get(VariableComputationHelperExtractionParametrizedTest.class
-                .getResource("VAR_WITH_MATH_OPERATIONS.cvs").toURI()));
+                .getResource("VAR_WITH_MATH_OPERATIONS.cvs").toURI()), Charset.forName("UTF-8"));
 
         List<Object[]> o = new ArrayList<>(0);
         int lineNumber = 0;

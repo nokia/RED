@@ -26,7 +26,7 @@ public class CommonVariableHelper {
 
     private static final Pattern NAME = Pattern.compile("[{](.+?)[}]");
 
-    private static final Pattern ASSIGN = Pattern.compile("((\\s)*[=]+)+(\\s)*$");
+    private static final Pattern ASSIGN = Pattern.compile("(\\s)*((\\s*)[=])+(\\s)*$");
 
     private final ParsingStateHelper stateHelper;
 
