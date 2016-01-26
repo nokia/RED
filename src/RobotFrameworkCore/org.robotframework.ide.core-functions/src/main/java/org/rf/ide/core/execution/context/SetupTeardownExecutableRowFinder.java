@@ -74,9 +74,9 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
     private RobotExecutableRow<TestCase> extractExecutableRowFromSettingTable(
             final List<? extends AKeywordBaseSetting<SettingTable>> settingsList) {
         if (settingsList != null && !settingsList.isEmpty()) {
-            TestCase artCase = new TestCase(null);
-            artCase.setParent(settingsList.get(0).getParent().getParent().getTestCaseTable());
-            return createSetupExecutableRow(settingsList.get(0).getKeywordName(), artCase);
+            TestCase tempCase = new TestCase(null);
+            tempCase.setParent(settingsList.get(0).getParent().getParent().getTestCaseTable());
+            return createSetupExecutableRow(settingsList.get(0).getKeywordName(), tempCase);
         }
         return null;
     }
