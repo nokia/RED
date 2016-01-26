@@ -65,6 +65,7 @@ import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.RerunAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.RerunFailedOnlyAction;
 import org.robotframework.ide.eclipse.main.plugin.execution.ShowFailedOnlyAction;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
@@ -84,7 +85,7 @@ public class ExecutionView {
     
     @Inject
     protected IEventBroker eventBroker;
-
+    
     public static final String ID = "org.robotframework.ide.ExecutionView";
 
     private Label passCounterLabel;
@@ -151,6 +152,8 @@ public class ExecutionView {
         messageText.setAlwaysShowScrollBars(false);
         
         createToolbarActions(part.getViewSite().getActionBars().getToolBarManager());
+        
+        initPreviousViewerContent();
     }
     
     @Focus
@@ -441,5 +444,11 @@ public class ExecutionView {
     
     private void setViewerInput() {
         executionViewer.setInput(executionViewerInput.toArray(new ExecutionStatus[executionViewerInput.size()]));
+    }
+    
+    private void initPreviousViewerContent() {
+        for (final ExecutionElement executionElement : RobotEventBroker.getExecutionViewContent()) {
+            executionEvent(executionElement);
+        }
     }
 }

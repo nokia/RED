@@ -16,6 +16,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
 
 /**
@@ -39,6 +40,8 @@ public class MessageLogView {
         styledText = new StyledText(parent, SWT.H_SCROLL | SWT.V_SCROLL);
         styledText.setFont(JFaceResources.getTextFont());
         styledText.setEditable(false);
+        
+        styledText.setText(RobotEventBroker.getMessageLogViewContent());
     }
     
     @Focus
