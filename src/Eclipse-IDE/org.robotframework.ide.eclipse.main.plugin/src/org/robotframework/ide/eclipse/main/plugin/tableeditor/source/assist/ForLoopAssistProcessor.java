@@ -60,9 +60,9 @@ public class ForLoopAssistProcessor extends RedContentAssistProcessor {
                 final String content = region.isPresent()
                         ? document.get(region.get().getOffset(), region.get().getLength()) : "";
 
-                if (DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1) {
+                if (DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1) {
                     return getForProposal(prefix, content, offset);
-                } else if (DocumentUtilities.getNumberOfCellSeparators(lineContent) > 2) {
+                } else if (DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) > 2) {
                     return getInConstructsProposals(prefix, content, offset);
                 } else {
                     return newArrayList();
@@ -127,7 +127,8 @@ public class ForLoopAssistProcessor extends RedContentAssistProcessor {
 
     protected boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
-        return isInProperContentType(document, offset) && DocumentUtilities.getNumberOfCellSeparators(lineContent) > 0;
+        return isInProperContentType(document, offset)
+                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) > 0;
     }
 
 }

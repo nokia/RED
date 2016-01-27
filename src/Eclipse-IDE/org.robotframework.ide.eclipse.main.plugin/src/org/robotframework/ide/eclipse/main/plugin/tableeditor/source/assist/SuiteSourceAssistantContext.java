@@ -56,7 +56,11 @@ public class SuiteSourceAssistantContext {
     }
 
     public String getSeparatorToFollow() {
-        return assistPreferences.getSeparatorToFollow(getFile().getFileExtension().equals("tsv"));
+        return assistPreferences.getSeparatorToFollow(isTsvFile());
+    }
+
+    public boolean isTsvFile() {
+        return getFile().getFileExtension().equals("tsv");
     }
 
     public AcceptanceMode getAcceptanceMode() {
