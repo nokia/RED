@@ -41,7 +41,6 @@ import org.eclipse.jface.text.quickassist.QuickAssistAssistant;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
-import org.eclipse.jface.text.rules.BufferedRuleBasedScanner;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
@@ -61,6 +60,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceTokenScanner.SuiteTsvSourceTokenScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
@@ -371,26 +371,28 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 .getSyntaxColoring(SyntaxHighlightingCategory.DEFAULT_SECTION);
         final IToken defaultSection = new Token(createAttribute(garbagePref));
 
+        final boolean isTsv = "tsv".equals(editor.fileModel.getFileExtension());
+
         final IRule[] defaultRules = new IRule[] { new EndOfLineRule("#", comment), createReadAllRule(defaultSection) };
-        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, defaultRules);
+        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, defaultRules, isTsv);
 
         final IRule[] testCasesRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
                 createDefinitionRule(definition), createLocalSettingRule(setting), createKeywordCallRule(call),
                 createCommentRule(comment) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, testCasesRules);
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, testCasesRules, isTsv);
 
         final IRule[] keywordsRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
                 createKeywordDefinitionRule(definition), createLocalSettingRule(setting), createKeywordCallRule(call),
                 createCommentRule(comment) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules);
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules, isTsv);
 
         final IRule[] settingsRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
                 createDefinitionRule(setting), createKeywordUsageInSettings(call), createCommentRule(comment) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, settingsRules);
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, settingsRules, isTsv);
 
         final IRule[] variablesRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
                 createDefinitionRule(variable), createCommentRule(comment) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, variablesRules);
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, variablesRules, isTsv);
 
         return reconciler;
     }
@@ -400,8 +402,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private static void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
-            final IRule[] rules) {
-        final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(new SingleTokenScanner(rules));
+            final IRule[] rules, final boolean isTsv) {
+        final SuiteSourceTokenScanner scanner = isTsv ? new SuiteTsvSourceTokenScanner(rules)
+                : new SuiteSourceTokenScanner(rules);
+        final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(scanner);
         reconciler.setDamager(damagerRepairer, contentType);
         reconciler.setRepairer(damagerRepairer, contentType);
     }
@@ -422,11 +426,4 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         formatter.setMasterStrategy(new SuiteSourceFormattingStrategy());
         return formatter;
     }
-
-    private static class SingleTokenScanner extends BufferedRuleBasedScanner {
-
-        public SingleTokenScanner(final IRule[] rules) {
-            setRules(rules);
-        }
-    };
 }

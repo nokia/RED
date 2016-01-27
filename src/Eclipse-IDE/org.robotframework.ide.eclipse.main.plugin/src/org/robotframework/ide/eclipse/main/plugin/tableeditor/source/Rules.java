@@ -115,8 +115,7 @@ public class Rules {
             @Override
             public IToken evaluate(final ICharacterScanner scanner) {
                 if (scanner.getColumn() > 1 || scanner.getColumn() == 1 && CharacterScannerUtilities.lookBack(scanner, 1).equals("\t")) {
-                    final String lineContent = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
-                    if (DocumentUtilities.getNumberOfCellSeparators(lineContent) != 0) {
+                    if (((SuiteSourceTokenScanner) scanner).numberOfCellSeparatorsInLineBeforeOffset() != 0) {
                         return Token.UNDEFINED;
                     }
                 }
@@ -155,7 +154,7 @@ public class Rules {
                 }
 
                 final String n = CharacterScannerUtilities.lookAhead(scanner, 1);
-                if (!n.isEmpty() && Character.isAlphabetic(n.charAt(0))) {
+                if (!n.isEmpty() && (Character.isAlphabetic(n.charAt(0)) || Character.isDigit(n.charAt(0)))) {
                     while (true) {
                         final int ch = scanner.read();
 
@@ -185,9 +184,7 @@ public class Rules {
                 if (ch == EOF || Character.isWhitespace(ch)) {
                     return Token.UNDEFINED;
                 }
-                final String lineContentBefore = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
-
-                if (DocumentUtilities.getNumberOfCellSeparators(lineContentBefore) == 1) {
+                if (((SuiteSourceTokenScanner) scanner).numberOfCellSeparatorsInLineBeforeOffset() == 1) {
                     ch = scanner.read();
                     if (ch != '[') {
                         scanner.unread();
@@ -216,10 +213,10 @@ public class Rules {
                 if (ch == EOF || Character.isWhitespace(ch)) {
                     return Token.UNDEFINED;
                 }
-                final String lineContentBefore = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
+                final String lineContentBefore = ((SuiteSourceTokenScanner) scanner).lineContentBeforeCurrentPosition();
 
-                final int numberOfCellSeparators = DocumentUtilities.getNumberOfCellSeparators(lineContentBefore);
-                if (numberOfCellSeparators == 1 && isKeywordBasedSetting(lineContentBefore)) {
+                if (isKeywordBasedSetting(lineContentBefore)
+                        && ((SuiteSourceTokenScanner) scanner).numberOfCellSeparatorsInLineBeforeOffset() == 1) {
                     consumeWholeToken(scanner);
                     return token;
                 } else {
@@ -252,12 +249,12 @@ public class Rules {
                 if (ch == EOF || Character.isWhitespace(ch) || ch == '|') {
                     return Token.UNDEFINED;
                 }
-                final String lineContentBefore = CharacterScannerUtilities.lineContentBeforeCurrentPosition(scanner);
+                final String lineContentBefore = ((SuiteSourceTokenScanner) scanner).lineContentBeforeCurrentPosition();
                 if (isAssignment(ch, lineContentBefore)) {
                     return Token.UNDEFINED;
                 }
-
-                final int numberOfCellSeparators = DocumentUtilities.getNumberOfCellSeparators(lineContentBefore);
+                final int numberOfCellSeparators = ((SuiteSourceTokenScanner) scanner)
+                        .numberOfCellSeparatorsInLineBeforeOffset();
                 if (numberOfCellSeparators == 1) {
                     consumeWholeToken(scanner);
                     return token;
