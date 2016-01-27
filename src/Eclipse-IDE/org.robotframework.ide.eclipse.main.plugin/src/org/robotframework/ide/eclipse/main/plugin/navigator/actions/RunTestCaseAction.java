@@ -33,21 +33,23 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
     private final Mode mode;
 
     public RunTestCaseAction(final ISelectionProvider selectionProvider, final Mode mode) {
-        super(mode.getActionName(), mode.getImage());
+        super(mode.actionName, mode.getImage());
         this.selectionProvider = selectionProvider;
         this.mode = mode;
     }
 
     @Override
     public void run() {
+        runTestCase((IStructuredSelection) selectionProvider.getSelection(), mode);
+    }
 
+    public static void runTestCase(final IStructuredSelection selection, final Mode mode) {
         final WorkspaceJob job = new WorkspaceJob("Launching Robot Tests") {
 
             @Override
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
 
-                final List<RobotCase> selectedTestCases = Selections.getElements(
-                        (IStructuredSelection) selectionProvider.getSelection(), RobotCase.class);
+                final List<RobotCase> selectedTestCases = Selections.getElements(selection, RobotCase.class);
 
                 final List<IResource> suiteFiles = new ArrayList<IResource>();
                 final List<String> testCasesNames = new ArrayList<String>();
@@ -61,7 +63,7 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
                 }
 
                 RobotLaunchConfiguration.createLaunchConfigurationForSelectedTestCases(suiteFiles, testCasesNames)
-                        .launch(mode.nameInLaunchManager(), monitor);
+                        .launch(mode.launchMgrName, monitor);
 
                 return Status.OK_STATUS;
             }
@@ -91,15 +93,7 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
             this.imageConst = imageConst;
         }
 
-        public String getActionName() {
-            return actionName;
-        }
-
-        public String nameInLaunchManager() {
-            return launchMgrName;
-        }
-
-        public ImageDescriptor getImage() {
+        ImageDescriptor getImage() {
             return DebugUITools.getImageDescriptor(imageConst);
         }
     }
