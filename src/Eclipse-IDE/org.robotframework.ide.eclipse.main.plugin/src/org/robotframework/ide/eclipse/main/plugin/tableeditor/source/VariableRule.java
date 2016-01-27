@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
-import static com.google.common.collect.Sets.newHashSet;
-
 import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
@@ -82,7 +80,8 @@ class VariableRule implements IPredicateRule {
     }
 
     private boolean startDetected(final ICharacterScanner scanner) {
-        return newHashSet("${", "@{", "&{", "%{").contains(CharacterScannerUtilities.lookAhead(scanner, 2));
+        final String lookahed = CharacterScannerUtilities.lookAhead(scanner, 2);
+        return "${".equals(lookahed) || "@{".equals(lookahed) || "&{".equals(lookahed) || "%{".equals(lookahed);
     }
 
     private boolean endDetected(final ICharacterScanner scanner) {

@@ -37,7 +37,7 @@ import com.google.common.collect.Multimap;
  */
 public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
-    private final SuiteSourceAssistantContext assist;
+    protected final SuiteSourceAssistantContext assist;
 
     public KeywordCallsAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
@@ -149,7 +149,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
     protected boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
-        return isInProperContentType(document, offset) && DocumentUtilities.getNumberOfCellSeparators(lineContent) > 0;
+        return isInProperContentType(document, offset)
+                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) > 0;
     }
 
     private class GroupKey {
