@@ -86,7 +86,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             public RobotFileOutput parse() {
                 if (getProject().getProject().exists()) {
                     final List<RobotFileOutput> outputs = getProject().getRobotParser()
-                            .parse(file.getLocation().toFile());
+                            .parse(new java.io.File(file.getLocationURI()));
                     return outputs.isEmpty() ? null : outputs.get(0);
                 } else {
                     // this can happen e.g. when renaming project

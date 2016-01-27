@@ -1051,6 +1051,31 @@
           id="org.robotframework.red.toggleComment"
           name="Toggle comment">
     </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.openRunSingleTestMenu"
+          name="Open run single test menu">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.openDebugSingleTestMenu"
+          name="Open debug single test menu">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.runSingleTestFromSource"
+          name="Run single test">
+       <commandParameter
+             id="org.robotframework.red.runSingleTestFromSource.testName"
+             name="Test name"
+             optional="false">
+       </commandParameter>
+       <commandParameter
+             id="org.robotframework.red.runSingleTestFromSource.mode"
+             name="Mode"
+             optional="false">
+       </commandParameter>
+    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -2102,6 +2127,33 @@
           </reference>
        </activeWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestHandler"
+          commandId="org.robotframework.red.runSingleTestFromSource">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.sourcePartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.OpenRunTestMenuHandler"
+          commandId="org.robotframework.red.openRunSingleTestMenu">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.sourcePartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.OpenDebugTestMenuHandler"
+          commandId="org.robotframework.red.openDebugSingleTestMenu">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.sourcePartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
  </extension>
  <extension
        name="Red xml editor handlers"
@@ -2339,6 +2391,18 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+/">
+    </key>
+    <key
+          commandId="org.robotframework.red.openRunSingleTestMenu"
+          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M3+R">
+    </key>
+    <key
+          commandId="org.robotframework.red.openDebugSingleTestMenu"
+          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M3+M1+R">
     </key>
  </extension>
  <extension
@@ -3203,6 +3267,26 @@
                   label="Format source"
                   style="push">
             </command>
+         </menu>
+         <menu
+               commandId="org.robotframework.red.openRunSingleTestMenu"
+               icon="resources/exec_run.png"
+               id="org.robotframework.red.source.editor.runSingle"
+               label="Run test...">
+            <dynamic
+                  class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestDynamicMenuItem"
+                  id="org.robotframework.red.menu.dynamic.source.run">
+            </dynamic>
+         </menu>
+         <menu
+               commandId="org.robotframework.red.openDebugSingleTestMenu"
+               icon="resources/exec_debug.png"
+               id="org.robotframework.red.source.editor.runSingleDebug"
+               label="Debug test...">
+            <dynamic
+                  class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestInDebugDynamicMenuItem"
+                  id="org.robotframework.red.menu.dynamic.source.debug">
+            </dynamic>
          </menu>
       </menuContribution>
    </extension>
