@@ -14,6 +14,8 @@ import java.util.regex.PatternSyntaxException;
  */
 public class EmbeddedKeywordNamesSupport {
 
+    private static final Pattern VARIABLE_MATCHER = Pattern.compile("\\$\\{([^\\}]+)\\}");
+
     public static boolean matches(final String definitionName, final QualifiedKeywordName occurrenceQualifiedName) {
         return matchesWithLowerCase(definitionName.toLowerCase(), occurrenceQualifiedName.getKeywordName()
                 .toLowerCase(), occurrenceQualifiedName.getEmbeddedKeywordName().toLowerCase());
@@ -48,7 +50,7 @@ public class EmbeddedKeywordNamesSupport {
     }
 
     private static String substituteVariablesWithRegex(final String definitionName) {
-        final Matcher matcher = Pattern.compile("\\$\\{([^\\}]+)\\}").matcher(definitionName);
+        final Matcher matcher = VARIABLE_MATCHER.matcher(definitionName);
 
         final StringBuilder wholeRegex = new StringBuilder();
 
@@ -70,7 +72,7 @@ public class EmbeddedKeywordNamesSupport {
     }
     
     public static boolean hasEmbeddedArguments(final String definitionName) {
-        return Pattern.compile("\\$\\{([^\\}]+)\\}").matcher(definitionName).find();
+        return VARIABLE_MATCHER.matcher(definitionName).find();
     }
 
 }
