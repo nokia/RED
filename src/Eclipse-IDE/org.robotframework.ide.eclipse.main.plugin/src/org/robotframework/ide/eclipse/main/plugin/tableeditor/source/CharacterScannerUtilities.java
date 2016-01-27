@@ -9,38 +9,12 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 
 /**
  * @author Michal Anglart
- *
  */
 class CharacterScannerUtilities {
 
     static boolean isCellSeparator(final String string) {
         return string.startsWith("\t") || string.startsWith(" \t") || string.startsWith("  ")
                 || string.startsWith(" | ") || string.startsWith(" |\t");
-    }
-
-    static String lineContentBeforeCurrentPosition(final ICharacterScanner scanner) {
-        final StringBuilder builder = new StringBuilder();
-
-        int additional = 0;
-        while (true) {
-            scanner.unread();
-            if (scanner.getColumn() == -1) {
-                additional = 1;
-                break;
-            }
-            final int ch = scanner.read();
-            if (ch == '\n') {
-                break;
-            }
-            builder.append((char) ch);
-            scanner.unread();
-        }
-        // maybe we've read less due to EOF
-        for (int i = 0; i < builder.length() + additional; i++) {
-            scanner.read();
-        }
-        builder.reverse();
-        return builder.toString();
     }
 
     static String lookAhead(final ICharacterScanner scanner, final int n) {
@@ -65,7 +39,7 @@ class CharacterScannerUtilities {
 
     static String lookBack(final ICharacterScanner scanner, final int n) {
         final StringBuilder builder = new StringBuilder();
-        
+
         for (int i = 0; i < n; i++) {
             scanner.unread();
             if (scanner.getColumn() == -1) {

@@ -102,6 +102,7 @@ public class SettingsAssistProcessor extends RedContentAssistProcessor {
 
     private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
-        return isInProperContentType(document, offset) && DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1;
+        return isInProperContentType(document, offset)
+                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1;
     }
 }

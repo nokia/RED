@@ -104,7 +104,7 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
     private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
         return isInProperContentType(document, offset) && lineContent.toLowerCase().startsWith("library")
-                && DocumentUtilities.getNumberOfCellSeparators(lineContent) == 1;
+                && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1;
     }
 
 }

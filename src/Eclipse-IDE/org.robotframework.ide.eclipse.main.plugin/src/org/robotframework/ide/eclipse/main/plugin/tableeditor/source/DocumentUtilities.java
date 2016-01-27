@@ -238,13 +238,18 @@ public class DocumentUtilities {
         return document.get(optional.get().getOffset(), offset - optional.get().getOffset());
     }
 
-    public static int getNumberOfCellSeparators(final String lineContentBefore) {
+    public static int getNumberOfCellSeparators(final String lineContentBefore, final boolean isTsv) {
+        return isTsv ? getNumberOfCellSeparatorsInTsv(lineContentBefore)
+                : getNumberOfCellsSeparators(lineContentBefore);
+    }
+
+    private static int getNumberOfCellsSeparators(final String lineContentBefore) {
+        if (lineContentBefore.isEmpty()) {
+            return 0;
+        }
         final String withoutTabs = lineContentBefore.replaceAll("\t", "  ")
                 .replaceAll(" \\| ", "   ")
                 .replaceFirst("^\\| ", "  ");
-        if (withoutTabs.isEmpty()) {
-            return 0;
-        }
 
         int spacesRegions = 0;
         int currentNumberOfSpaces = 0;
@@ -264,6 +269,16 @@ public class DocumentUtilities {
         }
 
         return spacesRegions;
+    }
+
+    private static int getNumberOfCellSeparatorsInTsv(final String lineContentBefore) {
+        int separators = 0;
+        for (final char ch : lineContentBefore.toCharArray()) {
+            if (ch == '\t') {
+                separators++;
+            }
+        }
+        return separators;
     }
 
     public static String getDelimiter(final IDocument document) {
