@@ -181,15 +181,4 @@ public class DocumentUtilitiesTest {
         assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength()))
                 .isEqualTo("line2\nline3\nline4\nline5");
     }
-
-    @Test
-    public void cellSeparatorNumber_isProperlyCounted() {
-        assertThat(DocumentUtilities.getNumberOfCellSeparators("")).isEqualTo(0);
-        assertThat(DocumentUtilities.getNumberOfCellSeparators("  c")).isEqualTo(1);
-        assertThat(DocumentUtilities.getNumberOfCellSeparators("\tc")).isEqualTo(1);
-        assertThat(DocumentUtilities.getNumberOfCellSeparators("| c")).isEqualTo(1);
-        assertThat(DocumentUtilities.getNumberOfCellSeparators("c | c")).isEqualTo(1);
-        assertThat(DocumentUtilities.getNumberOfCellSeparators("c\tc\tc\t")).isEqualTo(3);
-        assertThat(DocumentUtilities.getNumberOfCellSeparators("cell content")).isEqualTo(0);
-    }
 }
