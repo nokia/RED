@@ -13,9 +13,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.DIParameterizedHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewVariableHandler.E4InsertNewHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 import static org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
