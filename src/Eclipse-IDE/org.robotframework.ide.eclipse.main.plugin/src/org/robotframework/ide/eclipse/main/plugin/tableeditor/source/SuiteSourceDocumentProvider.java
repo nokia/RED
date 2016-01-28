@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
+import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
 
 class SuiteSourceDocumentProvider extends FileDocumentProvider {
@@ -28,4 +29,13 @@ class SuiteSourceDocumentProvider extends FileDocumentProvider {
         return document;
     }
 
+    @Override
+    public boolean isDeleted(final Object element) {
+        if (element instanceof IFileEditorInput) {
+            final IFileEditorInput input = (IFileEditorInput) element;
+
+            return !input.getFile().exists();
+        }
+        return super.isDeleted(element);
+    }
 }

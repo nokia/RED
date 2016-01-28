@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -81,19 +82,27 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public List<RobotSuiteFileSection> getSections() {
-        return getSections(new ParsingStrategy() {
+        if (file.getLocation() != null) {
+            return getSections(createFileParsingStrategy());
+        } else {
+            return getSections(createReparsingStrategy(""));
+        }
+    }
+
+    private ParsingStrategy createFileParsingStrategy() {
+        return new ParsingStrategy() {
             @Override
             public RobotFileOutput parse() {
                 if (getProject().getProject().exists()) {
                     final List<RobotFileOutput> outputs = getProject().getRobotParser()
-                            .parse(new java.io.File(file.getLocationURI()));
+                            .parse(file.getLocation().toFile());
                     return outputs.isEmpty() ? null : outputs.get(0);
                 } else {
                     // this can happen e.g. when renaming project
                     return null;
                 }
             }
-        });
+        };
     }
 
     public List<RobotSuiteFileSection> getSections(final ParsingStrategy parsingStrategy) {
@@ -157,7 +166,9 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             @Override
             public RobotFileOutput parse() {
                 if (getProject().getProject().exists()) {
-                    return getProject().getRobotParser().parseEditorContent(newContent, file.getLocation().toFile());
+                    final IPath location = file.getLocation();
+                    final File f = location == null ? new File(file.getName()) : location.toFile();
+                    return getProject().getRobotParser().parseEditorContent(newContent, f);
                 }
                 // this can happen e.g. when renaming project
                 return null;
