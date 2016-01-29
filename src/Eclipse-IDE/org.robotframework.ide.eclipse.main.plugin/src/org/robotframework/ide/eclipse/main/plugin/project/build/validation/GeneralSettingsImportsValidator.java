@@ -81,18 +81,19 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 if (RobotExpressions.isParameterized(resolved)) {
                     reportParameterizedImport(pathOrNameToken);
                 } else {
-                    validateSpecifiedImport(imported, resolved, pathOrNameToken, monitor);
+                    validateSpecifiedImport(imported, resolved, pathOrNameToken, true, monitor);
                 }
             } else {
-                validateSpecifiedImport(imported, pathOrName, pathOrNameToken, monitor);
+                validateSpecifiedImport(imported, pathOrName, pathOrNameToken, false, monitor);
             }
         }
     }
 
     private void validateSpecifiedImport(final AImported imported, final String pathOrName,
-            final RobotToken pathOrNameToken, final IProgressMonitor monitor) throws CoreException {
+            final RobotToken pathOrNameToken, final boolean isParametrized, final IProgressMonitor monitor)
+            throws CoreException {
         if (isPathImport(pathOrName)) {
-            validatePathImport(imported, pathOrName, pathOrNameToken, monitor);
+            validatePathImport(imported, pathOrName, pathOrNameToken, isParametrized, monitor);
         } else {
             validateNameImport(imported, pathOrName, pathOrNameToken, monitor);
         }
@@ -102,15 +103,16 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     @SuppressWarnings("unused")
     protected void validatePathImport(final AImported imported, final String path, final RobotToken pathToken,
-            final IProgressMonitor monitor) throws CoreException {
+            final boolean isParametrized, final IProgressMonitor monitor) throws CoreException {
         final Path resPath = new Path(path);
         final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
 
         IPath wsRelativePath = null;
         if (resPath.isAbsolute()) {
-            reporter.handleProblem(
-                    RobotProblem.causedBy(GeneralSettingsProblem.ABSOLUTE_IMPORT_PATH).formatMessageWith(path),
-                    suiteFile.getFile(), pathToken);
+            if (!isParametrized) {
+                reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.ABSOLUTE_IMPORT_PATH)
+                        .formatMessageWith(path), suiteFile.getFile(), pathToken);
+            }
             wsRelativePath = resPath.makeRelativeTo(wsRoot.getLocation());
             if (!wsRoot.getLocation().isPrefixOf(resPath)) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE)
@@ -188,7 +190,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
         @Override
         protected void validatePathImport(final AImported imported, final String path, final RobotToken pathToken,
-                final IProgressMonitor monitor) throws CoreException {
+                final boolean isParametrized, final IProgressMonitor monitor) throws CoreException {
             LibrarySpecification specification = null;
             for (final Entry<ReferencedLibrary, LibrarySpecification> entry : validationContext
                     .getReferencedLibrarySpecifications().entrySet()) {

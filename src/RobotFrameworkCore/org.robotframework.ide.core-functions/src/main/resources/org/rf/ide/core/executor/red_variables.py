@@ -11,7 +11,8 @@ def get_global_variables():
     # Global variables copied from robot.variables.__init__.py
     global_variables = {
         '${TEMPDIR}': os.path.normpath(tempfile.gettempdir()),
-        '${EXECDIR}': os.path.abspath('.'),
+        '${EXECDIR}': '',
+        '${dupa}': '1',
         '${/}': os.sep,
         '${:}': os.pathsep,
         '${SPACE}': ' ',
@@ -32,14 +33,17 @@ def get_global_variables():
         '${PREV_TEST_MESSAGE}': '',
         '${CURDIR}': '.',
         '${TEST_NAME}': '',
-        '${TEST DOCUMENTATION}': '',
+        '${TEST_DOCUMENTATION}': '',
         '@{TEST_TAGS}': [],
         '${TEST_STATUS}': '',
         '${TEST_MESSAGE}': '',
         '${SUITE_NAME}': '',
         '${SUITE_SOURCE}': '',
         '${SUITE_STATUS}': '',
-        '${SUITE_MESSAGE}': ''
+        '${SUITE_MESSAGE}': '',
+        '${SUITE_DOCUMENTATION}': '',
+        '${KEYWORD_MESSAGE}': '',
+        '${KEYWORD_STATUS}': ''
     }
 
     glob_variables = {}
@@ -49,10 +53,16 @@ def get_global_variables():
         glob_variables = GLOBAL_VARIABLES
     except ImportError:  # for robot >2.9
         global_variables['&{EMPTY}'] = {}
+        global_variables['&{SUITE_METADATA}'] = {}
         from robot.conf.settings import RobotSettings
         from robot.variables.scopes import GlobalVariables
 
         glob_variables = GlobalVariables(RobotSettings()).as_dict()
+        glob_variables['${OUTPUT_DIR}'] = ''
+        glob_variables['${EXECDIR}'] = ''
+        glob_variables['${OUTPUT_FILE}'] = ''
+        glob_variables['${REPORT_FILE}'] = ''
+        glob_variables['${LOG_FILE}'] = ''
 
     data = {_wrap_variable_if_needed(key) : value for key, value in glob_variables.items()}
 
