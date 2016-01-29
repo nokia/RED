@@ -282,7 +282,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
     
     private static boolean isVariableInSetterOrCommentKeyword(final IExecutableRowDescriptor<?> lineDescription,
             final FileValidationContext validationContext, final Set<String> definedVariables) {
-        final String keywordName = QualifiedKeywordName.fromOccurrence(getKeywordName(lineDescription))
+        final String keywordName = QualifiedKeywordName.fromOccurrence(getKeyword(lineDescription))
                 .getKeywordName();
         if (keywordName.equals("settestvariable") && isKeywordFromBuiltin(validationContext, keywordName)) {
             final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
@@ -300,7 +300,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
         return validationContext.findMatchingKeywordValidationContexts(keywordName).size() == 1;
     }
 
-    private static String getKeywordName(final IExecutableRowDescriptor<?> lineDescription) {
+    private static String getKeyword(final IExecutableRowDescriptor<?> lineDescription) {
         RobotAction action = null;
         if (lineDescription.getRowType() == ERowType.FOR_CONTINUE) {
             action = ((ForLoopContinueRowDescriptor<?>) lineDescription).getKeywordAction();
