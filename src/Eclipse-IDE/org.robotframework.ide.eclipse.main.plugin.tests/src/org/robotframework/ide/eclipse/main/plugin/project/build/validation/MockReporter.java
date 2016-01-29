@@ -30,6 +30,10 @@ public class MockReporter extends ProblemsReportingStrategy {
 
     private final Set<Problem> problems = newHashSet();
 
+    public MockReporter() {
+        super(false);
+    }
+
     public boolean wasProblemReported() {
         return !problems.isEmpty();
     }
