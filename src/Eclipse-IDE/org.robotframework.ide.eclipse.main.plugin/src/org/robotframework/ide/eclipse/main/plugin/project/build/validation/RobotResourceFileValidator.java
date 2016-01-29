@@ -21,6 +21,7 @@ import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
@@ -29,8 +30,9 @@ import com.google.common.collect.Range;
 
 public class RobotResourceFileValidator extends RobotFileValidator {
 
-    public RobotResourceFileValidator(final ValidationContext context, final IFile file) {
-        super(context, file);
+    public RobotResourceFileValidator(final ValidationContext context, final IFile file,
+            final ProblemsReportingStrategy reporter) {
+        super(context, file, reporter);
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 
@@ -23,8 +24,9 @@ import com.google.common.collect.Range;
 
 public class RobotSuiteFileValidator extends RobotFileValidator {
 
-    public RobotSuiteFileValidator(final ValidationContext context, final IFile file) {
-        super(context, file);
+    public RobotSuiteFileValidator(final ValidationContext context, final IFile file,
+            final ProblemsReportingStrategy reporter) {
+        super(context, file, reporter);
     }
 
     @Override

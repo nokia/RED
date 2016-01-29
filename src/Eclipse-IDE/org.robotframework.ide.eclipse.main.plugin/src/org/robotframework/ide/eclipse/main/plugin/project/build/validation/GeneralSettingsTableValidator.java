@@ -55,10 +55,10 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     private final VersionDependentValidators versionDependentValidators;
 
     GeneralSettingsTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotSettingsSection> settingSection) {
+            final Optional<RobotSettingsSection> settingSection, final ProblemsReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.settingsSection = settingSection;
-        this.reporter = new ProblemsReportingStrategy();
+        this.reporter = reporter;
         this.versionDependentValidators = new VersionDependentValidators();
     }
 
@@ -90,7 +90,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     private void reportVersionSpecificProblems(final IFile file, final RobotSettingsSection section,
             final IProgressMonitor monitor) throws CoreException {
         final List<? extends ModelUnitValidator> validators = versionDependentValidators
-                .getGeneralSettingsValidators(file, section, validationContext.getVersion());
+                .getGeneralSettingsValidators(file, section, reporter, validationContext.getVersion());
         for (final ModelUnitValidator validator : validators) {
             validator.validate(monitor);
         }

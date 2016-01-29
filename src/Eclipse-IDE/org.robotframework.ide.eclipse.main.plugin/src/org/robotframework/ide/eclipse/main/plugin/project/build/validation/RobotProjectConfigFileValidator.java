@@ -50,14 +50,17 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
     private final IFile configFile;
 
-    public RobotProjectConfigFileValidator(final ValidationContext context, final IFile configFile) {
+    private final ProblemsReportingStrategy reporter;
+
+    public RobotProjectConfigFileValidator(final ValidationContext context, final IFile configFile,
+            final ProblemsReportingStrategy reporter) {
         this.context = context;
         this.configFile = configFile;
+        this.reporter = reporter;
     }
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
         RobotProjectConfigWithLines config = null;
         try {
             config = new RobotProjectConfigReader().readConfigurationWithLines(configFile);

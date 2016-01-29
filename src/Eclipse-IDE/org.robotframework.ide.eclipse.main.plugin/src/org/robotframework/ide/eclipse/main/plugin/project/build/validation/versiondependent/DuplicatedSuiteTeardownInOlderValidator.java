@@ -12,6 +12,7 @@ import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
 import com.google.common.base.Function;
@@ -19,8 +20,9 @@ import com.google.common.collect.Range;
 
 public class DuplicatedSuiteTeardownInOlderValidator extends ADuplicatedInOldValidator<SuiteSetup> {
 
-    public DuplicatedSuiteTeardownInOlderValidator(final IFile file, final RobotSettingsSection section) {
-        super(file, section);
+    public DuplicatedSuiteTeardownInOlderValidator(final IFile file, final RobotSettingsSection section,
+            final ProblemsReportingStrategy reporter) {
+        super(file, section, reporter);
     }
 
     @Override

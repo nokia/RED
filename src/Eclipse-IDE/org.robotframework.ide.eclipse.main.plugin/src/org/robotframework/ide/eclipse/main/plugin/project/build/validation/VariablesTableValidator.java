@@ -42,8 +42,8 @@ class VariablesTableValidator implements ModelUnitValidator {
     private final VersionDependentValidators versionDependentValidators;
 
     VariablesTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotVariablesSection> variablesSection) {
-        this(validationContext, variablesSection, new ProblemsReportingStrategy(), new VersionDependentValidators());
+            final Optional<RobotVariablesSection> variablesSection, final ProblemsReportingStrategy reportingStrategy) {
+        this(validationContext, variablesSection, reportingStrategy, new VersionDependentValidators());
     }
 
     @VisibleForTesting

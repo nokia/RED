@@ -22,22 +22,23 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSe
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 
-public abstract class ADuplicatedInOldValidator<T extends AModelElement<?>> extends VersionDependentModelUnitValidator {
+abstract class ADuplicatedInOldValidator<T extends AModelElement<?>> extends VersionDependentModelUnitValidator {
 
-    protected final IFile file;
+    private final IFile file;
 
     protected final RobotSettingsSection section;
 
-    protected final ProblemsReportingStrategy reporter;
+    private final ProblemsReportingStrategy reporter;
 
-    public ADuplicatedInOldValidator(final IFile file, final RobotSettingsSection section) {
+    ADuplicatedInOldValidator(final IFile file, final RobotSettingsSection section,
+            final ProblemsReportingStrategy reporter) {
         this.file = file;
         this.section = section;
-        this.reporter = new ProblemsReportingStrategy();
+        this.reporter = reporter;
     }
 
     @Override
-    public void validate(IProgressMonitor monitor) throws CoreException {
+    public void validate(final IProgressMonitor monitor) throws CoreException {
         final List<T> elems = getElements();
 
         final String inUse = Joiner.on(' ').skipNulls().join(transform(elems, getImportantElement()));

@@ -97,7 +97,8 @@ public class LibrariesBuilder {
     }
 
     public void buildLibraries(final RobotProject robotProject, final RobotRuntimeEnvironment runtimeEnvironment,
-            final RobotProjectConfig configuration, final SubMonitor monitor) {
+            final RobotProjectConfig configuration, final SubMonitor monitor,
+            final ProblemsReportingStrategy reporter) {
         monitor.subTask("generating libdocs");
 
         final List<ILibdocGenerator> libdocGenerators = newArrayList();
@@ -121,7 +122,7 @@ public class LibrariesBuilder {
             } catch (final RobotEnvironmentException e) {
                 final RobotProblem problem = RobotProblem.causedBy(
                         ProjectConfigurationProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED).formatMessageWith(e.getMessage());
-                new ProblemsReportingStrategy().handleProblem(problem, robotProject.getFile(".project"), 1);
+                reporter.handleProblem(problem, robotProject.getFile(".project"), 1);
             }
             monitor.worked(1);
         }

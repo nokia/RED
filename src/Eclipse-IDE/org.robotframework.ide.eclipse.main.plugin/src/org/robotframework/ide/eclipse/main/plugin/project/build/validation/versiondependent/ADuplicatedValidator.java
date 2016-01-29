@@ -17,22 +17,23 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 
-public abstract class ADuplicatedValidator<T extends AModelElement<?>> extends VersionDependentModelUnitValidator {
+abstract class ADuplicatedValidator<T extends AModelElement<?>> extends VersionDependentModelUnitValidator {
 
-    protected final IFile file;
+    private final IFile file;
 
     protected final RobotSettingsSection section;
 
-    protected final ProblemsReportingStrategy reporter;
+    private final ProblemsReportingStrategy reporter;
 
-    public ADuplicatedValidator(final IFile file, final RobotSettingsSection section) {
+    ADuplicatedValidator(final IFile file, final RobotSettingsSection section,
+            final ProblemsReportingStrategy reporter) {
         this.file = file;
         this.section = section;
-        this.reporter = new ProblemsReportingStrategy();
+        this.reporter = reporter;
     }
 
     @Override
-    public void validate(IProgressMonitor monitor) throws CoreException {
+    public void validate(final IProgressMonitor monitor) throws CoreException {
         final List<T> elems = getElements();
 
         if (elems.size() > 1) {
