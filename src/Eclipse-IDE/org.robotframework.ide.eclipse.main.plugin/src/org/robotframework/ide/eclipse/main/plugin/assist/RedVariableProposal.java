@@ -44,7 +44,7 @@ public final class RedVariableProposal {
         return new RedVariableProposal(name, path, value, "", VariableType.IMPORTED);
     }
 
-    static RedVariableProposal createBuiltIn(final String name, final String value) {
+    public static RedVariableProposal createBuiltIn(final String name, final String value) {
         return new RedVariableProposal(name, "built-in", value, "", VariableType.BUILTIN);
     }
 

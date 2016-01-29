@@ -17,6 +17,8 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
@@ -64,8 +66,11 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             final String content = variable.isPresent()
                     ? document.get(variable.get().getOffset(), variable.get().getLength()) : "";
 
+            List<RedVariableProposal> variableProposals = assist.getVariables(offset);
+            removeInvisibleGlobalVariables(variableProposals, getVirtualContentType(document, offset));
+            
             final List<ICompletionProposal> proposals = newArrayList();
-            for (final RedVariableProposal varProposal : assist.getVariables(offset)) {
+            for (final RedVariableProposal varProposal : variableProposals) {
                 if (varProposal.getName().toLowerCase().startsWith(prefix.toLowerCase())) {
                     final String additionalInfo = createSecondaryInfo(varProposal);
                     final Image image = getImage(varProposal.getName());
@@ -94,6 +99,24 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             throws BadLocationException {
         return isInProperContentType(document, offset)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) >= 1;
+    }
+
+    private void removeInvisibleGlobalVariables(final List<RedVariableProposal> varProposals, final String contentType) {
+        if(!SuiteSourcePartitionScanner.KEYWORDS_SECTION.equals(contentType)) {
+            varProposals.remove(RedVariableProposal.createBuiltIn("${KEYWORD_STATUS}", ""));
+            varProposals.remove(RedVariableProposal.createBuiltIn("${KEYWORD_MESSAGE}", ""));
+        }
+        if(SuiteSourcePartitionScanner.VARIABLES_SECTION.equals(contentType)) {
+            varProposals.remove(RedVariableProposal.createBuiltIn("${TEST_NAME}", ""));
+            varProposals.remove(RedVariableProposal.createBuiltIn("${TEST_DOCUMENTATION}", ""));
+            varProposals.remove(RedVariableProposal.createBuiltIn("${TEST_STATUS}", ""));
+            varProposals.remove(RedVariableProposal.createBuiltIn("${TEST_MESSAGE}", ""));
+            varProposals.remove(RedVariableProposal.createBuiltIn("@{TEST_TAGS}", "[]"));
+        }
+        if(SuiteSourcePartitionScanner.TEST_CASES_SECTION.equals(contentType) || SuiteSourcePartitionScanner.VARIABLES_SECTION.equals(contentType)) {
+            varProposals.remove(RedVariableProposal.createBuiltIn("${SUITE_STATUS}", ""));
+            varProposals.remove(RedVariableProposal.createBuiltIn("${SUITE_MESSAGE}", ""));
+        }
     }
 
     private Image getImage(final String name) {

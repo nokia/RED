@@ -417,6 +417,9 @@ public class RobotProject extends RobotContainer {
         final Map<String, String> knownVariables = newHashMap();
         knownVariables.put("${/}", File.separator);
         knownVariables.put("${curdir}", ".");
+        final String projectLocation = getProject().getLocation().toPortableString();
+        knownVariables.put("${execdir}", projectLocation);
+        knownVariables.put("${outputdir}", projectLocation);
         if (configuration != null) {
             for (final VariableMapping mapping : configuration.getVariableMappings()) {
                 knownVariables.put(VariableNamesSupport.extractUnifiedVariableName(mapping.getName()),
