@@ -29,5 +29,7 @@
     </topic>
     <topic href="doc/user_guide/unicode.html" label="Unicode - handling language specific chars in Eclipse">
     </topic>
+	<topic href="doc/user_guide/virtual_folders.html" label="Working with virtual folders mounted via SSH">
+    </topic>
  </topic>
 </toc>
