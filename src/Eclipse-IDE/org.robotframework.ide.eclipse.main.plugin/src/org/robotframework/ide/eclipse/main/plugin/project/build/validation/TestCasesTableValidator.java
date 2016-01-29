@@ -54,11 +54,13 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     private final Optional<RobotCasesSection> testCaseSection;
 
-    private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
+    private final ProblemsReportingStrategy reporter;
 
-    TestCasesTableValidator(final FileValidationContext validationContext, final Optional<RobotCasesSection> section) {
+    TestCasesTableValidator(final FileValidationContext validationContext, final Optional<RobotCasesSection> section,
+            final ProblemsReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.testCaseSection = section;
+        this.reporter = reporter;
     }
 
     @Override
@@ -255,7 +257,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
                         }
                         
                         final String variableName = variableDeclaration.getVariableName().getText();
-                        RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
+                        final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
                                 .formatMessageWith(variableName);
                         final int variableOffset = variableDeclaration.getStartFromFile().getOffset();
                         final ProblemPosition position = new ProblemPosition(variableDeclaration.getStartFromFile()

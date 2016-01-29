@@ -86,7 +86,7 @@ public class RobotProblem {
         }
     }
 
-    private String getMessage() {
+    public String getMessage() {
         return String.format(cause.getProblemDescription(), objects == null ? new Object[0] : objects);
     }
 }

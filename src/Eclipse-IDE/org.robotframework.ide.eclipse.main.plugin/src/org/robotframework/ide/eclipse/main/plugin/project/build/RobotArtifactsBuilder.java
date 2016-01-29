@@ -34,7 +34,8 @@ public class RobotArtifactsBuilder {
         this.project = project;
     }
 
-    public Job createBuildJob(final boolean rebuildNeeded) {
+    public Job createBuildJob(final boolean rebuildNeeded, final ProblemsReportingStrategy fatalReporter,
+            final ProblemsReportingStrategy usualReporter) {
         if (rebuildNeeded) {
             try {
                 project.refreshLocal(IResource.DEPTH_INFINITE, null);
@@ -60,7 +61,7 @@ public class RobotArtifactsBuilder {
                         } catch (final CoreException e) {
                             // that's fine, lets try to build project
                         }
-                        buildArtifacts(project, monitor, new FatalProblemsReportingStrategy());
+                        buildArtifacts(project, monitor, fatalReporter, usualReporter);
 
                         return Status.OK_STATUS;
                     } catch (final ReportingInterruptedException e) {
@@ -82,7 +83,7 @@ public class RobotArtifactsBuilder {
     }
 
     private void buildArtifacts(final IProject project, final IProgressMonitor monitor,
-            final ProblemsReportingStrategy reporter) {
+            final ProblemsReportingStrategy fatalReporter, final ProblemsReportingStrategy usualReporter) {
         if (monitor.isCanceled()) {
             return;
         }
@@ -92,7 +93,7 @@ public class RobotArtifactsBuilder {
 
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         final SubMonitor configCreationMonitor = subMonitor.newChild(15);
-        final RobotProjectConfig configuration = provideConfiguration(robotProject, reporter);
+        final RobotProjectConfig configuration = provideConfiguration(robotProject, fatalReporter);
         configCreationMonitor.done();
         if (subMonitor.isCanceled()) {
             return;
@@ -100,13 +101,14 @@ public class RobotArtifactsBuilder {
 
         final SubMonitor runtimeEnvCreationMonitor = subMonitor.newChild(15);
         final RobotRuntimeEnvironment runtimeEnvironment = provideRuntimeEnvironment(robotProject, configuration,
-                reporter);
+                fatalReporter);
         runtimeEnvCreationMonitor.done();
         if (subMonitor.isCanceled()) {
             return;
         }
 
-        new LibrariesBuilder().buildLibraries(robotProject, runtimeEnvironment, configuration, subMonitor.newChild(70));
+        new LibrariesBuilder().buildLibraries(robotProject, runtimeEnvironment, configuration, subMonitor.newChild(70),
+                usualReporter);
     }
 
     private RobotProjectConfig provideConfiguration(final RobotProject robotProject,
