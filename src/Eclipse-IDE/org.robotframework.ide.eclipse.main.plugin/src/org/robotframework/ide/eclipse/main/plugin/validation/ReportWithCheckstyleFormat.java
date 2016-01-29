@@ -20,13 +20,17 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.collect.Table;
+import com.google.common.escape.Escaper;
 import com.google.common.io.Files;
+import com.google.common.xml.XmlEscapers;
 
 /**
  * @author Michal Anglart
  *
  */
 public class ReportWithCheckstyleFormat implements AutoCloseable {
+
+    private final Escaper xmlAttrEscaper = XmlEscapers.xmlAttributeEscaper();
 
     private final Writer writer;
 
@@ -54,7 +58,7 @@ public class ReportWithCheckstyleFormat implements AutoCloseable {
             final RobotProblem problem = problemEntry.getValue();
             final IProblemCause cause = problem.getCause();
             writer.append(Strings.repeat(" ", 4) + "<error line=\"" + position.getLine() + "\" message=\""
-                    + problem.getMessage().replaceAll("\"", "'") + "\" severity=\""
+                    + xmlAttrEscaper.escape(problem.getMessage()) + "\" severity=\""
                     + cause.getSeverity().getName().toLowerCase() + "\""
                     + "/>\n");
         }
