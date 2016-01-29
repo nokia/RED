@@ -93,7 +93,7 @@ public class ValidationApplication implements IApplication {
     private void runValidation(final ProvidedArguments arguments) throws CoreException {
 
         final Table<IPath, ProblemPosition, RobotProblem> allProblems = HashBasedTable.create();
-        for (final String projectName : arguments.projectNames) {
+        for (final String projectName : arguments.getProjectNames()) {
             System.out.print("Validating '" + projectName + "' project... ");
 
             final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
@@ -126,7 +126,7 @@ public class ValidationApplication implements IApplication {
             }
         }
 
-        final File outFile = new File(arguments.reportFilepath);
+        final File outFile = new File(arguments.getReportFilePath());
         generateFile(outFile, allProblems);
     }
 
@@ -173,5 +173,13 @@ public class ValidationApplication implements IApplication {
         private String reportFilepath;
 
         private List<String> projectNames;
+
+        public String getReportFilePath() {
+            return reportFilepath == null ? "report.xml" : reportFilepath;
+        }
+
+        public List<String> getProjectNames() {
+            return projectNames;
+        }
     }
 }
