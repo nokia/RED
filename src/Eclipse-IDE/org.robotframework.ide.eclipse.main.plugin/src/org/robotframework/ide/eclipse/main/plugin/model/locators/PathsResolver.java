@@ -21,7 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
 
 /**
  * @author Michal Anglart
@@ -87,7 +86,7 @@ public class PathsResolver {
     private static List<IPath> resolveToAbsolutePossiblePath(final RobotSuiteFile file, final IPath path)
             throws PathResolvingException {
         final List<IPath> paths = newArrayList(resolveToAbsolutePath(file, path));
-        final Escaper escaper = Escapers.builder().addEscape(' ', "%20").build();
+        final Escaper escaper = PathsConverter.getUriSpecialCharsEscaper();
         for (final File f : file.getProject().getModuleSearchPaths()) {
             final URI resolvedPath = f.toURI().resolve(escaper.escape(path.toString()));
             paths.add(new Path(resolvedPath.getPath()));
@@ -108,7 +107,7 @@ public class PathsResolver {
             return path;
         } else {
             try {
-                final Escaper escaper = Escapers.builder().addEscape(' ', "%20").build();
+                final Escaper escaper = PathsConverter.getUriSpecialCharsEscaper();
 
                 final String portablePath = file.getFile().getLocation().toPortableString();
                 final URI filePath = new URI(escaper.escape(portablePath));
