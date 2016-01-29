@@ -4,8 +4,7 @@ Bundle-Name: RED Robot Editor
 Bundle-SymbolicName: org.robotframework.ide.eclipse.main.plugin; singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Vendor: Nokia Networks
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.e4.core.di,
+Require-Bundle: org.eclipse.e4.core.di,
  org.eclipse.e4.ui.di,
  org.eclipse.e4.core.contexts,
  org.eclipse.e4.tools.compat,
@@ -21,7 +20,9 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.e4.core.services,
  org.eclipse.core.expressions,
  org.eclipse.ui.views,
- org.eclipse.search
+ org.eclipse.search,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: lib/org.robotframework.ide.core-functions-0.0.1-SNAPSHOT.jar,
