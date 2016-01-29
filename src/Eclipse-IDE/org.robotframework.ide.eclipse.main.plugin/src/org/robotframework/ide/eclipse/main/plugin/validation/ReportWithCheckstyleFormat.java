@@ -54,7 +54,8 @@ public class ReportWithCheckstyleFormat implements AutoCloseable {
             final RobotProblem problem = problemEntry.getValue();
             final IProblemCause cause = problem.getCause();
             writer.append(Strings.repeat(" ", 4) + "<error line=\"" + position.getLine() + "\" message=\""
-                    + problem.getMessage() + "\" severity=\"" + cause.getSeverity().getName().toLowerCase() + "\""
+                    + problem.getMessage().replaceAll("\"", "'") + "\" severity=\""
+                    + cause.getSeverity().getName().toLowerCase() + "\""
                     + "/>\n");
         }
     }
