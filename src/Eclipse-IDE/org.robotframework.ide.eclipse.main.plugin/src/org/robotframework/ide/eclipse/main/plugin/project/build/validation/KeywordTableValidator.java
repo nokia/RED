@@ -42,14 +42,15 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private final Optional<RobotKeywordsSection> keywordSection;
 
-    private final ProblemsReportingStrategy reporter = new ProblemsReportingStrategy();
+    private final ProblemsReportingStrategy reporter;
 
     private final FileValidationContext validationContext;
 
     KeywordTableValidator(final FileValidationContext validationContext,
-            final Optional<RobotKeywordsSection> keywordSection) {
+            final Optional<RobotKeywordsSection> keywordSection, final ProblemsReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.keywordSection = keywordSection;
+        this.reporter = reporter;
     }
 
     @Override

@@ -12,13 +12,15 @@ import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 
 import com.google.common.collect.Range;
 
 public class DuplicatedTestTeardownValidator extends ADuplicatedValidator<TestTeardown> {
 
-    public DuplicatedTestTeardownValidator(final IFile file, final RobotSettingsSection section) {
-        super(file, section);
+    public DuplicatedTestTeardownValidator(final IFile file, final RobotSettingsSection section,
+            final ProblemsReportingStrategy reporter) {
+        super(file, section, reporter);
     }
 
     @Override
