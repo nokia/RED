@@ -15,7 +15,7 @@
     </topic>
 	</topic>
  <topic href="doc/user_guide/user_guide.html" label="User guide">
-    <topic href="doc/user_guide/libs.html" label="Recognising external libraries and variable files in RED">
+    <topic href="doc/user_guide/libs.html" label="Recognizing external libraries and variable files in RED">
     </topic>
     <topic href="doc/user_guide/remote.html" label="Remote debug">
     </topic>
@@ -30,6 +30,8 @@
     <topic href="doc/user_guide/unicode.html" label="Unicode - handling language specific chars in Eclipse">
     </topic>
 	<topic href="doc/user_guide/virtual_folders.html" label="Working with virtual folders mounted via SSH">
+    </topic>
+	<topic href="doc/user_guide/variable_files.html" label="How to handle missing remote host Robot variables">
     </topic>
  </topic>
 </toc>
