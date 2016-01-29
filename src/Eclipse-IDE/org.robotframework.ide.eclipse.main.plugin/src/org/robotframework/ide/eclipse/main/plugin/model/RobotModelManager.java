@@ -75,7 +75,9 @@ public final class RobotModelManager {
     }
 
     public void dispose() {
-        ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
+        if (PlatformUI.isWorkbenchRunning()) {
+            ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
+        }
         model = new RobotModel();
     }
 
