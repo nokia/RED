@@ -43,23 +43,26 @@ public class VersionDependentValidators {
     }
 
     public List<? extends ModelUnitValidator> getGeneralSettingsValidators(final IFile file,
-            final RobotSettingsSection section, final RobotVersion version) {
+            final RobotSettingsSection section, final ProblemsReportingStrategy reporter, final RobotVersion version) {
         final List<VersionDependentModelUnitValidator> allValidators = newArrayList(
-                new DuplicatedTemplateInOlderValidator(file, section), new DuplicatedTemplateValidator(file, section),
-                new DuplicatedSuiteSetupInOlderValidator(file, section),
-                new DuplicatedSuiteSetupValidator(file, section),
-                new DuplicatedSuiteTeardownInOlderValidator(file, section),
-                new DuplicatedSuiteTeardownValidator(file, section),
-                new DuplicatedTestSetupInOlderValidator(file, section), new DuplicatedTestSetupValidator(file, section),
-                new DuplicatedTestTeardownInOlderValidator(file, section),
-                new DuplicatedTestTeardownValidator(file, section),
-                new DuplicatedTestTimeoutInOlderValidator(file, section),
-                new DuplicatedTestTimeoutValidator(file, section),
-                new DuplicatedForceTagsInOlderValidator(file, section), new DuplicatedForceTagsValidator(file, section),
-                new DuplicatedDefaultTagsInOlderValidator(file, section),
-                new DuplicatedDefaultTagsValidator(file, section),
-                new DuplicatedDocumentationInOlderValidator(file, section),
-                new DuplicatedDocumentationValidator(file, section));
+                new DuplicatedTemplateInOlderValidator(file, section, reporter),
+                new DuplicatedTemplateValidator(file, section, reporter),
+                new DuplicatedSuiteSetupInOlderValidator(file, section, reporter),
+                new DuplicatedSuiteSetupValidator(file, section, reporter),
+                new DuplicatedSuiteTeardownInOlderValidator(file, section, reporter),
+                new DuplicatedSuiteTeardownValidator(file, section, reporter),
+                new DuplicatedTestSetupInOlderValidator(file, section, reporter),
+                new DuplicatedTestSetupValidator(file, section, reporter),
+                new DuplicatedTestTeardownInOlderValidator(file, section, reporter),
+                new DuplicatedTestTeardownValidator(file, section, reporter),
+                new DuplicatedTestTimeoutInOlderValidator(file, section, reporter),
+                new DuplicatedTestTimeoutValidator(file, section, reporter),
+                new DuplicatedForceTagsInOlderValidator(file, section, reporter),
+                new DuplicatedForceTagsValidator(file, section, reporter),
+                new DuplicatedDefaultTagsInOlderValidator(file, section, reporter),
+                new DuplicatedDefaultTagsValidator(file, section, reporter),
+                new DuplicatedDocumentationInOlderValidator(file, section, reporter),
+                new DuplicatedDocumentationValidator(file, section, reporter));
 
         return newArrayList(Iterables.filter(allValidators, new Predicate<VersionDependentModelUnitValidator>() {
 

@@ -29,9 +29,9 @@ class UnknownTablesValidator implements ModelUnitValidator {
 
     private final ProblemsReportingStrategy reporter;
 
-    UnknownTablesValidator(final RobotSuiteFile fileModel) {
+    UnknownTablesValidator(final RobotSuiteFile fileModel, final ProblemsReportingStrategy reporter) {
         this.fileModel = fileModel;
-        this.reporter = new ProblemsReportingStrategy();
+        this.reporter = reporter;
     }
 
     @Override

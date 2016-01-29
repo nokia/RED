@@ -2,6 +2,18 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension
+         id="validation"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="org.robotframework.ide.eclipse.main.plugin.validation.ValidationApplication">
+         </run>
+      </application>
+   </extension>
+   <extension
          point="org.eclipse.ui.newWizards">
       <category
             id="org.robotframework.ide.eclipse.wizards.category"

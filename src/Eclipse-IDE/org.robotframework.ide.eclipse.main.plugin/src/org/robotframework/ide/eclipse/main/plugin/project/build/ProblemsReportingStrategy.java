@@ -15,6 +15,20 @@ import com.google.common.collect.Range;
 
 public class ProblemsReportingStrategy {
 
+    static ProblemsReportingStrategy reportOnly() {
+        return new ProblemsReportingStrategy(false);
+    }
+
+    static ProblemsReportingStrategy reportAndPanic() {
+        return new ProblemsReportingStrategy(true);
+    }
+
+    protected final boolean shouldPanic;
+
+    protected ProblemsReportingStrategy(final boolean shouldPanic) {
+        this.shouldPanic = shouldPanic;
+    }
+
     public void handleProblem(final RobotProblem problem, final IFile file, final int line) throws ReportingInterruptedException {
         handleProblem(problem, file, new ProblemPosition(line), new HashMap<String, Object>());
     }
@@ -46,10 +60,14 @@ public class ProblemsReportingStrategy {
         if (problem != null) {
             problem.createMarker(file, filePosition, additionalAttributes);
         }
+        if (shouldPanic) {
+            throw new ReportingInterruptedException("Building and validation was interrupted by fatal problem");
+        }
     }
 
     public class ReportingInterruptedException extends RuntimeException {
-        ReportingInterruptedException(final String message) {
+
+        public ReportingInterruptedException(final String message) {
             super(message);
         }
     }

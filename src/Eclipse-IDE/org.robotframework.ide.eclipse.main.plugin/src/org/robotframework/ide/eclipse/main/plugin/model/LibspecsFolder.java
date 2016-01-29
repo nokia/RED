@@ -86,14 +86,13 @@ public class LibspecsFolder {
     }
 
     public boolean shouldRegenerateLibspecs(final IResourceDelta delta, final int kind) {
-        if (delta == null) {
+        if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
             return true;
         }
 
         final IFile cfgFile = folder.getProject().getFile(RobotProjectConfig.FILENAME);
         // full build is being perfomed or config file has changed
-        return kind == IncrementalProjectBuilder.FULL_BUILD
-                || delta.findMember(cfgFile.getProjectRelativePath()) != null
+        return delta.findMember(cfgFile.getProjectRelativePath()) != null
                 || delta.findMember(folder.getProjectRelativePath()) != null
                         && libspecFileChanged(delta.findMember(folder.getProjectRelativePath()));
     }

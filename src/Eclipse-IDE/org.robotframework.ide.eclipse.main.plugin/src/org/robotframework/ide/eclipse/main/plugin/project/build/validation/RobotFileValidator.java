@@ -24,10 +24,11 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
 
     protected final ProblemsReportingStrategy reporter;
 
-    public RobotFileValidator(final ValidationContext context, final IFile file) {
+    public RobotFileValidator(final ValidationContext context, final IFile file,
+            final ProblemsReportingStrategy reporter) {
         this.context = context;
         this.file = file;
-        this.reporter = new ProblemsReportingStrategy();
+        this.reporter = reporter;
     }
 
     @Override
@@ -56,12 +57,14 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
             throws CoreException {
         // TODO : check output status and parsing messages
 
-        new UnknownTablesValidator(fileModel).validate(null);
-        new TestCasesTableValidator(validationContext, fileModel.findSection(RobotCasesSection.class)).validate(null);
-        new GeneralSettingsTableValidator(validationContext, fileModel.findSection(RobotSettingsSection.class))
+        new UnknownTablesValidator(fileModel, reporter).validate(null);
+        new TestCasesTableValidator(validationContext, fileModel.findSection(RobotCasesSection.class), reporter)
                 .validate(null);
-        new KeywordTableValidator(validationContext, fileModel.findSection(RobotKeywordsSection.class)).validate(null);
-        new VariablesTableValidator(validationContext, fileModel.findSection(RobotVariablesSection.class))
+        new GeneralSettingsTableValidator(validationContext, fileModel.findSection(RobotSettingsSection.class),
+                reporter).validate(null);
+        new KeywordTableValidator(validationContext, fileModel.findSection(RobotKeywordsSection.class), reporter)
+                .validate(null);
+        new VariablesTableValidator(validationContext, fileModel.findSection(RobotVariablesSection.class), reporter)
                 .validate(null);
     }
 }
