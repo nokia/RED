@@ -22,12 +22,16 @@ import com.google.common.escape.Escapers;
  */
 public class PathsConverter {
 
+    public static Escaper getUriSpecialCharsEscaper() {
+        return Escapers.builder().addEscape(' ', "%20").addEscape('%', "%25").addEscape('^', "%5e").build();
+    }
+
     public static IPath fromResourceRelativeToWorkspaceRelative(final IResource resource, final IPath path) {
         if (path.isAbsolute()) {
             throw new IllegalArgumentException("Unable to convert absolute path");
         }
         try {
-            final Escaper escaper = Escapers.builder().addEscape(' ', "%20").build();
+            final Escaper escaper = getUriSpecialCharsEscaper();
 
             final String pathWithoutSpaces = escaper.escape(path.toString());
             final URI resolvedPath = new URI(escaper.escape(resource.getFullPath().toString()))
