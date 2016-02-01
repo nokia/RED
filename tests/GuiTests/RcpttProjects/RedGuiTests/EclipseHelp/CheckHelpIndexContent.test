@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _8zddgHlzEeWW6Pum9hja4g
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 10/23/15 1:18 PM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 2/1/16 11:55 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -45,4 +45,7 @@ with [get-view Help | get-tree] {
     get-item "RED Robot Editor User Guide/RED Overview" | get-property caption | equals "RED Overview" | verify-true
     get-item "RED Robot Editor User Guide/Legal" | get-property caption | equals Legal | verify-true
 }
+
+//close Help
+get-view Help | close
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
