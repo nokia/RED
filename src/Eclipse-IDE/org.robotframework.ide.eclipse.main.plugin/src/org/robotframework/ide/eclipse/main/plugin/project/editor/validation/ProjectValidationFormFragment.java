@@ -199,7 +199,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             viewer.setSelection(selection);
 
         } catch (final CoreException e) {
-            throw new IllegalStateException("Unable to read project structure");
+            throw new IllegalStateException("Unable to read project structure", e);
         } finally {
             viewer.getTree().setRedraw(true);
         }
