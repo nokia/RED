@@ -1,0 +1,35 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: open_close_content_assist
+Element-Type: context
+Element-Version: 2.0
+Id: _UKJR8MkGEeWPuqMw6GC70Q
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 2/1/16 6:08 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc "close-content-assist" [val file_name]{
+	with [get-editor $file_name]{
+	    get-canvas | key-type "TRAVERSE_ESCAPE"
+	    get-text-viewer | key-type ESC
+	}
+}
+
+proc "open-content_assist" [val file_name] [val remove_previouse_char 0] [val first_char ""] [val row] [val col]{
+	with [get-editor $file_name] {
+	    with [get-text-viewer] {
+	        set-caret-pos $row $col
+	        if [$remove_previouse_char| equals 1]{
+	        	key-type BackSpace
+	        }
+	        type-text $first_char
+	        key-type "M1+SPACE"
+	        wait 200
+	    }
+	}
+}
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
