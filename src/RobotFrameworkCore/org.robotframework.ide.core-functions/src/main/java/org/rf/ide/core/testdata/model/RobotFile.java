@@ -19,6 +19,8 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
+import com.google.common.base.Optional;
+
 public class RobotFile implements IChildElement<RobotFileOutput> {
 
     private final RobotFileOutput parentFileOutput;
@@ -57,6 +59,27 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
 
     public void addNewLine(final RobotLine line) {
         this.fileContent.add(line);
+    }
+
+    public Optional<Integer> getRobotLineIndexBy(final int offset) {
+        Optional<Integer> foundLine = Optional.absent();
+        if (offset >= 0) {
+            List<RobotLine> robotLines = getFileContent();
+            int numberOfLines = robotLines.size();
+            for (int lineIndex = 0; lineIndex < numberOfLines; lineIndex++) {
+                RobotLine line = robotLines.get(lineIndex);
+                int eolStartOffset = line.getEndOfLine().getStartOffset();
+                int start = (line.getLineElements().isEmpty()) ? eolStartOffset
+                        : line.getLineElements().get(0).getStartOffset();
+                int end = eolStartOffset + line.getEndOfLine().getRaw().length();
+                if (start >= offset && offset <= end) {
+                    foundLine = Optional.of(lineIndex);
+                    break;
+                }
+            }
+        }
+
+        return foundLine;
     }
 
     public SettingTable getSettingTable() {
