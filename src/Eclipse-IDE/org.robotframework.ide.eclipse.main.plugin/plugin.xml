@@ -55,6 +55,15 @@
             id="org.robotframework.ide.eclipse.wizards.newRobotCase"
             name="Robot Test Suite">
       </wizard>
+      <wizard
+            category="org.robotframework.ide.eclipse.wizards.category"
+            class="org.robotframework.ide.eclipse.main.plugin.wizards.NewRobotPythonFileWizard"
+            finalPerspective="org.eclipse.ui.perspectives.RobotPerspective"
+            hasPages="true"
+            icon="resources/python.png"
+            id="org.robotframework.ide.eclipse.wizards.newRobotPython"
+            name="Robot python file">
+      </wizard>
    </extension>
    <!--<extension
          point="org.eclipse.ui.importWizards">
@@ -251,6 +260,9 @@
        </newWizardShortcut>
        <newWizardShortcut
              id="org.robotframework.ide.eclipse.wizards.newRobotCase">
+       </newWizardShortcut>
+       <newWizardShortcut
+             id="org.robotframework.ide.eclipse.wizards.newRobotPython">
        </newWizardShortcut>
        <actionSet
              id="org.eclipse.debug.ui.launchActionSet">
@@ -593,6 +605,18 @@
     <commonWizard
           type="new"
           wizardId="org.robotframework.ide.eclipse.wizards.newRobotSuite">
+       <enablement>
+          <with
+                variable="activeWorkbenchWindow.activePerspective">
+             <equals
+                   value="org.eclipse.ui.perspectives.RobotPerspective">
+             </equals>
+          </with>
+       </enablement>
+    </commonWizard>
+    <commonWizard
+          type="new"
+          wizardId="org.robotframework.ide.eclipse.wizards.newRobotPython">
        <enablement>
           <with
                 variable="activeWorkbenchWindow.activePerspective">
