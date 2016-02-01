@@ -290,7 +290,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
                 } catch (final CoreException e) {
                     // nothing to do
                 }
-                if (shouldRefresh.get()) {
+                if (shouldRefresh.get() && viewer.getTree() != null && !viewer.getTree().isDisposed()) {
                     SwtThread.syncExec(viewer.getTree().getDisplay(), new Runnable() {
                         @Override
                         public void run() {
