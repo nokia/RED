@@ -46,7 +46,7 @@ public class ReportWithCheckstyleFormat implements AutoCloseable {
     void writeEntries(final Table<IPath, ProblemPosition, RobotProblem> problems)
             throws IOException {
         for (final IPath path : problems.rowKeySet()) {
-            writer.append(Strings.repeat(" ", 2) + "<file name=\"" + path.toString() + "\">\n");
+            writer.append(Strings.repeat(" ", 2) + "<file name=\"" + xmlAttrEscaper.escape(path.toString()) + "\">\n");
             writeProblems(problems.row(path));
             writer.append(Strings.repeat(" ", 2) + "</file>\n");
         }
