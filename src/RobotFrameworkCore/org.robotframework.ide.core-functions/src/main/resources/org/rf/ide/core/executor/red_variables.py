@@ -12,7 +12,6 @@ def get_global_variables():
     global_variables = {
         '${TEMPDIR}': os.path.normpath(tempfile.gettempdir()),
         '${EXECDIR}': '',
-        '${dupa}': '1',
         '${/}': os.sep,
         '${:}': os.pathsep,
         '${SPACE}': ' ',
