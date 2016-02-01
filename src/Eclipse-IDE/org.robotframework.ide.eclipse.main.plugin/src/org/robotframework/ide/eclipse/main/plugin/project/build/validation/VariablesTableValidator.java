@@ -64,13 +64,13 @@ class VariablesTableValidator implements ModelUnitValidator {
         final RobotSuiteFile suiteModel = variablesSection.get().getSuiteFile();
         final VariableTable variableTable = (VariableTable) variablesSection.get().getLinkedElement();
         reportVersionSpecificProblems(suiteModel.getFile(), variableTable, monitor);
-        
+
         reportInvalidVariableName(suiteModel.getFile(), variableTable);
         reportUnknownVariableTypes(suiteModel.getFile(), variableTable);
         reportDuplicatedVariables(suiteModel.getFile(), variableTable);
     }
 
-	private void reportVersionSpecificProblems(final IFile file, final VariableTable variableTable,
+    private void reportVersionSpecificProblems(final IFile file, final VariableTable variableTable,
             final IProgressMonitor monitor) throws CoreException {
         for (final IVariableHolder variable : variableTable.getVariables()) {
             final List<? extends ModelUnitValidator> validators = versionDependentValidators.getVariableValidators(file,
