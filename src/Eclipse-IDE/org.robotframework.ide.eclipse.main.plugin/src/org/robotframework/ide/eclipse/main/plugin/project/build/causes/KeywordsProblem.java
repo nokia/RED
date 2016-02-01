@@ -13,20 +13,23 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddPrefixToKeywordUsage;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeKeywordNameFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateKeywordFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveKeywordFixer;
 
 import com.google.common.base.Splitter;
 
-
 public enum KeywordsProblem implements IProblemCause {
     UNKNOWN_KEYWORD {
+
         @Override
         public String getProblemDescription() {
             return "Unknown keyword '%s'";
@@ -46,13 +49,14 @@ public enum KeywordsProblem implements IProblemCause {
             final ArrayList<IMarkerResolution> fixers = newArrayList();
             fixers.addAll(ImportLibraryFixer.createFixers(suiteFile, keywordName));
             fixers.addAll(CreateKeywordFixer.createFixers(keywordOriginalName));
-            fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker), new SimilaritiesAnalyst()
-                    .provideSimilarAccessibleKeywords(suiteFile, keywordName)));
+            fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
+                    new SimilaritiesAnalyst().provideSimilarAccessibleKeywords(suiteFile, keywordName)));
 
             return fixers;
         }
     },
     AMBIGUOUS_KEYWORD {
+
         @Override
         public String getProblemDescription() {
             return "Ambiguous keyword '%s' reference. Matching keywords are defined in: %s";
@@ -75,6 +79,7 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     DEPRECATED_KEYWORD {
+
         @Override
         public Severity getSeverity() {
             return Severity.WARNING;
@@ -86,6 +91,7 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     DUPLICATED_KEYWORD {
+
         @Override
         public String getProblemDescription() {
             return "Duplicated keyword definition '%s'";
@@ -102,6 +108,7 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     EMPTY_KEYWORD {
+
         @Override
         public String getProblemDescription() {
             return "Keyword '%s' contains no keywords to execute";
@@ -118,6 +125,7 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     KEYWORD_FROM_NESTED_LIBRARY {
+
         @Override
         public Severity getSeverity() {
             return Severity.WARNING;
@@ -129,18 +137,21 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     ARGUMENTS_DEFINED_TWICE {
+
         @Override
         public String getProblemDescription() {
             return "Keyword '%s' defines arguments by using both embedded syntax and [Arguments] setting";
         }
     },
     MISSING_KEYWORD {
+
         @Override
         public String getProblemDescription() {
             return "There is no keyword to execute specified";
         }
     },
     KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION {
+
         @Override
         public Severity getSeverity() {
             return Severity.WARNING;
@@ -150,7 +161,7 @@ public enum KeywordsProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Given keyword name '%s' is not consistent with keyword definition: %s";
         }
-        
+
         @Override
         public boolean hasResolution() {
             return true;
@@ -159,8 +170,52 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new ChangeKeywordNameFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, null),
-                    marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null), marker.getAttribute(
-                            AdditionalMarkerAttributes.SOURCES, "")));
+                    marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null),
+                    marker.getAttribute(AdditionalMarkerAttributes.SOURCES, "")));
+        }
+    },
+    DEPRACATED_DOCUMENT_WORD_FROM_30 {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Keyword setting '%s' is depracated from Robot Framework 3.0. Use Documentation syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new DocumentToDocumentationWordFixer(RobotKeywordsSection.class));
+        }
+    },
+    DEPRACATED_POSTCONDITION_SYNONIM_FROM_30 {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is depracated from Robot Framework 3.0. Use [Teardown] syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
         }
     };
 

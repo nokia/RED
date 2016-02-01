@@ -15,9 +15,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 
 import com.google.common.collect.Range;
 
-abstract class VersionDependentModelUnitValidator implements ModelUnitValidator {
+public abstract class VersionDependentModelUnitValidator implements ModelUnitValidator {
 
-    boolean isApplicableFor(final RobotVersion version) {
+    public boolean isApplicableFor(final RobotVersion version) {
         return getApplicableVersionRange().contains(version);
     }
 
