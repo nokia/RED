@@ -123,9 +123,9 @@ def _escape_unicode(data):
         return data.encode('unicode_escape')
     if py_version < (3,0,0) and isinstance(data, basestring):
         return data.encode('unicode_escape')
-    if py_version >= (3,0,0) and isinstance(data, int) and (data < -(2**31) or data > (2 ** 31) -1):
-        return str(data)
     if py_version < (3,0,0) and isinstance(data, long):  # for OverflowError in XML-RPC
+        return str(data)
+    if isinstance(data, int) and (data < -(2**31) or data > (2 ** 31) -1):
         return str(data)
     if isinstance(data, dict):
         data_result = {}
