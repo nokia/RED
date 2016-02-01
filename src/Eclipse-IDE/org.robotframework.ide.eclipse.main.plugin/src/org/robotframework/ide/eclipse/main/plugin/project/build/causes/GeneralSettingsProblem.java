@@ -15,12 +15,15 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IMarkerResolution;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.AddLibraryToRedXmlFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImportedPathFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
@@ -174,12 +177,12 @@ public enum GeneralSettingsProblem implements IProblemCause {
         }
     },
     HTML_RESOURCE_IMPORT {
-        
+
         @Override
         public Severity getSeverity() {
             return Severity.WARNING;
         }
-        
+
         @Override
         public String getProblemDescription() {
             return "HTML is valid resource type for Robot although RED does not support html files.";
@@ -305,6 +308,160 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Setting '%s' is duplicated. Robot will try to use merged elements as documentation";
+        }
+    },
+    METADATA_SETTING_JOINED_WITH_KEY_IN_COLUMN_29 {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' in the same column with Metadata Key is removed in Robot Framework 3.0";
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new MetadataKeyInSameColumnFixer());
+        }
+    },
+    METADATA_SETTING_JOINED_WITH_KEY_IN_COLUMN_30 {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' in the same column with Metadata Key is removed in Robot Framework 3.0";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new MetadataKeyInSameColumnFixer());
+        }
+    },
+    DEPRACATED_DOCUMENT_WORD_FROM_30 {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is depracated from Robot Framework 3.0. Use Documentation syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
+        }
+    },
+    DEPRACATED_SUITE_PRECONDITION_SYNONIM_FROM_30 {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is depracated from Robot Framework 3.0. Use Suite Setup syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
+        }
+    },
+    DEPRACATED_SUITE_POSTCONDITION_SYNONIM_FROM_30 {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is depracated from Robot Framework 3.0. Use Suite Teardown syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
+        }
+    },
+    DEPRACATED_TEST_PRECONDITION_SYNONIM_FROM_30 {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is depracated from Robot Framework 3.0. Use Test Setup syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
+        }
+    },
+    DEPRACATED_TEST_POSTCONDITION_SYNONIM_FROM_30 {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is depracated from Robot Framework 3.0. Use Test Teardown syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
         }
     };
 
