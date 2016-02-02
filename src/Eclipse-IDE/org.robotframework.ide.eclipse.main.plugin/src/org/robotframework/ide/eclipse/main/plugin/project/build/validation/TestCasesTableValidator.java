@@ -42,7 +42,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsP
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -57,14 +56,11 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     private final ProblemsReportingStrategy reporter;
 
-    private final VersionDependentValidators versionDependentValidators;
-
     TestCasesTableValidator(final FileValidationContext validationContext, final Optional<RobotCasesSection> section,
             final ProblemsReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.testCaseSection = section;
         this.reporter = reporter;
-        this.versionDependentValidators = new VersionDependentValidators();
     }
 
     @Override
@@ -73,25 +69,13 @@ class TestCasesTableValidator implements ModelUnitValidator {
             return;
         }
         final RobotSuiteFile suiteModel = testCaseSection.get().getSuiteFile();
-        final IFile file = suiteModel.getFile();
         final TestCaseTable casesTable = (TestCaseTable) testCaseSection.get().getLinkedElement();
         final List<TestCase> cases = casesTable.getTestCases();
-
-        reportVersionSpecificProblems(file, testCaseSection.get(), monitor);
 
         reportEmptyCases(suiteModel.getFile(), cases);
         reportDuplicatedCases(suiteModel.getFile(), cases);
         reportKeywordUsageProblems(suiteModel, testCaseSection.get().getChildren());
         reportUnknownVariables(suiteModel, cases);
-    }
-
-    private void reportVersionSpecificProblems(final IFile file, final RobotCasesSection section,
-            final IProgressMonitor monitor) throws CoreException {
-        final List<? extends ModelUnitValidator> validators = versionDependentValidators.getTestCasesValidators(file,
-                section, reporter, validationContext.getVersion());
-        for (final ModelUnitValidator validator : validators) {
-            validator.validate(monitor);
-        }
     }
 
     private void reportEmptyCases(final IFile file, final List<TestCase> cases) {

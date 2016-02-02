@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.keywords;
+package org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.ADocumentDepracatedDeclarationValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDepracatedDeclarationValidator;
 
 public class DocumentationUserKeywordDeclarationSettingValidator extends ADocumentDepracatedDeclarationValidator {
 
@@ -31,7 +31,7 @@ public class DocumentationUserKeywordDeclarationSettingValidator extends ADocume
 
     @Override
     public IProblemCause getSettingProblemId() {
-        return KeywordsProblem.DEPRACATED_DOCUMENT_WORD_FROM_30;
+        return KeywordsProblem.DOCUMENT_SYNONIM;
     }
 
     @Override

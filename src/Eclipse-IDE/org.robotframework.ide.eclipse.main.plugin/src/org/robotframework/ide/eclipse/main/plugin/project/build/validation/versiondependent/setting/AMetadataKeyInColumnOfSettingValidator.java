@@ -17,6 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.OldMetaSynataxHelper;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 
 public abstract class AMetadataKeyInColumnOfSettingValidator extends VersionDependentModelUnitValidator {
@@ -27,11 +28,14 @@ public abstract class AMetadataKeyInColumnOfSettingValidator extends VersionDepe
 
     private final ProblemsReportingStrategy reporter;
 
+    private final OldMetaSynataxHelper oldMetaHelper;
+
     public AMetadataKeyInColumnOfSettingValidator(final IFile file, final RobotSettingsSection section,
             final ProblemsReportingStrategy reporter) {
         this.file = file;
         this.section = section;
         this.reporter = reporter;
+        this.oldMetaHelper = new OldMetaSynataxHelper();
     }
 
     @Override
@@ -40,13 +44,11 @@ public abstract class AMetadataKeyInColumnOfSettingValidator extends VersionDepe
 
         final List<Metadata> metadatas = table.getMetadatas();
         for (final Metadata metadata : metadatas) {
-            RobotToken settingDeclaration = metadata.getDeclaration();
-            String settingText = settingDeclaration.getText();
-            if ("meta:".equalsIgnoreCase(settingText.trim())) {
-                if (settingDeclaration.getEndColumn() + 1 == metadata.getKey().getStartColumn()) {
-                    reporter.handleProblem(RobotProblem.causedBy(getSettingProblemId())
-                            .formatMessageWith(settingDeclaration.getText()), file, settingDeclaration);
-                }
+            if (oldMetaHelper.isOldSyntax(metadata, table)) {
+                final RobotToken settingDeclaration = metadata.getDeclaration();
+                reporter.handleProblem(
+                        RobotProblem.causedBy(getSettingProblemId()).formatMessageWith(settingDeclaration.getText()),
+                        file, settingDeclaration);
             }
         }
     }
