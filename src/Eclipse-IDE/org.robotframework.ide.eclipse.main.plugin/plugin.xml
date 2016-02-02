@@ -661,6 +661,15 @@
                 label="Exclude from validation"
                 style="push">
           </command>
+          <separator
+                name="navigation"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.red.addLibraryFromNavigator"
+                label="Add Library"
+                style="push">
+          </command>
        </menu>
     </menuContribution>
  </extension>
@@ -758,6 +767,28 @@
           </with>
        </enabledWhen>
     </handler>
+    <handler
+		  class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.AddLibraryHandler"
+		  commandId="org.robotframework.red.addLibraryFromNavigator">
+	   <activeWhen>
+		  <with
+				variable="selection">
+			 <iterate
+				   ifEmpty="false"
+				   operator="and">
+				<and>
+				   <instanceof
+						 value="org.eclipse.core.resources.IFile">
+				   </instanceof>
+				   <test
+						 property="org.eclipse.core.resources.projectNature"
+						 value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+				   </test>
+				</and>
+			 </iterate>
+		  </with>
+	   </activeWhen>
+	</handler>
  </extension>
  <extension
        point="org.eclipse.ui.themes">
@@ -956,6 +987,11 @@
           categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.exclude"
           name="Exclude">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.addLibraryFromNavigator"
+          name="Add Library">
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
