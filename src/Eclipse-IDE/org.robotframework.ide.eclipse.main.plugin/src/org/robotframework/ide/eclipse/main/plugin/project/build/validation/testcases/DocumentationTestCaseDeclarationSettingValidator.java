@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.testcases;
+package org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.ADocumentDepracatedDeclarationValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.ADocumentDepracatedDeclarationValidator;
 
 public class DocumentationTestCaseDeclarationSettingValidator extends ADocumentDepracatedDeclarationValidator {
 
@@ -31,7 +31,7 @@ public class DocumentationTestCaseDeclarationSettingValidator extends ADocumentD
 
     @Override
     public IProblemCause getSettingProblemId() {
-        return TestCasesProblem.DEPRACATED_DOCUMENT_WORD_FROM_30;
+        return TestCasesProblem.DOCUMENT_SYNONIM;
     }
 
     @Override

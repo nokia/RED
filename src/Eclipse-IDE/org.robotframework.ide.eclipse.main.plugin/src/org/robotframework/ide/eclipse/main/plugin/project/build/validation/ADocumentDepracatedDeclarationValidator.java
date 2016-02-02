@@ -3,22 +3,20 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent;
+package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 
-import com.google.common.collect.Range;
-
-public abstract class ADocumentDepracatedDeclarationValidator extends VersionDependentModelUnitValidator {
+public abstract class ADocumentDepracatedDeclarationValidator implements ModelUnitValidator {
 
     private final IFile file;
 
@@ -39,11 +37,6 @@ public abstract class ADocumentDepracatedDeclarationValidator extends VersionDep
                         docToken);
             }
         }
-    }
-
-    @Override
-    protected Range<RobotVersion> getApplicableVersionRange() {
-        return Range.all();
     }
 
     public abstract IProblemCause getSettingProblemId();
