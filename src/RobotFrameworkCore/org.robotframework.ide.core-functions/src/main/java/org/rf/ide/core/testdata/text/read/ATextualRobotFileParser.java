@@ -339,6 +339,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             parsingOutput.addBuildMessage(BuildMessage.createErrorMessage(
                     "Unknown problem during reading file " + robotFile + ".\nStack:" + e, "File " + robotFile));
             // FIXME: stack trace adding
+            System.err.println("File: " + robotFile + " line " + lineNumber);
             e.printStackTrace();
             wasProcessingError = true;
         } finally {
