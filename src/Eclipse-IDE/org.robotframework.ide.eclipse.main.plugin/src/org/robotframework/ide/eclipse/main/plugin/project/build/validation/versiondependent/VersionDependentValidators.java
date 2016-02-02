@@ -7,18 +7,14 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation.vers
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.keywords.DocumentationUserKeywordDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedDefaultTagsInOlderValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedDefaultTagsValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedDocumentationInOlderValidator;
@@ -37,7 +33,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versi
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTeardownValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTimeoutInOlderValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.DuplicatedTestTimeoutValidator;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.testcases.DocumentationTestCaseDeclarationSettingValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.MetadataKeyInColumnOfSettingValidatorStartFromRF30;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.setting.MetadataKeyInColumnOfSettingValidatorUntilRF30;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.DictionaryExistenceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.ScalarAsListInOlderRobotValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.variables.ScalarAsListValidator;
@@ -83,36 +80,9 @@ public class VersionDependentValidators {
                 new DuplicatedDefaultTagsInOlderValidator(file, section, reporter),
                 new DuplicatedDefaultTagsValidator(file, section, reporter),
                 new DuplicatedDocumentationInOlderValidator(file, section, reporter),
-                new DuplicatedDocumentationValidator(file, section, reporter));
-
-        return newArrayList(Iterables.filter(allValidators, new Predicate<VersionDependentModelUnitValidator>() {
-
-            @Override
-            public boolean apply(final VersionDependentModelUnitValidator validator) {
-                return validator.isApplicableFor(version);
-            }
-        }));
-    }
-
-    public List<? extends ModelUnitValidator> getTestCasesValidators(final IFile file, final RobotCasesSection section,
-            final ProblemsReportingStrategy reporter, final RobotVersion version) {
-
-        final List<VersionDependentModelUnitValidator> allValidators = new ArrayList<>(0);
-        allValidators.add(new DocumentationTestCaseDeclarationSettingValidator(file, section, reporter));
-
-        return newArrayList(Iterables.filter(allValidators, new Predicate<VersionDependentModelUnitValidator>() {
-
-            @Override
-            public boolean apply(final VersionDependentModelUnitValidator validator) {
-                return validator.isApplicableFor(version);
-            }
-        }));
-    }
-
-    public List<? extends ModelUnitValidator> getUserKeywordsValidators(final IFile file,
-            final RobotKeywordsSection section, final ProblemsReportingStrategy reporter, final RobotVersion version) {
-        final List<VersionDependentModelUnitValidator> allValidators = new ArrayList<>(0);
-        allValidators.add(new DocumentationUserKeywordDeclarationSettingValidator(file, section, reporter));
+                new DuplicatedDocumentationValidator(file, section, reporter),
+                new MetadataKeyInColumnOfSettingValidatorUntilRF30(file, section, reporter),
+                new MetadataKeyInColumnOfSettingValidatorStartFromRF30(file, section, reporter));
 
         return newArrayList(Iterables.filter(allValidators, new Predicate<VersionDependentModelUnitValidator>() {
 
