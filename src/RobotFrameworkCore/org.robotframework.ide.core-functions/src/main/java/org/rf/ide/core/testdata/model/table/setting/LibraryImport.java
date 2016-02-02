@@ -11,44 +11,41 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-
 public class LibraryImport extends AImported {
 
     private final List<RobotToken> arguments = new ArrayList<>();
-    private LibraryAlias alias = new LibraryAlias(null);
 
+    private LibraryAlias alias = new LibraryAlias(null);
 
     public LibraryImport(final RobotToken libraryDeclaration) {
         super(Type.LIBRARY, libraryDeclaration);
     }
 
-
     public LibraryAlias getAlias() {
         return alias;
     }
-
 
     public void setAlias(final LibraryAlias alias) {
         alias.setParent(this);
         this.alias = alias;
     }
 
-
     public List<RobotToken> getArguments() {
         return Collections.unmodifiableList(arguments);
     }
-
 
     public void addArgument(final RobotToken argument) {
         this.arguments.add(argument);
     }
 
+    public void removeArgument(final int index) {
+        this.arguments.remove(index);
+    }
 
     @Override
     public boolean isPresent() {
         return true; // TODO: check if correct imported
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {
