@@ -12,7 +12,6 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
 
 /**
@@ -48,11 +47,11 @@ public enum TestCasesProblem implements IProblemCause {
             return newArrayList();// new RemoveKeywordFixer(marker.getAttribute("name", null)));
         }
     },
-    DEPRACATED_DOCUMENT_WORD_FROM_30 {
+    DOCUMENT_SYNONIM {
 
         @Override
         public Severity getSeverity() {
-            return Severity.WARNING;
+            return Severity.ERROR;
         }
 
         @Override
@@ -62,56 +61,12 @@ public enum TestCasesProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Test Case setting '%s' is depracated from Robot Framework 3.0. Use Documentation syntax instead of current.";
+            return "Test Case setting '%s' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current.";
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new DocumentToDocumentationWordFixer(RobotCasesSection.class));
-        }
-    },
-    DEPRACATED_PRECONDITION_SYNONIM_FROM_30 {
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is depracated from Robot Framework 3.0. Use [Setup] syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
-        }
-    },
-    DEPRACATED_POSTCONDITION_SYNONIM_FROM_30 {
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is depracated from Robot Framework 3.0. Use [Teardown] syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
         }
     };
 

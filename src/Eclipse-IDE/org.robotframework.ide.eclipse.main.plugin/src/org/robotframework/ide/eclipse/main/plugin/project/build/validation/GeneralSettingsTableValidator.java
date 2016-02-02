@@ -35,6 +35,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentP
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DocumentationDeclarationSettingValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.MetaDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Function;
@@ -71,8 +73,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         final IFile file = suiteFile.getFile();
         final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
 
+        validateByExternal(file, settingsSection.get(), monitor);
         reportVersionSpecificProblems(file, settingsSection.get(), monitor);
-
         reportUnknownSettings(file, settingsTable.getUnknownSettings());
 
         validateLibraries(suiteFile, getLibraryImports(settingsTable), monitor);
@@ -85,6 +87,12 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         validateTags(file, getTags(settingsTable));
         validateDocumentations(file, settingsTable.getDocumentation());
         validateMetadatas(file, settingsTable.getMetadatas());
+    }
+
+    private void validateByExternal(final IFile file, final RobotSettingsSection section,
+            final IProgressMonitor monitor) throws CoreException {
+        new MetaDeclarationSettingValidator(file, section, reporter).validate(monitor);
+        new DocumentationDeclarationSettingValidator(file, section, reporter).validate(monitor);
     }
 
     private void reportVersionSpecificProblems(final IFile file, final RobotSettingsSection section,
@@ -167,8 +175,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(keywordName);
                     final Map<String, Object> additional = ImmutableMap.<String, Object> of(
-                            AdditionalMarkerAttributes.NAME, keywordName,
-                            AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName);
+                            AdditionalMarkerAttributes.NAME, keywordName, AdditionalMarkerAttributes.ORIGINAL_NAME,
+                            keywordName);
                     reporter.handleProblem(problem, file, keywordToken, additional);
                 }
                 final List<String> sources = validationContext.getKeywordSourceNames(keywordName);
@@ -191,14 +199,16 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
                 }
-                final KeywordValidationContext keywordValidationContext = validationContext.checkIfKeywordOccurrenceIsEqualToDefinition(keywordName);
+                final KeywordValidationContext keywordValidationContext = validationContext
+                        .checkIfKeywordOccurrenceIsEqualToDefinition(keywordName);
                 if (keywordValidationContext != null) {
                     reporter.handleProblem(
                             RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
                                     .formatMessageWith(keywordName,
-                                            keywordValidationContext.getNameFromKeywordDefinition()), file,
-                            keywordToken, ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
-                                    keywordName, AdditionalMarkerAttributes.ORIGINAL_NAME,
+                                            keywordValidationContext.getNameFromKeywordDefinition()),
+                            file, keywordToken,
+                            ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, keywordName,
+                                    AdditionalMarkerAttributes.ORIGINAL_NAME,
                                     keywordValidationContext.getNameFromKeywordDefinition(),
                                     AdditionalMarkerAttributes.SOURCES, keywordValidationContext.getSourceNameInUse()));
 
@@ -218,9 +228,9 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                         .formatMessageWith(settingName);
                 reporter.handleProblem(problem, file, settingToken);
             } else {
-                
+
                 final String keywordName = keywordToken.getText().toString();
-                
+
                 if (keywordName.toLowerCase().equals("none")) {
                     continue;
                 }
@@ -229,8 +239,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
                             .formatMessageWith(keywordName);
                     final Map<String, Object> additional = ImmutableMap.<String, Object> of(
-                            AdditionalMarkerAttributes.NAME, keywordName,
-                            AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName);
+                            AdditionalMarkerAttributes.NAME, keywordName, AdditionalMarkerAttributes.ORIGINAL_NAME,
+                            keywordName);
                     reporter.handleProblem(problem, file, keywordToken, additional);
                 }
                 final List<String> sources = validationContext.getKeywordSourceNames(keywordName);
@@ -253,14 +263,16 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                             .formatMessageWith(keywordName);
                     reporter.handleProblem(problem, file, keywordToken);
                 }
-                final KeywordValidationContext keywordValidationContext = validationContext.checkIfKeywordOccurrenceIsEqualToDefinition(keywordName);
+                final KeywordValidationContext keywordValidationContext = validationContext
+                        .checkIfKeywordOccurrenceIsEqualToDefinition(keywordName);
                 if (keywordValidationContext != null) {
                     reporter.handleProblem(
                             RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
                                     .formatMessageWith(keywordName,
-                                            keywordValidationContext.getNameFromKeywordDefinition()), file,
-                            keywordToken, ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
-                                    keywordName, AdditionalMarkerAttributes.ORIGINAL_NAME,
+                                            keywordValidationContext.getNameFromKeywordDefinition()),
+                            file, keywordToken,
+                            ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, keywordName,
+                                    AdditionalMarkerAttributes.ORIGINAL_NAME,
                                     keywordValidationContext.getNameFromKeywordDefinition(),
                                     AdditionalMarkerAttributes.SOURCES, keywordValidationContext.getSourceNameInUse()));
 

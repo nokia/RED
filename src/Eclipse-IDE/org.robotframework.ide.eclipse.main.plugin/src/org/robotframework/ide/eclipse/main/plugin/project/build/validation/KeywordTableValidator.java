@@ -33,7 +33,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -47,14 +46,11 @@ class KeywordTableValidator implements ModelUnitValidator {
 
     private final FileValidationContext validationContext;
 
-    private final VersionDependentValidators versionDependentValidators;
-
     KeywordTableValidator(final FileValidationContext validationContext,
             final Optional<RobotKeywordsSection> keywordSection, final ProblemsReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.keywordSection = keywordSection;
         this.reporter = reporter;
-        this.versionDependentValidators = new VersionDependentValidators();
     }
 
     @Override
@@ -67,23 +63,12 @@ class KeywordTableValidator implements ModelUnitValidator {
         final KeywordTable keywordTable = (KeywordTable) keywordSection.get().getLinkedElement();
         final List<UserKeyword> keywords = keywordTable.getKeywords();
 
-        reportVersionSpecificProblems(file, keywordSection.get(), monitor);
-
         reportEmptyKeyword(file, keywords);
         reportDuplicatedKewords(file, keywords);
         reportEmbeddedArgumentsConflicts(file, keywords);
         TestCasesTableValidator.reportKeywordUsageProblems(suiteModel, validationContext, reporter,
                 findExecutableRows(keywords), Optional.<String> absent());
         reportUnknownVariables(suiteModel.getFile(), keywords);
-    }
-
-    private void reportVersionSpecificProblems(final IFile file, final RobotKeywordsSection section,
-            final IProgressMonitor monitor) throws CoreException {
-        final List<? extends ModelUnitValidator> validators = versionDependentValidators.getUserKeywordsValidators(file,
-                section, reporter, validationContext.getVersion());
-        for (final ModelUnitValidator validator : validators) {
-            validator.validate(monitor);
-        }
     }
 
     private void reportEmptyKeyword(final IFile file, final List<UserKeyword> keywords) {

@@ -14,11 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
-import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -28,14 +24,14 @@ import org.robotframework.red.graphics.ImagesManager;
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
-public class MetadataKeyInSameColumnFixer extends RedSuiteMarkerResolution {
+public class SettingMetaSynonimFixer extends RedSuiteMarkerResolution {
 
-    public MetadataKeyInSameColumnFixer() {
+    public SettingMetaSynonimFixer() {
     }
 
     @Override
     public String getLabel() {
-        return "Split Metadata key from setting declaration.";
+        return "Change Meta declaration to Metadata.";
     }
 
     @Override
@@ -65,36 +61,11 @@ public class MetadataKeyInSameColumnFixer extends RedSuiteMarkerResolution {
         final RobotToken metadataDec = robotKeywordCall.getLinkedElement().getDeclaration();
         final String metaText = metadataDec.getRaw().endsWith(":") ? "Metadata:" : "Metadata";
         final int offset = metadataDec.getStartOffset();
-        final String correctedMetadata = new StringBuilder().append(metaText)
-                .append(getSeparator(suiteModel, offset))
-                .toString();
+        final String correctedMetadata = new StringBuilder().append(metaText).toString();
         final ICompletionProposal proposal = new CompletionProposal(correctedMetadata, offset,
                 metadataDec.getRaw().length(), offset, ImagesManager.getImage(RedImages.getUserKeywordImage()),
                 getLabel(), null, null);
         return Optional.of(proposal);
-    }
-
-    private String getSeparator(final RobotSuiteFile suiteModel, final int offset) {
-        String separator = "  ";
-
-        RobotFile fileModel = suiteModel.getLinkedElement();
-        FileFormat fileFormat = fileModel.getParent().getFileFormat();
-        if (fileFormat == FileFormat.TSV) {
-            separator = "\t";
-        } else {
-            Optional<Integer> line = fileModel.getRobotLineIndexBy(offset);
-            if (line.isPresent()) {
-                RobotLine robotLine = fileModel.getFileContent().get(line.get());
-                SeparatorType separatorForLine = robotLine.getSeparatorForLine().get();
-                if (separatorForLine == SeparatorType.PIPE) {
-                    separator = " | ";
-                } else {
-                    separator = "  ";
-                }
-            }
-        }
-
-        return separator;
     }
 
     private Range<Integer> getRange(final IMarker marker) {

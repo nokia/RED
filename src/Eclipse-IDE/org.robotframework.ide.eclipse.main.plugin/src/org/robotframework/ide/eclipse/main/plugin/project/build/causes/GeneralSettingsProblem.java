@@ -24,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixe
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingMetaSynonimFixer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
@@ -354,11 +355,11 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return newArrayList(new MetadataKeyInSameColumnFixer());
         }
     },
-    DEPRACATED_DOCUMENT_WORD_FROM_30 {
+    META_SYNONIM {
 
         @Override
         public Severity getSeverity() {
-            return Severity.WARNING;
+            return Severity.ERROR;
         }
 
         @Override
@@ -368,19 +369,19 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Setting '%s' is depracated from Robot Framework 3.0. Use Documentation syntax instead of current.";
+            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Metadata syntax instead of current.";
         }
 
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
+            return newArrayList(new SettingMetaSynonimFixer());
         }
     },
-    DEPRACATED_SUITE_PRECONDITION_SYNONIM_FROM_30 {
+    DOCUMENT_SYNONIM {
 
         @Override
         public Severity getSeverity() {
-            return Severity.WARNING;
+            return Severity.ERROR;
         }
 
         @Override
@@ -390,73 +391,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Setting '%s' is depracated from Robot Framework 3.0. Use Suite Setup syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
-        }
-    },
-    DEPRACATED_SUITE_POSTCONDITION_SYNONIM_FROM_30 {
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is depracated from Robot Framework 3.0. Use Suite Teardown syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
-        }
-    },
-    DEPRACATED_TEST_PRECONDITION_SYNONIM_FROM_30 {
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is depracated from Robot Framework 3.0. Use Test Setup syntax instead of current.";
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
-        }
-    },
-    DEPRACATED_TEST_POSTCONDITION_SYNONIM_FROM_30 {
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
-        }
-
-        @Override
-        public boolean hasResolution() {
-            return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is depracated from Robot Framework 3.0. Use Test Teardown syntax instead of current.";
+            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current.";
         }
 
         @Override
