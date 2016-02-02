@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _u8fMELqtEeW29Kbu_epUIA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/1/16 6:07 PM
+Save-Time: 2/2/16 4:18 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -178,6 +178,47 @@ proc "check-automatic-variables-in-keywords" [val start_index 0] [val count_item
 	}
 
 }
+
+
+proc "check-automatic-variables-in-variables" [val start_index 0] [val count_items 1]{
+	list "${/}"
+		"${:}"
+		"${\\n}"
+		"${CURDIR}"
+		"${DEBUG_FILE}"
+		"${EMPTY}"
+		"${EXECDIR}"
+		"${False}"
+		"${LOG_FILE}"
+		"${LOG_LEVEL}"
+		"${None}"
+		"${null}"
+		"${OUTPUT_DIR}"
+		"${OUTPUT_FILE}"
+		"${PREV_TEST_MESSAGE}"
+		"${PREV_TEST_NAME}"
+		"${PREV_TEST_STATUS}"
+		"${REPORT_FILE}"
+		"${SPACE}"
+		"${SUITE_DOCUMENTATION}"
+		"${SUITE_NAME}"
+		"${SUITE_SOURCE}"
+		"${SUMMARY_FILE}"
+		"${TEMPDIR}"
+		"${True}" | each [val element] [val index] {
+			with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+			    get-property [format "getItems().TableItem[%s].getText()" [plus $start_index $index]]| equals $element | verify-true
+		
+			}
+		}
+	if [$count_items| eq 1]{	
+		let [val settings_var_count 25]{
+			get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-property itemCount | equals [plus $settings_var_count $start_index] | verify-true	
+		}
+	}
+
+}
+
 
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
