@@ -33,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DocumentationUserKeywordDeclarationSettingValidator;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -58,10 +59,13 @@ class KeywordTableValidator implements ModelUnitValidator {
         if (!keywordSection.isPresent()) {
             return;
         }
-        final RobotSuiteFile suiteModel = keywordSection.get().getSuiteFile();
+        RobotKeywordsSection robotKeywordsSection = keywordSection.get();
+        final RobotSuiteFile suiteModel = robotKeywordsSection.getSuiteFile();
         final IFile file = suiteModel.getFile();
-        final KeywordTable keywordTable = (KeywordTable) keywordSection.get().getLinkedElement();
+        final KeywordTable keywordTable = (KeywordTable) robotKeywordsSection.getLinkedElement();
         final List<UserKeyword> keywords = keywordTable.getKeywords();
+
+        validateByExternal(file, robotKeywordsSection, monitor);
 
         reportEmptyKeyword(file, keywords);
         reportDuplicatedKewords(file, keywords);
@@ -69,6 +73,11 @@ class KeywordTableValidator implements ModelUnitValidator {
         TestCasesTableValidator.reportKeywordUsageProblems(suiteModel, validationContext, reporter,
                 findExecutableRows(keywords), Optional.<String> absent());
         reportUnknownVariables(suiteModel.getFile(), keywords);
+    }
+
+    private void validateByExternal(final IFile file, final RobotKeywordsSection section,
+            final IProgressMonitor monitor) throws CoreException {
+        new DocumentationUserKeywordDeclarationSettingValidator(file, section, reporter).validate(monitor);
     }
 
     private void reportEmptyKeyword(final IFile file, final List<UserKeyword> keywords) {

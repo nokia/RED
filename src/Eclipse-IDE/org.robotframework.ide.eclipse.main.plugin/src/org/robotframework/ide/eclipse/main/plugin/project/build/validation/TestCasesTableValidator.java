@@ -42,6 +42,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsP
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.DocumentationTestCaseDeclarationSettingValidator;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -68,14 +69,21 @@ class TestCasesTableValidator implements ModelUnitValidator {
         if (!testCaseSection.isPresent()) {
             return;
         }
-        final RobotSuiteFile suiteModel = testCaseSection.get().getSuiteFile();
-        final TestCaseTable casesTable = (TestCaseTable) testCaseSection.get().getLinkedElement();
+        RobotCasesSection robotCasesSection = testCaseSection.get();
+        final RobotSuiteFile suiteModel = robotCasesSection.getSuiteFile();
+        final TestCaseTable casesTable = (TestCaseTable) robotCasesSection.getLinkedElement();
         final List<TestCase> cases = casesTable.getTestCases();
 
+        validateByExternal(suiteModel.getFile(), robotCasesSection, monitor);
         reportEmptyCases(suiteModel.getFile(), cases);
         reportDuplicatedCases(suiteModel.getFile(), cases);
-        reportKeywordUsageProblems(suiteModel, testCaseSection.get().getChildren());
+        reportKeywordUsageProblems(suiteModel, robotCasesSection.getChildren());
         reportUnknownVariables(suiteModel, cases);
+    }
+
+    private void validateByExternal(final IFile file, final RobotCasesSection section, final IProgressMonitor monitor)
+            throws CoreException {
+        new DocumentationTestCaseDeclarationSettingValidator(file, section, reporter).validate(monitor);
     }
 
     private void reportEmptyCases(final IFile file, final List<TestCase> cases) {
