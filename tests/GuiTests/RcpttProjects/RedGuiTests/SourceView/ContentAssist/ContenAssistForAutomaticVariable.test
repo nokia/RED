@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-8FTwKSdEeW4l-rLhvMqpg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/1/16 6:08 PM
+Save-Time: 2/2/16 4:48 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -80,6 +80,127 @@ close-content-assist -file_name "TestFile.robot"
 open-content_assist -file_name "TestFile.robot" -remove_previouse_char 1 -row 13 -col 6 -first_char "&"
 check-automatic-maps
 close-content-assist  -file_name "TestFile.robot"  
+//
+//----------------------------- Variables ------------------------------------------------
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 16 1
+get-editor "TestFile.robot" | get-text-viewer | type-text "*** Variables ***\n"
+    + "${newScalar}\t"
+wait 1000    
+open-content_assist -file_name "TestFile.robot" -row 17 -col 15 -first_char "$"
+check-automatic-variables-in-variables -start_index 1
+close-content-assist -file_name "TestFile.robot" 
 
+//check list
+open-content_assist -file_name "TestFile.robot" -remove_previouse_char 1 -row 17 -col 16 -first_char "@"
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+SPACE"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "@{EMPTY}" | verify-true
+}
+close-content-assist -file_name "TestFile.robot" 
+
+//check maps
+open-content_assist -file_name "TestFile.robot" -remove_previouse_char 1 -row 17 -col 16 -first_char "&"
+check-automatic-maps
+close-content-assist  -file_name "TestFile.robot" 
+
+
+//=====================================================   TSV ==================================================================
+
+
+//Open editor
+get-view "Project Explorer" | get-tree | select "RobotProject/checking_var.tsv" | select "RobotProject/checking_var.tsv" 
+    | double-click
+
+
+//---------------------------------------------------- Settings ----------------------------------------------------------
+//check variables on Setting section    
+open-content_assist -file_name "checking_var.tsv" -row 3 -col 17 -first_char "$"
+check-automatic-variables-for-settings
+close-content-assist -file_name  "checking_var.tsv"
+
+//check list
+open-content_assist -file_name "checking_var.tsv" -remove_previouse_char 1 -row 3 -col 18 -first_char "@"
+check-automatic-lists
+close-content-assist -file_name  "checking_var.tsv"
+
+//check maps
+open-content_assist -file_name "checking_var.tsv" -remove_previouse_char 1 -row 3 -col 18 -first_char "&"
+check-automatic-maps
+close-content-assist -file_name  "checking_var.tsv"
+
+
+
+//check all varibales, maps, list on Variables
+open-content_assist -file_name "checking_var.tsv" -remove_previouse_char 0 -row 4 -col 13 -first_char ""
+check-automatic-variables-for-settings -count_items 0
+check-automatic-maps -start_index 31 -count_items 0
+check-automatic-lists  -start_index 33 -count_items 0
+
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-property itemCount | equals 35 
+    | verify-true
+    
+close-content-assist -file_name  "checking_var.tsv"    
+    
+//------------------------Test cases -----------------------------------------------------------------    
+
+//check variables
+open-content_assist -file_name "checking_var.tsv" -row 10 -col 5 -first_char "$"
+check-automatic-variables-in-test-cases
+close-content-assist -file_name "checking_var.tsv" 
+
+//check list
+open-content_assist -file_name "checking_var.tsv" -remove_previouse_char 1 -row 10 -col 6 -first_char "@"
+check-automatic-lists
+close-content-assist -file_name "checking_var.tsv" 
+
+//check maps
+open-content_assist -file_name "checking_var.tsv" -remove_previouse_char 1 -row 10 -col 6 -first_char "&"
+check-automatic-maps
+close-content-assist  -file_name "checking_var.tsv"  
+
+//----------------------------- keywords ------------------------------------------------
+
+open-content_assist -file_name "checking_var.tsv" -row 14 -col 5 -first_char "$"
+check-automatic-variables-in-keywords
+close-content-assist -file_name "checking_var.tsv" 
+
+//check list
+open-content_assist -file_name "checking_var.tsv" -remove_previouse_char 1 -row 14 -col 6 -first_char "@"
+check-automatic-lists
+close-content-assist -file_name "checking_var.tsv" 
+
+//check maps
+open-content_assist -file_name "checking_var.tsv" -remove_previouse_char 1 -row 14 -col 6 -first_char "&"
+check-automatic-maps
+close-content-assist  -file_name "checking_var.tsv"  
+
+//----------------------------- Variables ------------------------------------------------
+
+get-editor "checking_var.tsv" | get-text-viewer | set-caret-pos 16 1
+get-editor "checking_var.tsv" | get-text-viewer | type-text "*** Variables ***\n"
+    + "${newScalar}\t"
+wait 1000
+open-content_assist -file_name "checking_var.tsv" -row 17 -col 17 -first_char "$"
+check-automatic-variables-in-variables -start_index 1 
+close-content-assist -file_name "checking_var.tsv" 
+
+//check list
+open-content_assist -file_name "checking_var.tsv" -remove_previouse_char 1 -row 17 -col 18 -first_char "@"
+with [get-editor "checking_var.tsv" | get-text-viewer] {
+    key-type "M1+SPACE"
+}
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "@{EMPTY}" | verify-true
+}
+close-content-assist -file_name "checking_var.tsv" 
+
+//check maps
+open-content_assist -file_name "checking_var.tsv" -remove_previouse_char 1 -row 17 -col 18 -first_char "&"
+check-automatic-maps
+close-content-assist  -file_name "checking_var.tsv" 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
