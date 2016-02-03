@@ -421,7 +421,8 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_TEARDOWN(
             TableType.KEYWORDS,
-            VersionAvailabilityInfoBuilder.create().addRepresentation("[Teardown]").build()),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("[Teardown]").build(),
+            VersionAvailabilityInfoBuilder.create().addRepresentation("[Postcondition]").deprecatedFrom("3.0").build()),
     /**
      */
     KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME(TableType.KEYWORDS),

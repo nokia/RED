@@ -37,6 +37,10 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsP
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DocumentationDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.MetaDeclarationSettingValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.SuitePostconditionDeclarationExistanceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.SuitePreconditionDeclarationExistanceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.TestPostconditionDeclarationExistanceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.TestPreconditionDeclarationExistanceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Function;
@@ -93,6 +97,10 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             final IProgressMonitor monitor) throws CoreException {
         new MetaDeclarationSettingValidator(file, section, reporter).validate(monitor);
         new DocumentationDeclarationSettingValidator(file, section, reporter).validate(monitor);
+        new SuitePreconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
+        new SuitePostconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
+        new TestPreconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
+        new TestPostconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
     }
 
     private void reportVersionSpecificProblems(final IFile file, final RobotSettingsSection section,
