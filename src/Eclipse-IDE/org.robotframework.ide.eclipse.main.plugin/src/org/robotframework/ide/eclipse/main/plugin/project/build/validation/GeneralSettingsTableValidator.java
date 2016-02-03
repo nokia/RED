@@ -37,6 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsP
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DeprecatedSettingHeaderAlias;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DocumentationDeclarationSettingValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.LibraryAliasesDeclarationUpperCaseValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.MetaDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.SuitePostconditionDeclarationExistanceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.SuitePreconditionDeclarationExistanceValidator;
@@ -103,6 +104,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         new TestPreconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
         new TestPostconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
         new DeprecatedSettingHeaderAlias(file, reporter, section).validate(monitor);
+        new LibraryAliasesDeclarationUpperCaseValidator(file, reporter, section).validate(monitor);
     }
 
     private void reportVersionSpecificProblems(final IFile file, final RobotSettingsSection section,
