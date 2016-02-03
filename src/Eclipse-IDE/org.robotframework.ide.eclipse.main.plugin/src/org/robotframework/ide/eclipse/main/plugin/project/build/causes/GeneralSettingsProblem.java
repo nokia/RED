@@ -26,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDo
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingMetaSynonimFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.TableHeaderDepracatedAliasesReplacer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
@@ -490,6 +491,29 @@ public enum GeneralSettingsProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(
                     new SettingSimpleWordReplacer(RobotSettingsSection.class, "Test Postcondition", "Test Teardown"));
+        }
+    },
+    METADATA_TABLE_HEADER_SYNONIM {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Table header '%s' is deprecated from Robot Framework 3.0. Use *** Settings *** syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(
+                    new TableHeaderDepracatedAliasesReplacer(RobotSettingsSection.class, "Metadata", "Settings"));
         }
     };
 
