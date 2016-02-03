@@ -24,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDo
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveKeywordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.TableHeaderDepracatedAliasesReplacer;
 
 import com.google.common.base.Splitter;
 
@@ -216,6 +217,29 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new SettingSimpleWordReplacer(RobotKeywordsSection.class, "Postcondition", "Teardown"));
+        }
+    },
+    USER_KEYWORD_TABLE_HEADER_SYNONIM {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Table header '%s' is deprecated from Robot Framework 3.0. Use *** Keywords *** or *** Keyword *** syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(
+                    new TableHeaderDepracatedAliasesReplacer(RobotKeywordsSection.class, "User Keyword", "Keyword"));
         }
     };
 
