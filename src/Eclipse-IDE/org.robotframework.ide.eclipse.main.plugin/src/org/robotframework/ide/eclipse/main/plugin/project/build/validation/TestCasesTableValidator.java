@@ -43,6 +43,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCases
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.DocumentationTestCaseDeclarationSettingValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PostconditionDeclarationExistanceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.testcases.PreconditionDeclarationExistanceValidator;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -84,6 +86,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
     private void validateByExternal(final IFile file, final RobotCasesSection section, final IProgressMonitor monitor)
             throws CoreException {
         new DocumentationTestCaseDeclarationSettingValidator(file, section, reporter).validate(monitor);
+        new PreconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
+        new PostconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
     }
 
     private void reportEmptyCases(final IFile file, final List<TestCase> cases) {
