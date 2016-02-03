@@ -270,7 +270,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         @Override
         protected void validateExistingResource(final IResource resource, final String path,
                 final RobotToken pathToken) {
-            if (resource.getType() != IResource.FILE) {
+            if (resource.getType() != IResource.FILE && resource.getType() != IResource.FOLDER) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_VARIABLES_IMPORT)
                         .formatMessageWith(path, ": given location does not point to a file"), suiteFile.getFile(),
                         pathToken);
