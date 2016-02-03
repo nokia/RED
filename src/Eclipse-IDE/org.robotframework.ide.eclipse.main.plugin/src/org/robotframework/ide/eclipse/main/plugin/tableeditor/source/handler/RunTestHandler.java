@@ -10,13 +10,18 @@ import java.util.Arrays;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunTestCaseAction;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.RunTestCaseAction.Mode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestHandler.E4RunTestHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 
@@ -35,21 +40,31 @@ public class RunTestHandler extends DIParameterizedHandler<E4RunTestHandler> {
     public static class E4RunTestHandler {
 
         @Execute
-        public Object runSingleTest(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile suiteModel,
-                @Named(RunTestDynamicMenuItem.RUN_TEST_COMMAND_MODE_PARAMETER) final String mode,
-                @Named(RunTestDynamicMenuItem.RUN_TEST_COMMAND_TEST_NAME_PARAMETER) final String testName) {
+        public Object runSingleTest(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
+                @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile suiteModel,
+                @Named(RunTestDynamicMenuItem.RUN_TEST_COMMAND_MODE_PARAMETER) final String mode) {
 
-            final Optional<RobotCasesSection> casesSection = suiteModel.findSection(RobotCasesSection.class);
-            if (casesSection.isPresent()) {
-                for (final RobotCase testCase : casesSection.get().getChildren()) {
-                    if (testCase.getName().equals(testName)) {
-                        final StructuredSelection selection = new StructuredSelection(Arrays.asList(testCase));
-                        RunTestCaseAction.runTestCase(selection, Mode.valueOf(mode));
-                        break;
-                    }
-                }
+            final SourceViewer viewer = editor.getSourceEditor().getViewer();
+            final ITextSelection selection = (ITextSelection) viewer.getSelection();
+            final RobotCase testCase = getTestCase(suiteModel, selection.getOffset());
+
+            if (testCase != null) {
+                RunTestCaseAction.runTestCase(new StructuredSelection(Arrays.asList(testCase)), Mode.valueOf(mode));
             }
             return null;
         }
+    }
+
+    static RobotCase getTestCase(final RobotSuiteFile suiteModel, final int caretOffset) {
+        final Optional<? extends RobotElement> element = suiteModel.findElement(caretOffset);
+        if (element.isPresent()) {
+            final RobotElement elem = element.get();
+            if (elem instanceof RobotCase) {
+                return (RobotCase) elem;
+            } else if (elem instanceof RobotKeywordCall && elem.getParent() instanceof RobotCase) {
+                return (RobotCase) elem.getParent();
+            }
+        }
+        return null;
     }
 }
