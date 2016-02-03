@@ -34,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DocumentationUserKeywordDeclarationSettingValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.PostconditionDeclarationExistanceValidator;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -78,6 +79,7 @@ class KeywordTableValidator implements ModelUnitValidator {
     private void validateByExternal(final IFile file, final RobotKeywordsSection section,
             final IProgressMonitor monitor) throws CoreException {
         new DocumentationUserKeywordDeclarationSettingValidator(file, section, reporter).validate(monitor);
+        new PostconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
     }
 
     private void reportEmptyKeyword(final IFile file, final List<UserKeyword> keywords) {
