@@ -667,7 +667,7 @@
           </separator>
           <command
                 commandId="org.robotframework.red.addLibraryFromNavigator"
-                label="Add Library"
+                label="Add Library to red.xml"
                 style="push">
           </command>
        </menu>
