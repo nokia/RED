@@ -29,7 +29,6 @@ public abstract class ADeprecatedSettingElement implements ModelUnitValidator {
         this.file = file;
         this.reporter = reporter;
         this.representation = representation.toLowerCase().replaceAll("\\s", "");
-        ;
     }
 
     @Override

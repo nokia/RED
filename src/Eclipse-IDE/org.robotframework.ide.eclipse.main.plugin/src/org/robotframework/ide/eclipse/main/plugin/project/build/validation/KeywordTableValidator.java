@@ -33,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DeprecatedKeywordHeaderAlias;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DocumentationUserKeywordDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.PostconditionDeclarationExistanceValidator;
 
@@ -80,6 +81,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             final IProgressMonitor monitor) throws CoreException {
         new DocumentationUserKeywordDeclarationSettingValidator(file, section, reporter).validate(monitor);
         new PostconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
+        new DeprecatedKeywordHeaderAlias(file, reporter, section).validate(monitor);
     }
 
     private void reportEmptyKeyword(final IFile file, final List<UserKeyword> keywords) {
