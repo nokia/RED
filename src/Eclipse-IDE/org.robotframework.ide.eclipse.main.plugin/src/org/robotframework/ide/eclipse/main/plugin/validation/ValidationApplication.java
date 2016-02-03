@@ -9,15 +9,20 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
@@ -31,6 +36,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.google.common.io.Files;
 
 
 public class ValidationApplication implements IApplication {
@@ -41,7 +47,9 @@ public class ValidationApplication implements IApplication {
             System.out.println("# RED projects validator\n");
 
             final List<String> args = newArrayList((String[]) context.getArguments().get("application.args"));
-            runValidation(parseArguments(args));
+            final ProvidedArguments arguments = parseArguments(args);
+            importNeededProjects(arguments.projectsToImport);
+            runValidation(arguments);
 
             return IApplication.EXIT_OK;
         } catch (final InvalidArgumentsProvidedException e) {
@@ -59,7 +67,9 @@ public class ValidationApplication implements IApplication {
         }
         final ProvidedArguments args = new ProvidedArguments();
         while (!passedArgs.isEmpty()) {
-            if (passedArgs.get(0).equals("-projects")) {
+            if (passedArgs.get(0).equals("-import")) {
+                parseImportArgument(passedArgs, args);
+            } else if (passedArgs.get(0).equals("-projects")) {
                 parseProjectsArgument(passedArgs, args);
             } else if (passedArgs.get(0).equals("-report")) {
                 parseReportArgument(passedArgs, args);
@@ -68,6 +78,13 @@ public class ValidationApplication implements IApplication {
             }
         }
         return args;
+    }
+
+    private void parseImportArgument(final List<String> passedArgs, final ProvidedArguments args) {
+        passedArgs.remove(0);
+        while (!passedArgs.isEmpty() && !isSwitch(passedArgs.get(0))) {
+            args.projectsToImport.add(passedArgs.remove(0));
+        }
     }
 
     private void parseProjectsArgument(final List<String> passedArgs, final ProvidedArguments args) {
@@ -88,6 +105,40 @@ public class ValidationApplication implements IApplication {
 
     private boolean isSwitch(final String arg) {
         return "-projects".equals(arg) || "-report".equals(arg);
+    }
+
+    private void importNeededProjects(final List<String> projectsToImport)
+            throws InvocationTargetException, InterruptedException, CoreException, IOException {
+        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        final IPath wsLocation = workspace.getRoot().getLocation();
+
+        for (final String path : projectsToImport) {
+            final IPath originalLocation = new Path(path);
+            final IPath wsProjectLocation = wsLocation.append(originalLocation.lastSegment());
+
+            copyProjectFiles(originalLocation.toFile(), wsProjectLocation.toFile());
+
+            final IProjectDescription description = workspace
+                    .loadProjectDescription(wsProjectLocation.append(".project"));
+            final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(description.getName());
+            project.create(description, null);
+            project.open(null);
+        }
+    }
+
+    private void copyProjectFiles(final File sourceLocation, final File targetLocation) throws IOException {
+        if (sourceLocation.isDirectory()) {
+            if (!targetLocation.exists()) {
+                targetLocation.mkdir();
+            }
+
+            final String[] children = sourceLocation.list();
+            for (int i = 0; i < children.length; i++) {
+                copyProjectFiles(new File(sourceLocation, children[i]), new File(targetLocation, children[i]));
+            }
+        } else {
+            Files.copy(sourceLocation, targetLocation);
+        }
     }
 
     private void runValidation(final ProvidedArguments arguments) throws CoreException {
@@ -169,6 +220,8 @@ public class ValidationApplication implements IApplication {
     }
 
     private static class ProvidedArguments {
+
+        private final List<String> projectsToImport = new ArrayList<>();
 
         private String reportFilepath;
 
