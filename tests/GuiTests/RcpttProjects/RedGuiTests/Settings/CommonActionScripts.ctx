@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/22/15 3:08 PM
+Save-Time: 2/3/16 11:44 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -298,10 +298,10 @@ proc "check-debug-marker-on-ruler" [val line] [val script_name]{
 proc replace [val input] [val old] [val new]{
 
 	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-		exec-process  "\"python.exe\"" "-c"  "\"import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])\"" $input $old $new | get stdout 
+		exec-process  "\"python.exe\"" "-c"  "\"import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])\"" $input $old $new | get stdout | split "!" -trimResults 
 
 	}-else{
-		exec-process  "python" "-c"  "import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])" $input $old $new | get stdout 
+		exec-process  "python" "-c"  "import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])" $input $old $new | get stdout |split "!" -trimResults 
 	}	
 
 }
