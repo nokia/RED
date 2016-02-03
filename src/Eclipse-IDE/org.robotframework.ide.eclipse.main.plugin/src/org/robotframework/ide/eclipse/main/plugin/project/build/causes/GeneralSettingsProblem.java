@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeImport
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ChangeToFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobalVariableInConfigFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.LibraryAliasToUpperCaseReplacer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingMetaSynonimFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
@@ -514,6 +515,28 @@ public enum GeneralSettingsProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(
                     new TableHeaderDepracatedAliasesReplacer(RobotSettingsSection.class, "Metadata", "Settings"));
+        }
+    },
+    LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting is not upper case '%s' is deprecated from Robot Framework 3.0.\nUse WITH NAME syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new LibraryAliasToUpperCaseReplacer());
         }
     };
 
