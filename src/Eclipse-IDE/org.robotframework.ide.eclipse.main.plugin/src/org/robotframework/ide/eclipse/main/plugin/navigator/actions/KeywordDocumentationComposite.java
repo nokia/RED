@@ -120,7 +120,7 @@ class KeywordDocumentationComposite extends InputLoadingFormComposite {
         final Documentation kwSpec = (Documentation) jobResult;
 
         if (kwSpec.isHtml) {
-            argumentsText.setText(kwSpec.text, true, true);
+            documentationText.setText(kwSpec.text, true, true);
         } else {
             argumentsText.setText(kwSpec.arguments, true, false);
             documentationText.setText(kwSpec.text, false, true);
