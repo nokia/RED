@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateKeywor
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ImportLibraryFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveKeywordFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
 
 import com.google.common.base.Splitter;
 
@@ -193,6 +194,28 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new DocumentToDocumentationWordFixer(RobotKeywordsSection.class));
+        }
+    },
+    POSTCONDITION_SYNONIM {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Teardown syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(new SettingSimpleWordReplacer(RobotKeywordsSection.class, "Postcondition", "Teardown"));
         }
     };
 

@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DefineGlobal
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.DocumentToDocumentationWordFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.MetadataKeyInSameColumnFixer;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingMetaSynonimFixer;
+import org.robotframework.ide.eclipse.main.plugin.project.build.fix.SettingSimpleWordReplacer;
 
 public enum GeneralSettingsProblem implements IProblemCause {
     UNKNOWN_SETTING {
@@ -397,6 +398,98 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new DocumentToDocumentationWordFixer(RobotSettingsSection.class));
+        }
+    },
+    SUITE_PRECONDITION_SYNONIM {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Suite Setup syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(
+                    new SettingSimpleWordReplacer(RobotSettingsSection.class, "Suite Precondition", "Suite Setup"));
+        }
+    },
+    SUITE_POSTCONDITION_SYNONIM {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Suite Teardown syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(
+                    new SettingSimpleWordReplacer(RobotSettingsSection.class, "Suite Postcondition", "Suite Teardown"));
+        }
+    },
+    TEST_PRECONDITION_SYNONIM {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Test Setup syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(
+                    new SettingSimpleWordReplacer(RobotSettingsSection.class, "Test Precondition", "Test Setup"));
+        }
+    },
+    TEST_POSTCONDITION_SYNONIM {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Test Teardown syntax instead of current.";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList(
+                    new SettingSimpleWordReplacer(RobotSettingsSection.class, "Test Postcondition", "Test Teardown"));
         }
     };
 
