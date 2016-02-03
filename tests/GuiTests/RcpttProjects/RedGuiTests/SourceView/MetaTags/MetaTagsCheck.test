@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _oqiBUMD5EeWqU8ILayOzQw
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 1/22/16 12:21 PM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 2/3/16 11:33 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,19 +17,34 @@ Entry-Name: .content
 
 // this is tests for outdates meta
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** settings ***\n"
+    + "Metadata  Name  Value\n"
+    + "Meta: Name     Value\n"
+    + "*** Test Cases ***"
+
 with [get-editor "TestFile.robot" | get-text-viewer] {
-    key-type Enter
-    key-type Up
-    type-text "*** settings **"
-    type-text "*"
-    key-type Enter
-    set-caret-pos 2 1
-    type-text "Metadata  Name  Value"
-    key-type Enter
-    type-text "Meta: Name     Value"
     key-type "M1+s"
-    key-type "M2+M3+CAPS_LOCK"
 }
 get-tab-folder -index 4 | get-tab-item Problems | click
-get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+wait 1000
+
+with [get-view Problems] {
+    get-label "0 errors, 1 warning, 0 others" | get-property caption | equals "0 errors, 1 warning, 0 others" 
+        | verify-true
+    with [get-tree] {
+        get-item "Warnings \\(1 item\\)/Setting 'Meta:' in the same column with Metadata Key is removed in Robot Framework 3.0" 
+            | get-property caption 
+            | equals "Setting 'Meta:' in the same column with Metadata Key is removed in Robot Framework 3.0" 
+            | verify-true
+    }
+}
+
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** settings ***\n"
+    + "Metadata  Name  Value\n"
+    + "Meta: Name     Value\n"
+    + "*** Test Cases ***"
+    
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
