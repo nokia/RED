@@ -23,7 +23,19 @@ import com.google.common.escape.Escapers;
 public class PathsConverter {
 
     public static Escaper getUriSpecialCharsEscaper() {
-        return Escapers.builder().addEscape(' ', "%20").addEscape('%', "%25").addEscape('^', "%5e").build();
+        return Escapers.builder()
+                .addEscape(' ', "%20")
+                .addEscape('!', "%21")
+                .addEscape('@', "%40")
+                .addEscape('#', "%23")
+                .addEscape('$', "%24")
+                .addEscape('%', "%25")
+                .addEscape('&', "%26")
+                .addEscape('(', "%28")
+                .addEscape(')', "%29")
+                .addEscape(';', "%3b")
+                .addEscape('^', "%5e")
+                .build();
     }
 
     public static IPath fromResourceRelativeToWorkspaceRelative(final IResource resource, final IPath path) {
