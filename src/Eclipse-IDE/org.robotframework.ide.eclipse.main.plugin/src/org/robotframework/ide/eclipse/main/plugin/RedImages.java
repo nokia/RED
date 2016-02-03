@@ -22,6 +22,14 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/filter.png");
     }
 
+    public static ImageDescriptor getExecuteRunImage() {
+        return RedPlugin.getImageDescriptor("resources/exec_run.png");
+    }
+
+    public static ImageDescriptor getExecuteDebugImage() {
+        return RedPlugin.getImageDescriptor("resources/exec_debug.png");
+    }
+
     public static ImageDescriptor getStopImage() {
         return RedPlugin.getImageDescriptor("resources/stop.png");
     }
