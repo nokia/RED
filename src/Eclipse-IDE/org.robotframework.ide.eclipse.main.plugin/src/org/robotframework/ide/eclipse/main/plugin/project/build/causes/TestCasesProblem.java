@@ -123,7 +123,7 @@ public enum TestCasesProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Unknown test case setting definition '%s'";
+            return "Unknown test case setting's definition '%s'";
         }
 
         @Override
