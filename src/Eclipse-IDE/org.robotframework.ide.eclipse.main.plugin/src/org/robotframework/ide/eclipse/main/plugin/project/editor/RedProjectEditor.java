@@ -48,6 +48,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.general.General
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesProjectConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectValidationConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.variables.VariablesProjectConfigurationEditorPart;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Optional;
 
@@ -78,7 +79,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
                     new RobotProjectConfigReader().readConfigurationWithLines(file));
             installResourceListener();
         } else {
-            final IStorage storage = (IStorage) input.getAdapter(IStorage.class);
+            final IStorage storage = input.getAdapter(IStorage.class);
             if (storage != null) {
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
@@ -116,7 +117,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
     }
 
     private IEclipseContext prepareContext() {
-        final IEclipseContext context = ((IEclipseContext) getEditorSite().getService(IEclipseContext.class))
+        final IEclipseContext context = getEditorSite().getService(IEclipseContext.class)
                 .getActiveLeaf();
         context.set(RedProjectEditorInput.class, editorInput);
         context.set(IEditorSite.class, getEditorSite());
@@ -131,7 +132,12 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
             @Override
             public void whenFileWasRemoved() {
-                getSite().getPage().closeEditor(RedProjectEditor.this, false);
+                SwtThread.syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        getSite().getPage().closeEditor(RedProjectEditor.this, false);
+                    }
+                });
             }
 
             @Override
@@ -303,7 +309,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
     @Override
     public void dispose() {
-        final IEclipseContext context = ((IEclipseContext) getEditorSite().getService(IEclipseContext.class))
+        final IEclipseContext context = getEditorSite().getService(IEclipseContext.class)
                 .getActiveLeaf();
         for (final IEditorPart part : parts) {
             ContextInjectionFactory.uninject(part, context);
