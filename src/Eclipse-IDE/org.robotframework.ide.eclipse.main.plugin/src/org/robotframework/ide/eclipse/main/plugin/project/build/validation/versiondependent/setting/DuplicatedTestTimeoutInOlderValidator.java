@@ -49,6 +49,6 @@ public class DuplicatedTestTimeoutInOlderValidator extends ADuplicatedInOldValid
 
     @Override
     protected GeneralSettingsProblem getSettingProblemId() {
-        return GeneralSettingsProblem.DUPLICATED_SUITE_TEARDOWN_28;
+        return GeneralSettingsProblem.DUPLICATED_TEST_TIMEOUT_28;
     }
 }
