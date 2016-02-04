@@ -93,6 +93,10 @@ public enum ModelType {
     /**
      * 
      */
+    TEST_CASE_SETTING_UNKNOWN,
+    /**
+     * 
+     */
     TEST_CASE_SETUP,
     /**
      * 
@@ -118,6 +122,10 @@ public enum ModelType {
      * 
      */
     USER_KEYWORD_ARGUMENTS,
+    /**
+     * 
+     */
+    USER_KEYWORD_SETTING_UNKNOWN,
     /**
      * 
      */
