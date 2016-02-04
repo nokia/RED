@@ -109,20 +109,22 @@ class TestCasesTableValidator implements ModelUnitValidator {
         for (final TestCase testCase : cases) {
             final RobotToken caseName = testCase.getTestName();
             final IProblemCause cause = TestCasesProblem.EMPTY_CASE;
-            reportEmptyExecutableRows(file, reporter, caseName, testCase.getTestExecutionRows(), cause);
+            reportNoExecutableRows(file, reporter, caseName, testCase.getTestExecutionRows(), cause);
         }
     }
 
-    static void reportEmptyExecutableRows(final IFile file, final ProblemsReportingStrategy reporter,
+    static void reportNoExecutableRows(final IFile file, final ProblemsReportingStrategy reporter,
             final RobotToken def, final List<? extends RobotExecutableRow<?>> executables,
             final IProblemCause causeToReport) {
-        if (executables.isEmpty()) {
-            final String name = def.getText().toString();
-            final RobotProblem problem = RobotProblem.causedBy(causeToReport).formatMessageWith(name);
-            final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
-                    name);
-            reporter.handleProblem(problem, file, def, arguments);
+        for (RobotExecutableRow<?> robotExecutableRow : executables) {
+            if (robotExecutableRow.isExecutable()) {
+                return;
+            }
         }
+        final String name = def.getText().toString();
+        final RobotProblem problem = RobotProblem.causedBy(causeToReport).formatMessageWith(name);
+        final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, name);
+        reporter.handleProblem(problem, file, def, arguments);
     }
 
     private void reportDuplicatedCases(final IFile file, final List<TestCase> cases) {
