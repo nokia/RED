@@ -86,8 +86,19 @@ public class TableHeaderDepracatedAliasesReplacer extends RedSuiteMarkerResoluti
         if (header != null) {
             final RobotToken declaration = header.getDeclaration();
             final String declarationValue = declaration.getRaw();
+            final String declarationLowerCase = declarationValue.toLowerCase();
 
-            String myReplacement = declarationValue.toLowerCase().replaceFirst(toReplace.toLowerCase(), replacement);
+            StringBuilder replaced = new StringBuilder();
+            replaced.append(declarationLowerCase.substring(0,
+                    declarationLowerCase.indexOf(Character.toLowerCase(toReplace.charAt(0)))));
+            replaced.append(replacement);
+            replaced.append(
+                    declarationLowerCase.substring(
+                            declarationLowerCase
+                                    .lastIndexOf(Character.toLowerCase(toReplace.charAt(toReplace.length() - 1))) + 1,
+                            declarationLowerCase.length()));
+
+            String myReplacement = replaced.toString();
 
             final String replacementString = myReplacement.toString();
             final int offset = declaration.getStartOffset();

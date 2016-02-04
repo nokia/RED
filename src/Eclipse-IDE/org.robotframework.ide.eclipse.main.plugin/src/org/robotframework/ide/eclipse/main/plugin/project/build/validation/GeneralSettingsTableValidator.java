@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -87,10 +88,15 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         validateResources(suiteFile, getResourcesImports(settingsTable), monitor);
         validateVariables(suiteFile, getVariablesImports(settingsTable), monitor);
 
-        validateSetupsAndTeardowns(file, getKeywordBasedSettings(settingsTable));
+        validateSetupsAndTeardowns(file, new ArrayList<AKeywordBaseSetting<?>>(settingsTable.getSuiteSetups()));
+        validateSetupsAndTeardowns(file, new ArrayList<AKeywordBaseSetting<?>>(settingsTable.getSuiteTeardowns()));
+        validateSetupsAndTeardowns(file, new ArrayList<AKeywordBaseSetting<?>>(settingsTable.getTestSetups()));
+        validateSetupsAndTeardowns(file, new ArrayList<AKeywordBaseSetting<?>>(settingsTable.getTestTeardowns()));
+
         validateTestTemplates(file, settingsTable.getTestTemplates());
         validateTestTimeouts(file, settingsTable.getTestTimeouts());
-        validateTags(file, getTags(settingsTable));
+        validateTags(file, new ArrayList<ATags<?>>(settingsTable.getDefaultTags()));
+        validateTags(file, new ArrayList<ATags<?>>(settingsTable.getForceTags()));
         validateDocumentations(file, settingsTable.getDocumentation());
         validateMetadatas(file, settingsTable.getMetadatas());
     }
@@ -114,13 +120,6 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         for (final ModelUnitValidator validator : validators) {
             validator.validate(monitor);
         }
-    }
-
-    private List<ATags<?>> getTags(final SettingTable settingsTable) {
-        final List<ATags<?>> tags = newArrayList();
-        tags.addAll(settingsTable.getDefaultTags());
-        tags.addAll(settingsTable.getForceTags());
-        return tags;
     }
 
     private void reportUnknownSettings(final IFile file, final List<UnknownSetting> unknownSettings) {
@@ -162,25 +161,12 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 reporter).validate(monitor);
     }
 
-    private static List<AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingsTable) {
-        final List<AKeywordBaseSetting<?>> settings = newArrayList();
-        settings.addAll(settingsTable.getSuiteSetups());
-        settings.addAll(settingsTable.getSuiteTeardowns());
-        settings.addAll(settingsTable.getTestSetups());
-        settings.addAll(settingsTable.getTestTeardowns());
-        return settings;
-    }
-
     private void validateSetupsAndTeardowns(final IFile file, final List<AKeywordBaseSetting<?>> keywordBasedSettings) {
+        boolean wasAllEmpty = true;
         for (final AKeywordBaseSetting<?> keywordBased : keywordBasedSettings) {
             final RobotToken keywordToken = keywordBased.getKeywordName();
-            if (keywordToken == null) {
-                final RobotToken settingToken = keywordBased.getDeclaration();
-                final String settingName = settingToken.getText().toString();
-                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
-                        .formatMessageWith(settingName);
-                reporter.handleProblem(problem, file, settingToken);
-            } else {
+            if (keywordToken != null) {
+                wasAllEmpty = false;
                 final String keywordName = keywordToken.getText().toString();
 
                 if (!validationContext.isKeywordAccessible(keywordName)) {
@@ -227,20 +213,25 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 }
             }
         }
-    }
 
-    private void validateTestTemplates(final IFile file, final List<TestTemplate> testTemplates) {
-        for (final TestTemplate template : testTemplates) {
-            final RobotToken settingToken = template.getDeclaration();
-            final RobotToken keywordToken = template.getKeywordName();
-            if (keywordToken == null) {
-
+        if (wasAllEmpty) {
+            for (final AKeywordBaseSetting<?> keywordBased : keywordBasedSettings) {
+                final RobotToken settingToken = keywordBased.getDeclaration();
                 final String settingName = settingToken.getText().toString();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
                         .formatMessageWith(settingName);
                 reporter.handleProblem(problem, file, settingToken);
-            } else {
+            }
+        }
+    }
 
+    private void validateTestTemplates(final IFile file, final List<TestTemplate> testTemplates) {
+        boolean wasAllEmpty = true;
+        for (final TestTemplate template : testTemplates) {
+            final RobotToken settingToken = template.getDeclaration();
+            final RobotToken keywordToken = template.getKeywordName();
+            if (keywordToken != null) {
+                wasAllEmpty = false;
                 final String keywordName = keywordToken.getText().toString();
 
                 if (keywordName.toLowerCase().equals("none")) {
@@ -302,19 +293,22 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             }
         }
 
-    }
-
-    private void validateTestTimeouts(final IFile file, final List<TestTimeout> timeouts) {
-        for (final TestTimeout testTimeout : timeouts) {
-            final RobotToken timeoutToken = testTimeout.getTimeout();
-            if (timeoutToken == null) {
-
-                final RobotToken settingToken = testTimeout.getDeclaration();
+        if (wasAllEmpty) {
+            for (final TestTemplate template : testTemplates) {
+                final RobotToken settingToken = template.getDeclaration();
                 final String settingName = settingToken.getText().toString();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
                         .formatMessageWith(settingName);
                 reporter.handleProblem(problem, file, settingToken);
-            } else {
+            }
+        }
+    }
+
+    private void validateTestTimeouts(final IFile file, final List<TestTimeout> timeouts) {
+        boolean wasAllEmpty = true;
+        for (final TestTimeout testTimeout : timeouts) {
+            final RobotToken timeoutToken = testTimeout.getTimeout();
+            if (timeoutToken != null) {
                 final String timeout = timeoutToken.getText().toString();
                 if (!RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
                     final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
@@ -323,11 +317,30 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 }
             }
         }
+
+        if (wasAllEmpty) {
+            for (final TestTimeout testTimeout : timeouts) {
+                final RobotToken settingToken = testTimeout.getDeclaration();
+                final String settingName = settingToken.getText().toString();
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
+                        .formatMessageWith(settingName);
+                reporter.handleProblem(problem, file, settingToken);
+            }
+        }
     }
 
     private void validateTags(final IFile file, final List<ATags<?>> tagsSetting) {
+        boolean wasAllEmpty = true;
+
         for (final ATags<?> tags : tagsSetting) {
-            if (tags.getTags().isEmpty()) {
+            if (!tags.getTags().isEmpty()) {
+                wasAllEmpty = false;
+                break;
+            }
+        }
+
+        if (wasAllEmpty) {
+            for (final ATags<?> tags : tagsSetting) {
                 final RobotToken declarationToken = tags.getDeclaration();
                 final String settingName = declarationToken.getText().toString();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
@@ -350,8 +363,16 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     }
 
     private void validateDocumentations(final IFile file, final List<SuiteDocumentation> documentations) {
+        boolean wasAllEmpty = true;
         for (final SuiteDocumentation docu : documentations) {
-            if (docu.getDocumentationText().isEmpty()) {
+            if (!docu.getDocumentationText().isEmpty()) {
+                wasAllEmpty = false;
+                break;
+            }
+        }
+
+        if (wasAllEmpty) {
+            for (final SuiteDocumentation docu : documentations) {
                 final RobotToken declarationToken = docu.getDeclaration();
                 final String settingName = declarationToken.getText().toString();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
@@ -359,7 +380,6 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 reporter.handleProblem(problem, file, declarationToken);
             }
         }
-
     }
 
     private static List<String> toString(final List<RobotToken> tokens) {
