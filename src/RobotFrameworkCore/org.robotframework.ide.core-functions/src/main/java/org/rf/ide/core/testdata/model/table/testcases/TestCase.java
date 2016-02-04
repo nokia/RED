@@ -20,7 +20,7 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class TestCase extends AModelElement<TestCaseTable>implements IExecutableStepsHolder<TestCase> {
+public class TestCase extends AModelElement<TestCaseTable> implements IExecutableStepsHolder<TestCase> {
 
     private RobotToken testName;
 
@@ -35,6 +35,8 @@ public class TestCase extends AModelElement<TestCaseTable>implements IExecutable
     private final List<TestCaseTemplate> templates = new ArrayList<>();
 
     private final List<TestCaseTimeout> timeouts = new ArrayList<>();
+
+    private final List<TestCaseUnknownSettings> unknownSettings = new ArrayList<>(0);
 
     private final List<RobotExecutableRow<TestCase>> testContext = new ArrayList<>();
 
@@ -57,9 +59,21 @@ public class TestCase extends AModelElement<TestCaseTable>implements IExecutable
         return getTestName();
     }
 
+    public void addUnknownSettings(final TestCaseUnknownSettings unknownSetting) {
+        this.unknownSettings.add(unknownSetting);
+    }
+
+    public List<TestCaseUnknownSettings> getUnknownSettings() {
+        return Collections.unmodifiableList(unknownSettings);
+    }
+
     public void addTestExecutionRow(final RobotExecutableRow<TestCase> executionRow) {
         executionRow.setParent(this);
         this.testContext.add(executionRow);
+    }
+
+    public void removeExecutableLineWithIndex(final int rowIndex) {
+        this.testContext.remove(rowIndex);
     }
 
     public void removeAllTestExecutionRows() {
