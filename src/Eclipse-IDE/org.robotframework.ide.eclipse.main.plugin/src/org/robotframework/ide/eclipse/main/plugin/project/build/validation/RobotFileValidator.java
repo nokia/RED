@@ -8,6 +8,11 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
+import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage.LogLevel;
+import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -15,6 +20,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 
 public abstract class RobotFileValidator implements ModelUnitValidator {
 
@@ -55,8 +62,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
      */
     protected void validate(final RobotSuiteFile fileModel, final FileValidationContext validationContext)
             throws CoreException {
-        // TODO : check output status and parsing messages
-
+        
         new UnknownTablesValidator(fileModel, reporter).validate(null);
         new TestCasesTableValidator(validationContext, fileModel.findSection(RobotCasesSection.class), reporter)
                 .validate(null);
@@ -66,5 +72,29 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
                 .validate(null);
         new VariablesTableValidator(validationContext, fileModel.findSection(RobotVariablesSection.class), reporter)
                 .validate(null);
+
+        checkRobotFileOutputStatus(fileModel);
+    }
+    
+    private void checkRobotFileOutputStatus(final RobotSuiteFile fileModel) {
+        final RobotFile linkedElement = fileModel.getLinkedElement();
+        if (linkedElement != null) {
+            final RobotFileOutput robotFileOutput = linkedElement.getParent();
+            if (robotFileOutput != null) {
+                if (robotFileOutput.getStatus() == Status.FAILED) {
+                    reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.FILE_PARSING_FAILED)
+                            .formatMessageWith(file.getName()), file, -1);
+                }
+                for (final BuildMessage buildMessage : robotFileOutput.getBuildingMessages()) {
+                    if (buildMessage.getType() == LogLevel.ERROR) {
+                        reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.BUILD_ERROR_MESSAGE)
+                                .formatMessageWith(buildMessage.getFileName(), buildMessage.getMessage()), file, -1);
+                    } else if (buildMessage.getType() == LogLevel.WARN) {
+                        reporter.handleProblem(RobotProblem.causedBy(SuiteFileProblem.BUILD_WARNING_MESSAGE)
+                                .formatMessageWith(buildMessage.getFileName(), buildMessage.getMessage()), file, -1);
+                    }
+                }
+            }
+        }
     }
 }

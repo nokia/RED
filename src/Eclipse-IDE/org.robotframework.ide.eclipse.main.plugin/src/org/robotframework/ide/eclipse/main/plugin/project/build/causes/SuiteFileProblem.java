@@ -28,7 +28,48 @@ public enum SuiteFileProblem implements IProblemCause {
         
         @Override
         public String getProblemDescription() {
-            return "Unrecognized table header: '%s";
+            return "Unrecognized table header: '%s'";
+        }
+    },
+    BUILD_ERROR_MESSAGE {
+        
+        @Override
+        public boolean hasResolution() {
+            return false;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Parser error in '%s': %s";
+        }
+    },
+    BUILD_WARNING_MESSAGE {
+        
+        @Override
+        public boolean hasResolution() {
+            return false;
+        }
+        
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Parser warning in '%s': %s";
+        }
+    },
+    FILE_PARSING_FAILED {
+
+        @Override
+        public boolean hasResolution() {
+            return false;
+        }
+        
+        @Override
+        public String getProblemDescription() {
+            return "Parsing file '%s' failed";
         }
     };
 
