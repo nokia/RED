@@ -313,6 +313,12 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create().availableFrom("2.9").build()),
     /**
      */
+    TEST_CASE_SETTING_UNKNOWN_DECLARATION(TableType.TEST_CASES),
+    /**
+     */
+    TEST_CASE_SETTING_UNKNOWN_ARGUMENTS(TableType.TEST_CASES),
+    /**
+     */
     TEST_CASE_SETTING_DOCUMENTATION(
             TableType.TEST_CASES,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Documentation]").build(),
@@ -383,6 +389,12 @@ public enum RobotTokenType implements IRobotTokenType {
     /**
      */
     TEST_CASE_ACTION_ARGUMENT(TableType.TEST_CASES),
+    /**
+     */
+    KEYWORD_SETTING_UNKNOWN_DECLARATION(TableType.KEYWORDS),
+    /**
+     */
+    KEYWORD_SETTING_UNKNOWN_ARGUMENTS(TableType.KEYWORDS),
     /**
      */
     KEYWORD_SETTING_DOCUMENTATION(

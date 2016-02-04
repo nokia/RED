@@ -27,6 +27,7 @@ import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -77,10 +78,24 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final List<TestCase> cases = casesTable.getTestCases();
 
         validateByExternal(suiteModel.getFile(), robotCasesSection, monitor);
+        reportUnknownSettings(suiteModel.getFile(), cases);
+
         reportEmptyCases(suiteModel.getFile(), cases);
         reportDuplicatedCases(suiteModel.getFile(), cases);
         reportKeywordUsageProblems(suiteModel, robotCasesSection.getChildren());
         reportUnknownVariables(suiteModel, cases);
+    }
+
+    private void reportUnknownSettings(final IFile file, final List<TestCase> cases) {
+        for (final TestCase testCase : cases) {
+            List<TestCaseUnknownSettings> unknownSettings = testCase.getUnknownSettings();
+            for (final TestCaseUnknownSettings unknownSetting : unknownSettings) {
+                final RobotToken token = unknownSetting.getDeclaration();
+                final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.UNKNOWN_TEST_CASE_SETTING)
+                        .formatMessageWith(token.getText().toString());
+                reporter.handleProblem(problem, file, token);
+            }
+        }
     }
 
     private void validateByExternal(final IFile file, final RobotCasesSection section, final IProgressMonitor monitor)

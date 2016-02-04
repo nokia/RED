@@ -23,6 +23,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -68,6 +69,7 @@ class KeywordTableValidator implements ModelUnitValidator {
         final List<UserKeyword> keywords = keywordTable.getKeywords();
 
         validateByExternal(file, robotKeywordsSection, monitor);
+        reportUnknownSettings(file, keywords);
 
         reportEmptyKeyword(file, keywords);
         reportDuplicatedKewords(file, keywords);
@@ -75,6 +77,18 @@ class KeywordTableValidator implements ModelUnitValidator {
         TestCasesTableValidator.reportKeywordUsageProblems(suiteModel, validationContext, reporter,
                 findExecutableRows(keywords), Optional.<String> absent());
         reportUnknownVariables(suiteModel.getFile(), keywords);
+    }
+
+    private void reportUnknownSettings(final IFile file, final List<UserKeyword> keywords) {
+        for (final UserKeyword keyword : keywords) {
+            List<KeywordUnknownSettings> unknownSettings = keyword.getUnknownSettings();
+            for (final KeywordUnknownSettings unknownSetting : unknownSettings) {
+                final RobotToken token = unknownSetting.getDeclaration();
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD_SETTING)
+                        .formatMessageWith(token.getText().toString());
+                reporter.handleProblem(problem, file, token);
+            }
+        }
     }
 
     private void validateByExternal(final IFile file, final RobotKeywordsSection section,
