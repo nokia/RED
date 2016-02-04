@@ -101,17 +101,15 @@ class KeywordTableValidator implements ModelUnitValidator {
     private void reportEmptyKeyword(final IFile file, final List<UserKeyword> keywords) {
         for (final UserKeyword keyword : keywords) {
             final RobotToken caseName = keyword.getKeywordName();
-            if (keyword.getExecutionContext().isEmpty()) {
-                boolean report = true;
-                if (!keyword.getReturns().isEmpty()) {
-                    final KeywordReturn keywordReturn = keyword.getReturns().get(keyword.getReturns().size() - 1);
-                    final List<RobotToken> returnValues = keywordReturn.getReturnValues();
-                    report = isReturnEmpty(returnValues);
-                }
-                if (report) {
-                    TestCasesTableValidator.reportEmptyExecutableRows(file, reporter, caseName,
-                            keyword.getKeywordExecutionRows(), KeywordsProblem.EMPTY_KEYWORD);
-                }
+            boolean report = true;
+            if (!keyword.getReturns().isEmpty()) {
+                final KeywordReturn keywordReturn = keyword.getReturns().get(keyword.getReturns().size() - 1);
+                final List<RobotToken> returnValues = keywordReturn.getReturnValues();
+                report = isReturnEmpty(returnValues);
+            }
+            if (report) {
+                TestCasesTableValidator.reportNoExecutableRows(file, reporter, caseName,
+                        keyword.getKeywordExecutionRows(), KeywordsProblem.EMPTY_KEYWORD);
             }
         }
     }
