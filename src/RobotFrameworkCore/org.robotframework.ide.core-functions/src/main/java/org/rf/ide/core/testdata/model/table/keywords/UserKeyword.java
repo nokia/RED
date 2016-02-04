@@ -18,7 +18,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class UserKeyword extends AModelElement<KeywordTable>implements IExecutableStepsHolder<UserKeyword> {
+public class UserKeyword extends AModelElement<KeywordTable> implements IExecutableStepsHolder<UserKeyword> {
 
     private RobotToken keywordName;
 
@@ -34,6 +34,8 @@ public class UserKeyword extends AModelElement<KeywordTable>implements IExecutab
 
     private final List<KeywordTimeout> timeouts = new ArrayList<>();
 
+    private final List<KeywordUnknownSettings> unknownSettings = new ArrayList<>(0);
+
     private final List<RobotExecutableRow<UserKeyword>> keywordContext = new ArrayList<>();
 
     public UserKeyword(final RobotToken keywordName) {
@@ -48,9 +50,21 @@ public class UserKeyword extends AModelElement<KeywordTable>implements IExecutab
         this.keywordName = keywordName;
     }
 
+    public void addUnknownSettings(final KeywordUnknownSettings unknownSetting) {
+        this.unknownSettings.add(unknownSetting);
+    }
+
+    public List<KeywordUnknownSettings> getUnknownSettings() {
+        return Collections.unmodifiableList(unknownSettings);
+    }
+
     public void addKeywordExecutionRow(final RobotExecutableRow<UserKeyword> executionRow) {
         executionRow.setParent(this);
         this.keywordContext.add(executionRow);
+    }
+
+    public void removeExecutableLineWithIndex(final int rowIndex) {
+        this.keywordContext.remove(rowIndex);
     }
 
     public void removeAllKeywordExecutionRows() {

@@ -113,6 +113,23 @@ public enum TestCasesProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new SettingSimpleWordReplacer(RobotCasesSection.class, "Postcondition", "Teardown"));
         }
+    },
+    UNKNOWN_TEST_CASE_SETTING {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.ERROR;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Unknown test case setting definition '%s'";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList();// new RemoveKeywordFixer(marker.getAttribute("name", null)));
+        }
     };
 
     @Override

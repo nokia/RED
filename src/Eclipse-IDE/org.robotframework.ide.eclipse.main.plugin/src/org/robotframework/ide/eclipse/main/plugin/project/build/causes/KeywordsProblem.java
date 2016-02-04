@@ -241,6 +241,18 @@ public enum KeywordsProblem implements IProblemCause {
             return newArrayList(
                     new TableHeaderDepracatedAliasesReplacer(RobotKeywordsSection.class, "User Keyword", "Keyword"));
         }
+    },
+    UNKNOWN_KEYWORD_SETTING {
+
+        @Override
+        public String getProblemDescription() {
+            return "Unknown keyword setting definition '%s'";
+        }
+
+        @Override
+        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+            return newArrayList();// new RemoveKeywordFixer(marker.getAttribute("name", null)));
+        }
     };
 
     @Override
