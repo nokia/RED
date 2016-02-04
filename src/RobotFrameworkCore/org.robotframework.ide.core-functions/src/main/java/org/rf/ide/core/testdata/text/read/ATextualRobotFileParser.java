@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.read;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -484,7 +486,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             final RobotFile fileModel = robotFileOutput.getFileModel();
             if (utility.isTableHeader(robotToken)) {
                 if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, fileModel, currentLine,
-                        robotToken)) {
+                        robotToken) && isCorrectTableHeader(robotToken)) {
                     if (wasRecognizedCorrectly) {
                         @SuppressWarnings("rawtypes")
                         final TableHeader<?> header = new TableHeader(robotToken);
@@ -538,6 +540,32 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         utility.fixNotSetPositions(robotToken, fp);
 
         return robotToken;
+    }
+
+    private boolean isCorrectTableHeader(final RobotToken robotToken) {
+        boolean result = false;
+
+        final List<RobotTokenType> tableHeadersTypes = newArrayList(RobotTokenType.SETTINGS_TABLE_HEADER,
+                RobotTokenType.VARIABLES_TABLE_HEADER, RobotTokenType.TEST_CASES_TABLE_HEADER,
+                RobotTokenType.KEYWORDS_TABLE_HEADER);
+
+        final String raw = robotToken.getRaw().replaceAll("\\s+|[*]", "");
+        List<IRobotTokenType> types = robotToken.getTypes();
+        for (IRobotTokenType type : types) {
+            if (tableHeadersTypes.contains(type)) {
+                List<String> representations = type.getRepresentation();
+                for (String r : representations) {
+                    if (r.replaceAll("\\s+", "").equalsIgnoreCase(raw)) {
+                        result = true;
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+
+        return result;
+
     }
 
     private RobotToken mapToCorrectTokenAndPutInCorrectPlaceInModel(final RobotLine currentLine,

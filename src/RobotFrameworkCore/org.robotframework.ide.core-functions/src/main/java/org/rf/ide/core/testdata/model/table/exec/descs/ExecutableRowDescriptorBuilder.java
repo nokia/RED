@@ -51,6 +51,7 @@ public class ExecutableRowDescriptorBuilder {
 
                 rowDesc = builderToUse.buildDescription(execRowLine, acceptResult);
             }
+
         } else {
             rowDesc = new SimpleRowDescriptorBuilder().buildDescription(execRowLine, new AcceptResult(true));
         }
