@@ -17,56 +17,54 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDecla
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-
 public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
     private final List<VariableDeclaration> createdVariables = new ArrayList<>();
-    private RobotAction action = new RobotAction(new RobotToken(),
-            new ArrayList<IElementDeclaration>());
-    private final List<VariableDeclaration> usedVariables = new ArrayList<>();
-    private final List<IElementDeclaration> textParameters = new ArrayList<>();
-    private final IRowType type = ERowType.UNKONWN;
-    private final List<BuildMessage> messages = new ArrayList<>();
-    private final RobotExecutableRow<T> row;
 
+    private RobotAction action = new RobotAction(new RobotToken(), new ArrayList<IElementDeclaration>());
+
+    private final List<VariableDeclaration> commentedVariables = new ArrayList<>();
+
+    private final List<VariableDeclaration> usedVariables = new ArrayList<>();
+
+    private final List<IElementDeclaration> textParameters = new ArrayList<>();
+
+    private final IRowType type = ERowType.UNKONWN;
+
+    private final List<BuildMessage> messages = new ArrayList<>();
+
+    private final RobotExecutableRow<T> row;
 
     public SimpleRowDescriptor(final RobotExecutableRow<T> row) {
         this.row = row;
     }
-
 
     @Override
     public List<VariableDeclaration> getCreatedVariables() {
         return Collections.unmodifiableList(createdVariables);
     }
 
-
     public void addCreatedVariable(final VariableDeclaration variable) {
         this.createdVariables.add(variable);
     }
-
 
     @Override
     public RobotAction getAction() {
         return action;
     }
 
-
     public void setAction(final RobotAction action) {
         this.action = action;
     }
-
 
     @Override
     public List<VariableDeclaration> getUsedVariables() {
         return Collections.unmodifiableList(usedVariables);
     }
 
-
     public void addUsedVariable(final VariableDeclaration usedVar) {
         usedVariables.add(usedVar);
     }
-
 
     public void addUsedVariables(final List<VariableDeclaration> usedVars) {
         for (final VariableDeclaration usedVar : usedVars) {
@@ -74,17 +72,29 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         }
     }
 
+    @Override
+    public List<VariableDeclaration> getCommentedVariables() {
+        return Collections.unmodifiableList(commentedVariables);
+    }
+
+    public void addCommentedVariable(final VariableDeclaration variable) {
+        this.commentedVariables.add(variable);
+    }
+
+    public void addCommentedVariables(final List<VariableDeclaration> commentedVars) {
+        for (final VariableDeclaration var : commentedVars) {
+            addCommentedVariable(var);
+        }
+    }
 
     @Override
     public List<IElementDeclaration> getTextParameters() {
         return Collections.unmodifiableList(textParameters);
     }
 
-
     public void addTextParameter(final IElementDeclaration text) {
         textParameters.add(text);
     }
-
 
     public void addTextParameters(final List<IElementDeclaration> texts) {
         for (final IElementDeclaration text : texts) {
@@ -92,12 +102,10 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         }
     }
 
-
     @Override
     public List<BuildMessage> getMessages() {
         return Collections.unmodifiableList(messages);
     }
-
 
     public void addMessages(final List<BuildMessage> msgs) {
         for (final BuildMessage bm : msgs) {
@@ -105,11 +113,9 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         }
     }
 
-
     public void addMessage(final BuildMessage bm) {
         messages.add(bm);
     }
-
 
     @Override
     public IRowType getRowType() {
@@ -125,18 +131,15 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         return correctType;
     }
 
-
     @Override
     public RobotExecutableRow<T> getRow() {
         return row;
     }
 
-
     @Override
     public String toString() {
-        return String
-                .format("SimpleRowDescriptor [createdVariables=%s, action=%s, rowType=%s, usedVariables=%s, textParameters=%s, messages=%s, row=%s]",
-                        createdVariables, action, type, usedVariables,
-                        textParameters, messages, row);
+        return String.format(
+                "SimpleRowDescriptor [createdVariables=%s, action=%s, rowType=%s, usedVariables=%s, textParameters=%s, messages=%s, row=%s]",
+                createdVariables, action, type, usedVariables, textParameters, messages, row);
     }
 }

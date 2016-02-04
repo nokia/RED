@@ -12,19 +12,19 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo.VersionAvailabilityInfoBuilder;
 
-
 public class EndOfLineBuilder {
 
     private List<Constant> constant = new ArrayList<>(0);
-    private int lineNumber = IRobotLineElement.NOT_SET;
-    private int startColumn = IRobotLineElement.NOT_SET;
-    private int startOffset = IRobotLineElement.NOT_SET;
 
+    private int lineNumber = IRobotLineElement.NOT_SET;
+
+    private int startColumn = IRobotLineElement.NOT_SET;
+
+    private int startOffset = IRobotLineElement.NOT_SET;
 
     public static EndOfLineBuilder newInstance() {
         return new EndOfLineBuilder();
     }
-
 
     public EndOfLineBuilder setEndOfLines(final List<Constant> constant) {
         if (constant == null) {
@@ -37,7 +37,6 @@ public class EndOfLineBuilder {
         return this;
     }
 
-
     public EndOfLineBuilder setLineNumber(final int lineNumber) {
         if (lineNumber > IRobotLineElement.NOT_SET) {
             this.lineNumber = lineNumber;
@@ -47,7 +46,6 @@ public class EndOfLineBuilder {
 
         return this;
     }
-
 
     public EndOfLineBuilder setStartColumn(final int startColumn) {
         if (startColumn > IRobotLineElement.NOT_SET) {
@@ -59,7 +57,6 @@ public class EndOfLineBuilder {
         return this;
     }
 
-
     public EndOfLineBuilder setStartOffset(final int startOffset) {
         if (startOffset > IRobotLineElement.NOT_SET) {
             this.startOffset = startOffset;
@@ -70,17 +67,14 @@ public class EndOfLineBuilder {
         return this;
     }
 
-
     public IRobotLineElement buildEOL() {
         IRobotLineElement eol = null;
         if (constant.size() == 1) {
             final Constant myEol = constant.get(0);
             if (myEol == Constant.CR) {
-                eol = new CarritageReturnEndOfLine(startOffset, lineNumber,
-                        startColumn);
+                eol = new CarritageReturnEndOfLine(startOffset, lineNumber, startColumn);
             } else if (myEol == Constant.LF) {
-                eol = new LineFeedEndOfLine(startOffset, lineNumber,
-                        startColumn);
+                eol = new LineFeedEndOfLine(startOffset, lineNumber, startColumn);
             } else if (myEol == Constant.EOF) {
                 eol = new EndOfFile(startOffset, lineNumber, startColumn);
             }
@@ -104,32 +98,28 @@ public class EndOfLineBuilder {
 
     private class LFCREndOfLine extends AEndOfLine {
 
-        public LFCREndOfLine(final int startOffset, final int lineNumber,
-                final int startColumn) {
+        public LFCREndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.LFCR, startOffset, lineNumber, startColumn);
         }
     }
 
     private class CRLFEndOfLine extends AEndOfLine {
 
-        public CRLFEndOfLine(final int startOffset, final int lineNumber,
-                final int startColumn) {
+        public CRLFEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.CRLF, startOffset, lineNumber, startColumn);
         }
     }
 
     private class EndOfFile extends AEndOfLine {
 
-        public EndOfFile(final int startOffset, final int lineNumber,
-                final int startColumn) {
+        public EndOfFile(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.EOF, startOffset, lineNumber, startColumn);
         }
     }
 
     private class LineFeedEndOfLine extends AEndOfLine {
 
-        public LineFeedEndOfLine(final int startOffset, final int lineNumber,
-                final int startColumn) {
+        public LineFeedEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.LF, startOffset, lineNumber, startColumn);
         }
 
@@ -137,8 +127,7 @@ public class EndOfLineBuilder {
 
     private class CarritageReturnEndOfLine extends AEndOfLine {
 
-        public CarritageReturnEndOfLine(final int startOffset,
-                final int lineNumber, final int startColumn) {
+        public CarritageReturnEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.CR, startOffset, lineNumber, startColumn);
         }
 
@@ -146,8 +135,7 @@ public class EndOfLineBuilder {
 
     private class UndeclaredEndOfLine extends AEndOfLine {
 
-        public UndeclaredEndOfLine(final int startOffset, final int lineNumber,
-                final int startColumn) {
+        public UndeclaredEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.NON, startOffset, lineNumber, startColumn);
         }
 
@@ -156,13 +144,15 @@ public class EndOfLineBuilder {
     private abstract class AEndOfLine implements IRobotLineElement {
 
         private final int lineNumber;
+
         private final int startColumn;
+
         private final int startOffset;
+
         private final List<IRobotTokenType> types;
 
-
-        public AEndOfLine(final EndOfLineTypes type, final int startOffset,
-                final int lineNumber, final int startColumn) {
+        public AEndOfLine(final EndOfLineTypes type, final int startOffset, final int lineNumber,
+                final int startColumn) {
             this.lineNumber = lineNumber;
             this.startColumn = startColumn;
             this.startOffset = startOffset;
@@ -170,70 +160,58 @@ public class EndOfLineBuilder {
             this.types.add(type);
         }
 
-
         @Override
         public int getLineNumber() {
             return lineNumber;
         }
-
 
         @Override
         public int getStartColumn() {
             return startColumn;
         }
 
-
         @Override
         public int getEndColumn() {
             return startColumn + getText().length();
         }
-
 
         @Override
         public int getStartOffset() {
             return startOffset;
         }
 
-
         @Override
         public FilePosition getFilePosition() {
-            return new FilePosition(lineNumber, getStartColumn(),
-                    getStartOffset());
+            return new FilePosition(lineNumber, getStartColumn(), getStartOffset());
         }
-
 
         @Override
         public String getText() {
-            return getTypes().get(0).getRepresentation().get(0);
+            return !getTypes().isEmpty() && !getTypes().get(0).getRepresentation().isEmpty()
+                    ? getTypes().get(0).getRepresentation().get(0) : "";
         }
-
 
         @Override
         public String getRaw() {
-            return getTypes().get(0).getRepresentation().get(0);
+            return !getTypes().isEmpty() && !getTypes().get(0).getRepresentation().isEmpty()
+                    ? getTypes().get(0).getRepresentation().get(0) : "";
         }
-
 
         @Override
         public List<IRobotTokenType> getTypes() {
             return types;
         }
 
-
         @Override
         public boolean isDirty() {
             return false;
         }
 
-
         @Override
         public String toString() {
-            return String
-                    .format("%s [lineNumber=%s, startColumn=%s, startOffset=%s, types=%s]",
-                            this.getClass(), lineNumber, startColumn,
-                            startOffset, types);
+            return String.format("%s [lineNumber=%s, startColumn=%s, startOffset=%s, types=%s]", this.getClass(),
+                    lineNumber, startColumn, startOffset, types);
         }
-
 
         @Override
         public VersionAvailabilityInfo getVersionInformation() {
@@ -252,28 +230,23 @@ public class EndOfLineBuilder {
         NON,
         /**
          */
-        CR(VersionAvailabilityInfoBuilder.create().addRepresentation("\r")
-                .build()),
+        CR(VersionAvailabilityInfoBuilder.create().addRepresentation("\r").build()),
         /**
          */
-        LF(VersionAvailabilityInfoBuilder.create().addRepresentation("\n")
-                .build()),
+        LF(VersionAvailabilityInfoBuilder.create().addRepresentation("\n").build()),
         /**
          */
-        CRLF(VersionAvailabilityInfoBuilder.create().addRepresentation("\r\n")
-                .build()),
+        CRLF(VersionAvailabilityInfoBuilder.create().addRepresentation("\r\n").build()),
         /**
          */
-        LFCR(VersionAvailabilityInfoBuilder.create().addRepresentation("\n\r")
-                .build()),
+        LFCR(VersionAvailabilityInfoBuilder.create().addRepresentation("\n\r").build()),
         /**
          */
         EOF;
 
         private final List<String> text = new ArrayList<>(0);
-        private final List<VersionAvailabilityInfo> representation = new ArrayList<>(
-                0);
 
+        private final List<VersionAvailabilityInfo> representation = new ArrayList<>(0);
 
         private EndOfLineTypes(final VersionAvailabilityInfo... representations) {
             for (VersionAvailabilityInfo vInfo : representations) {
@@ -282,18 +255,15 @@ public class EndOfLineBuilder {
             }
         }
 
-
         @Override
         public List<String> getRepresentation() {
             return text;
         }
 
-
         @Override
         public List<VersionAvailabilityInfo> getVersionAvailabilityInfos() {
             return representation;
         }
-
 
         @Override
         public VersionAvailabilityInfo findVersionAvailablilityInfo(String text) {
