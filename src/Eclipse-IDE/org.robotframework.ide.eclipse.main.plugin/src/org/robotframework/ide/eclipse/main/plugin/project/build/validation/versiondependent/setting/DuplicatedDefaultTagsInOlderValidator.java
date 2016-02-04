@@ -61,6 +61,6 @@ public class DuplicatedDefaultTagsInOlderValidator extends ADuplicatedInOldValid
 
     @Override
     protected GeneralSettingsProblem getSettingProblemId() {
-        return GeneralSettingsProblem.DUPLICATED_FORCE_TAGS_28;
+        return GeneralSettingsProblem.DUPLICATED_DEFAULT_TAGS_28;
     }
 }

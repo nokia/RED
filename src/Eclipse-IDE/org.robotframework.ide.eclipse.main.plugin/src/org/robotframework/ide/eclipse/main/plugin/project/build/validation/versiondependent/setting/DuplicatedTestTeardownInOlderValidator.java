@@ -49,6 +49,6 @@ public class DuplicatedTestTeardownInOlderValidator extends ADuplicatedInOldVali
 
     @Override
     protected GeneralSettingsProblem getSettingProblemId() {
-        return GeneralSettingsProblem.DUPLICATED_SUITE_TEARDOWN_28;
+        return GeneralSettingsProblem.DUPLICATED_TEST_TEARDOWN_28;
     }
 }
