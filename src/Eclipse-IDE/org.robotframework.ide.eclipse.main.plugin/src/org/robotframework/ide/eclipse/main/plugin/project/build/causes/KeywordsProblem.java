@@ -246,7 +246,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Unknown keyword setting's definition '%s'";
+            return "Unknown keyword's setting definition '%s'";
         }
 
         @Override
