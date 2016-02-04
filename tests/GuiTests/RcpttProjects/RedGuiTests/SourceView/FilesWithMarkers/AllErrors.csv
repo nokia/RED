@@ -41,9 +41,9 @@ _indent,Description,Resource,Path,Location,Type
 1,Variable import 'C:var/myvariables.py' is invalid: given location does not point to a file,wrong_settings.robot,/RobotProject,line 5,Robot Problem
 0,Warnings (7 items),,,,
 1,Path '/folder/full.py' is absolute. It is preferred to use relative paths,wrong_settings.robot,/RobotProject,line 6,Robot Problem
-1,Unrecognized table header: '***,incorrect_header.robot,/RobotProject,line 12,Robot Problem
-1,Unrecognized table header: '*** ****,incorrect_header.robot,/RobotProject,line 2,Robot Problem
-1,Unrecognized table header: '*** Test Casas****,incorrect_header.robot,/RobotProject,line 4,Robot Problem
-1,Unrecognized table header: '*** V ***,incorrect_header.robot,/RobotProject,line 8,Robot Problem
-1,Unrecognized table header: '****,incorrect_header.robot,/RobotProject,line 10,Robot Problem
-1,Unrecognized table header: '**** ${tst} ***,incorrect_header.robot,/RobotProject,line 6,Robot Problem
+1,Unrecognized table header: '*** ****',incorrect_header.robot,/RobotProject,line 2,Robot Problem
+1,Unrecognized table header: '*** Test Casas****',incorrect_header.robot,/RobotProject,line 4,Robot Problem
+1,Unrecognized table header: '*** V ***',incorrect_header.robot,/RobotProject,line 8,Robot Problem
+1,Unrecognized table header: '***',incorrect_header.robot,/RobotProject,line 12,Robot Problem
+1,Unrecognized table header: '**** ${tst} ***',incorrect_header.robot,/RobotProject,line 6,Robot Problem
+1,Unrecognized table header: '****',incorrect_header.robot,/RobotProject,line 10,Robot Problem
