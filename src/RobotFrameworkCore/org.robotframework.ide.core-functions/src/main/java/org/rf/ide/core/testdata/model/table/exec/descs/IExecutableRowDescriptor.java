@@ -12,32 +12,32 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.IElementDeclaration;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 
-
 public interface IExecutableRowDescriptor<T> {
 
     List<VariableDeclaration> getCreatedVariables();
 
-
     RobotAction getAction();
-
 
     List<VariableDeclaration> getUsedVariables();
 
+    List<VariableDeclaration> getCommentedVariables();
 
     List<IElementDeclaration> getTextParameters();
 
-
     List<BuildMessage> getMessages();
 
-
     IRowType getRowType();
-
 
     RobotExecutableRow<T> getRow();
 
     public enum ERowType implements IRowType {
-        UNKONWN, COMMENTED_HASH, SIMPLE, FOR, FOR_CONTINUE;
+        UNKONWN,
+        COMMENTED_HASH,
+        SIMPLE,
+        FOR,
+        FOR_CONTINUE;
 
+        @Override
         public IRowType getParentType() {
             return null;
         }

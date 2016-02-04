@@ -9,8 +9,11 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.exec.CommentedVariablesFilter;
+import org.rf.ide.core.testdata.model.table.exec.CommentedVariablesFilter.FilteredVariables;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
 import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder;
 import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
@@ -35,18 +38,22 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
         final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine.getParent();
         final ARobotSectionTable table = (ARobotSectionTable) keywordOrTestcase.getParent();
         final RobotFile robotFile = table.getParent();
-        final String fileName = robotFile.getParent().getProcessedFile().getAbsolutePath();
+        final RobotFileOutput rfo = robotFile.getParent();
+        final String fileName = rfo.getProcessedFile().getAbsolutePath();
 
         final VariableExtractor varExtractor = new VariableExtractor();
         final List<RobotToken> lineElements = execRowLine.getElementTokens();
         boolean isAfterFirstAction = false;
+        final CommentedVariablesFilter filter = new CommentedVariablesFilter();
         for (final RobotToken elem : lineElements) {
             final MappingResult mappingResult = varExtractor.extract(elem, fileName);
             simple.addMessages(mappingResult.getMessages());
 
             // value is keyword if is on the first place and have in it nested
             // variables and when contains text on the beginning or end of field
-            final List<VariableDeclaration> correctVariables = mappingResult.getCorrectVariables();
+            FilteredVariables filteredVars = filter.filter(rfo, mappingResult.getCorrectVariables());
+            simple.addCommentedVariables(filteredVars.getCommented());
+            final List<VariableDeclaration> correctVariables = filteredVars.getUsed();
             final List<IElementDeclaration> mappedElements = mappingResult.getMappedElements();
             if (isAfterFirstAction) {
                 simple.addUsedVariables(correctVariables);

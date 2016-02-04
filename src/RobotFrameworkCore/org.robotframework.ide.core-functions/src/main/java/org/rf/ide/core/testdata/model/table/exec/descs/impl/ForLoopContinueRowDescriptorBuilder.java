@@ -128,9 +128,10 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         final IExecutableRowDescriptor<T> buildDescription = new SimpleRowDescriptorBuilder()
                 .buildDescription(rowWithoutLoopContinue, new AcceptResult(true));
         forContinueDesc.setKeywordAction(buildDescription.getAction());
-        forContinueDesc.addCreatedVariables(buildDescription.getCreatedVariables());
         forContinueDesc.addMessages(buildDescription.getMessages());
         forContinueDesc.addTextParameters(buildDescription.getTextParameters());
+        forContinueDesc.addCreatedVariables(buildDescription.getCreatedVariables());
+        forContinueDesc.addCommentedVariables(buildDescription.getCommentedVariables());
         forContinueDesc.addUsedVariables(buildDescription.getUsedVariables());
     }
 
