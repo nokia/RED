@@ -309,6 +309,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         for (final TestTimeout testTimeout : timeouts) {
             final RobotToken timeoutToken = testTimeout.getTimeout();
             if (timeoutToken != null) {
+                wasAllEmpty = false;
                 final String timeout = timeoutToken.getText().toString();
                 if (!RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
                     final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
