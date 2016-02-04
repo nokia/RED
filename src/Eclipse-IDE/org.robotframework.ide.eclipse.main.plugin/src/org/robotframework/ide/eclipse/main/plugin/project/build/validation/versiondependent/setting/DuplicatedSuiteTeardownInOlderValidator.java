@@ -10,7 +10,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
@@ -18,7 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSe
 import com.google.common.base.Function;
 import com.google.common.collect.Range;
 
-public class DuplicatedSuiteTeardownInOlderValidator extends ADuplicatedInOldValidator<SuiteSetup> {
+public class DuplicatedSuiteTeardownInOlderValidator extends ADuplicatedInOldValidator<SuiteTeardown> {
 
     public DuplicatedSuiteTeardownInOlderValidator(final IFile file, final RobotSettingsSection section,
             final ProblemsReportingStrategy reporter) {
@@ -31,17 +31,17 @@ public class DuplicatedSuiteTeardownInOlderValidator extends ADuplicatedInOldVal
     }
 
     @Override
-    protected List<SuiteSetup> getElements() {
+    protected List<SuiteTeardown> getElements() {
         final SettingTable table = (SettingTable) section.getLinkedElement();
-        return table.getSuiteSetups();
+        return table.getSuiteTeardowns();
     }
 
     @Override
-    protected Function<SuiteSetup, String> getImportantElement() {
-        return new Function<SuiteSetup, String>() {
+    protected Function<SuiteTeardown, String> getImportantElement() {
+        return new Function<SuiteTeardown, String>() {
 
             @Override
-            public String apply(final SuiteSetup setup) {
+            public String apply(final SuiteTeardown setup) {
                 return setup.getKeywordName() == null ? null : setup.getKeywordName().getText();
             }
         };
