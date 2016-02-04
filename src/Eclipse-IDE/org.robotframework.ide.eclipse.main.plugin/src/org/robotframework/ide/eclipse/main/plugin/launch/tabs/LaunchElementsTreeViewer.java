@@ -216,9 +216,10 @@ public class LaunchElementsTreeViewer {
             }
         } else if (element instanceof TestCaseLaunchElement) {
             final TestCaseLaunchElement testCase = (TestCaseLaunchElement) element;
-            if (testCase.getParent().isChecked) {
-                testCase.setChecked(isElementChecked);
+            if (!testCase.getParent().isChecked) {
+                testCase.getParent().setChecked(isElementChecked);
             }
+            testCase.setChecked(isElementChecked);
         }
         treeViewer.refresh();
     }
