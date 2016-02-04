@@ -10,13 +10,13 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 
 import com.google.common.collect.Range;
 
-public class DuplicatedSuiteTeardownValidator extends ADuplicatedValidator<SuiteSetup> {
+public class DuplicatedSuiteTeardownValidator extends ADuplicatedValidator<SuiteTeardown> {
 
     public DuplicatedSuiteTeardownValidator(final IFile file, final RobotSettingsSection section,
             final ProblemsReportingStrategy reporter) {
@@ -29,8 +29,8 @@ public class DuplicatedSuiteTeardownValidator extends ADuplicatedValidator<Suite
     }
 
     @Override
-    protected List<SuiteSetup> getElements() {
+    protected List<SuiteTeardown> getElements() {
         final SettingTable table = (SettingTable) section.getLinkedElement();
-        return table.getSuiteSetups();
+        return table.getSuiteTeardowns();
     }
 }
