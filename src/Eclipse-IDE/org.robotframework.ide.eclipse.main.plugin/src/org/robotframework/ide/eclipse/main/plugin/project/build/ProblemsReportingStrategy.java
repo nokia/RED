@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.collect.Range;
@@ -57,6 +58,9 @@ public class ProblemsReportingStrategy {
 
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
             final Map<String, Object> additionalAttributes) {
+        if (!PlatformUI.isWorkbenchRunning()) {
+            throw new IllegalStateException("This reporter should not be used in headless mode");
+        }
         if (problem != null) {
             problem.createMarker(file, filePosition, additionalAttributes);
         }

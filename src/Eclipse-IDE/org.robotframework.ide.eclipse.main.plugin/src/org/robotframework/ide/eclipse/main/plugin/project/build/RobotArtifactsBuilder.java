@@ -29,14 +29,17 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBu
 public class RobotArtifactsBuilder {
 
     private final IProject project;
+    private final BuildLogger logger;
 
-    public RobotArtifactsBuilder(final IProject project) {
+    public RobotArtifactsBuilder(final IProject project, final BuildLogger logger) {
         this.project = project;
+        this.logger = logger;
     }
 
     public Job createBuildJob(final boolean rebuildNeeded, final ProblemsReportingStrategy fatalReporter,
             final ProblemsReportingStrategy usualReporter) {
         if (rebuildNeeded) {
+            logger.log("BUILDING: refreshing project");
             try {
                 project.refreshLocal(IResource.DEPTH_INFINITE, null);
                 final LibspecsFolder libspecsFolder = LibspecsFolder.get(project);
@@ -75,6 +78,7 @@ public class RobotArtifactsBuilder {
             return new Job("Skipping build") {
                 @Override
                 protected IStatus run(final IProgressMonitor monitor) {
+                    logger.log("BUILDING: skipped");
                     monitor.done();
                     return Status.OK_STATUS;
                 }
@@ -87,6 +91,7 @@ public class RobotArtifactsBuilder {
         if (monitor.isCanceled()) {
             return;
         }
+        logger.log("BUILDING: project '" + project.getName() + "' build started");
         final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
         subMonitor.beginTask("Building", 100);
         subMonitor.subTask("checking Robot execution environment");
@@ -107,8 +112,9 @@ public class RobotArtifactsBuilder {
             return;
         }
 
-        new LibrariesBuilder().buildLibraries(robotProject, runtimeEnvironment, configuration, subMonitor.newChild(70),
-                usualReporter);
+        new LibrariesBuilder(logger).buildLibraries(robotProject, runtimeEnvironment, configuration,
+                subMonitor.newChild(70), usualReporter);
+        logger.log("BUILDING: project '" + project.getName() + "' build finished");
     }
 
     private RobotProjectConfig provideConfiguration(final RobotProject robotProject,

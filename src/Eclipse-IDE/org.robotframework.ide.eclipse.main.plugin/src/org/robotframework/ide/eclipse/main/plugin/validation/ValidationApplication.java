@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -45,11 +46,19 @@ public class ValidationApplication implements IApplication {
 
     @Override
     public Object start(final IApplicationContext context) throws Exception {
+        IWorkspaceDescription description = ResourcesPlugin.getWorkspace().getDescription();
+        final boolean isAutobuildingEnabled = description.isAutoBuilding();
+        description.setAutoBuilding(false);
+        ResourcesPlugin.getWorkspace().setDescription(description);
         try {
             System.out.println("# RED projects validator\n");
 
             final List<String> args = newArrayList((String[]) context.getArguments().get("application.args"));
             final ProvidedArguments arguments = parseArguments(args);
+
+            description.setAutoBuilding(false);
+            ResourcesPlugin.getWorkspace().setDescription(description);
+
             importNeededProjects(arguments.projectsToImport);
             runValidation(arguments);
 
@@ -60,6 +69,10 @@ public class ValidationApplication implements IApplication {
         } catch (final Exception e) {
             e.printStackTrace();
             return -200;
+        } finally {
+            description = ResourcesPlugin.getWorkspace().getDescription();
+            description.setAutoBuilding(isAutobuildingEnabled);
+            ResourcesPlugin.getWorkspace().setDescription(description);
         }
     }
 
@@ -177,7 +190,7 @@ public class ValidationApplication implements IApplication {
                 final ProblemsGatheringReportingStrategy reporter = ProblemsGatheringReportingStrategy.reportOnly();
                 final ProblemsGatheringReportingStrategy fatalReporter = ProblemsGatheringReportingStrategy
                         .reportAndPanic();
-                final RobotProjectBuilder builder = new RobotProjectBuilder(reporter, fatalReporter);
+                final RobotProjectBuilder builder = new RobotProjectBuilder(reporter, fatalReporter, logger);
 
                 final long start = System.currentTimeMillis();
                 builder.build(IncrementalProjectBuilder.FULL_BUILD, robotProject, new NullProgressMonitor());
