@@ -63,7 +63,7 @@ class SimilaritiesAnalyst {
         new KeywordDefinitionLocator(suiteFile).locateKeywordDefinition(new KeywordDetector() {
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
+                    final KeywordSpecification kwSpec, final String libraryAlias, final RobotSuiteFile exposingFile) {
                 names.add(kwSpec.getName());
                 return ContinueDecision.CONTINUE;
             }

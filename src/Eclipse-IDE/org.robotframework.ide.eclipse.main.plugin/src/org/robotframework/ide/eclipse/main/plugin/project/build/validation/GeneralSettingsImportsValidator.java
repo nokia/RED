@@ -74,7 +74,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         if (pathOrNameToken == null) {
             reportMissingImportArgument(imported);
         } else {
-            String pathOrName = pathOrNameToken.getText().toString();
+            String pathOrName = pathOrNameToken.getText();
             pathOrName = pathOrName.replaceAll(" [\\\\] ", "  ");
             if (RobotExpressions.isParameterized(pathOrName)) {
                 final String resolved = suiteFile.getProject().resolve(pathOrName);
@@ -91,7 +91,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     private void validateSpecifiedImport(final AImported imported, final String pathOrName,
             final RobotToken pathOrNameToken, final boolean isParametrized, final IProgressMonitor monitor)
-            throws CoreException {
+                    throws CoreException {
         if (isPathImport(pathOrName)) {
             validatePathImport(imported, pathOrName, pathOrNameToken, isParametrized, monitor);
         } else {
@@ -105,23 +105,25 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     protected void validatePathImport(final AImported imported, final String path, final RobotToken pathToken,
             final boolean isParametrized, final IProgressMonitor monitor) throws CoreException {
         final Path resPath = new Path(path);
-        final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
+        final IWorkspaceRoot wsRoot = validationContext.getFile().getWorkspace().getRoot();
 
         IPath wsRelativePath = null;
         if (resPath.isAbsolute()) {
             if (!isParametrized) {
-                reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.ABSOLUTE_IMPORT_PATH)
-                        .formatMessageWith(path), suiteFile.getFile(), pathToken);
+                reporter.handleProblem(
+                        RobotProblem.causedBy(GeneralSettingsProblem.ABSOLUTE_IMPORT_PATH).formatMessageWith(path),
+                        validationContext.getFile(), pathToken);
             }
             wsRelativePath = resPath.makeRelativeTo(wsRoot.getLocation());
             if (!wsRoot.getLocation().isPrefixOf(resPath)) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_OUTSIDE_WORKSPACE)
-                        .formatMessageWith(path), suiteFile.getFile(), pathToken);
+                        .formatMessageWith(path), validationContext.getFile(), pathToken);
                 return;
             }
         }
         if (wsRelativePath == null) {
-            wsRelativePath = PathsConverter.fromResourceRelativeToWorkspaceRelative(suiteFile.getFile(), resPath);
+            wsRelativePath = PathsConverter.fromResourceRelativeToWorkspaceRelative(validationContext.getFile(),
+                    resPath);
         }
         final IResource resource = wsRoot.findMember(wsRelativePath);
         if (resource == null || !resource.exists()) {
@@ -129,7 +131,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                     wsRelativePath.toPortableString());
             reporter.handleProblem(
                     RobotProblem.causedBy(getCauseForNonExistingResourceImport()).formatMessageWith(path),
-                    suiteFile.getFile(), pathToken, attributes);
+                    validationContext.getFile(), pathToken, attributes);
         } else {
             validateExistingResource(resource, path, pathToken);
         }
@@ -149,15 +151,15 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     private void reportMissingImportArgument(final AImported imported) {
         final RobotToken declarationToken = imported.getDeclaration();
         reporter.handleProblem(RobotProblem.causedBy(getCauseForMissingImportArguments())
-                .formatMessageWith(declarationToken.getText().toString()), suiteFile.getFile(), declarationToken);
+                .formatMessageWith(declarationToken.getText()), validationContext.getFile(), declarationToken);
     }
 
     private void reportParameterizedImport(final RobotToken pathOrNameToken) {
-        final String path = pathOrNameToken.getText().toString();
+        final String path = pathOrNameToken.getText();
         final Map<String, Object> additional = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, path);
         reporter.handleProblem(
                 RobotProblem.causedBy(GeneralSettingsProblem.PARAMETERIZED_IMPORT_PATH).formatMessageWith(path),
-                suiteFile.getFile(), pathOrNameToken, additional);
+                validationContext.getFile(), pathOrNameToken, additional);
     }
 
     protected abstract IProblemCause getCauseForMissingImportArguments();
@@ -218,8 +220,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         private String createLibName(final String name, final List<RobotToken> arguments) {
             if ("Remote".equals(name)) {
                 // TODO : raise problem when there are no arguments for remote
-                return name + " "
-                        + (arguments.isEmpty() ? "http://127.0.0.1:8270/RPC2" : arguments.get(0).getText().toString());
+                return name + " " + (arguments.isEmpty() ? "http://127.0.0.1:8270/RPC2" : arguments.get(0).getText());
             }
             return name;
         }
@@ -233,14 +234,14 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 final Optional<ArgumentsDescriptor> descriptor = constructor == null
                         ? Optional.<ArgumentsDescriptor> absent()
                         : Optional.of(constructor.createArgumentsDescriptor());
-                new KeywordCallArgumentsValidator(suiteFile.getFile(), pathOrNameToken, reporter, descriptor, arguments)
-                        .validate(monitor);
+                new KeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
+                        arguments).validate(monitor);
             } else {
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNKNOWN_LIBRARY)
                         .formatMessageWith(pathOrName);
                 final Map<String, Object> additional = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
                         pathOrName, AdditionalMarkerAttributes.IS_PATH, isPath);
-                reporter.handleProblem(problem, suiteFile.getFile(), pathOrNameToken, additional);
+                reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
             }
         }
     }
@@ -272,8 +273,8 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 final RobotToken pathToken) {
             if (resource.getType() != IResource.FILE && resource.getType() != IResource.FOLDER) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_VARIABLES_IMPORT)
-                        .formatMessageWith(path, ": given location does not point to a file"), suiteFile.getFile(),
-                        pathToken);
+                        .formatMessageWith(path, ": given location does not point to a file"),
+                        validationContext.getFile(), pathToken);
             }
         }
     }
@@ -305,16 +306,17 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 final RobotToken pathToken) {
             if (resource.getType() != IResource.FILE) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
-                        .formatMessageWith(path, ": given location does not point to a file"), suiteFile.getFile(),
-                        pathToken);
+                        .formatMessageWith(path, ": given location does not point to a file"),
+                        validationContext.getFile(), pathToken);
             } else if (!ASuiteFileDescriber.isResourceFile((IFile) resource)) {
                 if (resource.getFileExtension().equalsIgnoreCase("html")) {
                     reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.HTML_RESOURCE_IMPORT),
-                            suiteFile.getFile(), pathToken);
+                            validationContext.getFile(), pathToken);
                 } else {
-                    reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
-                            .formatMessageWith(path, ": given file is not a Resource file"), suiteFile.getFile(),
-                            pathToken);
+                    reporter.handleProblem(
+                            RobotProblem.causedBy(GeneralSettingsProblem.INVALID_RESOURCE_IMPORT)
+                                    .formatMessageWith(path, ": given file is not a Resource file"),
+                            validationContext.getFile(), pathToken);
                 }
             }
         }

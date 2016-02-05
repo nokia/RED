@@ -5,9 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
 public enum KeywordScope {
     LOCAL,
     RESOURCE,
     REF_LIBRARY,
-    STD_LIBRARY
+    STD_LIBRARY;
+
+    public static List<KeywordScope> defaultOrder() {
+        return newArrayList(LOCAL, RESOURCE, REF_LIBRARY, STD_LIBRARY);
+    }
 }

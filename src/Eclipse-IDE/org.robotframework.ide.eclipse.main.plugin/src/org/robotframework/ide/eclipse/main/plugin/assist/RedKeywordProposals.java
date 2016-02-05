@@ -5,21 +5,32 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities.AccessibleKeywordsCollector;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefinitionLocator.KeywordDetector;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 
 public class RedKeywordProposals {
@@ -56,47 +67,92 @@ public class RedKeywordProposals {
         };
     }
 
-    public List<RedKeywordProposal> getKeywordProposals() {
-        return getKeywordProposals("", null);
-    }
-
-    public List<RedKeywordProposal> getKeywordProposals(final Comparator<RedKeywordProposal> comparator) {
-        return getKeywordProposals("", comparator);
-    }
-
     public List<RedKeywordProposal> getKeywordProposals(final String prefix,
-            final Comparator<RedKeywordProposal> comparator) {
+            final Comparator<? super RedKeywordProposal> comparator) {
+        final AccessibleKeywordsEntities keywordEntities = getAccessibleKeywordsEntities(suiteFile, prefix);
+        final ListMultimap<KeywordScope, KeywordEntity> possible = keywordEntities.getPossibleKeywords();
 
-        final List<RedKeywordProposal> proposals = newArrayList();
+        final List<RedKeywordProposal> entities = new ArrayList<>();
+        for (final KeywordEntity entity : possible.values()) {
+            entities.add((RedKeywordProposal) entity);
+        }
+        if (comparator != null) {
+            Collections.sort(entities, comparator);
+        }
+        return entities;
+    }
 
+    public RedKeywordProposal getBestMatchingKeywordProposal(final String keywordName) {
+        final AccessibleKeywordsEntities accessibleKeywordsEntities = getAccessibleKeywordsEntities(suiteFile, "");
+        final ListMultimap<KeywordScope, KeywordEntity> keywords = accessibleKeywordsEntities
+                .getPossibleKeywords(keywordName);
+
+        for (final KeywordScope scope : KeywordScope.defaultOrder()) {
+            for (final KeywordEntity keyword : keywords.get(scope)) {
+                return (RedKeywordProposal) keyword;
+            }
+        }
+        return null;
+    }
+
+    private AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite, final String prefix) {
+        final AccessibleKeywordsCollector collector = new AccessibleKeywordsCollector() {
+            @Override
+            public Map<String, Collection<KeywordEntity>> collect() {
+                return collectAccessibleKeywords(prefix);
+            }
+        };
+        return new AccessibleKeywordsEntities(suite.getFile().getFullPath(), collector);
+    }
+
+    private Map<String, Collection<KeywordEntity>> collectAccessibleKeywords(final String prefix) {
+        final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
         new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(new KeywordDetector() {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final String libraryAlias, final boolean isFromNestedLibrary) {
-                if (kwSpec.getName().toLowerCase().startsWith(prefix.toLowerCase()) && !libSpec.isReserved()) {
-                    final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
-                            : KeywordScope.STD_LIBRARY;
-                    final String sourceName = libraryAlias.isEmpty() ? libSpec.getName() : libraryAlias;
-                    proposals.add(RedKeywordProposal.create(libSpec, kwSpec, scope, sourceName));
-                }
+                    final KeywordSpecification kwSpec, final String libraryAlias, final RobotSuiteFile exposingFile) {
+                final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY : KeywordScope.STD_LIBRARY;
+                final String sourceName = libraryAlias.isEmpty() ? libSpec.getName() : libraryAlias;
+
+                addAccessibleKeyword(kwSpec.getName(), RedKeywordProposal.create(libSpec, kwSpec, scope, sourceName,
+                        exposingFile.getFile().getFullPath()), prefix);
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
             public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
-                if (keyword.getName().toLowerCase().startsWith(prefix.toLowerCase())) {
-                    final KeywordScope scope = suiteFile == file ? KeywordScope.LOCAL : KeywordScope.RESOURCE;
-                    final String sourceName = Files.getNameWithoutExtension(file.getName());
-                    proposals.add(RedKeywordProposal.create(file, keyword, scope, sourceName));
-                }
+                final KeywordScope scope = suiteFile == file ? KeywordScope.LOCAL : KeywordScope.RESOURCE;
+                final String sourceName = Files.getNameWithoutExtension(file.getName());
+                addAccessibleKeyword(keyword.getName(), RedKeywordProposal.create(file, keyword, scope, sourceName),
+                        prefix);
                 return ContinueDecision.CONTINUE;
             }
-        });
 
-        if (comparator != null) {
-            Collections.sort(proposals, comparator);
-        }
-        return proposals;
+            private void addAccessibleKeyword(final String keywordName, final RedKeywordProposal keyword,
+                    final String prefix) {
+                if (!matchesPrefix(keyword, prefix)) {
+                    return;
+                }
+                final String unifiedName = QualifiedKeywordName.unifyDefinition(keywordName);
+                if (accessibleKeywords.containsKey(unifiedName)) {
+                    accessibleKeywords.get(unifiedName).add(keyword);
+                } else {
+                    final LinkedHashSet<KeywordEntity> setOfKeywords = newLinkedHashSet();
+                    setOfKeywords.add(keyword);
+                    accessibleKeywords.put(unifiedName, setOfKeywords);
+                }
+            }
+
+            private boolean matchesPrefix(final RedKeywordProposal keyword, final String prefix) {
+                final String keywordName = keyword.getLabel();
+                final String keywordPrefix = keyword.getSourcePrefix() + ".";
+                final String wholeDefinition = keywordPrefix + keywordName;
+
+                return EmbeddedKeywordNamesSupport.startsWith(keywordName, prefix)
+                        || EmbeddedKeywordNamesSupport.startsWith(wholeDefinition, prefix);
+            }
+        });
+        return accessibleKeywords;
     }
 }

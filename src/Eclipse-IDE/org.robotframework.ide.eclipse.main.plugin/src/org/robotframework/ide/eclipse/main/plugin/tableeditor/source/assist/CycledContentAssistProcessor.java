@@ -125,15 +125,17 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         // this method is called also for processors from which the proposal was not chosen
         // hence canReopenAssistantProgramatically is holding information which proccessor
         // is able to open proposals after accepting
-        if (canReopenAssitantProgramatically && proposal instanceof RedCompletionProposal
-                && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()) {
-            canReopenAssitantProgramatically = false;
-            Display.getCurrent().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    assistant.openCompletionProposals();
-                }
-            });
+        if (proposal instanceof RedCompletionProposal) {
+            final RedCompletionProposal redCompletionProposal = (RedCompletionProposal) proposal;
+
+            if (redCompletionProposal.shouldActivateAssitantAfterAccepting()) {
+                Display.getCurrent().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        assistant.openCompletionProposals();
+                    }
+                });
+            }
         }
     }
 
