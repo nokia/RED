@@ -19,7 +19,7 @@ public class RobotModel implements RobotElement {
 
     private final List<RobotElement> projects = new ArrayList<>();
 
-    public RobotProject createRobotProject(final IProject project) {
+    public synchronized RobotProject createRobotProject(final IProject project) {
         if (project == null) {
             return null;
         }
@@ -32,7 +32,7 @@ public class RobotModel implements RobotElement {
         }
     }
 
-    RobotFolder createRobotSuite(final IFolder folder) {
+    synchronized RobotFolder createRobotSuite(final IFolder folder) {
         if (folder == null) {
             return null;
         }
@@ -43,7 +43,7 @@ public class RobotModel implements RobotElement {
         }
     }
 
-    public RobotSuiteFile createSuiteFile(final IFile file) {
+    public synchronized RobotSuiteFile createSuiteFile(final IFile file) {
         if (file == null) {
             return null;
         }
@@ -79,7 +79,7 @@ public class RobotModel implements RobotElement {
         return new OpenStrategy();
     }
 
-    List<RobotElementChange> removeProject(final IProject project) {
+    synchronized List<RobotElementChange> removeProject(final IProject project) {
         final List<RobotElementChange> changes = new ArrayList<>();
         
         final List<RobotElement> toRemove = new ArrayList<>();
@@ -93,7 +93,7 @@ public class RobotModel implements RobotElement {
         return changes;
     }
 
-    List<RobotElementChange> synchronizeChanges(final IResourceDelta delta) {
+    synchronized List<RobotElementChange> synchronizeChanges(final IResourceDelta delta) {
         final List<IProject> toRemove = new ArrayList<>();
         final List<RobotElementChange> changes = new ArrayList<>();
 

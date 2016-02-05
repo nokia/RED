@@ -6,8 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedByNames;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -17,18 +17,14 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
-import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
 
 
 /**
@@ -71,14 +67,10 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
                 final List<RedCompletionProposal> proposals = newArrayList();
 
-                final List<RedKeywordProposal> matchingProposals = getMatchingProposals(prefix);
-                final Multimap<GroupKey, RedKeywordProposal> groupedProposals = groupProposalsByContent(
-                        matchingProposals);
-
-                for (final RedKeywordProposal keywordProposal : matchingProposals) {
+                for (final RedKeywordProposal keywordProposal : assist.getKeywords(prefix, sortedByNames())) {
                     final String keywordName = keywordProposal.getContent();
-                    final boolean shouldAddKeywordPrefix = (isKeywordPrefixAutoAdditionEnabled || keywordProposalIsConflicting(
-                            groupedProposals, keywordProposal)) && keywordProposal.getScope() != KeywordScope.LOCAL;
+                    final boolean shouldAddKeywordPrefix = (isKeywordPrefixAutoAdditionEnabled
+                            || keywordProposalIsConflicting(keywordProposal));
                     final String keywordPrefix = shouldAddKeywordPrefix ? keywordProposal.getSourcePrefix() + "." : "";
                     final String textToInsert = keywordPrefix + keywordName + separator;
 
@@ -97,6 +89,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                             .thenCursorWillStopAtTheEndOfInsertion()
                             .currentPrefixShouldBeDecorated()
                             .displayedLabelShouldBe(keywordName)
+                            .andItShouldBeStrikedout(keywordProposal.isDeprecated())
                             .labelShouldBeAugmentedWith(keywordProposal.getLabelDecoration())
                             .proposalsShouldHaveIcon(ImagesManager.getImage(keywordProposal.getImage()))
                             .create();
@@ -111,32 +104,9 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         }
     }
 
-    private List<RedKeywordProposal> getMatchingProposals(final String prefix) {
-        final List<RedKeywordProposal> proposals = new ArrayList<>();
-        for (final RedKeywordProposal keywordProposal : assist.getKeywords()) {
-            final String keywordName = keywordProposal.getLabel();
-            final String keywordPrefix = keywordProposal.getSourcePrefix() + ".";
-            final String wholeDefinition = keywordPrefix + keywordName;
-
-            if (EmbeddedKeywordNamesSupport.startsWith(keywordName, prefix)
-                    || EmbeddedKeywordNamesSupport.startsWith(wholeDefinition, prefix)) {
-                proposals.add(keywordProposal);
-            }
-        }
-        return proposals;
-    }
-
-    private Multimap<GroupKey, RedKeywordProposal> groupProposalsByContent(final List<RedKeywordProposal> proposals) {
-        final Multimap<GroupKey, RedKeywordProposal> groupedProposals = LinkedHashMultimap.create();
-        for (final RedKeywordProposal proposal : proposals) {
-            groupedProposals.put(new GroupKey(proposal.getScope(), proposal.getContent()), proposal);
-        }
-        return groupedProposals;
-    }
-
-    private boolean keywordProposalIsConflicting(final Multimap<GroupKey, RedKeywordProposal> groupedProposals,
-            final RedKeywordProposal proposal) {
-        return groupedProposals.get(new GroupKey(proposal.getScope(), proposal.getContent())).size() > 1;
+    private boolean keywordProposalIsConflicting(final RedKeywordProposal keywordEntity) {
+        final KeywordEntity bestMatching = assist.getBestMatchingKeyword(keywordEntity.getNameFromDefinition());
+        return !bestMatching.equals(keywordEntity);
     }
 
     protected String getSeparatorToFollow() {
@@ -151,29 +121,5 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
             throws BadLocationException {
         return isInProperContentType(document, offset)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) > 0;
-    }
-
-    private class GroupKey {
-
-        private final Object[] groupingKeys;
-
-        public GroupKey(final Object... groupingKeys) {
-            this.groupingKeys = groupingKeys;
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj instanceof GroupKey) {
-                final GroupKey that = (GroupKey) obj;
-                return Objects.equal(this.groupingKeys, that.groupingKeys);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hashCode(groupingKeys);
-        }
-
     }
 }

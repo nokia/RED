@@ -27,6 +27,13 @@ public class Stylers {
             }
         };
 
+        public static final Styler STRIKEOUT_STYLER = new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.strikeout = true;
+            }
+        };
+
         public static final Styler ERROR_STYLER = new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
@@ -47,6 +54,18 @@ public class Stylers {
                 style.foreground = ColorsManager.getColor(135, 150, 255);
                 style.background = ColorsManager.getColor(230, 240, 255);
                 style.borderColor = ColorsManager.getColor(135, 150, 255);
+                style.borderStyle = SWT.BORDER_DOT;
+            }
+        };
+
+        public static final Styler MARKED_STRIKEOUT_PREFIX_STYLER = new Styler() {
+
+            @Override
+            public void applyStyles(final TextStyle style) {
+                style.foreground = ColorsManager.getColor(135, 150, 255);
+                style.background = ColorsManager.getColor(230, 240, 255);
+                style.borderColor = ColorsManager.getColor(135, 150, 255);
+                style.strikeout = true;
                 style.borderStyle = SWT.BORDER_DOT;
             }
         };

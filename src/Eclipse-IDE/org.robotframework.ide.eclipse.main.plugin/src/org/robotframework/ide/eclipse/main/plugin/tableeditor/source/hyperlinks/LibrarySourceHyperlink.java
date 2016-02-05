@@ -6,10 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowLibrarySourceAction;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -18,7 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
  * @author Michal Anglart
  *
  */
-public class LibrarySourceHyperlink implements IHyperlink {
+public class LibrarySourceHyperlink implements RedHyperlink {
 
     private final IRegion source;
 
@@ -48,9 +49,18 @@ public class LibrarySourceHyperlink implements IHyperlink {
     }
 
     @Override
+    public String getLabelForCompoundHyperlinksDialog() {
+        return libSpec.getName();
+    }
+
+    @Override
+    public ImageDescriptor getImage() {
+        return RedImages.getLibraryImage();
+    }
+
+    @Override
     public void open() {
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
         ShowLibrarySourceAction.openLibrarySource(page, project, libSpec);
     }
 }

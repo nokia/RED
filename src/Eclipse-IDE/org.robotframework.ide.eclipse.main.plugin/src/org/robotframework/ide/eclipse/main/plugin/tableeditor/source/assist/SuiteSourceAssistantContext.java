@@ -6,10 +6,10 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedByNames;
 import static org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals.variablesSortedByTypesAndNames;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -23,10 +23,10 @@ import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
-
 
 /**
  * @author Michal Anglart
@@ -75,9 +75,13 @@ public class SuiteSourceAssistantContext {
         return new RedVariableProposals(suiteModel).getVariableProposals(variablesSortedByTypesAndNames(), offset);
     }
 
-    public Collection<RedKeywordProposal> getKeywords() {
-        final RedKeywordProposals proposals = new RedKeywordProposals(suiteModel);
-        return proposals.getKeywordProposals(sortedByNames());
+    public List<RedKeywordProposal> getKeywords(final String prefix,
+            final Comparator<? super RedKeywordProposal> comparator) {
+        return new RedKeywordProposals(suiteModel).getKeywordProposals(prefix, comparator);
+    }
+
+    public KeywordEntity getBestMatchingKeyword(final String name) {
+        return new RedKeywordProposals(suiteModel).getBestMatchingKeywordProposal(name);
     }
 
     public Collection<LibrarySpecification> getLibraries() {
@@ -109,8 +113,7 @@ public class SuiteSourceAssistantContext {
         });
     }
 
-    private List<IFile> getMatchingFiles(final IResource root, final FileMatcher matcher) {
-        final IWorkspaceRoot wsRoot = suiteModel.getProject().getProject().getWorkspace().getRoot();
+    private List<IFile> getMatchingFiles(final IResource wsRoot, final FileMatcher matcher) {
         final List<IFile> matchingFiles = newArrayList();
         try {
             wsRoot.accept(new IResourceVisitor() {

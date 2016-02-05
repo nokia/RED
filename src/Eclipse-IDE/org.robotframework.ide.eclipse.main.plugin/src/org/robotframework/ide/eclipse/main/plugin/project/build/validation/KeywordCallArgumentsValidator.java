@@ -55,7 +55,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         if (!possibleArgsNumber.contains(arguments.size())) {
             final String argumentsForm = descriptor.isPresent() ? descriptor.get().getDescription() : "[]";
             final String additionalMsg = String.format(" The '%s' accepts argument in form: %s",
-                    definingToken.getText().toString(), argumentsForm);
+                    definingToken.getText(), argumentsForm);
             final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS)
                     .formatMessageWith(additionalMsg);
             reporter.handleProblem(problem, file, definingToken);

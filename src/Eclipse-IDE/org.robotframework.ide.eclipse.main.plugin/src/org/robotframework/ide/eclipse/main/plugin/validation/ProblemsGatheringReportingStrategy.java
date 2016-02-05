@@ -37,7 +37,8 @@ public class ProblemsGatheringReportingStrategy extends ProblemsReportingStrateg
     private final Table<IPath, ProblemPosition, RobotProblem> problems = HashBasedTable.create();
 
     @Override
-    public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
+    public synchronized void handleProblem(final RobotProblem problem, final IFile file,
+            final ProblemPosition filePosition,
             final Map<String, Object> additionalAttributes) {
         problems.put(file.getLocation(), filePosition, problem);
         if (shouldPanic) {

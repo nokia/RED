@@ -14,26 +14,23 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
-import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DeprecatedKeywordHeaderAlias;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DocumentationUserKeywordDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.PostconditionDeclarationExistanceValidator;
@@ -62,80 +59,72 @@ class KeywordTableValidator implements ModelUnitValidator {
         if (!keywordSection.isPresent()) {
             return;
         }
-        RobotKeywordsSection robotKeywordsSection = keywordSection.get();
-        final RobotSuiteFile suiteModel = robotKeywordsSection.getSuiteFile();
-        final IFile file = suiteModel.getFile();
+
+        final RobotKeywordsSection robotKeywordsSection = keywordSection.get();
         final KeywordTable keywordTable = (KeywordTable) robotKeywordsSection.getLinkedElement();
         final List<UserKeyword> keywords = keywordTable.getKeywords();
 
-        validateByExternal(file, robotKeywordsSection, monitor);
-        reportUnknownSettings(file, keywords);
+        validateByExternal(robotKeywordsSection, monitor);
 
-        reportEmptyKeyword(file, keywords);
-        reportDuplicatedKewords(file, keywords);
-        reportEmbeddedArgumentsConflicts(file, keywords);
-        TestCasesTableValidator.reportKeywordUsageProblems(suiteModel, validationContext, reporter,
-                findExecutableRows(keywords), Optional.<String> absent());
-        reportUnknownVariables(suiteModel.getFile(), keywords);
+        reportEmptyKeyword(keywords);
+        reportDuplicatedKeywords(keywords);
+        reportSettingsProblems(keywords);
+        reportKeywordUsageProblems(keywords);
+        reportUnknownVariables(keywords);
     }
 
-    private void reportUnknownSettings(final IFile file, final List<UserKeyword> keywords) {
-        for (final UserKeyword keyword : keywords) {
-            List<KeywordUnknownSettings> unknownSettings = keyword.getUnknownSettings();
-            for (final KeywordUnknownSettings unknownSetting : unknownSettings) {
-                final RobotToken token = unknownSetting.getDeclaration();
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD_SETTING)
-                        .formatMessageWith(token.getText().toString());
-                reporter.handleProblem(problem, file, token);
-            }
-        }
-    }
-
-    private void validateByExternal(final IFile file, final RobotKeywordsSection section,
+    private void validateByExternal(final RobotKeywordsSection section,
             final IProgressMonitor monitor) throws CoreException {
-        new DocumentationUserKeywordDeclarationSettingValidator(file, section, reporter).validate(monitor);
-        new PostconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
-        new DeprecatedKeywordHeaderAlias(file, reporter, section).validate(monitor);
+        new DocumentationUserKeywordDeclarationSettingValidator(validationContext.getFile(), section, reporter)
+                .validate(monitor);
+        new PostconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+                .validate(monitor);
+        new DeprecatedKeywordHeaderAlias(validationContext.getFile(), reporter, section).validate(monitor);
     }
 
-    private void reportEmptyKeyword(final IFile file, final List<UserKeyword> keywords) {
+    private void reportEmptyKeyword(final List<UserKeyword> keywords) {
         for (final UserKeyword keyword : keywords) {
-            final RobotToken caseName = keyword.getKeywordName();
-            boolean report = true;
-            if (!keyword.getReturns().isEmpty()) {
-                final KeywordReturn keywordReturn = keyword.getReturns().get(keyword.getReturns().size() - 1);
-                final List<RobotToken> returnValues = keywordReturn.getReturnValues();
-                report = isReturnEmpty(returnValues);
-            }
-            if (report) {
-                TestCasesTableValidator.reportNoExecutableRows(file, reporter, caseName,
-                        keyword.getKeywordExecutionRows(), KeywordsProblem.EMPTY_KEYWORD);
+            final RobotToken keywordName = keyword.getKeywordName();
+            if (isReturnEmpty(keyword) && !hasAnythingToExecute(keyword)) {
+                final String name = keywordName.getText();
+                final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.EMPTY_CASE).formatMessageWith(name);
+                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                        name);
+                reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
             }
         }
     }
 
-    private boolean isReturnEmpty(final List<RobotToken> returnValues) {
-        boolean report = true;
-        if (!returnValues.isEmpty()) {
+    private boolean hasAnythingToExecute(final UserKeyword keyword) {
+        for (final RobotExecutableRow<?> robotExecutableRow : keyword.getExecutionContext()) {
+            if (robotExecutableRow.isExecutable()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isReturnEmpty(final UserKeyword keyword) {
+        if (!keyword.getReturns().isEmpty()) {
+            final KeywordReturn keywordReturn = keyword.getReturns().get(keyword.getReturns().size() - 1);
+            final List<RobotToken> returnValues = keywordReturn.getReturnValues();
             for (final RobotToken rtValue : returnValues) {
-                if (!rtValue.getText().toString().trim().isEmpty()) {
-                    report = false;
-                    break;
+                if (!rtValue.getText().trim().isEmpty()) {
+                    return false;
                 }
             }
         }
-
-        return report;
+        return true;
     }
 
-    private void reportDuplicatedKewords(final IFile file, final List<UserKeyword> keywords) {
+    private void reportDuplicatedKeywords(final List<UserKeyword> keywords) {
         final Set<String> duplicatedNames = newHashSet();
 
         for (final UserKeyword kw1 : keywords) {
             for (final UserKeyword kw2 : keywords) {
                 if (kw1 != kw2) {
-                    final String kw1Name = kw1.getKeywordName().getText().toString();
-                    final String kw2Name = kw2.getKeywordName().getText().toString();
+                    final String kw1Name = kw1.getKeywordName().getText();
+                    final String kw2Name = kw2.getKeywordName().getText();
 
                     if (kw1Name.equalsIgnoreCase(kw2Name)) {
                         duplicatedNames.add(kw1Name.toLowerCase());
@@ -146,38 +135,27 @@ class KeywordTableValidator implements ModelUnitValidator {
 
         for (final UserKeyword keyword : keywords) {
             final RobotToken keywordName = keyword.getKeywordName();
-            final String name = keywordName.getText().toString();
+            final String name = keywordName.getText();
 
             if (duplicatedNames.contains(name.toLowerCase())) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD)
                         .formatMessageWith(name);
                 final Map<String, Object> additionalArguments = ImmutableMap
                         .<String, Object> of(AdditionalMarkerAttributes.NAME, name);
-                reporter.handleProblem(problem, file, keywordName, additionalArguments);
+                reporter.handleProblem(problem, validationContext.getFile(), keywordName, additionalArguments);
             }
         }
     }
 
-    private void reportEmbeddedArgumentsConflicts(final IFile file, final List<UserKeyword> keywords) {
-        final VariableExtractor variableExtractor = new VariableExtractor();
-        final String fileName = file.getName();
-
+    private void reportSettingsProblems(final List<UserKeyword> keywords) throws CoreException {
         for (final UserKeyword keyword : keywords) {
-            final List<KeywordArguments> arguments = keyword.getArguments();
-            final boolean hasArgumentsSetting = arguments != null && !arguments.isEmpty();
-
-            final List<VariableDeclaration> extractedVariables = variableExtractor
-                    .extract(keyword.getKeywordName(), fileName).getCorrectVariables();
-            final boolean hasEmbeddedArguments = !extractedVariables.isEmpty();
-
-            if (hasArgumentsSetting && hasEmbeddedArguments) {
-                final String name = keyword.getKeywordName().getText();
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENTS_DEFINED_TWICE)
-                        .formatMessageWith(name);
-                final Map<String, Object> additionalArguments = ImmutableMap.<String, Object> of("name", name);
-                reporter.handleProblem(problem, file, keyword.getKeywordName(), additionalArguments);
-            }
+            new KeywordSettingsValidator(validationContext, keyword, reporter).validate(null);
         }
+    }
+
+    private void reportKeywordUsageProblems(final List<UserKeyword> keywords) {
+        TestCasesTableValidator.reportKeywordUsageProblems(validationContext, reporter, findExecutableRows(keywords),
+                Optional.<String> absent());
     }
 
     private List<RobotExecutableRow<?>> findExecutableRows(final List<UserKeyword> keywords) {
@@ -188,16 +166,16 @@ class KeywordTableValidator implements ModelUnitValidator {
         return executables;
     }
 
-    private void reportUnknownVariables(final IFile file, final List<UserKeyword> keywords) {
+    private void reportUnknownVariables(final List<UserKeyword> keywords) {
         final Set<String> variables = validationContext.getAccessibleVariables();
         final VariableExtractor variableExtractor = new VariableExtractor();
-        final String fileName = file.getName();
+        final String fileName = validationContext.getFile().getName();
 
         for (final UserKeyword keyword : keywords) {
             final Set<String> allVariables = newHashSet(variables);
             allVariables.addAll(extractArgumentVariables(keyword, variableExtractor, fileName));
 
-            TestCasesTableValidator.reportUnknownVariables(file, reporter, validationContext,
+            TestCasesTableValidator.reportUnknownVariables(validationContext, reporter,
                     keyword.getKeywordExecutionRows(), allVariables);
         }
     }

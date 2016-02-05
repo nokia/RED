@@ -5,9 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextSelection;
-import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorRegistry;
@@ -15,6 +15,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
@@ -24,9 +25,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
  * @author Michal Anglart
  *
  */
-public class SuiteFileHyperlink implements IHyperlink {
+public class SuiteFileHyperlink implements RedHyperlink {
 
-    private static final String DEFAULT_TEXT = "Open Definition";
+    static final String DEFAULT_TEXT = "Open Definition";
 
     private final IRegion source;
 
@@ -69,6 +70,16 @@ public class SuiteFileHyperlink implements IHyperlink {
     @Override
     public String getHyperlinkText() {
         return label;
+    }
+
+    @Override
+    public String getLabelForCompoundHyperlinksDialog() {
+        return destinationFile.getName();
+    }
+
+    @Override
+    public ImageDescriptor getImage() {
+        return RedImages.getImageForFileWithExtension(destinationFile.getFileExtension());
     }
 
     @Override

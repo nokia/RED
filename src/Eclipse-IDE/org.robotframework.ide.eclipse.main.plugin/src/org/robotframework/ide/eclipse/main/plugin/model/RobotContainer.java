@@ -27,7 +27,7 @@ public abstract class RobotContainer implements RobotElement {
         this.elements = new ArrayList<>();
     }
 
-    RobotFolder createRobotSuite(final IFolder folder) {
+    synchronized RobotFolder createRobotSuite(final IFolder folder) {
         if (folder == null) {
             return null;
         }
@@ -40,7 +40,7 @@ public abstract class RobotContainer implements RobotElement {
         }
     }
 
-    RobotSuiteFile createSuiteFile(final IFile file) {
+    synchronized RobotSuiteFile createSuiteFile(final IFile file) {
         if (file == null) {
             return null;
         }

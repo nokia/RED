@@ -7,11 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
@@ -28,14 +25,11 @@ import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.KeywordValidationContext;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DeprecatedSettingHeaderAlias;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DocumentationDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.LibraryAliasesDeclarationUpperCaseValidator;
@@ -44,12 +38,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setti
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.SuitePreconditionDeclarationExistanceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.TestPostconditionDeclarationExistanceValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.TestPreconditionDeclarationExistanceValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
@@ -77,57 +71,62 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             return;
         }
         final RobotSuiteFile suiteFile = settingsSection.get().getSuiteFile();
-        final IFile file = suiteFile.getFile();
         final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
 
-        validateByExternal(file, settingsSection.get(), monitor);
-        reportVersionSpecificProblems(file, settingsSection.get(), monitor);
-        reportUnknownSettings(file, settingsTable.getUnknownSettings());
+        validateByExternal(settingsSection.get(), monitor);
+
+        reportVersionSpecificProblems(settingsSection.get(), monitor);
+        reportUnknownSettings(settingsTable.getUnknownSettings());
 
         validateLibraries(suiteFile, getLibraryImports(settingsTable), monitor);
         validateResources(suiteFile, getResourcesImports(settingsTable), monitor);
         validateVariables(suiteFile, getVariablesImports(settingsTable), monitor);
 
-        validateSetupsAndTeardowns(file, new ArrayList<AKeywordBaseSetting<?>>(settingsTable.getSuiteSetups()));
-        validateSetupsAndTeardowns(file, new ArrayList<AKeywordBaseSetting<?>>(settingsTable.getSuiteTeardowns()));
-        validateSetupsAndTeardowns(file, new ArrayList<AKeywordBaseSetting<?>>(settingsTable.getTestSetups()));
-        validateSetupsAndTeardowns(file, new ArrayList<AKeywordBaseSetting<?>>(settingsTable.getTestTeardowns()));
+        validateSetupsAndTeardowns(settingsTable.getSuiteSetups());
+        validateSetupsAndTeardowns(settingsTable.getSuiteTeardowns());
+        validateSetupsAndTeardowns(settingsTable.getTestSetups());
+        validateSetupsAndTeardowns(settingsTable.getTestTeardowns());
 
-        validateTestTemplates(file, settingsTable.getTestTemplates());
-        validateTestTimeouts(file, settingsTable.getTestTimeouts());
-        validateTags(file, new ArrayList<ATags<?>>(settingsTable.getDefaultTags()));
-        validateTags(file, new ArrayList<ATags<?>>(settingsTable.getForceTags()));
-        validateDocumentations(file, settingsTable.getDocumentation());
-        validateMetadatas(file, settingsTable.getMetadatas());
+        validateTestTemplates(settingsTable.getTestTemplates());
+        validateTestTimeouts(settingsTable.getTestTimeouts());
+        validateTags(settingsTable.getDefaultTags());
+        validateTags(settingsTable.getForceTags());
+        validateDocumentations(settingsTable.getDocumentation());
+        validateMetadatas(settingsTable.getMetadatas());
     }
 
-    private void validateByExternal(final IFile file, final RobotSettingsSection section,
-            final IProgressMonitor monitor) throws CoreException {
-        new MetaDeclarationSettingValidator(file, section, reporter).validate(monitor);
-        new DocumentationDeclarationSettingValidator(file, section, reporter).validate(monitor);
-        new SuitePreconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
-        new SuitePostconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
-        new TestPreconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
-        new TestPostconditionDeclarationExistanceValidator(file, reporter, section).validate(monitor);
-        new DeprecatedSettingHeaderAlias(file, reporter, section).validate(monitor);
-        new LibraryAliasesDeclarationUpperCaseValidator(file, reporter, section).validate(monitor);
+    private void validateByExternal(final RobotSettingsSection section, final IProgressMonitor monitor)
+            throws CoreException {
+        new MetaDeclarationSettingValidator(validationContext.getFile(), section, reporter).validate(monitor);
+        new DocumentationDeclarationSettingValidator(validationContext.getFile(), section, reporter).validate(monitor);
+        new SuitePreconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+                .validate(monitor);
+        new SuitePostconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+                .validate(monitor);
+        new TestPreconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+                .validate(monitor);
+        new TestPostconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
+                .validate(monitor);
+        new DeprecatedSettingHeaderAlias(validationContext.getFile(), reporter, section).validate(monitor);
+        new LibraryAliasesDeclarationUpperCaseValidator(validationContext.getFile(), reporter, section)
+                .validate(monitor);
     }
 
-    private void reportVersionSpecificProblems(final IFile file, final RobotSettingsSection section,
-            final IProgressMonitor monitor) throws CoreException {
-        final List<? extends ModelUnitValidator> validators = versionDependentValidators
-                .getGeneralSettingsValidators(file, section, reporter, validationContext.getVersion());
+    private void reportVersionSpecificProblems(final RobotSettingsSection section, final IProgressMonitor monitor)
+            throws CoreException {
+        final Iterable<VersionDependentModelUnitValidator> validators = versionDependentValidators
+                .getGeneralSettingsValidators(validationContext, section, reporter);
         for (final ModelUnitValidator validator : validators) {
             validator.validate(monitor);
         }
     }
 
-    private void reportUnknownSettings(final IFile file, final List<UnknownSetting> unknownSettings) {
+    private void reportUnknownSettings(final List<UnknownSetting> unknownSettings) {
         for (final UnknownSetting unknownSetting : unknownSettings) {
             final RobotToken token = unknownSetting.getDeclaration();
             final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.UNKNOWN_SETTING)
-                    .formatMessageWith(token.getText().toString());
-            reporter.handleProblem(problem, file, token);
+                    .formatMessageWith(token.getText());
+            reporter.handleProblem(problem, validationContext.getFile(), token);
         }
     }
 
@@ -161,160 +160,73 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 reporter).validate(monitor);
     }
 
-    private void validateSetupsAndTeardowns(final IFile file, final List<AKeywordBaseSetting<?>> keywordBasedSettings) {
+    private void validateSetupsAndTeardowns(final List<? extends AKeywordBaseSetting<?>> keywordBasedSettings) {
         boolean wasAllEmpty = true;
         for (final AKeywordBaseSetting<?> keywordBased : keywordBasedSettings) {
             final RobotToken keywordToken = keywordBased.getKeywordName();
             if (keywordToken != null) {
                 wasAllEmpty = false;
-                final String keywordName = keywordToken.getText().toString();
-
-                if (!validationContext.isKeywordAccessible(keywordName)) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
-                            .formatMessageWith(keywordName);
-                    final Map<String, Object> additional = ImmutableMap.<String, Object> of(
-                            AdditionalMarkerAttributes.NAME, keywordName, AdditionalMarkerAttributes.ORIGINAL_NAME,
-                            keywordName);
-                    reporter.handleProblem(problem, file, keywordToken, additional);
-                }
-                final List<String> sources = validationContext.getKeywordSourceNames(keywordName);
-                if (sources.size() > 1) {
-                    reporter.handleProblem(
-                            RobotProblem.causedBy(KeywordsProblem.AMBIGUOUS_KEYWORD).formatMessageWith(keywordName,
-                                    "[" + Joiner.on(", ").join(sources) + "]"),
-                            file, keywordToken,
-                            ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, keywordName,
-                                    AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName,
-                                    AdditionalMarkerAttributes.SOURCES, Joiner.on(';').join(sources)));
-                }
-                if (validationContext.isKeywordDeprecated(keywordName)) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
-                            .formatMessageWith(keywordName);
-                    reporter.handleProblem(problem, file, keywordToken);
-                }
-                if (validationContext.isKeywordFromNestedLibrary(keywordName)) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY)
-                            .formatMessageWith(keywordName);
-                    reporter.handleProblem(problem, file, keywordToken);
-                }
-                final KeywordValidationContext keywordValidationContext = validationContext
-                        .checkIfKeywordOccurrenceIsEqualToDefinition(keywordName);
-                if (keywordValidationContext != null) {
-                    reporter.handleProblem(
-                            RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
-                                    .formatMessageWith(keywordName,
-                                            keywordValidationContext.getNameFromKeywordDefinition()),
-                            file, keywordToken,
-                            ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, keywordName,
-                                    AdditionalMarkerAttributes.ORIGINAL_NAME,
-                                    keywordValidationContext.getNameFromKeywordDefinition(),
-                                    AdditionalMarkerAttributes.SOURCES, keywordValidationContext.getSourceNameInUse()));
-
-                }
+                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken);
             }
         }
 
         if (wasAllEmpty) {
             for (final AKeywordBaseSetting<?> keywordBased : keywordBasedSettings) {
                 final RobotToken settingToken = keywordBased.getDeclaration();
-                final String settingName = settingToken.getText().toString();
+                final String settingName = settingToken.getText();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
                         .formatMessageWith(settingName);
-                reporter.handleProblem(problem, file, settingToken);
+                reporter.handleProblem(problem, validationContext.getFile(), settingToken);
             }
         }
     }
 
-    private void validateTestTemplates(final IFile file, final List<TestTemplate> testTemplates) {
+    private void validateTestTemplates(final List<TestTemplate> testTemplates) {
         boolean wasAllEmpty = true;
         for (final TestTemplate template : testTemplates) {
             final RobotToken settingToken = template.getDeclaration();
             final RobotToken keywordToken = template.getKeywordName();
             if (keywordToken != null) {
                 wasAllEmpty = false;
-                final String keywordName = keywordToken.getText().toString();
-
+                final String keywordName = keywordToken.getText();
                 if (keywordName.toLowerCase().equals("none")) {
                     continue;
                 }
-
-                if (!validationContext.isKeywordAccessible(keywordName)) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD)
-                            .formatMessageWith(keywordName);
-                    final Map<String, Object> additional = ImmutableMap.<String, Object> of(
-                            AdditionalMarkerAttributes.NAME, keywordName, AdditionalMarkerAttributes.ORIGINAL_NAME,
-                            keywordName);
-                    reporter.handleProblem(problem, file, keywordToken, additional);
-                }
-                final List<String> sources = validationContext.getKeywordSourceNames(keywordName);
-                if (sources.size() > 1) {
-                    reporter.handleProblem(
-                            RobotProblem.causedBy(KeywordsProblem.AMBIGUOUS_KEYWORD).formatMessageWith(keywordName,
-                                    "[" + Joiner.on(", ").join(sources) + "]"),
-                            file, keywordToken,
-                            ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, keywordName,
-                                    AdditionalMarkerAttributes.ORIGINAL_NAME, keywordName,
-                                    AdditionalMarkerAttributes.SOURCES, Joiner.on(';').join(sources)));
-                }
-                if (validationContext.isKeywordDeprecated(keywordName)) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEPRECATED_KEYWORD)
-                            .formatMessageWith(keywordName);
-                    reporter.handleProblem(problem, file, keywordToken);
-                }
-                if (validationContext.isKeywordFromNestedLibrary(keywordName)) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_FROM_NESTED_LIBRARY)
-                            .formatMessageWith(keywordName);
-                    reporter.handleProblem(problem, file, keywordToken);
-                }
-                final KeywordValidationContext keywordValidationContext = validationContext
-                        .checkIfKeywordOccurrenceIsEqualToDefinition(keywordName);
-                if (keywordValidationContext != null) {
-                    reporter.handleProblem(
-                            RobotProblem.causedBy(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION)
-                                    .formatMessageWith(keywordName,
-                                            keywordValidationContext.getNameFromKeywordDefinition()),
-                            file, keywordToken,
-                            ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, keywordName,
-                                    AdditionalMarkerAttributes.ORIGINAL_NAME,
-                                    keywordValidationContext.getNameFromKeywordDefinition(),
-                                    AdditionalMarkerAttributes.SOURCES, keywordValidationContext.getSourceNameInUse()));
-
-                }
+                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken);
             }
             if (!template.getUnexpectedTrashArguments().isEmpty()) {
-
                 final String actualArgs = "[" + Joiner.on(", ").join(toString(template.getUnexpectedTrashArguments()))
                         + "]";
                 final String additionalMsg = "Only keyword name should be specified for templates.";
                 final RobotProblem problem = RobotProblem
                         .causedBy(GeneralSettingsProblem.SETTING_ARGUMENTS_NOT_APPLICABLE)
-                        .formatMessageWith(settingToken.getText().toString(), actualArgs, additionalMsg);
-                reporter.handleProblem(problem, file, settingToken);
+                        .formatMessageWith(settingToken.getText(), actualArgs, additionalMsg);
+                reporter.handleProblem(problem, validationContext.getFile(), settingToken);
             }
         }
 
         if (wasAllEmpty) {
             for (final TestTemplate template : testTemplates) {
                 final RobotToken settingToken = template.getDeclaration();
-                final String settingName = settingToken.getText().toString();
+                final String settingName = settingToken.getText();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
                         .formatMessageWith(settingName);
-                reporter.handleProblem(problem, file, settingToken);
+                reporter.handleProblem(problem, validationContext.getFile(), settingToken);
             }
         }
     }
 
-    private void validateTestTimeouts(final IFile file, final List<TestTimeout> timeouts) {
+    private void validateTestTimeouts(final List<TestTimeout> timeouts) {
         boolean wasAllEmpty = true;
         for (final TestTimeout testTimeout : timeouts) {
             final RobotToken timeoutToken = testTimeout.getTimeout();
             if (timeoutToken != null) {
                 wasAllEmpty = false;
-                final String timeout = timeoutToken.getText().toString();
+                final String timeout = timeoutToken.getText();
                 if (!RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
                     final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
                             .formatMessageWith(timeout);
-                    reporter.handleProblem(problem, file, timeoutToken);
+                    reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
                 }
             }
         }
@@ -322,15 +234,15 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         if (wasAllEmpty) {
             for (final TestTimeout testTimeout : timeouts) {
                 final RobotToken settingToken = testTimeout.getDeclaration();
-                final String settingName = settingToken.getText().toString();
+                final String settingName = settingToken.getText();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
                         .formatMessageWith(settingName);
-                reporter.handleProblem(problem, file, settingToken);
+                reporter.handleProblem(problem, validationContext.getFile(), settingToken);
             }
         }
     }
 
-    private void validateTags(final IFile file, final List<ATags<?>> tagsSetting) {
+    private void validateTags(final List<? extends ATags<?>> tagsSetting) {
         boolean wasAllEmpty = true;
 
         for (final ATags<?> tags : tagsSetting) {
@@ -343,27 +255,27 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         if (wasAllEmpty) {
             for (final ATags<?> tags : tagsSetting) {
                 final RobotToken declarationToken = tags.getDeclaration();
-                final String settingName = declarationToken.getText().toString();
+                final String settingName = declarationToken.getText();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
                         .formatMessageWith(settingName);
-                reporter.handleProblem(problem, file, declarationToken);
+                reporter.handleProblem(problem, validationContext.getFile(), declarationToken);
             }
         }
     }
 
-    private void validateMetadatas(final IFile file, final List<Metadata> metadatas) {
+    private void validateMetadatas(final List<Metadata> metadatas) {
         for (final Metadata metadata : metadatas) {
             if (metadata.getKey() == null) {
                 final RobotToken declarationToken = metadata.getDeclaration();
-                final String settingName = declarationToken.getText().toString();
+                final String settingName = declarationToken.getText();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
                         .formatMessageWith(settingName);
-                reporter.handleProblem(problem, file, declarationToken);
+                reporter.handleProblem(problem, validationContext.getFile(), declarationToken);
             }
         }
     }
 
-    private void validateDocumentations(final IFile file, final List<SuiteDocumentation> documentations) {
+    private void validateDocumentations(final List<SuiteDocumentation> documentations) {
         boolean wasAllEmpty = true;
         for (final SuiteDocumentation docu : documentations) {
             if (!docu.getDocumentationText().isEmpty()) {
@@ -375,10 +287,10 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         if (wasAllEmpty) {
             for (final SuiteDocumentation docu : documentations) {
                 final RobotToken declarationToken = docu.getDeclaration();
-                final String settingName = declarationToken.getText().toString();
+                final String settingName = declarationToken.getText();
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.EMPTY_SETTING)
                         .formatMessageWith(settingName);
-                reporter.handleProblem(problem, file, declarationToken);
+                reporter.handleProblem(problem, validationContext.getFile(), declarationToken);
             }
         }
     }
@@ -388,7 +300,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
             @Override
             public String apply(final RobotToken token) {
-                return token.getText().toString().trim();
+                return token.getText().trim();
             }
         }));
     }
