@@ -51,6 +51,19 @@ public class KeywordDefinitionLocator {
         }
     }
 
+    private ContinueDecision locateInLibraries(final Collection<LibrarySpecification> collection,
+            final KeywordDetector detector) {
+        for (final LibrarySpecification libSpec : collection) {
+            for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
+                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec, "", null);
+                if (shouldContinue == ContinueDecision.STOP) {
+                    return ContinueDecision.STOP;
+                }
+            }
+        }
+        return ContinueDecision.CONTINUE;
+    }
+
     public void locateKeywordDefinition(final KeywordDetector detector) {
         final RobotSuiteFile startingFile = model.createSuiteFile(file);
         ContinueDecision shouldContinue = locateInCurrentFile(startingFile, detector);
@@ -62,7 +75,7 @@ public class KeywordDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        locateInLibraries(startingFile.getImportedLibraries(), detector);
+        locateInLibraries(startingFile, detector);
     }
 
     private ContinueDecision locateInCurrentFile(final RobotSuiteFile file, final KeywordDetector detector) {
@@ -96,8 +109,7 @@ public class KeywordDefinitionLocator {
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
-            shouldContinue = locateInLibrariesFromResourceFile(resourceSuiteFile.getImportedLibraries(), startingFile,
-                    detector);
+            shouldContinue = locateInLibraries(resourceSuiteFile, detector);
             if (shouldContinue == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;
             }
@@ -109,28 +121,14 @@ public class KeywordDefinitionLocator {
         return ContinueDecision.CONTINUE;
     }
 
-    private ContinueDecision locateInLibrariesFromResourceFile(final Map<LibrarySpecification, String> librariesMap,
-            final RobotSuiteFile startingFile, final KeywordDetector detector) {
-        for (final LibrarySpecification spec : librariesMap.keySet()) {
-            if (!spec.isAccessibleWithoutImport()) {
-                final boolean isFromNestedLibrary = !startingFile.getImportedLibraries().containsKey(spec);
-                for (final KeywordSpecification kwSpec : spec.getKeywords()) {
-                    final ContinueDecision shouldContinue = detector.libraryKeywordDetected(spec, kwSpec,
-                            librariesMap.get(spec), isFromNestedLibrary);
-                    if (shouldContinue == ContinueDecision.STOP) {
-                        return ContinueDecision.STOP;
-                    }
-                }
-            }
-        }
-        return ContinueDecision.CONTINUE;
-    }
-
-    private ContinueDecision locateInLibraries(final Collection<LibrarySpecification> collection,
+    private ContinueDecision locateInLibraries(final RobotSuiteFile file,
             final KeywordDetector detector) {
-        for (final LibrarySpecification libSpec : collection) {
-            for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
-                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec, "", false);
+        final Map<LibrarySpecification, String> librariesMap = file.getImportedLibraries();
+        for (final LibrarySpecification libSpec : librariesMap.keySet()) {
+            final List<KeywordSpecification> keywords = libSpec.getKeywords();
+            for (final KeywordSpecification kwSpec : keywords) {
+                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec,
+                        librariesMap.get(libSpec), file);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
@@ -139,29 +137,35 @@ public class KeywordDefinitionLocator {
         return ContinueDecision.CONTINUE;
     }
 
-    private ContinueDecision locateInLibraries(final Map<LibrarySpecification, String> librariesMap,
-            final KeywordDetector detector) {
-        for (final LibrarySpecification libSpec : librariesMap.keySet()) {
-            final List<KeywordSpecification> keywords = libSpec.getKeywords();
-            if (keywords != null) {
-                for (final KeywordSpecification kwSpec : keywords) {
-                    final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec,
-                            librariesMap.get(libSpec), false);
-                    if (shouldContinue == ContinueDecision.STOP) {
-                        return ContinueDecision.STOP;
-                    }
-                }
-            }
-        }
-        return ContinueDecision.CONTINUE;
-    }
-
     public interface KeywordDetector {
 
+        /**
+         * Called when keyword definition was detected inside file.
+         * 
+         * @param file
+         *            File in which definition was detected
+         * @param keyword
+         *            Detected keyword definition
+         * @return A decision whether detection should proceed
+         */
         ContinueDecision keywordDetected(RobotSuiteFile file, RobotKeywordDefinition keyword);
 
+        /**
+         * Called when keyword of given specification was found within given library which was
+         * exposed by given file
+         * 
+         * @param libSpec
+         *            Specification of library where keyword was detected
+         * @param kwSpec
+         *            Specification of detected keyword
+         * @param libraryAlias
+         *            Library alias (may be empty)
+         * @param exposingFile
+         *            The file which imported given library
+         * @return A decision whether detection should proceed
+         */
         ContinueDecision libraryKeywordDetected(LibrarySpecification libSpec, KeywordSpecification kwSpec,
-                String libraryAlias, boolean isFromNestedLibrary);
+                String libraryAlias, RobotSuiteFile exposingFile);
 
     }
 }

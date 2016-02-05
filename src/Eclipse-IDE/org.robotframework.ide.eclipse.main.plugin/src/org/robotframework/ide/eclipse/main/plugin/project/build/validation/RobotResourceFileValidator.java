@@ -50,31 +50,31 @@ public class RobotResourceFileValidator extends RobotFileValidator {
         }
         final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
         for (final SuiteSetup setup : settingsTable.getSuiteSetups()) {
-            reportProblem(setup.getDeclaration().getText().toString(), setup);
+            reportProblem(setup.getDeclaration().getText(), setup);
         }
         for (final SuiteTeardown teardown : settingsTable.getSuiteTeardowns()) {
-            reportProblem(teardown.getDeclaration().getText().toString(), teardown);
+            reportProblem(teardown.getDeclaration().getText(), teardown);
         }
         for (final TestSetup testSetup : settingsTable.getTestSetups()) {
-            reportProblem(testSetup.getDeclaration().getText().toString(), testSetup);
+            reportProblem(testSetup.getDeclaration().getText(), testSetup);
         }
         for (final TestTeardown testTeardown : settingsTable.getTestTeardowns()) {
-            reportProblem(testTeardown.getDeclaration().getText().toString(), testTeardown);
+            reportProblem(testTeardown.getDeclaration().getText(), testTeardown);
         }
         for (final TestTemplate template : settingsTable.getTestTemplates()) {
-            reportProblem(template.getDeclaration().getText().toString(), template);
+            reportProblem(template.getDeclaration().getText(), template);
         }
         for (final TestTimeout testTimeout : settingsTable.getTestTimeouts()) {
-            reportProblem(testTimeout.getDeclaration().getText().toString(), testTimeout);
+            reportProblem(testTimeout.getDeclaration().getText(), testTimeout);
         }
         for (final ForceTags forceTag : settingsTable.getForceTags()) {
-            reportProblem(forceTag.getDeclaration().getText().toString(), forceTag);
+            reportProblem(forceTag.getDeclaration().getText(), forceTag);
         }
         for (final DefaultTags defaultTag : settingsTable.getDefaultTags()) {
-            reportProblem(defaultTag.getDeclaration().getText().toString(), defaultTag);
+            reportProblem(defaultTag.getDeclaration().getText(), defaultTag);
         }
         for (final Metadata metadata : settingsTable.getMetadatas()) {
-            reportProblem(metadata.getDeclaration().getText().toString(), metadata);
+            reportProblem(metadata.getDeclaration().getText(), metadata);
         }
     }
 

@@ -44,10 +44,10 @@ public class RobotInitFileValidator extends RobotFileValidator {
         }
         final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
         for (final TestTemplate template : settingsTable.getTestTemplates()) {
-            reportProblem(template.getDeclaration().getText().toString(), template);
+            reportProblem(template.getDeclaration().getText(), template);
         }
         for (final DefaultTags defaultTag : settingsTable.getDefaultTags()) {
-            reportProblem(defaultTag.getDeclaration().getText().toString(), defaultTag);
+            reportProblem(defaultTag.getDeclaration().getText(), defaultTag);
         }
     }
 

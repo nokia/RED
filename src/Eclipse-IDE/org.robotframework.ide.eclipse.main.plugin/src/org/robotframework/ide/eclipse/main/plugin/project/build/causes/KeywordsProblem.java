@@ -141,7 +141,28 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Keyword '%s' defines arguments by using both embedded syntax and [Arguments] setting";
+            return "Keyword '%s' arguments are defined in multiple ways";
+        }
+    },
+    DEFAULT_ARGUMENT_AFTER_NON_DEFAULT {
+
+        @Override
+        public String getProblemDescription() {
+            return "The non-default argument '%s' cannot occur after default one";
+        }
+    },
+    ARGUMENT_AFTER_VARARG {
+
+        @Override
+        public String getProblemDescription() {
+            return "The argument '%s' cannot occur after vararg";
+        }
+    },
+    ARGUMENT_AFTER_KWARG {
+
+        @Override
+        public String getProblemDescription() {
+            return "The argument '%s' cannot occur after kwarg";
         }
     },
     MISSING_KEYWORD {
@@ -160,7 +181,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Given keyword name '%s' is not consistent with keyword definition: %s";
+            return "Given keyword name '%s' is not consistent with keyword definition name '%s'";
         }
 
         @Override

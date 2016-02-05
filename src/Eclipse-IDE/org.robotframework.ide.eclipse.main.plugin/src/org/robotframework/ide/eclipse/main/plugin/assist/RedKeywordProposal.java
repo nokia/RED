@@ -8,20 +8,21 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Joiner;
 
-public class RedKeywordProposal {
+public class RedKeywordProposal extends KeywordEntity {
 
     private final String sourceName;
-    private final KeywordScope scope;
     private final KeywordType type;
     private final String name;
     private final String decoration;
@@ -33,25 +34,27 @@ public class RedKeywordProposal {
 
     private final LazyProvider<String> htmlDocumentationProvider;
 
-    private RedKeywordProposal(final String sourceName, final KeywordScope scope, final KeywordType type,
-            final String name, final String decoration, final boolean hasDescription,
+    private RedKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
+            final KeywordType type, final String name, final String decoration, final boolean hasDescription,
             final LazyProvider<List<String>> argumentsProvider, final LazyProvider<String> htmlDocumentationProvider,
-            final String documentation, final String sourcePrefix) {
+            final String documentation, final boolean isDeprecated, final IPath exposingFilePath) {
+
+        super(scope, sourceName, name, sourceAlias, isDeprecated, exposingFilePath);
+
         this.sourceName = sourceName;
-        this.scope = scope;
         this.type = type;
         this.name = name;
         this.decoration = decoration;
         this.hasDescription = hasDescription;
         this.documentation = documentation;
-        this.sourcePrefix = sourcePrefix;
+        this.sourcePrefix = sourceAlias;
 
         this.htmlDocumentationProvider = htmlDocumentationProvider;
         this.argumentsProvider = argumentsProvider;
     }
 
     static RedKeywordProposal create(final LibrarySpecification spec, final KeywordSpecification keyword,
-            final KeywordScope scope, final String sourcePrefix) {
+            final KeywordScope scope, final String sourcePrefix, final IPath exposingFilepath) {
         final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
 
             @Override
@@ -66,14 +69,14 @@ public class RedKeywordProposal {
                 return keyword.getArguments() == null ? new ArrayList<String>() : keyword.getArguments();
             }
         };
-        return new RedKeywordProposal(spec.getName(), scope, KeywordType.LIBRARY, keyword.getName(),
-                "- " + spec.getName(), true, argsProvider, htmlDocuProvider, keyword.getDocumentation(), sourcePrefix);
+        return new RedKeywordProposal(spec.getName(), sourcePrefix, scope, KeywordType.LIBRARY, keyword.getName(),
+                "- " + spec.getName(), true, argsProvider, htmlDocuProvider, keyword.getDocumentation(),
+                keyword.isDeprecated(), exposingFilepath);
     }
 
     static RedKeywordProposal create(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword,
             final KeywordScope scope, final String sourcePrefix) {
         final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
-
             @Override
             public String provide() {
                 return "<p>to be implemented</p>";
@@ -85,17 +88,14 @@ public class RedKeywordProposal {
                 return userKeyword.getArguments();
             }
         };
-        return new RedKeywordProposal("User Defined (" + file.getFile().getFullPath().toPortableString() + ")", scope,
-                KeywordType.USER_DEFINED, userKeyword.getName(), "- " + file.getName(), true, argsProvider,
-                htmlDocuProvider, userKeyword.getDocumentation(), sourcePrefix);
+        return new RedKeywordProposal("User Defined (" + file.getFile().getFullPath().toPortableString() + ")",
+                sourcePrefix, scope, KeywordType.USER_DEFINED, userKeyword.getName(), "- " + file.getName(), true,
+                argsProvider, htmlDocuProvider, userKeyword.getDocumentation(), userKeyword.isDeprecated(),
+                file.getFile().getFullPath());
     }
 
     public String getSourceName() {
         return sourceName;
-    }
-
-    public KeywordScope getScope() {
-        return scope;
     }
 
     public KeywordType getType() {

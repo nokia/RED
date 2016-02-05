@@ -5,15 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 /**
  * @author mmarzec
  */
-public class RegionsHyperlink implements IHyperlink {
+public class RegionsHyperlink implements RedHyperlink {
 
     private final ITextViewer viewer;
 
@@ -21,7 +23,15 @@ public class RegionsHyperlink implements IHyperlink {
 
     private final IRegion destination;
 
+    private final RobotSuiteFile sourceAndDestinationFile;
+
     public RegionsHyperlink(final ITextViewer viewer, final IRegion from, final IRegion to) {
+        this(viewer, null, from, to);
+    }
+
+    public RegionsHyperlink(final ITextViewer viewer, final RobotSuiteFile fromAndToFile, final IRegion from,
+            final IRegion to) {
+        this.sourceAndDestinationFile = fromAndToFile;
         this.source = from;
         this.destination = to;
         this.viewer = viewer;
@@ -40,6 +50,17 @@ public class RegionsHyperlink implements IHyperlink {
     @Override
     public String getHyperlinkText() {
         return "Open Definition";
+    }
+
+    @Override
+    public String getLabelForCompoundHyperlinksDialog() {
+        return sourceAndDestinationFile == null ? "[local definition in current file]"
+                : sourceAndDestinationFile.getName() + " [current file]";
+    }
+
+    @Override
+    public ImageDescriptor getImage() {
+        return RedImages.getImageForFileWithExtension(sourceAndDestinationFile.getFileExtension());
     }
 
     @Override

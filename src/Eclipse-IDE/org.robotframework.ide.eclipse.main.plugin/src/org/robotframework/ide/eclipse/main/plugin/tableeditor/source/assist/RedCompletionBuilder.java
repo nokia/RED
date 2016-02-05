@@ -56,6 +56,8 @@ public class RedCompletionBuilder {
 
         DecorationsStep displayedLabelShouldBe(String label);
 
+        DecorationsStep andItShouldBeStrikedout(boolean deprecated);
+
         DecorationsStep proposalsShouldHaveIcon(Image image);
 
         DecorationsStep currentPrefixShouldBeDecorated();
@@ -101,6 +103,8 @@ public class RedCompletionBuilder {
         private boolean decoratePrefix;
 
         private boolean activateAssitant;
+
+        private boolean strikeout;
 
         @Override
         public ProposalContentStep will(final AcceptanceMode mode) {
@@ -195,6 +199,12 @@ public class RedCompletionBuilder {
         }
 
         @Override
+        public DecorationsStep andItShouldBeStrikedout(final boolean strikeout) {
+            this.strikeout = strikeout;
+            return this;
+        }
+
+        @Override
         public DecorationsStep proposalsShouldHaveIcon(final Image image) {
             this.image = image;
             return this;
@@ -224,7 +234,7 @@ public class RedCompletionBuilder {
                 return new RedCompletionProposal(priority, contentToInsert, offset, currentPrefix.length(),
                         currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
                         activateAssitant, contextInformation, additionalInfo, additionalInfoAsHtml,
-                        additionalInfoInLabel);
+                        additionalInfoInLabel, strikeout);
             } else if (mode == AcceptanceMode.SUBSTITUTE) {
                 if (wholeContent == null) {
                     throw new IllegalStateException("Unable to create proposal in substitution mode if there is no "
@@ -233,7 +243,7 @@ public class RedCompletionBuilder {
                 return new RedCompletionProposal(priority, contentToInsert, offset, wholeContent.length(),
                         currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
                         activateAssitant, contextInformation, additionalInfo, additionalInfoAsHtml,
-                        additionalInfoInLabel);
+                        additionalInfoInLabel, strikeout);
             } else {
                 throw new IllegalStateException("Unknown acceptance mode: " + mode.toString());
             }

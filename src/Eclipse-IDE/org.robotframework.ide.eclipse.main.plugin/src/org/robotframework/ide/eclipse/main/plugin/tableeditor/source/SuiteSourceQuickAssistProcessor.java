@@ -163,14 +163,17 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
         // this method is called also for processors from which the proposal was not chosen
         // hence canReopenAssistantProgramatically is holding information which proccessor
         // is able to open proposals after accepting
-        if (proposal instanceof RedCompletionProposal
-                && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()) {
-            Display.getCurrent().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    sourceViewer.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
-                }
-            });
+        if (proposal instanceof RedCompletionProposal) {
+            final RedCompletionProposal redCompletionProposal = (RedCompletionProposal) proposal;
+
+            if (redCompletionProposal.shouldActivateAssitantAfterAccepting()) {
+                Display.getCurrent().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        sourceViewer.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
+                    }
+                });
+            }
         }
 
     }

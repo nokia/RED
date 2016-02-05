@@ -7,7 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.project.library;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -27,6 +32,18 @@ public class ArgumentsDescriptor {
 
     private ArgumentsDescriptor(final List<Argument> args) {
         this.arguments = args;
+    }
+
+    public static ArgumentsDescriptor createDescriptor(final UserKeyword userKeyword) {
+        final List<KeywordArguments> arguments = userKeyword.getArguments();
+        if (arguments == null) {
+            return null;
+        }
+        final List<Argument> args = new ArrayList<>(2);
+        for (final RobotToken argumentToken : arguments.get(arguments.size() - 1).getArguments()) {
+            
+        }
+        return new ArgumentsDescriptor(args);
     }
 
     static ArgumentsDescriptor createDescriptor(final List<String> args) {
@@ -98,7 +115,7 @@ public class ArgumentsDescriptor {
         }
 
         public boolean isVarArg() {
-            return argumentName.startsWith("*") && argumentName.startsWith("**");
+            return argumentName.startsWith("*") && !argumentName.startsWith("**");
         }
 
         public boolean isKwArg() {
