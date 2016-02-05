@@ -47,6 +47,7 @@ public abstract class RobotFileValidator implements ModelUnitValidator {
     public final void validate(final RobotSuiteFile suiteFile, final IProgressMonitor monitor) throws CoreException {
         final FileValidationContext fileValidationContext = context.createUnitContext(file);
 
+        context.getLogger().log("VALIDATING: " + file.getFullPath().toString());
         monitor.setTaskName(file.getFullPath().toPortableString());
         validate(suiteFile, fileValidationContext);
     }

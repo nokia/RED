@@ -43,10 +43,12 @@ import com.google.common.collect.Queues;
 
 public class RobotArtifactsValidator {
 
+    private final BuildLogger logger;
     private final IProject project;
 
-    public RobotArtifactsValidator(final IProject project) {
+    public RobotArtifactsValidator(final IProject project, final BuildLogger logger) {
         this.project = project;
+        this.logger = logger;
     }
 
     public static void revalidate(final RobotSuiteFile suiteModel) {
@@ -58,7 +60,7 @@ public class RobotArtifactsValidator {
             return;
         }
 
-        final ValidationContext context = new ValidationContext(file.getProject());
+        final ValidationContext context = new ValidationContext(file.getProject(), new BuildLogger());
 
         try {
             final Optional<? extends ModelUnitValidator> validator = createValidationUnits(context, file,
@@ -98,9 +100,11 @@ public class RobotArtifactsValidator {
                     return Status.CANCEL_STATUS;
                 }
                 try {
+                    logger.log("VALIDATING: validation of '" + project.getName() + "' project started");
+                    logger.log("VALIDATING: gathering files to be validated");
 
                     final Queue<ModelUnitValidator> unitValidators = Queues.newArrayDeque();
-                    final ValidationContext context = new ValidationContext(project);
+                    final ValidationContext context = new ValidationContext(project, logger);
 
                     if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
                         unitValidators.addAll(createValidationUnitsForWholeProject(context, reporter));
@@ -114,6 +118,9 @@ public class RobotArtifactsValidator {
                     final SubMonitor validationSubMonitor = subMonitor.newChild(100);
                     validationSubMonitor.setWorkRemaining(unitValidators.size());
 
+                    int i = 0;
+                    final int total = unitValidators.size();
+                    final String totalString = Integer.toString(total);
                     while (!unitValidators.isEmpty()) {
                         if (monitor.isCanceled()) {
                             monitor.setCanceled(true);
@@ -121,7 +128,9 @@ public class RobotArtifactsValidator {
                         }
                         final ModelUnitValidator validator = unitValidators.poll();
                         validator.validate(monitor);
+                        logger.log("VALIDATING: done (" + Integer.toString(i) + "/" + totalString + ")");
                         validationSubMonitor.worked(1);
+                        i++;
                     }
 
                     return Status.OK_STATUS;
