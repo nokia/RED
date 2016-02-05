@@ -41,6 +41,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -65,13 +66,15 @@ public class ValidationContext {
 
     private final Map<ReferencedLibrary, LibrarySpecification> referencedAccessibleLibraries;
 
+    private BuildLogger logger;
 
-    public ValidationContext(final IProject project) {
-        this(RedPlugin.getModelManager().getModel(), project);
+    public ValidationContext(final IProject project, final BuildLogger logger) {
+        this(RedPlugin.getModelManager().getModel(), project, logger);
     }
 
-    public ValidationContext(final RobotModel model, final IProject project) {
+    public ValidationContext(final RobotModel model, final IProject project, final BuildLogger logger) {
         this.model = model;
+        this.logger = logger;
         final RobotProject robotProject = model.createRobotProject(project);
         this.projectConfig = robotProject.getRobotProjectConfig();
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
@@ -92,6 +95,10 @@ public class ValidationContext {
         this.executorInUse = executor;
         this.accessibleLibraries = libs;
         this.referencedAccessibleLibraries = refLibs;
+    }
+
+    BuildLogger getLogger() {
+        return logger;
     }
 
     RobotModel getModel() {
@@ -209,5 +216,4 @@ public class ValidationContext {
         });
         return accessibleKeywords;
     }
-
 }

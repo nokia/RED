@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
+import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProjectConfigurationProblem;
@@ -35,6 +36,12 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
 public class LibrariesBuilder {
+
+    private final BuildLogger logger;
+
+    public LibrariesBuilder(final BuildLogger logger) {
+        this.logger = logger;
+    }
 
     public void forceLibrariesRebuild(final Multimap<IProject, LibrarySpecification> groupedSpecifications,
             final SubMonitor monitor) {
@@ -99,6 +106,7 @@ public class LibrariesBuilder {
     public void buildLibraries(final RobotProject robotProject, final RobotRuntimeEnvironment runtimeEnvironment,
             final RobotProjectConfig configuration, final SubMonitor monitor,
             final ProblemsReportingStrategy reporter) {
+        logger.log("BUILDING: generating library docs");
         monitor.subTask("generating libdocs");
 
         final List<ILibdocGenerator> libdocGenerators = newArrayList();
@@ -116,6 +124,8 @@ public class LibrariesBuilder {
             if (monitor.isCanceled()) {
                 return;
             }
+
+            logger.log("BUILDING: " + generator.getMessage());
             monitor.subTask(generator.getMessage());
             try {
                 generator.generateLibdoc(runtimeEnvironment);

@@ -21,17 +21,19 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
+    private final BuildLogger logger;
     private final ProblemsReportingStrategy reporter;
     private final ProblemsReportingStrategy fatalReporter;
     
     public RobotProjectBuilder() {
-        this(ProblemsReportingStrategy.reportOnly(), ProblemsReportingStrategy.reportAndPanic());
+        this(ProblemsReportingStrategy.reportOnly(), ProblemsReportingStrategy.reportAndPanic(), new BuildLogger());
     }
 
-    public RobotProjectBuilder(final ProblemsReportingStrategy reporter,
-            final ProblemsReportingStrategy fatalReporter) {
+    public RobotProjectBuilder(final ProblemsReportingStrategy reporter, final ProblemsReportingStrategy fatalReporter,
+            final BuildLogger logger) {
         this.reporter = reporter;
         this.fatalReporter = fatalReporter;
+        this.logger = logger;
     }
 
     @Override
@@ -50,9 +52,9 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
             final boolean rebuildNeeded = libspecsFolder.shouldRegenerateLibspecs(getDelta(project),
                     kind);
 
-            final Job buildJob = new RobotArtifactsBuilder(project).createBuildJob(rebuildNeeded, fatalReporter,
+            final Job buildJob = new RobotArtifactsBuilder(project, logger).createBuildJob(rebuildNeeded, fatalReporter,
                     reporter);
-            final Job validationJob = new RobotArtifactsValidator(project).createValidationJob(buildJob,
+            final Job validationJob = new RobotArtifactsValidator(project, logger).createValidationJob(buildJob,
                     getDelta(project), kind, reporter);
             try {
                 final String projectPath = project.getFullPath().toString();

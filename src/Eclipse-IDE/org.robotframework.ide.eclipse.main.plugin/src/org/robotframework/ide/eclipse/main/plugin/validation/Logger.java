@@ -8,17 +8,19 @@ package org.robotframework.ide.eclipse.main.plugin.validation;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
+
 /**
  * @author Michal Anglart
- *
  */
-class Logger {
+class Logger extends BuildLogger {
 
-    void log(final String message) {
+    @Override
+    public void log(final String message) {
         System.out.println(getTimestamp() + " " + message);
     }
 
-    void logError(final String message) {
+    public void logError(final String message) {
         System.out.println(getTimestamp() + " " + message);
     }
 
