@@ -121,7 +121,7 @@ public class ValidationApplication implements IApplication {
             final IPath originalLocation = new Path(path);
             final IPath wsProjectLocation = wsLocation.append(originalLocation.lastSegment());
 
-            final File from = originalLocation.toFile();
+            final File from = new File(originalLocation.toFile().toURI());
             final File to = wsProjectLocation.toFile();
             if (from.equals(to)) {
                 logger.log("WARNING: project " + path + " is already in the workspace");
