@@ -18,6 +18,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
+import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
@@ -68,6 +69,10 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                 final List<RedCompletionProposal> proposals = newArrayList();
 
                 for (final RedKeywordProposal keywordProposal : assist.getKeywords(prefix, sortedByNames())) {
+                    if (isReserved(keywordProposal)) {
+                        continue;
+                    }
+
                     final String keywordName = keywordProposal.getContent();
                     final boolean shouldAddKeywordPrefix = (isKeywordPrefixAutoAdditionEnabled
                             || keywordProposalIsConflicting(keywordProposal));
@@ -102,6 +107,11 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         } catch (final BadLocationException e) {
             return null;
         }
+    }
+
+    private boolean isReserved(final RedKeywordProposal keywordProposal) {
+        return keywordProposal.getScope(assist.getFile().getFullPath()) == KeywordScope.STD_LIBRARY
+                && keywordProposal.getSourceName().equals("Reserved");
     }
 
     private boolean keywordProposalIsConflicting(final RedKeywordProposal keywordEntity) {
