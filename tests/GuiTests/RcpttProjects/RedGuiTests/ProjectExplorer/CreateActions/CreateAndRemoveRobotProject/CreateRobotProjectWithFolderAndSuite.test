@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/20/15 9:32 AM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 2/5/16 3:18 PM
 Tags: Unstable
 Testcase-Type: ecl
 Verifications: _ase_IGBvEeW-9bGOK0urnw
@@ -20,14 +20,28 @@ Entry-Name: .content
 proc "compare-menu" [val list_of_items]{
 	repeat [val index] -times [get-menu "File/New"|  get-object  | invoke getMenu  | invoke	 	getItemCount |int]  -command
 	{
-		get-menu "File/New"|  get-object  | invoke getMenu  | invoke	getItem $index | invoke toString | equals [ $list_of_items| get $index]
+		get-menu "File/New"|  get-object  | invoke getMenu  | invoke	getItem $index | invoke toString | let [val item_from_menu -input]{	
+			$item_from_menu | equals [ $list_of_items| get $index]
+				| assert-true -message [format "Item %s not equal. Should be: '%s' but is' %s'"  $index [ $list_of_items| get $index] $item_from_menu]
+		}
 	}
 }
+
 //this is workaround because RCPPT cannot click In File/New in procedure
 get-menu "File/New/Project..." | click
 get-window "New Project" | get-button Cancel | click
 
-compare-menu [list "MenuItem {Robot Project}" "MenuItem {P&roject...}" "MenuItem {|}" "MenuItem {Robot Test Suites folder}"  "MenuItem {|}" "MenuItem {Robot Resource file}"  "MenuItem {Robot Test Suite}" "MenuItem {|}" "MenuItem {E&xample...}" "MenuItem {|}" "MenuItem {&Other...	M1+N}]"]
+compare-menu [list "MenuItem {Robot Project}"
+	"MenuItem {P&roject...}"
+	"MenuItem {|}"
+	"MenuItem {Robot Test Suites folder}"
+	"MenuItem {Robot Resource file}"
+	"MenuItem {Robot Test Suite}"
+	"MenuItem {Robot python file}"
+	"MenuItem {|}"
+	"MenuItem {E&xample...}"
+	"MenuItem {|}"
+	"MenuItem {&Other...	M1+N}"]
 
 //create new project
 get-menu "File/New/Robot Project" | click
@@ -201,7 +215,7 @@ with [get-editor "new_tsv_suite.tsv"] {
 
 //Check outline
 with [get-view Outline | get-tree] {
-    get-item "new_tsv_suite.tsv" | get-property childCount | equals 0 | verify-true
+    get-item "new_tsv_suite.tsv" | get-property childCount | equals 1 | verify-true
 }
 
 //check if robot suite is open and active
