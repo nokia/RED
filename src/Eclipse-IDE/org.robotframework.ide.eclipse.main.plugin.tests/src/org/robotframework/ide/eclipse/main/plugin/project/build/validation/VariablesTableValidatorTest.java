@@ -9,8 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -26,11 +24,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.versiondependent.VersionDependentValidators;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
@@ -50,7 +48,7 @@ public class VariablesTableValidatorTest {
     public void nothingIsReported_whenThereIsNoVariablesSection() throws CoreException {
         final RobotSuiteFile file = RobotSuiteFileCreator.createModel("");
         
-        final FileValidationContext context = prepareContext(file);
+        final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -66,7 +64,7 @@ public class VariablesTableValidatorTest {
                 "@{list}  1",
                 "&{dict}  1");
 
-        final FileValidationContext context = prepareContext(file);
+        final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -81,30 +79,45 @@ public class VariablesTableValidatorTest {
                 "${scalar}  1");
 
         final IProblemCause mockedCause = mock(IProblemCause.class);
-        final ModelUnitValidator alwaysFailingVersionDepValidator_1 = new ModelUnitValidator() {
+        final VersionDependentModelUnitValidator alwaysFailingVersionDepValidator_1 = new VersionDependentModelUnitValidator() {
             @Override
             public void validate(final IProgressMonitor monitor) throws CoreException {
                 reporter.handleProblem(RobotProblem.causedBy(mockedCause), null,
                         new ProblemPosition(2, Range.closed(18, 27)));
             }
+
+            @Override
+            protected Range<RobotVersion> getApplicableVersionRange() {
+                return Range.all();
+            }
         };
-        final ModelUnitValidator alwaysFailingVersionDepValidator_2 = new ModelUnitValidator() {
+        final VersionDependentModelUnitValidator alwaysFailingVersionDepValidator_2 = new VersionDependentModelUnitValidator() {
             @Override
             public void validate(final IProgressMonitor monitor) throws CoreException {
                 reporter.handleProblem(RobotProblem.causedBy(mockedCause), null,
                         new ProblemPosition(2, Range.closed(18, 30)));
             }
+
+            @Override
+            protected Range<RobotVersion> getApplicableVersionRange() {
+                return Range.all();
+            }
         };
-        final ModelUnitValidator alwaysPassingVersionDepValidator = new ModelUnitValidator() {
+        final VersionDependentModelUnitValidator alwaysPassingVersionDepValidator = new VersionDependentModelUnitValidator() {
             @Override
             public void validate(final IProgressMonitor monitor) throws CoreException {
                 // that's fine it passes
+            }
+
+            @Override
+            protected Range<RobotVersion> getApplicableVersionRange() {
+                return Range.all();
             }
         };
         final VersionDependentValidators versionValidators = createVersionDependentValidators(
                 alwaysFailingVersionDepValidator_1, alwaysFailingVersionDepValidator_2,
                 alwaysPassingVersionDepValidator);
-        final FileValidationContext context = prepareContext(file);
+        final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, versionValidators);
         validator.validate(null);
@@ -121,7 +134,7 @@ public class VariablesTableValidatorTest {
                 "*** Variables ***", 
                 "var  1");
 
-        final FileValidationContext context = prepareContext(file);
+        final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -137,7 +150,7 @@ public class VariablesTableValidatorTest {
                 "*** Variables ***", 
                 "$ {var}  1");
 
-        final FileValidationContext context = prepareContext(file);
+        final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -154,7 +167,7 @@ public class VariablesTableValidatorTest {
                 "${var}  1",
                 "@{var}  2");
 
-        final FileValidationContext context = prepareContext(file);
+        final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -174,7 +187,7 @@ public class VariablesTableValidatorTest {
                 "${var}  1",
                 "@{var}  2");
 
-        final FileValidationContext context = prepareContext(file);
+        final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
                 file.findSection(RobotVariablesSection.class), reporter, createVersionDependentValidators());
         validator.validate(null);
@@ -188,22 +201,23 @@ public class VariablesTableValidatorTest {
         
     }
 
-    private static VersionDependentValidators createVersionDependentValidators(final ModelUnitValidator... validators) {
+    private static VersionDependentValidators createVersionDependentValidators(
+            final VersionDependentModelUnitValidator... validators) {
         return new VersionDependentValidators() {
             @Override
-            public List<? extends ModelUnitValidator> getVariableValidators(final IFile file,
-                    final IVariableHolder variable, final ProblemsReportingStrategy reporter,
-                    final RobotVersion version) {
+            public Iterable<VersionDependentModelUnitValidator> getVariableValidators(
+                    final FileValidationContext validationContext, final IVariableHolder variable,
+                    final ProblemsReportingStrategy reporter) {
                 return newArrayList(validators);
             }
         };
     }
 
-    private static FileValidationContext prepareContext(final RobotSuiteFile file) {
+    private static FileValidationContext prepareContext() {
         final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
                 SuiteExecutor.Python, Maps.<String, LibrarySpecification> newHashMap(),
                 Maps.<ReferencedLibrary, LibrarySpecification> newHashMap());
-        final FileValidationContext context = new FileValidationContext(parentContext, file.getFile());
+        final FileValidationContext context = new FileValidationContext(parentContext, mock(IFile.class));
         return context;
     }
 }
