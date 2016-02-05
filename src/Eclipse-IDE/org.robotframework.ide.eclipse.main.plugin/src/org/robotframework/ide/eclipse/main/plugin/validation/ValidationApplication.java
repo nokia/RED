@@ -41,6 +41,8 @@ import com.google.common.io.Files;
 
 public class ValidationApplication implements IApplication {
 
+    private final Logger logger = new Logger();
+
     @Override
     public Object start(final IApplicationContext context) throws Exception {
         try {
@@ -109,20 +111,33 @@ public class ValidationApplication implements IApplication {
 
     private void importNeededProjects(final List<String> projectsToImport)
             throws InvocationTargetException, InterruptedException, CoreException, IOException {
+
         final IWorkspace workspace = ResourcesPlugin.getWorkspace();
         final IPath wsLocation = workspace.getRoot().getLocation();
 
         for (final String path : projectsToImport) {
+            logger.log("Importing project: " + path);
+
             final IPath originalLocation = new Path(path);
             final IPath wsProjectLocation = wsLocation.append(originalLocation.lastSegment());
 
-            copyProjectFiles(originalLocation.toFile(), wsProjectLocation.toFile());
+            final File from = originalLocation.toFile();
+            final File to = wsProjectLocation.toFile();
+            if (from.equals(to)) {
+                logger.log("WARNING: project " + path + " is already in the workspace");
+            } else {
+                copyProjectFiles(from, to);
+            }
 
             final IProjectDescription description = workspace
                     .loadProjectDescription(wsProjectLocation.append(".project"));
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(description.getName());
-            project.create(description, null);
+            if (!project.exists()) {
+                project.create(description, null);
+            }
             project.open(null);
+
+            logger.log("Project: " + path + " was succesfully imported");
         }
     }
 
@@ -145,15 +160,15 @@ public class ValidationApplication implements IApplication {
 
         final Table<IPath, ProblemPosition, RobotProblem> allProblems = HashBasedTable.create();
         for (final String projectName : arguments.getProjectNames()) {
-            System.out.print("Validating '" + projectName + "' project... ");
+            logger.log("Project '" + projectName + "' validation started");
 
             final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
             final IProject project = wsRoot.getProject(projectName);
 
             if (!project.exists()) {
-                System.out.println("SKIPPED (does not exist in workspace)");
+                logger.log("Project '" + projectName + "' validation was SKIPPED (does not exist in workspace)");
             } else if (!project.isOpen()) {
-                System.out.println("SKIPPED (is closed)");
+                logger.log("Project '" + projectName + "' validation was SKIPPED (is closed)");
             } else {
                 final RobotProject robotProject = new RobotModel().createRobotProject(project);
                 robotProject.clearConfiguration();
@@ -169,8 +184,8 @@ public class ValidationApplication implements IApplication {
                 final long end = System.currentTimeMillis();
                 final double duration = (end - start) / 1000.0;
 
-                System.out.println(String.format("FINISHED (took %.3f seconds and found %d problems)", duration,
-                        reporter.getNumberOfProblems() + fatalReporter.getNumberOfProblems()));
+                logger.log(String.format("Project %s validation has FINISHED (took %.3f seconds and found %d problems)",
+                        projectName, duration, reporter.getNumberOfProblems() + fatalReporter.getNumberOfProblems()));
 
                 allProblems.putAll(fatalReporter.getProblems());
                 allProblems.putAll(reporter.getProblems());
@@ -182,15 +197,14 @@ public class ValidationApplication implements IApplication {
     }
 
     private void generateFile(final File file, final Table<IPath, ProblemPosition, RobotProblem> problems) {
-        System.out.print("Generating report file '" + file.getAbsolutePath() + "'");
+        logger.log("Generating report file '" + file.getAbsolutePath() + "'");
         try (ReportWithCheckstyleFormat checkstyleReporter = new ReportWithCheckstyleFormat(file)) {
             checkstyleReporter.writeHeader();
             checkstyleReporter.writeEntries(problems);
             checkstyleReporter.writeFooter();
-            System.out.println(" FINISHED");
+            logger.log("Report file '" + file.getAbsolutePath() + "' has been generated");
         } catch (final IOException e) {
-            System.err.println(
-                    "\nUnable to create report file '" + file.getAbsolutePath() + "'. Reason: " + e.getMessage());
+            logger.logError("Unable to create report file '" + file.getAbsolutePath() + "'. Reason: " + e.getMessage());
         }
     }
 
@@ -210,10 +224,12 @@ public class ValidationApplication implements IApplication {
             explanation.append("Invalid application arguments were provided: ");
             explanation.append(getMessage() + "\n");
             explanation.append("Application usage:\n");
-            explanation.append(Strings.padEnd("\t-projects", 20, ' '));
-            explanation.append("[REQUIRED] semicolon-separated names of projects to validate\n");
-            explanation.append(Strings.padEnd("\t-report", 20, ' '));
-            explanation.append("[OPTIONAL] path to the report file which should be written\n");
+            explanation.append(Strings.padEnd("\t-projects <projects>", 30, ' '));
+            explanation.append("[REQUIRED] where <projects> are semicolon-separated names of projects to validate\n");
+            explanation.append(Strings.padEnd("\t-report <file>", 30, ' '));
+            explanation.append("[OPTIONAL] <file> path to the report file which should be written\n");
+            explanation.append(Strings.padEnd("\t-import <path1> ... <pathn>", 30, ' '));
+            explanation.append("[Optional] paths to projects which should be imported to workspace\n");
             explanation.append("\n");
             System.err.println(explanation.toString());
         }
