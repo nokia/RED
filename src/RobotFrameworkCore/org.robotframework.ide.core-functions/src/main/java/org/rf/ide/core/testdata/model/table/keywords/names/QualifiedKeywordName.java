@@ -69,6 +69,10 @@ public final class QualifiedKeywordName {
         return source;
     }
 
+    public QualifiedKeywordName toLowerCase() {
+        return new QualifiedKeywordName(name.toLowerCase(), embeddedName.toLowerCase(), source.toLowerCase());
+    }
+
     public boolean matchesIgnoringCase(final QualifiedKeywordName that) {
         if (source.isEmpty()) {
             return this.name.equalsIgnoreCase(that.name);

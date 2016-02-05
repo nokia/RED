@@ -17,8 +17,8 @@ public class EmbeddedKeywordNamesSupport {
     private static final Pattern VARIABLE_MATCHER = Pattern.compile("\\$\\{([^\\}]+)\\}");
 
     public static boolean matches(final String definitionName, final QualifiedKeywordName occurrenceQualifiedName) {
-        return matchesWithLowerCase(definitionName.toLowerCase(), occurrenceQualifiedName.getKeywordName()
-                .toLowerCase(), occurrenceQualifiedName.getEmbeddedKeywordName().toLowerCase());
+        return matchesWithLowerCase(definitionName, occurrenceQualifiedName.getKeywordName(),
+                occurrenceQualifiedName.getEmbeddedKeywordName());
     }
 
     public static boolean startsWith(final String definitionName, final String potentialUsageName) {
