@@ -28,6 +28,8 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
     /** The string to be displayed in the completion proposal popup. */
     private final String displayString;
 
+    private final boolean strikeout;
+
     /** The replacement string. */
     private final String replacementString;
 
@@ -94,7 +96,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
             final int replacementLength, final int prefixLength, final int cursorPosition, final int selectionLength,
             final Image image, final boolean decoratePrefix, final String displayString, final boolean activateAssitant,
             final IContextInformation contextInformation, final String additionalProposalInfo,
-            final boolean additionalInfoAsHtml, final String additionalInfoForStyledLabel) {
+            final boolean additionalInfoAsHtml, final String additionalInfoForStyledLabel, final boolean strikeout) {
         Preconditions.checkNotNull(replacementString);
         Preconditions.checkState(replacementOffset >= 0);
         Preconditions.checkState(replacementLength >= 0);
@@ -110,6 +112,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         this.selectionLength = selectionLength;
         this.image = image;
         this.displayString = displayString;
+        this.strikeout = strikeout;
         this.contextInformation = contextInformation;
         this.activateAssistant = activateAssitant;
         this.additionalProposalInfo = additionalProposalInfo;
@@ -190,10 +193,12 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         if (decoratePrefix) {
             final String alreadyWrittenPrefix = toDisplay.substring(0, prefixLength);
             final String suffixWhichWillBeAdded = toDisplay.substring(prefixLength);
-            styledString.append(alreadyWrittenPrefix, Stylers.Common.MARKED_PREFIX_STYLER);
-            styledString.append(suffixWhichWillBeAdded);
+            styledString.append(alreadyWrittenPrefix,
+                    strikeout ? Stylers.Common.MARKED_STRIKEOUT_PREFIX_STYLER : Stylers.Common.MARKED_PREFIX_STYLER);
+            styledString.append(suffixWhichWillBeAdded,
+                    strikeout ? Stylers.Common.STRIKEOUT_STYLER : Stylers.Common.EMPTY_STYLER);
         } else {
-            styledString.append(toDisplay);
+            styledString.append(toDisplay, strikeout ? Stylers.Common.STRIKEOUT_STYLER : Stylers.Common.EMPTY_STYLER);
         }
         if (additionalInfoForStyledLabel != null) {
             styledString.append(" " + additionalInfoForStyledLabel, StyledString.DECORATIONS_STYLER);

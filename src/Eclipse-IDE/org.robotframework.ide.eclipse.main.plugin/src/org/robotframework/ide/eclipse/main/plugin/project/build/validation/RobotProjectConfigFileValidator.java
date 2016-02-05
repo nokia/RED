@@ -175,7 +175,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
         if (context.getExecutorInUse() != SuiteExecutor.Jython) {
             javaLibProblems.add(RobotProblem.causedBy(ConfigFileProblem.JAVA_LIB_IN_NON_JAVA_ENV)
-                    .formatMessageWith(libraryPath, context.getExecutorInUse().toString()));
+                    .formatMessageWith(libraryPath, context.getExecutorInUse()));
         }
         return javaLibProblems;
     }
@@ -226,7 +226,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final Path projectPath = new Path(project.getName());
         if (!project.exists(asExcludedPath)) {
             final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_EXCLUDED_FOLDER)
-                    .formatMessageWith(projectPath.append(asExcludedPath).toString());
+                    .formatMessageWith(projectPath.append(asExcludedPath));
             reporter.handleProblem(problem, configFile, linesMapping.get(excludedPath));
         }
 
@@ -235,8 +235,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
                 final IPath otherAsPath = otherPath.asPath();
                 if (otherAsPath.isPrefixOf(asExcludedPath)) {
                     final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.USELESS_FOLDER_EXCLUSION)
-                            .formatMessageWith(projectPath.append(asExcludedPath).toString(),
-                                    projectPath.append(otherAsPath).toString());
+                            .formatMessageWith(projectPath.append(asExcludedPath), projectPath.append(otherAsPath));
                     reporter.handleProblem(problem, configFile, linesMapping.get(excludedPath));
                 }
             }

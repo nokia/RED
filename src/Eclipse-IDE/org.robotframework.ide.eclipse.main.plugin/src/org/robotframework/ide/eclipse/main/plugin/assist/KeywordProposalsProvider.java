@@ -25,11 +25,11 @@ class KeywordProposalsProvider implements IContentProposalProvider {
     @Override
     public IContentProposal[] getProposals(final String contents, final int position) {
         final String prefix = contents.substring(0, position);
-        final List<RedKeywordProposal> keywordsProposals = new RedKeywordProposals(suiteFile).getKeywordProposals(
-                prefix, sortedBySourcesAndNames());
+        final List<RedKeywordProposal> keywordsEntities = new RedKeywordProposals(suiteFile).getKeywordProposals(prefix,
+                sortedBySourcesAndNames());
 
         final List<KeywordContentProposal> proposals = newArrayList();
-        for (final RedKeywordProposal proposedKeyword : keywordsProposals) {
+        for (final RedKeywordProposal proposedKeyword : keywordsEntities) {
             proposals.add(new KeywordContentProposal(proposedKeyword));
         }
         return proposals.toArray(new IContentProposal[0]);

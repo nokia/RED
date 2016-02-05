@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedByNames;
 
 import java.util.Iterator;
 import java.util.List;
@@ -37,10 +36,8 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
-import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
-import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
@@ -198,23 +195,14 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
 
     private String getKeywordHoverInfo(final String keywordName) {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteFile);
-        final List<RedKeywordProposal> keywordProposals = proposals.getKeywordProposals(sortedByNames());
-        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(keywordName);
 
-        for (final RedKeywordProposal proposal : keywordProposals) {
-            if (hasEqualSources(qualifiedName.getKeywordSource(), proposal.getSourcePrefix())
-                    && EmbeddedKeywordNamesSupport.matches(QualifiedKeywordName.unifyDefinition(proposal.getLabel()),
-                            qualifiedName)) {
-                return proposal.getDocumentation();
-            }
+        final RedKeywordProposal best = proposals.getBestMatchingKeywordProposal(keywordName);
+        if (best != null) {
+            return best.getDocumentation();
         }
         return null;
     }
     
-    private boolean hasEqualSources(final String typedKeywordSourceName, final String sourcePrefix) {
-        return !typedKeywordSourceName.isEmpty() ? typedKeywordSourceName.equalsIgnoreCase(sourcePrefix) : true;
-    }
-
     private IAnnotationModel getAnnotationModel(final ISourceViewer viewer) {
         if (viewer instanceof ISourceViewerExtension2) {
             final ISourceViewerExtension2 extension = (ISourceViewerExtension2) viewer;
