@@ -30,7 +30,7 @@ public class ProblemsGatheringReportingStrategy extends ProblemsReportingStrateg
         return new ProblemsGatheringReportingStrategy(true);
     }
 
-    protected ProblemsGatheringReportingStrategy(final boolean shouldPanic) {
+    private ProblemsGatheringReportingStrategy(final boolean shouldPanic) {
         super(shouldPanic);
     }
 
@@ -38,8 +38,7 @@ public class ProblemsGatheringReportingStrategy extends ProblemsReportingStrateg
 
     @Override
     public synchronized void handleProblem(final RobotProblem problem, final IFile file,
-            final ProblemPosition filePosition,
-            final Map<String, Object> additionalAttributes) {
+            final ProblemPosition filePosition, final Map<String, Object> additionalAttributes) {
         problems.put(file.getLocation(), filePosition, problem);
         if (shouldPanic) {
             throw new ReportingInterruptedException("Building and validation was interrupted by fatal problem");
