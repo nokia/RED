@@ -1,9 +1,10 @@
 _indent,Description,Resource,Path,Location,Type
-0,Errors (39 items),,,,
+0,Errors (43 items),,,,
 1,The setting 'Test Teardown' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 10,Robot Problem
 1,Unknown keyword 'Do nothing',resource_invalid_settings.robot,/RobotProject,line 10,Robot Problem
 1,Unknown keyword 'using missng kw',missing_keyword.robot,/SecondRobotProject,line 10,Robot Problem
 1,"Variable 'e_1' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 10,Robot Problem
+1,Keyword 'KW with comment' contains no keywords to execute,empty_TC_KW.robot,/RobotProject,line 11,Robot Problem
 1,The setting 'Metadata' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 11,Robot Problem
 1,Unknown keyword 'alabama',wrong_settings.robot,/RobotProject,line 11,Robot Problem
 1,Unknown keyword 'Using missng kw',missing_keyword.robot,/SecondRobotProject,line 11,Robot Problem
@@ -21,11 +22,13 @@ _indent,Description,Resource,Path,Location,Type
 1,The setting 'Test Template' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 16,Robot Problem
 1,Unknown keyword 'convert text',resource_invalid_settings.robot,/RobotProject,line 16,Robot Problem
 1,The setting 'Test Timeout' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 17,Robot Problem
+1,Test case 'Empty test' contains no keywords to execute,empty_TC_KW.robot,/RobotProject,line 2,Robot Problem
 1,Test case 'test 4' contains no keywords to execute,test_case_settings.robot,/RobotProject,line 2,Robot Problem
 1,Unknown keyword 'not existing_kw',missing_keyword.robot,/SecondRobotProject,line 3,Robot Problem
 1,Unknown test case's setting definition '[wrong]',test_case_settings.robot,/RobotProject,line 3,Robot Problem
 1,"Variable 'a' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 3,Robot Problem
 1,Resource import 'not_existing.robot' is invalid: file does not exist,wrong_settings.robot,/RobotProject,line 4,Robot Problem
+1,Test case 'Test with comment' contains no keywords to execute,empty_TC_KW.robot,/RobotProject,line 4,Robot Problem
 1,Unknown test case's setting definition '[Tagss]',test_case_settings.robot,/RobotProject,line 4,Robot Problem
 1,"Variable 'b' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 4,Robot Problem
 1,Unknown keyword 'Second_not_existing_kw',missing_keyword.robot,/SecondRobotProject,line 5,Robot Problem
@@ -33,6 +36,7 @@ _indent,Description,Resource,Path,Location,Type
 1,"Variable 'c' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 5,Robot Problem
 1,Variable import 'C:var/myvariables.py' is invalid: given location does not point to a file,wrong_settings.robot,/RobotProject,line 5,Robot Problem
 1,Path '/folder/full.py' points to location outside your workspace,wrong_settings.robot,/RobotProject,line 6,Robot Problem
+1,Keyword 'Empty kw' contains no keywords to execute,empty_TC_KW.robot,/RobotProject,line 8,Robot Problem
 1,Unknown keyword 'not_existing',wrong_settings.robot,/RobotProject,line 8,Robot Problem
 1,The setting 'Test Setup' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 9,Robot Problem
 1,Unknown keyword 'alska',wrong_settings.robot,/RobotProject,line 9,Robot Problem
