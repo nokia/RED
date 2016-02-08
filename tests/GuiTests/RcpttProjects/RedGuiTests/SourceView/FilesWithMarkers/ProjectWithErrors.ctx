@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _8M41sHZSEeW40oUKBdzNfQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 1/14/16 2:34 PM
+Save-Time: 2/8/16 4:42 PM
 
 ------=_contents/RobotProject/libspecs/XML.libspec-5f0968c1-3b2e-33be-bc28-91ac92d378f5
 Content-Type: q7/binary
@@ -1535,6 +1535,28 @@ tHntfrqRtqxoCRV0785/uNkmHgZ/KxWu/xdQSwcI/uqKbcQgAABjdQAAUEsBAhQAFAAICAgAAAAhAP7q
 im3EIAAAY3UAAAgAAAAAAAAAAAAAAAAAAAAAAC5jb250ZW50UEsFBgAAAAABAAEANgAAAPogAAAAAA==
 
 ------=_contents/SecondRobotProject/libspecs/Telnet.libspec-ec278b00-5163-3908-9c2f-fa351beaeccf--
+------=_contents/SecondRobotProject/all_settings.robot-47c65390-2fce-376c-9f03-8acc0dec8ca9
+Content-Type: q7/binary
+Entry-Name: contents/SecondRobotProject/all_settings.robot
+
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnSVVW1v2kAM/l6p/8GifEJqWqDVxodJ
+Q7AXqe06FdRuUiV0TQw5NclFd0cpQ/z32XmBS0KnLkFwefz4ic82vk6nAxO0ViYLA51O5/joBO7QqKX2
+EcDIOI1wpgvA0+pJ2SrF887oUzJmcxntaHxfyyct9BpgpKIIfStVYhx0LCxOZYwuJEWkFi7pizAWtQPc
+pqgFhzxZkyV2LD+18tG4zhQp6hcMHGjia8TEhBzjHrSaBB1gilGCLuPXzfUBfn6Plb+MMbGCNwjQsqE0
+QJ88gWDx1bYarJtlJG0kE4THBALlw6NtcNqbIBDbBgwwTABfRaFuLJiltMgqDm0lbQgdo2LswGyudCyy
+Qs+84yPP86ByTbAQqkqQF8RK15WLVxsS4e2fwL3QUjwRwlqsM3sR2kvXDRs1SyCsOPNVHKvkLZajwI9C
+L7r8294M7771tvzKG7SChYhb5Jp9XPwetSmSRdfFpWujpnpFf2kxgKHNlb/fTqaZ8iTLJP0plimAH6L/
+DHIOFIyQFB7MtYohXduQs0Pdzq9+kYZtNV+68qqY7Pl5tUv2583VA9BWJluAE0gkpfcPtb1oCrQ3V19+
+P9zejbdwyDvvvtxpikIHapVw9orV86ppfCuqiuoBp3dF8lXxUJgKGiZg+TvBFXCLV03tTUrpjLdVtEUe
+3Rbr8qpXSI5xLpaRLTiaKpa1Ka9stuxVOXWP9obEssJO2Y+njVqSf7cODAYQy6SOfhx4lx/oruPndeB0
+MBj0+nW0vfmhEtzWYY4qXx+KjOOA/jlVyDcNo3fJZmrdhmlAHk2tQKyhByGNZwP90hUuWFwlgQGWiyJZ
+PDb8A+iF0I/hgphxw3wK3XPYue62UvQvzekEhmkk/WJsoR/J1GCVpZgldqwDRldi3zr7xO3adBQpg/94
+457pZ0zhMF3p98vuuDQO6SzjwyXEWFBj5gAz6Fh1plt2yBaDDKDP67IVuAdLh0x2JEzpkTU99WweKNWL
+6J9oPdLI772WJqs2lZo1s4mutC3wNvNZmfFc/wrXK6WDQp3+8fW4iXmtFlDZyfHRf85DKFXKDZchVEbU
+m6zaoMrhiJlsyQ0lt9ZsDpd7iI49qnbKW6hX8zDzL1BLBwjI32nNQQMAABkJAABQSwECFAAUAAgICAAA
+ACEAyN9pzUEDAAAZCQAACAAAAAAAAAAAAAAAAAAAAAAALmNvbnRlbnRQSwUGAAAAAAEAAQA2AAAAdwMA
+AAAA
+------=_contents/SecondRobotProject/all_settings.robot-47c65390-2fce-376c-9f03-8acc0dec8ca9--
 ------=_contents/RobotProject/libspecs/Collections.libspec-211e798f-db8c-3d93-9dbc-bed2989ad7ce
 Content-Type: q7/binary
 Entry-Name: contents/RobotProject/libspecs/Collections.libspec
@@ -2964,9 +2986,9 @@ v3+8LH59nn8TPNskyXQzDUe7G76tfntga3njZ55aX9FqWDU3FjqJbBHu5wb0itTM8lMKKxDp3wnDfQ+B
 kXwJqoAgQ1Pl+Xy5ze9hy9MvsC8aoJDc+z4A+lXQkBu3VtYUOQIR75nelQmQcq0Qoh3q4N2iH+0tt7fj
 rZlhBRof1/FJgcuVsXTtZCv8p/cT9MpbywvKZwBj8PeK4NaUEMUaZf0iquxIIfH2iyC/VBBUsw6TLVuU
 MRZ8qjRg1LhvACGseStHsBMdABwuPUXRFHjSMeQtWAdRNe/Gn56FZWm73w8dgLUKB/d+ueW3pvFFWW37
-DO9Pst8Qs7TL2wP5OwHO5+JFUrg0iLyWXZS+eJJ2Xcph92065tcxv4751SMcsvTxVy1L+/6mMvQAUEsH
-CFF8SrLzAQAAAwsAAFBLAQIUABQACAgIAAAAIQBRfEqy8wEAAAMLAAAIAAAAAAAAAAAAAAAAAAAAAAAu
-Y29udGVudFBLBQYAAAAAAQABADYAAAApAgAAAAA=
+DO9Pst8Qs7TL2wP5OwHO5+JFUlhZGx1FpUFkrovhF0/hrsM57L5rx+w7Zt8x+3oES5Y+/uZlad9fXIYe
+AFBLBwjAtgpq9wEAAD8LAABQSwECFAAUAAgICAAAACEAwLYKavcBAAA/CwAACAAAAAAAAAAAAAAAAAAA
+AAAALmNvbnRlbnRQSwUGAAAAAAEAAQA2AAAALQIAAAAA
 ------=_.q7.content-3d2e0690-ce48-3609-83e0-c704d49f1eaf--
 ------=_contents/RobotProject/libspecs/String.libspec-8de79ab4-578e-3edd-946f-4682b4930f41
 Content-Type: q7/binary

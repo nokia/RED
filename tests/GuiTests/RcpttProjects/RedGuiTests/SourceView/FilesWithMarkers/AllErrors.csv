@@ -1,49 +1,76 @@
 _indent,Description,Resource,Path,Location,Type
 0,Errors (39 items),,,,
-1,Path '/folder/full.py' points to location outside your workspace,wrong_settings.robot,/RobotProject,line 6,Robot Problem
-1,Resource import 'not_existing.robot' is invalid: file does not exist,wrong_settings.robot,/RobotProject,line 4,Robot Problem
-1,Test case 'test 4' contains no keywords to execute,test_case_settings.robot,/RobotProject,line 2,Robot Problem
-1,The setting 'Default Tags' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 15,Robot Problem
-1,The setting 'Force Tags' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 14,Robot Problem
-1,The setting 'Metadata' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 11,Robot Problem
-1,The setting 'Suite Setup' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 12,Robot Problem
-1,The setting 'Suite Teardown' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 13,Robot Problem
-1,The setting 'Test Setup' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 9,Robot Problem
 1,The setting 'Test Teardown' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 10,Robot Problem
-1,The setting 'Test Template' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 16,Robot Problem
-1,The setting 'Test Timeout' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 17,Robot Problem
-1,Unknown keyword 'alabama',wrong_settings.robot,/RobotProject,line 11,Robot Problem
-1,Unknown keyword 'alska',wrong_settings.robot,/RobotProject,line 9,Robot Problem
-1,Unknown keyword 'convert text',resource_invalid_settings.robot,/RobotProject,line 16,Robot Problem
 1,Unknown keyword 'Do nothing',resource_invalid_settings.robot,/RobotProject,line 10,Robot Problem
-1,Unknown keyword 'my_setup',resource_invalid_settings.robot,/RobotProject,line 9,Robot Problem
-1,Unknown keyword 'not existing_kw',missing_keyword.robot,/SecondRobotProject,line 3,Robot Problem
-1,Unknown keyword 'not_existing',wrong_settings.robot,/RobotProject,line 8,Robot Problem
-1,Unknown keyword 'REVERSE MY LIST',resource_invalid_settings.robot,/RobotProject,line 12,Robot Problem
-1,Unknown keyword 'San Francisco',wrong_settings.robot,/RobotProject,line 15,Robot Problem
-1,Unknown keyword 'Second_not_existing_kw',missing_keyword.robot,/SecondRobotProject,line 5,Robot Problem
-1,Unknown keyword 'Sum Two Values',resource_invalid_settings.robot,/RobotProject,line 13,Robot Problem
 1,Unknown keyword 'using missng kw',missing_keyword.robot,/SecondRobotProject,line 10,Robot Problem
+1,"Variable 'e_1' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 10,Robot Problem
+1,The setting 'Metadata' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 11,Robot Problem
+1,Unknown keyword 'alabama',wrong_settings.robot,/RobotProject,line 11,Robot Problem
 1,Unknown keyword 'Using missng kw',missing_keyword.robot,/SecondRobotProject,line 11,Robot Problem
-1,Unknown keyword 'washington 2',wrong_settings.robot,/RobotProject,line 12,Robot Problem
 1,Unknown keyword's setting definition '[]',test_case_settings.robot,/RobotProject,line 11,Robot Problem
-1,Unknown keyword's setting definition '[incorrect]',test_case_settings.robot,/RobotProject,line 9,Robot Problem
+1,"Variable 'f 1' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 11,Robot Problem
+1,The setting 'Suite Setup' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 12,Robot Problem
+1,Unknown keyword 'REVERSE MY LIST',resource_invalid_settings.robot,/RobotProject,line 12,Robot Problem
+1,Unknown keyword 'washington 2',wrong_settings.robot,/RobotProject,line 12,Robot Problem
+1,The setting 'Suite Teardown' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 13,Robot Problem
+1,Unknown keyword 'Sum Two Values',resource_invalid_settings.robot,/RobotProject,line 13,Robot Problem
 1,Unknown keyword's setting definition '[RReturn]',test_case_settings.robot,/RobotProject,line 13,Robot Problem
-1,Unknown test case's setting definition '[]',test_case_settings.robot,/RobotProject,line 5,Robot Problem
-1,Unknown test case's setting definition '[Tagss]',test_case_settings.robot,/RobotProject,line 4,Robot Problem
+1,The setting 'Force Tags' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 14,Robot Problem
+1,The setting 'Default Tags' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 15,Robot Problem
+1,Unknown keyword 'San Francisco',wrong_settings.robot,/RobotProject,line 15,Robot Problem
+1,The setting 'Test Template' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 16,Robot Problem
+1,Unknown keyword 'convert text',resource_invalid_settings.robot,/RobotProject,line 16,Robot Problem
+1,The setting 'Test Timeout' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 17,Robot Problem
+1,Test case 'test 4' contains no keywords to execute,test_case_settings.robot,/RobotProject,line 2,Robot Problem
+1,Unknown keyword 'not existing_kw',missing_keyword.robot,/SecondRobotProject,line 3,Robot Problem
 1,Unknown test case's setting definition '[wrong]',test_case_settings.robot,/RobotProject,line 3,Robot Problem
 1,"Variable 'a' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 3,Robot Problem
+1,Resource import 'not_existing.robot' is invalid: file does not exist,wrong_settings.robot,/RobotProject,line 4,Robot Problem
+1,Unknown test case's setting definition '[Tagss]',test_case_settings.robot,/RobotProject,line 4,Robot Problem
 1,"Variable 'b' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 4,Robot Problem
+1,Unknown keyword 'Second_not_existing_kw',missing_keyword.robot,/SecondRobotProject,line 5,Robot Problem
+1,Unknown test case's setting definition '[]',test_case_settings.robot,/RobotProject,line 5,Robot Problem
 1,"Variable 'c' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 5,Robot Problem
-1,"Variable 'd' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 9,Robot Problem
-1,"Variable 'e_1' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 10,Robot Problem
-1,"Variable 'f 1' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 11,Robot Problem
 1,Variable import 'C:var/myvariables.py' is invalid: given location does not point to a file,wrong_settings.robot,/RobotProject,line 5,Robot Problem
-0,Warnings (7 items),,,,
-1,Path '/folder/full.py' is absolute. It is preferred to use relative paths,wrong_settings.robot,/RobotProject,line 6,Robot Problem
-1,Unrecognized table header: '*** ****',incorrect_header.robot,/RobotProject,line 2,Robot Problem
-1,Unrecognized table header: '*** Test Casas****',incorrect_header.robot,/RobotProject,line 4,Robot Problem
-1,Unrecognized table header: '*** V ***',incorrect_header.robot,/RobotProject,line 8,Robot Problem
-1,Unrecognized table header: '***',incorrect_header.robot,/RobotProject,line 12,Robot Problem
-1,Unrecognized table header: '**** ${tst} ***',incorrect_header.robot,/RobotProject,line 6,Robot Problem
+1,Path '/folder/full.py' points to location outside your workspace,wrong_settings.robot,/RobotProject,line 6,Robot Problem
+1,Unknown keyword 'not_existing',wrong_settings.robot,/RobotProject,line 8,Robot Problem
+1,The setting 'Test Setup' is not supported inside resource file,resource_invalid_settings.robot,/RobotProject,line 9,Robot Problem
+1,Unknown keyword 'alska',wrong_settings.robot,/RobotProject,line 9,Robot Problem
+1,Unknown keyword 'my_setup',resource_invalid_settings.robot,/RobotProject,line 9,Robot Problem
+1,Unknown keyword's setting definition '[incorrect]',test_case_settings.robot,/RobotProject,line 9,Robot Problem
+1,"Variable 'd' is used, but not defined",variable_errors.robot,/SecondRobotProject,line 9,Robot Problem
+0,Warnings (34 items),,,,
 1,Unrecognized table header: '****',incorrect_header.robot,/RobotProject,line 10,Robot Problem
+1,Unrecognized table header: '***',incorrect_header.robot,/RobotProject,line 12,Robot Problem
+1,Unrecognized table header: '*** ****',incorrect_header.robot,/RobotProject,line 2,Robot Problem
+1,Setting 'Documentation' is duplicated. Robot will try to use merged elements as documentation,all_settings.robot,/SecondRobotProject,line 22,Robot Problem
+1,Setting 'Documentation' is duplicated. Robot will try to use merged elements as documentation,all_settings.robot,/SecondRobotProject,line 23,Robot Problem
+1,Setting 'Documentation' is duplicated. Robot will try to use merged elements as documentation,all_settings.robot,/SecondRobotProject,line 24,Robot Problem
+1,Setting 'Suite Setup' is duplicated. Robot will try to use 'check if varaible from python file is visible' keyword as suite setup,all_settings.robot,/SecondRobotProject,line 36,Robot Problem
+1,Setting 'Suite Setup' is duplicated. Robot will try to use 'check if varaible from python file is visible' keyword as suite setup,all_settings.robot,/SecondRobotProject,line 37,Robot Problem
+1,Unrecognized table header: '*** Test Casas****',incorrect_header.robot,/RobotProject,line 4,Robot Problem
+1,Setting 'Suite Teardown' is duplicated. Robot will try to use 'teardown kw' keyword as suite teardown,all_settings.robot,/SecondRobotProject,line 41,Robot Problem
+1,Setting 'Suite Teardown' is duplicated. Robot will try to use 'teardown kw' keyword as suite teardown,all_settings.robot,/SecondRobotProject,line 42,Robot Problem
+1,"Setting 'Force Tags' is duplicated. Robot will try to use 'tags new line ${param} ""tag1"" ""tag2' merged elements as force tags",all_settings.robot,/SecondRobotProject,line 46,Robot Problem
+1,"Setting 'Force Tags' is duplicated. Robot will try to use 'tags new line ${param} ""tag1"" ""tag2' merged elements as force tags",all_settings.robot,/SecondRobotProject,line 47,Robot Problem
+1,Setting 'Default Tags' is duplicated. Robot will try to use 'red test redt test2  ${tag}' merged elements as default tags,all_settings.robot,/SecondRobotProject,line 51,Robot Problem
+1,Setting 'Default Tags' is duplicated. Robot will try to use 'red test redt test2  ${tag}' merged elements as default tags,all_settings.robot,/SecondRobotProject,line 52,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 55,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 56,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 57,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 58,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 59,Robot Problem
+1,Path '/folder/full.py' is absolute. It is preferred to use relative paths,wrong_settings.robot,/RobotProject,line 6,Robot Problem
+1,Unrecognized table header: '**** ${tst} ***',incorrect_header.robot,/RobotProject,line 6,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 60,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 62,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 63,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 64,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 65,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 66,Robot Problem
+1,Setting 'Test Timeout' is duplicated. Robot will try to use '1' as test timeout,all_settings.robot,/SecondRobotProject,line 67,Robot Problem
+1,Setting 'Test Setup' is duplicated. Robot will try to use 'Open Aplication' keyword as test setup,all_settings.robot,/SecondRobotProject,line 71,Robot Problem
+1,Setting 'Test Setup' is duplicated. Robot will try to use 'Open Aplication' keyword as test setup,all_settings.robot,/SecondRobotProject,line 72,Robot Problem
+1,Setting 'Test Teardown' is duplicated. Robot will try to use 'Close Aplication' keyword as test teardown,all_settings.robot,/SecondRobotProject,line 76,Robot Problem
+1,Setting 'Test Teardown' is duplicated. Robot will try to use 'Close Aplication' keyword as test teardown,all_settings.robot,/SecondRobotProject,line 77,Robot Problem
+1,Unrecognized table header: '*** V ***',incorrect_header.robot,/RobotProject,line 8,Robot Problem
