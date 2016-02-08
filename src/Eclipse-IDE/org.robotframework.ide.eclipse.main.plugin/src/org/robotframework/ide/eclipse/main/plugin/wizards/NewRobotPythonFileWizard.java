@@ -59,10 +59,9 @@ public class NewRobotPythonFileWizard extends BasicNewResourceWizard {
                 desc = editorRegistry.findEditor("org.eclipse.ui.DefaultTextEditor");
                 if (desc == null) {
                     throw new EditorOpeningException("Unable to open editor for file: " + newFile.getName());
-                } else {
-                    page.openEditor(new FileEditorInput(newFile), desc.getId());
                 }
             }
+            page.openEditor(new FileEditorInput(newFile), desc.getId());
         } catch (final PartInitException e) {
             throw new EditorOpeningException("Unable to open editor for file: " + newFile.getName(), e);
         }
