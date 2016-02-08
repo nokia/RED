@@ -171,11 +171,11 @@ public class SuiteSourceTokenScanner extends RuleBasedScanner {
         --fOffset;
         fColumn = UNDEFINED;
         final int idx = fOffset - buffStart;
-        updateNumberOfCellsAfterUnread(buffer[idx]);
+        updateNumberOfCellsAfterUnread(idx < bufferSize ? buffer[idx] : EOF);
     }
 
     protected void updateNumberOfCellsAfterUnread(final int ch) {
-        if (ch == '\n' || ch == '\r') {
+        if (ch == '\n' || ch == '\r' || ch == EOF) {
             numberOfCellSeparators = UNDEFINED;
             numberOfCharsInCurrentSeparator = 0;
         } else if (ch == ' ' || ch == '\t') {

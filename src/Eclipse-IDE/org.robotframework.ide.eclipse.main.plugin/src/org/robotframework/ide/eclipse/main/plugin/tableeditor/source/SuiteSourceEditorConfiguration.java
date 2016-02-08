@@ -45,6 +45,7 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.EndOfLineRule;
 import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.DefaultAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationHover;
@@ -403,7 +404,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     private static void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
             final IRule[] rules, final boolean isTsv) {
-        final SuiteSourceTokenScanner scanner = isTsv ? new SuiteTsvSourceTokenScanner(rules)
+        final ITokenScanner scanner = isTsv ? new SuiteTsvSourceTokenScanner(rules)
                 : new SuiteSourceTokenScanner(rules);
         final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(scanner);
         reconciler.setDamager(damagerRepairer, contentType);
