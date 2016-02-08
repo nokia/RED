@@ -96,28 +96,28 @@ public class EndOfLineBuilder {
         return eol;
     }
 
-    private class LFCREndOfLine extends AEndOfLine {
+    private static class LFCREndOfLine extends AEndOfLine {
 
         public LFCREndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.LFCR, startOffset, lineNumber, startColumn);
         }
     }
 
-    private class CRLFEndOfLine extends AEndOfLine {
+    private static class CRLFEndOfLine extends AEndOfLine {
 
         public CRLFEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.CRLF, startOffset, lineNumber, startColumn);
         }
     }
 
-    private class EndOfFile extends AEndOfLine {
+    private static class EndOfFile extends AEndOfLine {
 
         public EndOfFile(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.EOF, startOffset, lineNumber, startColumn);
         }
     }
 
-    private class LineFeedEndOfLine extends AEndOfLine {
+    private static class LineFeedEndOfLine extends AEndOfLine {
 
         public LineFeedEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.LF, startOffset, lineNumber, startColumn);
@@ -125,7 +125,7 @@ public class EndOfLineBuilder {
 
     }
 
-    private class CarritageReturnEndOfLine extends AEndOfLine {
+    private static class CarritageReturnEndOfLine extends AEndOfLine {
 
         public CarritageReturnEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.CR, startOffset, lineNumber, startColumn);
@@ -133,7 +133,7 @@ public class EndOfLineBuilder {
 
     }
 
-    private class UndeclaredEndOfLine extends AEndOfLine {
+    private static class UndeclaredEndOfLine extends AEndOfLine {
 
         public UndeclaredEndOfLine(final int startOffset, final int lineNumber, final int startColumn) {
             super(EndOfLineTypes.NON, startOffset, lineNumber, startColumn);
@@ -141,7 +141,7 @@ public class EndOfLineBuilder {
 
     }
 
-    private abstract class AEndOfLine implements IRobotLineElement {
+    private static abstract class AEndOfLine implements IRobotLineElement {
 
         private final int lineNumber;
 
