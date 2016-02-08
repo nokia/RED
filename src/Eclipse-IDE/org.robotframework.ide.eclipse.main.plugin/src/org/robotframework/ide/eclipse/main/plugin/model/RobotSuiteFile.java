@@ -9,6 +9,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -39,8 +42,10 @@ import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharStreams;
 
 public class RobotSuiteFile implements RobotFileInternalElement {
 
@@ -167,11 +172,26 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             public RobotFileOutput parse() {
                 if (getProject().getProject().exists()) {
                     final IPath location = file.getLocation();
-                    final File f = location == null ? new File(file.getName()) : location.toFile();
-                    return getProject().getRobotParser().parseEditorContent(newContent, f);
+
+                    if (location == null) {
+                        final File f = new File(file.getName());
+                        final String content = newContent.isEmpty() ? getContent(file) : newContent;
+                        return getProject().getRobotParser().parseEditorContent(content, f);
+                    } else {
+                        return getProject().getRobotParser().parseEditorContent(newContent, location.toFile());
+                    }
+
                 }
                 // this can happen e.g. when renaming project
                 return null;
+            }
+
+            private String getContent(final IFile file) {
+                try (InputStream stream = file.getContents()) {
+                    return CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
+                } catch (IOException | CoreException e) {
+                    return "";
+                }
             }
         };
     }
