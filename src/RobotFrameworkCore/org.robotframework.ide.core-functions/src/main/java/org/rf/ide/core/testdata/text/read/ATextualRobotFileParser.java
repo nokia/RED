@@ -657,16 +657,9 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             }
         }
 
-        ParsingState currentStatus = parsingStateHelper.getCurrentStatus(processingState);
         size = matchedMappers.size();
         if (size == 1) {
             robotToken = matchedMappers.get(0).map(currentLine, processingState, robotFileOutput, robotToken, fp, text);
-        } else {
-            if (currentStatus != ParsingState.TRASH && currentStatus != ParsingState.COMMENT) {
-                robotFileOutput.addBuildMessage(BuildMessage.createWarnMessage(
-                        "Unknown data \'" + text + "\' appears in " + fp + ", during state: " + processingState,
-                        fileName));
-            }
         }
         return robotToken;
     }
