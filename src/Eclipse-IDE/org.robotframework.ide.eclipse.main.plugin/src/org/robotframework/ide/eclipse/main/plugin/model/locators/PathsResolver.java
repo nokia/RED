@@ -105,6 +105,8 @@ public class PathsResolver {
             throw new PathResolvingException("Given path is parameterized");
         } else if (path.isAbsolute()) {
             return path;
+        } else if (file.getFile().getLocation() == null) {
+            throw new PathResolvingException("Given file is not located physically in the file system");
         } else {
             try {
                 final Escaper escaper = PathsConverter.getUriSpecialCharsEscaper();
