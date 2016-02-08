@@ -9,17 +9,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
-import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Collection;
 
 import org.eclipse.core.runtime.IPath;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
+import org.robotframework.ide.eclipse.main.plugin.validation.CheckstyleReportingStrategy.RobotProblemWithPosition;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
-import com.google.common.collect.Table;
+import com.google.common.collect.Multimap;
 import com.google.common.escape.Escaper;
 import com.google.common.io.Files;
 import com.google.common.xml.XmlEscapers;
@@ -43,19 +43,19 @@ public class ReportWithCheckstyleFormat implements AutoCloseable {
         writer.append("<checkstyle version=\"6.14\">\n");
     }
 
-    void writeEntries(final Table<IPath, ProblemPosition, RobotProblem> problems)
+    void writeEntries(final Multimap<IPath, RobotProblemWithPosition> problems)
             throws IOException {
-        for (final IPath path : problems.rowKeySet()) {
+        for (final IPath path : problems.keySet()) {
             writer.append(Strings.repeat(" ", 2) + "<file name=\"" + xmlAttrEscaper.escape(path.toString()) + "\">\n");
-            writeProblems(problems.row(path));
+            writeProblems(problems.get(path));
             writer.append(Strings.repeat(" ", 2) + "</file>\n");
         }
     }
 
-    private void writeProblems(final Map<ProblemPosition, RobotProblem> problems) throws IOException {
-        for (final Entry<ProblemPosition, RobotProblem> problemEntry : problems.entrySet()) {
-            final ProblemPosition position = problemEntry.getKey();
-            final RobotProblem problem = problemEntry.getValue();
+    private void writeProblems(final Collection<RobotProblemWithPosition> problems) throws IOException {
+        for (final RobotProblemWithPosition problemEntry : problems) {
+            final ProblemPosition position = problemEntry.getPosition();
+            final RobotProblem problem = problemEntry.getProblem();
             final IProblemCause cause = problem.getCause();
             writer.append(Strings.repeat(" ", 4) + "<error line=\"" + position.getLine() + "\" message=\""
                     + xmlAttrEscaper.escape(problem.getMessage()) + "\" severity=\""
