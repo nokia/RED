@@ -118,7 +118,7 @@ public class RobotArtifactsValidator {
                     final SubMonitor validationSubMonitor = subMonitor.newChild(100);
                     validationSubMonitor.setWorkRemaining(unitValidators.size());
 
-                    int i = 0;
+                    int i = 1;
                     final int total = unitValidators.size();
                     final String totalString = Integer.toString(total);
                     while (!unitValidators.isEmpty()) {
