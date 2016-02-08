@@ -30,7 +30,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportin
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.TestCasesProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DeprecatedKeywordHeaderAlias;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DocumentationUserKeywordDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.PostconditionDeclarationExistanceValidator;
@@ -73,8 +72,8 @@ class KeywordTableValidator implements ModelUnitValidator {
         reportUnknownVariables(keywords);
     }
 
-    private void validateByExternal(final RobotKeywordsSection section,
-            final IProgressMonitor monitor) throws CoreException {
+    private void validateByExternal(final RobotKeywordsSection section, final IProgressMonitor monitor)
+            throws CoreException {
         new DocumentationUserKeywordDeclarationSettingValidator(validationContext.getFile(), section, reporter)
                 .validate(monitor);
         new PostconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
@@ -87,7 +86,8 @@ class KeywordTableValidator implements ModelUnitValidator {
             final RobotToken keywordName = keyword.getKeywordName();
             if (isReturnEmpty(keyword) && !hasAnythingToExecute(keyword)) {
                 final String name = keywordName.getText();
-                final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.EMPTY_CASE).formatMessageWith(name);
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD)
+                        .formatMessageWith(name);
                 final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
                         name);
                 reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
