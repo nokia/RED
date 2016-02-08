@@ -38,11 +38,7 @@ public class RobotLine implements IChildElement<RobotFile> {
     }
 
     public void setSeparatorType(final SeparatorType separatorForLine) {
-        if (separatorForLine == null) {
-            this.separatorForLine = Optional.absent();
-        } else {
-            this.separatorForLine = Optional.of(separatorForLine);
-        }
+        this.separatorForLine = Optional.fromNullable(separatorForLine);
     }
 
     public Optional<SeparatorType> getSeparatorForLine() {
@@ -72,7 +68,7 @@ public class RobotLine implements IChildElement<RobotFile> {
 
     public Optional<Integer> getElementPositionInLine(final IRobotLineElement elem) {
         Optional<Integer> pos = Optional.absent();
-        int size = lineElements.size();
+        final int size = lineElements.size();
         for (int i = 0; i < size; i++) {
             if (lineElements.get(i) == elem) {
                 pos = Optional.of(i);
