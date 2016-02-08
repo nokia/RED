@@ -80,7 +80,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         boolean isFromNestedLibrary(final IFile useplaceFile) {
             final IPath path = useplaceFile.getFullPath();
             final KeywordScope scope = getScope(path);
-            return (scope == KeywordScope.REF_LIBRARY || scope == KeywordScope.REF_LIBRARY)
+            return (scope == KeywordScope.REF_LIBRARY || scope == KeywordScope.STD_LIBRARY)
                     && !path.equals(getExposingFilepath());
         }
     }
