@@ -184,19 +184,23 @@ public class Rules {
                 if (ch == EOF || Character.isWhitespace(ch)) {
                     return Token.UNDEFINED;
                 }
-                if (((SuiteSourceTokenScanner) scanner).numberOfCellSeparatorsInLineBeforeOffset() == 1) {
-                    ch = scanner.read();
-                    if (ch != '[') {
-                        scanner.unread();
-                        return Token.UNDEFINED;
-                    }
-                    ch = scanner.read();
-                    while (ch != EOF && !Character.isWhitespace(ch)) {
+                if (ch == '[' && ((SuiteSourceTokenScanner) scanner).numberOfCellSeparatorsInLineBeforeOffset() == 1) {
+                    int charactersRead = 0;
+                    while (true) {
                         ch = scanner.read();
-                    }
-                    scanner.unread();
+                        charactersRead++;
 
-                    return token;
+                        if (ch == ']' && CharacterScannerUtilities
+                                .isCellSeparator(CharacterScannerUtilities.lookAhead(scanner, 3))) {
+                            return token;
+                        } else if (ch == EOF || ch == '\r' || ch == '\n' || CharacterScannerUtilities
+                                .isCellSeparator(CharacterScannerUtilities.lookAhead(scanner, 3))) {
+                            for (int i = 0; i < charactersRead; i++) {
+                                scanner.unread();
+                            }
+                            return Token.UNDEFINED;
+                        }
+                    }
                 }
                 return Token.UNDEFINED;
             }
