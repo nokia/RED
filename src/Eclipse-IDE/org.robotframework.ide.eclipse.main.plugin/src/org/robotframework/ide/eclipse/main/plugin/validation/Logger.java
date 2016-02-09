@@ -20,8 +20,9 @@ class Logger extends BuildLogger {
         System.out.println(getTimestamp() + " " + message);
     }
 
+    @Override
     public void logError(final String message) {
-        System.out.println(getTimestamp() + " " + message);
+        System.err.println(getTimestamp() + " " + message);
     }
 
     private String getTimestamp() {
