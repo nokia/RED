@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/3/16 2:42 PM
+Save-Time: 2/9/16 11:06 AM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -119,9 +119,10 @@ with [get-editor "Script.robot" | get-text-viewer] {
     key-type Enter
     type-text "here_is_class"
     key-type "M1+s"
+    wait 500
     set-caret-pos 6 19
     get-menu "Quick Fix" | click
-    wait 300
+    wait 500
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'here_is_class' and add to configuration" | click -default
