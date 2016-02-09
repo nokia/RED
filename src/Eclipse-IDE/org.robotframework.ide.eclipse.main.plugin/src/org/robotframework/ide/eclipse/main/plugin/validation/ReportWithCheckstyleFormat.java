@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Collection;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
@@ -19,7 +20,6 @@ import org.robotframework.ide.eclipse.main.plugin.validation.CheckstyleReporting
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
-import com.google.common.collect.Multimap;
 import com.google.common.escape.Escaper;
 import com.google.common.io.Files;
 import com.google.common.xml.XmlEscapers;
@@ -43,7 +43,7 @@ public class ReportWithCheckstyleFormat implements AutoCloseable {
         writer.append("<checkstyle version=\"6.14\">\n");
     }
 
-    void writeEntries(final Multimap<IPath, RobotProblemWithPosition> problems)
+    void writeEntries(final Map<IPath, Collection<RobotProblemWithPosition>> problems)
             throws IOException {
         for (final IPath path : problems.keySet()) {
             writer.append(Strings.repeat(" ", 2) + "<file name=\"" + xmlAttrEscaper.escape(path.toString()) + "\">\n");
