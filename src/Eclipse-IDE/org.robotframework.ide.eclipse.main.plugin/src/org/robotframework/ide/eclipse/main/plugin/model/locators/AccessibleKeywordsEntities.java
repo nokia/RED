@@ -103,7 +103,7 @@ public class AccessibleKeywordsEntities {
         final QualifiedKeywordName qualifedName = QualifiedKeywordName.fromOccurrence(name);
         for (final KeywordEntity keyword : keywords) {
             final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
-                    .create(qualifedName.getKeywordName(), keyword.getSourceNameInUse());
+                    .create(keyword.getNameFromDefinition(), keyword.getSourceNameInUse());
             if (qualifedName.matchesIgnoringCase(candidateQualifiedName)) {
                 matchingKeywords.add(keyword);
             }
