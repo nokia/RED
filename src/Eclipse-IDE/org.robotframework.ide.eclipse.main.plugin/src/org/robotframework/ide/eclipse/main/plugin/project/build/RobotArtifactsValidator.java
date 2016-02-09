@@ -9,6 +9,9 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -108,6 +111,7 @@ public class RobotArtifactsValidator {
 
                     if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
                         unitValidators.addAll(createValidationUnitsForWholeProject(context, reporter));
+                        project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
                     } else if (delta != null) {
                         unitValidators.addAll(createValidationUnitsForChangedFiles(context, delta, reporter));
                     }
@@ -118,28 +122,51 @@ public class RobotArtifactsValidator {
                     final SubMonitor validationSubMonitor = subMonitor.newChild(100);
                     validationSubMonitor.setWorkRemaining(unitValidators.size());
 
-                    int i = 1;
+                    final int threadPoolSize = Runtime.getRuntime().availableProcessors();
+                    logger.log("VALIDATING: " + threadPoolSize + " threads will be used");
+                    final ExecutorService threadPool = Executors.newFixedThreadPool(threadPoolSize);
+
+                    int current = 1;
                     final int total = unitValidators.size();
-                    final String totalString = Integer.toString(total);
                     while (!unitValidators.isEmpty()) {
-                        if (monitor.isCanceled()) {
-                            monitor.setCanceled(true);
-                            break;
-                        }
                         final ModelUnitValidator validator = unitValidators.poll();
-                        validator.validate(monitor);
-                        logger.log("VALIDATING: done (" + Integer.toString(i) + "/" + totalString + ")");
-                        validationSubMonitor.worked(1);
-                        i++;
+                        threadPool.submit(
+                                createValidationRunnable(monitor, validationSubMonitor, current, total, validator));
+                        current++;
                     }
+                    threadPool.shutdown();
+                    threadPool.awaitTermination(1, TimeUnit.HOURS);
 
                     return Status.OK_STATUS;
-                } catch (final CoreException e) {
+                } catch (final CoreException | InterruptedException e) {
                     RedPlugin.logError("Project validation was corrupted", e);
                     return Status.CANCEL_STATUS;
                 } finally {
                     monitor.done();
                 }
+            }
+
+            private Runnable createValidationRunnable(final IProgressMonitor monitor,
+                    final SubMonitor validationSubMonitor, final int id, final int total,
+                    final ModelUnitValidator validator) {
+                return new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            if (monitor.isCanceled()) {
+                                logger.log("VALIDATING: cancelled (" + id + "/" + total + ")");
+                                return;
+                            }
+                            validator.validate(monitor);
+                            logger.log("VALIDATING: done (" + id + "/" + total + ")");
+                        } catch (final Exception e) {
+                            logger.log("VALIDATING: error (" + id + "/" + total + ")");
+                            logger.logError("VALIDATING: error\n" + e.getMessage());
+                        } finally {
+                            validationSubMonitor.worked(1);
+                        }
+                    }
+                };
             }
         };
     }
@@ -148,13 +175,6 @@ public class RobotArtifactsValidator {
             final ProblemsReportingStrategy reporter)
             throws CoreException {
         final List<ModelUnitValidator> validators = newArrayList();
-        validators.add(new ModelUnitValidator() {
-
-            @Override
-            public void validate(final IProgressMonitor monitor) throws CoreException {
-                project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-            }
-        });
         project.accept(new IResourceVisitor() {
 
             @Override

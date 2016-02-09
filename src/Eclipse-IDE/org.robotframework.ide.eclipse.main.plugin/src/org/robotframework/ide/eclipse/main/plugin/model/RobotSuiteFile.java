@@ -110,7 +110,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         };
     }
 
-    public List<RobotSuiteFileSection> getSections(final ParsingStrategy parsingStrategy) {
+    public synchronized List<RobotSuiteFileSection> getSections(final ParsingStrategy parsingStrategy) {
         if (sections == null) {
             fileOutput = parseModel(parsingStrategy);
             if (fileOutput != null) {
