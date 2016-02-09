@@ -14,4 +14,8 @@ public class BuildLogger {
     public void log(final String message) {
         // nothing to do
     }
+
+    public void logError(final String message) {
+        // nothing to do
+    }
 }

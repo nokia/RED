@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.validation;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
@@ -60,15 +61,15 @@ public class CheckstyleReportingStrategy extends HeadlessValidationReportingStra
                 logger.logError("There is an invalid number of problems handled: " + numberOfProblems + " counted, but "
                         + problems.size() + " stored");
             }
-            generateFile(new File(reportFilepath), problems);
+            generateFile(new File(reportFilepath), problems.asMap());
         }
     }
 
-    private void generateFile(final File file, final Multimap<IPath, RobotProblemWithPosition> problems) {
+    private void generateFile(final File file, final Map<IPath, Collection<RobotProblemWithPosition>> map) {
         logger.log("Generating report file '" + file.getAbsolutePath() + "'");
         try (ReportWithCheckstyleFormat checkstyleReporter = new ReportWithCheckstyleFormat(file)) {
             checkstyleReporter.writeHeader();
-            checkstyleReporter.writeEntries(problems);
+            checkstyleReporter.writeEntries(map);
             checkstyleReporter.writeFooter();
             logger.log("Report file '" + file.getAbsolutePath() + "' has been generated");
         } catch (final IOException e) {
