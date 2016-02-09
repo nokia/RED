@@ -181,7 +181,7 @@ public enum KeywordsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Given keyword name '%s' is not consistent with keyword definition name '%s'";
+            return "Given keyword name '%s' is not consistent with keyword definition '%s'";
         }
 
         @Override
@@ -194,6 +194,18 @@ public enum KeywordsProblem implements IProblemCause {
             return newArrayList(new ChangeKeywordNameFixer(marker.getAttribute(AdditionalMarkerAttributes.NAME, null),
                     marker.getAttribute(AdditionalMarkerAttributes.ORIGINAL_NAME, null),
                     marker.getAttribute(AdditionalMarkerAttributes.SOURCES, "")));
+        }
+    },
+    KEYWORD_NAME_WITH_DOTS {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Given keyword name '%s' contains dots. Use underscores instead of dots in keywords names.";
         }
     },
     DOCUMENT_SYNONIM {

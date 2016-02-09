@@ -65,7 +65,7 @@ class KeywordTableValidator implements ModelUnitValidator {
 
         validateByExternal(robotKeywordsSection, monitor);
 
-        reportEmptyKeyword(keywords);
+        reportEmptyKeywordAndWrongKeywordName(keywords);
         reportDuplicatedKeywords(keywords);
         reportSettingsProblems(keywords);
         reportKeywordUsageProblems(keywords);
@@ -81,15 +81,18 @@ class KeywordTableValidator implements ModelUnitValidator {
         new DeprecatedKeywordHeaderAlias(validationContext.getFile(), reporter, section).validate(monitor);
     }
 
-    private void reportEmptyKeyword(final List<UserKeyword> keywords) {
+    private void reportEmptyKeywordAndWrongKeywordName(final List<UserKeyword> keywords) {
         for (final UserKeyword keyword : keywords) {
             final RobotToken keywordName = keyword.getKeywordName();
+            final String name = keywordName.getText();
+            if(name.contains(".")) {
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_WITH_DOTS).formatMessageWith(name);
+                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,name);
+                reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
+            }
             if (isReturnEmpty(keyword) && !hasAnythingToExecute(keyword)) {
-                final String name = keywordName.getText();
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD)
-                        .formatMessageWith(name);
-                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
-                        name);
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD).formatMessageWith(name);
+                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,name);
                 reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
             }
         }
