@@ -116,7 +116,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
     private boolean keywordProposalIsConflicting(final RedKeywordProposal keywordEntity) {
         final KeywordEntity bestMatching = assist.getBestMatchingKeyword(keywordEntity.getNameFromDefinition());
-        return !bestMatching.equals(keywordEntity);
+        return !keywordEntity.equals(bestMatching);
     }
 
     protected String getSeparatorToFollow() {
