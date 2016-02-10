@@ -142,8 +142,8 @@ class KeywordSettingsValidator implements ModelUnitValidator {
             final boolean isVararg = argumentToken.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION);
             final boolean isKwarg = argumentToken.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
 
-            if (wasDefault && !isDefault && !isVararg) {
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DEFAULT_ARGUMENT_AFTER_NON_DEFAULT)
+            if (wasDefault && !isDefault && !isVararg && !isKwarg) {
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.NON_DEFAULT_ARGUMENT_AFTER_DEFAULT)
                         .formatMessageWith(argumentToken.getText());
                 reporter.handleProblem(problem, validationContext.getFile(), argumentToken);
             }
