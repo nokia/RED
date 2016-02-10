@@ -17,20 +17,20 @@ public final class QualifiedKeywordName {
 
     private final String source;
     
-    private String embeddedName;
+    private final String embeddedName;
 
     private QualifiedKeywordName(final String name, final String source) {
-        this.name = name;
-        this.source = source;
+        this(name, null, source);
     }
     
     private QualifiedKeywordName(final String name, final String embeddedName, final String source) {
-        this(name, source);
+        this.name = name;
+        this.source = source;
         this.embeddedName = embeddedName;
     }
 
     public static QualifiedKeywordName create(final String name, final String sourceName) {
-        return new QualifiedKeywordName(name, sourceName);
+        return new QualifiedKeywordName(unifyDefinition(name), sourceName);
     }
 
     public static QualifiedKeywordName fromOccurrence(final String givenWholeName) {
