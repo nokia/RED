@@ -98,5 +98,10 @@ public class ATextualRobotFileParserSpecialCasesTest {
         public IRobotFileParser newInstance() {
             return new DummyATextualRobotFileParser();
         }
+
+        @Override
+        public boolean isPrettyAlignLineOnly(String currentLineText) {
+            return false;
+        }
     }
 }
