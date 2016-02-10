@@ -10,6 +10,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -17,16 +19,13 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicates;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 
 public class InstalledRobotEnvironments {
 
     // active environment is cached, since its retrieval can take a little bit
     private static RobotRuntimeEnvironment active = null;
-    private static List<RobotRuntimeEnvironment> all = null;
+    private static Map<File, RobotRuntimeEnvironment> all = null;
     static {
         InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID).addPreferenceChangeListener(
                 new IPreferenceChangeListener() {
@@ -56,7 +55,18 @@ public class InstalledRobotEnvironments {
         final ArrayList<String> paths = newArrayList(allRuntimes.split(";"));
         for (final String path : paths) {
             if (new File(path).equals(file)) {
-                return createRuntimeEnvironment(path);
+                if (all != null && all.get(file) != null) {
+                    return all.get(file);
+                } else {
+                    final RobotRuntimeEnvironment env = createRuntimeEnvironment(file.getAbsolutePath());
+                    if (env != null) {
+                        if (all == null) {
+                            all = new ConcurrentHashMap<>();
+                        }
+                        all.put(file, env);
+                        return env;
+                    }
+                }
             }
         }
         return null;
@@ -66,14 +76,14 @@ public class InstalledRobotEnvironments {
         if (all == null) {
             all = readAllFromPreferences(preferences);
         }
-        return all;
+        return newArrayList(all.values());
     }
 
     private static RobotRuntimeEnvironment readActiveFromPreferences(final RedPreferences preferences) {
         return createRuntimeEnvironment(preferences.getActiveRuntime());
     }
     
-    private static List<RobotRuntimeEnvironment> readAllFromPreferences(final RedPreferences preferences) {
+    private static Map<File, RobotRuntimeEnvironment> readAllFromPreferences(final RedPreferences preferences) {
         return createRuntimeEnvironments(preferences.getAllRuntimes());
     }
 
@@ -81,17 +91,17 @@ public class InstalledRobotEnvironments {
         return Strings.isNullOrEmpty(path) ? null : RobotRuntimeEnvironment.create(path);
     }
 
-    private static List<RobotRuntimeEnvironment> createRuntimeEnvironments(final String allPaths) {
+    private static Map<File, RobotRuntimeEnvironment> createRuntimeEnvironments(final String allPaths) {
         if (Strings.isNullOrEmpty(allPaths)) {
-            return newArrayList();
+            return new ConcurrentHashMap<>();
         }
-        final List<String> all = newArrayList(allPaths.split(";"));
-        final List<RobotRuntimeEnvironment> envs = newArrayList(Iterables.transform(all, new Function<String, RobotRuntimeEnvironment>() {
-            @Override
-            public RobotRuntimeEnvironment apply(final String path) {
-                return createRuntimeEnvironment(path);
+        final Map<File, RobotRuntimeEnvironment> envs = new ConcurrentHashMap<>();
+        for (final String path : allPaths.split(";")) {
+            final RobotRuntimeEnvironment env = createRuntimeEnvironment(path);
+            if (env != null) {
+                envs.put(env.getFile(), env);
             }
-        }));
-        return newArrayList(Iterables.filter(envs, Predicates.notNull()));
+        }
+        return envs;
     }
 }
