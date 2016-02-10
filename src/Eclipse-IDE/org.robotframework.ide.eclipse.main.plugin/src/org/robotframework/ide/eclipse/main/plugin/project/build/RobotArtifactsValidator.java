@@ -22,6 +22,7 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -67,7 +68,7 @@ public class RobotArtifactsValidator {
 
         try {
             final Optional<? extends ModelUnitValidator> validator = createValidationUnits(context, file,
-                    ProblemsReportingStrategy.reportOnly());
+                    ProblemsReportingStrategy.reportOnly(), true);
             if (validator.isPresent()) {
                 final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
 
@@ -180,7 +181,7 @@ public class RobotArtifactsValidator {
             @Override
             public boolean visit(final IResource resource) throws CoreException {
                 final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context, resource,
-                        reporter);
+                        reporter, false);
                 if (validationUnit.isPresent()) {
                     final ModelUnitValidator unit = validationUnit.get();
                     validators.add(unit);
@@ -201,7 +202,7 @@ public class RobotArtifactsValidator {
                 if (delta.getKind() != IResourceDelta.REMOVED && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
                     final IResource file = delta.getResource();
                     final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context, file,
-                            reporter);
+                            reporter, false);
                     if (validationUnit.isPresent()) {
                         validators.add(new ModelUnitValidator() {
 
@@ -220,13 +221,16 @@ public class RobotArtifactsValidator {
     }
 
     private static Optional<? extends ModelUnitValidator> createValidationUnits(final ValidationContext context,
-            final IResource resource, final ProblemsReportingStrategy reporter) throws CoreException {
-        return shouldValidate(context.getProjectConfiguration(), resource)
-                ? createProperValidator(context, (IFile) resource, reporter) : Optional.<ModelUnitValidator> absent();
+            final IResource resource, final ProblemsReportingStrategy reporter, final boolean isRevalidating)
+            throws CoreException {
+        return shouldValidate(context.getProjectConfiguration(), resource, isRevalidating) ? createProperValidator(
+                context, (IFile) resource, reporter) : Optional.<ModelUnitValidator> absent();
     }
 
-    private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource) {
-        if (resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource) ) {
+    private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource,
+            final boolean isRevalidating) {
+        if (resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource)
+                && hasRequiredFileSize(robotProjectConfig, resource, isRevalidating)) {
             final List<ExcludedFolderPath> excludedPaths = robotProjectConfig.getExcludedPath();
             for (final ExcludedFolderPath excludedPath : excludedPaths) {
 
@@ -246,6 +250,26 @@ public class RobotArtifactsValidator {
             }
         }
         return false;
+    }
+    
+    private static boolean hasRequiredFileSize(final RobotProjectConfig robotProjectConfig, final IResource resource,
+            final boolean isRevalidating) {
+        if (!isRevalidating && robotProjectConfig.isValidatedFileSizeCheckingEnabled()) {
+            final IPath fileLocation = resource.getLocation();
+            if (fileLocation != null) {
+                final long fileSizeInKilobytes = fileLocation.toFile().length() / 1024;
+                long maxFileSize = 0L;
+                try {
+                    maxFileSize = Long.parseLong(robotProjectConfig.getValidatedFileMaxSize());
+                } catch (final NumberFormatException e) {
+                    maxFileSize = Long.parseLong(robotProjectConfig.getValidatedFileDefaultMaxSize());
+                }
+                if (fileSizeInKilobytes > maxFileSize) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public static Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext context,
