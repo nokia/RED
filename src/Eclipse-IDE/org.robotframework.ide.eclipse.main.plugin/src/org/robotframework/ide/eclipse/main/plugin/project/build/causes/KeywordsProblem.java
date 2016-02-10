@@ -150,7 +150,7 @@ public enum KeywordsProblem implements IProblemCause {
             return "The '%s' argument is defined multiple times";
         }
     },
-    DEFAULT_ARGUMENT_AFTER_NON_DEFAULT {
+    NON_DEFAULT_ARGUMENT_AFTER_DEFAULT {
 
         @Override
         public String getProblemDescription() {
