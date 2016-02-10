@@ -112,9 +112,9 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                                     keywordEntity.exposingResource, keywordEntity.userKeyword));
                             break;
                         default:
-                            definitionHyperlinks.add(new LibrarySourceHyperlink(fromRegion,
+                            definitionHyperlinks.add(new LibrarySourceHyperlink(adjustedFromRegion,
                                     suiteFile.getFile().getProject(), keywordEntity.libSpec));
-                            documentationHyperlinks.add(new KeywordDocumentationHyperlink(fromRegion,
+                            documentationHyperlinks.add(new KeywordDocumentationHyperlink(adjustedFromRegion,
                                     keywordEntity.libSpec, keywordEntity.kwSpec));
                             break;
                     }
