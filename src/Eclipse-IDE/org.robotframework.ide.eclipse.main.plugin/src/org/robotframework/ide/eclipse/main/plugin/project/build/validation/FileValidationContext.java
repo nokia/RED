@@ -35,19 +35,18 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
     private Set<String> accessibleVariables;
 
     public FileValidationContext(final ValidationContext context, final IFile file) {
-        this(context, file, null);
-    }
-
-    @VisibleForTesting
-    public FileValidationContext(final ValidationContext context, final IFile file,
-            final Set<String> accessibleVariables) {
-        super(file.getFullPath(), new AccessibleKeywordsCollector() {
-
+        this(context, file, new AccessibleKeywordsCollector() {
             @Override
             public Map<String, Collection<KeywordEntity>> collect() {
                 return context.collectAccessibleKeywordNames(file);
             }
-        });
+        }, null);
+    }
+
+    @VisibleForTesting
+    public FileValidationContext(final ValidationContext context, final IFile file,
+            final AccessibleKeywordsCollector accessibleKeywordsCollector, final Set<String> accessibleVariables) {
+        super(file.getFullPath(),accessibleKeywordsCollector);
         this.context = context;
         this.file = file;
         this.accessibleVariables = accessibleVariables;
@@ -78,6 +77,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
     public static final class ValidationKeywordEntity extends KeywordEntity {
 
+        @VisibleForTesting
         ValidationKeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,
                 final String alias, final boolean isDeprecated, final IPath exposingFilepath) {
             super(scope, sourceName, keywordName, alias, isDeprecated, exposingFilepath);
