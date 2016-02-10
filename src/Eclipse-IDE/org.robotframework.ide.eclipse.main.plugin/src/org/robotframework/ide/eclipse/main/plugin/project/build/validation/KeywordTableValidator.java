@@ -22,6 +22,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -34,7 +35,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywo
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.DocumentationUserKeywordDeclarationSettingValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywords.PostconditionDeclarationExistanceValidator;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
@@ -188,26 +188,14 @@ class KeywordTableValidator implements ModelUnitValidator {
         final Set<String> arguments = newHashSet();
 
         // first add arguments embedded in name, then from [Arguments] setting
-        arguments.addAll(newArrayList(transform(VariableNamesSupport.extractUnifiedVariableNamesFromArguments(
-                newArrayList(keyword.getKeywordName()), extractor, fileName), removeRegex())));
+        arguments.addAll(newArrayList(transform(
+                VariableNamesSupport
+                        .extractUnifiedVariables(newArrayList(keyword.getKeywordName()), extractor, fileName).keySet(),
+                EmbeddedKeywordNamesSupport.removeRegexFunction())));
         for (final KeywordArguments argument : keyword.getArguments()) {
-            arguments.addAll(VariableNamesSupport.extractUnifiedVariableNamesFromArguments(argument.getArguments(),
-                    extractor, fileName));
+            arguments.addAll(VariableNamesSupport.extractUnifiedVariables(argument.getArguments(), extractor, fileName)
+                    .keySet());
         }
         return arguments;
-    }
-
-    private static Function<String, String> removeRegex() {
-        return new Function<String, String>() {
-
-            @Override
-            public String apply(final String variable) {
-                return removeRegex(variable);
-            }
-        };
-    }
-
-    private static String removeRegex(final String variable) {
-        return variable.indexOf(':') != -1 ? variable.substring(0, variable.indexOf(':')) + "}" : variable;
     }
 }
