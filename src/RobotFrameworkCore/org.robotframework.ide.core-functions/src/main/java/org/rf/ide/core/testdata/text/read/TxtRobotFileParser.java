@@ -34,4 +34,9 @@ public class TxtRobotFileParser extends ATextualRobotFileParser {
     public IRobotFileParser newInstance() {
         return new TxtRobotFileParser();
     }
+
+    @Override
+    public boolean isPrettyAlignLineOnly(String currentLineText) {
+        return " ".equals(currentLineText);
+    }
 }

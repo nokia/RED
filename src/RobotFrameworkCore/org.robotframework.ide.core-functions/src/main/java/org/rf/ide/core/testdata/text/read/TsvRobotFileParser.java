@@ -29,4 +29,9 @@ public class TsvRobotFileParser extends ATextualRobotFileParser {
     public IRobotFileParser newInstance() {
         return new TsvRobotFileParser();
     }
+
+    @Override
+    public boolean isPrettyAlignLineOnly(final String currentLineText) {
+        return currentLineText.replaceAll(" ", "").length() == 0;
+    }
 }
