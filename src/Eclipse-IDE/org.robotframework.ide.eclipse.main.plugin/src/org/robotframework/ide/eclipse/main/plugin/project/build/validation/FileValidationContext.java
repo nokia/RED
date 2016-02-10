@@ -24,6 +24,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.annotations.VisibleForTesting;
+
 public class FileValidationContext extends AccessibleKeywordsEntities {
 
     private final ValidationContext context;
@@ -33,7 +35,14 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
     private Set<String> accessibleVariables;
 
     public FileValidationContext(final ValidationContext context, final IFile file) {
+        this(context, file, null);
+    }
+
+    @VisibleForTesting
+    public FileValidationContext(final ValidationContext context, final IFile file,
+            final Set<String> accessibleVariables) {
         super(file.getFullPath(), new AccessibleKeywordsCollector() {
+
             @Override
             public Map<String, Collection<KeywordEntity>> collect() {
                 return context.collectAccessibleKeywordNames(file);
@@ -41,6 +50,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         });
         this.context = context;
         this.file = file;
+        this.accessibleVariables = accessibleVariables;
     }
 
     public IFile getFile() {
