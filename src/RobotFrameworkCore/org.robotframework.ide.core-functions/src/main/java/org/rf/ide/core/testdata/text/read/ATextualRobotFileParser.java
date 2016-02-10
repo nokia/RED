@@ -220,7 +220,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 RobotToken rt = null;
 
                 boolean wasPrettyAlign = false;
-                if (" ".equals(currentLineText)) {
+                if (isPrettyAlignLineOnly(currentLineText)) {
                     rt = new RobotToken();
                     rt.setLineNumber(lineNumber);
                     rt.setRaw(currentLineText);
@@ -366,6 +366,8 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
         return parsingOutput;
     }
+
+    public abstract boolean isPrettyAlignLineOnly(final String currentLineText);
 
     @VisibleForTesting
     protected int handleCRLFcaseSplittedBetweenBuffers(final RobotFileOutput parsingOutput, final LineReader lineHolder,

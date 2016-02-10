@@ -25,6 +25,8 @@ import org.rf.ide.core.testdata.text.read.TxtRobotFileParser;
 
 public class RobotParser {
 
+    private static final int MAX_NUMBER_OF_TRASH_LINES = 5000;
+
     private static final List<IRobotFileParser> AVAIL_FORMAT_PARSERS = new ArrayList<>();
 
     static {
@@ -101,7 +103,9 @@ public class RobotParser {
             if (fileModel.containsAnyRobotSection()) {
                 importExternal(robotFile);
             } else {
-                fileModel.removeLines();
+                if (fileModel.getFileContent().size() > MAX_NUMBER_OF_TRASH_LINES) {
+                    fileModel.removeLines();
+                }
             }
         } else {
             robotFile.addBuildMessage(
@@ -149,7 +153,9 @@ public class RobotParser {
                     if (fileModel.containsAnyRobotSection()) {
                         importExternal(robotFile);
                     } else {
-                        fileModel.removeLines();
+                        if (fileModel.getFileContent().size() > MAX_NUMBER_OF_TRASH_LINES) {
+                            fileModel.removeLines();
+                        }
                     }
                     robotProject.addModelFile(robotFile);
                 }
