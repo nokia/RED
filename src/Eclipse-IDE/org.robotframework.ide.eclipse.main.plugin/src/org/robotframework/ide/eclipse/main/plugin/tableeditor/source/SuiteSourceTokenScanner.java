@@ -186,6 +186,30 @@ public class SuiteSourceTokenScanner extends RuleBasedScanner {
             if (shouldDecrement) {
                 numberOfCellSeparators--;
             }
+        } else {
+            final int oldBufferStart = buffStart;
+
+            numberOfCharsInCurrentSeparator = 0;
+            int i = 1;
+            while (true) {
+                if (fOffset - buffStart - i < 0 && buffStart == 0) {
+                    break;
+                } else if (fOffset - buffStart - i < 0) {
+                    shiftBuffer(Math.max(0, buffStart - (bufferSize / 2)));
+                }
+
+                if (buffer[fOffset - buffStart - i] == ' ') {
+                    numberOfCharsInCurrentSeparator++;
+                } else if (buffer[fOffset - buffStart - i] == '\t') {
+                    numberOfCharsInCurrentSeparator += 2;
+                } else {
+                    break;
+                }
+                i++;
+            }
+            if (oldBufferStart != buffStart) {
+                shiftBuffer(oldBufferStart);
+            }
         }
     }
 
