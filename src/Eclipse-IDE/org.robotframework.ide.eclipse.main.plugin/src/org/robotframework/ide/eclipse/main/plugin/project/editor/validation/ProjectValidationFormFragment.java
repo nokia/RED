@@ -48,8 +48,14 @@ import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorSite;
@@ -94,28 +100,36 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
     private RowExposingTreeViewer viewer;
 
+    private Button excludeFilesBtn;
+
+    private Text excludeFilesTxt;
+
     ISelectionProvider getViewer() {
         return viewer;
     }
 
     @Override
     public void initialize(final Composite parent) {
-        final Section section = createSection(parent);
+        final Section excludePartsSection = createExcludePartsSection(parent);
+        final Composite excludePartsComposite = toolkit.createComposite(excludePartsSection);
+        excludePartsSection.setClient(excludePartsComposite);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(excludePartsComposite);
+        GridLayoutFactory.fillDefaults().applyTo(excludePartsComposite);
 
-        final Composite internalComposite = toolkit.createComposite(section);
-        section.setClient(internalComposite);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().applyTo(internalComposite);
-
-        createViewer(internalComposite);
+        createViewer(excludePartsComposite);
         createColumns();
         createContextMenu();
-
         setInput();
         installResourceChangeListener();
+        
+        final Section excludeFilesSection = createExcludeFilesSection(parent);
+        final Composite excludeFilesComposite = toolkit.createComposite(excludeFilesSection);
+        excludeFilesSection.setClient(excludeFilesComposite);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 10).applyTo(excludeFilesComposite);
+        createExcludeFilesControls(excludeFilesComposite);
     }
 
-    private Section createSection(final Composite parent) {
+    private Section createExcludePartsSection(final Composite parent) {
         final Section section = toolkit.createSection(parent,
                 ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
         section.setText("Excluded project parts");
@@ -148,6 +162,44 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
             .labelsProvidedBy(new ProjectValidationPathsLabelProvider(editorInput))
             .createFor(viewer);
+    }
+    
+    private Section createExcludeFilesSection(final Composite parent) {
+        final Section section = toolkit.createSection(parent,
+                ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
+        section.setText("Excluded files by size");
+        section.setDescription("Specify files from the project which shouldn't be validated.");
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
+        return section;
+    }
+    
+    private void createExcludeFilesControls(final Composite parent) {
+        final RobotProjectConfig projectConfiguration = editorInput.getProjectConfiguration();
+        excludeFilesBtn = toolkit.createButton(parent, "Exclude files by size [KB] greater than:", SWT.CHECK);
+        excludeFilesBtn.setSelection(projectConfiguration.isValidatedFileSizeCheckingEnabled());
+
+        excludeFilesTxt = toolkit.createText(parent, projectConfiguration.getValidatedFileMaxSize());
+        GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).applyTo(excludeFilesTxt);
+        
+        excludeFilesTxt.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(ModifyEvent e) {
+                editorInput.getProjectConfiguration().setValidatedFileMaxSize(excludeFilesTxt.getText());
+                setDirty(true);
+            }
+        });
+        
+        excludeFilesBtn.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                final boolean selection = excludeFilesBtn.getSelection();
+                excludeFilesTxt.setEnabled(selection);
+                editorInput.getProjectConfiguration().setIsValidatedFileSizeCheckingEnabled(selection);
+                setDirty(true);
+            }
+        });
     }
 
     private void createContextMenu() {
@@ -329,6 +381,8 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
         setInput();
         viewer.getTree().setEnabled(false);
+        excludeFilesBtn.setEnabled(false);
+        excludeFilesTxt.setEditable(false);
     }
 
     @Inject
@@ -336,6 +390,8 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
         viewer.getTree().setEnabled(editorInput.isEditable());
+        excludeFilesBtn.setEnabled(editorInput.isEditable());
+        excludeFilesTxt.setEditable(editorInput.isEditable());
     }
 
     @Inject
