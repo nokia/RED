@@ -179,22 +179,21 @@ public class Rules {
 
             @Override
             public IToken evaluate(final ICharacterScanner scanner) {
-                int ch = scanner.read();
-                scanner.unread();
-                if (ch == EOF || Character.isWhitespace(ch)) {
-                    return Token.UNDEFINED;
-                }
-                if (ch == '[' && ((SuiteSourceTokenScanner) scanner).numberOfCellSeparatorsInLineBeforeOffset() == 1) {
+                if (CharacterScannerUtilities.lookAhead(scanner, 1).equals("[")
+                        && ((SuiteSourceTokenScanner) scanner).numberOfCellSeparatorsInLineBeforeOffset() == 1) {
                     int charactersRead = 0;
                     while (true) {
-                        ch = scanner.read();
+                        final int ch = scanner.read();
                         charactersRead++;
 
-                        if (ch == ']' && CharacterScannerUtilities
-                                .isCellSeparator(CharacterScannerUtilities.lookAhead(scanner, 3))) {
+                        final String lookAhead = CharacterScannerUtilities.lookAhead(scanner, 3);
+                        if (ch == ']' && (CharacterScannerUtilities.isCellSeparator(lookAhead) || lookAhead.isEmpty()
+                                || lookAhead.startsWith("\n") || lookAhead.startsWith("\r")
+                                || lookAhead.startsWith(" \n") || lookAhead.startsWith(" \r")
+                                || lookAhead.equals(" "))) {
                             return token;
                         } else if (ch == EOF || ch == '\r' || ch == '\n' || CharacterScannerUtilities
-                                .isCellSeparator(CharacterScannerUtilities.lookAhead(scanner, 3))) {
+                                .isCellSeparator(lookAhead)) {
                             for (int i = 0; i < charactersRead; i++) {
                                 scanner.unread();
                             }
