@@ -5,13 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
-import static com.google.common.collect.Sets.newHashSet;
-
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -28,7 +27,7 @@ import com.google.common.collect.Range;
  */
 public class MockReporter extends ProblemsReportingStrategy {
 
-    private final Set<Problem> problems = newHashSet();
+    private final List<Problem> problems = new ArrayList<>();
 
     public MockReporter() {
         super(false);
