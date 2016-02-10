@@ -33,13 +33,15 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "variableMappings", "libraries", "remoteLocations",
-        "referencedVariableFiles", "excludedPath" })
+        "referencedVariableFiles", "excludedPath", "isValidatedFileSizeCheckingEnabled", "validatedFileMaxSize" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
     public static final String FILENAME = "red.xml";
 
     private static final String CURRENT_VERSION = "1.0";
+    
+    private static final String VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB = "1024";
 
     @XmlElement(name = "configVersion", required = true)
     private String version;
@@ -61,6 +63,12 @@ public class RobotProjectConfig {
 
     @XmlElementWrapper(name = "excludedForValidation", required = false)
     private List<ExcludedFolderPath> excludedPath = new ArrayList<>();
+    
+    @XmlElement(name = "isValidatedFileSizeCheckingEnabled", required = true)
+    private boolean isValidatedFileSizeCheckingEnabled = true;
+    
+    @XmlElement(name = "validatedFileMaxSize", required = true)
+    private String validatedFileMaxSize = VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB;
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -121,6 +129,26 @@ public class RobotProjectConfig {
 
     public List<ExcludedFolderPath> getExcludedPath() {
         return excludedPath;
+    }
+    
+    public void setIsValidatedFileSizeCheckingEnabled(final boolean isFileSizeCheckingEnabled) {
+        this.isValidatedFileSizeCheckingEnabled = isFileSizeCheckingEnabled;
+    }
+
+    public boolean isValidatedFileSizeCheckingEnabled() {
+        return this.isValidatedFileSizeCheckingEnabled;
+    }
+    
+    public void setValidatedFileMaxSize(final String validatedFileMaxSize) {
+        this.validatedFileMaxSize = validatedFileMaxSize;
+    }
+
+    public String getValidatedFileMaxSize() {
+        return this.validatedFileMaxSize;
+    }
+    
+    public String getValidatedFileDefaultMaxSize() {
+        return VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB;
     }
 
     public void addExcludedPath(final IPath path) {
