@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _JbiswKQQEeW4l-rLhvMqpg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/9/16 3:25 PM
+Save-Time: 2/10/16 1:48 PM
 
 ------=_contents/RobotProject/libspecs/XML.libspec-5f0968c1-3b2e-33be-bc28-91ac92d378f5
 Content-Type: q7/binary
@@ -213,10 +213,11 @@ AAAAAAAuY29udGVudFBLBQYAAAAAAQABADYAAACLLQAAAAA=
 Content-Type: q7/binary
 Entry-Name: contents/RobotProject/settings_colour.robot
 
-UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnTT0tJSCEktLlFwTixOLVbQ0tLiAmIF
-79TK8vyiFIiAd7khlwIQRLvkJ5fmpuaVJJZk5ufFgoRKUitKIHIKjkXpYMliBbCMSnViLYhMgkiXZGQW
-KwBRNsRgsCCYAABQSwcI9M9nH10AAACBAAAAUEsBAhQAFAAICAgAAAAhAPTPZx9dAAAAgQAAAAgAAAAA
-AAAAAAAAAAAAAAAAAC5jb250ZW50UEsFBgAAAAABAAEANgAAAJMAAAAAAA==
+UEsDBBQACAgIAAAAIQAAAAAAAAAAAAAAAAAIAAAALmNvbnRlbnQljcEKwkAMRO/9ijl4ym39A9FbPYm3
+IhI1tEXtwiZ1FfHf3W5CZkjeQEJEOIoatqyiIKKmCK18ckw3B20ODUp1u3idnzIZ2xin04JM3uYZNqmv
+oaImqy//Fr94bMOoKH33ww4HVnDqAQ5F6wr3sezB5+4gNif/NEk+v/hRebU/UEsHCGLZsyd/AAAAugAA
+AFBLAQIUABQACAgIAAAAIQBi2bMnfwAAALoAAAAIAAAAAAAAAAAAAAAAAAAAAAAuY29udGVudFBLBQYA
+AAAAAQABADYAAAC1AAAAAAA=
 ------=_contents/RobotProject/settings_colour.robot-b82c980f-46ff-3e3f-8e42-e6673b7bc266--
 ------=_contents/RobotProject/TestFile.robot-119b10ac-356b-31b0-b25a-1639adaa4fcb
 Content-Type: q7/binary
