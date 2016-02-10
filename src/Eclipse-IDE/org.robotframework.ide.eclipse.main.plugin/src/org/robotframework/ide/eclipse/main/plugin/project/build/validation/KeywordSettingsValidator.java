@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -15,12 +18,17 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDecla
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * @author Michal Anglart
@@ -44,6 +52,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         reportUnknownSettings();
+        reportDuplicatedArgumentSettings();
         reportDuplicatedArguments();
         reportArgumentsOrderProblems();
     }
@@ -58,24 +67,59 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         }
     }
 
-    private void reportDuplicatedArguments() {
+    private void reportDuplicatedArgumentSettings() {
         final String kwName = keyword.getKeywordName().getText();
 
         final IFile file = validationContext.getFile();
         final List<KeywordArguments> args = keyword.getArguments();
         if (args != null && args.size() > 1) {
             for (final KeywordArguments arg : args) {
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENTS_DEFINED_TWICE)
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENT_SETTING_DEFINED_TWICE)
                         .formatMessageWith(kwName);
                 reporter.handleProblem(problem, file, arg.getDeclaration());
             }
         }
         final String fileName = file.getName();
         if (args != null && !args.isEmpty() && hasEmbeddedArguments(fileName, keyword)) {
-            final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENTS_DEFINED_TWICE)
+            final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENT_SETTING_DEFINED_TWICE)
                     .formatMessageWith(kwName);
             reporter.handleProblem(problem, file, keyword.getKeywordName());
         }
+    }
+
+    private void reportDuplicatedArguments() {
+        final String fileName = validationContext.getFile().getName();
+        
+        final Multimap<String, RobotToken> arguments = extractArgumentVariables(keyword, new VariableExtractor(),
+                fileName);
+
+        for (final String arg : arguments.keySet()) {
+            final Collection<RobotToken> tokens = arguments.get(arg);
+            if (tokens.size() > 1) {
+                for (final RobotToken token : tokens) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENT_DEFINED_TWICE)
+                            .formatMessageWith(token.getText());
+                    reporter.handleProblem(problem, validationContext.getFile(), token);
+                }
+            }
+        }
+    }
+
+    private Multimap<String, RobotToken> extractArgumentVariables(final UserKeyword keyword,
+            final VariableExtractor extractor, final String fileName) {
+        final Multimap<String, RobotToken> arguments = ArrayListMultimap.create();
+        
+        // first add arguments embedded in name, then from [Arguments] setting
+        final Multimap<String, RobotToken> embeddedArguments = VariableNamesSupport
+                .extractUnifiedVariables(newArrayList(keyword.getKeywordName()), extractor, fileName);
+        for (final String argName : embeddedArguments.keySet()) {
+            arguments.putAll(EmbeddedKeywordNamesSupport.removeRegex(argName), embeddedArguments.get(argName));
+        }
+        for (final KeywordArguments argument : keyword.getArguments()) {
+            arguments
+                    .putAll(VariableNamesSupport.extractUnifiedVariables(argument.getArguments(), extractor, fileName));
+        }
+        return arguments;
     }
 
     private boolean hasEmbeddedArguments(final String fileName, final UserKeyword keyword) {
