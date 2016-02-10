@@ -137,11 +137,17 @@ public enum KeywordsProblem implements IProblemCause {
             return "Keyword '%s' is from a library nested in a resource file";
         }
     },
-    ARGUMENTS_DEFINED_TWICE {
+    ARGUMENT_SETTING_DEFINED_TWICE {
 
         @Override
         public String getProblemDescription() {
             return "Keyword '%s' arguments are defined in multiple ways";
+        }
+    },
+    ARGUMENT_DEFINED_TWICE {
+        @Override
+        public String getProblemDescription() {
+            return "The '%s' argument is defined multiple times";
         }
     },
     DEFAULT_ARGUMENT_AFTER_NON_DEFAULT {
@@ -209,12 +215,6 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     DOCUMENT_SYNONIM {
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
-        }
-
         @Override
         public boolean hasResolution() {
             return true;
@@ -231,12 +231,6 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     POSTCONDITION_SYNONIM {
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
-        }
-
         @Override
         public boolean hasResolution() {
             return true;
@@ -253,12 +247,6 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     USER_KEYWORD_TABLE_HEADER_SYNONIM {
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
-        }
-
         @Override
         public boolean hasResolution() {
             return true;
