@@ -17,6 +17,8 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDecla
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 /**
  * @author mmarzec
@@ -34,12 +36,15 @@ public class VariableNamesSupport {
         return vars;
     }
     
-    public static List<String> extractUnifiedVariableNamesFromArguments(final List<RobotToken> assignments,
+    public static Multimap<String, RobotToken> extractUnifiedVariables(final List<RobotToken> assignments,
             final VariableExtractor extractor, final String fileName) {
-        final List<String> vars = newArrayList();
+        final Multimap<String, RobotToken> vars = ArrayListMultimap.create();
         for (final RobotToken token : assignments) {
             final MappingResult mappingResult = extractor.extract(token, fileName);
-            vars.addAll(extractUnifiedVariableNames(mappingResult.getCorrectVariables()));
+            for (final VariableDeclaration variableDeclaration : mappingResult.getCorrectVariables()) {
+                vars.put(extractUnifiedVariableName(variableDeclaration.asToken().getText()),
+                        variableDeclaration.asToken());
+            }
         }
         return vars;
     }

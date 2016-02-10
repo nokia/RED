@@ -9,6 +9,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.google.common.base.Function;
+
 /**
  * @author Michal Anglart
  */
@@ -75,4 +77,16 @@ public class EmbeddedKeywordNamesSupport {
         return VARIABLE_MATCHER.matcher(definitionName).find();
     }
 
+    public static Function<String, String> removeRegexFunction() {
+        return new Function<String, String>() {
+            @Override
+            public String apply(final String variable) {
+                return removeRegex(variable);
+            }
+        };
+    }
+
+    public static String removeRegex(final String variable) {
+        return variable.indexOf(':') != -1 ? variable.substring(0, variable.indexOf(':')) + "}" : variable;
+    }
 }
