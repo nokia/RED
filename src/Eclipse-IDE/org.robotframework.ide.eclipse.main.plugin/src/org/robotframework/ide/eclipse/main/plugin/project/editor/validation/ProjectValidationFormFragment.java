@@ -110,26 +110,24 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
     @Override
     public void initialize(final Composite parent) {
-        final Section excludePartsSection = createExcludePartsSection(parent);
-        final Composite excludePartsComposite = toolkit.createComposite(excludePartsSection);
-        excludePartsSection.setClient(excludePartsComposite);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(excludePartsComposite);
-        GridLayoutFactory.fillDefaults().applyTo(excludePartsComposite);
+        final Section section = createSection(parent);
+        final Composite internalComposite = toolkit.createComposite(section);
+        section.setClient(internalComposite);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().applyTo(internalComposite);
 
-        createViewer(excludePartsComposite);
+        createViewer(internalComposite);
         createColumns();
         createContextMenu();
         setInput();
         installResourceChangeListener();
         
-        final Section excludeFilesSection = createExcludeFilesSection(parent);
-        final Composite excludeFilesComposite = toolkit.createComposite(excludeFilesSection);
-        excludeFilesSection.setClient(excludeFilesComposite);
+        final Composite excludeFilesComposite = toolkit.createComposite(internalComposite);
         GridLayoutFactory.fillDefaults().numColumns(2).margins(0, 10).applyTo(excludeFilesComposite);
         createExcludeFilesControls(excludeFilesComposite);
     }
 
-    private Section createExcludePartsSection(final Composite parent) {
+    private Section createSection(final Composite parent) {
         final Section section = toolkit.createSection(parent,
                 ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
         section.setText("Excluded project parts");
@@ -162,15 +160,6 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
             .labelsProvidedBy(new ProjectValidationPathsLabelProvider(editorInput))
             .createFor(viewer);
-    }
-    
-    private Section createExcludeFilesSection(final Composite parent) {
-        final Section section = toolkit.createSection(parent,
-                ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
-        section.setText("Excluded files by size");
-        section.setDescription("Specify files from the project which shouldn't be validated.");
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(section);
-        return section;
     }
     
     private void createExcludeFilesControls(final Composite parent) {
