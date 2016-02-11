@@ -137,6 +137,10 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
                     }
                 });
             }
+
+            for (final Runnable operation : redCompletionProposal.operationsToPerformAfterAccepting()) {
+                operation.run();
+            }
         }
     }
 
