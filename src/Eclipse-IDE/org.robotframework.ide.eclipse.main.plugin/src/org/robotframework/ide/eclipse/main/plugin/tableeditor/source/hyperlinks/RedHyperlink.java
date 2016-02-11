@@ -19,4 +19,6 @@ public interface RedHyperlink extends IHyperlink {
 
     ImageDescriptor getImage();
 
+    String additionalLabelDecoration();
+
 }

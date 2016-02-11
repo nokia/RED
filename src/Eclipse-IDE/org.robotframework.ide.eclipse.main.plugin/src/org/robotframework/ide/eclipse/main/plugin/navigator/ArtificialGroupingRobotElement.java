@@ -71,7 +71,7 @@ public class ArtificialGroupingRobotElement implements RobotFileInternalElement 
     }
 
     @Override
-    public Position getDefinitionPosition() {
+    public DefinitionPosition getDefinitionPosition() {
         return groupedElements.get(0).getDefinitionPosition();
     }
 

@@ -190,11 +190,9 @@ public class RobotCase extends RobotCodeHoldingElement {
     }
 
     @Override
-    public Position getDefinitionPosition() {
-        final int begin = testCase.getTestName().getStartOffset();
-        final int length = testCase.getTestName().getText().length();
-
-        return new Position(begin, length);
+    public DefinitionPosition getDefinitionPosition() {
+        return new DefinitionPosition(testCase.getTestName().getFilePosition(),
+                testCase.getTestName().getText().length());
     }
 
     public Optional<String> getTemplateInUse() {

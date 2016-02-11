@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
@@ -136,7 +137,12 @@ public class HyperlinkDialog extends PopupDialog {
         @Override
         public StyledString getStyledText(final Object element) {
             final RedHyperlink hyperlink = (RedHyperlink) element;
-            return new StyledString(hyperlink.getLabelForCompoundHyperlinksDialog());
+            final StyledString label = new StyledString(hyperlink.getLabelForCompoundHyperlinksDialog());
+            final String additional = hyperlink.additionalLabelDecoration();
+            if (!additional.isEmpty()) {
+                label.append(" " + additional, Stylers.Common.ECLIPSE_DECORATION_STYLER);
+            }
+            return label;
         }
 
         @Override

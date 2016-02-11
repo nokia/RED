@@ -92,9 +92,9 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
     }
 
     @Override
-    public Position getDefinitionPosition() {
+    public DefinitionPosition getDefinitionPosition() {
         final RobotToken tableHeader = sectionTable.getHeaders().get(0).getTableHeader();
-        return new Position(tableHeader.getStartOffset(), tableHeader.getText().length());
+        return new DefinitionPosition(tableHeader.getFilePosition(), tableHeader.getText().length());
     }
 
     @Override

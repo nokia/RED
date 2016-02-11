@@ -43,7 +43,7 @@ public class SettingMetaSynonimFixer extends RedSuiteMarkerResolution {
             final Range<Integer> range = getRange(marker);
             final List<RobotKeywordCall> metadataSettings = section.get().getMetadataSettings();
             for (final RobotKeywordCall robotKeywordCall : metadataSettings) {
-                if (range.contains(robotKeywordCall.getDefinitionPosition().offset)) {
+                if (range.contains(robotKeywordCall.getDefinitionPosition().getOffset())) {
                     try {
                         proposal = createProposal(document, robotKeywordCall, suiteModel);
                     } catch (final BadLocationException e) {

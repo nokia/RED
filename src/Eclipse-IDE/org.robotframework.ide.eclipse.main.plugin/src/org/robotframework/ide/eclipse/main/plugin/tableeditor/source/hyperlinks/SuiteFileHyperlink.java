@@ -27,34 +27,24 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
  */
 public class SuiteFileHyperlink implements RedHyperlink {
 
-    static final String DEFAULT_TEXT = "Open Definition";
-
     private final IRegion source;
 
     private final IRegion destination;
 
     private final RobotSuiteFile destinationFile;
 
-    private final String label;
-
-    public SuiteFileHyperlink(final IRegion from, final RobotSuiteFile toFile) {
-        this(from, toFile, null, DEFAULT_TEXT);
-    }
-
-    public SuiteFileHyperlink(final IRegion from, final RobotSuiteFile toFile, final String label) {
-        this(from, toFile, null, label);
-    }
+    private final String additionalLabelDecoration;
 
     public SuiteFileHyperlink(final IRegion from, final RobotSuiteFile toFile, final IRegion to) {
-        this(from, toFile, to, DEFAULT_TEXT);
+        this(from, toFile, to, "");
     }
 
     public SuiteFileHyperlink(final IRegion from, final RobotSuiteFile toFile, final IRegion to,
-            final String label) {
+            final String additionalLabelDecoration) {
         this.source = from;
         this.destinationFile = toFile;
         this.destination = to;
-        this.label = label;
+        this.additionalLabelDecoration = additionalLabelDecoration;
     }
 
     @Override
@@ -69,12 +59,17 @@ public class SuiteFileHyperlink implements RedHyperlink {
 
     @Override
     public String getHyperlinkText() {
-        return label;
+        return "Open Definition";
     }
 
     @Override
     public String getLabelForCompoundHyperlinksDialog() {
         return destinationFile.getName();
+    }
+
+    @Override
+    public String additionalLabelDecoration() {
+        return additionalLabelDecoration;
     }
 
     @Override
