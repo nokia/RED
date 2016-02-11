@@ -20,7 +20,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
@@ -29,6 +28,7 @@ import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.N
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
@@ -98,24 +98,32 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             for (final KeywordScope scope : KeywordScope.defaultOrder()) {
                 for (final KeywordEntity keyword : keywords.get(scope)) {
                     final KeywordHyperlinkEntity keywordEntity = (KeywordHyperlinkEntity) keyword;
+                    final DefinitionPosition keywordPosition = keywordEntity.destinationPosition;
                     switch (scope) {
                         case LOCAL:
+                            String lbl = "[" + keywordEntity.getNameFromDefinition() + ", line: "
+                                    + keywordPosition.getLine() + "] ["
+                                    + keywordEntity.exposingResource.getFile().getFullPath() + "]";
+
                             definitionHyperlinks.add(new RegionsHyperlink(textViewer, keywordEntity.exposingResource,
-                                    adjustedFromRegion, keywordEntity.destinationRegion));
+                                    adjustedFromRegion, keywordPosition.toRegion(), lbl));
                             documentationHyperlinks.add(new UserKeywordDocumentationHyperlink(adjustedFromRegion,
-                                    keywordEntity.exposingResource, keywordEntity.userKeyword));
+                                    keywordEntity.exposingResource, keywordEntity.userKeyword, lbl));
                             break;
                         case RESOURCE:
+                            lbl = "[" + keywordEntity.getNameFromDefinition() + ", line: " + keywordPosition.getLine()
+                                    + "] [" + keywordEntity.exposingResource.getFile().getFullPath() + "]";
+
                             definitionHyperlinks.add(new SuiteFileHyperlink(adjustedFromRegion,
-                                    keywordEntity.exposingResource, keywordEntity.destinationRegion));
+                                    keywordEntity.exposingResource, keywordPosition.toRegion(), lbl));
                             documentationHyperlinks.add(new UserKeywordDocumentationHyperlink(adjustedFromRegion,
-                                    keywordEntity.exposingResource, keywordEntity.userKeyword));
+                                    keywordEntity.exposingResource, keywordEntity.userKeyword, lbl));
                             break;
                         default:
-                            definitionHyperlinks.add(new LibrarySourceHyperlink(adjustedFromRegion,
+                            definitionHyperlinks.add(new KeywordInLibrarySourceHyperlink(adjustedFromRegion,
                                     suiteFile.getFile().getProject(), keywordEntity.libSpec));
                             documentationHyperlinks.add(new KeywordDocumentationHyperlink(adjustedFromRegion,
-                                    keywordEntity.libSpec, keywordEntity.kwSpec));
+                                    suiteFile.getFile().getProject(), keywordEntity.libSpec, keywordEntity.kwSpec));
                             break;
                     }
                 }
@@ -179,10 +187,9 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                         final KeywordScope scope = suiteFile.getFile().equals(file) ? KeywordScope.LOCAL
                                 : KeywordScope.RESOURCE;
 
-                        final Position position = kwDefinition.getDefinitionPosition();
-                        final IRegion destination = new Region(position.getOffset(), position.getLength());
-                        final KeywordHyperlinkEntity keyword = KeywordHyperlinkEntity.from(scope, suiteFile,
-                                destination, kwDefinition);
+                        final DefinitionPosition position = kwDefinition.getDefinitionPosition();
+                        final KeywordHyperlinkEntity keyword = KeywordHyperlinkEntity.from(scope, suiteFile, position,
+                                kwDefinition);
 
                         addAccessibleKeyword(kwDefinition.getName(), keyword);
                         return ContinueDecision.CONTINUE;
@@ -204,7 +211,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
 
     private static class KeywordHyperlinkEntity extends KeywordEntity {
 
-        private final IRegion destinationRegion;
+        private final DefinitionPosition destinationPosition;
 
         private final RobotSuiteFile exposingResource;
 
@@ -222,18 +229,18 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
         }
 
         static KeywordHyperlinkEntity from(final KeywordScope scope, final RobotSuiteFile exposingResource,
-                final IRegion destinationRegion, final RobotKeywordDefinition userKeyword) {
+                final DefinitionPosition position, final RobotKeywordDefinition userKeyword) {
             return new KeywordHyperlinkEntity(scope, Files.getNameWithoutExtension(exposingResource.getName()),
-                    userKeyword.getName(), "", userKeyword.isDeprecated(), exposingResource, destinationRegion,
+                    userKeyword.getName(), "", userKeyword.isDeprecated(), exposingResource, position,
                     userKeyword, null, null);
         }
 
         protected KeywordHyperlinkEntity(final KeywordScope scope, final String sourceName, final String keywordName,
                 final String alias, final boolean isDeprecated, final RobotSuiteFile exposingResource,
-                final IRegion destinationRegion, final RobotKeywordDefinition userKeyword,
+                final DefinitionPosition position, final RobotKeywordDefinition userKeyword,
                 final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
             super(scope, sourceName, keywordName, alias, isDeprecated, exposingResource.getFile().getFullPath());
-            this.destinationRegion = destinationRegion;
+            this.destinationPosition = position;
             this.exposingResource = exposingResource;
             this.userKeyword = userKeyword;
             this.libSpec = libSpec;

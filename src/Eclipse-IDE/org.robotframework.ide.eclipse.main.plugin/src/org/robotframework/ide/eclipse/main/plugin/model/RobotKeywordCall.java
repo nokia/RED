@@ -127,7 +127,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     }
 
     @Override
-    public Position getDefinitionPosition() {
+    public DefinitionPosition getDefinitionPosition() {
         RobotToken token;
         if (linkedElement instanceof RobotExecutableRow<?>) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
@@ -140,7 +140,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
             token = linkedElement.getElementTokens().get(0);
         }
 
-        return new Position(token.getStartOffset(), token.getText().length());
+        return new DefinitionPosition(token.getFilePosition(), token.getText().length());
     }
 
     @Override

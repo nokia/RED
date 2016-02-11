@@ -25,16 +25,19 @@ public class RegionsHyperlink implements RedHyperlink {
 
     private final RobotSuiteFile sourceAndDestinationFile;
 
+    private final String additionalLabelDecoration;
+
     public RegionsHyperlink(final ITextViewer viewer, final IRegion from, final IRegion to) {
-        this(viewer, null, from, to);
+        this(viewer, null, from, to, "");
     }
 
     public RegionsHyperlink(final ITextViewer viewer, final RobotSuiteFile fromAndToFile, final IRegion from,
-            final IRegion to) {
+            final IRegion to, final String additionalLabelDecoration) {
         this.sourceAndDestinationFile = fromAndToFile;
         this.source = from;
         this.destination = to;
         this.viewer = viewer;
+        this.additionalLabelDecoration = additionalLabelDecoration;
     }
 
     @Override
@@ -55,7 +58,12 @@ public class RegionsHyperlink implements RedHyperlink {
     @Override
     public String getLabelForCompoundHyperlinksDialog() {
         return sourceAndDestinationFile == null ? "[local definition in current file]"
-                : sourceAndDestinationFile.getName() + " [current file]";
+                : sourceAndDestinationFile.getName();
+    }
+
+    @Override
+    public String additionalLabelDecoration() {
+        return additionalLabelDecoration;
     }
 
     @Override

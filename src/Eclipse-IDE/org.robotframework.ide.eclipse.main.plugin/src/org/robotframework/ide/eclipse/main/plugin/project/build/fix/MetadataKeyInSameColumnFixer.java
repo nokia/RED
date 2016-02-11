@@ -47,7 +47,7 @@ public class MetadataKeyInSameColumnFixer extends RedSuiteMarkerResolution {
             final Range<Integer> range = getRange(marker);
             final List<RobotKeywordCall> metadataSettings = section.get().getMetadataSettings();
             for (final RobotKeywordCall robotKeywordCall : metadataSettings) {
-                if (range.contains(robotKeywordCall.getDefinitionPosition().offset)) {
+                if (range.contains(robotKeywordCall.getDefinitionPosition().getOffset())) {
                     try {
                         proposal = createProposal(document, robotKeywordCall, suiteModel);
                     } catch (final BadLocationException e) {
@@ -77,15 +77,15 @@ public class MetadataKeyInSameColumnFixer extends RedSuiteMarkerResolution {
     private String getSeparator(final RobotSuiteFile suiteModel, final int offset) {
         String separator = "  ";
 
-        RobotFile fileModel = suiteModel.getLinkedElement();
-        FileFormat fileFormat = fileModel.getParent().getFileFormat();
+        final RobotFile fileModel = suiteModel.getLinkedElement();
+        final FileFormat fileFormat = fileModel.getParent().getFileFormat();
         if (fileFormat == FileFormat.TSV) {
             separator = "\t";
         } else {
-            Optional<Integer> line = fileModel.getRobotLineIndexBy(offset);
+            final Optional<Integer> line = fileModel.getRobotLineIndexBy(offset);
             if (line.isPresent()) {
-                RobotLine robotLine = fileModel.getFileContent().get(line.get());
-                SeparatorType separatorForLine = robotLine.getSeparatorForLine().get();
+                final RobotLine robotLine = fileModel.getFileContent().get(line.get());
+                final SeparatorType separatorForLine = robotLine.getSeparatorForLine().get();
                 if (separatorForLine == SeparatorType.PIPE) {
                     separator = " | ";
                 } else {

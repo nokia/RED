@@ -25,7 +25,6 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -67,6 +66,7 @@ import org.robotframework.ide.eclipse.main.plugin.execution.RerunFailedOnlyActio
 import org.robotframework.ide.eclipse.main.plugin.execution.ShowFailedOnlyAction;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.TestCasesDefinitionLocator;
@@ -299,7 +299,7 @@ public class ExecutionView {
                                 .openEditor(new FileEditorInput(sourceFile), desc.getId());
                         if (editor instanceof RobotFormEditor) {
                             final SuiteSourceEditor sourcePage = ((RobotFormEditor) editor).activateSourcePage();
-                            final Position position = testCase.getDefinitionPosition();
+                            final DefinitionPosition position = testCase.getDefinitionPosition();
                             sourcePage.getSelectionProvider()
                                     .setSelection(new TextSelection(position.getOffset(), position.getLength()));
 

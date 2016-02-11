@@ -11,7 +11,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -27,6 +26,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
@@ -124,10 +124,8 @@ class RobotOutlinePage extends ContentOutlinePage {
                     final ISelectionProvider selectionProvider = editor.getActiveEditor()
                             .getSite()
                             .getSelectionProvider();
-                    final Position position = robotElement.getDefinitionPosition();
-                    final int offset = position.getOffset();
-                    final int length = position.getLength();
-                    selectionProvider.setSelection(new TextSelection(offset, length));
+                    final DefinitionPosition position = robotElement.getDefinitionPosition();
+                    selectionProvider.setSelection(new TextSelection(position.getOffset(), position.getLength()));
                 } else {
                     robotElement.getOpenRobotEditorStrategy(getSite().getPage()).run();
                 }

@@ -136,11 +136,9 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
     }
 
     @Override
-    public Position getDefinitionPosition() {
-        final int begin = holder.getDeclaration().getStartOffset();
-        final int length = holder.getDeclaration().getText().length();
-
-        return new Position(begin, length);
+    public DefinitionPosition getDefinitionPosition() {
+        return new DefinitionPosition(holder.getDeclaration().getFilePosition(),
+                holder.getDeclaration().getText().length());
     }
 
     @Override

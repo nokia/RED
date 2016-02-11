@@ -13,6 +13,7 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.widgets.Display;
+import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
 
@@ -24,6 +25,15 @@ public class Stylers {
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 // no styles to apply
+            }
+        };
+
+        public static final Styler ECLIPSE_DECORATION_STYLER = new Styler() {
+
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.foreground = RedTheme.getEclipseDecorationColor();
+
             }
         };
 

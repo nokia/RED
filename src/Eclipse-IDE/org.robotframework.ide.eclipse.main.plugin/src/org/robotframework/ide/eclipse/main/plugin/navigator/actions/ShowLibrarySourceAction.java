@@ -63,14 +63,13 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
             final LibrarySpecification spec) {
         try {
             final String libName = spec.getName() + ".py";
-            final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
-            final IFile file = LibspecsFolder.get(project).getFile(libName);
             
-            final IPath location = extractLibraryLocation(robotProject, spec);
+            final IPath location = extractLibraryLocation(project, spec);
             if(location == null) {
                 throw new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Empty location path!"));
             }
             
+            final IFile file = LibspecsFolder.get(project).getFile(libName);
             file.createLink(location, IResource.REPLACE | IResource.HIDDEN, null);
 
             IEditorDescriptor desc = IDE.getEditorDescriptor(file);
@@ -91,7 +90,8 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         }
     }
     
-    private static IPath extractLibraryLocation(final RobotProject robotProject, final LibrarySpecification spec) {
+    public static IPath extractLibraryLocation(final IProject project, final LibrarySpecification spec) {
+        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         if (robotProject.isStandardLibrary(spec)) {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());
