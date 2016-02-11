@@ -39,6 +39,11 @@ public final class QualifiedKeywordName {
         final String source = Joiner.on('.').join(splitted.subList(0, splitted.size() - 1)).trim();
         return new QualifiedKeywordName(unifyDefinition(name), name.toLowerCase(), source);
     }
+    
+    public static QualifiedKeywordName fromOccurrenceWithDots(final String givenWholeName) { 
+        // ignore keyword source
+        return new QualifiedKeywordName(unifyDefinition(givenWholeName), givenWholeName.toLowerCase(), "");
+    }
 
     public static String unifyDefinition(final String keywordDefinition) {
         if (keywordDefinition != null) {

@@ -224,18 +224,10 @@ class TestCasesTableValidator implements ModelUnitValidator {
                 Range.closed(offset, offset + name.length()));
 
         if (!nameToUse.isPresent()) {
-            if (name.contains(".")) {
-                reporter.handleProblem(
-                        RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_WITH_DOTS).formatMessageWith(name),
-                        validationContext.getFile(), position, ImmutableMap.<String, Object> of(
-                                AdditionalMarkerAttributes.NAME, name, AdditionalMarkerAttributes.ORIGINAL_NAME,
-                                keywordName.getText()));
-            } else {
-                reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD).formatMessageWith(name),
-                        validationContext.getFile(), position, ImmutableMap.<String, Object> of(
-                                AdditionalMarkerAttributes.NAME, name, AdditionalMarkerAttributes.ORIGINAL_NAME,
-                                keywordName.getText()));
-            }
+            reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.UNKNOWN_KEYWORD).formatMessageWith(name),
+                    validationContext.getFile(), position, ImmutableMap.<String, Object> of(
+                            AdditionalMarkerAttributes.NAME, name, AdditionalMarkerAttributes.ORIGINAL_NAME,
+                            keywordName.getText()));
             return;
         }
 
