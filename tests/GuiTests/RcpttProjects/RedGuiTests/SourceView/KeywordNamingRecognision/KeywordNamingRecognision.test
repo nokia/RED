@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Zh-NYLuAEeWqb5cDUfI1Nw
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 1/18/16 10:38 AM
+Save-Time: 2/11/16 5:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -14,6 +14,7 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-tab-folder -index 4 | get-tab-item Problems | click
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 1 19
     key-type Enter
@@ -42,8 +43,9 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     type-text 1
     key-type Enter
 }
-get-tab-folder -index 4 | get-tab-item Problems | click
-wait 3000
-get-view Problems | get-label "0 errors, 5 warnings, 0 others" | get-property caption 
-    | equals "0 errors, 5 warnings, 0 others" | verify-true
+
+try -times 5 -delay 1000 -command{
+	get-view Problems | get-label "0 errors, 5 warnings, 0 others" | get-property caption 
+	    | equals "0 errors, 5 warnings, 0 others" | verify-true
+}	    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
