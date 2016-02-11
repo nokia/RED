@@ -73,7 +73,7 @@ public class AccessibleKeywordsEntities {
             final QualifiedKeywordName qualifedNameWithDots = QualifiedKeywordName.fromOccurrenceWithDots(name);
             for (final KeywordEntity keyword : keywords) {
                 final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName.create(
-                        qualifedNameWithDots.getKeywordName(), keyword.getSourceNameInUse());
+                        keyword.getNameFromDefinition(), keyword.getSourceNameInUse());
                 if (qualifedNameWithDots.matchesIgnoringCase(candidateQualifiedName)) {
                     return Optional.of(keyword);
                 }
