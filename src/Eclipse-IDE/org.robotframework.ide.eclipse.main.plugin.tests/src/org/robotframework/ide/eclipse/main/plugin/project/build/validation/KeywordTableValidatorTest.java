@@ -416,12 +416,12 @@ public class KeywordTableValidatorTest {
     }
     
 	@Test
-	public void keywordNameWithDotsIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword.1", "    k.w");
+	public void keywordDefinitionWithDotsIsReported() throws CoreException {
+		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword.1", "    kw");
 
-		final KeywordEntity entity = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w", "", false,
+		final KeywordEntity entity = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
 				new Path("/res.robot"));
-		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
+		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
@@ -433,9 +433,26 @@ public class KeywordTableValidatorTest {
 		assertThat(reporter.getReportedProblems()).containsExactly(
 				new Problem(KeywordsProblem.KEYWORD_NAME_WITH_DOTS, new ProblemPosition(2, Range.closed(17, 26))));
 	}
+	
+	@Test
+	public void keywordOccurrenceWithDotsIsNotReported() throws CoreException {
+		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword", "    k.w");
+
+		final KeywordEntity entity = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w", "", false,
+				new Path("/res.robot"));
+		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
+				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+
+		final FileValidationContext context = prepareContext(accessibleKws);
+		final KeywordTableValidator validator = new KeywordTableValidator(context,
+				file.findSection(RobotKeywordsSection.class), reporter);
+		validator.validate(null);
+
+		assertThat(reporter.getReportedProblems().isEmpty());
+	}
     
 	@Test
-	public void keywordWithDotsAndSourceIsReported() throws CoreException {
+	public void keywordOccurrenceWithDotsAndSourceIsReported() throws CoreException {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword", "    res.k.w",
 				"    res1.kw", "    res.kw");
 
