@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.swt.graphics.Image;
 
@@ -42,6 +45,8 @@ public class RedCompletionBuilder {
         OptionalSettingsStep contextInformationShouldBeShownAfterAccepting(IContextInformation contextInformation);
 
         OptionalSettingsStep activateAssistantAfterAccepting(boolean activate);
+
+        OptionalSettingsStep performAfterAccepting(Collection<Runnable> operations);
 
         DecorationsStep thenCursorWillStopAt(int position);
 
@@ -106,6 +111,8 @@ public class RedCompletionBuilder {
 
         private boolean strikeout;
 
+        private final Collection<Runnable> operationsAfterAccept = new ArrayList<>();
+
         @Override
         public ProposalContentStep will(final AcceptanceMode mode) {
             this.mode = mode;
@@ -160,6 +167,12 @@ public class RedCompletionBuilder {
         @Override
         public OptionalSettingsStep activateAssistantAfterAccepting(final boolean activate) {
             this.activateAssitant = activate;
+            return this;
+        }
+
+        @Override
+        public OptionalSettingsStep performAfterAccepting(final Collection<Runnable> operations) {
+            this.operationsAfterAccept.addAll(operations);
             return this;
         }
 
@@ -233,8 +246,8 @@ public class RedCompletionBuilder {
             if (mode == AcceptanceMode.INSERT) {
                 return new RedCompletionProposal(priority, contentToInsert, offset, currentPrefix.length(),
                         currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
-                        activateAssitant, contextInformation, additionalInfo, additionalInfoAsHtml,
-                        additionalInfoInLabel, strikeout);
+                        activateAssitant, operationsAfterAccept, contextInformation, additionalInfo,
+                        additionalInfoAsHtml, additionalInfoInLabel, strikeout);
             } else if (mode == AcceptanceMode.SUBSTITUTE) {
                 if (wholeContent == null) {
                     throw new IllegalStateException("Unable to create proposal in substitution mode if there is no "
@@ -242,8 +255,8 @@ public class RedCompletionBuilder {
                 }
                 return new RedCompletionProposal(priority, contentToInsert, offset, wholeContent.length(),
                         currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
-                        activateAssitant, contextInformation, additionalInfo, additionalInfoAsHtml,
-                        additionalInfoInLabel, strikeout);
+                        activateAssitant, operationsAfterAccept, contextInformation, additionalInfo,
+                        additionalInfoAsHtml, additionalInfoInLabel, strikeout);
             } else {
                 throw new IllegalStateException("Unknown acceptance mode: " + mode.toString());
             }
