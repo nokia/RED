@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
+import java.util.Collection;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DefaultInformationControl;
 import org.eclipse.jface.text.IDocument;
@@ -65,6 +67,8 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
 
     private final boolean activateAssistant;
 
+    private final Collection<Runnable> operationsAfterAccepting;
+
     /**
      * Creates a new completion proposal. All fields are initialized based on the provided
      * information.
@@ -95,8 +99,9 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
     RedCompletionProposal(final int priority, final String replacementString, final int replacementOffset,
             final int replacementLength, final int prefixLength, final int cursorPosition, final int selectionLength,
             final Image image, final boolean decoratePrefix, final String displayString, final boolean activateAssitant,
-            final IContextInformation contextInformation, final String additionalProposalInfo,
-            final boolean additionalInfoAsHtml, final String additionalInfoForStyledLabel, final boolean strikeout) {
+            final Collection<Runnable> operationsAfterAccepting, final IContextInformation contextInformation,
+            final String additionalProposalInfo, final boolean additionalInfoAsHtml,
+            final String additionalInfoForStyledLabel, final boolean strikeout) {
         Preconditions.checkNotNull(replacementString);
         Preconditions.checkState(replacementOffset >= 0);
         Preconditions.checkState(replacementLength >= 0);
@@ -115,6 +120,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         this.strikeout = strikeout;
         this.contextInformation = contextInformation;
         this.activateAssistant = activateAssitant;
+        this.operationsAfterAccepting = operationsAfterAccepting;
         this.additionalProposalInfo = additionalProposalInfo;
         this.additionalInfoAsHtml = additionalInfoAsHtml;
         this.additionalInfoForStyledLabel = additionalInfoForStyledLabel;
@@ -208,6 +214,10 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
 
     public boolean shouldActivateAssitantAfterAccepting() {
         return activateAssistant;
+    }
+
+    public Collection<Runnable> operationsToPerformAfterAccepting() {
+        return operationsAfterAccepting;
     }
 
 }

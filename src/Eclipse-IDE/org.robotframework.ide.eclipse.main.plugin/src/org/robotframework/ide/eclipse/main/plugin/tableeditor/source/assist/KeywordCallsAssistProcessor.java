@@ -8,21 +8,32 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals.sortedByNames;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.link.LinkedModeModel;
+import org.eclipse.jface.text.link.LinkedModeUI;
+import org.eclipse.jface.text.link.LinkedPosition;
+import org.eclipse.jface.text.link.LinkedPositionGroup;
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -91,6 +102,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                             .secondaryPopupShouldBeDisplayed(keywordProposal.getDocumentation())
                             .contextInformationShouldBeShownAfterAccepting(
                                     new ContextInformation(keywordName, arguments))
+                            .performAfterAccepting(createOperationsToPerformAfterAccepting(
+                                    calculateRegionsForLinkedMode(offset - prefix.length(), keywordName), viewer))
                             .thenCursorWillStopAtTheEndOfInsertion()
                             .currentPrefixShouldBeDecorated()
                             .displayedLabelShouldBe(keywordName)
@@ -107,6 +120,50 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         } catch (final BadLocationException e) {
             return null;
         }
+    }
+
+    private Collection<IRegion> calculateRegionsForLinkedMode(final int beginOffset, final String keywordName) {
+        final Collection<IRegion> regions = new ArrayList<>();
+        if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName)) {
+            final Matcher matcher = Pattern.compile("\\$\\{[^\\}]+\\}").matcher(keywordName);
+            while (matcher.find()) {
+                regions.add(new Region(beginOffset + matcher.start(), matcher.end() - matcher.start()));
+            }
+        }
+        return regions;
+    }
+
+    private Collection<Runnable> createOperationsToPerformAfterAccepting(final Collection<IRegion> regionsToLinkedEdit,
+            final ITextViewer viewer) {
+        final List<Runnable> operations = new ArrayList<>();
+        if (!regionsToLinkedEdit.isEmpty()) {
+            operations.add(new Runnable() {
+                @Override
+                public void run() {
+                    SwtThread.asyncExec(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            try {
+                                final LinkedModeModel model = new LinkedModeModel();
+                                for (final IRegion region : regionsToLinkedEdit) {
+                                    final LinkedPositionGroup group = new LinkedPositionGroup();
+                                    group.addPosition(new LinkedPosition(viewer.getDocument(), region.getOffset(),
+                                            region.getLength()));
+                                    model.addGroup(group);
+                                }
+                                model.forceInstall();
+                                final LinkedModeUI ui = new LinkedModeUI(model, new ITextViewer[] { viewer });
+                                ui.enter();
+                            } catch (final BadLocationException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        return operations;
     }
 
     private boolean isReserved(final RedKeywordProposal keywordProposal) {
