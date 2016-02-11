@@ -68,6 +68,17 @@ public class AccessibleKeywordsEntities {
                 return Optional.of(keyword);
             }
         }
+        if (name.contains(".")) {
+            // try to find keyword name with dots, ignore keyword source
+            final QualifiedKeywordName qualifedNameWithDots = QualifiedKeywordName.fromOccurrenceWithDots(name);
+            for (final KeywordEntity keyword : keywords) {
+                final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName.create(
+                        qualifedNameWithDots.getKeywordName(), keyword.getSourceNameInUse());
+                if (qualifedNameWithDots.matchesIgnoringCase(candidateQualifiedName)) {
+                    return Optional.of(keyword);
+                }
+            }
+        }
         return Optional.absent();
     }
 
@@ -147,8 +158,14 @@ public class AccessibleKeywordsEntities {
 
     private Collection<? extends KeywordEntity> getPossibleEntities(final String name) {
         final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(name);
-        final Collection<? extends KeywordEntity> keywords = getAccessibleKeywords()
+        Collection<? extends KeywordEntity> keywords = getAccessibleKeywords()
                 .get(qualifiedName.getKeywordName());
+        
+        if (keywords == null && name.contains(".")) { 
+            // try to find keyword name with dots, ignore keyword source
+            keywords = getAccessibleKeywords().get(QualifiedKeywordName.fromOccurrenceWithDots(name).getKeywordName());
+        }
+        
         if (keywords != null) {
             final LinkedHashSet<KeywordEntity> result = newLinkedHashSet(keywords);
             result.addAll(tryWithEmbeddedArguments(qualifiedName));
