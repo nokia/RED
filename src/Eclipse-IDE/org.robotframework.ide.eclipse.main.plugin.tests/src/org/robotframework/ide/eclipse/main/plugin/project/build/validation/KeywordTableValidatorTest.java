@@ -130,9 +130,33 @@ public class KeywordTableValidatorTest {
                 file.findSection(RobotKeywordsSection.class), reporter);
         validator.validate(null);
 
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(KeywordsProblem.DUPLICATED_KEYWORD, new ProblemPosition(2, Range.closed(17, 26))),
                 new Problem(KeywordsProblem.DUPLICATED_KEYWORD, new ProblemPosition(4, Range.closed(42, 51))));
+    }
+    
+    @Test
+    public void keywordsAreReported_whenTheyAreDuplicated_2() throws CoreException {
+        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
+                "*** Keywords ***", 
+                "keyword 1",
+                "  [Return]  1", 
+                "k e y w o r d 1",
+                "  [Return]  2", 
+                "k_E_y_W_o_R_d_1",
+                "  [Return]  3");
+
+        final FileValidationContext context = prepareContext();
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(3);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD, new ProblemPosition(2, Range.closed(17, 26))),
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD, new ProblemPosition(4, Range.closed(41, 56))),
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD, new ProblemPosition(6, Range.closed(71, 86))));
     }
 
     @Test
