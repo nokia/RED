@@ -19,7 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
  * @author Michal Anglart
  *
  */
-public class LibrarySourceHyperlink implements RedHyperlink {
+public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
 
     private final IRegion source;
 
@@ -27,7 +27,7 @@ public class LibrarySourceHyperlink implements RedHyperlink {
 
     private final LibrarySpecification libSpec;
 
-    public LibrarySourceHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec) {
+    public KeywordInLibrarySourceHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec) {
         this.source = from;
         this.project = project;
         this.libSpec = libSpec;
@@ -51,6 +51,11 @@ public class LibrarySourceHyperlink implements RedHyperlink {
     @Override
     public String getLabelForCompoundHyperlinksDialog() {
         return libSpec.getName();
+    }
+
+    @Override
+    public String additionalLabelDecoration() {
+        return "[" + ShowLibrarySourceAction.extractLibraryLocation(project, libSpec) + "]";
     }
 
     @Override

@@ -235,11 +235,9 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     }
 
     @Override
-    public Position getDefinitionPosition() {
-        final int begin = keyword.getKeywordName().getStartOffset();
-        final int length = keyword.getKeywordName().getText().length();
-
-        return new Position(begin, length);
+    public DefinitionPosition getDefinitionPosition() {
+        return new DefinitionPosition(keyword.getKeywordName().getFilePosition(),
+                keyword.getKeywordName().getText().length());
     }
 
     public List<VariableDeclaration> getEmbeddedArguments() {

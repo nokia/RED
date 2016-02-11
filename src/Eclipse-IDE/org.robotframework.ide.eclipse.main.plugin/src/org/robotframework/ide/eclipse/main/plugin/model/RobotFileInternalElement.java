@@ -5,7 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import java.util.Objects;
+
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
+import org.eclipse.jface.text.Region;
+import org.rf.ide.core.testdata.model.FilePosition;
 
 import com.google.common.base.Optional;
 
@@ -35,7 +40,7 @@ public interface RobotFileInternalElement extends RobotElement {
      * 
      * @return position
      */
-    Position getDefinitionPosition();
+    DefinitionPosition getDefinitionPosition();
 
     /**
      * Gets model element for given offset in file
@@ -51,4 +56,53 @@ public interface RobotFileInternalElement extends RobotElement {
      * @return Comment of the element
      */
     String getComment();
+
+    public static final class DefinitionPosition {
+
+        private final int line;
+
+        private final int offset;
+
+        private final int length;
+
+        public DefinitionPosition(final FilePosition positionInFile, final int length) {
+            this(positionInFile.getLine(), positionInFile.getOffset(), length);
+        }
+
+        public DefinitionPosition(final int line, final int offset, final int length) {
+            this.line = line;
+            this.offset = offset;
+            this.length = length;
+        }
+
+        public int getOffset() {
+            return offset;
+        }
+
+        public int getLength() {
+            return length;
+        }
+
+        public int getLine() {
+            return line;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj != null && obj.getClass() == DefinitionPosition.class) {
+                final DefinitionPosition that = (DefinitionPosition) obj;
+                return this.line == that.line && this.offset == that.offset && this.length == that.length;
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(line, offset, length);
+        }
+
+        public IRegion toRegion() {
+            return new Region(offset, length);
+        }
+    }
 }

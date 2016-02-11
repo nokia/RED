@@ -27,11 +27,14 @@ public class UserKeywordDocumentationHyperlink implements RedHyperlink {
 
     private final RobotSuiteFile exposingResource;
 
+    private final String additionalLabelDecoration;
+
     public UserKeywordDocumentationHyperlink(final IRegion sourceRegion, final RobotSuiteFile exposingResource,
-            final RobotKeywordDefinition userKeyword) {
+            final RobotKeywordDefinition userKeyword, final String additionalLabelDecoration) {
         this.sourceRegion = sourceRegion;
         this.exposingResource = exposingResource;
         this.userKeyword = userKeyword;
+        this.additionalLabelDecoration = additionalLabelDecoration;
     }
 
     @Override
@@ -52,6 +55,11 @@ public class UserKeywordDocumentationHyperlink implements RedHyperlink {
     @Override
     public String getLabelForCompoundHyperlinksDialog() {
         return exposingResource.getName();
+    }
+
+    @Override
+    public String additionalLabelDecoration() {
+        return additionalLabelDecoration;
     }
 
     @Override

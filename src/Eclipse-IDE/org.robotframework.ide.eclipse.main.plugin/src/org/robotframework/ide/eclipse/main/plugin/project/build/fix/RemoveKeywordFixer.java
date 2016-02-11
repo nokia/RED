@@ -50,7 +50,7 @@ public class RemoveKeywordFixer extends RedSuiteMarkerResolution {
         }
         for (final RobotKeywordDefinition keyword : section.get().getChildren()) {
             final Range<Integer> defRange = getRange(marker);
-            if (defRange.contains(keyword.getDefinitionPosition().offset)) {
+            if (defRange.contains(keyword.getDefinitionPosition().getOffset())) {
                 try {
                     return createProposal(document, keyword);
                 } catch (final BadLocationException e) {
