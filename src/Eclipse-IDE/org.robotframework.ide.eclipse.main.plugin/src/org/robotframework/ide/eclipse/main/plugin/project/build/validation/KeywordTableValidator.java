@@ -23,6 +23,7 @@ import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -126,11 +127,11 @@ class KeywordTableValidator implements ModelUnitValidator {
         for (final UserKeyword kw1 : keywords) {
             for (final UserKeyword kw2 : keywords) {
                 if (kw1 != kw2) {
-                    final String kw1Name = kw1.getKeywordName().getText();
-                    final String kw2Name = kw2.getKeywordName().getText();
+                    final String kw1Name = QualifiedKeywordName.unifyDefinition(kw1.getKeywordName().getText());
+                    final String kw2Name = QualifiedKeywordName.unifyDefinition(kw2.getKeywordName().getText());
 
-                    if (kw1Name.equalsIgnoreCase(kw2Name)) {
-                        duplicatedNames.add(kw1Name.toLowerCase());
+                    if (kw1Name.equals(kw2Name)) {
+                        duplicatedNames.add(kw1Name);
                     }
                 }
             }
@@ -140,7 +141,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             final RobotToken keywordName = keyword.getKeywordName();
             final String name = keywordName.getText();
 
-            if (duplicatedNames.contains(name.toLowerCase())) {
+            if (duplicatedNames.contains(QualifiedKeywordName.unifyDefinition(name.toLowerCase()))) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD)
                         .formatMessageWith(name);
                 final Map<String, Object> additionalArguments = ImmutableMap
