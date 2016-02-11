@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3-pdQBtFEeWSh6BKjAxDIw
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 1/18/16 5:53 PM
+Save-Time: 1/18/16 5:47 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -32,22 +32,27 @@ exec-with-options -disableJobWaiting -command {
 		get-view Variables | get-tree | get-property itemCount -raw |int | gt 1 | verify-true
 	}
 	
-	//full scren of variables
+	
 	with [get-tab-folder -index 1] {
     	double-click
     	get-tab-item Variables | click
 	}
-	
-	//expand Global Variables
 	try -times 5 -delay 1000 -command{
 		get-view Variables | get-tree  | select "Global Variables" | double-click
 	}
-	wait 2000
+	
+	try -times 3 -delay 1000 -command {
+		get-view Variables | get-tree | get-item "Global Variables"| get-property "getItemCount()" -raw | int| gt 1| verify-true	
+	}
+	
+	get-view Variables | get-tree | select "Global Variables"
+	
 	
 	if [$robot_version | matches "^Robot Framework 2\.9\.\d .*"] {
 			try -times 5 -delay 1000 -command {
 					get-view Variables | get-tree | get-item "Global Variables" | get-property "getItemCount()" | equals 19| verify-true
 			}
+			wait 1000	
 			with [get-view Variables | get-tree] {
 			    get-item "Global Variables" | get-property "getItems().TreeItem[0].getText()" | equals "${/}" | verify-true
 			    get-item "Global Variables" | get-property "getItems().TreeItem[1].getText()" | equals "${:}" | verify-true
@@ -60,6 +65,11 @@ exec-with-options -disableJobWaiting -command {
 			    get-item "Global Variables" | get-property "getItems().TreeItem[8].getText()" | equals "${OUTPUT_DIR}" | verify-true
 			    get-item "Global Variables" | get-property "getItems().TreeItem[9].getText()" | equals "${OUTPUT_FILE}" 
 			        | verify-true
+			}
+			//seperated to click
+			get-view Variables | get-tree | select "Global Variables/${OUTPUT_FILE}"
+			wait 1000
+			with [get-view Variables | get-tree] {
 			    get-item "Global Variables" | get-property "getItems().TreeItem[10].getText()" | equals "${PREV_TEST_MESSAGE}" 
 			        | verify-true
 			    get-item "Global Variables" | get-property "getItems().TreeItem[11].getText()" | equals "${PREV_TEST_NAME}" 
@@ -74,6 +84,8 @@ exec-with-options -disableJobWaiting -command {
 			    get-item "Global Variables" | get-property "getItems().TreeItem[17].getText()" | equals "${\\n}" | verify-true
 			    get-item "Global Variables" | get-property "getItems().TreeItem[18].getText()" | equals "${null}" | verify-true
 			}
+			
+			
 		}-else{	
 			try -times 5 -delay 1000 -command {
 					get-view Variables | get-tree | get-item "Global Variables" | get-property "getItemCount()" | equals 21| verify-true
