@@ -12,12 +12,12 @@ import java.util.List;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
@@ -76,7 +76,7 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
             @Override
             public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
                 if (VariableNamesSupport.extractUnifiedVariableName(variable.getName()).equals(hoveredVariableName)) {
-                    final Position position = variable.getDefinitionPosition();
+                    final DefinitionPosition position = variable.getDefinitionPosition();
                     final IRegion destination = new Region(position.getOffset(), position.getLength());
 
                     final IHyperlink definitionHyperlink = file == suiteFile

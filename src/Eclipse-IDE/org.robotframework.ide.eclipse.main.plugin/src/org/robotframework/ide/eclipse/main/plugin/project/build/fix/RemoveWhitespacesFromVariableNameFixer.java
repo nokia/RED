@@ -46,7 +46,7 @@ public class RemoveWhitespacesFromVariableNameFixer extends RedSuiteMarkerResolu
         }
         for (final RobotVariable variable : section.get().getChildren()) {
             final Range<Integer> defRange = getRange(marker);
-            if (defRange.contains(variable.getDefinitionPosition().offset)) {
+            if (defRange.contains(variable.getDefinitionPosition().getOffset())) {
                 try {
                     return createProposal(document, variable);
                 } catch (final BadLocationException e) {

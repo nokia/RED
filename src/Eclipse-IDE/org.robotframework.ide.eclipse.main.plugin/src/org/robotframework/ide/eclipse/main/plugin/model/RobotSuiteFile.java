@@ -276,8 +276,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     @Override
-    public Position getDefinitionPosition() {
-        return new Position(0);
+    public DefinitionPosition getDefinitionPosition() {
+        return new DefinitionPosition(0, 0, 0);
     }
 
     @Override
