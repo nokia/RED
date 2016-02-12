@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 
 
 /**
@@ -51,7 +51,8 @@ public class CompoundHyperlink implements IHyperlink {
 
     @Override
     public void open() {
-        final HyperlinkDialog dialog = new HyperlinkDialog(Display.getCurrent().getActiveShell(), name, hyperlinks);
+        final HyperlinkDialog dialog = new HyperlinkDialog(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), name, hyperlinks);
         dialog.open();
     }
 
