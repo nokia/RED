@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,14 +81,14 @@ public class RedProjectEditor extends MultiPageEditorPart {
                     new RobotProjectConfigReader().readConfigurationWithLines(file));
             installResourceListener();
         } else {
-            final IStorage storage = (IStorage) input.getAdapter(IStorage.class);
+            final IStorage storage = input.getAdapter(IStorage.class);
             if (storage != null) {
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
 
-                try {
+                try (InputStream stream = storage.getContents()) {
                     editorInput = new RedProjectEditorInput(Optional.<IFile> absent(), !storage.isReadOnly(),
-                            new RobotProjectConfigReader().readConfigurationWithLines(storage.getContents()));
-                } catch (final CoreException e) {
+                            new RobotProjectConfigReader().readConfigurationWithLines(stream));
+                } catch (final CoreException | IOException e) {
                     throw new IllegalProjectConfigurationEditorInputException(
                             "Unable to open editor: unrecognized input of class: " + input.getClass().getName(), e);
                 }
@@ -117,7 +119,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
     }
 
     private IEclipseContext prepareContext() {
-        final IEclipseContext context = ((IEclipseContext) getEditorSite().getService(IEclipseContext.class))
+        final IEclipseContext context = getEditorSite().getService(IEclipseContext.class)
                 .getActiveLeaf();
         context.set(RedProjectEditorInput.class, editorInput);
         context.set(IEditorSite.class, getEditorSite());
@@ -309,7 +311,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
 
     @Override
     public void dispose() {
-        final IEclipseContext context = ((IEclipseContext) getEditorSite().getService(IEclipseContext.class))
+        final IEclipseContext context = getEditorSite().getService(IEclipseContext.class)
                 .getActiveLeaf();
         for (final IEditorPart part : parts) {
             ContextInjectionFactory.uninject(part, context);
@@ -326,7 +328,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             super(message);
         }
 
-        public IllegalProjectConfigurationEditorInputException(final String message, final CoreException cause) {
+        public IllegalProjectConfigurationEditorInputException(final String message, final Exception cause) {
             super(message, cause);
         }
     }
