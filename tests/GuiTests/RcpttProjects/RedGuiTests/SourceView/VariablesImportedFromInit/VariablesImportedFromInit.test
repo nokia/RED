@@ -1,0 +1,47 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _WWztYNGDEeWl7fLmvSqX3Q
+Element-Name: VariablesImportedFromInit
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _T93gENGDEeWl7fLmvSqX3Q
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 2/12/16 1:33 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "VariableModule/TestVariable.robot" | double-click
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+get-tab-folder -index 4 | get-tab-item Problems | click
+with [get-editor "TestVariable.robot" | get-text-viewer] {
+    set-caret-pos 6 21
+    key-type Enter
+}
+// validate and check if there are no errors - if so, it means that ${config} is not initialised from init file 
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+
+// use content assist to write ${config}
+with [get-editor "TestVariable.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 7 5
+        type-text log
+        key-type Tab
+        type-text "${co"
+        key-type "M1+SPACE"
+        key-type Enter
+    }
+    
+}
+// validate if no errors
+get-editor "TestVariable.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Variables    config\n\n"
+    + "*** Test Cases ***\n"
+    + "T1\n"
+    + "    Log    ${CONFIG}\n"
+    + "    log    ${config}" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
