@@ -1,0 +1,31 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _FA5wUKfoEeWg6OFh_tHgTw
+Element-Name: AddLibraryByRightClickToRedXml
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _8paAQNFwEeWl7fLmvSqX3Q
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 2/12/16 11:16 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+
+
+get-view "Project Explorer" | get-tree | select "RobotProject/multiply.py" 
+    | get-menu "Robot Framework/Add Library to red.xml" | click
+get-window "Select library class" | get-table | select multiply | click -default
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/multiply RobotProject \\(1\\)" | get-property caption 
+    | equals "multiply RobotProject (1)" | verify-true
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | get-item "multiply - RobotProject" 
+    | get-property caption | equals "multiply - RobotProject" | verify-true
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
