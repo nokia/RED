@@ -334,7 +334,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
         if (keywordName.equals("settestvariable") && isKeywordFromBuiltin(validationContext, keywordName)) {
             final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
             if (!usedVariables.isEmpty()) {
-                definedVariables.add(usedVariables.get(0).asToken().getText());
+                definedVariables.add(VariableNamesSupport.extractUnifiedVariableName(usedVariables.get(0).asToken().getText()));
                 return true;
             }
         } else if (keywordName.equals("comment") && isKeywordFromBuiltin(validationContext, keywordName)) {
