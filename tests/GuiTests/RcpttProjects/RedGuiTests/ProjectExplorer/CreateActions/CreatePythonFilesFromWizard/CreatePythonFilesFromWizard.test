@@ -6,6 +6,79 @@ Element-Version: 3.0
 External-Reference: 
 Id: __DQnANGFEeWl7fLmvSqX3Q
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 2/12/16 1:41 PM
+Save-Time: 2/12/16 2:37 PM
 Testcase-Type: ecl
 
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// create empty python file
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot python file" | click
+with [get-window "New Robot python file"] {
+    get-editbox -after [get-label "File name:"] | set-text "empty.py"
+    get-button Finish | click
+}
+// check body
+get-editor "empty.py" | get-text-viewer | get-property text | equals "" | verify-true
+
+// create variable file
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot python file" 
+    | click
+with [get-window "New Robot python file"] {
+    get-button "Variables file" | click
+    get-editbox -after [get-label "File name:"] | set-text "var_file.py"
+    get-button Finish | click
+}
+// check body
+get-editor "var_file.py" | get-text-viewer | get-property text | equals "def get_variables(arg):\n"
+    + "    variables = {'var' : 'value'}\n"
+    + "    return variables" | verify-true
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot python file" 
+    | click
+
+// create Variables file with class
+with [get-window "New Robot python file"] {
+    get-button "Variables file with class" | click
+    get-editbox -after [get-label "File name:"] | set-text "var_with_class.py"
+    get-button Finish | click
+}
+
+// check body
+get-editor "var_with_class.py" | get-text-viewer | get-property text | equals "class var_with_class(object):\n"
+    + "    def get_variables(self, *args):\n"
+    + "        variables = {'var' : 'value'}\n"
+    + "        return variables" | verify-true
+
+// create Robot python file
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot python file" 
+    | click
+with [get-window "New Robot python file"] {
+    get-button Library | click
+    get-editbox -after [get-label "File name:"] | set-text "lib.py"
+    get-button Finish | click
+}
+// check body
+get-editor "lib.py" | get-text-viewer | get-property text | equals "class lib(object):\n\n"
+    + "    ROBOT_LIBRARY_VERSION = 1.0\n\n"
+    + "    def __init__(self):\n"
+    + "        pass\n\n"
+    + "    def keyword(self):\n"
+    + "        pass" | verify-true
+
+// create New Robot python file
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot python file" 
+    | click
+
+with [get-window "New Robot python file"] {
+    get-button "Dynamic API library" | click
+    get-editbox -after [get-label "File name:"] | set-text "dyn_lib.py"
+    get-button Finish | click
+}
+// check body
+get-editor "dyn_lib.py" | get-text-viewer | get-property text | equals "class dyn_lib(object):\n\n"
+    + "    def get_keyword_names(self):\n"
+    + "        return ['first keyword', 'second keyword']\n\n"
+    + "    def run_keyword(self, name, args):\n"
+    + "        print \"Running keyword '%s' with arguments %s.\" % (name, args)" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
