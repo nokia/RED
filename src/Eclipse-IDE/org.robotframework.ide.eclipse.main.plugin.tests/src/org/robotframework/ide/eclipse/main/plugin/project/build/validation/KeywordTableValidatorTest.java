@@ -117,6 +117,22 @@ public class KeywordTableValidatorTest {
     }
     
     @Test
+    public void emptyKeywordIsReported_whenThereIsACommentedLine() throws CoreException {
+        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
+                "*** Keywords ***", 
+                "keyword", "  # kw");
+
+        final FileValidationContext context = prepareContext();
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(KeywordsProblem.EMPTY_KEYWORD, new ProblemPosition(2, Range.closed(17, 24))));
+    }
+    
+    @Test
     public void keywordsAreReported_whenTheyAreDuplicated() throws CoreException {
         final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
                 "*** Keywords ***", 
