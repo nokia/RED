@@ -84,11 +84,12 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_LIBRARY_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Library").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Library:").build()),
     /**
      */
-    SETTING_UNKNOWN(TableType.SETTINGS),
+    SETTING_UNKNOWN(TableType.SETTINGS, true),
     /**
      */
     SETTING_UNKNOWN_ARGUMENT(TableType.SETTINGS),
@@ -110,6 +111,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_VARIABLES_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Variables").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Variables:").build()),
     /**
@@ -122,6 +124,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_RESOURCE_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Resource").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Resource:").build()),
     /**
@@ -134,6 +137,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_DOCUMENTATION_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Documentation").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Documentation:").build(),
             VersionAvailabilityInfoBuilder.create().deprecatedFrom("3.0").addRepresentation("Document").build(),
@@ -145,6 +149,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_METADATA_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Metadata:").build(),
             VersionAvailabilityInfoBuilder.create().deprecatedFrom("3.0").addRepresentation("Meta").build(),
@@ -159,6 +164,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_SUITE_SETUP_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Suite Setup").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Suite Setup:").build(),
             VersionAvailabilityInfoBuilder.create()
@@ -179,6 +185,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_SUITE_TEARDOWN_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Suite Teardown").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Suite Teardown:").build(),
             VersionAvailabilityInfoBuilder.create()
@@ -199,6 +206,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_FORCE_TAGS_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Force Tags").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Force Tags:").build()),
     /**
@@ -208,6 +216,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_DEFAULT_TAGS_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Default Tags").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Default Tags:").build()),
     /**
@@ -217,6 +226,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_TEST_SETUP_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Setup").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Setup:").build(),
             VersionAvailabilityInfoBuilder.create()
@@ -240,6 +250,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_TEST_TEARDOWN_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Teardown").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Teardown:").build(),
             VersionAvailabilityInfoBuilder.create()
@@ -260,6 +271,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_TEST_TEMPLATE_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Template").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Template:").build()),
     /**
@@ -272,6 +284,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     SETTING_TEST_TIMEOUT_DECLARATION(
             TableType.SETTINGS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Timeout").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("Test Timeout:").build()),
     /**
@@ -282,24 +295,25 @@ public enum RobotTokenType implements IRobotTokenType {
     SETTING_TEST_TIMEOUT_MESSAGE(TableType.SETTINGS),
     /**
      */
-    VARIABLES_SCALAR_DECLARATION(TableType.VARIABLES),
+    VARIABLES_SCALAR_DECLARATION(TableType.VARIABLES, true),
     /**
      */
-    VARIABLES_SCALAR_AS_LIST_DECLARATION(TableType.VARIABLES),
+    VARIABLES_SCALAR_AS_LIST_DECLARATION(TableType.VARIABLES, true),
     /**
      */
-    VARIABLES_LIST_DECLARATION(TableType.VARIABLES),
+    VARIABLES_LIST_DECLARATION(TableType.VARIABLES, true),
     /**
      */
     VARIABLES_DICTIONARY_DECLARATION(
             TableType.VARIABLES,
+            true,
             VersionAvailabilityInfoBuilder.create().availableFrom("2.9").build()),
     /**
      */
-    VARIABLES_ENVIRONMENT_DECLARATION(TableType.VARIABLES),
+    VARIABLES_ENVIRONMENT_DECLARATION(TableType.VARIABLES, true),
     /**
      */
-    VARIABLES_UNKNOWN_DECLARATION(TableType.VARIABLES),
+    VARIABLES_UNKNOWN_DECLARATION(TableType.VARIABLES, true),
     /**
      */
     VARIABLES_VARIABLE_VALUE(TableType.VARIABLES),
@@ -313,7 +327,7 @@ public enum RobotTokenType implements IRobotTokenType {
             VersionAvailabilityInfoBuilder.create().availableFrom("2.9").build()),
     /**
      */
-    TEST_CASE_SETTING_UNKNOWN_DECLARATION(TableType.TEST_CASES),
+    TEST_CASE_SETTING_UNKNOWN_DECLARATION(TableType.TEST_CASES, true),
     /**
      */
     TEST_CASE_SETTING_UNKNOWN_ARGUMENTS(TableType.TEST_CASES),
@@ -321,6 +335,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     TEST_CASE_SETTING_DOCUMENTATION(
             TableType.TEST_CASES,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Documentation]").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Document]").deprecatedFrom("3.0").build()),
     /**
@@ -330,6 +345,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     TEST_CASE_SETTING_TAGS_DECLARATION(
             TableType.TEST_CASES,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Tags]").build()),
     /**
      */
@@ -338,6 +354,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     TEST_CASE_SETTING_SETUP(
             TableType.TEST_CASES,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Setup]").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Precondition]").deprecatedFrom("3.0").build()),
     /**
@@ -350,6 +367,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     TEST_CASE_SETTING_TEARDOWN(
             TableType.TEST_CASES,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Teardown]").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Postcondition]").deprecatedFrom("3.0").build()),
     /**
@@ -362,6 +380,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     TEST_CASE_SETTING_TEMPLATE(
             TableType.TEST_CASES,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Template]").build()),
     /**
      */
@@ -373,6 +392,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     TEST_CASE_SETTING_TIMEOUT(
             TableType.TEST_CASES,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Timeout]").build()),
     /**
      */
@@ -391,7 +411,7 @@ public enum RobotTokenType implements IRobotTokenType {
     TEST_CASE_ACTION_ARGUMENT(TableType.TEST_CASES),
     /**
      */
-    KEYWORD_SETTING_UNKNOWN_DECLARATION(TableType.KEYWORDS),
+    KEYWORD_SETTING_UNKNOWN_DECLARATION(TableType.KEYWORDS, true),
     /**
      */
     KEYWORD_SETTING_UNKNOWN_ARGUMENTS(TableType.KEYWORDS),
@@ -399,6 +419,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_DOCUMENTATION(
             TableType.KEYWORDS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Documentation]").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Document]").deprecatedFrom("3.0").build()),
     /**
@@ -408,6 +429,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_TAGS(
             TableType.KEYWORDS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Tags]").build()),
     /**
      */
@@ -416,6 +438,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_ARGUMENTS(
             TableType.KEYWORDS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Arguments]").build()),
     /**
      */
@@ -424,6 +447,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_RETURN(
             TableType.KEYWORDS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Return]").build()),
     /**
      */
@@ -433,6 +457,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_TEARDOWN(
             TableType.KEYWORDS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Teardown]").build(),
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Postcondition]").deprecatedFrom("3.0").build()),
     /**
@@ -446,6 +471,7 @@ public enum RobotTokenType implements IRobotTokenType {
      */
     KEYWORD_SETTING_TIMEOUT(
             TableType.KEYWORDS,
+            true,
             VersionAvailabilityInfoBuilder.create().addRepresentation("[Timeout]").build()),
     /**
      */
@@ -494,6 +520,8 @@ public enum RobotTokenType implements IRobotTokenType {
 
     private final TableType type;
 
+    private final boolean settingDeclaration;
+
     private static final ArrayListMultimap<TableType, RobotTokenType> TYPE_TO_TABLE = ArrayListMultimap.create();
 
     static {
@@ -509,11 +537,21 @@ public enum RobotTokenType implements IRobotTokenType {
     }
 
     private RobotTokenType(final TableType type, final VersionAvailabilityInfo... representations) {
+        this(type, false, representations);
+    }
+
+    private RobotTokenType(final TableType type, final boolean settingDeclaration,
+            final VersionAvailabilityInfo... representations) {
         this.type = type;
+        this.settingDeclaration = settingDeclaration;
         for (VersionAvailabilityInfo vInfo : representations) {
             representation.add(vInfo);
             text.add(vInfo.getRepresentation());
         }
+    }
+
+    public boolean isSettingDeclaration() {
+        return settingDeclaration;
     }
 
     private enum TableType {
