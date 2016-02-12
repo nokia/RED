@@ -29,7 +29,7 @@ class StandardLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     protected String getLibraryName() {
-        return targetSpecFile.getLocation().removeFileExtension().lastSegment();
+        return targetSpecFile.getFullPath().removeFileExtension().lastSegment();
     }
 
     @Override
