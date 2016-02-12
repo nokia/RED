@@ -92,6 +92,30 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
 
     }
 
+    private void createAcceptanceModeEditors(final Composite parent) {
+        final RadioGroupFieldEditor insertionModeEditor = new RadioGroupFieldEditor(
+                RedPreferences.ASSISTANT_COMPLETION_MODE, "Proposals", 2, createModes(), parent, true);
+        addField(insertionModeEditor);
+    }
+
+    private String[][] createModes() {
+        return new String[][] { new String[] { "Completion inserts", AcceptanceMode.INSERT.name() },
+                new String[] { "Completion overrides", AcceptanceMode.SUBSTITUTE.name() } };
+    }
+    
+    private void createKeywordPrefixAutoAdditionEditor(final Composite parent) {
+        final Group keywordsGroup = new Group(parent, SWT.NONE);
+        keywordsGroup.setText("Keywords");
+        GridDataFactory.fillDefaults().grab(true, true).span(2, 1).applyTo(keywordsGroup);
+        GridLayoutFactory.fillDefaults().applyTo(keywordsGroup);
+        final BooleanFieldEditor automaticKeywordPrefixingEditor = new BooleanFieldEditor(
+                RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED,
+                "Automatically add library or resource name to keyword proposal insertion", keywordsGroup);
+        addField(automaticKeywordPrefixingEditor);
+        final Button button = (Button) automaticKeywordPrefixingEditor.getDescriptionControl(keywordsGroup);
+        GridDataFactory.fillDefaults().indent(5, 10).applyTo(button);
+    }
+
     @Override
     protected void performDefaults() {
         super.performDefaults();
@@ -101,27 +125,4 @@ public class ContentAssistPreferencePage extends FieldEditorPreferencePage imple
         delayTextControl.setEnabled(isAutoActivationEnabled);
         charsTextControl.setEnabled(isAutoActivationEnabled);
     }
-
-    private void createAcceptanceModeEditors(final Composite parent) {
-        final RadioGroupFieldEditor insertionModeEditor = new RadioGroupFieldEditor(
-                RedPreferences.ASSISTANT_COMPLETION_MODE, "Proposals", 2, createModes(), parent, true);
-        addField(insertionModeEditor);
-    }
-    
-    private void createKeywordPrefixAutoAdditionEditor(final Composite parent) {
-        final Group keywordsGroup = new Group(parent, SWT.NONE);
-        keywordsGroup.setText("Keywords");
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(keywordsGroup);
-        GridLayoutFactory.fillDefaults().applyTo(keywordsGroup);
-        final BooleanFieldEditor booleanFieldEditor = new BooleanFieldEditor(
-                RedPreferences.ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED,
-                "Automatically add library or resource name to keyword proposal insertion", keywordsGroup);
-        addField(booleanFieldEditor);
-    }
-
-    private String[][] createModes() {
-        return new String[][] { new String[] { "Completion inserts", AcceptanceMode.INSERT.name() },
-                new String[] { "Completion overrides", AcceptanceMode.SUBSTITUTE.name() } };
-    }
-
 }
