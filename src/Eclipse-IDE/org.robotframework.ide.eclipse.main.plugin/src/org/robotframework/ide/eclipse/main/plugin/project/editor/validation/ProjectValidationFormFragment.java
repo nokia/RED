@@ -169,13 +169,19 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
         excludeFilesTxt = toolkit.createText(parent, projectConfiguration.getValidatedFileMaxSize());
         GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).applyTo(excludeFilesTxt);
-        
+
         excludeFilesTxt.addModifyListener(new ModifyListener() {
 
             @Override
             public void modifyText(ModifyEvent e) {
-                editorInput.getProjectConfiguration().setValidatedFileMaxSize(excludeFilesTxt.getText());
-                setDirty(true);
+            	try {
+            		final String fileMaxSizeTxt = excludeFilesTxt.getText();
+                    Long.parseLong(fileMaxSizeTxt);
+                    editorInput.getProjectConfiguration().setValidatedFileMaxSize(fileMaxSizeTxt);
+                    setDirty(true);
+                } catch (final NumberFormatException e1) {
+                    //nothing to do
+                }
             }
         });
         
