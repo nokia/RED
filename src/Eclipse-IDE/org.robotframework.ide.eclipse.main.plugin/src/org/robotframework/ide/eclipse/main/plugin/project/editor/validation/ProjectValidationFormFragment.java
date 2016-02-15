@@ -52,6 +52,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
@@ -169,11 +171,26 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
 
         excludeFilesTxt = toolkit.createText(parent, projectConfiguration.getValidatedFileMaxSize());
         GridDataFactory.fillDefaults().hint(200, SWT.DEFAULT).applyTo(excludeFilesTxt);
+        
+        excludeFilesTxt.addVerifyListener(new VerifyListener() {
 
+            @Override
+            public void verifyText(final VerifyEvent e) {
+                final String string = e.text;
+                final char[] chars = new char[string.length()];
+                string.getChars(0, chars.length, chars, 0);
+                for (int i = 0; i < chars.length; i++) {
+                    if (!('0' <= chars[i] && chars[i] <= '9')) {
+                        e.doit = false;
+                        return;
+                    }
+                }
+            }
+        });
         excludeFilesTxt.addModifyListener(new ModifyListener() {
 
             @Override
-            public void modifyText(ModifyEvent e) {
+            public void modifyText(final ModifyEvent e) {
             	try {
             		final String fileMaxSizeTxt = excludeFilesTxt.getText();
                     Long.parseLong(fileMaxSizeTxt);
@@ -188,7 +205,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         excludeFilesBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 final boolean selection = excludeFilesBtn.getSelection();
                 excludeFilesTxt.setEnabled(selection);
                 editorInput.getProjectConfiguration().setIsValidatedFileSizeCheckingEnabled(selection);
