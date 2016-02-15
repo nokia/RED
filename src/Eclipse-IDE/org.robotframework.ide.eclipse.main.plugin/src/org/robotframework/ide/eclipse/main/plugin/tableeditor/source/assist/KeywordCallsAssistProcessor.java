@@ -85,8 +85,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                     }
 
                     final String keywordName = keywordProposal.getContent();
-                    final boolean shouldAddKeywordPrefix = (isKeywordPrefixAutoAdditionEnabled
-                            || keywordProposalIsConflicting(keywordProposal));
+                    final boolean shouldAddKeywordPrefix = (isKeywordPrefixAutoAdditionEnabled || keywordProposalIsConflicting(keywordProposal))
+                            && keywordProposal.getScope(assist.getFile().getFullPath()) != KeywordScope.LOCAL; // Local keywords can't have prefix
                     final String keywordPrefix = shouldAddKeywordPrefix ? keywordProposal.getSourcePrefix() + "." : "";
                     final String textToInsert = keywordPrefix + keywordName + separator;
 
