@@ -5,19 +5,22 @@
 	rel="stylesheet" type="text/css" />
 </head>
 <body>
-<h2>Recognising external libraries and variable files in RED</h2>
+<h2>Recognizing external libraries and variable files in RED</h2>
 
 <h3>External libraries installed by pip or included in testcase by file path</h3>
 
 In order to provide validation and keyword assistance of external libraries ( any library not bundled with RobotFramework), external library <b>needs</b> to be included in <b> red.xml </b> file in the Referenced libraries part. </br>RED Editor does not add external library by itself by default - there are cases where tester is working with multiple versions of libraries and needs to have exact control which library is taken to validation and keyword assistance in RED. <br>
 <br>
-There are two ways to include library into red.xml
+There are few ways to include library into red.xml
+<h3>Add library from Project Explorer</h3>
+External libraries as python files can be directly included to red.xml file by right clicking on file and using option <br>
+<i>Robot Framework -> Add Library to red.xml </i>
 <h3>Quick Fix - shortcut CTRL+1</h3>
 Lets focus on following example:
 <br><br><img src="libs/libs_1.png"> <br><br>
 
 In sample testcase, there are two libraries included. CalculatorLibrary.py is custom user local library placed in the same folder as testcase, Selenium2Library was installed by pip.<br>
-Both libraries are not recognised by RED as libraries names are underlined and error markers are placed next to line numbers. <br>Note the light bulb in error marker - it indicates that there is Quick Fix action available.  
+Both libraries are not recognized by RED as libraries names are underlined and error markers are placed next to line numbers. <br>Note the light bulb in error marker - it indicates that there is Quick Fix action available.  
 <br>Click on the library name in test editor, open right click menu and choose Quick Fix or use CTRL+1
 <br><br><img src="libs/libs_2.png"> <br><br>
 Double click on Discover option, RED will search either PythonPath or library file path, if successful library will be added to Referenced libraries in red.xml 
@@ -37,16 +40,9 @@ Whenever python encounter problem, it will be shown as popup window with Python 
 This indicates that some of the dependencies are missing on your local machine which may affect testcase execution.    
 <h2>Importing Python Variable files into code assistance</h2>
 
-Python variable files can be imported to RED by adding path in red.xml
+Python variable files can be imported to RED by adding path in red.xml<br>
+Such imported variable file is seen anywhere across project and behaves as Global Variable. <br>
+Any file included in Variable Files section in red.xml will be taken into use during run or debug from RED.
 
-<h2>Parametrised file path to Libraries and Resources - Variable mappings</h2> <br>
-Whenever parametrised file path is used in resources or libraries paths (parameter value is assigned during test runtime), RED will not be able to evaluate parameter value by itself.<br>
-<br><br><img src="libs/libs_5.png"> <br><br>
-In this case Variables mappings can be used to statically assign value to variable for test editing time only. <br>
-This will allow RED to resolve path to libraries and resources with parametrised paths. <br>
-Open red.xml file by Eclipse Default Editor, in Variables mappings assign static value for variable in path:<br>
-<br><br><img src="libs/libs_6.png"> <br><br> 
-When successful, path will be recognised and validation will take placed
-<br><br><img src="libs/libs_7.png"> <br><br>
 </body>
 </html>

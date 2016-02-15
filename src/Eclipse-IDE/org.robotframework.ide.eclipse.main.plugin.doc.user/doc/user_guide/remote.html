@@ -10,6 +10,8 @@
 Remote debug allows to perform debug activities with RED using remote host to execute tests and get debug informaiton back to RED editor. <br>
 It is especially useful when Robot tests are executed on dedicated test line with hardware/software under test or in cloud environment where test editing and test execution is separated.<br>
 Remote debug is using custom RobotFramework listener (TestRunnerAgent.py python script) which sends running test status to local RED Editor. Apart from that, remote debug process does not differ from local debug - remember to set at least one breakpoint prior the debug run. 
+<br><br><img src="remote/remote_4.png"> <br><br>
+
 <h3>Setting up Remote Debug</h3>
  
 First choose testcase which will be remotely debugged. If there is no debug configuration created for testcase, it's best to run local debug first even though it may fail. This will create debug configuration which will be used in later steps.  <br>
@@ -25,7 +27,7 @@ From console copy
 </ul>
 <h3>Configure ip/port to accept connection from TestRunnerAgent.py </h3>
 Remote tab of Debug Configurations consists Local IP and Local port. This fields needs to be populated with local IP/port where RED is run.<br>
-Do not use localhost in IP field as it is not supported.<br>
+<b>Do not use <i>localhost</i> in IP field as it is not supported.</b><br>
  
 <h3>Running Remote Debug</h3>
 
@@ -34,7 +36,7 @@ After pressing Debug in Debug Configurations or starting Debug manually, followi
 On remote host, testcase with custom listener (TestRunnerAgent.py) needs to be started. <br>
 Exact command depends on testing environment and testname, it can be derived from local debug run and from RobotFramework robot.run implementation ( see <a href="https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html">https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html</a> ). <br> Generally syntax with additional listener is following: <br>
 <i>python -m robot.run --listener REMOTE_PATH\TestRunnerAgent.py:PORT:True:IP ADDITONAL_PARAMETERS</i> <br><br>
-For instance: <i>python -m robot.run --listener C:\RED\TestRunnerAgent.py:60401:True:192.168.1.5 -s robot_test.Keyword_driven</i> <br><br>
+For instance: <i>python -m robot.run --listener C:\RED\TestRunnerAgent.py:6060:True:192.168.81.1 -s robot_test.Keyword_driven</i> <br><br>
 
 <h3>Possible issues</h3>  
 When having problem with Remote Debug, please double check following:
