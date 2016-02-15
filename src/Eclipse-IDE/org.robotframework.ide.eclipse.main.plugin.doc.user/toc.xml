@@ -19,11 +19,15 @@
     </topic>
     <topic href="doc/user_guide/libs.html" label="Recognizing external libraries and variable files in RED">
     </topic>
+    <topic href="doc/user_guide/variable_mapping.html" label="Variable mapping - dealing with parametrized paths to libraries and resources">
+    </topic>
+	<topic href="doc/user_guide/variable_files.html" label="Variable Files - dealing with missing variables ">
+    </topic>
     <topic href="doc/user_guide/remote.html" label="Remote debug">
     </topic>
     <topic href="doc/user_guide/importing.html" label="Importing files and projects to workspace.">
     </topic>
-    <topic href="doc/user_guide/general.html" label="General usage hints - validation, code assist, clean&amp;build,Quick Fix">
+    <topic href="doc/user_guide/general.html" label="General usage hints - running selected test,validation, code assist, clean&amp;build,Quick Fix">
     </topic>
     <topic href="doc/user_guide/keys.html" label="RED key shortcuts">
     </topic>
@@ -33,7 +37,9 @@
     </topic>
 	<topic href="doc/user_guide/virtual_folders.html" label="Working with virtual folders mounted via SSH">
     </topic>
-	<topic href="doc/user_guide/variable_files.html" label="How to handle missing remote host Robot variables">
+	<topic href="doc/user_guide/eclipse_memory.html" label="Allocating memory to Eclipse/RED">
+    </topic>
+	<topic href="doc/user_guide/headless.html" label="Headless - running validation in command line">
     </topic>
  </topic>
 </toc>
