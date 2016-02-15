@@ -77,6 +77,7 @@ public class KeywordReturn extends AModelElement<UserKeyword> {
 
     public RobotExecutableRow<UserKeyword> asExecutableRow() {
         RobotExecutableRow<UserKeyword> execRow = new RobotExecutableRow<>();
+        execRow.setParent(getParent());
         execRow.setAction(getDeclaration());
         for (final RobotToken returns : values) {
             execRow.addArgument(returns);
