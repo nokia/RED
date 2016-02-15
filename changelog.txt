@@ -1,51 +1,34 @@
-RED 0.6.0 - 2016/01/26
+RED 0.6.1 - 2016/02/15
 
-Features
-    Validation include/exclude option in red.xml and under right click in Project Explorer
-    Auto two spaces in new line 
+Bug
 
-Bug fixes
-	TSV specific issues for FOR, multiline, comments which caused NPE 
-	Python server exceptions while processing variables python files
-    Step In/Over is not working in FOR keyword in Debug
-    Debug and variable resolving
-    Code coloring is wrong for string beginning with ${ , @{ &{
-    NPE when no Robot is installed
-    Missing coloring for dynamic parameters and parameter recognition
-    FOR outline shows each item as new keyword
-    Validation error msg - Unable to communicate with XML-RPC server - in file
-    Variable mapping - variable names should be case insensitive
-    Ignore validation and file listings in dot fodlers - .svn
-    Links with ${/} to resources and libs does not generate KW
-    Spaces in path libs - path syntax error popup
-    Using ${/} in lib path will not provide lib KW assist
-    NPE while validating %{ne_type} token
-    Show library source throws exception when library is include as module (by __init__.py)
-    HTML resource - change problem from error to warning as file type is valid but not supported by RED
-    RED Debug feature can't handle test suites with initialization files and Suite Setup inside
-    Content assist does not show proposal for Settings in TSV
-    Content assist is limited when cursor is on the last position in file
-    NPE when Test material contains initialization file with Suite Setup inside [DEBUG]
-    Variable from file with space in name are not recognize
-	Handling section names with and without spaces
-	Resizing (by width) Variable files in red.xml does strange effects
+    Improve validation performance and progress reporting
+    Missing automatic parameters in content assist
+    Not supported characters in resource path
+    Hyperlinks point to keyword base on appearance in file not base on Robot order
+    Support files from remote locations
+    Fix errors from validation project
+    Resource is not parsed and colored correctly
+    Adding error when Test case has no content (lines with comments)
+    RSE - Project Validation does not work under RSE
+    No error when keywords are duplicated but in other case
 
-Enhancements
-    Add X icon (close) to manpage from libspecs
-    Red.xml changes - new look
-    Reload python file after changes to have new variables in content assist
-    Remote debug - check valid port, runner rename, configure timeout
-    LibDoc reload after python lib change - by right click on library
-    For - add backslash \ when moving by enter to new line
-    Change default preference for COMMA for content assist
-    Embedded variables validation - ${SPACE * 10} , hex/dec/bin
-    Handle space before/after dot in lib refix to recognise following usage BuiltIn.<space>KW
-    Support libdoc for notation: library.classname
-    [DEBUG] Possibility to Step Into (F5) keywords inside resource which have dynamic location path or is BuiltIn.Import Resource loaded
-    Possibility to import Python variables file with parameters
-    KW recognition & validation for names with _ space
-	Add to help - activation of content assistance keys
-	Add to help - include/exclude validation
+Enhancement
 
-Task
-    Check RED compatibility with new keyword types in Robot 3.0
+    Scroll bar in manpage from libspecs
+    Adding python files to Content assist for Variables and section
+    Add action to add libs from project explorer directly to red.xml by file and folder
+    Proper value for robot env variables - ${EXECDIR}, ${OUTPUTDIR}
+    Possible to run test(s) from Source Editor base on cursor location
+    In case of duplicated keywords it will be nice to see declaration of all
+    Variable mapping and paths - there should be no error/warning about absolute path
+    Add support for keywords which in parameters get name of created by own variables
+    Disable validation for commented part of line
+    Mark deprecated or removed elements from section Settings to be exactly on same place like RF 3.0
+    Support for importing variables, which exists as module
+    Extend RED to recognize unknown settings in TestCases and Keywords
+
+Feature
+
+    Provide headless application which will validate projects
+    Add wizard for creating new .py files

@@ -1,4 +1,4 @@
-# RED - Robot Editor v0.6
+# RED - Robot Editor v0.6.1
 ## Introduction
 RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
 Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
@@ -24,15 +24,20 @@ Uninstall:
 Open Help -> Installation Details, select old RED feature and perform unistall
 
 ## Updates
-- Validation scope - include/exclude folders for validation (under right click menu in Project Explorer - see help for more info)
-- Fixed NullPointerExceptions for numerous cases in tsv format
-- Fixed NullPointerException when RobotFramework is not installed
-- Fixed exceptions in Python server while processing external python files 
+- Include python library to red.xml by right click on Project Explorer
+- Run selected test case by right click on testcase from editor and file outline
+- Allow to read and write on virtual folders (by SSH,FTP etc.) provided by RemoteSystemExplorer
+- Validation of Keywords [Arguments] section
+- Validation scope - exclude validations for files bigger than threshold
+- Run validation against project in headless - see help for details
+- Coloring performance improvements
+- Wizard to create sample python files for variables and libraries 
+- Updated User Guide help
 - Check **changelog.txt** for details
 
 ## What's in the package
-- Robot Perspective & Robot nature (Project,files and other file artefacts)
-- Text Source editor with syntax colouring
+- Robot Perspective & Robot nature (Project,files and other file artifacts)
+- Text Source editor with syntax coloring
 - Table editors (non persistent for trial usage)
 - Debug Perspective for test case debugging with breakpoints, stepping, variable watch
 - Remote debug
@@ -44,15 +49,14 @@ Open Help -> Installation Details, select old RED feature and perform unistall
 ## Known issues
 - Eclipse does not have UTF-8 support in editors by default. Check Preferences and RED help to get how to change it.
 - Usage of keywords with dots is not discovered properly. Now unknown keyword error marker is shown in such cases. 
-- Performance drop while coloring content of files larger than 600 lines
 - Table editors edits are not persistent, changes done in Table editors will not be visible in source nor saved to file. Sync is done from Source -> Table only.
 - Library auto-discovery is not yet supported thus user needs to add any external library to red.xml by themselves, if not then validation will show unknown library error. Either you add it in red.xml or invoke option Quick Fix on item in Source editor or in Problems view.  
 - Due to difficult to comprehend and countless exceptions in RF syntax, validation can show false positive errors. In such case please provide us sample test case for us to have a look at.
 
 
 ## Short term plans
-- Performance improvments for coloring large files
-- Run selected testcase from Project Explorer and file
+- Keywords usage arguments validation
+- Table Editor
 
 
 ## Notes
