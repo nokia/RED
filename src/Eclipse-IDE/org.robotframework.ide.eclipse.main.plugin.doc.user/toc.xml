@@ -15,6 +15,8 @@
     </topic>
 	</topic>
  <topic href="doc/user_guide/user_guide.html" label="User guide">
+     <topic href="doc/user_guide/quick_start.html" label="Quick start with RED - Robot Editor">
+    </topic>
     <topic href="doc/user_guide/libs.html" label="Recognizing external libraries and variable files in RED">
     </topic>
     <topic href="doc/user_guide/remote.html" label="Remote debug">
