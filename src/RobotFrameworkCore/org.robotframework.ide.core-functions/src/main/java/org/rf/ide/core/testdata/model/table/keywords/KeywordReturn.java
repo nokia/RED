@@ -12,6 +12,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class KeywordReturn extends AModelElement<UserKeyword> {
@@ -72,5 +73,18 @@ public class KeywordReturn extends AModelElement<UserKeyword> {
         }
 
         return tokens;
+    }
+
+    public RobotExecutableRow<UserKeyword> asExecutableRow() {
+        RobotExecutableRow<UserKeyword> execRow = new RobotExecutableRow<>();
+        execRow.setAction(getDeclaration());
+        for (final RobotToken returns : values) {
+            execRow.addArgument(returns);
+        }
+        for (final RobotToken commentPart : comment) {
+            execRow.addComment(commentPart);
+        }
+
+        return execRow;
     }
 }
