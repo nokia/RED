@@ -9,18 +9,20 @@
 <body>
 <h2>Validation</h2>
 <h3>General information</h3>
-Validation is a mechanism to read and parse Robot testcases in order to provide feedback about Robot defined spellcheck.<br>
+Validation is a mechanism to read and parse Robot testcases in order to provide feedback about Robot defined spell check.<br>
 Validation mechanism walk down the project tree and read all testfiles format supported by RED (.robot, .txt and .tsv), mark all unknown/undefined keywords, variable misuse, missing resources etc. <br>
 <h3>Validation execution</h3>
 Validation mechanism is executed any time when edited file is changed with slight delay while <b>Build Automatic </b>option is selected from Project.<br>
 Whole project validation can be started using option <b>Project -> Clean</b>. 
 <h3>Limiting validation scope</h3> 
 When working with bigger projects, it is good to limit validation scope to folders relevant to current work to speed up validation and reduce test error markers to be relevant to files under scope.<br>
-Excluded folders are still parsed so code completion is preserved, just no spell-check is performed.<br>
+Excluded folders are still parsed so code completion is preserved, just validation is omitted thus validation errors and warnings are skipped for excluded folders.<br>
 Include/exclude can be triggered in Project Explorer under right click menu on selected folders: <br>
 <br><br><img src="validation/exclude_1.png"> <br><br>
-Include/exclude can also be found in red.xml editor under Validation table - include/exclude action is available as right click menu. 
+Include/exclude can also be found in red.xml editor under Validation table - include/exclude action is available as right click menu. <br>
+In case of big amounts of .txt or .tsv files which are not Robot test cases, validation can be excluded on files bigger than size threshold<br>   
+
 <br><br><img src="validation/exclude_2.png"> <br><br>
-Note that exclude folders are greyed out, state is inherited from parent folders.
+Note that exclude folders are grayed out, exclude state is inherited from parent folders.
 </body>
 </html>
