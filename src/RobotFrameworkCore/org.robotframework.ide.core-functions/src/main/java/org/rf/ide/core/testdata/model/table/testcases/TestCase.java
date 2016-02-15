@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class TestCase extends AModelElement<TestCaseTable> implements IExecutableStepsHolder<TestCase> {
@@ -202,6 +203,32 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     public boolean isDataDrivenTestCase() {
         return (getTemplateKeywordName() != null);
+    }
+
+    public RobotToken getTemplateKeywordLocation() {
+        RobotToken token = new RobotToken();
+
+        String templateKeyword = getRobotViewAboutTestTemplate();
+        if (templateKeyword == null) {
+            final SettingTable settingTable = getParent().getParent().getSettingTable();
+            if (settingTable.isPresent()) {
+                for (final TestTemplate tt : settingTable.getTestTemplates()) {
+                    if (tt.getKeywordName() != null) {
+                        token = tt.getKeywordName();
+                        break;
+                    }
+                }
+            }
+        } else {
+            for (final TestCaseTemplate tct : templates) {
+                if (tct.getKeywordName() != null) {
+                    token = tct.getKeywordName();
+                    break;
+                }
+            }
+        }
+
+        return token;
     }
 
     public String getTemplateKeywordName() {
