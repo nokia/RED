@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
+import org.rf.ide.core.testdata.model.table.exec.descs.IRowDescriptorBuilder.AcceptResult;
+import org.rf.ide.core.testdata.model.table.exec.descs.impl.SimpleRowDescriptorBuilder;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
@@ -77,5 +81,23 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
         }
 
         return tokens;
+    }
+
+    public IExecutableRowDescriptor<T> asExecutableDescription() {
+        SimpleRowDescriptorBuilder builder = new SimpleRowDescriptorBuilder();
+        RobotExecutableRow<T> execRow = new RobotExecutableRow<>();
+        execRow.setParent(getParent());
+        RobotToken keyword = getKeywordName();
+        if (keyword != null) {
+            execRow.setAction(keyword);
+            for (final RobotToken argument : arguments) {
+                execRow.addArgument(argument);
+            }
+            for (final RobotToken c : comment) {
+                execRow.addComment(c);
+            }
+        }
+
+        return builder.buildDescription(execRow, new AcceptResult(true));
     }
 }
