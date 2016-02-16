@@ -104,7 +104,7 @@ public class KeywordTableValidatorTest {
                 "  kw");
 
         final KeywordEntity entity = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-                new Path("/res.robot"));
+                new Path("/res.robot"), 0);
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
                 (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
@@ -436,7 +436,7 @@ public class KeywordTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword.1", "    kw");
 
 		final KeywordEntity entity = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-				new Path("/res.robot"));
+                new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
@@ -455,7 +455,7 @@ public class KeywordTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword", "    k.w");
 
 		final KeywordEntity entity = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w", "", false,
-				new Path("/res.robot"));
+                new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
@@ -473,9 +473,9 @@ public class KeywordTableValidatorTest {
 				"    res1.kw", "    res.kw");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w", "", false,
-				new Path("/res.robot"));
+                new Path("/res.robot"), 0);
 		final KeywordEntity entity2 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-				new Path("/res.robot"));
+                new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
