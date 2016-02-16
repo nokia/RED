@@ -22,6 +22,7 @@ import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
@@ -132,7 +133,7 @@ public class VariableDefinitionLocator {
             final List<VariableDeclaration> embeddedArguments = keywordDef.getEmbeddedArguments();
             for (final VariableDeclaration declaration : embeddedArguments) {
                 final RobotToken variableAsToken = declaration.asToken();
-                variableAsToken.setText(removeRegex(variableAsToken.getText()));
+                variableAsToken.setText(EmbeddedKeywordNamesSupport.removeRegex(variableAsToken.getText()));
 
                 final ContinueDecision shouldContinue = detector.localVariableDetected(file, variableAsToken);
                 if (shouldContinue == ContinueDecision.STOP) {
@@ -141,10 +142,6 @@ public class VariableDefinitionLocator {
             }
         }
         return ContinueDecision.CONTINUE;
-    }
-
-    private static String removeRegex(final String variable) {
-        return variable.indexOf(':') != -1 ? variable.substring(0, variable.indexOf(':')) + "}" : variable;
     }
 
     private ContinueDecision locateInPreviousCalls(final RobotSuiteFile file, final VariableDetector detector,

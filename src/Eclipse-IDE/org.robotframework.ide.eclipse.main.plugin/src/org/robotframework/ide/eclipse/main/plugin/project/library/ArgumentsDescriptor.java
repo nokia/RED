@@ -10,10 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -34,19 +30,7 @@ public class ArgumentsDescriptor {
         this.arguments = args;
     }
 
-    public static ArgumentsDescriptor createDescriptor(final UserKeyword userKeyword) {
-        final List<KeywordArguments> arguments = userKeyword.getArguments();
-        if (arguments == null) {
-            return null;
-        }
-        final List<Argument> args = new ArrayList<>(2);
-        for (final RobotToken argumentToken : arguments.get(arguments.size() - 1).getArguments()) {
-            
-        }
-        return new ArgumentsDescriptor(args);
-    }
-
-    static ArgumentsDescriptor createDescriptor(final List<String> args) {
+    public static ArgumentsDescriptor createDescriptor(final List<String> args) {
         if (args == null) {
             return new ArgumentsDescriptor(Lists.<Argument> newArrayList());
         }
@@ -55,33 +39,43 @@ public class ArgumentsDescriptor {
         for (final String arg : args) {
             if (arg.contains("=")) {
                 final List<String> splitted = Splitter.on("=").splitToList(arg);
-                arguments.add(new Argument(splitted.get(0), splitted.get(1)));
+                arguments.add(new Argument(ArgumentType.DEFAULT, splitted.get(0), splitted.get(1)));
+            } else if (arg.startsWith("**")) {
+                arguments.add(new Argument(ArgumentType.KWARG, arg.substring(2)));
+            } else if (arg.startsWith("*")) {
+                arguments.add(new Argument(ArgumentType.VARARG, arg.substring(1)));
             } else {
-                arguments.add(new Argument(arg));
+                arguments.add(new Argument(ArgumentType.REQUIRED, arg));
             }
         }
         return new ArgumentsDescriptor(arguments);
     }
 
+    public List<Argument> getRequiredArguments() {
+        final List<Argument> required = new ArrayList<>();
+        for (final Argument argument : arguments) {
+            if (argument.isRequired()) {
+                required.add(argument);
+            }
+        }
+        return required;
+    }
+
+
     public Range<Integer> getPossibleNumberOfArguments() {
         int min = 0;
         boolean isUnbounded = false;
         for (final Argument argument : arguments) {
-            if (!argument.isOptional() && !argument.isVarArg() && !argument.isKwArg()) {
+            if (argument.isRequired()) {
                 min++;
             }
             isUnbounded |= argument.isVarArg() || argument.isKwArg();
         }
-        if (isUnbounded) {
-            return Range.atLeast(min);
-        } else {
-            return Range.closed(min, arguments.size());
-        }
+        return isUnbounded ? Range.atLeast(min) : Range.closed(min, arguments.size());
     }
 
     public String getDescription() {
         final Iterable<String> args = Iterables.transform(arguments, new Function<Argument, String>() {
-
             @Override
             public String apply(final Argument arg) {
                 return arg.getDescription();
@@ -92,38 +86,60 @@ public class ArgumentsDescriptor {
 
     public static class Argument {
 
+        private final ArgumentType type;
+        
         private final String argumentName;
 
         private final Optional<String> defaultValue;
 
-        public Argument(final String arg) {
-            this.argumentName = arg;
-            this.defaultValue = Optional.absent();
+        public Argument(final ArgumentType type, final String arg) {
+            this(type, arg, null);
         }
 
-        public Argument(final String arg, final String defaultValue) {
+        public Argument(final ArgumentType type, final String arg, final String defaultValue) {
+            this.type = type;
             this.argumentName = arg;
-            this.defaultValue = Optional.of(defaultValue);
+            this.defaultValue = Optional.fromNullable(defaultValue);
         }
 
         public String getName() {
             return argumentName;
         }
 
-        public boolean isOptional() {
-            return defaultValue.isPresent();
+        public boolean isRequired() {
+            return type == ArgumentType.REQUIRED;
+        }
+
+        public boolean isDefault() {
+            return type == ArgumentType.DEFAULT;
         }
 
         public boolean isVarArg() {
-            return argumentName.startsWith("*") && !argumentName.startsWith("**");
+            return type == ArgumentType.VARARG;
         }
 
         public boolean isKwArg() {
-            return argumentName.startsWith("**");
+            return type == ArgumentType.KWARG;
         }
 
         public String getDescription() {
-            return defaultValue.isPresent() ? argumentName + "=" + defaultValue.get() : argumentName;
+            return getPrefix() + (defaultValue.isPresent() ? argumentName + "=" + defaultValue.get() : argumentName);
         }
+
+        private String getPrefix() {
+            if (type == ArgumentType.VARARG) {
+                return "*";
+            } else if (type == ArgumentType.KWARG) {
+                return "**";
+            }
+            return "";
+        }
+    }
+
+    private enum ArgumentType {
+        REQUIRED,
+        DEFAULT,
+        VARARG,
+        KWARG
     }
 }

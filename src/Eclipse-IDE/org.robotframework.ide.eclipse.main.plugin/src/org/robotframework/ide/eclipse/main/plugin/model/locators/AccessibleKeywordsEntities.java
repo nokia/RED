@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
-import static com.google.common.collect.Sets.newLinkedHashSet;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
@@ -115,7 +113,8 @@ public class AccessibleKeywordsEntities {
         for (final KeywordEntity keyword : keywords) {
             final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
                     .create(keyword.getNameFromDefinition(), keyword.getSourceNameInUse());
-            if (qualifedName.matchesIgnoringCase(candidateQualifiedName)) {
+            if (qualifedName.matchesIgnoringCase(candidateQualifiedName)
+                    || EmbeddedKeywordNamesSupport.matches(keyword.getNameFromDefinition(), qualifedName)) {
                 matchingKeywords.add(keyword);
             }
         }
@@ -127,7 +126,6 @@ public class AccessibleKeywordsEntities {
         if (candidates == null) {
             return null;
         }
-
         return filterDuplicates(candidates);
     }
 
@@ -166,13 +164,15 @@ public class AccessibleKeywordsEntities {
             keywords = getAccessibleKeywords().get(QualifiedKeywordName.fromOccurrenceWithDots(name).getKeywordName());
         }
         
-        if (keywords != null) {
-            final LinkedHashSet<KeywordEntity> result = newLinkedHashSet(keywords);
-            result.addAll(tryWithEmbeddedArguments(qualifiedName));
-            return result;
-        } else {
-            return tryWithEmbeddedArguments(qualifiedName);
-        }
+        return keywords != null ? keywords : tryWithEmbeddedArguments(qualifiedName);
+        //
+        // if (keywords != null) {
+        // final LinkedHashSet<KeywordEntity> result = newLinkedHashSet(keywords);
+        // result.addAll(tryWithEmbeddedArguments(qualifiedName));
+        // return result;
+        // } else {
+        // return tryWithEmbeddedArguments(qualifiedName);
+        // }
     }
 
     private Collection<? extends KeywordEntity> tryWithEmbeddedArguments(final QualifiedKeywordName qualifiedName) {
