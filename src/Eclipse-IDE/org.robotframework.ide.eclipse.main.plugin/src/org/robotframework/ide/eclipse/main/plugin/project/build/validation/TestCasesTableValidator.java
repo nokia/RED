@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.List;
@@ -28,6 +29,8 @@ import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
+import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -163,8 +166,29 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     void reportKeywordUsageProblems(final List<RobotCase> cases) {
         for (final RobotCase testCase : cases) {
+            reportKeywordUsageProblemsInTestCaseSettings(testCase);
             reportKeywordUsageProblems(validationContext, reporter, testCase.getLinkedElement().getTestExecutionRows(),
                     testCase.getTemplateInUse());
+        }
+        
+    }
+    
+    private void reportKeywordUsageProblemsInTestCaseSettings(final RobotCase testCase) {
+        for (final TestCaseSetup testCaseSetup : testCase.getLinkedElement().getSetups()) {
+            final RobotToken keywordNameToken = testCaseSetup.getKeywordName();
+            if (keywordNameToken != null) {
+                validateExistingKeywordCall(validationContext, reporter, keywordNameToken);
+            }
+        }
+        for (final TestCaseTeardown testCaseTeardown : testCase.getLinkedElement().getTeardowns()) {
+            final RobotToken keywordNameToken = testCaseTeardown.getKeywordName();
+            if (keywordNameToken != null) {
+                validateExistingKeywordCall(validationContext, reporter, keywordNameToken);
+            }
+        }
+        final RobotToken templateKeyword = testCase.getLinkedElement().getTemplateKeywordLocation();
+        if (!templateKeyword.getFilePosition().isNotSet()) {
+            validateExistingKeywordCall(validationContext, reporter, templateKeyword);
         }
     }
 
@@ -281,8 +305,22 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final Set<String> variables = validationContext.getAccessibleVariables();
 
         for (final TestCase testCase : cases) {
-            reportUnknownVariables(validationContext, reporter, testCase.getTestExecutionRows(), variables);
+            reportUnknownVariables(validationContext, reporter, collectTestCaseExeRowsForVariablesChecking(testCase), variables);
         }
+    }
+    
+    private List<? extends RobotExecutableRow<?>> collectTestCaseExeRowsForVariablesChecking(final TestCase testCase) {
+        final List<RobotExecutableRow<?>> exeRows = newArrayList();
+        final List<TestCaseSetup> setups = testCase.getSetups();
+        if (!setups.isEmpty()) {
+            exeRows.add(setups.get(0).asExecutableRow());
+        }
+        exeRows.addAll(testCase.getTestExecutionRows());
+        final List<TestCaseTeardown> teardowns = testCase.getTeardowns();
+        if (!teardowns.isEmpty()) {
+            exeRows.add(teardowns.get(0).asExecutableRow());
+        }
+        return exeRows;
     }
 
     static void reportUnknownVariables(final FileValidationContext validationContext,
