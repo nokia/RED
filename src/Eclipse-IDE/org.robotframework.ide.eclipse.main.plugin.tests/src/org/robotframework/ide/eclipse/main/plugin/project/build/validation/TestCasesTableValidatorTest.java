@@ -86,7 +86,7 @@ public class TestCasesTableValidatorTest {
 				"  kw");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-				new Path("/res.robot"));
+				new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -106,7 +106,7 @@ public class TestCasesTableValidatorTest {
 				"    kw");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-				new Path("/res.robot"));
+				new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -126,7 +126,7 @@ public class TestCasesTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", true,
-				new Path("/res.robot"));
+				new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -146,9 +146,9 @@ public class TestCasesTableValidatorTest {
 				"    kw2");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.REF_LIBRARY, "lib", "kw1", "", false,
-				new Path("/res.robot"));
+				new Path("/res.robot"), 0);
 		final KeywordEntity entity2 = new ValidationKeywordEntity(KeywordScope.STD_LIBRARY, "lib", "kw2", "", false,
-				new Path("/res.robot"));
+				new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw1",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "kw2",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
@@ -169,9 +169,9 @@ public class TestCasesTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.REF_LIBRARY, "lib", "kw", "", false,
-				new Path("/suite.robot"));
-		final KeywordEntity entity2 = new ValidationKeywordEntity(KeywordScope.REF_LIBRARY, "lib", "kw", "", false,
-				new Path("/res.robot"));
+				new Path("/suite.robot"), 0);
+        final KeywordEntity entity2 = new ValidationKeywordEntity(KeywordScope.REF_LIBRARY, "lib", "kw", "", false,
+                new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1, entity2));
 
@@ -188,7 +188,7 @@ public class TestCasesTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    lib.kw");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.REF_LIBRARY, "library", "kw", "lib",
-				false, new Path("/suite.robot"));
+				false, new Path("/suite.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -205,7 +205,7 @@ public class TestCasesTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    library.kw");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.REF_LIBRARY, "library", "kw", "", false,
-				new Path("/suite.robot"));
+                new Path("/suite.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -223,7 +223,7 @@ public class TestCasesTableValidatorTest {
 				"  k_w1", "  k_w 1", "  K w1", "  K_w 1");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw1", "", false,
-				new Path("/res.robot"));
+                new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw1",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -251,9 +251,9 @@ public class TestCasesTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res1", "kw", "", false,
-				new Path("/res1.robot"));
+                new Path("/res1.robot"), 0);
 		final KeywordEntity entity2 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res2", "kw", "", false,
-				new Path("/res2.robot"));
+                new Path("/res2.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1, entity2));
 
@@ -269,13 +269,16 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void keywordWithAmbiguousNameIsNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    res1.kw",
+		final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
+		        "*** Test Cases ***", 
+		        "test", 
+		        "    res1.kw",
 				"    res2.kw");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res1", "kw", "", false,
-				new Path("/res1.robot"));
+                new Path("/res1.robot"), 0);
 		final KeywordEntity entity2 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res2", "kw", "", false,
-				new Path("/res2.robot"));
+                new Path("/res2.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1, entity2));
 
@@ -293,7 +296,7 @@ public class TestCasesTableValidatorTest {
 				"    kw  ${var2}");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-				new Path("/res.robot"));
+                new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -315,7 +318,7 @@ public class TestCasesTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw  ${2}");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-				new Path("/res.robot"));
+                new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -332,7 +335,7 @@ public class TestCasesTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw  ${var-2}");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-				new Path("/res.robot"));
+                new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -353,7 +356,7 @@ public class TestCasesTableValidatorTest {
 				"    Comment  ${var}");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn", "Comment", "",
-				false, new Path("/suite.robot"));
+                false, new Path("/suite.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("comment",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -371,9 +374,9 @@ public class TestCasesTableValidatorTest {
 				"    Set Test Variable  ${V_ar}", "    kw  ${var}");
 
 		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
-				"Set Test Variable", "", false, new Path("/suite.robot"));
+                "Set Test Variable", "", false, new Path("/suite.robot"), 0);
 		final KeywordEntity entity2 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-				new Path("/res.robot"));
+                new Path("/res.robot"), 0);
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("settestvariable",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
@@ -404,7 +407,7 @@ public class TestCasesTableValidatorTest {
 		final ValidationContext parentContext = new ValidationContext(new RobotModel(), RobotVersion.from("0.0"),
 				SuiteExecutor.Python, Maps.<String, LibrarySpecification> newHashMap(),
 				Maps.<ReferencedLibrary, LibrarySpecification> newHashMap());
-		IFile file = mock(IFile.class);
+		final IFile file = mock(IFile.class);
 		when(file.getFullPath()).thenReturn(new Path("/suite.robot"));
 		final FileValidationContext context = new FileValidationContext(parentContext, file, collector,
 				accessibleVariables);
