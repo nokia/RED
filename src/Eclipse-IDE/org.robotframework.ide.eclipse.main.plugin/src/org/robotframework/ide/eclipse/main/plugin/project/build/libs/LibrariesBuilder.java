@@ -67,8 +67,9 @@ public class LibrariesBuilder {
                 } catch (final RobotEnvironmentException e) {
                     try {
                         generatorWithSource.sourceLibdocFile.delete(true, null);
+                        throw e;
                     } catch (final CoreException e1) {
-                        // ok fine
+                        throw e;
                     }
                 }
                 monitor.worked(1);
