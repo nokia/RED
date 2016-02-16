@@ -1,4 +1,4 @@
-RED 0.6.1 - 2016/02/15
+RED 0.6.1 - 2016/02/16
 
 Bug
 
@@ -12,7 +12,7 @@ Bug
     Adding error when Test case has no content (lines with comments)
     RSE - Project Validation does not work under RSE
     No error when keywords are duplicated but in other case
-
+	
 Enhancement
 
     Scroll bar in manpage from libspecs
@@ -27,7 +27,7 @@ Enhancement
     Mark deprecated or removed elements from section Settings to be exactly on same place like RF 3.0
     Support for importing variables, which exists as module
     Extend RED to recognize unknown settings in TestCases and Keywords
-
+	Keywords with dots are recognized properly although RED still rise error when such keyword is used together with resource prefix
 Feature
 
     Provide headless application which will validate projects
