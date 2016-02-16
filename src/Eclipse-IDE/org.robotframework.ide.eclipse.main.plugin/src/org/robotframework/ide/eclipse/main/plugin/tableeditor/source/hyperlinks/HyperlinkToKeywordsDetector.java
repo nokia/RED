@@ -15,8 +15,10 @@ import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
@@ -245,6 +247,23 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
             this.userKeyword = userKeyword;
             this.libSpec = libSpec;
             this.kwSpec = kwSpec;
+        }
+
+        @Override
+        public boolean isSameAs(final KeywordEntity other, final IPath useplaceFilepath) {
+            return Objects.equals(destinationPosition, ((KeywordHyperlinkEntity) other).destinationPosition)
+                    && super.isSameAs(other, useplaceFilepath);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            return super.equals(obj)
+                    || Objects.equals(destinationPosition, ((KeywordHyperlinkEntity) obj).destinationPosition);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(super.hashCode(), destinationPosition);
         }
 
     }

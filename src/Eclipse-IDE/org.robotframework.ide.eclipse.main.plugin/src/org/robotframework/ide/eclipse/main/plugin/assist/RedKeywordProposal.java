@@ -5,7 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import java.util.ArrayList;
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
@@ -15,10 +17,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
+import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
+import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Joiner;
+import com.google.common.base.Function;
+import com.google.common.collect.Range;
 
 public class RedKeywordProposal extends KeywordEntity {
 
@@ -30,13 +35,13 @@ public class RedKeywordProposal extends KeywordEntity {
     private final String documentation;
     private final String sourcePrefix;
 
-    private final LazyProvider<List<String>> argumentsProvider;
+    private final ArgumentsDescriptor argumentsDescriptor;
 
     private final LazyProvider<String> htmlDocumentationProvider;
 
     private RedKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
             final KeywordType type, final String name, final String decoration, final boolean hasDescription,
-            final LazyProvider<List<String>> argumentsProvider, final LazyProvider<String> htmlDocumentationProvider,
+            final ArgumentsDescriptor argumentsDescriptor, final LazyProvider<String> htmlDocumentationProvider,
             final String documentation, final boolean isDeprecated, final IPath exposingFilePath) {
 
         super(scope, sourceName, name, sourceAlias, isDeprecated, exposingFilePath);
@@ -50,7 +55,7 @@ public class RedKeywordProposal extends KeywordEntity {
         this.sourcePrefix = sourceAlias;
 
         this.htmlDocumentationProvider = htmlDocumentationProvider;
-        this.argumentsProvider = argumentsProvider;
+        this.argumentsDescriptor = argumentsDescriptor;
     }
 
     static RedKeywordProposal create(final LibrarySpecification spec, final KeywordSpecification keyword,
@@ -62,15 +67,9 @@ public class RedKeywordProposal extends KeywordEntity {
                 return keyword.getDocumentationAsHtml();
             }
         };
-        final LazyProvider<List<String>> argsProvider = new LazyProvider<List<String>>() {
-
-            @Override
-            public List<String> provide() {
-                return keyword.getArguments() == null ? new ArrayList<String>() : keyword.getArguments();
-            }
-        };
+        final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
         return new RedKeywordProposal(spec.getName(), sourcePrefix, scope, KeywordType.LIBRARY, keyword.getName(),
-                "- " + spec.getName(), true, argsProvider, htmlDocuProvider, keyword.getDocumentation(),
+                "- " + spec.getName(), true, argsDescriptor, htmlDocuProvider, keyword.getDocumentation(),
                 keyword.isDeprecated(), exposingFilepath);
     }
 
@@ -82,15 +81,10 @@ public class RedKeywordProposal extends KeywordEntity {
                 return "<p>to be implemented</p>";
             }
         };
-        final LazyProvider<List<String>> argsProvider = new LazyProvider<List<String>>() {
-            @Override
-            public List<String> provide() {
-                return userKeyword.getArguments();
-            }
-        };
+        final ArgumentsDescriptor argsDescriptor = userKeyword.createArgumentsDescriptor();
         return new RedKeywordProposal("User Defined (" + file.getFile().getFullPath().toPortableString() + ")",
                 sourcePrefix, scope, KeywordType.USER_DEFINED, userKeyword.getName(), "- " + file.getName(), true,
-                argsProvider, htmlDocuProvider, userKeyword.getDocumentation(), userKeyword.isDeprecated(),
+                argsDescriptor, htmlDocuProvider, userKeyword.getDocumentation(), userKeyword.isDeprecated(),
                 file.getFile().getFullPath());
     }
 
@@ -127,11 +121,20 @@ public class RedKeywordProposal extends KeywordEntity {
     }
 
     public String getArgumentsLabel() {
-        return "[" + Joiner.on(" | ").join(getArguments()) + "]";
+        return argumentsDescriptor.getDescription();
     }
 
-    public List<String> getArguments() {
-        return argumentsProvider.provide();
+    public Range<Integer> getNumberOfArguments() {
+        return argumentsDescriptor.getPossibleNumberOfArguments();
+    }
+
+    public List<String> getRequiredArguments() {
+        return newArrayList(transform(argumentsDescriptor.getRequiredArguments(), new Function<Argument, String>() {
+            @Override
+            public String apply(final Argument arg) {
+                return arg.getName();
+            }
+        }));
     }
 
     private static interface LazyProvider<T> {
