@@ -185,8 +185,8 @@ public class ValidationContext {
                     final KeywordSpecification kwSpec, final String libraryAlias, final RobotSuiteFile exposingFile) {
 
                 final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY : KeywordScope.STD_LIBRARY;
-                final ValidationKeywordEntity keyword = new ValidationKeywordEntity(scope, libSpec.getName(), kwSpec.getName(),
-                        libraryAlias, kwSpec.isDeprecated(), exposingFile.getFile().getFullPath());
+                final ValidationKeywordEntity keyword = new ValidationKeywordEntity(scope, libSpec.getName(),
+                        kwSpec.getName(), libraryAlias, kwSpec.isDeprecated(), exposingFile.getFile().getFullPath(), 0);
 
                 addAccessibleKeyword(kwSpec.getName(), keyword);
                 return ContinueDecision.CONTINUE;
@@ -197,7 +197,8 @@ public class ValidationContext {
                     final RobotKeywordDefinition kwDefinition) {
                 final ValidationKeywordEntity keyword = new ValidationKeywordEntity(null,
                         Files.getNameWithoutExtension(suiteFile.getName()), kwDefinition.getName(), "",
-                        kwDefinition.isDeprecated(), suiteFile.getFile().getFullPath());
+                        kwDefinition.isDeprecated(), suiteFile.getFile().getFullPath(),
+                        kwDefinition.getDefinitionPosition().getOffset());
 
                 addAccessibleKeyword(kwDefinition.getName(), keyword);
                 return ContinueDecision.CONTINUE;

@@ -33,10 +33,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.Range;
 
 
 /**
@@ -85,13 +87,33 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                     }
 
                     final String keywordName = keywordProposal.getContent();
-                    final boolean shouldAddKeywordPrefix = (isKeywordPrefixAutoAdditionEnabled || keywordProposalIsConflicting(keywordProposal))
-                            && keywordProposal.getScope(assist.getFile().getFullPath()) != KeywordScope.LOCAL; // Local keywords can't have prefix
-                    final String keywordPrefix = shouldAddKeywordPrefix ? keywordProposal.getSourcePrefix() + "." : "";
-                    final String textToInsert = keywordPrefix + keywordName + separator;
+                    final boolean shouldAddKeywordPrefix = keywordIsNotInLocalScope(keywordProposal)
+                            && (isKeywordPrefixAutoAdditionEnabled || keywordProposalIsConflicting(keywordProposal));
 
-                    final List<String> args = keywordProposal.getArguments();
-                    final String arguments = args.isEmpty() ? "no arguments" : Joiner.on(" | ").join(args);
+                    final String keywordPrefix = shouldAddKeywordPrefix ? keywordProposal.getSourcePrefix() + "." : "";
+
+                    String textToInsert;
+                    final Collection<IRegion> regionsForLinkedMode;
+                    if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName)) {
+                        textToInsert = keywordPrefix + keywordName;
+                        regionsForLinkedMode = calculateRegionsForLinkedModeForEmbeddedKeyword(
+                                offset - prefix.length() + keywordPrefix.length(), keywordName);
+                    } else {
+                        final List<String> requiredArguments = keywordProposal.getRequiredArguments();
+                        final Range<Integer> noOfArgs = keywordProposal.getNumberOfArguments();
+
+                        final boolean addPlaceForOptional = !noOfArgs.hasUpperBound()
+                                || noOfArgs.upperEndpoint() > requiredArguments.size();
+
+                        final String argumentsToInsert = requiredArguments.isEmpty() ? ""
+                                : separator + Joiner.on(separator).join(requiredArguments);
+                        textToInsert = keywordPrefix + keywordName + argumentsToInsert
+                                + (addPlaceForOptional ? separator : "");
+                        regionsForLinkedMode = calculateRegionsForLinkedModeForRegularKeyword(
+                                offset - prefix.length() + keywordPrefix.length(), separator.length(), keywordName,
+                                requiredArguments);
+                    }
+
                     final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                             .will(assist.getAcceptanceMode())
                             .theText(textToInsert)
@@ -101,9 +123,9 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                             .andWholeContentIs(content)
                             .secondaryPopupShouldBeDisplayed(keywordProposal.getDocumentation())
                             .contextInformationShouldBeShownAfterAccepting(
-                                    new ContextInformation(keywordName, arguments))
-                            .performAfterAccepting(createOperationsToPerformAfterAccepting(
-                                    calculateRegionsForLinkedMode(offset - prefix.length(), keywordName), viewer))
+                                    new ContextInformation(keywordName, keywordProposal.getArgumentsLabel()))
+                            .performAfterAccepting(
+                                    createOperationsToPerformAfterAccepting(regionsForLinkedMode, viewer))
                             .thenCursorWillStopAtTheEndOfInsertion()
                             .currentPrefixShouldBeDecorated()
                             .displayedLabelShouldBe(keywordName)
@@ -122,13 +144,34 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         }
     }
 
-    private Collection<IRegion> calculateRegionsForLinkedMode(final int beginOffset, final String keywordName) {
+    private boolean keywordIsNotInLocalScope(final RedKeywordProposal keywordProposal) {
+        return keywordProposal
+                .getScope(assist.getFile().getFullPath()) != KeywordScope.LOCAL;
+    }
+
+    private Collection<IRegion> calculateRegionsForLinkedModeForEmbeddedKeyword(final int beginOffset,
+            final String keywordName) {
         final Collection<IRegion> regions = new ArrayList<>();
-        if (EmbeddedKeywordNamesSupport.hasEmbeddedArguments(keywordName)) {
-            final Matcher matcher = Pattern.compile("\\$\\{[^\\}]+\\}").matcher(keywordName);
-            while (matcher.find()) {
-                regions.add(new Region(beginOffset + matcher.start(), matcher.end() - matcher.start()));
-            }
+        final Matcher matcher = Pattern.compile("\\$\\{[^\\}]+\\}").matcher(keywordName);
+        while (matcher.find()) {
+            regions.add(new Region(beginOffset + matcher.start(), matcher.end() - matcher.start()));
+        }
+        return regions;
+    }
+
+    private Collection<IRegion> calculateRegionsForLinkedModeForRegularKeyword(final int beginOffset,
+            final int separatorLength, final String keywordName, final List<String> requiredArguments) {
+        final Collection<IRegion> regions = new ArrayList<>();
+        int currentOffset = beginOffset + keywordName.length();
+        if (!requiredArguments.isEmpty()) {
+            currentOffset += separatorLength;
+        }
+        for (final String requiredArg : requiredArguments) {
+            regions.add(new Region(currentOffset, requiredArg.length()));
+            currentOffset += requiredArg.length() + separatorLength;
+        }
+        if (!requiredArguments.isEmpty()) {
+            regions.add(new Region(currentOffset, 0));
         }
         return regions;
     }
@@ -153,8 +196,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                                     model.addGroup(group);
                                 }
                                 model.forceInstall();
-                                final LinkedModeUI ui = new LinkedModeUI(model, new ITextViewer[] { viewer });
-                                ui.enter();
+                                final LinkedModeUI linkedModeUi = new RedEditorLinkedModeUI(model, viewer);
+                                linkedModeUi.enter();
                             } catch (final BadLocationException e) {
                                 e.printStackTrace();
                             }

@@ -25,10 +25,12 @@ import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 
 import com.google.common.collect.Lists;
@@ -195,22 +197,32 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         return "<not documented>";
     }
 
-    public List<String> getArguments() {
-        final RobotDefinitionSetting argumentsSetting = getArgumentsSetting();
-        if (argumentsSetting != null) {
-            final KeywordArguments arguments = (KeywordArguments) argumentsSetting.getLinkedElement();
-            final List<String> args = newArrayList();
-            for (final RobotToken token : arguments.getArguments()) {
-                args.add(toPythonicNotation(token));
+    public ArgumentsDescriptor createArgumentsDescriptor() {
+        return ArgumentsDescriptor.createDescriptor(getArguments());
+    }
+
+    private List<String> getArguments() {
+        final List<VariableDeclaration> embedded = getEmbeddedArguments();
+        final List<String> args = newArrayList();
+        if (!embedded.isEmpty()) {
+            for (final VariableDeclaration var : embedded) {
+                args.add(toPythonicNotation(var.asToken()));
             }
-            return args;
+        } else {
+            final RobotDefinitionSetting argumentsSetting = getArgumentsSetting();
+            if (argumentsSetting != null) {
+                final KeywordArguments arguments = (KeywordArguments) argumentsSetting.getLinkedElement();
+                for (final RobotToken token : arguments.getArguments()) {
+                    args.add(toPythonicNotation(token));
+                }
+            }
         }
-        return newArrayList();
+        return args;
     }
 
     private String toPythonicNotation(final RobotToken token) {
         final List<IRobotTokenType> types = token.getTypes();
-        final String text = token.getText().toString();
+        final String text = EmbeddedKeywordNamesSupport.removeRegex(token.getText().toString());
         if (types.contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)) {
             return "**" + text.substring(2, text.length() - 1);
         } else if (types.contains(RobotTokenType.VARIABLES_LIST_DECLARATION)) {
