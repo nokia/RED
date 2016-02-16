@@ -114,7 +114,8 @@ public class AccessibleKeywordsEntities {
             final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
                     .create(keyword.getNameFromDefinition(), keyword.getSourceNameInUse());
             if (qualifedName.matchesIgnoringCase(candidateQualifiedName)
-                    || EmbeddedKeywordNamesSupport.matches(keyword.getNameFromDefinition(), qualifedName)) {
+                    || (keyword.getSourceNameInUse().toLowerCase().equals(qualifedName.getKeywordSource().toLowerCase())
+                            && EmbeddedKeywordNamesSupport.matches(keyword.getNameFromDefinition(), qualifedName))) {
                 matchingKeywords.add(keyword);
             }
         }
