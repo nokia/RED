@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/5/16 3:18 PM
+Save-Time: 2/16/16 6:01 PM
 Tags: Unstable
 Testcase-Type: ecl
 Verifications: _ase_IGBvEeW-9bGOK0urnw
@@ -262,95 +262,20 @@ with [get-tab-folder -index 1] {
     get-property tabCount | equals 3 | verify-true
 }
 
-//--------------------------------------------------------------------------------------------------------------
-//open red.xml normal
-get-view "Project Explorer" | get-tree | select "New/red.xml" | select "New/red.xml" | double-click
-
-//check if all sections are shown
-with [get-editor "New/red.xml"] {
-    get-canvas | get-property "getText()" | equals "RED Project" | verify-true
-    with [get-section "Robot framework"] {
-        get-property "getDescription()" 
-            | equals "In this section Robot framework location can be specified. The selected framework will be used by this project. Currently following framework is in use:" 
-            | verify-true
-        get-property "getText()" | equals "Robot framework" | verify-true
-        with [get-button "Use local settings for this project"] {
-            get-property enablement | equals true | verify-true
-            get-property caption | equals "Use local settings for this project" | verify-true
-            get-property selected | equals false | verify-true
-        }
-        with [get-table] {
-            get-property itemCount | equals 1 | verify-true
-            get-property "columns[0].caption" | equals Name | verify-true
-            get-property "columns[1].caption" | equals Path | verify-true
-            //get-property "getItems().TableItem[0].getData().getFile().getCanonicalPath()" | equals $python_exe_path
-            //    | verify-true
-            get-property "getItems().TableItem[0].getData().getVersion()" 
-                | equals $robot_version | verify-true
-        }
-    }
-    with [get-section "Referenced libraries"] {
-        get-property "getDescription()" 
-            | equals "In this section referenced libraries can be specified. Those libraries will be available for all suites within project." 
-            | verify-true
-        get-property "getText()" | equals "Referenced libraries" | verify-true
-        with [get-button "Add Python library"] {
-            get-property enablement | equals true | verify-true
-            get-property selected | equals false | verify-true
-        }
-        with [get-button "Add Java library"] {
-            get-property enablement | equals false | verify-true
-            get-property selected | equals false | verify-true
-        }
-        with [get-button "Add libspec file"] {
-            get-property enablement | equals true | verify-true
-            get-property caption | equals "Add libspec file" | verify-true
-            get-property selected | equals false | verify-true
-        }
-        with [get-button Remove] {
-            get-property enablement | equals false | verify-true
-            get-property selected | equals false | verify-true
-        }
-    }
-    with [get-section "Remote library locations"] {
-        get-property "getDescription()" 
-            | equals "In this section locations of servers for Remote library can be specified. Those addresses will be available for all suites within project." 
-            | verify-true
-        get-property "getText()" | equals "Remote library locations" | verify-true
-        get-table | get-property itemCount | equals 0 | verify-true
-        with [get-button "Add location"] {
-            get-property enablement | equals true | verify-true
-            get-property selected | equals false | verify-true
-        }
-        with [get-button Remove] {
-            get-property enablement | equals false | verify-true
-            get-property selected | equals false | verify-true
-        }
-    }
-    with [get-section "Variable files"] {
-        get-property "getDescription()" 
-            | equals "In this section variable files can be specified. Those variables will be available for all suites within project and will be accessible without importing." 
-            | verify-true
-        get-property "getText()" | equals "Variable files" | verify-true
-        with [get-button "Add Variable File"] {
-            get-property enablement | equals true | verify-true
-            get-property selected | equals false | verify-true
-        }
-        with [get-button Remove] {
-            get-property enablement | equals false | verify-true
-            get-property selected | equals false | verify-true
-        }
-    }
-}
-
+//checking layout of red.xml is in other test
+get-view "Project Explorer" | get-tree | select "New/red.xml" | double-click
 //check how red.xml looks like in text view
 with [get-view "Project Explorer" | get-tree] {
     select "New/red.xml" | get-menu "Open With/Text Editor" | click
 }
+get-tab-folder -index 1 | get-tab-item "red.xml" | click
 get-editor "red.xml" | get-text-viewer | get-property text 
     | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
     + "<projectConfiguration>\n"
     + "    <configVersion>1.0</configVersion>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
     + "</projectConfiguration>" | verify-true
 
 
@@ -593,4 +518,7 @@ with [get-tab-folder -index 1] {
     get-property activePage | equals "new_txt_resource.txt" | verify-true
     get-property tabCount | equals 11 | verify-true
 }
+
+get-view "Project Explorer" | get-tree | select New | key-type F5
+wait 1000
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
