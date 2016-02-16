@@ -47,12 +47,11 @@ Open Help -> Installation Details, select old RED feature and perform unistall
 - File support: .robot, .txt, .tsv
 
 ## Known issues
-- Eclipse does not have UTF-8 support in editors by default. Check Preferences and RED help to get how to change it.
-- Usage of keywords with dots is not discovered properly. Now unknown keyword error marker is shown in such cases. 
+- Eclipse does not have UTF-8 support in editors by default. Check Preferences and RED help to get how to change it. 
 - Table editors edits are not persistent, changes done in Table editors will not be visible in source nor saved to file. Sync is done from Source -> Table only.
 - Library auto-discovery is not yet supported thus user needs to add any external library to red.xml by themselves, if not then validation will show unknown library error. Either you add it in red.xml or invoke option Quick Fix on item in Source editor or in Problems view.  
 - Due to difficult to comprehend and countless exceptions in RF syntax, validation can show false positive errors. In such case please provide us sample test case for us to have a look at.
-
+- Keyword with dot in the name is discovered properly, warning is rise for such case. Mind that still usage of such keywords with resource profix is unresloved.
 
 ## Short term plans
 - Keywords usage arguments validation
