@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
@@ -55,6 +56,16 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         reportDuplicatedArgumentSettings();
         reportDuplicatedArguments();
         reportArgumentsOrderProblems();
+        reportKeywordUsageProblemsInUserKeywordSettings();
+    }
+    
+    private void reportKeywordUsageProblemsInUserKeywordSettings() {
+        for (final KeywordTeardown keywordTeardown : keyword.getTeardowns()) {
+            final RobotToken keywordNameToken = keywordTeardown.getKeywordName();
+            if (keywordNameToken != null) {
+                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordNameToken);
+            }
+        }
     }
 
     private void reportUnknownSettings() {
