@@ -21,6 +21,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
@@ -180,8 +181,24 @@ class KeywordTableValidator implements ModelUnitValidator {
             allVariables.addAll(extractArgumentVariables(keyword, variableExtractor, fileName));
 
             TestCasesTableValidator.reportUnknownVariables(validationContext, reporter,
-                    keyword.getKeywordExecutionRows(), allVariables);
+                    collectKeywordExeRowsForVariablesChecking(keyword), allVariables);
         }
+    }
+    
+    private List<? extends RobotExecutableRow<?>> collectKeywordExeRowsForVariablesChecking(final UserKeyword keyword) {
+        final List<RobotExecutableRow<?>> exeRows = newArrayList();
+        exeRows.addAll(keyword.getKeywordExecutionRows());
+
+        final List<KeywordTeardown> teardowns = keyword.getTeardowns();
+        if (!teardowns.isEmpty()) {
+            exeRows.add(teardowns.get(0).asExecutableRow());
+        }
+        final List<KeywordReturn> returns = keyword.getReturns();
+        if (!returns.isEmpty()) {
+            exeRows.add(returns.get(0).asExecutableRow());
+        }
+
+        return exeRows;
     }
 
     private Collection<String> extractArgumentVariables(final UserKeyword keyword, final VariableExtractor extractor,
