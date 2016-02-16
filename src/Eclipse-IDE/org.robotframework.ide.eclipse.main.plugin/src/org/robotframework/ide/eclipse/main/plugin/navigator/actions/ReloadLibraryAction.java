@@ -63,7 +63,7 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
             });
         } catch (InvocationTargetException | InterruptedException e) {
             MessageDialog.openError(shell, "Regenerating library specification",
-                    "Problems occured during library specification generation " + e.getMessage());
+                    "Problems occured during library specification generation " + e.getCause().getMessage());
         }
 
     }
