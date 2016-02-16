@@ -27,7 +27,9 @@ import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesS
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -39,6 +41,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.validation.keywo
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ListMultimap;
 
 class KeywordTableValidator implements ModelUnitValidator {
 
@@ -67,7 +70,9 @@ class KeywordTableValidator implements ModelUnitValidator {
 
         validateByExternal(robotKeywordsSection, monitor);
 
-        reportEmptyKeywordAndWrongKeywordName(keywords);
+        reportEmptyKeywords(keywords);
+        reportWrongKeywordName(keywords);
+        reportMaskingKeywords(keywords);
         reportDuplicatedKeywords(keywords);
         reportSettingsProblems(keywords);
         reportKeywordUsageProblems(keywords);
@@ -83,21 +88,50 @@ class KeywordTableValidator implements ModelUnitValidator {
         new DeprecatedKeywordHeaderAlias(validationContext.getFile(), reporter, section).validate(monitor);
     }
 
-    private void reportEmptyKeywordAndWrongKeywordName(final List<UserKeyword> keywords) {
+    private void reportEmptyKeywords(final List<UserKeyword> keywords) {
         for (final UserKeyword keyword : keywords) {
             final RobotToken keywordName = keyword.getKeywordName();
             final String name = keywordName.getText();
-            if(name.contains(".")) {
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_WITH_DOTS).formatMessageWith(name);
-                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,name);
-                reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
-            }
             if (isReturnEmpty(keyword) && !hasAnythingToExecute(keyword)) {
                 final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD).formatMessageWith(name);
                 final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,name);
                 reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
             }
         }
+    }
+
+    private void reportWrongKeywordName(final List<UserKeyword> keywords) {
+        for (final UserKeyword keyword : keywords) {
+            final RobotToken keywordName = keyword.getKeywordName();
+            final String name = keywordName.getText();
+            if (name.contains(".")) {
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_NAME_WITH_DOTS)
+                        .formatMessageWith(name);
+                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                        name);
+                reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
+            }
+        }
+    }
+
+    private void reportMaskingKeywords(final List<UserKeyword> keywords) {
+        for (final UserKeyword keyword : keywords) {
+            final RobotToken keywordName = keyword.getKeywordName();
+            final String name = keywordName.getText();
+            final ListMultimap<KeywordScope, KeywordEntity> possibleKeywords = validationContext
+                    .getPossibleKeywords(name);
+            for (final KeywordScope scope : KeywordScope.defaultOrder()) {
+                if (scope != KeywordScope.LOCAL && !possibleKeywords.get(scope).isEmpty()) {
+                    final KeywordEntity maskedKeyword = possibleKeywords.get(scope).get(0);
+                    final String maskedName = maskedKeyword.getNameFromDefinition();
+                    final String maskedSource = maskedKeyword.getSourceNameInUse();
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.KEYWORD_MASKS_OTHER_KEYWORD)
+                            .formatMessageWith(name, maskedName, maskedSource, maskedSource + "." + maskedName);
+                    reporter.handleProblem(problem, validationContext.getFile(), keywordName);
+                }
+            }
+        }
+
     }
 
     private boolean hasAnythingToExecute(final UserKeyword keyword) {

@@ -214,6 +214,18 @@ public enum KeywordsProblem implements IProblemCause {
             return "Given keyword name '%s' contains dots. Use underscores instead of dots in keywords names.";
         }
     },
+    KEYWORD_MASKS_OTHER_KEYWORD {
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "The keyword '%s' is masking the keyword '%s' defined in %s. "
+                    + "Use '%s' in this suite file if the latter is desired";
+        }
+    },
     DOCUMENT_SYNONIM {
         @Override
         public boolean hasResolution() {
