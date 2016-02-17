@@ -30,6 +30,10 @@ public class ArgumentsDescriptor {
         this.arguments = args;
     }
 
+    public static ArgumentsDescriptor createDescriptor(final String... args) {
+        return createDescriptor(newArrayList(args));
+    }
+
     public static ArgumentsDescriptor createDescriptor(final List<String> args) {
         if (args == null) {
             return new ArgumentsDescriptor(Lists.<Argument> newArrayList());

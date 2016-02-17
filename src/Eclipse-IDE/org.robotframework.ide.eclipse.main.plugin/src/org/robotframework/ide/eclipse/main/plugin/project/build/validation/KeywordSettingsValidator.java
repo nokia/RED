@@ -28,6 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -63,7 +64,8 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         for (final KeywordTeardown keywordTeardown : keyword.getTeardowns()) {
             final RobotToken keywordNameToken = keywordTeardown.getKeywordName();
             if (keywordNameToken != null) {
-                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordNameToken);
+                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordNameToken,
+                        Optional.of(keywordTeardown.getArguments()));
             }
         }
     }
