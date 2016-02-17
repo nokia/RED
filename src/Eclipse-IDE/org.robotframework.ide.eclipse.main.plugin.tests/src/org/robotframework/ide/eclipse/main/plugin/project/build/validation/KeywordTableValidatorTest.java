@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.FileValidationContext.ValidationKeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
+import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.collect.ImmutableMap;
@@ -103,8 +105,8 @@ public class KeywordTableValidatorTest {
                 "keyword",
                 "  kw");
 
-        final KeywordEntity entity = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-                new Path("/res.robot"), 0);
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"));
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
                 (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
@@ -435,8 +437,8 @@ public class KeywordTableValidatorTest {
 	public void keywordDefinitionWithDotsIsReported() throws CoreException {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword.1", "    kw");
 
-		final KeywordEntity entity = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-                new Path("/res.robot"), 0);
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"));
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
@@ -454,8 +456,8 @@ public class KeywordTableValidatorTest {
 	public void keywordOccurrenceWithDotsIsNotReported() throws CoreException {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword", "    k.w");
 
-		final KeywordEntity entity = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w", "", false,
-                new Path("/res.robot"), 0);
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w",
+                new Path("/res.robot"));
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
@@ -472,10 +474,10 @@ public class KeywordTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword", "    res.k.w",
 				"    res1.kw", "    res.kw");
 
-		final KeywordEntity entity1 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w", "", false,
-                new Path("/res.robot"), 0);
-		final KeywordEntity entity2 = new ValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw", "", false,
-                new Path("/res.robot"), 0);
+        final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w",
+                new Path("/res.robot"));
+        final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"));
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
@@ -490,6 +492,12 @@ public class KeywordTableValidatorTest {
 				new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(29, 36))),
 				new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(4, Range.closed(41, 48))));
 	}
+
+    private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
+            final String name, final IPath exposingPath) {
+        return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
+                ArgumentsDescriptor.createDescriptor());
+    }
 
     private static FileValidationContext prepareContext() {
         return prepareContext(new HashMap<String, Collection<KeywordEntity>>());
