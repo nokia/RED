@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.robotframework.red.jface.dialogs.InputLoadingFormComposite.InputJob;
@@ -30,6 +31,13 @@ public class InputLoadingFormCompositeTest {
 
     @Rule
     public ShellProvider shellProvider = new ShellProvider();
+
+    @After
+    public void afterTest() {
+        while (Display.getCurrent().readAndDispatch()) {
+            // handle all the events which came to UI thread after the job has finished
+        }
+    }
 
     @Test
     public void whenCompositeIsCreated_theInputLoadingJobStartsAndLoadingLabelIsVisible() throws InterruptedException {
