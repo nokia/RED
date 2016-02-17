@@ -100,34 +100,39 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     public boolean isExecutable() {
         boolean result = false;
         if (action != null && !action.getFilePosition().isNotSet()) {
-            @SuppressWarnings("unchecked")
-            IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
-            FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
+            if (getParent() instanceof IExecutableStepsHolder) {
+                @SuppressWarnings("unchecked")
+                IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
+                FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
 
-            if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                String raw = action.getRaw().trim();
-                List<RobotToken> elementTokens = getElementTokens();
-                if (raw.equals("\\")) {
-                    if (elementTokens.size() > 1) {
-                        if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                            result = true;
-                        }
-                    }
-                } else if ("".equals(raw)) {
-                    if (fileFormat == FileFormat.TSV) {
+                if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                    String raw = action.getRaw().trim();
+                    List<RobotToken> elementTokens = getElementTokens();
+                    if (raw.equals("\\")) {
                         if (elementTokens.size() > 1) {
                             if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
                                 result = true;
                             }
                         }
+                    } else if ("".equals(raw)) {
+                        if (fileFormat == FileFormat.TSV) {
+                            if (elementTokens.size() > 1) {
+                                if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                                    result = true;
+                                }
+                            }
+                        } else {
+                            result = true;
+                        }
                     } else {
                         result = true;
                     }
-                } else {
-                    result = true;
                 }
+            } else {
+                result = !action.getTypes().contains(RobotTokenType.START_HASH_COMMENT);
             }
         }
+
         return result;
     }
 
