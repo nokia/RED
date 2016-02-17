@@ -80,16 +80,27 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
         return tokens;
     }
 
+    protected abstract List<AKeywordBaseSetting<T>> getAllThisKindSettings();
+
     public RobotExecutableRow<T> asExecutableRow() {
-        RobotExecutableRow<T> execRow = new RobotExecutableRow<>();
+        final RobotExecutableRow<T> execRow = new RobotExecutableRow<>();
         execRow.setParent(getParent());
-        RobotToken keyword = getKeywordName();
-        if (keyword != null) {
-            execRow.setAction(keyword);
-            for (final RobotToken argument : arguments) {
-                execRow.addArgument(argument);
+
+        boolean wasAction = false;
+        final List<AKeywordBaseSetting<T>> allThisKindSettings = getAllThisKindSettings();
+        for (final AKeywordBaseSetting<T> baseSetting : allThisKindSettings) {
+            if (baseSetting.getKeywordName() != null && !baseSetting.getKeywordName().getFilePosition().isNotSet()) {
+                if (!wasAction) {
+                    execRow.setAction(baseSetting.getKeywordName());
+                    wasAction = true;
+                } else {
+                    execRow.addArgument(baseSetting.getKeywordName());
+                }
             }
-            for (final RobotToken c : comment) {
+            for (final RobotToken arg : baseSetting.getArguments()) {
+                execRow.addArgument(arg);
+            }
+            for (final RobotToken c : baseSetting.getComment()) {
                 execRow.addComment(c);
             }
         }
