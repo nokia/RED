@@ -189,13 +189,14 @@ class TestCasesTableValidator implements ModelUnitValidator {
                         Optional.of(testCaseTeardown.getArguments()));
             }
         }
+
         final RobotToken templateKeyword = testCase.getLinkedElement().getTemplateKeywordLocation();
-        if (!templateKeyword.getFilePosition().isNotSet()) {
+        if (!templateKeyword.getFilePosition().isNotSet() && isTemplateFromTestCasesTable(testCase)) {
             validateExistingKeywordCall(validationContext, reporter, templateKeyword,
                     Optional.<List<RobotToken>> absent());
         }
     }
-
+    
     static void reportKeywordUsageProblems(final FileValidationContext validationContext,
             final ProblemsReportingStrategy reporter, final List<? extends RobotExecutableRow<?>> executables,
             final Optional<String> templateKeyword) {
@@ -413,5 +414,9 @@ class TestCasesTableValidator implements ModelUnitValidator {
             action = lineDescription.getAction();
         }
         return action.getToken().getText();
+    }
+    
+    private boolean isTemplateFromTestCasesTable(final RobotCase testCase) {
+    	return testCase.getLinkedElement().getRobotViewAboutTestTemplate() != null;
     }
 }
