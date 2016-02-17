@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UUQjsLrCEeW29Kbu_epUIA
 Runtime-Version: 2.0.1.201508250612
-Save-Time: 2/17/16 5:50 PM
+Save-Time: 2/17/16 6:17 PM
 Testcase-Type: ecl
 Verifications: _ERtq8NWOEeWy4ZEoqcgipg,_KRyuULrEEeW29Kbu_epUIA
 
@@ -24,11 +24,9 @@ verify-error {get-window "Problem Occurred"}
 
 //sort by Description descending
 if [get-view Problems | get-tree| get-property "getSortColumn().getText()" -raw| not-eq Description]{
-
-	if [get-view Problems | get-tree| get-property "getSortDirection()" | equals 1024 ]{
 		get-view Problems | get-tree | get-column-header Description | click
-	}
 }
+
 
 with [get-view Problems | get-tree] {
     select "Errors \\(.* items\\)" | double-click
