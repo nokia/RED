@@ -35,8 +35,14 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
     public <T> IExecutableRowDescriptor<T> buildDescription(final RobotExecutableRow<T> execRowLine,
             final AcceptResult acceptResult) {
         final SimpleRowDescriptor<T> simple = new SimpleRowDescriptor<>(execRowLine);
-        final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine.getParent();
-        final ARobotSectionTable table = (ARobotSectionTable) keywordOrTestcase.getParent();
+        final ARobotSectionTable table;
+        if (execRowLine.getParent() instanceof AModelElement) {
+            final AModelElement<?> keywordOrTestcase = (AModelElement<?>) execRowLine.getParent();
+            table = (ARobotSectionTable) keywordOrTestcase.getParent();
+        } else {
+            table = (ARobotSectionTable) execRowLine.getParent();
+        }
+
         final RobotFile robotFile = table.getParent();
         final RobotFileOutput rfo = robotFile.getParent();
         final String fileName = rfo.getProcessedFile().getAbsolutePath();
