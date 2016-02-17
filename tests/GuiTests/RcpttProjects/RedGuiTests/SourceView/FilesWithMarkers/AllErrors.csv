@@ -1,5 +1,5 @@
 _indent,Description,Resource,Path,Location,Type
-0,Errors (56 items),,,,
+0,Errors (64 items),,,,
 1,Keyword 'Empty kw' contains no keywords to execute,empty_TC_KW.robot,/RobotProject,line 8,Robot Problem
 1,Keyword 'KW with comment' contains no keywords to execute,empty_TC_KW.robot,/RobotProject,line 11,Robot Problem
 1,Path '/folder/full.py' points to location outside your workspace,wrong_settings.robot,/RobotProject,line 7,Robot Problem
@@ -48,8 +48,16 @@ _indent,Description,Resource,Path,Location,Type
 1,"Variable 'global_var_kw' is used, but not defined",set_variable_commands.robot,/SecondRobotProject,line 39,Robot Problem
 1,"Variable 'global_var' is used, but not defined",set_variable_commands.robot,/SecondRobotProject,line 14,Robot Problem
 1,"Variable 'global_var' is used, but not defined",set_variable_commands.robot,/SecondRobotProject,line 15,Robot Problem
+1,"Variable 'KEYWORD' is used, but not defined",all_settings.robot,/SecondRobotProject,line 37,Robot Problem
+1,"Variable 'KEYWORD' is used, but not defined",all_settings.robot,/SecondRobotProject,line 42,Robot Problem
+1,"Variable 'KW ARGS' is used, but not defined",all_settings.robot,/SecondRobotProject,line 36,Robot Problem
+1,"Variable 'KW ARGS' is used, but not defined",all_settings.robot,/SecondRobotProject,line 37,Robot Problem
+1,"Variable 'KW ARGS' is used, but not defined",all_settings.robot,/SecondRobotProject,line 41,Robot Problem
+1,"Variable 'KW ARGS' is used, but not defined",all_settings.robot,/SecondRobotProject,line 42,Robot Problem
 1,"Variable 'NoUnderscore' is used, but not defined",set_variable_commands.robot,/SecondRobotProject,line 20,Robot Problem
 1,"Variable 'NoUnderscore' is used, but not defined",set_variable_commands.robot,/SecondRobotProject,line 21,Robot Problem
+1,"Variable 'param' is used, but not defined",all_settings.robot,/SecondRobotProject,line 72,Robot Problem
+1,"Variable 'param' is used, but not defined",all_settings.robot,/SecondRobotProject,line 76,Robot Problem
 1,"Variable 'suite_var_kw' is used, but not defined",set_variable_commands.robot,/SecondRobotProject,line 34,Robot Problem
 1,"Variable 'suite_var_kw' is used, but not defined",set_variable_commands.robot,/SecondRobotProject,line 35,Robot Problem
 1,"Variable 'suite_var' is used, but not defined",set_variable_commands.robot,/SecondRobotProject,line 11,Robot Problem
