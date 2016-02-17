@@ -41,6 +41,8 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
         TestCase testCase = testCaseFinder.findOrCreateNearestTestCase(currentLine, processingState, robotFileOutput,
                 rt, fp);
         List<IRobotTokenType> types = rt.getTypes();
+        types.remove(RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
+        types.remove(RobotTokenType.UNKNOWN);
         types.add(0, RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
 
         List<RobotToken> specialTokens = specialTokensRecognizer.recognize(fp, text);
@@ -69,6 +71,7 @@ public class TestCaseExecutableRowArgumentMapper implements IParsingMapper {
                 types.add(0, RobotTokenType.TEST_CASE_ACTION_NAME);
                 robotExecutableRow.setAction(rt);
             } else {
+                types.remove(RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
                 types.add(0, RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
                 robotExecutableRow.addArgument(rt);
             }
