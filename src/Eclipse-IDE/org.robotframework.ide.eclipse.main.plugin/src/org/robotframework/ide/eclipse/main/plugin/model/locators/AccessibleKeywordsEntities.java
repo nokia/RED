@@ -166,14 +166,6 @@ public class AccessibleKeywordsEntities {
         }
         
         return keywords != null ? keywords : tryWithEmbeddedArguments(qualifiedName);
-        //
-        // if (keywords != null) {
-        // final LinkedHashSet<KeywordEntity> result = newLinkedHashSet(keywords);
-        // result.addAll(tryWithEmbeddedArguments(qualifiedName));
-        // return result;
-        // } else {
-        // return tryWithEmbeddedArguments(qualifiedName);
-        // }
     }
 
     private Collection<? extends KeywordEntity> tryWithEmbeddedArguments(final QualifiedKeywordName qualifiedName) {

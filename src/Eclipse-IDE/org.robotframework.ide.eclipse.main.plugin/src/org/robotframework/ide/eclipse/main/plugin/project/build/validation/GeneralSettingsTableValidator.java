@@ -166,7 +166,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             final RobotToken keywordToken = keywordBased.getKeywordName();
             if (keywordToken != null) {
                 wasAllEmpty = false;
-                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken);
+                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken,
+                        Optional.of(keywordBased.getArguments()));
             }
         }
 
@@ -192,7 +193,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 if (keywordName.toLowerCase().equals("none")) {
                     continue;
                 }
-                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken);
+                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken,
+                        Optional.<List<RobotToken>> absent());
             }
             if (!template.getUnexpectedTrashArguments().isEmpty()) {
                 final String actualArgs = "[" + Joiner.on(", ").join(toString(template.getUnexpectedTrashArguments()))

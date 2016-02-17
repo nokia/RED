@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -80,11 +81,19 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
         private final int position;
 
+        private final ArgumentsDescriptor argumentsDescriptor;
+
         @VisibleForTesting
         ValidationKeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,
-                final String alias, final boolean isDeprecated, final IPath exposingFilepath, final int position) {
+                final String alias, final boolean isDeprecated, final IPath exposingFilepath, final int position,
+                final ArgumentsDescriptor argumentsDescriptor) {
             super(scope, sourceName, keywordName, alias, isDeprecated, exposingFilepath);
             this.position = position;
+            this.argumentsDescriptor = argumentsDescriptor;
+        }
+
+        public ArgumentsDescriptor getArgumentsDescriptor() {
+            return argumentsDescriptor;
         }
 
         public boolean hasInconsistentName(final String useplaceName) {

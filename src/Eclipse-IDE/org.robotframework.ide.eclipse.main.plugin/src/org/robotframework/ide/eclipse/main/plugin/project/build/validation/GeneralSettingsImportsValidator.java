@@ -34,10 +34,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibraryConstructor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -230,10 +228,9 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 final boolean isPath) throws CoreException {
             if (specification != null) {
                 final List<RobotToken> arguments = ((LibraryImport) imported).getArguments();
-                final LibraryConstructor constructor = specification.getConstructor();
-                final Optional<ArgumentsDescriptor> descriptor = constructor == null
-                        ? Optional.<ArgumentsDescriptor> absent()
-                        : Optional.of(constructor.createArgumentsDescriptor());
+                final ArgumentsDescriptor descriptor = specification.getConstructor() == null
+                        ? ArgumentsDescriptor.createDescriptor()
+                        : specification.getConstructor().createArgumentsDescriptor();
                 new KeywordCallArgumentsValidator(validationContext.getFile(), pathOrNameToken, reporter, descriptor,
                         arguments).validate(monitor);
             } else {
