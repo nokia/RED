@@ -392,6 +392,93 @@ public class TestCasesTableValidatorTest {
 		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
 	}
 
+	@Test
+	public void undeclaredVariableAndKeywordInTestCaseSetupAreReported() throws CoreException {
+		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
+				"  [Setup]  kw1  ${var}", "  kw");
+
+		final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
+				new Path("/suite.robot"));
+		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+
+		final FileValidationContext context = prepareContext(accessibleKws);
+		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+				file.findSection(RobotCasesSection.class), reporter);
+		validator.validate(null);
+
+		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
+		assertThat(reporter.getReportedProblems()).containsExactly(
+				new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(35, 38))),
+				new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(40, 46))));
+	}
+	
+	@Test
+	public void undeclaredVariableAndKeywordInTestCaseTeardownAreReported() throws CoreException {
+		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
+				"  [Teardown]  kw1  ${var}", "  kw");
+
+		final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
+				new Path("/suite.robot"));
+		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+
+		final FileValidationContext context = prepareContext(accessibleKws);
+		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+				file.findSection(RobotCasesSection.class), reporter);
+		validator.validate(null);
+
+		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
+		assertThat(reporter.getReportedProblems()).containsExactly(
+				new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(38, 41))),
+				new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(43, 49))));
+	}
+	
+	@Test
+	public void undeclaredKeywordInTestCaseTemplateIsReported() throws CoreException {
+		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
+				"  [Template]  kw1 ${var}", "  kw");
+
+		final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
+				new Path("/suite.robot"));
+		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+
+		final FileValidationContext context = prepareContext(accessibleKws);
+		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+				file.findSection(RobotCasesSection.class), reporter);
+		validator.validate(null);
+
+		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+		assertThat(reporter.getReportedProblems()).containsExactly(
+				new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(38, 48))));
+	}
+	
+	@Test
+	public void declaredVariablesAndKeywordsInTestCaseSettingsAreNotReported() throws CoreException {
+		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
+				"  [Setup]  kw  ${var1}", "  [Teardown]  kw  ${var2}", "  ${var2}=  Set Variable  2");
+
+		final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
+				new Path("/suite.robot"));
+		final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn", "Set Variable",
+				new Path("/suite.robot"));
+		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "setvariable",
+				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
+
+		final Set<String> accessibleVariables = new HashSet<>();
+		accessibleVariables.add("${var1}");
+
+		final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
+		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+				file.findSection(RobotCasesSection.class), reporter);
+		validator.validate(null);
+
+		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+	}
+	
+
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
             final String name, final IPath exposingPath) {
         return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
