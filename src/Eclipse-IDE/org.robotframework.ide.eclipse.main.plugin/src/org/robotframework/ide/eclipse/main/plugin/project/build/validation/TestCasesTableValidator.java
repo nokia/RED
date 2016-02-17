@@ -16,6 +16,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
@@ -177,18 +178,21 @@ class TestCasesTableValidator implements ModelUnitValidator {
         for (final TestCaseSetup testCaseSetup : testCase.getLinkedElement().getSetups()) {
             final RobotToken keywordNameToken = testCaseSetup.getKeywordName();
             if (keywordNameToken != null) {
-                validateExistingKeywordCall(validationContext, reporter, keywordNameToken);
+                validateExistingKeywordCall(validationContext, reporter, keywordNameToken,
+                        Optional.of(testCaseSetup.getArguments()));
             }
         }
         for (final TestCaseTeardown testCaseTeardown : testCase.getLinkedElement().getTeardowns()) {
             final RobotToken keywordNameToken = testCaseTeardown.getKeywordName();
             if (keywordNameToken != null) {
-                validateExistingKeywordCall(validationContext, reporter, keywordNameToken);
+                validateExistingKeywordCall(validationContext, reporter, keywordNameToken,
+                        Optional.of(testCaseTeardown.getArguments()));
             }
         }
         final RobotToken templateKeyword = testCase.getLinkedElement().getTemplateKeywordLocation();
         if (!templateKeyword.getFilePosition().isNotSet()) {
-            validateExistingKeywordCall(validationContext, reporter, templateKeyword);
+            validateExistingKeywordCall(validationContext, reporter, templateKeyword,
+                    Optional.<List<RobotToken>> absent());
         }
     }
 
@@ -222,7 +226,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
             }
 
             if (!keywordName.getFilePosition().isNotSet()) {
-                validateExistingKeywordCall(validationContext, reporter, keywordName);
+                validateExistingKeywordCall(validationContext, reporter, keywordName,
+                        Optional.of(executable.getArguments()));
             } else {
                 reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.MISSING_KEYWORD)
                         .formatMessageWith(executable.getAction().getText()), file, executable.getAction());
@@ -231,7 +236,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
     }
 
     static void validateExistingKeywordCall(final FileValidationContext validationContext,
-            final ProblemsReportingStrategy reporter, final RobotToken keywordName) {
+            final ProblemsReportingStrategy reporter, final RobotToken keywordName,
+            final Optional<List<RobotToken>> arguments) {
         final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(keywordName.getText(),
                 new NameTransformation<String>() {
 
@@ -279,6 +285,10 @@ class TestCasesTableValidator implements ModelUnitValidator {
                             ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME, name,
                                     AdditionalMarkerAttributes.ORIGINAL_NAME, keyword.getNameFromDefinition(),
                                     AdditionalMarkerAttributes.SOURCES, keyword.getSourceNameInUse()));
+                }
+                if (arguments.isPresent()) {
+                    new KeywordCallArgumentsValidator(validationContext.getFile(), keywordName, reporter,
+                            keyword.getArgumentsDescriptor(), arguments.get()).validate(new NullProgressMonitor());
                 }
                 break;
             } else if (keywordEntities.size() > 1) {
