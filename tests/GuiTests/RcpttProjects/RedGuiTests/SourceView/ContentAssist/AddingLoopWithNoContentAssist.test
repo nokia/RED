@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3DFlELkTEeWzJthH3JoEWQ
 Runtime-Version: 2.0.1.201508250612
-Save-Time: 1/15/16 12:06 PM
+Save-Time: 2/17/16 1:18 PM
 Testcase-Type: ecl
 Verifications: _V3Dw8Lt3EeWNQsJ9kfZ-bA,_l1AbYLt3EeWNQsJ9kfZ-bA,_xVs3YLt3EeWNQsJ9kfZ-bA,_ufZ8gLtzEeW29Kbu_epUIA
 
@@ -70,7 +70,7 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     wait 300
     key-type Enter
     type-text "${z}"
-    key-type Enter
+    key-type Enter -times 2
     key-type BackSpace
     type-text ": fOR\t${i}\tIn Range\t700\t750"
     key-type Enter
