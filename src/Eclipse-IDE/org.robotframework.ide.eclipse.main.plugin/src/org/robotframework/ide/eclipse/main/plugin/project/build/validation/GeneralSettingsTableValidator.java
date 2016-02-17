@@ -8,11 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.ATags;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
@@ -82,10 +84,12 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         validateResources(suiteFile, getResourcesImports(settingsTable), monitor);
         validateVariables(suiteFile, getVariablesImports(settingsTable), monitor);
 
-        validateSetupsAndTeardowns(settingsTable.getSuiteSetups());
-        validateSetupsAndTeardowns(settingsTable.getSuiteTeardowns());
-        validateSetupsAndTeardowns(settingsTable.getTestSetups());
-        validateSetupsAndTeardowns(settingsTable.getTestTeardowns());
+        final List<RobotExecutableRow<?>> executableRowsInSetupsAndTeardowns = newArrayList();
+        validateSetupsAndTeardowns(settingsTable.getSuiteSetups(), executableRowsInSetupsAndTeardowns);
+        validateSetupsAndTeardowns(settingsTable.getSuiteTeardowns(), executableRowsInSetupsAndTeardowns);
+        validateSetupsAndTeardowns(settingsTable.getTestSetups(), executableRowsInSetupsAndTeardowns);
+        validateSetupsAndTeardowns(settingsTable.getTestTeardowns(), executableRowsInSetupsAndTeardowns);
+        validateVariablesInSetupsAndTeardowns(executableRowsInSetupsAndTeardowns);
 
         validateTestTemplates(settingsTable.getTestTemplates());
         validateTestTimeouts(settingsTable.getTestTimeouts());
@@ -160,7 +164,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 reporter).validate(monitor);
     }
 
-    private void validateSetupsAndTeardowns(final List<? extends AKeywordBaseSetting<?>> keywordBasedSettings) {
+    private void validateSetupsAndTeardowns(final List<? extends AKeywordBaseSetting<?>> keywordBasedSettings, final List<RobotExecutableRow<?>> executableRows) {
         boolean wasAllEmpty = true;
         for (final AKeywordBaseSetting<?> keywordBased : keywordBasedSettings) {
             final RobotToken keywordToken = keywordBased.getKeywordName();
@@ -179,6 +183,15 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                         .formatMessageWith(settingName);
                 reporter.handleProblem(problem, validationContext.getFile(), settingToken);
             }
+        } else {
+            executableRows.add(keywordBasedSettings.get(0).asExecutableRow());
+        }
+    }
+    
+    private void validateVariablesInSetupsAndTeardowns(final List<RobotExecutableRow<?>> executableRows) {
+        if(!executableRows.isEmpty()) {
+            final Set<String> variables = validationContext.getAccessibleVariables();
+            TestCasesTableValidator.reportUnknownVariables(validationContext, reporter, executableRows, variables);
         }
     }
 
