@@ -33,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 public class RobotKeywordDefinition extends RobotCodeHoldingElement {
@@ -222,12 +223,18 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
     private String toPythonicNotation(final RobotToken token) {
         final List<IRobotTokenType> types = token.getTypes();
-        final String text = EmbeddedKeywordNamesSupport.removeRegex(token.getText().toString());
-        if (types.contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)) {
+        String text = EmbeddedKeywordNamesSupport.removeRegex(token.getText().toString());
+        if (text.contains("=")) {
+            text = Splitter.on('=').limit(2).splitToList(text).get(0);
+        }
+        if (types.contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION) && text.startsWith("&{")
+                && text.endsWith("}")) {
             return "**" + text.substring(2, text.length() - 1);
-        } else if (types.contains(RobotTokenType.VARIABLES_LIST_DECLARATION)) {
+        } else if (types.contains(RobotTokenType.VARIABLES_LIST_DECLARATION) && text.startsWith("@{")
+                && text.endsWith("}")) {
             return "*" + text.substring(2, text.length() - 1);
-        } else if (types.contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION)) {
+        } else if (types.contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION) && text.startsWith("${")
+                && text.endsWith("}")) {
             return text.substring(2, text.length() - 1);
         } else {
             return text;
