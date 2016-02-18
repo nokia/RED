@@ -18,19 +18,23 @@ import org.eclipse.ui.IMarkerResolution;
  */
 public enum ArgumentProblem implements IProblemCause {
     INVALID_NUMBER_OF_PARAMETERS {
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
-        }
-
         @Override
         public String getProblemDescription() {
             return "Invalid number of parameters. %s";
         }
-
+    },
+    POSITIONAL_ARGUMENT_AFTER_NAMED {
+        @Override
+        public String getProblemDescription() {
+            return "Positional argument cannot be used after named arguments";
+        }
     },
     INVALID_TIME_FORMAT {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
 
         @Override
         public String getProblemDescription() {
@@ -40,7 +44,7 @@ public enum ArgumentProblem implements IProblemCause {
 
     @Override
     public Severity getSeverity() {
-        return Severity.WARNING;
+        return Severity.ERROR;
     }
 
     @Override
