@@ -8,7 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.project.library;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
+import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -22,7 +25,7 @@ import com.google.common.collect.Range;
  * @author Michal Anglart
  *
  */
-public class ArgumentsDescriptor {
+public class ArgumentsDescriptor implements Iterable<Argument> {
 
     private final List<Argument> arguments;
 
@@ -53,6 +56,11 @@ public class ArgumentsDescriptor {
             }
         }
         return new ArgumentsDescriptor(arguments);
+    }
+
+    @Override
+    public Iterator<Argument> iterator() {
+        return arguments.iterator();
     }
 
     public List<Argument> getRequiredArguments() {
@@ -140,7 +148,7 @@ public class ArgumentsDescriptor {
         }
     }
 
-    private enum ArgumentType {
+    public enum ArgumentType {
         REQUIRED,
         DEFAULT,
         VARARG,
