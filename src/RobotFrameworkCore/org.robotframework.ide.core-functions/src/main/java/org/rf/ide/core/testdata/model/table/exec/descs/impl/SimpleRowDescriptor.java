@@ -29,6 +29,8 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
     private final List<IElementDeclaration> textParameters = new ArrayList<>();
 
+    private final List<RobotToken> keywordArguments = new ArrayList<>(0);
+
     private final IRowType type = ERowType.UNKONWN;
 
     private final List<BuildMessage> messages = new ArrayList<>();
@@ -99,6 +101,21 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
     public void addTextParameters(final List<IElementDeclaration> texts) {
         for (final IElementDeclaration text : texts) {
             addTextParameter(text);
+        }
+    }
+
+    @Override
+    public List<RobotToken> getKeywordArguments() {
+        return Collections.unmodifiableList(keywordArguments);
+    }
+
+    public void addKeywordArgument(final RobotToken argument) {
+        keywordArguments.add(argument);
+    }
+
+    public void addKeywordArguments(final List<RobotToken> arguments) {
+        for (final RobotToken keywordArgument : arguments) {
+            addKeywordArgument(keywordArgument);
         }
     }
 
