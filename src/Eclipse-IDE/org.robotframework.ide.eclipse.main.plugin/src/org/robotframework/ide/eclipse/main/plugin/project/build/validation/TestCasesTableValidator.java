@@ -228,7 +228,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
             if (!keywordName.getFilePosition().isNotSet()) {
                 validateExistingKeywordCall(validationContext, reporter, keywordName,
-                        Optional.of(executable.getArguments()));
+                        Optional.of(executableRowDescriptor.getKeywordArguments()));
             } else {
                 reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.MISSING_KEYWORD)
                         .formatMessageWith(executable.getAction().getText()), file, executable.getAction());
