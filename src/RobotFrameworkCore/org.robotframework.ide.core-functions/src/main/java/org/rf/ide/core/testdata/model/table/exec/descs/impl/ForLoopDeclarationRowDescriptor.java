@@ -19,6 +19,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class ForLoopDeclarationRowDescriptor<T> implements IExecutableRowDescriptor<T> {
 
+    private final static List<RobotToken> KEYWORD_ARGUMENTS = Collections
+            .unmodifiableList(new ArrayList<RobotToken>(0));
+
     private final List<VariableDeclaration> createdVariables = new ArrayList<>();
 
     private RobotAction forAction = new RobotAction(new RobotToken(), new ArrayList<IElementDeclaration>());
@@ -141,5 +144,10 @@ public class ForLoopDeclarationRowDescriptor<T> implements IExecutableRowDescrip
     @Override
     public RobotExecutableRow<T> getRow() {
         return row;
+    }
+
+    @Override
+    public List<RobotToken> getKeywordArguments() {
+        return KEYWORD_ARGUMENTS;
     }
 }

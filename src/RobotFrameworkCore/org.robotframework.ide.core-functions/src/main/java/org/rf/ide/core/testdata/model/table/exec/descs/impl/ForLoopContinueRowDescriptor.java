@@ -31,6 +31,8 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
 
     private final List<IElementDeclaration> textParameters = new ArrayList<>();
 
+    private final List<RobotToken> keywordArguments = new ArrayList<>(0);
+
     private int forLoopStartRowIndex = -1;
 
     private final IRowType type = ERowType.FOR_CONTINUE;
@@ -126,6 +128,21 @@ public class ForLoopContinueRowDescriptor<T> implements IExecutableRowDescriptor
 
     public void addTextParameter(final IElementDeclaration textParam) {
         this.textParameters.add(textParam);
+    }
+
+    @Override
+    public List<RobotToken> getKeywordArguments() {
+        return Collections.unmodifiableList(keywordArguments);
+    }
+
+    public void addKeywordArgument(final RobotToken argument) {
+        keywordArguments.add(argument);
+    }
+
+    public void addKeywordArguments(final List<RobotToken> arguments) {
+        for (final RobotToken keywordArgument : arguments) {
+            addKeywordArgument(keywordArgument);
+        }
     }
 
     @Override

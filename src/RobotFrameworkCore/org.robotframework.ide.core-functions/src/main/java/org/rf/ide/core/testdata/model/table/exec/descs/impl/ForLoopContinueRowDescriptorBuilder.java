@@ -133,6 +133,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         forContinueDesc.addCreatedVariables(buildDescription.getCreatedVariables());
         forContinueDesc.addCommentedVariables(buildDescription.getCommentedVariables());
         forContinueDesc.addUsedVariables(buildDescription.getUsedVariables());
+        forContinueDesc.addKeywordArguments(buildDescription.getKeywordArguments());
     }
 
     @SuppressWarnings("unchecked")
