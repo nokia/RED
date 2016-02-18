@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RTKmUJNnEeWXp4iZQnTw0A
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/18/15 9:40 AM
+Save-Time: 2/18/16 4:56 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -28,7 +28,7 @@ with [get-editor "TestSuite.robot"] {
     with [get-text-viewer] {
         set-caret-pos 3 19
         key-type Enter
-        type-text "Push button"
+        type-text "Push button  text"
         key-type "M1+s"
     }
 }
