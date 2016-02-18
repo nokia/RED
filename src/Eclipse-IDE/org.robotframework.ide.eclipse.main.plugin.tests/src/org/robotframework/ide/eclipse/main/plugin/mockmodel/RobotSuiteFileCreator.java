@@ -6,6 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.mockmodel;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
@@ -18,11 +20,23 @@ import com.google.common.base.Joiner;
  */
 public class RobotSuiteFileCreator {
 
+    @Deprecated // use builder instead
     public static RobotSuiteFile createModel(final String... lines) {
         final String content = Joiner.on('\n').join(lines);
         final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
         final RobotSuiteStreamFile model = new RobotSuiteStreamFile("file.robot", stream, false);
         model.reparseEverything(content);
         return model;
+    }
+    
+    private final List<String> lines = new ArrayList<>();
+
+    public RobotSuiteFileCreator appendLine(final String line) {
+        lines.add(line);
+        return this;
+    }
+
+    public RobotSuiteFile build() {
+        return createModel(lines.toArray(new String[0]));
     }
 }
