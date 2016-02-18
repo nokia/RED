@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
+import java.util.Arrays;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -114,6 +116,7 @@ public class SuiteSourceTokenScanner extends RuleBasedScanner {
 
         try {
             final String content = fDocument.get(buffStart, buffEnd - buffStart);
+            Arrays.fill(buffer, (char) 0);
             content.getChars(0, buffEnd - buffStart, buffer, 0);
         } catch (final BadLocationException x) {
         }
@@ -236,8 +239,8 @@ public class SuiteSourceTokenScanner extends RuleBasedScanner {
         protected void updateNumberOfCellsAfterRead(final int ch) {
             if (ch == '\n' || ch == '\r') {
                 numberOfCellSeparators = 0;
-            } else if (ch == '\t' && numberOfCellSeparators != UNDEFINED) {
-                numberOfCellSeparators++;
+            } else if (ch == '\t') {
+                numberOfCellSeparators = numberOfCellSeparators == UNDEFINED ? 1 : numberOfCellSeparators + 1;
             }
         }
 
