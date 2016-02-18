@@ -1,0 +1,103 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _821KoM_jEeWblO0vn84SSw
+Element-Name: LinksForScopeOfDuplicatedKW
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _aJnaIM_iEeWblO0vn84SSw
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 2/18/16 4:10 PM
+Testcase-Type: ecl
+Verifications: _gazR8NZREeW52_ojRMzdeg
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file and go to declaration (best matched will be selected)
+get-view "Project Explorer" | get-tree | select "DuplicationKeywords/Test1.robot" | double-click
+with [get-editor "Test1.robot" | get-text-viewer] {
+    hover-text 6 8
+    set-caret-pos 6 8
+    key-type F3
+}
+
+//check taht "OnionTV" is selected
+with [get-editor "Test1.robot" | get-text-viewer] {
+    get-property "getSelectionText()" | equals OnionTV | verify-true
+}
+
+//check that no other editor was open
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "Test1.robot" | verify-true
+    get-property activePage | equals "Test1.robot" | verify-true
+    get-property tabCount | equals 1 | verify-true
+}
+
+//open second editor
+get-view "Project Explorer" | get-tree | select "DuplicationKeywords/Test2.tsv" 
+    | select "DuplicationKeywords/Test2.tsv" | double-click
+    
+//select MyTest - duplicated keyword are in this file - first will be selected
+with [get-editor "Test2.tsv" | get-text-viewer] {
+    hover-text 7  5
+    set-caret-pos 7 5
+    open-declaration
+    hover-text  7 5
+}
+
+//select theSameKw - open declartion - will open Res2.robot file
+get-editor "Test2.tsv" | get-text-viewer | get-property "getSelectionText()" | equals "My_test" | verify-true
+with [get-editor "Test2.tsv" | get-text-viewer] {
+    set-caret-pos 8 5
+    open-declaration
+    hover-text 8 5
+}
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "Test1.robot" | verify-true
+    get-property "pages[1]" | equals "Test2.tsv" | verify-true
+    get-property "pages[2]" | equals "Res2.robot" | verify-true
+    get-property activePage | equals "Res2.robot" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
+get-editor "Res2.robot" | get-text-viewer | get-property "getSelectionText()" | equals "the_same_kw" | verify-true
+
+
+//check links to pytohn file
+get-tab-folder -index 1 | get-tab-item "Test2.tsv" | click
+with [get-editor "Test2.tsv" | get-text-viewer] {
+    hover-text 9 14
+    set-caret-pos 9 15
+    open-declaration
+    hover-text 9 14
+}
+
+//check that editor was open
+get-editor "lib.py" | get-text-viewer | get-property text | equals "def keyword_from_lib():\n"
+    + "\t\"\"\"This is KW from lib.py\n"
+    + "\t\"\"\"\n"
+    + "\ta = 5\n"
+    + "\treturn 1\n"
+    + "\t\n"
+    + "\t\n"
+    + "def another_kw_from_lib():\n"
+    + "\t\"\"\"This is another KW from lib.py \n"
+    + "\t\"\"\"\n"
+    + "\tb = 4\n"
+    + "\treturn b" | verify-true
+  
+//check that coursor is in first line
+with [get-editor "lib.py" | get-text-viewer] {
+    get-property "caretPosition.line" | equals 1 | verify-true
+    get-property "caretPosition.column" | equals 1 | verify-true
+}  
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "Test1.robot" | verify-true
+    get-property "pages[1]" | equals "Test2.tsv" | verify-true
+    get-property "pages[2]" | equals "Res2.robot" | verify-true
+    get-property "pages[3]" | equals "lib.py" | verify-true
+    get-property activePage | equals "lib.py" | verify-true
+    get-property tabCount | equals 4 | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
