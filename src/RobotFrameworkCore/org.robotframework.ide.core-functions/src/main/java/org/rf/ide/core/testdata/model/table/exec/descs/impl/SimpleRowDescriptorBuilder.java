@@ -64,6 +64,7 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
             if (isAfterFirstAction) {
                 simple.addUsedVariables(correctVariables);
                 simple.addTextParameters(mappingResult.getTextElements());
+                simple.addKeywordArgument(elem);
             } else {
                 if (correctVariables.size() == 1 && mappedElements.size() == 1) {
                     // definition variable
