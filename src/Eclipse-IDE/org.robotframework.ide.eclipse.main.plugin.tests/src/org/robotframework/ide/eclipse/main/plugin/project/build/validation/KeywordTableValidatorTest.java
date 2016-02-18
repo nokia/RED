@@ -53,9 +53,10 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void emptyKeywordIsReported() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -69,10 +70,11 @@ public class KeywordTableValidatorTest {
     
     @Test
     public void emptyKeywordIsReported_whenThereIsAnEmptyReturn() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Return]");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Return]")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -86,10 +88,11 @@ public class KeywordTableValidatorTest {
     
     @Test
     public void nothingIsReported_whenThereIsNonEmptyReturn() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Return]  42");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Return]  42")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -101,10 +104,11 @@ public class KeywordTableValidatorTest {
     
     @Test
     public void nothingIsReported_whenThereIsALineToExecute() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***",
-                "keyword",
-                "  kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  kw")
+                .build();
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
@@ -121,9 +125,11 @@ public class KeywordTableValidatorTest {
     
     @Test
     public void emptyKeywordIsReported_whenThereIsACommentedLine() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword", "  # kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  # kw")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -137,12 +143,13 @@ public class KeywordTableValidatorTest {
     
     @Test
     public void keywordsAreReported_whenTheyAreDuplicated() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword 1",
-                "  [Return]  42", 
-                "keyword 1",
-                "  [Return]  100");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword 1")
+                .appendLine("  [Return]  42")
+                .appendLine("keyword 1")
+                .appendLine("  [Return]  100")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -157,14 +164,15 @@ public class KeywordTableValidatorTest {
     
     @Test
     public void keywordsAreReported_whenTheyAreDuplicated_2() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword 1",
-                "  [Return]  1", 
-                "k e y w o r d 1",
-                "  [Return]  2", 
-                "k_E_y_W_o_R_d_1",
-                "  [Return]  3");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword 1")
+                .appendLine("  [Return]  1")
+                .appendLine("k e y w o r d 1")
+                .appendLine("  [Return]  2")
+                .appendLine("k_E_y_W_o_R_d_1")
+                .appendLine("  [Return]  3")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -180,11 +188,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void unrecognizedSettingsAreReported() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Unknown setting]",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Unknown setting]")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -198,11 +207,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void duplicatedArgumentsAreReported_inArgumentsSetting() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  ${x}  ${x}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${x}  ${x}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -217,10 +227,11 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void duplicatedArgumentsAreReported_inEmbeddedArguments() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword ${x} ${y} ${x} rest of name",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword ${x} ${y} ${x} rest of name")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -235,10 +246,11 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void duplicatedArgumentsAreReported_inEmbeddedArgumentsWithRegex() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword ${x:\\d+} ${y} ${x} rest of name",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword ${x:\\d+} ${y} ${x} rest of name")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -253,12 +265,13 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void duplicatedArgumentsAreReported_whenDefinedInDuplicatedSettings() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword ${x:\\d+} rest of name",
-                "  [Arguments]  ${a}  ${x}",
-                "  [Arguments]  ${x}  ${b}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword ${x:\\d+} rest of name")
+                .appendLine("  [Arguments]  ${a}  ${x}")
+                .appendLine("  [Arguments]  ${x}  ${b}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -277,11 +290,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void defaultArgumentsAreReported_whenTheyOccurBeforeNonDefaultOnes() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  ${a}=10  ${b}  ${c}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${a}=10  ${b}  ${c}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -298,11 +312,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void nothingIsReported_whenDefaultArgumentIsFollowedByVarargs() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  ${a}=10  @{b}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${a}=10  @{b}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -314,11 +329,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void nothingIsReported_whenDefaultArgumentIsFollowedByKwargs() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  ${a}=10  &{b}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${a}=10  &{b}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -330,11 +346,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void scalarIsReported_whenItFollowsVararg() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  @{a}  ${b}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  @{a}  ${b}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -348,11 +365,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void listIsReported_whenItFollowsVararg() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  @{a}  @{b}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  @{a}  @{b}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -366,11 +384,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void nothingIsReported_whenDictionaryFollowsVararg() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  @{a}  &{b}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  @{a}  &{b}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -382,11 +401,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void scalarIsReported_whenItFollowsKwargs() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  &{a}  ${b}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  &{a}  ${b}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -400,11 +420,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void listIsReported_whenItFollowsKwargs() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  &{a}  @{b}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  &{a}  @{b}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -418,11 +439,12 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void dictIsReported_whenItFollowsKwargs() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Keywords ***", 
-                "keyword",
-                "  [Arguments]  &{a}  &{b}",
-                "  [Return]  10");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  &{a}  &{b}")
+                .appendLine("  [Return]  10")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final KeywordTableValidator validator = new KeywordTableValidator(context,
@@ -436,7 +458,11 @@ public class KeywordTableValidatorTest {
     
 	@Test
 	public void keywordDefinitionWithDotsIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword.1", "    kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword.1")
+                .appendLine("    kw")
+                .build();
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
@@ -455,7 +481,11 @@ public class KeywordTableValidatorTest {
 	
 	@Test
 	public void keywordOccurrenceWithDotsIsNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword", "    k.w");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("    k.w")
+                .build();
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w",
                 new Path("/res.robot"));
@@ -472,8 +502,13 @@ public class KeywordTableValidatorTest {
     
 	@Test
 	public void keywordOccurrenceWithDotsAndSourceIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword", "    res.k.w",
-				"    res1.kw", "    res.kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("    res.k.w")
+                .appendLine("    res1.kw")
+                .appendLine("    res.kw")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w",
                 new Path("/res.robot"));
@@ -496,7 +531,12 @@ public class KeywordTableValidatorTest {
 	
 	@Test
 	public void undeclaredVariableAndKeywordInTeardownAreReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword", "  [Teardown]  kw1  ${var}", "  kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Teardown]  kw1  ${var}")
+                .appendLine("  kw")
+                .build();
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
@@ -516,8 +556,12 @@ public class KeywordTableValidatorTest {
 	
 	@Test
 	public void undeclaredVariableInReturnIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword",
-				"  [Return]  ${var}", "  kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Return]  ${var}")
+                .appendLine("  kw")
+                .build();
 
 		final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
 				new Path("/res.robot"));
