@@ -56,7 +56,10 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void emptyTestCaseIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .build();
 
 		final FileValidationContext context = prepareContext();
 		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
@@ -70,7 +73,11 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void emptyTestCaseIsReported_whenCommentedLineIsInside() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "  # kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  # kw")
+                .build();
 
 		final FileValidationContext context = prepareContext();
 		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
@@ -84,8 +91,12 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void unknownTestCaseSettingIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "  [Unknown]",
-				"  kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  [Unknown]")
+                .appendLine("  kw")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
@@ -104,8 +115,13 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void duplicatedCaseIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw", "test",
-				"    kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    kw")
+                .appendLine("test")
+                .appendLine("    kw")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
@@ -125,7 +141,11 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void deprecatedKeywordIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    kw")
+                .build();
 
         final KeywordEntity entity1 = newDeprecatedValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
@@ -144,8 +164,12 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void keywordFromNestedLibraryIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw1",
-				"    kw2");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    kw1")
+                .appendLine("    kw2")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.REF_LIBRARY, "lib", "kw1",
                 new Path("/res.robot"));
@@ -168,7 +192,11 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void keywordFromNestedLibraryIsNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    kw")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.REF_LIBRARY, "lib", "kw",
                 new Path("/suite.robot"));
@@ -187,7 +215,11 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void keywordFromLibraryIsNotReported_whenAliasIsUsed() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    lib.kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    lib.kw")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.REF_LIBRARY, "library", "lib", "kw",
                 new Path("/suite.robot"));
@@ -204,7 +236,11 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void keywordFromLibraryIsNotReported_whenLibraryPrefixIsUsed() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    library.kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    library.kw")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.REF_LIBRARY, "library", "kw",
                 new Path("/suite.robot"));
@@ -221,8 +257,16 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void keywordWithInconsistentNameIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "  kw1", "  k w1",
-				"  k_w1", "  k_w 1", "  K w1", "  K_w 1");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  kw1")
+                .appendLine("  k w1")
+                .appendLine("  k_w1")
+                .appendLine("  k_w 1")
+                .appendLine("  K w1")
+                .appendLine("  K_w 1")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw1",
                 new Path("/res.robot"));
@@ -250,7 +294,11 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void keywordWithAmbiguousNameIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    kw")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res1", "kw",
                 new Path("/res1.robot"));
@@ -271,11 +319,12 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void keywordWithAmbiguousNameIsNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-		        "*** Test Cases ***", 
-		        "test", 
-		        "    res1.kw",
-				"    res2.kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    res1.kw")
+                .appendLine("    res2.kw")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res1", "kw",
                 new Path("/res1.robot"));
@@ -294,8 +343,12 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void undeclaredVariableIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw  ${var}",
-				"    kw  ${var2}");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    kw  ${var}")
+                .appendLine("    kw  ${var2}")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "var2");
@@ -317,7 +370,11 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void numberVariableIsNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw  ${2}");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    kw  ${2}")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "arg");
@@ -334,7 +391,11 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void variableInComputationIsNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw  ${var-2}");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    kw  ${var-2}")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "arg");
@@ -354,8 +415,11 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void variableInCommentKeywordIsNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
-				"    Comment  ${var}");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Comment  ${var}")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn", "Comment",
                 new Path("/suite.robot"), "var");
@@ -373,8 +437,12 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void variableInSetTestVariableKeywordIsNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
-				"    Set Test Variable  ${V_ar}", "    kw  ${var}");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    Set Test Variable  ${V_ar}")
+                .appendLine("    kw  ${var}")
+                .build();
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
                 "Set Test Variable", new Path("/suite.robot"), "arg");
@@ -394,8 +462,12 @@ public class TestCasesTableValidatorTest {
 
 	@Test
 	public void undeclaredVariableAndKeywordInTestCaseSetupAreReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
-				"  [Setup]  kw1  ${var}", "  kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  [Setup]  kw1  ${var}")
+                .appendLine("  kw")
+                .build();
 
 		final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
 				new Path("/suite.robot"));
@@ -415,8 +487,12 @@ public class TestCasesTableValidatorTest {
 	
 	@Test
 	public void undeclaredVariableAndKeywordInTestCaseTeardownAreReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
-				"  [Teardown]  kw1  ${var}", "  kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  [Teardown]  kw1  ${var}")
+                .appendLine("  kw")
+                .build();
 
 		final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
 				new Path("/suite.robot"));
@@ -436,8 +512,12 @@ public class TestCasesTableValidatorTest {
 	
 	@Test
 	public void undeclaredKeywordInTestCaseTemplateIsReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
-				"  [Template]  kw1 ${var}", "  kw");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  [Template]  kw1 ${var}")
+                .appendLine("  kw")
+                .build();
 
 		final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
 				new Path("/suite.robot"));
@@ -456,8 +536,13 @@ public class TestCasesTableValidatorTest {
 	
 	@Test
 	public void declaredVariablesAndKeywordsInTestCaseSettingsAreNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test",
-				"  [Setup]  kw  ${var1}", "  [Teardown]  kw  ${var2}", "  ${var2}=  Set Variable  2");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("  [Setup]  kw  ${var1}")
+                .appendLine("  [Teardown]  kw  ${var2}")
+                .appendLine("  ${var2}=  Set Variable  2")
+                .build();
 
 		final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
                 new Path("/suite.robot"), "arg");
