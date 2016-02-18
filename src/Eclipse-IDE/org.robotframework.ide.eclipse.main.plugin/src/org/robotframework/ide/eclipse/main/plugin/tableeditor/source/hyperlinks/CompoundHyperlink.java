@@ -9,8 +9,9 @@ import java.util.List;
 
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 /**
  * @author Michal Anglart
@@ -51,9 +52,14 @@ public class CompoundHyperlink implements IHyperlink {
 
     @Override
     public void open() {
-        final HyperlinkDialog dialog = new HyperlinkDialog(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), name, hyperlinks);
-        dialog.open();
-    }
+        Shell current = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+        while (current != null && current.getParent() instanceof Shell) {
+            current = (Shell) current.getParent();
+        }
 
+        if (current == null) {
+            RedPlugin.logWarning("The parent shell was null when creating hyperlinks dialog");
+        }
+        new HyperlinkDialog(current, name, hyperlinks).open();
+    }
 }
