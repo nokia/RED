@@ -536,13 +536,18 @@ public class KeywordTableValidatorTest {
 	
 	@Test
 	public void declaredVariableAndKeywordInKeywordSettingsAreNotReported() throws CoreException {
-		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Keywords ***", "keyword",
-				"  [Teardown]  kw  ${var}", "  [Return]  ${var}", "  ${var}=  Set Variable  1");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Teardown]  kw  ${var}")
+                .appendLine("  [Return]  ${var}")
+                .appendLine("  ${var}=  Set Variable  1")
+                .build();
 
 		final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
-				new Path("/res.robot"));
+                new Path("/res.robot"), "var");
 		final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "BuiltIn", "Set Variable",
-				new Path("/res.robot"));
+                new Path("/res.robot"), "arg");
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "setvariable",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
@@ -557,9 +562,9 @@ public class KeywordTableValidatorTest {
 	
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
-            final String name, final IPath exposingPath) {
+            final String name, final IPath exposingPath, final String... args) {
         return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
-                ArgumentsDescriptor.createDescriptor());
+                ArgumentsDescriptor.createDescriptor(args));
     }
 
     private static FileValidationContext prepareContext() {
