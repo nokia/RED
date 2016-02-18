@@ -46,7 +46,7 @@ public class VariablesTableValidatorTest {
 
     @Test
     public void nothingIsReported_whenThereIsNoVariablesSection() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel("");
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("").build();
         
         final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
@@ -58,11 +58,12 @@ public class VariablesTableValidatorTest {
 
     @Test
     public void nothingIsReported_whenValidVariablesAreDefined() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Variables ***", 
-                "${scalar}  1", 
-                "@{list}  1",
-                "&{dict}  1");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Variables ***")
+                .appendLine("${scalar}  1")
+                .appendLine("@{list}  1")
+                .appendLine("&{dict}  1")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
@@ -74,9 +75,10 @@ public class VariablesTableValidatorTest {
     
     @Test
     public void customProblemsAreRaised_whenVersionDependentValidatorsAreUsed() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Variables ***", 
-                "${scalar}  1");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Variables ***")
+                .appendLine("${scalar}  1")
+                .build();
 
         final IProblemCause mockedCause = mock(IProblemCause.class);
         final VersionDependentModelUnitValidator alwaysFailingVersionDepValidator_1 = new VersionDependentModelUnitValidator() {
@@ -130,9 +132,10 @@ public class VariablesTableValidatorTest {
 
     @Test
     public void unrecognizedVariableIsReported() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Variables ***", 
-                "var  1");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Variables ***")
+                .appendLine("var  1")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
@@ -146,9 +149,10 @@ public class VariablesTableValidatorTest {
 
     @Test
     public void invalidVariableNameIsReported() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Variables ***", 
-                "$ {var}  1");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Variables ***")
+                .appendLine("$ {var}  1")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
@@ -162,10 +166,11 @@ public class VariablesTableValidatorTest {
 
     @Test
     public void duplicatedVariablesAreReported() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Variables ***", 
-                "${var}  1",
-                "@{var}  2");
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Variables ***")
+                .appendLine("${var}  1")
+                .appendLine("@{var}  2")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
@@ -180,12 +185,12 @@ public class VariablesTableValidatorTest {
     
     @Test
     public void multipleProblemsAreReported() throws CoreException {
-        final RobotSuiteFile file = RobotSuiteFileCreator.createModel(
-                "*** Variables ***",
-                "scalar  1",
-                "$ {x}  1",
-                "${var}  1",
-                "@{var}  2");
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Variables ***")
+                .appendLine("scalar  1")
+                .appendLine("$ {x}  1")
+                .appendLine("${var}  1")
+                .appendLine("@{var}  2")
+                .build();
 
         final FileValidationContext context = prepareContext();
         final VariablesTableValidator validator = new VariablesTableValidator(context,
