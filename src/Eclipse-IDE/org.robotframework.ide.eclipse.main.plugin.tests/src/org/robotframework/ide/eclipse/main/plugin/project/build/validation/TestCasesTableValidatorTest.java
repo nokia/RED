@@ -298,7 +298,7 @@ public class TestCasesTableValidatorTest {
 				"    kw  ${var2}");
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
-                new Path("/res.robot"));
+                new Path("/res.robot"), "var2");
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -320,7 +320,7 @@ public class TestCasesTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw  ${2}");
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
-                new Path("/res.robot"));
+                new Path("/res.robot"), "arg");
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -337,7 +337,7 @@ public class TestCasesTableValidatorTest {
 		final RobotSuiteFile file = RobotSuiteFileCreator.createModel("*** Test Cases ***", "test", "    kw  ${var-2}");
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
-                new Path("/res.robot"));
+                new Path("/res.robot"), "arg");
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
@@ -358,7 +358,7 @@ public class TestCasesTableValidatorTest {
 				"    Comment  ${var}");
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn", "Comment",
-                new Path("/suite.robot"));
+                new Path("/suite.robot"), "var");
 
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("comment",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
@@ -377,9 +377,9 @@ public class TestCasesTableValidatorTest {
 				"    Set Test Variable  ${V_ar}", "    kw  ${var}");
 
         final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn",
-                "Set Test Variable", new Path("/suite.robot"));
+                "Set Test Variable", new Path("/suite.robot"), "arg");
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
-                new Path("/res.robot"));
+                new Path("/res.robot"), "arg");
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("settestvariable",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
@@ -460,9 +460,9 @@ public class TestCasesTableValidatorTest {
 				"  [Setup]  kw  ${var1}", "  [Teardown]  kw  ${var2}", "  ${var2}=  Set Variable  2");
 
 		final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
-				new Path("/suite.robot"));
+                new Path("/suite.robot"), "arg");
 		final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.STD_LIBRARY, "BuiltIn", "Set Variable",
-				new Path("/suite.robot"));
+                new Path("/suite.robot"), "arg");
 		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "setvariable",
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
@@ -480,9 +480,9 @@ public class TestCasesTableValidatorTest {
 	
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
-            final String name, final IPath exposingPath) {
+            final String name, final IPath exposingPath, final String... args) {
         return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
-                ArgumentsDescriptor.createDescriptor());
+                ArgumentsDescriptor.createDescriptor(args));
     }
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
