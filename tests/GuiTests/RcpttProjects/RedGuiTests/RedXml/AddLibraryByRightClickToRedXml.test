@@ -6,26 +6,59 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _8paAQNFwEeWl7fLmvSqX3Q
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 2/12/16 11:16 AM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 2/18/16 4:33 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-
-
+//add pytohn file in root of project
 get-view "Project Explorer" | get-tree | select "RobotProject/multiply.py" 
     | get-menu "Robot Framework/Add Library to red.xml" | click
 get-window "Select library class" | get-table | select multiply | click -default
+
+//check that red.xml was not opened
+get-tab-folder -index 1 | get-property tabCount | equals 0 | verify-true
+
+//check that libspec was generated
 get-view "Project Explorer" | get-tree 
     | get-item "RobotProject/Robot Referenced libraries/multiply RobotProject \\(1\\)" | get-property caption 
     | equals "multiply RobotProject (1)" | verify-true
+    
+//open file and check that file was added    
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | get-item "multiply - RobotProject" 
     | get-property caption | equals "multiply - RobotProject" | verify-true
 
+//add new file when red.xml is opend
+get-view "Project Explorer" | get-tree | select "RobotProject/variables/single_var.py" 
+    | get-menu "Robot Framework/Add Library to red.xml" | click
+with [get-window "Select library class"] {
+    get-table | select "single_var"
+    get-button OK | click
+}
 
+//check that file is not saved
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "*RobotProject/red.xml" | verify-true
+    get-property activePage | equals "*RobotProject/red.xml" | verify-true
+    get-property tabCount | equals 1 | verify-true
+}
+
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table 
+    | select "single_var - RobotProject\\/variables"
+    
+get-button "Save (M1+S)" | click
+
+//check that any file can be added: xml, robot
+get-view "Project Explorer" | get-tree | select "RobotProject/report_xml/output.xml"
+with [get-view "Project Explorer" | get-tree] {
+    get-menu "Robot Framework/Add Library to red.xml" | get-property enablement | equals true | verify-true
+}
+
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Add Library to red.xml" | get-property enablement 
+    | equals true | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
