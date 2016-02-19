@@ -174,7 +174,7 @@ public class GeneralSettingsTableValidatorTest {
                 .build();
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
-                new Path("/suite.robot"));
+                new Path("/suite.robot"), "arg");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
                 (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
@@ -210,9 +210,9 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
-            final String name, final IPath exposingPath) {
+            final String name, final IPath exposingPath, final String... args) {
         return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
-                ArgumentsDescriptor.createDescriptor());
+                ArgumentsDescriptor.createDescriptor(args));
     }
 
     private static FileValidationContext prepareContext() {

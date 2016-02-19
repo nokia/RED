@@ -20,15 +20,6 @@ import com.google.common.base.Joiner;
  */
 public class RobotSuiteFileCreator {
 
-    @Deprecated // use builder instead
-    public static RobotSuiteFile createModel(final String... lines) {
-        final String content = Joiner.on('\n').join(lines);
-        final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
-        final RobotSuiteStreamFile model = new RobotSuiteStreamFile("file.robot", stream, false);
-        model.reparseEverything(content);
-        return model;
-    }
-    
     private final List<String> lines = new ArrayList<>();
 
     public RobotSuiteFileCreator appendLine(final String line) {
