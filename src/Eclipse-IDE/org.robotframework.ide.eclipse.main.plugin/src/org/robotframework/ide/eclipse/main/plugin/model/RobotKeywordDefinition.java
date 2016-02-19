@@ -224,8 +224,11 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     private String toPythonicNotation(final RobotToken token) {
         final List<IRobotTokenType> types = token.getTypes();
         String text = EmbeddedKeywordNamesSupport.removeRegex(token.getText().toString());
+        String defaultValue = null;
         if (text.contains("=")) {
-            text = Splitter.on('=').limit(2).splitToList(text).get(0);
+            final List<String> splitted = Splitter.on('=').limit(2).splitToList(text);
+            text = splitted.get(0);
+            defaultValue = splitted.get(1);
         }
         if (types.contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION) && text.startsWith("&{")
                 && text.endsWith("}")) {
@@ -235,7 +238,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             return "*" + text.substring(2, text.length() - 1);
         } else if (types.contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION) && text.startsWith("${")
                 && text.endsWith("}")) {
-            return text.substring(2, text.length() - 1);
+            defaultValue = defaultValue == null ? "" : "=" + defaultValue;
+            return text.substring(2, text.length() - 1) + defaultValue;
         } else {
             return text;
         }
