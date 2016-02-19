@@ -96,6 +96,11 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         return "[" + Joiner.on(", ").join(args) + "]";
     }
 
+    @Override
+    public String toString() {
+        return "[" + Joiner.on(", ").join(arguments) + "]";
+    }
+
     public static class Argument {
 
         private final ArgumentType type;
@@ -145,6 +150,11 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
                 return "**";
             }
             return "";
+        }
+
+        @Override
+        public String toString() {
+            return getDescription();
         }
     }
 
