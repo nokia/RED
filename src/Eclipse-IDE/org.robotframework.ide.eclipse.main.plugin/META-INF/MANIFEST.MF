@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: RED Robot Editor
 Bundle-SymbolicName: org.robotframework.ide.eclipse.main.plugin; singleton:=true
 Bundle-Version: 1.0.0.qualifier
-Bundle-Vendor: Nokia Networks
+Bundle-Vendor: Nokia Solutions and Networks
 Require-Bundle: org.eclipse.e4.core.di,
  org.eclipse.e4.ui.di,
  org.eclipse.e4.core.contexts,
