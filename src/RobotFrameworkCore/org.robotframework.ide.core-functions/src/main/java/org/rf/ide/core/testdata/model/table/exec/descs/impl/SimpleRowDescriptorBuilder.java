@@ -83,6 +83,13 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
             }
         }
 
+        moveCreatedToUsedInCaseNoKeywords(simple);
         return simple;
+    }
+
+    private <T> void moveCreatedToUsedInCaseNoKeywords(final SimpleRowDescriptor<T> simple) {
+        if (simple.getAction().getToken().getFilePosition().isNotSet()) {
+            simple.moveCreatedVariablesToUsedVariables();
+        }
     }
 }
