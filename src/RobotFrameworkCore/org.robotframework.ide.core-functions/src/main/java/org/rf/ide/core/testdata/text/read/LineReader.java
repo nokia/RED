@@ -12,18 +12,17 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class LineReader extends Reader {
 
     private final Reader reader;
-    private int positionInFile = 0;
-    private final Map<Integer, Constant> eOLs = new LinkedHashMap<>();
 
+    private int positionInFile = 0;
+
+    private final Map<Integer, Constant> eOLs = new LinkedHashMap<>();
 
     public LineReader(final Reader reader) {
         this.reader = reader;
     }
-
 
     public List<Constant> getLineEnd(final int currentOffset) {
         final List<Constant> endOfLine = new ArrayList<>();
@@ -40,7 +39,6 @@ public class LineReader extends Reader {
 
         return endOfLine;
     }
-
 
     @Override
     public int read(final char[] cbuf, final int off, final int len) throws IOException {
@@ -63,11 +61,9 @@ public class LineReader extends Reader {
         return read;
     }
 
-
     public int getPosition() {
         return positionInFile;
     }
-
 
     @Override
     public void close() throws IOException {
@@ -75,20 +71,19 @@ public class LineReader extends Reader {
     }
 
     public enum Constant {
-        CR('\r'), LF('\n'), EOF((char) -1);
+        CR('\r'),
+        LF('\n'),
+        EOF((char) -1);
 
         private final char c;
-
 
         private Constant(final char c) {
             this.c = c;
         }
 
-
         public char getChar() {
             return c;
         }
-
 
         public static Constant get(final char c) {
             Constant me = null;
@@ -101,6 +96,20 @@ public class LineReader extends Reader {
             }
 
             return me;
+        }
+
+        public static List<Constant> get(final IRobotLineElement rle) {
+            final List<Constant> converted = new ArrayList<>(0);
+            final char[] cArray = rle.getRaw().toCharArray();
+            if (cArray.length > 0) {
+                for (final char c : cArray) {
+                    converted.add(Constant.get(c));
+                }
+            } else {
+                converted.add(EOF);
+            }
+
+            return converted;
         }
     }
 }
