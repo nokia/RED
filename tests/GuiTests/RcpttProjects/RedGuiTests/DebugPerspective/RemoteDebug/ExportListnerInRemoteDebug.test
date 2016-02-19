@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _LruXMJm-EeWwXrMNKVDTwg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/15/15 11:19 AM
+Save-Time: 2/19/16 2:37 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -31,7 +31,7 @@ get-button "Save (M1+S)" | click
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
 
 //generate new file
-get-button "Debug*." | click -arrow
+get-button "Debug.*" | click -arrow
 get-menu "Debug Configurations..." | click
 with [get-window "Debug Configurations"] {
     get-tree | select "Robot/TestFile.robot"
