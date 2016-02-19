@@ -59,6 +59,11 @@ public class SimpleRowDescriptor<T> implements IExecutableRowDescriptor<T> {
         this.action = action;
     }
 
+    public void moveCreatedVariablesToUsedVariables() {
+        usedVariables.addAll(createdVariables);
+        createdVariables.clear();
+    }
+
     @Override
     public List<VariableDeclaration> getUsedVariables() {
         return Collections.unmodifiableList(usedVariables);
