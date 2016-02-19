@@ -8,26 +8,21 @@ package org.rf.ide.core.testdata.text.write;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.IRobotFileDumper;
 import org.rf.ide.core.testdata.model.FilePosition;
-import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
-import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.TableHeader;
-import org.rf.ide.core.testdata.model.table.TableHeaderComparator;
-import org.rf.ide.core.testdata.model.table.TestCaseTable;
-import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 
-import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
 public class TxtRobotFileDumper implements IRobotFileDumper {
@@ -51,99 +46,34 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
 
     @Override
     public String dump(final RobotFile model) {
-        StringBuilder dumpText = new StringBuilder();
+        StringBuilder strLine = new StringBuilder();
 
-        SectionBuilder sectionBuilder = new SectionBuilder();
-        List<Section> sections = sectionBuilder.build(model);
-        for (Section section : sections) {
-            System.out.println(section);
-        }
-        dumpUntilRobotHeaderSection(model, sections, 0, dumpText);
+        List<RobotLine> newLines = newLines(model);
 
-        SettingTable settingTable = model.getSettingTable();
-        VariableTable variableTable = model.getVariableTable();
-        TestCaseTable testCaseTable = model.getTestCaseTable();
-        KeywordTable keywordTable = model.getKeywordTable();
-
-        List<TableHeader<? extends ARobotSectionTable>> headers = new ArrayList<>(0);
-        headers.addAll(settingTable.getHeaders());
-        headers.addAll(variableTable.getHeaders());
-        headers.addAll(testCaseTable.getHeaders());
-        headers.addAll(keywordTable.getHeaders());
-        Collections.sort(headers, new TableHeaderComparator());
-
-        for (final TableHeader<? extends ARobotSectionTable> th : headers) {
-            int sectionWithHeader = getSectionWithHeader(sections, th);
-            if (th.getModelType() == ModelType.SETTINGS_TABLE_HEADER) {
-                dumpSettingTable(model, th, sections, sectionWithHeader, dumpText);
-            } else if (th.getModelType() == ModelType.VARIABLES_TABLE_HEADER) {
-
-            } else if (th.getModelType() == ModelType.TEST_CASE_TABLE_HEADER) {
-
-            } else if (th.getModelType() == ModelType.KEYWORDS_TABLE_HEADER) {
-
+        for (final RobotLine line : newLines) {
+            for (final IRobotLineElement elem : line.getLineElements()) {
+                strLine.append(elem.getRaw());
             }
 
-            if (sectionWithHeader > -1) {
-                dumpUntilRobotHeaderSection(model, sections, sectionWithHeader + 1, dumpText);
-            }
+            strLine.append(line.getEndOfLine().getRaw());
         }
 
-        List<Section> userSections = filterUserTableHeadersOnly(sections);
-        dumpUntilRobotHeaderSection(model, userSections, 0, dumpText);
-
-        // return dumpText.toString();
-        return "";
+        return strLine.toString();
     }
 
-    private void dumpSettingTable(final RobotFile model, final TableHeader<? extends ARobotSectionTable> th,
-            final List<Section> section, final int sectionWithHeader, final StringBuilder dumpText) {
-        SettingTable settingTable = model.getSettingTable();
-        System.out.println("OK " + sectionWithHeader);
-        if (sectionWithHeader > -1) {
-            Optional<Integer> robotLineIndexBy = model
-                    .getRobotLineIndexBy(section.get(sectionWithHeader).getStart().getOffset());
-            RobotLine line = model.getFileContent().get(robotLineIndexBy.get());
-            for (IRobotLineElement elem : line.getLineElements()) {
-                dumpText.append(elem.getRaw());
-            }
-            dumpText.append(line.getEndOfLine().getRaw());
-        } else {
+    private List<RobotLine> newLines(final RobotFile model) {
+        final List<RobotLine> lines = new ArrayList<>(0);
 
-        }
-        // dumper per declaration with check of order for new one
-    }
+        final SectionBuilder sectionBuilder = new SectionBuilder();
+        final List<Section> sections = sectionBuilder.build(model);
 
-    private int getSectionWithHeader(final List<Section> sections,
-            final TableHeader<? extends ARobotSectionTable> theader) {
-        int section = -1;
-        int sectionsSize = sections.size();
-        for (int sectionId = 0; sectionId < sectionsSize; sectionId++) {
-            final Section s = sections.get(sectionId);
-            final FilePosition thPos = theader.getDeclaration().getFilePosition();
-            if (thPos.isSamePlace(s.getStart()) || (thPos.isAfter(s.getStart()) && thPos.isBefore(s.getEnd()))) {
-                section = sectionId;
-                break;
-            }
-        }
+        dumpUntilRobotHeaderSection(model, sections, 0, lines);
 
-        return section;
-    }
-
-    private List<Section> filterUserTableHeadersOnly(final List<Section> sections) {
-        List<Section> userSections = new ArrayList<>(0);
-        for (final Section section : sections) {
-            SectionType type = section.getType();
-            if (type == SectionType.TRASH || type == SectionType.USER_TABLE) {
-                userSections.add(section);
-            }
-        }
-
-        return userSections;
+        return lines;
     }
 
     private void dumpUntilRobotHeaderSection(final RobotFile model, final List<Section> sections,
-            final int currentSection, final StringBuilder dumpText) {
+            final int currentSection, final List<RobotLine> outLines) {
         int removedIndex = -1;
 
         int sectionSize = sections.size();
@@ -151,7 +81,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
             final Section section = sections.get(sectionId);
             SectionType type = section.getType();
             if (type == SectionType.TRASH || type == SectionType.USER_TABLE) {
-                dumpText.append(dumpFromTo(model, section.getStart(), section.getEnd()));
+                dumpFromTo(model, section.getStart(), section.getEnd(), outLines);
                 removedIndex++;
             } else {
                 break;
@@ -163,11 +93,11 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         }
     }
 
-    private String dumpFromTo(final RobotFile model, final FilePosition start, final FilePosition end) {
-        StringBuilder str = new StringBuilder();
-
+    private void dumpFromTo(final RobotFile model, final FilePosition start, final FilePosition end,
+            final List<RobotLine> outLines) {
         boolean meetEnd = false;
-        List<RobotLine> fileContent = model.getFileContent();
+
+        final List<RobotLine> fileContent = model.getFileContent();
         for (final RobotLine line : fileContent) {
             for (final IRobotLineElement elem : line.getLineElements()) {
                 final FilePosition elemPos = elem.getFilePosition();
@@ -175,7 +105,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                     continue;
                 } else if (elemPos.isSamePlace(start) || elemPos.isSamePlace(end)
                         || (elemPos.isAfter(start) && elemPos.isBefore(end))) {
-                    str.append(elem.getRaw());
+                    updateLine(model, outLines, elem);
                 } else {
                     meetEnd = true;
                     break;
@@ -189,11 +119,117 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                 final FilePosition endOfLineFP = endOfLine.getFilePosition();
                 if (endOfLineFP.isSamePlace(start) || endOfLineFP.isSamePlace(end)
                         || (endOfLineFP.isAfter(start) && endOfLineFP.isBefore(end))) {
-                    str.append(endOfLine.getRaw());
+                    updateLine(model, outLines, endOfLine);
                 }
             }
         }
+    }
 
-        return str.toString();
+    private void updateLine(final RobotFile model, final List<RobotLine> outLines, final IRobotLineElement elem) {
+        if (isEndOfLine(elem)) {
+            if (outLines.isEmpty()) {
+                RobotLine line = new RobotLine(1, model);
+                line.setEndOfLine(Constant.get(elem), 0, 0);
+                outLines.add(line);
+            } else {
+                RobotLine line = outLines.get(outLines.size() - 1);
+                final FilePosition pos = getPosition(line, outLines);
+                line.setEndOfLine(Constant.get(elem), pos.getOffset(), pos.getColumn());
+            }
+
+            if (!elem.getTypes().contains(EndOfLineTypes.EOF)) {
+                outLines.add(new RobotLine(outLines.size() + 1, model));
+            }
+        } else {
+            final RobotLine line;
+            if (outLines.isEmpty()) {
+                line = new RobotLine(1, model);
+                outLines.add(line);
+            } else {
+                line = outLines.get(outLines.size() - 1);
+            }
+
+            line.addLineElement(cloneWithPositionRecalculate(elem, line, outLines));
+        }
+    }
+
+    private IRobotLineElement cloneWithPositionRecalculate(final IRobotLineElement elem, final RobotLine line,
+            final List<RobotLine> outLines) {
+        IRobotLineElement newElem;
+        if (elem instanceof RobotToken) {
+            RobotToken newToken = new RobotToken();
+            newToken.setLineNumber(line.getLineNumber());
+            newToken.setRaw(elem.getRaw());
+            newToken.setText(elem.getText());
+            newToken.getTypes().addAll(elem.getTypes());
+            FilePosition pos = getPosition(line, outLines);
+            newToken.setStartColumn(pos.getColumn());
+            newToken.setStartOffset(pos.getOffset());
+
+            newElem = newToken;
+        } else {
+            Separator newSeparator = new Separator();
+
+            newSeparator.setLineNumber(line.getLineNumber());
+            newSeparator.setRaw(elem.getRaw());
+            newSeparator.setText(elem.getText());
+            newSeparator.getTypes().addAll(elem.getTypes());
+            FilePosition pos = getPosition(line, outLines);
+            newSeparator.setStartColumn(pos.getColumn());
+            newSeparator.setStartOffset(pos.getOffset());
+
+            newElem = newSeparator;
+        }
+
+        return newElem;
+    }
+
+    private boolean isEndOfLine(final IRobotLineElement elem) {
+        boolean result = false;
+        for (final IRobotTokenType t : elem.getTypes()) {
+            if (t instanceof EndOfLineTypes) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    private FilePosition getPosition(final RobotLine line, final List<RobotLine> outLines) {
+        FilePosition pos = FilePosition.createNotSet();
+
+        final IRobotLineElement endOfLine = line.getEndOfLine();
+        if (endOfLine != null && !endOfLine.getFilePosition().isNotSet()) {
+            pos = calculateEndPosition(endOfLine);
+        } else if (!line.getLineElements().isEmpty()) {
+            pos = calculateEndPosition(line.getLineElements().get(line.getLineElements().size() - 1));
+        } else if (outLines != null && !outLines.isEmpty()) {
+            pos = getPosition(outLines.get(outLines.size() - 1), null);
+        } else {
+            pos = new FilePosition(1, 0, 0);
+        }
+
+        return pos;
+    }
+
+    private FilePosition calculateEndPosition(final IRobotLineElement elem) {
+        final FilePosition elemPos = elem.getFilePosition();
+
+        final String raw = elem.getRaw();
+        int rawLength = 0;
+        if (raw != null) {
+            rawLength = raw.length();
+        }
+
+        int textLength = 0;
+        final String text = elem.getText();
+        if (text != null) {
+            textLength = text.length();
+        }
+
+        final int dataLength = Math.max(rawLength, textLength);
+
+        return new FilePosition(elemPos.getLine(), elemPos.getColumn() + dataLength, elemPos.getOffset() + dataLength);
     }
 }
