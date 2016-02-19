@@ -29,6 +29,26 @@ public enum ArgumentProblem implements IProblemCause {
             return "Positional argument cannot be used after named arguments";
         }
     },
+    MULTIPLE_MATCH_TO_SINGLE_ARG {
+
+        @Override
+        public String getProblemDescription() {
+            return "Argument '%s' has value already passed (%s)";
+        }
+    },
+    NO_VALUE_PROVIDED_FOR_REQUIRED_ARG {
+        @Override
+        public String getProblemDescription() {
+            return "Keyword '%s' requires '%s' argument to be specified";
+        }
+    },
+    MISMATCHING_ARGUMENT {
+
+        @Override
+        public String getProblemDescription() {
+            return "Argument '%s' cannot be matched to positional arguments of '%s' keyword, nor to '%s' kwargs argument";
+        }
+    },
     INVALID_TIME_FORMAT {
 
         @Override

@@ -63,6 +63,23 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         return arguments.iterator();
     }
 
+    public Argument get(final int index) {
+        return arguments.get(index);
+    }
+
+    public Optional<Argument> getKwargArgument() {
+        for (int i = arguments.size() - 1; i >= 0; i--) {
+            if (arguments.get(i).isKwArg()) {
+                return Optional.of(arguments.get(i));
+            }
+        }
+        return Optional.absent();
+    }
+
+    public boolean supportsKwargs() {
+        return getKwargArgument().isPresent();
+    }
+
     public List<Argument> getRequiredArguments() {
         final List<Argument> required = new ArrayList<>();
         for (final Argument argument : arguments) {
