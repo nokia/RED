@@ -171,6 +171,13 @@ public enum KeywordsProblem implements IProblemCause {
             return "The argument '%s' cannot occur after kwarg";
         }
     },
+    INVALID_KEYWORD_ARG_SYNTAX {
+
+        @Override
+        public String getProblemDescription() {
+            return "The argument '%s' has invalid syntax";
+        }
+    },
     MISSING_KEYWORD {
 
         @Override

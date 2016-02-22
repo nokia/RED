@@ -6,9 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -23,13 +27,18 @@ import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesS
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
 
 /**
@@ -57,9 +66,10 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         reportDuplicatedArgumentSettings();
         reportDuplicatedArguments();
         reportArgumentsOrderProblems();
+        reportArgumentsDefaultValuesUnknownVariables();
         reportKeywordUsageProblemsInUserKeywordSettings();
     }
-    
+
     private void reportKeywordUsageProblemsInUserKeywordSettings() {
         for (final KeywordTeardown keywordTeardown : keyword.getTeardowns()) {
             final RobotToken keywordNameToken = keywordTeardown.getKeywordName();
@@ -129,8 +139,22 @@ class KeywordSettingsValidator implements ModelUnitValidator {
             arguments.putAll(EmbeddedKeywordNamesSupport.removeRegex(argName), embeddedArguments.get(argName));
         }
         for (final KeywordArguments argument : keyword.getArguments()) {
-            arguments
-                    .putAll(VariableNamesSupport.extractUnifiedVariables(argument.getArguments(), extractor, fileName));
+            for (final RobotToken token : argument.getArguments()) {
+
+                final boolean hasDefault = token.getText().contains("=");
+                if (hasDefault) {
+                    final List<String> splitted = Splitter.on('=').limit(2).splitToList(token.getText());
+                    final String def = splitted.get(0);
+                    final String unifiedDefinitionName = VariableNamesSupport.extractUnifiedVariableName(def);
+                    final Multimap<String, RobotToken> usedVariables = VariableNamesSupport
+                            .extractUnifiedVariables(newArrayList(token), new VariableExtractor(), null);
+                    arguments.put(unifiedDefinitionName,
+                            Iterables.getFirst(usedVariables.get(unifiedDefinitionName), null));
+                } else {
+                    arguments.putAll(
+                            VariableNamesSupport.extractUnifiedVariables(newArrayList(token), extractor, fileName));
+                }
+            }
         }
         return arguments;
     }
@@ -173,6 +197,59 @@ class KeywordSettingsValidator implements ModelUnitValidator {
             wasVararg |= isVararg;
             wasDefault |= isDefault;
             wasKwarg |= isKwarg;
+        }
+    }
+
+    private void reportArgumentsDefaultValuesUnknownVariables() {
+        final List<KeywordArguments> arguments = keyword.getArguments();
+        if (arguments == null || arguments.isEmpty()) {
+            return;
+        }
+        for (final KeywordArguments argSetting : arguments) {
+            final Set<String> definedVariables = newHashSet(validationContext.getAccessibleVariables());
+            for (final RobotToken argToken : argSetting.getArguments()) {
+                if (!argToken.getTypes().contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION)
+                        && !argToken.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
+                        && !argToken.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX)
+                            .formatMessageWith(argToken.getText());
+                    reporter.handleProblem(problem, validationContext.getFile(), argToken);
+                } else {
+                    final boolean hasDefault = argToken.getText().contains("=");
+                    if (hasDefault) {
+                        final List<String> splitted = Splitter.on('=').limit(2).splitToList(argToken.getText());
+                        final String def = splitted.get(0);
+                        if (!def.trim().equals(def)) {
+                            final RobotProblem problem = RobotProblem
+                                    .causedBy(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX)
+                                    .formatMessageWith(argToken.getText());
+                            reporter.handleProblem(problem, validationContext.getFile(), argToken);
+                        }
+
+                        final String unifiedDefinitionName = VariableNamesSupport.extractUnifiedVariableName(def);
+                        final Multimap<String, RobotToken> usedVariables = VariableNamesSupport.extractUnifiedVariables(
+                                newArrayList(argToken), new VariableExtractor(), validationContext.getFile().getName());
+
+                        for (final Entry<String, RobotToken> entry : usedVariables.entries()) {
+                            if (!unifiedDefinitionName.equals(entry.getKey())
+                                    && !VariableNamesSupport.isDefinedVariable(VariableNamesSupport
+                                            .extractUnifiedVariableNameWithoutBrackets(entry.getKey()), "$",
+                                            definedVariables)) {
+                                final RobotProblem problem = RobotProblem
+                                        .causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
+                                        .formatMessageWith(entry.getKey());
+                                final Map<String, Object> additional = ImmutableMap
+                                        .<String, Object> of(AdditionalMarkerAttributes.NAME, entry.getKey());
+                                reporter.handleProblem(problem, validationContext.getFile(), entry.getValue(),
+                                        additional);
+                            }
+                        }
+                        definedVariables.add(unifiedDefinitionName);
+                    } else {
+                        definedVariables.add(VariableNamesSupport.extractUnifiedVariableName(argToken.getText()));
+                    }
+                }
+            }
         }
     }
 
