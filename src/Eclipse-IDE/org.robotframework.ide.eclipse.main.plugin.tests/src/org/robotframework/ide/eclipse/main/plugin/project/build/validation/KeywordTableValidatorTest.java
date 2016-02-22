@@ -455,6 +455,64 @@ public class KeywordTableValidatorTest {
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(KeywordsProblem.ARGUMENT_AFTER_KWARG, new ProblemPosition(3, Range.closed(46, 50))));
     }
+
+    @Test
+    public void unknownVariableIsReported_whenItIsUsedInDefaultValueAndNotKnown() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${x}  ${y}=${unknown}")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(51, 61))));
+    }
+
+    @Test
+    public void nothingIsReported_whendDefaultValuesUsesVariableDefinedJustBefore() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  ${x}  ${y}=${x}")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
+    @Test
+    public void syntaxProblesAreReported_whenDefinitionIsInvalid() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Keywords ***")
+                .appendLine("keyword")
+                .appendLine("  [Arguments]  123  ${x  {y}  ${x} =123")
+                .appendLine("  [Return]  10")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(4);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(40, 43))),
+                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(45, 48))),
+                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(50, 53))),
+                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(55, 64))));
+    }
     
 	@Test
 	public void keywordDefinitionWithDotsIsReported() throws CoreException {
