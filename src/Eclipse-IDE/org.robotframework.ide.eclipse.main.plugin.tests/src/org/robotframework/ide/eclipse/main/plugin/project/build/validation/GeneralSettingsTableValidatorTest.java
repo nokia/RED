@@ -190,15 +190,81 @@ public class GeneralSettingsTableValidatorTest {
     }
 
     @Test
-    public void test() throws CoreException {
+    public void declaredVariableAsKeywordInSetupsAndTeardownsIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
-                .appendLine("Test Setup  kw")
-                .appendLine("Test Template  kw1")
+                .appendLine("Suite Setup  ${var}")
+                .appendLine("Test Setup  ${var}")
+                .appendLine("Suite Teardown  ${var}")
+                .appendLine("Test Teardown  ${var}")
+                .build();
+        
+        final Set<String> accessibleVariables = new HashSet<>();
+        accessibleVariables.add("${var}");
+
+        final FileValidationContext context = prepareContext(new HashMap<String, Collection<KeywordEntity>>(), accessibleVariables);
+        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
+                file.findSection(RobotSettingsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(4);
+        assertThat(reporter.getReportedProblems()).contains(
+                new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+                        new ProblemPosition(2, Range.closed(30, 36))),
+                new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+                        new ProblemPosition(3, Range.closed(49, 55))),
+                new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+                        new ProblemPosition(4, Range.closed(72, 78))),
+                new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
+                        new ProblemPosition(5, Range.closed(94, 100))));
+    }
+    
+    @Test
+    public void undeclaredVariableInTagsIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Default Tags  ${var}  ${var1}")
+                .appendLine("Force Tags  ${var}  ${var2}")
                 .build();
 
-        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw",
-                new Path("/suite.robot"));
-        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+        final Set<String> accessibleVariables = new HashSet<>();
+        accessibleVariables.add("${var}");
+
+        final FileValidationContext context = prepareContext(new HashMap<String, Collection<KeywordEntity>>(),
+                accessibleVariables);
+        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
+                file.findSection(RobotSettingsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
+        assertThat(reporter.getReportedProblems()).contains(
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(39, 46))),
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(67, 74))));
+    }
+    
+    @Test
+    public void undeclaredKeywordInTemplateIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Template  kw1 ${var}")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
+                file.findSection(RobotSettingsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).contains(
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(32, 42))));
+    }
+    
+    @Test
+    public void declaredKeywordInTemplateIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Template  kw1 ${arg}")
+                .build();
+        
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw1 ${arg}",
+                new Path("/suite.robot"), "arg");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw1 ${arg}",
                 (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
@@ -206,7 +272,41 @@ public class GeneralSettingsTableValidatorTest {
                 file.findSection(RobotSettingsSection.class), reporter);
         validator.validate(null);
 
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+    }
+    
+    @Test
+    public void undeclaredVariableInTimeoutIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Timeout  ${var}")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
+                file.findSection(RobotSettingsSection.class), reporter);
+        validator.validate(null);
+
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).contains(
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(31, 37))));
+    }
+    
+    @Test
+    public void declaredVariableInTimeoutIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Timeout  ${var}")
+                .build();
+
+        final Set<String> accessibleVariables = new HashSet<>();
+        accessibleVariables.add("${var}");
+
+        final FileValidationContext context = prepareContext(new HashMap<String, Collection<KeywordEntity>>(),
+                accessibleVariables);
+        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
+                file.findSection(RobotSettingsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
     }
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
