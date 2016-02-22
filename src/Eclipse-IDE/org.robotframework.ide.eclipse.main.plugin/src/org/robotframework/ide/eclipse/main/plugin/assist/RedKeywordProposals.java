@@ -96,63 +96,77 @@ public class RedKeywordProposals {
     }
 
     private AccessibleKeywordsEntities getAccessibleKeywordsEntities(final RobotSuiteFile suite, final String prefix) {
-        final AccessibleKeywordsCollector collector = new AccessibleKeywordsCollector() {
-            @Override
-            public Map<String, Collection<KeywordEntity>> collect() {
-                return collectAccessibleKeywords(prefix);
-            }
-        };
+        final AccessibleKeywordsCollector collector = new ProposalsKeywordCollector(suiteFile, prefix);
         return new AccessibleKeywordsEntities(suite.getFile().getFullPath(), collector);
     }
 
-    private Map<String, Collection<KeywordEntity>> collectAccessibleKeywords(final String prefix) {
-        final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
-        new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(new KeywordDetector() {
+    private static final class ProposalsKeywordCollector implements AccessibleKeywordsCollector {
 
-            @Override
-            public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final String libraryAlias, final RobotSuiteFile exposingFile) {
-                final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY : KeywordScope.STD_LIBRARY;
-                final String sourceName = libraryAlias.isEmpty() ? libSpec.getName() : libraryAlias;
+        private final RobotSuiteFile suiteFile;
+        private final String prefix;
 
-                addAccessibleKeyword(kwSpec.getName(), RedKeywordProposal.create(libSpec, kwSpec, scope, sourceName,
-                        exposingFile.getFile().getFullPath()), prefix);
-                return ContinueDecision.CONTINUE;
-            }
+        private ProposalsKeywordCollector(final RobotSuiteFile suiteFile, final String prefix) {
+            this.prefix = prefix;
+            this.suiteFile = suiteFile;
+        }
 
-            @Override
-            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
-                final KeywordScope scope = suiteFile == file ? KeywordScope.LOCAL : KeywordScope.RESOURCE;
-                final String sourceName = Files.getNameWithoutExtension(file.getName());
-                addAccessibleKeyword(keyword.getName(), RedKeywordProposal.create(file, keyword, scope, sourceName),
-                        prefix);
-                return ContinueDecision.CONTINUE;
-            }
+        @Override
+        public Map<String, Collection<KeywordEntity>> collect() {
+            return collectAccessibleKeywords(prefix);
+        }
 
-            private void addAccessibleKeyword(final String keywordName, final RedKeywordProposal keyword,
-                    final String prefix) {
-                if (!matchesPrefix(keyword, prefix)) {
-                    return;
+        private Map<String, Collection<KeywordEntity>> collectAccessibleKeywords(final String prefix) {
+            final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
+            new KeywordDefinitionLocator(suiteFile.getFile()).locateKeywordDefinition(new KeywordDetector() {
+
+                @Override
+                public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+                        final KeywordSpecification kwSpec, final String libraryAlias,
+                        final RobotSuiteFile exposingFile) {
+                    final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
+                            : KeywordScope.STD_LIBRARY;
+                    final String sourceName = libraryAlias.isEmpty() ? libSpec.getName() : libraryAlias;
+
+                    addAccessibleKeyword(kwSpec.getName(), RedKeywordProposal.create(libSpec, kwSpec, scope, sourceName,
+                            exposingFile.getFile().getFullPath()), prefix);
+                    return ContinueDecision.CONTINUE;
                 }
-                final String unifiedName = QualifiedKeywordName.unifyDefinition(keywordName);
-                if (accessibleKeywords.containsKey(unifiedName)) {
-                    accessibleKeywords.get(unifiedName).add(keyword);
-                } else {
-                    final LinkedHashSet<KeywordEntity> setOfKeywords = newLinkedHashSet();
-                    setOfKeywords.add(keyword);
-                    accessibleKeywords.put(unifiedName, setOfKeywords);
+
+                @Override
+                public ContinueDecision keywordDetected(final RobotSuiteFile file,
+                        final RobotKeywordDefinition keyword) {
+                    final KeywordScope scope = suiteFile == file ? KeywordScope.LOCAL : KeywordScope.RESOURCE;
+                    final String sourceName = Files.getNameWithoutExtension(file.getName());
+                    addAccessibleKeyword(keyword.getName(), RedKeywordProposal.create(file, keyword, scope, sourceName),
+                            prefix);
+                    return ContinueDecision.CONTINUE;
                 }
-            }
 
-            private boolean matchesPrefix(final RedKeywordProposal keyword, final String prefix) {
-                final String keywordName = keyword.getLabel();
-                final String keywordPrefix = keyword.getSourcePrefix() + ".";
-                final String wholeDefinition = keywordPrefix + keywordName;
+                private void addAccessibleKeyword(final String keywordName, final RedKeywordProposal keyword,
+                        final String prefix) {
+                    if (!matchesPrefix(keyword, prefix)) {
+                        return;
+                    }
+                    final String unifiedName = QualifiedKeywordName.unifyDefinition(keywordName);
+                    if (accessibleKeywords.containsKey(unifiedName)) {
+                        accessibleKeywords.get(unifiedName).add(keyword);
+                    } else {
+                        final LinkedHashSet<KeywordEntity> setOfKeywords = newLinkedHashSet();
+                        setOfKeywords.add(keyword);
+                        accessibleKeywords.put(unifiedName, setOfKeywords);
+                    }
+                }
 
-                return EmbeddedKeywordNamesSupport.startsWith(keywordName, prefix)
-                        || EmbeddedKeywordNamesSupport.startsWith(wholeDefinition, prefix);
-            }
-        });
-        return accessibleKeywords;
+                private boolean matchesPrefix(final RedKeywordProposal keyword, final String prefix) {
+                    final String keywordName = keyword.getLabel();
+                    final String keywordPrefix = keyword.getSourcePrefix() + ".";
+                    final String wholeDefinition = keywordPrefix + keywordName;
+
+                    return EmbeddedKeywordNamesSupport.startsWith(keywordName, prefix)
+                            || EmbeddedKeywordNamesSupport.startsWith(wholeDefinition, prefix);
+                }
+            });
+            return accessibleKeywords;
+        }
     }
 }
