@@ -208,9 +208,8 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         for (final KeywordArguments argSetting : arguments) {
             final Set<String> definedVariables = newHashSet(validationContext.getAccessibleVariables());
             for (final RobotToken argToken : argSetting.getArguments()) {
-                if (!argToken.getTypes().contains(RobotTokenType.VARIABLES_SCALAR_DECLARATION)
-                        && !argToken.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
-                        && !argToken.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)) {
+                if (!argToken.getText().contains("}") || (!argToken.getText().startsWith("${")
+                        && !argToken.getText().startsWith("@{") && !argToken.getText().startsWith("&{"))) {
                     final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX)
                             .formatMessageWith(argToken.getText());
                     reporter.handleProblem(problem, validationContext.getFile(), argToken);
