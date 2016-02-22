@@ -538,6 +538,18 @@ public enum GeneralSettingsProblem implements IProblemCause {
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new LibraryAliasToUpperCaseReplacer());
         }
+    },
+    VARIABLE_AS_KEYWORD_USAGE_IN_SETTING {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Variable '%s' is given as keyword name.";
+        }
     };
 
     @Override
