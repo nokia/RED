@@ -16,6 +16,8 @@ import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.ATags;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
@@ -30,7 +32,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DeprecatedSettingHeaderAlias;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.setting.DocumentationDeclarationSettingValidator;
@@ -89,7 +90,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         validateSetupsAndTeardowns(settingsTable.getSuiteTeardowns(), executableRowsInSetupsAndTeardowns);
         validateSetupsAndTeardowns(settingsTable.getTestSetups(), executableRowsInSetupsAndTeardowns);
         validateSetupsAndTeardowns(settingsTable.getTestTeardowns(), executableRowsInSetupsAndTeardowns);
-        validateVariablesInSetupsAndTeardowns(executableRowsInSetupsAndTeardowns);
+        validateVariablesInSetupAndTeardownExeRows(executableRowsInSetupsAndTeardowns);
 
         validateTestTemplates(settingsTable.getTestTemplates());
         validateTestTimeouts(settingsTable.getTestTimeouts());
@@ -164,14 +165,16 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 reporter).validate(monitor);
     }
 
-    private void validateSetupsAndTeardowns(final List<? extends AKeywordBaseSetting<?>> keywordBasedSettings, final List<RobotExecutableRow<?>> executableRows) {
+    private void validateSetupsAndTeardowns(final List<? extends AKeywordBaseSetting<?>> keywordBasedSettings,
+            final List<RobotExecutableRow<?>> executableRowsForVariablesChecking) {
+
         boolean wasAllEmpty = true;
         for (final AKeywordBaseSetting<?> keywordBased : keywordBasedSettings) {
             final RobotToken keywordToken = keywordBased.getKeywordName();
             if (keywordToken != null) {
                 wasAllEmpty = false;
-                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken,
-                        Optional.of(keywordBased.getArguments()));
+                TestCasesTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
+                        keywordToken, Optional.of(keywordBased.getArguments()));
             }
         }
 
@@ -184,14 +187,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 reporter.handleProblem(problem, validationContext.getFile(), settingToken);
             }
         } else {
-            executableRows.add(keywordBasedSettings.get(0).asExecutableRow());
-        }
-    }
-    
-    private void validateVariablesInSetupsAndTeardowns(final List<RobotExecutableRow<?>> executableRows) {
-        if(!executableRows.isEmpty()) {
-            final Set<String> variables = validationContext.getAccessibleVariables();
-            TestCasesTableValidator.reportUnknownVariables(validationContext, reporter, executableRows, variables);
+            executableRowsForVariablesChecking.add(keywordBasedSettings.get(0).asExecutableRow());
         }
     }
 
@@ -237,12 +233,8 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             final RobotToken timeoutToken = testTimeout.getTimeout();
             if (timeoutToken != null) {
                 wasAllEmpty = false;
-                final String timeout = timeoutToken.getText();
-                if (!RobotTimeFormat.isValidRobotTimeArgument(timeout.trim())) {
-                    final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_TIME_FORMAT)
-                            .formatMessageWith(timeout);
-                    reporter.handleProblem(problem, validationContext.getFile(), timeoutToken);
-                }
+                TestCasesTableValidator.validateTimeoutSetting(validationContext, reporter,
+                        validationContext.getAccessibleVariables(), timeoutToken);
             }
         }
 
@@ -263,7 +255,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         for (final ATags<?> tags : tagsSetting) {
             if (!tags.getTags().isEmpty()) {
                 wasAllEmpty = false;
-                break;
+                validateVariablesInTagsSettings(tags.getTags());
             }
         }
 
@@ -277,7 +269,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             }
         }
     }
-
+    
     private void validateMetadatas(final List<Metadata> metadatas) {
         for (final Metadata metadata : metadatas) {
             if (metadata.getKey() == null) {
@@ -307,6 +299,23 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                         .formatMessageWith(settingName);
                 reporter.handleProblem(problem, validationContext.getFile(), declarationToken);
             }
+        }
+    }
+    
+    private void validateVariablesInSetupAndTeardownExeRows(final List<RobotExecutableRow<?>> executableRows) {
+        if (!executableRows.isEmpty()) {
+            final Set<String> variables = validationContext.getAccessibleVariables();
+            TestCasesTableValidator.reportUnknownVariables(validationContext, reporter, executableRows, variables);
+        }
+    }
+
+    private void validateVariablesInTagsSettings(final List<RobotToken> tags) {
+        final Set<String> accessibleVariables = validationContext.getAccessibleVariables();
+        for (RobotToken tag : tags) {
+            final List<VariableDeclaration> variablesDeclarationsInTag = new VariableExtractor()
+                    .extract(tag, validationContext.getFile().getName()).getCorrectVariables();
+            TestCasesTableValidator.reportUnknownVariablesInSettingWithoutExeRows(validationContext, reporter,
+                    variablesDeclarationsInTag, accessibleVariables);
         }
     }
 
