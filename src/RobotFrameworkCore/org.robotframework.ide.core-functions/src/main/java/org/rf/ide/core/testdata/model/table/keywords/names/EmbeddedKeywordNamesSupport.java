@@ -43,7 +43,7 @@ public class EmbeddedKeywordNamesSupport {
         if (definitionName.indexOf('$') == -1) {
             return false;
         }
-        final String regex = "^" + substituteVariablesWithRegex(definitionName) + "$";
+        final String regex = "^" + substituteVariablesWithRegex(definitionName.toLowerCase()) + "$";
         try {
             return Pattern.matches(regex, occurrenceNameInEmbeddedForm);
         } catch (final PatternSyntaxException e) {
