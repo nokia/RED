@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Collection;
@@ -25,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
 
 /**
  * @author Michal Anglart
@@ -53,7 +55,7 @@ public class KeywordDefinitionLocator {
 
     private ContinueDecision locateInLibraries(final Collection<LibrarySpecification> collection,
             final KeywordDetector detector) {
-        for (final LibrarySpecification libSpec : collection) {
+        for (final LibrarySpecification libSpec : filter(collection, Predicates.notNull())) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
                 final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec, "", null);
                 if (shouldContinue == ContinueDecision.STOP) {
