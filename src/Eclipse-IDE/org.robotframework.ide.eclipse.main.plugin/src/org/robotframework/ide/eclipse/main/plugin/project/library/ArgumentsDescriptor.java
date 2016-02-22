@@ -63,6 +63,10 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
         return arguments.iterator();
     }
 
+    public int size() {
+        return arguments.size();
+    }
+
     public Argument get(final int index) {
         return arguments.get(index);
     }

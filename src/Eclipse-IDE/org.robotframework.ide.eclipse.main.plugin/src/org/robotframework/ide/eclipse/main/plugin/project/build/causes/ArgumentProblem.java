@@ -49,6 +49,17 @@ public enum ArgumentProblem implements IProblemCause {
             return "Argument '%s' cannot be matched to positional arguments of '%s' keyword nor to '%s' kwargs argument";
         }
     },
+    LIST_ARGUMENT_SHOULD_PROVIDE_ARGS {
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "List argument '%s' has to provide %d values in order to ensure %s arguments of keyword definition";
+        }
+    },
     INVALID_TIME_FORMAT {
 
         @Override

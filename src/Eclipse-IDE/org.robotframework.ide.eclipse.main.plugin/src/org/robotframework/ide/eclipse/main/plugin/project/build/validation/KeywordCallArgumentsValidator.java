@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Iterables.tryFind;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,6 +15,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -22,6 +25,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentP
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Range;
@@ -65,24 +70,35 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             return;
         }
 
-        final ArrayListMultimap<Argument, RobotToken> argsMapping = mapDescriptorArgumentsToTokens(namesToArgs);
+        final ArgumentsBinding<Argument, RobotToken> argsMapping = mapDescriptorArgumentsToTokens(namesToArgs);
 
-        validateArgumentsMapping(namesToArgs, argsMapping);
+        validateArgumentsBinding(namesToArgs, argsMapping);
     }
 
     private boolean validateNumberOfArguments() {
         final Range<Integer> expectedArgsNumber = descriptor.getPossibleNumberOfArguments();
         final int actual = arguments.size();
         if (!expectedArgsNumber.contains(actual)) {
-            final String additional = String.format("Keyword '%s' expects " + getRangesInfo(expectedArgsNumber)
-                    + ", but %d " + toBeInProperForm(actual) + " provided", definingToken.getText(), actual);
+            if (!listIsPassed()) {
+                final String additional = String.format("Keyword '%s' expects " + getRangesInfo(expectedArgsNumber)
+                        + ", but %d " + toBeInProperForm(actual) + " provided", definingToken.getText(), actual);
 
-            final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS)
-                    .formatMessageWith(additional);
-            reporter.handleProblem(problem, file, definingToken);
-            return false;
+                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.INVALID_NUMBER_OF_PARAMETERS)
+                        .formatMessageWith(additional);
+                reporter.handleProblem(problem, file, definingToken);
+                return false;
+            }
         }
         return true;
+    }
+
+    private boolean listIsPassed() {
+        return tryFind(arguments, new Predicate<RobotToken>() {
+            @Override
+            public boolean apply(final RobotToken argToken) {
+                return argToken.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION);
+            }
+        }).isPresent();
     }
 
     private Map<String, Argument> namesToArgsMapping() {
@@ -108,7 +124,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         return !thereIsAMessInOrder;
     }
 
-    private ArrayListMultimap<Argument, RobotToken> mapDescriptorArgumentsToTokens(
+    private ArgumentsBinding<Argument, RobotToken> mapDescriptorArgumentsToTokens(
             final Map<String, Argument> namesToArgs) {
         final List<RobotToken> positional = new ArrayList<>();
         final List<RobotToken> named = new ArrayList<>();
@@ -120,32 +136,41 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             }
         }
 
-        final ArrayListMultimap<Argument, RobotToken> argsMapping = ArrayListMultimap.create();
+        final ArgumentsBinding<Argument, RobotToken> mapping = new ArgumentsBinding<>();
+
         // map positional arguments
-        for (int i = 0, j = 0; i < positional.size(); i++) {
-            final Argument definingArg = descriptor.get(j);
-            argsMapping.put(definingArg, positional.get(i));
+        int i = 0, j = 0;
+        while (i < descriptor.size() && j < positional.size()) {
+            final Argument definingArg = descriptor.get(i);
+            final RobotToken currentToken = positional.get(j);
+
+            mapping.bind(definingArg, currentToken);
             if (definingArg.isRequired() || definingArg.isDefault()) {
+                i++;
+            }
+            final List<IRobotTokenType> tokenTypes = currentToken.getTypes();
+            if (!(tokenTypes.contains(RobotTokenType.VARIABLES_LIST_DECLARATION) && !definingArg.isVarArg())) {
                 j++;
             }
         }
-        // map named arguments
+
         for (final RobotToken argToken : named) {
             final String name = getName(argToken);
             final Argument potentialArgument = namesToArgs.get(name);
             if (potentialArgument != null) {
-                argsMapping.put(potentialArgument, argToken);
+                mapping.bind(potentialArgument, argToken);
             } else {
-                argsMapping.put(descriptor.getKwargArgument().get(), argToken);
+                mapping.bind(descriptor.getKwargArgument().get(), argToken);
             }
         }
-        return argsMapping;
+        return mapping;
     }
 
-    private void validateArgumentsMapping(final Map<String, Argument> namesToArgs,
-            final ArrayListMultimap<Argument, RobotToken> argsMapping) {
+    private void validateArgumentsBinding(final Map<String, Argument> namesToArgs,
+            final ArgumentsBinding<Argument, RobotToken> argsMapping) {
         for (final Argument arg : descriptor) {
-            final List<RobotToken> values = argsMapping.get(arg);
+            final List<RobotToken> values = argsMapping.getDefinitionsMapping(arg);
+
             if (arg.isRequired() && values.isEmpty()) {
                 final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.NO_VALUE_PROVIDED_FOR_REQUIRED_ARG)
                         .formatMessageWith(definingToken.getText(), arg.getName());
@@ -168,6 +193,16 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                 }
             }
         }
+
+        for (final RobotToken useSiteArg : arguments) {
+            final List<Argument> defs = argsMapping.getUsageMapping(useSiteArg);
+            if (useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION) && defs.size() > 1) {
+                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS)
+                        .formatMessageWith(useSiteArg.getText(), defs.size(), "[" + Joiner.on(", ").join(defs) + "]");
+                reporter.handleProblem(problem, file, useSiteArg);
+            }
+        }
+
     }
 
     private boolean isPositional(final RobotToken arg, final Collection<String> argumentNames) {
@@ -201,5 +236,25 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
     private static String toPluralIfNeeded(final String noun, final int amount) {
         return amount == 1 ? noun : noun + "s";
+    }
+
+    private static class ArgumentsBinding<D, U> {
+
+        public void bind(final D key, final U val) {
+            defToUsageMapping.put(key, val);
+            usageToDefMapping.put(val, key);
+        }
+
+        public List<U> getDefinitionsMapping(final D arg) {
+            return defToUsageMapping.get(arg);
+        }
+
+        public List<D> getUsageMapping(final U arg) {
+            return usageToDefMapping.get(arg);
+        }
+
+        private final ArrayListMultimap<D, U> defToUsageMapping = ArrayListMultimap.create();
+
+        private final ArrayListMultimap<U, D> usageToDefMapping = ArrayListMultimap.create();
     }
 }
