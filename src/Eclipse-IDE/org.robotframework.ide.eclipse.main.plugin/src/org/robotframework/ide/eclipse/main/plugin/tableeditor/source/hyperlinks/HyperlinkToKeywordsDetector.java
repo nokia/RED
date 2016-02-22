@@ -154,61 +154,73 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
     }
 
     private AccessibleKeywordsEntities createEntities() {
-        final AccessibleKeywordsCollector collector = new AccessibleKeywordsCollector() {
-            @Override
-            public Map<String, Collection<KeywordEntity>> collect() {
-                return collectAccessibleKeywordNames(suiteFile.getFile());
-            }
-        };
+        final AccessibleKeywordsCollector collector = new HyperlinksKeywordCollector(suiteFile.getFile());
         return new AccessibleKeywordsEntities(suiteFile.getFile().getFullPath(), collector);
     }
 
-    public Map<String, Collection<KeywordEntity>> collectAccessibleKeywordNames(final IFile file) {
-        final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
-        new KeywordDefinitionLocator(file, RedPlugin.getModelManager().getModel())
-                .locateKeywordDefinition(new KeywordDetector() {
 
-                    @Override
-                    public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                            final KeywordSpecification kwSpec, final String libraryAlias,
-                            final RobotSuiteFile exposingFile) {
 
-                        final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
-                                : KeywordScope.STD_LIBRARY;
-                        final KeywordHyperlinkEntity keyword = KeywordHyperlinkEntity.from(scope, libraryAlias,
-                                exposingFile, libSpec, kwSpec);
+    private static final class HyperlinksKeywordCollector implements AccessibleKeywordsCollector {
 
-                        addAccessibleKeyword(kwSpec.getName(), keyword);
-                        return ContinueDecision.CONTINUE;
-                    }
+        private final IFile file;
 
-                    @Override
-                    public ContinueDecision keywordDetected(final RobotSuiteFile suiteFile,
-                            final RobotKeywordDefinition kwDefinition) {
+        public HyperlinksKeywordCollector(final IFile file) {
+            this.file = file;
+        }
 
-                        final KeywordScope scope = suiteFile.getFile().equals(file) ? KeywordScope.LOCAL
-                                : KeywordScope.RESOURCE;
+        @Override
+        public Map<String, Collection<KeywordEntity>> collect() {
+            return collectAccessibleKeywordNames(file);
+        }
 
-                        final DefinitionPosition position = kwDefinition.getDefinitionPosition();
-                        final KeywordHyperlinkEntity keyword = KeywordHyperlinkEntity.from(scope, suiteFile, position,
-                                kwDefinition);
+        private Map<String, Collection<KeywordEntity>> collectAccessibleKeywordNames(final IFile file) {
+            final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
+            new KeywordDefinitionLocator(file, RedPlugin.getModelManager().getModel())
+                    .locateKeywordDefinition(new KeywordDetector() {
 
-                        addAccessibleKeyword(kwDefinition.getName(), keyword);
-                        return ContinueDecision.CONTINUE;
-                    }
+                        @Override
+                        public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
+                                final KeywordSpecification kwSpec, final String libraryAlias,
+                                final RobotSuiteFile exposingFile) {
 
-                    private void addAccessibleKeyword(final String keywordName, final KeywordHyperlinkEntity keyword) {
-                        final String unifiedName = QualifiedKeywordName.unifyDefinition(keywordName);
-                        if (accessibleKeywords.containsKey(unifiedName)) {
-                            accessibleKeywords.get(unifiedName).add(keyword);
-                        } else {
-                            final LinkedHashSet<KeywordEntity> setOfKeywords = newLinkedHashSet();
-                            setOfKeywords.add(keyword);
-                            accessibleKeywords.put(unifiedName, setOfKeywords);
+                            final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
+                                    : KeywordScope.STD_LIBRARY;
+                            final KeywordHyperlinkEntity keyword = KeywordHyperlinkEntity.from(scope, libraryAlias,
+                                    exposingFile, libSpec, kwSpec);
+
+                            addAccessibleKeyword(kwSpec.getName(), keyword);
+                            return ContinueDecision.CONTINUE;
                         }
-                    }
-                });
-        return accessibleKeywords;
+
+                        @Override
+                        public ContinueDecision keywordDetected(final RobotSuiteFile suiteFile,
+                                final RobotKeywordDefinition kwDefinition) {
+
+                            final KeywordScope scope = suiteFile.getFile().equals(file) ? KeywordScope.LOCAL
+                                    : KeywordScope.RESOURCE;
+
+                            final DefinitionPosition position = kwDefinition.getDefinitionPosition();
+                            final KeywordHyperlinkEntity keyword = KeywordHyperlinkEntity.from(scope, suiteFile,
+                                    position, kwDefinition);
+
+                            addAccessibleKeyword(kwDefinition.getName(), keyword);
+                            return ContinueDecision.CONTINUE;
+                        }
+
+                        private void addAccessibleKeyword(final String keywordName,
+                                final KeywordHyperlinkEntity keyword) {
+                            final String unifiedName = QualifiedKeywordName.unifyDefinition(keywordName);
+                            if (accessibleKeywords.containsKey(unifiedName)) {
+                                accessibleKeywords.get(unifiedName).add(keyword);
+                            } else {
+                                final LinkedHashSet<KeywordEntity> setOfKeywords = newLinkedHashSet();
+                                setOfKeywords.add(keyword);
+                                accessibleKeywords.put(unifiedName, setOfKeywords);
+                            }
+                        }
+                    });
+            return accessibleKeywords;
+        }
     }
 
     private static class KeywordHyperlinkEntity extends KeywordEntity {

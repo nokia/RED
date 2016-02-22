@@ -37,12 +37,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
     private Set<String> accessibleVariables;
 
     public FileValidationContext(final ValidationContext context, final IFile file) {
-        this(context, file, new AccessibleKeywordsCollector() {
-            @Override
-            public Map<String, Collection<KeywordEntity>> collect() {
-                return context.collectAccessibleKeywordNames(file);
-            }
-        }, null);
+        this(context, file, new ValidationKeywordCollector(file, context), null);
     }
 
     @VisibleForTesting
@@ -75,6 +70,23 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
             accessibleVariables = context.collectAccessibleVariables(file);
         }
         return accessibleVariables;
+    }
+
+    private static final class ValidationKeywordCollector implements AccessibleKeywordsCollector {
+
+        private final IFile file;
+
+        private final ValidationContext context;
+
+        private ValidationKeywordCollector(final IFile file, final ValidationContext context) {
+            this.file = file;
+            this.context = context;
+        }
+
+        @Override
+        public Map<String, Collection<KeywordEntity>> collect() {
+            return context.collectAccessibleKeywordNames(file);
+        }
     }
 
     public static final class ValidationKeywordEntity extends KeywordEntity {

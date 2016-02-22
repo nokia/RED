@@ -203,19 +203,13 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     }
 
     private List<String> getArguments() {
-        final List<VariableDeclaration> embedded = getEmbeddedArguments();
+        // embedded arguments are not provided for descriptor or documentation
         final List<String> args = newArrayList();
-        if (!embedded.isEmpty()) {
-            for (final VariableDeclaration var : embedded) {
-                args.add(toPythonicNotation(var.asToken()));
-            }
-        } else {
-            final RobotDefinitionSetting argumentsSetting = getArgumentsSetting();
-            if (argumentsSetting != null) {
-                final KeywordArguments arguments = (KeywordArguments) argumentsSetting.getLinkedElement();
-                for (final RobotToken token : arguments.getArguments()) {
-                    args.add(toPythonicNotation(token));
-                }
+        final RobotDefinitionSetting argumentsSetting = getArgumentsSetting();
+        if (argumentsSetting != null) {
+            final KeywordArguments arguments = (KeywordArguments) argumentsSetting.getLinkedElement();
+            for (final RobotToken token : arguments.getArguments()) {
+                args.add(toPythonicNotation(token));
             }
         }
         return args;
