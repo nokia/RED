@@ -352,6 +352,24 @@ public class KeywordCallArgumentsValidatorTest {
                 new Problem(ArgumentProblem.MISMATCHING_ARGUMENT, new ProblemPosition(3, Range.closed(47, 48))));
     }
 
+    @Test
+    public void warningIsReported_whenListIsUsedInOrderToProvideMultipleArguments() {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    keyword    @{list}")
+                .build();
+
+        final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
+        final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x", "y");
+
+        validate(file, tokens, descriptor);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
+                ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS, new ProblemPosition(3, Range.closed(39, 46))));
+    }
+
     private void validate(final RobotSuiteFile file, final DefiningTokenWithArgumentTokens tokens,
             final ArgumentsDescriptor descriptor) {
         final KeywordCallArgumentsValidator validator = new KeywordCallArgumentsValidator(file.getFile(),
