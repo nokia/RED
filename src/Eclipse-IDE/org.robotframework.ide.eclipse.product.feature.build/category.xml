@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.robotframework.ide.eclipse.product.feature.feature_1.0.0.qualifier.jar"
+            id="org.robotframework.ide.eclipse.product.feature" version="1.0.0.qualifier">
+      <category name="robotframework.ide.category"/>
+   </feature>   
+   <category-def name="robotframework.ide.category"
+                 label="Robot Framework IDE">
+      <description>
+         Development environment for Robot Framework
+      </description>
+   </category-def>
+</site>
