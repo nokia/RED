@@ -19,7 +19,7 @@ public class PythonTemplates extends NLS {
     }
 
     public static String variables;
-    public static String variables_with_class;
+    public static String variablesWithClass;
     public static String library;
-    public static String dynamic_library;
+    public static String dynamicLibrary;
 }
