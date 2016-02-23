@@ -19,9 +19,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
@@ -214,6 +217,8 @@ class KeywordTableValidator implements ModelUnitValidator {
             final Set<String> allVariables = newHashSet(variables);
             allVariables.addAll(extractArgumentVariables(keyword, variableExtractor, fileName));
 
+            reportUnknownVariablesInTimeoutSetting(keyword, allVariables);
+            reportUnknownVariablesInTagsSetting(keyword, allVariables);
             TestCasesTableValidator.reportUnknownVariables(validationContext, reporter,
                     collectKeywordExeRowsForVariablesChecking(keyword), allVariables);
         }
@@ -249,5 +254,30 @@ class KeywordTableValidator implements ModelUnitValidator {
                     .keySet());
         }
         return arguments;
+    }
+    
+    private void reportUnknownVariablesInTagsSetting(final UserKeyword keyword, final Set<String> variables) {
+        final List<KeywordTags> tags = keyword.getTags();
+        for (KeywordTags keywordTags : tags) {
+            final List<RobotToken> tagsTokens = keywordTags.getTags();
+            for (RobotToken tagToken : tagsTokens) {
+                final List<VariableDeclaration> variablesDeclarationsInTag = new VariableExtractor()
+                        .extract(tagToken, validationContext.getFile().getName()).getCorrectVariables();
+                if (!variablesDeclarationsInTag.isEmpty()) {
+                    TestCasesTableValidator.reportUnknownVariablesInSettingWithoutExeRows(validationContext, reporter,
+                            variablesDeclarationsInTag, variables);
+                }
+            }
+        }
+    }
+    
+    private void reportUnknownVariablesInTimeoutSetting(final UserKeyword keyword, final Set<String> variables) {
+        final List<KeywordTimeout> timeouts = keyword.getTimeouts();
+        for (KeywordTimeout keywordTimeout : timeouts) {
+            final RobotToken timeoutToken = keywordTimeout.getTimeout();
+            if (timeoutToken != null) {
+                TestCasesTableValidator.validateTimeoutSetting(validationContext, reporter, variables, timeoutToken);
+            }
+        }
     }
 }
