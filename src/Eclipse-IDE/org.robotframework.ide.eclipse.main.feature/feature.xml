@@ -3,7 +3,8 @@
       id="org.robotframework.ide.eclipse.main.feature"
       label="%featureName"
       version="1.0.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="org.robotframework.ide.eclipse.main.plugin">
 
    <description>
       %description
@@ -17,10 +18,6 @@
       %license
    </license>
 
-   <includes
-         id="org.eclipse.e4.core.tools.feature"
-         version="0.0.0"/>
-
    <plugin
          id="org.robotframework.ide.eclipse.main.plugin"
          download-size="0"
@@ -32,5 +29,19 @@
          download-size="0"
          install-size="0"
          version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.e4.tools.compat"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.e4.tools.services"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
 
 </feature>
