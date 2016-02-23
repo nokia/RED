@@ -67,8 +67,8 @@ class WizardNewRobotPythonFilePage extends WizardNewFileCreationPage {
     private static enum Template {
         VARIABLES_GLOBAL("Variables file", PythonTemplates.variables),
         LIBRARY("Library", PythonTemplates.library),
-        VARIABLES_CLASS("Variables file with class", PythonTemplates.variables_with_class),
-        LIBRARY_DYNAMIC("Dynamic API library", PythonTemplates.dynamic_library),
+        VARIABLES_CLASS("Variables file with class", PythonTemplates.variablesWithClass),
+        LIBRARY_DYNAMIC("Dynamic API library", PythonTemplates.dynamicLibrary),
         EMPTY("Empty content", "");
 
         private final String label;
