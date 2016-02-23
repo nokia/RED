@@ -8,16 +8,16 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.FormatSourceHandler.E4FormatSourceHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 
 /**
  * @author Michal Anglart
  */
-public class FormatSourceHandler extends DIHandler<E4FormatSourceHandler> {
+public class FormatSourceHandler extends DIParameterizedHandler<E4FormatSourceHandler> {
 
     public FormatSourceHandler() {
         super(E4FormatSourceHandler.class);

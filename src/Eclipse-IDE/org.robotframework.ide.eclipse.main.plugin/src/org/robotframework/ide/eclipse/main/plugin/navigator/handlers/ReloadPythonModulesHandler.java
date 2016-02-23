@@ -14,7 +14,6 @@ import javax.inject.Named;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -27,10 +26,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ReloadPythonModulesHandler.E4ReloadPythonModulesHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
 
-public class ReloadPythonModulesHandler extends DIHandler<E4ReloadPythonModulesHandler> {
+public class ReloadPythonModulesHandler extends DIParameterizedHandler<E4ReloadPythonModulesHandler> {
 
     public ReloadPythonModulesHandler() {
         super(E4ReloadPythonModulesHandler.class);

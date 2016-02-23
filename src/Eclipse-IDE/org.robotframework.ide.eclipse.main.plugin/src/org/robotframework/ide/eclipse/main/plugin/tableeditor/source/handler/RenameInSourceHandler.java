@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -24,13 +23,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RenameInSourceHandler.E4RenameInSourceHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 
 import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
  */
-public class RenameInSourceHandler extends DIHandler<E4RenameInSourceHandler> {
+public class RenameInSourceHandler extends DIParameterizedHandler<E4RenameInSourceHandler> {
 
     public RenameInSourceHandler() {
         super(E4RenameInSourceHandler.class);

@@ -12,7 +12,6 @@ import java.io.StringReader;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
@@ -21,13 +20,14 @@ import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleCommentHandler.E4ToggleCommentHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 
 import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
  */
-public class ToggleCommentHandler extends DIHandler<E4ToggleCommentHandler> {
+public class ToggleCommentHandler extends DIParameterizedHandler<E4ToggleCommentHandler> {
 
     public ToggleCommentHandler() {
         super(E4ToggleCommentHandler.class);

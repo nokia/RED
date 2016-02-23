@@ -10,7 +10,6 @@ import java.util.List;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -18,9 +17,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteCasesCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCasesHandler.E4DeleteCasesHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class DeleteCasesHandler extends DIHandler<E4DeleteCasesHandler> {
+public class DeleteCasesHandler extends DIParameterizedHandler<E4DeleteCasesHandler> {
 
     public DeleteCasesHandler() {
         super(E4DeleteCasesHandler.class);

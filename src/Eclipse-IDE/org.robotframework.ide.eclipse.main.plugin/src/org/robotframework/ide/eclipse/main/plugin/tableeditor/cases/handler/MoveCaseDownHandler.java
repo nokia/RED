@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -17,11 +16,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveCaseDownCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveKeywordCallDownCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseDownHandler.E4MoveCaseDownHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Optional;
 
-public class MoveCaseDownHandler extends DIHandler<E4MoveCaseDownHandler> {
+public class MoveCaseDownHandler extends DIParameterizedHandler<E4MoveCaseDownHandler> {
 
     public MoveCaseDownHandler() {
         super(E4MoveCaseDownHandler.class);

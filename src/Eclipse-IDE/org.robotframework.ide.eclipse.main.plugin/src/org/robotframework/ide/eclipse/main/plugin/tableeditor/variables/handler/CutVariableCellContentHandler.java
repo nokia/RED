@@ -5,15 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler;
 
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.E4CutCellContentHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.CutVariableCellContentHandler.E4CutVariableCellContentHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 
 import com.google.common.base.Optional;
 
-public class CutVariableCellContentHandler extends DIHandler<E4CutVariableCellContentHandler> {
+public class CutVariableCellContentHandler extends DIParameterizedHandler<E4CutVariableCellContentHandler> {
 
     public CutVariableCellContentHandler() {
         super(E4CutVariableCellContentHandler.class);

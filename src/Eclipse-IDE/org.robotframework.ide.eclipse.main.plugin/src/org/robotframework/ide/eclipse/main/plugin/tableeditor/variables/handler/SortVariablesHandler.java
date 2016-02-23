@@ -9,17 +9,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SortVariablesCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.SortVariablesHandler.E4SortVariablesHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 
 import com.google.common.base.Optional;
 
-public class SortVariablesHandler extends DIHandler<E4SortVariablesHandler> {
+public class SortVariablesHandler extends DIParameterizedHandler<E4SortVariablesHandler> {
 
     public SortVariablesHandler() {
         super(E4SortVariablesHandler.class);

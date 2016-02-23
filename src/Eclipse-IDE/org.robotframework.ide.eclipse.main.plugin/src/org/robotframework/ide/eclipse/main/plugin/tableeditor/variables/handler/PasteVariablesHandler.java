@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.Clipboard;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -20,11 +19,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.VariablesTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.PasteVariablesHandler.E4PasteVariablesHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Optional;
 
-public class PasteVariablesHandler extends DIHandler<E4PasteVariablesHandler> {
+public class PasteVariablesHandler extends DIParameterizedHandler<E4PasteVariablesHandler> {
 
     public PasteVariablesHandler() {
         super(E4PasteVariablesHandler.class);

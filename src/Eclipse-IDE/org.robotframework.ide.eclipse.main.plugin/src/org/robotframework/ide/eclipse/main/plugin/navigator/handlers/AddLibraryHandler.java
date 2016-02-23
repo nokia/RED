@@ -14,7 +14,6 @@ import javax.inject.Named;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -28,10 +27,11 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEven
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
 
-public class AddLibraryHandler extends DIHandler<E4AddLibraryHandler> {
+public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandler> {
 
     public AddLibraryHandler() {
         super(E4AddLibraryHandler.class);
@@ -48,7 +48,7 @@ public class AddLibraryHandler extends DIHandler<E4AddLibraryHandler> {
 
             final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
 
-            for (IFile file : selectedFiles) {
+            for (final IFile file : selectedFiles) {
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(file.getProject());
                 RobotProjectConfig config = robotProject.getOpenedProjectConfig();
                 final boolean inEditor = config != null;

@@ -15,18 +15,18 @@ import javax.inject.Named;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.ExcludePathHandler.E4ExcludePathHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
 
-public class ExcludePathHandler extends DIHandler<E4ExcludePathHandler> {
+public class ExcludePathHandler extends DIParameterizedHandler<E4ExcludePathHandler> {
 
     public ExcludePathHandler() {
         super(E4ExcludePathHandler.class);

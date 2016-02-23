@@ -9,7 +9,6 @@ import javax.inject.Named;
 
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -22,12 +21,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAcces
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteCellHandler.E4DeleteCellHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Optional;
 
-public class DeleteCellHandler extends DIHandler<E4DeleteCellHandler> implements IHandler {
+public class DeleteCellHandler extends DIParameterizedHandler<E4DeleteCellHandler> implements IHandler {
 
     public DeleteCellHandler() {
         super(E4DeleteCellHandler.class);
