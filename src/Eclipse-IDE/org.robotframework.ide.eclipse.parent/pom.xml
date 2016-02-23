@@ -6,24 +6,55 @@
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>RobotFramework Eclipse IDE Maven Parent Project</name>
-
-	<repositories>
-		<repository>
-			<id>eclipse-luna</id>
-			<url>http://download.eclipse.org/releases/luna/</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>eclipse-mars</id>
-			<url>http://download.eclipse.org/releases/mars/</url>
-			<layout>p2</layout>
-		</repository>
-        <repository>
-            <id>eclipse-neon</id>
-            <url>http://download.eclipse.org/releases/neon/</url>
-            <layout>p2</layout>
-        </repository>
-	</repositories>
+	
+	
+  <profiles>
+    <profile>
+        <id>luna-profile</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+        </activation>
+	    <repositories>
+	        <repository>
+	            <id>eclipse-luna</id>
+	            <url>http://download.eclipse.org/releases/luna/</url>
+	            <layout>p2</layout>
+	        </repository>
+	    </repositories>
+    </profile>
+    <profile>
+        <id>mars-profile</id>
+        <activation>
+            <property>
+                <name>eclipse.version</name>
+                <value>mars</value>
+            </property>
+        </activation>
+        <repositories>
+            <repository>
+                <id>eclipse-mars</id>
+                <url>http://download.eclipse.org/releases/mars/</url>
+                <layout>p2</layout>
+            </repository>
+        </repositories>
+    </profile>
+    <profile>
+        <id>neon-profile</id>
+        <activation>
+            <property>
+                <name>eclipse.version</name>
+                <value>neon</value>
+            </property>
+        </activation>
+        <repositories>
+            <repository>
+                <id>eclipse-neon</id>
+                <url>http://download.eclipse.org/releases/neon/</url>
+                <layout>p2</layout>
+            </repository>
+        </repositories>
+    </profile>
+  </profiles>
 
 	<properties>
 		<tycho-version>0.24.0</tycho-version>
