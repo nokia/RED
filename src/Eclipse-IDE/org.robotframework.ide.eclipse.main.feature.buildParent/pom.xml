@@ -8,7 +8,6 @@
   </parent>
   
   <artifactId>org.robotframework.ide.eclipse.feature.buildParent</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   
   <properties>
@@ -35,8 +34,8 @@
   <modules>
   	<module>${core.functions.dir}/org.robotframework.ide.core-functions</module>
   	<module>../org.robotframework.ide.eclipse.main.plugin</module>
+    <module>../org.robotframework.ide.eclipse.main.plugin.tests</module>
     <module>../org.robotframework.ide.eclipse.main.plugin.doc.user</module>
   	<module>../org.robotframework.ide.eclipse.main.feature</module>
-  	<module>../org.robotframework.ide.eclipse.main.plugin.tests</module>
   </modules>
 </project>
