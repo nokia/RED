@@ -5,9 +5,9 @@
       <category name="robotframework.ide.category"/>
    </feature>
    <category-def name="robotframework.ide.category"
-                 label="Robot Framework IDE Category">
+                 label="Robot Framework IDE">
       <description>
-         Robot Framework Eclipse IDE Category
+         Development environment for Robot Framework
       </description>
    </category-def>
 </site>
