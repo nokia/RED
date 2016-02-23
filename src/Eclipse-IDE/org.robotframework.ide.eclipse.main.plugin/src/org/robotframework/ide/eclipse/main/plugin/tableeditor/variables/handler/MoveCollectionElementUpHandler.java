@@ -10,14 +10,14 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveCollectionElementUpHandler.E4MoveCollectionElementUpHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class MoveCollectionElementUpHandler extends DIHandler<E4MoveCollectionElementUpHandler> {
+public class MoveCollectionElementUpHandler extends DIParameterizedHandler<E4MoveCollectionElementUpHandler> {
 
     public MoveCollectionElementUpHandler() {
         super(E4MoveCollectionElementUpHandler.class);

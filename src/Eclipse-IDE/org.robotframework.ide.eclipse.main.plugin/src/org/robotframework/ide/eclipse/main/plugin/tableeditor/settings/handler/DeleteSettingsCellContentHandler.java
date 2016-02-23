@@ -5,15 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.E4DeleteCellContentHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteSettingsCellContentHandler.E4DeleteSettingsCellContentHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 
 import com.google.common.base.Optional;
 
-public class DeleteSettingsCellContentHandler extends DIHandler<E4DeleteSettingsCellContentHandler> {
+public class DeleteSettingsCellContentHandler extends DIParameterizedHandler<E4DeleteSettingsCellContentHandler> {
 
     public DeleteSettingsCellContentHandler() {
         super(E4DeleteSettingsCellContentHandler.class);

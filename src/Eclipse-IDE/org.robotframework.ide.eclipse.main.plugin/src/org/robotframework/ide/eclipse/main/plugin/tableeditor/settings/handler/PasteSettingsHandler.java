@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.Clipboard;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -21,11 +20,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteSettingsHandler.E4PasteSettingsHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Optional;
 
-public class PasteSettingsHandler extends DIHandler<E4PasteSettingsHandler> {
+public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettingsHandler> {
 
     public PasteSettingsHandler() {
         super(E4PasteSettingsHandler.class);

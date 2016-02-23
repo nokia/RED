@@ -11,12 +11,12 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteVariableMappingHandler.E4DeleteVariableMappingHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
 
@@ -24,7 +24,7 @@ import org.robotframework.red.viewers.Selections;
  * @author Michal Anglart
  *
  */
-public class DeleteVariableMappingHandler extends DIHandler<E4DeleteVariableMappingHandler> {
+public class DeleteVariableMappingHandler extends DIParameterizedHandler<E4DeleteVariableMappingHandler> {
 
     public DeleteVariableMappingHandler() {
         super(E4DeleteVariableMappingHandler.class);

@@ -12,14 +12,14 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.DeleteCollectionElementHandler.E4DeleteCollectionElementHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class DeleteCollectionElementHandler extends DIHandler<E4DeleteCollectionElementHandler> {
+public class DeleteCollectionElementHandler extends DIParameterizedHandler<E4DeleteCollectionElementHandler> {
 
     public DeleteCollectionElementHandler() {
         super(E4DeleteCollectionElementHandler.class);
