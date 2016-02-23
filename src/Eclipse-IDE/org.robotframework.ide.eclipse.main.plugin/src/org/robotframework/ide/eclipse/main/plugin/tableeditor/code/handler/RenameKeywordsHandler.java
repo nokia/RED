@@ -8,12 +8,12 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.RenameKeywordsHandler.E4RenameKeywordsHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class RenameKeywordsHandler extends DIHandler<E4RenameKeywordsHandler> {
+public class RenameKeywordsHandler extends DIParameterizedHandler<E4RenameKeywordsHandler> {
 
     public RenameKeywordsHandler() {
         super(E4RenameKeywordsHandler.class);

@@ -10,7 +10,6 @@ import java.util.List;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ViewerCell;
@@ -21,12 +20,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAcces
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertCellHandler.E4InsertCellHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Optional;
 
-public class InsertCellHandler extends DIHandler<E4InsertCellHandler> {
+public class InsertCellHandler extends DIParameterizedHandler<E4InsertCellHandler> {
 
     public InsertCellHandler() {
         super(E4InsertCellHandler.class);

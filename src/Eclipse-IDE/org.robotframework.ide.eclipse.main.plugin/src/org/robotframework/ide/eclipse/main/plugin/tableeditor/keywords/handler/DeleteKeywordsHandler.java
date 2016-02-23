@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -19,9 +18,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCom
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteKeywordsHandler.E4DeleteKeywordsHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class DeleteKeywordsHandler extends DIHandler<E4DeleteKeywordsHandler> {
+public class DeleteKeywordsHandler extends DIParameterizedHandler<E4DeleteKeywordsHandler> {
 
     public DeleteKeywordsHandler() {
         super(E4DeleteKeywordsHandler.class);

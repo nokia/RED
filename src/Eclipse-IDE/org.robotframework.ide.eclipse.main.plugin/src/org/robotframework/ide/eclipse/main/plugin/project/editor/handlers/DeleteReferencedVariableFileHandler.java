@@ -11,15 +11,15 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteReferencedVariableFileHandler.E4DeleteVariableFileHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class DeleteReferencedVariableFileHandler extends DIHandler<E4DeleteVariableFileHandler> {
+public class DeleteReferencedVariableFileHandler extends DIParameterizedHandler<E4DeleteVariableFileHandler> {
 
     public DeleteReferencedVariableFileHandler() {
         super(E4DeleteVariableFileHandler.class);

@@ -10,13 +10,13 @@ import javax.inject.Named;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ExcludeFolderForValidationHandler.E4ExcludeFolderForValidationHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class ExcludeFolderForValidationHandler extends DIHandler<E4ExcludeFolderForValidationHandler> {
+public class ExcludeFolderForValidationHandler extends DIParameterizedHandler<E4ExcludeFolderForValidationHandler> {
 
     public ExcludeFolderForValidationHandler() {
         super(E4ExcludeFolderForValidationHandler.class);

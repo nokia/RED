@@ -18,7 +18,6 @@ import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.ui.ISources;
 import org.rf.ide.core.execution.context.RobotDebugExecutableLineChecker;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -27,11 +26,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler.E4ToggleBreakpointHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 
 /**
  * @author Michal Anglart
  */
-public class ToggleBreakpointHandler extends DIHandler<E4ToggleBreakpointHandler> {
+public class ToggleBreakpointHandler extends DIParameterizedHandler<E4ToggleBreakpointHandler> {
 
     public ToggleBreakpointHandler() {
         super(E4ToggleBreakpointHandler.class);
