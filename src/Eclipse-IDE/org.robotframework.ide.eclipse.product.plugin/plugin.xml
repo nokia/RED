@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="org.robotframework.red"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.ui.ide.workbench" name="RED">
+            <property name="startupForegroundColor" value="000000" />
+            <property name="startupMessageRect" value="50,245,370,20" />
+            <property name="startupProgressRect" value="50,270,370,20" />
+            <property name="aboutImage" value="icons/about.bmp" />
+            <property name="aboutText" value="RED - Robot Editor&#x0D;
+&#x0D;
+Development environment for Robot Framework http://www.robotframework.org/&#x0D;
+&#x0D;
+(c) Copyright 2008-2016 Nokia Solutions and Networks.&#x0D;
+&#x0D;
+&#x0D;Eclipse and the Eclipse logo are trademarks of the Eclipse Foundation, Inc., https://www.eclipse.org/. 
+Oracle and Java are trademarks or registered trademarks of Oracle and/or its 
+affiliates. Other names may be trademarks of their respective owners.&#x0D;
+&#x0D;
+This product includes software developed by other open source projects.&#x0D;
+&#x0D;
+GitHub https://github.com/nokia/RED"/> 
+            <property name="windowImages"
+                value="icons/red_icon16.gif,icons/red_icon32.gif" />
+            <property name="preferenceCustomization" value="plugin_customization.ini"/>
+            <property name="applicationXMI" value="org.robotframework.ide.eclipse.product.plugin/red.e4xmi"/>
+            <property name="applicationCSSResources" value="platform:/plugin/org.eclipse.platform/images/"/>
+      </product>
+   </extension>
+</plugin>
