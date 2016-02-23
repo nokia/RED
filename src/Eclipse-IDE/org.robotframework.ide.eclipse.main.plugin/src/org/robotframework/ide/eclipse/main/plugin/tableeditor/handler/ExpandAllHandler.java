@@ -8,14 +8,14 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ExpandAllHandler.E4ExpandAllHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 
-public class ExpandAllHandler extends DIHandler<E4ExpandAllHandler> {
+public class ExpandAllHandler extends DIParameterizedHandler<E4ExpandAllHandler> {
 
     public ExpandAllHandler() {
         super(E4ExpandAllHandler.class);

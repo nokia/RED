@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -17,11 +16,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveKeywordCallUpCom
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveKeywordDefinitionUpCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.MoveKeywordsUpHandler.E4MoveKeywordUpHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Optional;
 
-public class MoveKeywordsUpHandler extends DIHandler<E4MoveKeywordUpHandler> {
+public class MoveKeywordsUpHandler extends DIParameterizedHandler<E4MoveKeywordUpHandler> {
 
     public MoveKeywordsUpHandler() {
         super(E4MoveKeywordUpHandler.class);

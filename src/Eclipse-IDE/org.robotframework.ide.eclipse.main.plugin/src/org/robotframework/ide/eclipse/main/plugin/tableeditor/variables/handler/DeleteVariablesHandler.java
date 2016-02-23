@@ -11,15 +11,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.DeleteVariablesHandler.E4DeleteVariableHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class DeleteVariablesHandler extends DIHandler<E4DeleteVariableHandler> {
+public class DeleteVariablesHandler extends DIParameterizedHandler<E4DeleteVariableHandler> {
 
     public DeleteVariablesHandler() {
         super(E4DeleteVariableHandler.class);

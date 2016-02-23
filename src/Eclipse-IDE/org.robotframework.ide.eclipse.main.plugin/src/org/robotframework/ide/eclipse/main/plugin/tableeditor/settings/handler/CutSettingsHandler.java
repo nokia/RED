@@ -10,7 +10,6 @@ import java.util.List;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.Transfer;
@@ -20,9 +19,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeyword
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CutSettingsHandler.E4CutSettingsHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class CutSettingsHandler extends DIHandler<E4CutSettingsHandler> {
+public class CutSettingsHandler extends DIParameterizedHandler<E4CutSettingsHandler> {
 
     public CutSettingsHandler() {
         super(E4CutSettingsHandler.class);

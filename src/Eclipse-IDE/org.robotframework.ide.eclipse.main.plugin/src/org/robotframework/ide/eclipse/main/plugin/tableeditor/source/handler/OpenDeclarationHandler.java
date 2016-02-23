@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
@@ -19,13 +18,14 @@ import org.eclipse.jface.text.source.SourceViewerConfiguration;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.OpenDeclarationHandler.E4OpenDeclarationHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 
 import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
  */
-public class OpenDeclarationHandler extends DIHandler<E4OpenDeclarationHandler> {
+public class OpenDeclarationHandler extends DIParameterizedHandler<E4OpenDeclarationHandler> {
 
     public OpenDeclarationHandler() {
         super(E4OpenDeclarationHandler.class);

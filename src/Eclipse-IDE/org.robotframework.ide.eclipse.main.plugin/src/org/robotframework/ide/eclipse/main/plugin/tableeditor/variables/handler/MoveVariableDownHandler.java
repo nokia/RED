@@ -9,15 +9,15 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.e4.tools.compat.parts.DIHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveVariableDownCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveVariableDownHandler.E4MoveVariableDownHandler;
+import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
-public class MoveVariableDownHandler extends DIHandler<E4MoveVariableDownHandler> {
+public class MoveVariableDownHandler extends DIParameterizedHandler<E4MoveVariableDownHandler> {
 
     public MoveVariableDownHandler() {
         super(E4MoveVariableDownHandler.class);
