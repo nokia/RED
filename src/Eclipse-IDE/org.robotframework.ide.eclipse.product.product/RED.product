@@ -69,8 +69,8 @@ limitations under the License.
       <feature id="org.eclipse.equinox.p2.user.ui"/>
       <feature id="org.eclipse.rcp"/>
       <feature id="org.eclipse.equinox.p2.extras.feature"/>
-      <feature id="org.robotframework.ide.eclipse.main.feature"/>
-      <feature id="org.robotframework.ide.eclipse.product.feature"/>
+      <feature id="org.robotframework.ide.eclipse.main.feature" version="1.0.0.qualifier"/>
+      <feature id="org.robotframework.ide.eclipse.product.feature" version="1.0.0.qualifier"/>
    </features>
 
    <configurations>
