@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="RED" uid="org.robotframework.red" id="org.robotframework.red" application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
+
+   <configIni use="default">
+   </configIni>
+
+   <launcherArgs>
+      <programArgs>--launcher.appendVmargs
+      </programArgs>
+      <vmArgs>-Xms512m
+-Xmx2g
+      </vmArgs>
+      <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
+      </vmArgsMac>
+   </launcherArgs>
+
+   <windowImages/>
+
+   <splash
+      location="org.robotframework.ide.eclipse.product.plugin" />
+   <launcher name="RED">
+      <linux icon="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon32_32.xpm"/>
+      <solaris/>
+      <win useIco="false">
+         <bmp
+            winSmallHigh="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon16_32.bmp"
+            winSmallLow="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon16_8.bmp"
+            winMediumHigh="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon32_32.bmp"
+            winMediumLow="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon32_8.bmp"
+            winLargeHigh="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon48_32.bmp"
+            winLargeLow="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon48_8.bmp"
+            winExtraLargeHigh="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon256_32.bmp"/>
+      </win>
+   </launcher>
+
+   <vm>
+   </vm>
+
+   <license>
+        <url>http://www.apache.org/licenses/LICENSE-2.0</url>
+        <text>
+   Copyright 2008-2016 Nokia Solutions and Networks
+
+Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+         </text>
+   </license>
+
+   <plugins>
+   </plugins>
+
+   <features>
+      <feature id="org.eclipse.e4.rcp"/>
+      <feature id="org.eclipse.platform"/>
+      <feature id="org.eclipse.help"/>
+      <feature id="org.eclipse.emf.ecore"/>
+      <feature id="org.eclipse.equinox.p2.core.feature"/>
+      <feature id="org.eclipse.emf.common"/>
+      <feature id="org.eclipse.equinox.p2.rcp.feature"/>
+      <feature id="org.eclipse.equinox.p2.user.ui"/>
+      <feature id="org.eclipse.rcp"/>
+      <feature id="org.eclipse.equinox.p2.extras.feature"/>
+      <feature id="org.robotframework.ide.eclipse.main.feature" version="1.0.0.qualifier"/>
+      <feature id="org.robotframework.ide.eclipse.product.feature" version="1.0.0.qualifier"/>
+   </features>
+
+   <configurations>
+      <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.common" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.ds" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.event" autoStart="true" startLevel="2" />
+      <plugin id="org.eclipse.equinox.p2.reconciler.dropins" autoStart="true" startLevel="0" />
+      <plugin id="org.eclipse.equinox.simpleconfigurator" autoStart="true" startLevel="1" />
+   </configurations>
+
+   <preferencesInfo>
+      <targetfile overwrite="false"/>
+   </preferencesInfo>
+
+   <cssInfo>
+   </cssInfo>
+
+</product>
