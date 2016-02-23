@@ -33,7 +33,12 @@
 									<file>mars.target</file>
 									<type>target</type>
 									<classifier>mars</classifier>
-								</artifact>								
+								</artifact>
+                                <artifact>
+                                    <file>neon.target</file>
+                                    <type>target</type>
+                                    <classifier>neon</classifier>
+                                </artifact>
 							</artifacts>
 						</configuration>
 					</execution>
