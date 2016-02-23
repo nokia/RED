@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>org.robotframework.ide.eclipse.product.plugin</artifactId>
+	<packaging>eclipse-plugin</packaging>
+	
+	<parent>
+    	<groupId>org.robotframework.ide.eclipse</groupId>
+    	<artifactId>org.robotframework.ide.eclipse.parent</artifactId>
+    	<version>1.0.0-SNAPSHOT</version>
+    	<relativePath>${project.basedir}/../org.robotframework.ide.eclipse.parent/pom.xml</relativePath>
+  	</parent>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>				
+				<executions>
+					<execution>
+						<id>copy-dependencies</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-dependencies</goal>
+						</goals>
+						<configuration>
+						   <includeScope>compile</includeScope>
+						   <includeTypes>jar</includeTypes>
+						   <outputDirectory>lib</outputDirectory>
+						   <overWriteIfNewer>true</overWriteIfNewer>
+						   <overWriteReleases>true</overWriteReleases>
+						   <overWriteSnapshots>true</overWriteSnapshots>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.6</version>
+				<executions>
+					<execution>
+						<id>clean-dependencies</id>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<configuration>
+							<filesets>
+								<fileset>
+									<directory>lib</directory>
+									<includes>
+										<include>**/*</include>
+									</includes>
+								</fileset>
+							</filesets>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+</project>
