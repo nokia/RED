@@ -357,7 +357,7 @@ public class KeywordCallArgumentsValidatorTest {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
                 .appendLine("*** Test Cases ***")
                 .appendLine("test")
-                .appendLine("    keyword    @{list}")
+                .appendLine("    keyword    @{variables}")
                 .build();
 
         final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
