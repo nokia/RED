@@ -562,27 +562,27 @@ public enum RobotTokenType implements IRobotTokenType {
         KEYWORDS;
     }
 
-    public List<RobotTokenType> getTypesForSettingsTable() {
+    public static List<RobotTokenType> getTypesForSettingsTable() {
         return getTypes(TableType.SETTINGS);
     }
 
-    public List<RobotTokenType> getTypesForVariablesTable() {
+    public static List<RobotTokenType> getTypesForVariablesTable() {
         return getTypes(TableType.VARIABLES);
     }
 
-    public List<RobotTokenType> getTypesForTestCasesTable() {
+    public static List<RobotTokenType> getTypesForTestCasesTable() {
         return getTypes(TableType.TEST_CASES);
     }
 
-    public List<RobotTokenType> getTypesForKeywordsTable() {
+    public static List<RobotTokenType> getTypesForKeywordsTable() {
         return getTypes(TableType.KEYWORDS);
     }
 
-    public List<RobotTokenType> getTypesNotStrictlyBelongs() {
+    public static List<RobotTokenType> getTypesNotStrictlyBelongs() {
         return getTypes(TableType.NOT_STRICTLY_BELONGS);
     }
 
-    private List<RobotTokenType> getTypes(final TableType type) {
+    private static List<RobotTokenType> getTypes(final TableType type) {
         return new ArrayList<>(TYPE_TO_TABLE.get(type));
     }
 
