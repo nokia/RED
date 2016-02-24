@@ -159,8 +159,10 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             final Argument potentialArgument = namesToArgs.get(name);
             if (potentialArgument != null) {
                 mapping.bind(potentialArgument, argToken);
-            } else {
+            } else if (descriptor.supportsKwargs()) {
                 mapping.bind(descriptor.getKwargArgument().get(), argToken);
+            } else {
+
             }
         }
         return mapping;
