@@ -7,8 +7,8 @@
       <product
             application="org.eclipse.ui.ide.workbench" name="RED">
             <property name="startupForegroundColor" value="000000" />
-            <property name="startupMessageRect" value="50,245,370,20" />
-            <property name="startupProgressRect" value="50,270,370,20" />
+            <property name="startupMessageRect" value="40,255,390,20" />
+            <property name="startupProgressRect" value="40,280,390,20" />
             <property name="aboutImage" value="icons/about.bmp" />
             <property name="aboutText" value="RED - Robot Editor&#x0D;
 &#x0D;Development environment for Robot Framework http://www.robotframework.org/&#x0D;
