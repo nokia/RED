@@ -26,7 +26,7 @@ public enum ArgumentProblem implements IProblemCause {
     POSITIONAL_ARGUMENT_AFTER_NAMED {
         @Override
         public String getProblemDescription() {
-            return "Positional argument cannot be used after named arguments";
+            return "Positional argument cannot be used after named arguments%s";
         }
     },
     MULTIPLE_MATCH_TO_SINGLE_ARG {

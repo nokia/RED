@@ -116,7 +116,16 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
             if (!isPositional(arg, argumentNames)) {
                 thereWasNamedArgumentAlready = true;
             } else if (thereWasNamedArgumentAlready) {
-                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.POSITIONAL_ARGUMENT_AFTER_NAMED);
+                final String additionalMsg;
+                if (arg.getText().contains("=")) {
+                    final String argName = Splitter.on('=').limit(2).splitToList(arg.getText()).get(0).trim();
+                    additionalMsg = ". Although this argument looks like named one, it isn't because there is no '"
+                            + argName + "' argument in the keyword definition";
+                } else {
+                    additionalMsg = "";
+                }
+                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.POSITIONAL_ARGUMENT_AFTER_NAMED)
+                        .formatMessageWith(additionalMsg);
                 reporter.handleProblem(problem, file, arg);
                 thereIsAMessInOrder = true;
             }
