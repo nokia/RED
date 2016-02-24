@@ -14,7 +14,6 @@ import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 @SuppressWarnings("PMD.GodClass")
 public class ParsingStateHelper {
 
@@ -23,15 +22,13 @@ public class ParsingStateHelper {
         boolean result = false;
 
         List<RobotTokenType> typesForState = new ArrayList<>();
-        if (state == ParsingState.TEST_CASE_TABLE_INSIDE
-                || state == ParsingState.TEST_CASE_DECLARATION) {
+        if (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION) {
             typesForState = robotType.getTypesForTestCasesTable();
         } else if (state == ParsingState.SETTING_TABLE_INSIDE) {
             typesForState = robotType.getTypesForSettingsTable();
         } else if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
             typesForState = robotType.getTypesForVariablesTable();
-        } else if (state == ParsingState.KEYWORD_TABLE_INSIDE
-                || state == ParsingState.KEYWORD_DECLARATION) {
+        } else if (state == ParsingState.KEYWORD_TABLE_INSIDE || state == ParsingState.KEYWORD_DECLARATION) {
             typesForState = robotType.getTypesForKeywordsTable();
         }
 
@@ -44,11 +41,10 @@ public class ParsingStateHelper {
         }
 
         if (!result) {
-            if (state == ParsingState.TEST_CASE_DECLARATION
-                    || state == ParsingState.KEYWORD_DECLARATION
+            if (state == ParsingState.TEST_CASE_DECLARATION || state == ParsingState.KEYWORD_DECLARATION
                     || state == ParsingState.UNKNOWN) {
-                result = (types.contains(RobotTokenType.START_HASH_COMMENT) || types
-                        .contains(RobotTokenType.COMMENT_CONTINUE));
+                result = (types.contains(RobotTokenType.START_HASH_COMMENT)
+                        || types.contains(RobotTokenType.COMMENT_CONTINUE));
 
             }
         }
@@ -56,9 +52,7 @@ public class ParsingStateHelper {
         return result;
     }
 
-
-    public ParsingState findNearestNotCommentState(
-            final Stack<ParsingState> processingState) {
+    public ParsingState findNearestNotCommentState(final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.UNKNOWN;
         for (final ParsingState s : processingState) {
             if (s != ParsingState.COMMENT) {
@@ -68,12 +62,10 @@ public class ParsingStateHelper {
         return state;
     }
 
-
-    public void updateStatusesForNewLine(
-            final Stack<ParsingState> processingState) {
+    public void updateStatusesForNewLine(final Stack<ParsingState> processingState) {
 
         boolean clean = true;
-        while(clean) {
+        while (clean) {
             final ParsingState status = getCurrentStatus(processingState);
             if (isTableHeader(status)) {
                 processingState.pop();
@@ -102,22 +94,19 @@ public class ParsingStateHelper {
         }
     }
 
-
     public boolean isTestCaseExecution(final ParsingState status) {
         return (status == ParsingState.TEST_CASE_DECLARATION);
     }
-
 
     public boolean isKeywordExecution(final ParsingState status) {
         return (status == ParsingState.KEYWORD_DECLARATION);
     }
 
-
     public boolean isTableInsideStateInHierarchy(ParsingState state) {
         boolean result = false;
         if (!isTableInsideState(state)) {
             ParsingState parent = null;
-            while((parent = state.getPreviousState()) != null) {
+            while ((parent = state.getPreviousState()) != null) {
                 if (isTableInsideState(parent)) {
                     result = true;
                     break;
@@ -132,38 +121,27 @@ public class ParsingStateHelper {
         return result;
     }
 
-
     public boolean isTableState(final ParsingState state) {
-        return state == ParsingState.TEST_CASE_TABLE_HEADER
-                || state == ParsingState.SETTING_TABLE_HEADER
-                || state == ParsingState.VARIABLE_TABLE_HEADER
-                || state == ParsingState.KEYWORD_TABLE_HEADER;
+        return state == ParsingState.TEST_CASE_TABLE_HEADER || state == ParsingState.SETTING_TABLE_HEADER
+                || state == ParsingState.VARIABLE_TABLE_HEADER || state == ParsingState.KEYWORD_TABLE_HEADER;
     }
-
 
     public boolean isTableInsideState(final ParsingState state) {
-        return state == ParsingState.SETTING_TABLE_INSIDE
-                || state == ParsingState.TEST_CASE_TABLE_INSIDE
-                || state == ParsingState.KEYWORD_TABLE_INSIDE
-                || state == ParsingState.VARIABLE_TABLE_INSIDE;
+        return state == ParsingState.SETTING_TABLE_INSIDE || state == ParsingState.TEST_CASE_TABLE_INSIDE
+                || state == ParsingState.KEYWORD_TABLE_INSIDE || state == ParsingState.VARIABLE_TABLE_INSIDE;
     }
-
 
     public boolean isTableHeader(final ParsingState state) {
         boolean result = false;
-        if (state == ParsingState.SETTING_TABLE_HEADER
-                || state == ParsingState.VARIABLE_TABLE_HEADER
-                || state == ParsingState.TEST_CASE_TABLE_HEADER
-                || state == ParsingState.KEYWORD_TABLE_HEADER) {
+        if (state == ParsingState.SETTING_TABLE_HEADER || state == ParsingState.VARIABLE_TABLE_HEADER
+                || state == ParsingState.TEST_CASE_TABLE_HEADER || state == ParsingState.KEYWORD_TABLE_HEADER) {
             result = true;
         }
 
         return result;
     }
 
-
-    public ParsingState getCurrentStatus(
-            final Stack<ParsingState> processingState) {
+    public ParsingState getCurrentStatus(final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.UNKNOWN;
 
         if (!processingState.isEmpty()) {
@@ -172,7 +150,6 @@ public class ParsingStateHelper {
 
         return state;
     }
-
 
     public ParsingState getStatus(final RobotToken t) {
         ParsingState status = ParsingState.UNKNOWN;
@@ -190,9 +167,7 @@ public class ParsingStateHelper {
         return status;
     }
 
-
-    public ParsingState getNearestTableHeaderState(
-            final Stack<ParsingState> processingState) {
+    public ParsingState getNearestTableHeaderState(final Stack<ParsingState> processingState) {
         ParsingState state = ParsingState.UNKNOWN;
         for (final ParsingState s : processingState) {
             if (isTableState(s)) {
