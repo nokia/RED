@@ -295,6 +295,9 @@ public enum RobotTokenType implements IRobotTokenType {
     SETTING_TEST_TIMEOUT_MESSAGE(TableType.SETTINGS),
     /**
      */
+    VARIABLES_WRONG_DEFINED(TableType.VARIABLES, true),
+    /**
+     */
     VARIABLES_SCALAR_DECLARATION(TableType.VARIABLES, true),
     /**
      */
