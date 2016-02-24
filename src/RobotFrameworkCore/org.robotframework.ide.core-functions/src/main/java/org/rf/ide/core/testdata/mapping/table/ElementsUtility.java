@@ -102,6 +102,29 @@ public class ElementsUtility {
                     }
 
                     if (correct == null) {
+                        if (state == ParsingState.KEYWORD_INSIDE_ACTION && tokensExactlyOnPosition.size() == 1) {
+                            RobotToken exactlyOne = tokensExactlyOnPosition.get(0);
+                            final List<RobotTokenType> typesForVariablesTable = RobotTokenType
+                                    .getTypesForVariablesTable();
+                            boolean isVarDec = false;
+                            for (final IRobotTokenType type : exactlyOne.getTypes()) {
+                                if (type instanceof RobotTokenType) {
+                                    RobotTokenType tokenType = (RobotTokenType) type;
+                                    if (typesForVariablesTable.contains(tokenType)
+                                            && tokenType.isSettingDeclaration()) {
+                                        isVarDec = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (isVarDec) {
+                                correct = exactlyOne;
+                            }
+                        }
+                    }
+
+                    if (correct == null) {
                         if (ParsingState.getSettingsStates().contains(state) || currentTable == TableType.VARIABLES
                                 || currentTable == TableType.KEYWORD || currentTable == TableType.TEST_CASE
                                 || state == ParsingState.COMMENT) {
@@ -415,8 +438,8 @@ public class ElementsUtility {
 
                     result = result && lineTokenInfo.getDataEndIndex() >= separator.getCurrentElementIndex();
                 } else if (tableType == TableType.TEST_CASE || tableType == TableType.KEYWORD) {
-                    if (line.getLineElements().size() >= 2
-                            || (line.getLineElements().size() == 1 && separator instanceof StrictTsvTabulatorSeparator)) {
+                    if (line.getLineElements().size() >= 2 || (line.getLineElements().size() == 1
+                            && separator instanceof StrictTsvTabulatorSeparator)) {
                         if (isContinoue) {
                             result = lineTokenInfo.getDataStartIndex() <= separator.getCurrentElementIndex();
                         } else {
@@ -434,8 +457,8 @@ public class ElementsUtility {
                                  * </pre>
                                  */
                                 if (shouldTreatAsInlineContinue(lineTokenInfo)) {
-                                    result = separator.getCurrentElementIndex() > lineTokenInfo.getPositionsOfLineContinoue()
-                                            .get(0)
+                                    result = separator.getCurrentElementIndex() > lineTokenInfo
+                                            .getPositionsOfLineContinoue().get(0)
                                             || separator.getCurrentElementIndex() < lineTokenInfo.getDataStartIndex();
                                 } else {
                                     result = true;
@@ -445,7 +468,8 @@ public class ElementsUtility {
                                 final ForDescriptorInfo forInfo = ForDescriptorInfo.build(splittedLine);
                                 if (forInfo.getForStartIndex() > -1) {
                                     if (forInfo.getForLineContinueInlineIndex() > -1) {
-                                        result = (separator.getCurrentElementIndex() > forInfo.getForLineContinueInlineIndex());
+                                        result = (separator.getCurrentElementIndex() > forInfo
+                                                .getForLineContinueInlineIndex());
                                     } else {
                                         result = true;
                                     }
