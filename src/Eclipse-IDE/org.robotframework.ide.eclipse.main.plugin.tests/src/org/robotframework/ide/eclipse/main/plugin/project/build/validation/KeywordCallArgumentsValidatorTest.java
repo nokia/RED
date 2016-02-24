@@ -367,7 +367,7 @@ public class KeywordCallArgumentsValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS, new ProblemPosition(3, Range.closed(39, 46))));
+                ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS, new ProblemPosition(3, Range.closed(39, 51))));
     }
 
     private void validate(final RobotSuiteFile file, final DefiningTokenWithArgumentTokens tokens,
