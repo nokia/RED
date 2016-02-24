@@ -35,22 +35,24 @@ public class CommonVariableHelper {
     }
 
     public void extractVariableAssignmentPart(final RobotLine line, final Stack<ParsingState> state) {
-        final List<IRobotLineElement> lineElements = line.getLineElements();
-        boolean wasNotVariableElement = false;
-        for (int elementIndex = 0; elementIndex < lineElements.size(); elementIndex++) {
-            final IRobotLineElement element = lineElements.get(elementIndex);
-            if (element instanceof RobotToken) {
-                final RobotToken token = (RobotToken) element;
-                if (isVariable(token) && !wasNotVariableElement) {
-                    final String variableText = token.getRaw().toString();
-                    final RobotToken assignment = extractAssignmentPart(token.getFilePosition(), variableText);
-                    if (!assignment.getFilePosition().isNotSet()) {
-                        final String variable = variableText.substring(0,
-                                assignment.getStartColumn() - token.getStartColumn());
-                        token.setText(variable);
-                        token.setRaw(variable);
-                        line.addLineElementAt(elementIndex + 1, assignment);
-                        elementIndex++;
+        if (stateHelper.getCurrentStatus(state) != ParsingState.KEYWORD_SETTING_ARGUMENTS_ARGUMENT_VALUE) {
+            final List<IRobotLineElement> lineElements = line.getLineElements();
+            boolean wasNotVariableElement = false;
+            for (int elementIndex = 0; elementIndex < lineElements.size(); elementIndex++) {
+                final IRobotLineElement element = lineElements.get(elementIndex);
+                if (element instanceof RobotToken) {
+                    final RobotToken token = (RobotToken) element;
+                    if (isVariable(token) && !wasNotVariableElement) {
+                        final String variableText = token.getRaw().toString();
+                        final RobotToken assignment = extractAssignmentPart(token.getFilePosition(), variableText);
+                        if (!assignment.getFilePosition().isNotSet()) {
+                            final String variable = variableText.substring(0,
+                                    assignment.getStartColumn() - token.getStartColumn());
+                            token.setText(variable);
+                            token.setRaw(variable);
+                            line.addLineElementAt(elementIndex + 1, assignment);
+                            elementIndex++;
+                        }
                     }
                 }
             }
