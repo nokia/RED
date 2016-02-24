@@ -102,7 +102,9 @@ public class ElementsUtility {
                     }
 
                     if (correct == null) {
-                        if (state == ParsingState.KEYWORD_INSIDE_ACTION && tokensExactlyOnPosition.size() == 1) {
+                        if ((state == ParsingState.KEYWORD_INSIDE_ACTION
+                                || state == ParsingState.TEST_CASE_INSIDE_ACTION)
+                                && tokensExactlyOnPosition.size() == 1) {
                             RobotToken exactlyOne = tokensExactlyOnPosition.get(0);
                             final List<RobotTokenType> typesForVariablesTable = RobotTokenType
                                     .getTypesForVariablesTable();
