@@ -222,27 +222,29 @@ public class ElementsUtility {
                 // FIXME: decide what to do
 
                 newRobotToken.getTypes().addAll(token.getTypes());
-                final List<RobotTokenType> typesForVariablesTable = RobotTokenType.getTypesForVariablesTable();
-                for (final IRobotTokenType type : token.getTypes()) {
-                    if (type instanceof RobotTokenType) {
-                        RobotTokenType tokenType = (RobotTokenType) type;
-                        if (typesForVariablesTable.contains(tokenType) && tokenType.isSettingDeclaration()) {
-                            boolean notValidVar = true;
-                            if (!correctVariables.isEmpty()) {
-                                VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
-                                for (final VariableDeclaration vd : correctVariables) {
-                                    if (typeByTokenType.getIdentificator()
-                                            .equals(vd.getTypeIdentificator().getText())) {
-                                        notValidVar = false;
-                                        break;
+                if (state.getTable() != TableType.VARIABLES) {
+                    final List<RobotTokenType> typesForVariablesTable = RobotTokenType.getTypesForVariablesTable();
+                    for (final IRobotTokenType type : token.getTypes()) {
+                        if (type instanceof RobotTokenType) {
+                            RobotTokenType tokenType = (RobotTokenType) type;
+                            if (typesForVariablesTable.contains(tokenType) && tokenType.isSettingDeclaration()) {
+                                boolean notValidVar = true;
+                                if (!correctVariables.isEmpty()) {
+                                    VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
+                                    for (final VariableDeclaration vd : correctVariables) {
+                                        if (typeByTokenType.getIdentificator()
+                                                .equals(vd.getTypeIdentificator().getText())) {
+                                            notValidVar = false;
+                                            break;
+                                        }
                                     }
                                 }
-                            }
 
-                            if (notValidVar) {
-                                newRobotToken.getTypes().remove(type);
-                                if (!newRobotToken.getTypes().contains(RobotTokenType.VARIABLES_WRONG_DEFINED)) {
-                                    newRobotToken.getTypes().add(RobotTokenType.VARIABLES_WRONG_DEFINED);
+                                if (notValidVar) {
+                                    newRobotToken.getTypes().remove(type);
+                                    if (!newRobotToken.getTypes().contains(RobotTokenType.VARIABLES_WRONG_DEFINED)) {
+                                        newRobotToken.getTypes().add(RobotTokenType.VARIABLES_WRONG_DEFINED);
+                                    }
                                 }
                             }
                         }
