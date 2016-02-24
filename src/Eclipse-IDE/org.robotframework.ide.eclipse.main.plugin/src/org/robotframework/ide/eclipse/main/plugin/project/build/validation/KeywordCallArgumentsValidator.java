@@ -5,7 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.tryFind;
+import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -79,7 +81,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         final Range<Integer> expectedArgsNumber = descriptor.getPossibleNumberOfArguments();
         final int actual = arguments.size();
         if (!expectedArgsNumber.contains(actual)) {
-            if (!listIsPassed()) {
+            if (!listIsPassed() && !dictIsPassed()) {
                 final String additional = String.format("Keyword '%s' expects " + getRangesInfo(expectedArgsNumber)
                         + ", but %d " + toBeInProperForm(actual) + " provided", definingToken.getText(), actual);
 
@@ -92,11 +94,20 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         return true;
     }
 
+    private boolean dictIsPassed() {
+        return hasTokenOfType(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
+    }
+
     private boolean listIsPassed() {
+        return hasTokenOfType(RobotTokenType.VARIABLES_LIST_DECLARATION);
+    }
+
+    private boolean hasTokenOfType(final RobotTokenType type) {
         return tryFind(arguments, new Predicate<RobotToken>() {
+
             @Override
             public boolean apply(final RobotToken argToken) {
-                return argToken.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION);
+                return argToken.getTypes().contains(type);
             }
         }).isPresent();
     }
@@ -170,9 +181,19 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                 mapping.bind(potentialArgument, argToken);
             } else if (descriptor.supportsKwargs()) {
                 mapping.bind(descriptor.getKwargArgument().get(), argToken);
-            } else {
-
+            } else if (i < descriptor.size()) {
+                mapping.bind(descriptor.get(i), argToken);
+                i++;
             }
+        }
+
+        while (i < descriptor.size()) {
+            if (!named.isEmpty() && named.get(named.size() - 1)
+                    .getTypes()
+                    .contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)) {
+                mapping.bind(descriptor.get(i), named.get(named.size() - 1));
+            }
+            i++;
         }
         return mapping;
     }
@@ -207,9 +228,35 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
         for (final RobotToken useSiteArg : arguments) {
             final List<Argument> defs = argsMapping.getUsageMapping(useSiteArg);
-            if (useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION) && defs.size() > 1) {
+            if (useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION) && !defs.isEmpty()) {
+                final List<Argument> required = newArrayList(filter(defs, new Predicate<Argument>() {
+                    @Override
+                    public boolean apply(final Argument arg) {
+                        return arg.isRequired();
+                    }
+                }));
+                if (required.isEmpty()) {
+                    return;
+                }
                 final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS)
-                        .formatMessageWith(useSiteArg.getText(), defs.size(), "[" + Joiner.on(", ").join(defs) + "]");
+                        .formatMessageWith(useSiteArg.getText(), required.size(),
+                                "[" + Joiner.on(", ").join(required) + "]");
+                reporter.handleProblem(problem, file, useSiteArg);
+            } else if (useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)
+                    && !defs.isEmpty()) {
+                final List<Argument> required = newArrayList(filter(defs, new Predicate<Argument>() {
+
+                    @Override
+                    public boolean apply(final Argument arg) {
+                        return arg.isRequired();
+                    }
+                }));
+                if (required.isEmpty()) {
+                    return;
+                }
+                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.DICT_ARGUMENT_SHOULD_PROVIDE_ARGS)
+                        .formatMessageWith(useSiteArg.getText(), required.size(),
+                                "[" + Joiner.on(", ").join(required) + "]");
                 reporter.handleProblem(problem, file, useSiteArg);
             }
         }
