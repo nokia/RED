@@ -101,10 +101,15 @@ public class ElementsUtility {
                         }
                     }
 
-                    if (correct == null) {
-                        if ((state == ParsingState.KEYWORD_INSIDE_ACTION
-                                || state == ParsingState.TEST_CASE_INSIDE_ACTION)
-                                && tokensExactlyOnPosition.size() == 1) {
+                    TableType tableType = state.getTable();
+                    if (correct == null && (tableType == TableType.KEYWORD || tableType == TableType.TEST_CASE)) {
+                        final ParsingState expected;
+                        if (tableType == TableType.KEYWORD) {
+                            expected = ParsingState.KEYWORD_DECLARATION;
+                        } else {
+                            expected = ParsingState.TEST_CASE_DECLARATION;
+                        }
+                        if (meatsState(state, expected) && tokensExactlyOnPosition.size() == 1) {
                             RobotToken exactlyOne = tokensExactlyOnPosition.get(0);
                             final List<RobotTokenType> typesForVariablesTable = RobotTokenType
                                     .getTypesForVariablesTable();
@@ -227,6 +232,21 @@ public class ElementsUtility {
         }
 
         return correct;
+    }
+
+    private boolean meatsState(final ParsingState state, final ParsingState expected) {
+        boolean result = false;
+        ParsingState currentState = state;
+        while (currentState.getPreviousState() != null) {
+            if (currentState.getPreviousState() == expected) {
+                result = true;
+                break;
+            } else {
+                currentState = currentState.getPreviousState();
+            }
+        }
+
+        return result;
     }
 
     private List<RobotToken> getTokensExactlyOnPosition(final List<RobotToken> robotTokens,
