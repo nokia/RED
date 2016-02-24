@@ -178,7 +178,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
     private RobotDefinitionSetting findSetting(final String name) {
         for (final RobotKeywordCall call : getChildren()) {
-            if (call instanceof RobotDefinitionSetting && call.getName().equals(name)) {
+            if (call instanceof RobotDefinitionSetting && call.getName().equalsIgnoreCase(name)) {
                 return (RobotDefinitionSetting) call;
             }
         }
