@@ -370,6 +370,56 @@ public class KeywordCallArgumentsValidatorTest {
                 ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS, new ProblemPosition(3, Range.closed(39, 51))));
     }
 
+    @Test
+    public void warningIsReported_whenListIsUsedInOrderToProvideMultipleArguments_2() {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    ${a}=    keyword    @{variables}")
+                .build();
+
+        final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
+        final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x", "y");
+
+        validate(file, tokens, descriptor);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
+                ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS, new ProblemPosition(3, Range.closed(48, 60))));
+    }
+    
+    @Test
+    public void nothingIsReported_whenSomethingWhichSeemToBeAListIsUsed() {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    keyword    @{b")
+                .build();
+
+        final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
+        final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x");
+
+        validate(file, tokens, descriptor);
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+    
+    @Test
+    public void nothingIsReported_whenSomethingWhichSeemToBeADictionaryIsUsed() {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("test")
+                .appendLine("    keyword    &{b")
+                .build();
+
+        final DefiningTokenWithArgumentTokens tokens = getKeywordCallTokensFromFirstLineOf(file, "test");
+        final ArgumentsDescriptor descriptor = ArgumentsDescriptor.createDescriptor("x");
+
+        validate(file, tokens, descriptor);
+
+        assertThat(reporter.getReportedProblems()).isEmpty();
+    }
+
     private void validate(final RobotSuiteFile file, final DefiningTokenWithArgumentTokens tokens,
             final ArgumentsDescriptor descriptor) {
         final KeywordCallArgumentsValidator validator = new KeywordCallArgumentsValidator(file.getFile(),
@@ -384,7 +434,7 @@ public class KeywordCallArgumentsValidatorTest {
         final RobotExecutableRow<TestCase> executable = testCase.getLinkedElement().getTestExecutionRows().get(0);
         final IExecutableRowDescriptor<?> executableRowDescriptor = executable.buildLineDescription();
         return new DefiningTokenWithArgumentTokens(executableRowDescriptor.getAction().getToken(),
-                executable.getArguments());
+                executableRowDescriptor.getKeywordArguments());
     }
 
     private static class DefiningTokenWithArgumentTokens {
