@@ -559,6 +559,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                 if (positionResolvers.isCorrectPosition(PositionExpected.TABLE_HEADER, fileModel, currentLine,
                         robotToken) && isCorrectTableHeader(robotToken)) {
                     if (wasRecognizedCorrectly) {
+                        robotToken.getTypes().remove(RobotTokenType.UNKNOWN);
                         @SuppressWarnings("rawtypes")
                         final TableHeader<?> header = new TableHeader(robotToken);
                         ARobotSectionTable table = null;
@@ -590,6 +591,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                         robotToken)) {
                     // FIXME: add warning about user trash table
                     robotToken.getTypes().add(0, RobotTokenType.USER_OWN_TABLE_HEADER);
+                    robotToken.getTypes().remove(RobotTokenType.UNKNOWN);
                     processingState.clear();
                     processingState.push(ParsingState.TRASH);
 

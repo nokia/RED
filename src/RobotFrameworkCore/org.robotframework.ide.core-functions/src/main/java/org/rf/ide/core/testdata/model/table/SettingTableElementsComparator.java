@@ -11,11 +11,10 @@ import java.util.Map;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 
-
-public class SettingTableElementsComparator extends
-        AModelTypeComparator<AModelElement<SettingTable>> {
+public class SettingTableElementsComparator extends AModelTypeComparator<AModelElement<SettingTable>> {
 
     private final static Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
+
     static {
         int startPosition = 1;
         POSITION.put(ModelType.SUITE_DOCUMENTATION, startPosition);
@@ -30,9 +29,9 @@ public class SettingTableElementsComparator extends
         POSITION.put(ModelType.METADATA_SETTING, ++startPosition);
         POSITION.put(ModelType.LIBRARY_IMPORT_SETTING, ++startPosition);
         POSITION.put(ModelType.RESOURCE_IMPORT_SETTING, ++startPosition);
-        POSITION.put(ModelType.RESOURCE_IMPORT_SETTING, ++startPosition);
+        POSITION.put(ModelType.VARIABLES_IMPORT_SETTING, ++startPosition);
+        POSITION.put(ModelType.SETTINGS_UNKNOWN, ++startPosition);
     }
-
 
     public SettingTableElementsComparator() {
         super(POSITION);
