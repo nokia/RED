@@ -119,8 +119,10 @@ public class ElementsUtility {
                                     RobotTokenType tokenType = (RobotTokenType) type;
                                     if (typesForVariablesTable.contains(tokenType)
                                             && tokenType.isSettingDeclaration()) {
-                                        isVarDec = true;
-                                        break;
+                                        if (text.trim().endsWith("}")) {
+                                            isVarDec = true;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -214,15 +216,17 @@ public class ElementsUtility {
         }
 
         boolean hasAnyProposalVariableInside = false;
-        for (final RobotToken rt : robotTokens) {
-            final List<IRobotTokenType> types = rt.getTypes();
-            for (final IRobotTokenType type : types) {
-                if (type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION
-                        || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
-                        || type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
-                        || type == RobotTokenType.VARIABLES_LIST_DECLARATION) {
-                    hasAnyProposalVariableInside = true;
-                    break;
+        if (text.trim().endsWith("}")) {
+            for (final RobotToken rt : robotTokens) {
+                final List<IRobotTokenType> types = rt.getTypes();
+                for (final IRobotTokenType type : types) {
+                    if (type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION
+                            || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
+                            || type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
+                            || type == RobotTokenType.VARIABLES_LIST_DECLARATION) {
+                        hasAnyProposalVariableInside = true;
+                        break;
+                    }
                 }
             }
         }
