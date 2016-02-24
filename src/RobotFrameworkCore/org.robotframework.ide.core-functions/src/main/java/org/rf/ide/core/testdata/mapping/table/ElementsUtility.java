@@ -18,8 +18,11 @@ import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.ECompareResult;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.exec.descs.ForDescriptorInfo;
+import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
@@ -38,8 +41,11 @@ public class ElementsUtility {
 
     private final ParsingStateHelper parsingStateHelper;
 
+    private final VariableExtractor varExtractor;
+
     public ElementsUtility() {
         this.parsingStateHelper = new ParsingStateHelper();
+        this.varExtractor = new VariableExtractor();
     }
 
     public boolean isNewExecutableSection(final ALineSeparator separator, final RobotLine line) {
@@ -76,6 +82,10 @@ public class ElementsUtility {
         final ParsingState state = parsingStateHelper.getCurrentStatus(processingState);
 
         RobotToken correct = null;
+
+        List<VariableDeclaration> correctVariables = varExtractor.extract(FilePosition.createNotSet(), text, "fake")
+                .getCorrectVariables();
+
         if (robotTokens.size() > 1) {
             final List<RobotToken> tokensExactlyOnPosition = getTokensExactlyOnPosition(robotTokens, fp);
             final TableType currentTable = state.getTable();
@@ -119,9 +129,13 @@ public class ElementsUtility {
                                     RobotTokenType tokenType = (RobotTokenType) type;
                                     if (typesForVariablesTable.contains(tokenType)
                                             && tokenType.isSettingDeclaration()) {
-                                        if (text.trim().endsWith("}")) {
-                                            isVarDec = true;
-                                            break;
+                                        if (!correctVariables.isEmpty()) {
+                                            VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
+                                            if (typeByTokenType.getIdentificator()
+                                                    .equals(correctVariables.get(0).getTypeIdentificator().getText())) {
+                                                isVarDec = true;
+                                                break;
+                                            }
                                         }
                                     }
                                 }
@@ -216,16 +230,21 @@ public class ElementsUtility {
         }
 
         boolean hasAnyProposalVariableInside = false;
-        if (text.trim().endsWith("}")) {
-            for (final RobotToken rt : robotTokens) {
-                final List<IRobotTokenType> types = rt.getTypes();
-                for (final IRobotTokenType type : types) {
-                    if (type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION
-                            || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
-                            || type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
-                            || type == RobotTokenType.VARIABLES_LIST_DECLARATION) {
-                        hasAnyProposalVariableInside = true;
-                        break;
+
+        for (final RobotToken rt : robotTokens) {
+            final List<IRobotTokenType> types = rt.getTypes();
+            for (final IRobotTokenType type : types) {
+                if (type == RobotTokenType.VARIABLES_DICTIONARY_DECLARATION
+                        || type == RobotTokenType.VARIABLES_SCALAR_AS_LIST_DECLARATION
+                        || type == RobotTokenType.VARIABLES_SCALAR_DECLARATION
+                        || type == RobotTokenType.VARIABLES_LIST_DECLARATION) {
+                    if (!correctVariables.isEmpty()) {
+                        VariableType typeByTokenType = VariableType.getTypeByTokenType(type);
+                        if (typeByTokenType.getIdentificator()
+                                .equals(correctVariables.get(0).getTypeIdentificator().getText())) {
+                            hasAnyProposalVariableInside = true;
+                            break;
+                        }
                     }
                 }
             }
