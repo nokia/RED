@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.IVariableType;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
 public class MappingResult {
@@ -69,11 +70,18 @@ public class MappingResult {
 
     public boolean isOnlyPossibleCollectionVariable() {
         boolean result = false;
-        if (mappedElements.size() == 1 && correctVariables.size() == 1) {
-            VariableType robotType = correctVariables.get(0).getRobotType();
-            if (robotType == VariableType.DICTIONARY || robotType == VariableType.LIST
-                    || robotType == VariableType.SCALAR || robotType == VariableType.SCALAR_AS_LIST) {
-                result = !isCollectionVariableElementGet();
+        if (mappedElements.size() == 1) {
+            IElementDeclaration elemDec = mappedElements.get(0);
+            if (elemDec instanceof VariableDeclaration) {
+                VariableDeclaration varDec = (VariableDeclaration) elemDec;
+                VariableType robotType = varDec.getRobotType();
+                if (robotType == VariableType.DICTIONARY || robotType == VariableType.LIST
+                        || robotType == VariableType.SCALAR || robotType == VariableType.SCALAR_AS_LIST) {
+                    IVariableType extractorVariableType = varDec.getVariableType();
+                    result = !isCollectionVariableElementGet()
+                            && (extractorVariableType == VariableDeclaration.GeneralVariableType.NORMAL_TEXT
+                                    || extractorVariableType == VariableDeclaration.GeneralVariableType.DYNAMIC);
+                }
             }
         }
 
