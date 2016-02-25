@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 
 public class MappingResult {
 
@@ -80,16 +81,19 @@ public class MappingResult {
 
             if (mappedElements.get(0) instanceof VariableDeclaration
                     && mappedElements.get(1) instanceof IndexDeclaration) {
-                int indexElementsNumber = 0;
-                for (final IElementDeclaration dec : elems) {
-                    if (dec instanceof IndexDeclaration) {
-                        indexElementsNumber = 1;
-                        break;
+                VariableDeclaration varDec = (VariableDeclaration) mappedElements.get(0);
+                if (varDec.getRobotType() != VariableType.ENVIRONMENT) {
+                    int indexElementsNumber = 0;
+                    for (final IElementDeclaration dec : elems) {
+                        if (dec instanceof IndexDeclaration) {
+                            indexElementsNumber = 1;
+                            break;
+                        }
                     }
-                }
 
-                if (indexElementsNumber == 0) {
-                    result = true;
+                    if (indexElementsNumber == 0) {
+                        result = true;
+                    }
                 }
             }
         }
