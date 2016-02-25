@@ -67,6 +67,19 @@ public class MappingResult {
         return Collections.unmodifiableList(mappedElements);
     }
 
+    public boolean isOnlyPossibleCollectionVariable() {
+        boolean result = false;
+        if (mappedElements.size() == 1 && correctVariables.size() == 1) {
+            VariableType robotType = correctVariables.get(0).getRobotType();
+            if (robotType == VariableType.DICTIONARY || robotType == VariableType.LIST
+                    || robotType == VariableType.SCALAR || robotType == VariableType.SCALAR_AS_LIST) {
+                result = !isCollectionVariableElementGet();
+            }
+        }
+
+        return result;
+    }
+
     public boolean isCollectionVariableElementGet() {
         boolean result = false;
         if (mappedElements.size() == 2) {
@@ -87,6 +100,22 @@ public class MappingResult {
                     }
 
                     if (indexElementsNumber == 0) {
+                        result = true;
+                    }
+                }
+            }
+        } else if (mappedElements.size() == 1) {
+            if (mappedElements.get(0) instanceof VariableDeclaration) {
+                VariableDeclaration varDec = (VariableDeclaration) mappedElements.get(0);
+                if (varDec.getRobotType() != VariableType.ENVIRONMENT) {
+                    int indexElementsNumber = 0;
+                    for (final IElementDeclaration dec : mappedElements.get(0).getElementsDeclarationInside()) {
+                        if (dec instanceof IndexDeclaration) {
+                            indexElementsNumber++;
+                        }
+                    }
+
+                    if (indexElementsNumber == 1) {
                         result = true;
                     }
                 }
