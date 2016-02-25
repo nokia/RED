@@ -10,7 +10,8 @@
       <programArgs>--launcher.appendVmargs
       </programArgs>
       <vmArgs>-Xms512m
--Xmx2g
+         <argsX86>-Xmx1g</argsX86>
+         <argsX86_64>-Xmx2g</argsX86_64>
       </vmArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts
       </vmArgsMac>
