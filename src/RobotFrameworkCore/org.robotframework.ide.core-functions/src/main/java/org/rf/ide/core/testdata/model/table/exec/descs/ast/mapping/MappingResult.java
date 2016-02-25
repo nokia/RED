@@ -52,11 +52,6 @@ public class MappingResult {
         }
     }
 
-    public void updateMappedElements(final List<IElementDeclaration> mapped) {
-        mappedElements.clear();
-        addMappedElements(mappedElements);
-    }
-
     public List<IElementDeclaration> getTextElements() {
         final List<IElementDeclaration> texts = new ArrayList<>();
         for (final IElementDeclaration e : mappedElements) {
@@ -113,11 +108,6 @@ public class MappingResult {
         for (final VariableDeclaration variable : variables) {
             addCorrectVariable(variable);
         }
-    }
-
-    public void updateCorrectVariables(final List<VariableDeclaration> variables) {
-        correctVariables.clear();
-        addCorrectVariables(correctVariables);
     }
 
     public void addBuildMessage(final BuildMessage msg) {
