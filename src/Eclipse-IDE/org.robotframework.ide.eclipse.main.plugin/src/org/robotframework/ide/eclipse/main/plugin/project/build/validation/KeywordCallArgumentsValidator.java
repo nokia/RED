@@ -17,6 +17,8 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
+import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -124,7 +126,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
         boolean thereWasNamedArgumentAlready = false;
         boolean thereIsAMessInOrder = false;
         for (final RobotToken arg : arguments) {
-            if (!isPositional(arg, argumentNames)) {
+            if (isNamed(arg, argumentNames)) {
                 thereWasNamedArgumentAlready = true;
             } else if (thereWasNamedArgumentAlready) {
                 final String additionalMsg;
@@ -228,7 +230,8 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
         for (final RobotToken useSiteArg : arguments) {
             final List<Argument> defs = argsMapping.getUsageMapping(useSiteArg);
-            if (useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION) && !defs.isEmpty()) {
+            if (useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
+                    && !isNonCollectionVar(useSiteArg) && !defs.isEmpty()) {
                 final List<Argument> required = newArrayList(filter(defs, new Predicate<Argument>() {
                     @Override
                     public boolean apply(final Argument arg) {
@@ -243,6 +246,7 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                                 "[" + Joiner.on(", ").join(required) + "]");
                 reporter.handleProblem(problem, file, useSiteArg);
             } else if (useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)
+                    && !isNonCollectionVar(useSiteArg)
                     && !defs.isEmpty()) {
                 final List<Argument> required = newArrayList(filter(defs, new Predicate<Argument>() {
 
@@ -263,13 +267,25 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
     }
 
+    private boolean isNamed(final RobotToken arg, final Collection<String> argumentNames) {
+        return !isPositional(arg, argumentNames);
+    }
+
     private boolean isPositional(final RobotToken arg, final Collection<String> argumentNames) {
         final String argument = arg.getText();
         if (argument.contains("=")) {
             final String name = Splitter.on('=').limit(2).splitToList(argument).get(0);
             return !descriptor.supportsKwargs() && !argumentNames.contains(name);
+        } else if (arg.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)) {
+            return isNonCollectionVar(arg);
+        } else {
+            return true;
         }
-        return !arg.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
+    }
+
+    private boolean isNonCollectionVar(final RobotToken arg) {
+        final MappingResult extractedVars = new VariableExtractor().extract(arg, null);
+        return !extractedVars.isOnlyPossibleCollectionVariable();
     }
 
     private String getName(final RobotToken robotToken) {
