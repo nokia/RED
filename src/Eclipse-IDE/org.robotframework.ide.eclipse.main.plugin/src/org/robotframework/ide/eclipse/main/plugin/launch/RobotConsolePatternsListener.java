@@ -126,6 +126,15 @@ class RobotConsolePatternsListener implements IPatternMatchListener {
 
         @Override
         public void linkActivated() {
+            final IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+
+            if (!file.exists()) { // it could have been deleted in the meantime
+                final IStatus status = new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "The file " + file.getAbsolutePath()
+                        + " does not exist in the file system anymore");
+                ErrorDialog.openError(workbenchWindow.getShell(), "Missing file", "File does not exist", status);
+                return;
+            }
+
             final IPath fileAsPath = new Path(file.getAbsolutePath());
             final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(fileAsPath);
             final boolean wasConverted = !wsRelative.equals(fileAsPath);
@@ -143,7 +152,6 @@ class RobotConsolePatternsListener implements IPatternMatchListener {
                 wsFile = (IFile) root.findMember(wsRelative);
             }
 
-            final IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
             final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
             try {
