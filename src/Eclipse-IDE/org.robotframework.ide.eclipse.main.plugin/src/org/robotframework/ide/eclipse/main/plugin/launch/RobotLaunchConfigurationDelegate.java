@@ -17,7 +17,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -44,10 +43,6 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.console.ConsolePlugin;
-import org.eclipse.ui.console.IConsole;
-import org.eclipse.ui.console.IOConsole;
-import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.execution.ExecutionElement;
 import org.rf.ide.core.execution.IExecutionHandler;
@@ -85,7 +80,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     public RobotLaunchConfigurationDelegate() {
         launchManager = DebugPlugin.getDefault().getLaunchManager();
         launchConfigurationType = launchManager.getLaunchConfigurationType(RobotLaunchConfiguration.TYPE_ID);
-        robotEventBroker = new RobotEventBroker((IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
+        robotEventBroker = new RobotEventBroker(PlatformUI.getWorkbench().getService(IEventBroker.class));
         
     }
 
@@ -179,25 +174,22 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         // possibility
 
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-        final IProject project = getProject(robotConfig);
-        final RobotProject robotProject = getRobotProject(project);
+        final RobotProject robotProject = robotConfig.getRobotProject();
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
         final SuiteExecutor executor = robotConfig.getExecutor();
-        List<IResource> suiteResources = getSuiteResources(robotConfig, project);
+        List<IResource> suiteResources = getSuiteResources(robotConfig, robotProject.getProject());
 
-        final boolean isDebugging = ILaunchManager.DEBUG_MODE.equals(mode);
-        
-        boolean isRemoteDebugging = false;
         String host = robotConfig.getRemoteDebugHost();
         final String remoteDebugPort = robotConfig.getRemoteDebugPort();
         String connectionTimeout = robotConfig.getRemoteDebugTimeout();
-        if(isDebugging && !remoteDebugPort.isEmpty() && !host.isEmpty()) {
-            isRemoteDebugging = true;
-        }
+
+        final boolean isDebugging = ILaunchManager.DEBUG_MODE.equals(mode);
+        final boolean isRemoteDebugging = isDebugging && !remoteDebugPort.isEmpty() && !host.isEmpty();
 
         RunCommandLine cmdLine = null;
         if(!isRemoteDebugging) {
-            cmdLine = createStandardModeCmd(robotConfig, robotProject, project, runtimeEnvironment, suiteResources, isDebugging);
+            cmdLine = createStandardModeCmd(robotConfig, robotProject, robotProject.getProject(), runtimeEnvironment,
+                    suiteResources, isDebugging);
             host = "localhost";
             connectionTimeout = "";
         } else {
@@ -213,6 +205,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         if (cmdLine.getPort() < 0) {
             throw newCoreException("Unable to find free port", null);
         }
+
         DebugSocketManager socketManager = null;
         boolean isDebugServerSocketListening = false; 
         if (!isDebugging) {
@@ -235,35 +228,34 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
 
         final String description = runtimeEnvironment.getFile().getAbsolutePath();
-        final Process process = DebugPlugin.exec(cmdLine.getCommandLine(), project.getLocation().toFile());
+        final Process process = DebugPlugin.exec(cmdLine.getCommandLine(),
+                robotProject.getProject().getLocation().toFile());
         final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
         
-        IOConsoleOutputStream remoteDebugConsole = null;
+        final RobotConsoleFacade consoleFacade = new RobotConsoleFacade();
+        consoleFacade.connect(configuration, runtimeEnvironment, executor, cmdLine);
+
         if (isRemoteDebugging) {
-            remoteDebugConsole = getConsoleForRemoteDebugMessages(configuration, description);
             if (isDebugServerSocketListening && socketManager.getServerSocket() != null) {
-                if (remoteDebugConsole != null) {
-                    remoteDebugConsole.write("Debug server is listening on " + host + ":" + remoteDebugPort
-                            + ", you can run a remote test.\n");
-                }
+                consoleFacade.writeLine(
+                        "Debug server is listening on " + host + ":" + remoteDebugPort + ", you can run a remote test");
             } else {
                 if (eclipseProcess != null) {
                     eclipseProcess.terminate();
                 }
                 throw newCoreException("Cannot run Debug server on " + host + ":" + remoteDebugPort + ".", null);
             }
-        } else {
-            printCommandOnConsole(cmdLine.getCommandLine(), runtimeEnvironment.getVersion(executor), configuration, description);
         }
         
         if (isDebugging) {
             if(suiteResources.isEmpty()) {
                 suiteResources = newArrayList();
-                suiteResources.add(project);
+                suiteResources.add(robotProject.getProject());
             }
             IDebugTarget target = null;
             try {
-                target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotEventBroker, socketManager, remoteDebugConsole);
+                target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotEventBroker, socketManager,
+                        consoleFacade);
             } catch (final CoreException e) {
                 if (socketManager.getServerSocket() != null) {
                     socketManager.getServerSocket().close();
@@ -280,7 +272,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             throw newCoreException("Robot process was interrupted", e);
         }
     }
-    
+
     private RunCommandLine createStandardModeCmd(final RobotLaunchConfiguration robotConfig,
             final RobotProject robotProject, final IProject project, final RobotRuntimeEnvironment runtimeEnvironment,
             final List<IResource> suiteResources, final boolean isDebugging) throws CoreException, IOException {
@@ -303,14 +295,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         return runtimeEnvironment.createCommandLineCall(robotConfig.getExecutor(), classpath, pythonpath,
                 variableFilesPath, project.getLocation().toFile(), suites, testCases, userArguments, includedTags,
                 excludedTags, isDebugging);
-    }
-    
-    private RobotProject getRobotProject(final IProject project) throws CoreException {
-        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
-        if(robotProject == null) {
-            throw newCoreException("There is no available Robot project", null);
-        }
-        return robotProject;
     }
     
     private RobotRuntimeEnvironment getRobotRuntimeEnvironment(final RobotProject robotProject) throws CoreException {
@@ -349,15 +333,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         return suiteResources;
     }
 
-    private IProject getProject(final RobotLaunchConfiguration robotConfig) throws CoreException {
-        final String projectName = robotConfig.getProjectName();
-        final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
-        if (!project.exists()) {
-            throw newCoreException("Project '" + projectName + "' cannot be found in workspace", null);
-        }
-        return project;
-    }
-
     private static CoreException newCoreException(final String message, final Throwable cause) {
         return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
     }
@@ -389,32 +364,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         return Joiner.on('.').join(upperCased);
     }
 
-    private void printCommandOnConsole(final String[] cmd, final String executorVersion,
-            final ILaunchConfiguration configuration,
-            final String description) throws IOException {
-        final String consoleName = configuration.getName() + " [Robot] " + description;
-        final IConsole[] existingConsoles = ConsolePlugin.getDefault().getConsoleManager().getConsoles();
-        for (final IConsole console : existingConsoles) {
-            if (console instanceof IOConsole && console.getName().contains(consoleName)) {
-                final String command = "Command: " + Joiner.on(' ').join(cmd) + "\n";
-                final String env = "Suite Executor: " + executorVersion + "\n";
-                ((IOConsole) console).newOutputStream().write(command + env);
-            }
-        }
-    }
-    
-    private IOConsoleOutputStream getConsoleForRemoteDebugMessages(final ILaunchConfiguration configuration,
-            final String description) throws IOException {
-        final String consoleName = configuration.getName() + " [Robot] " + description;
-        final IConsole[] existingConsoles = ConsolePlugin.getDefault().getConsoleManager().getConsoles();
-        for (final IConsole console : existingConsoles) {
-            if (console instanceof IOConsole && console.getName().contains(consoleName)) {
-                return ((IOConsole) console).newOutputStream();
-            }
-        }
-        return null;
-    }
-    
     private boolean waitForDebugServerSocket(final DebugSocketManager socketManager) {
         boolean isListening = false;
         int retryCounter = 0;
