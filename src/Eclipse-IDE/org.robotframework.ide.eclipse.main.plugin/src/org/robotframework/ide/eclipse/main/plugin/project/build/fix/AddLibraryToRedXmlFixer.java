@@ -88,7 +88,6 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             final RobotProject project = RedPlugin.getModelManager().createProject(externalFile.getProject());
             final RobotRuntimeEnvironment env = project.getRuntimeEnvironment();
             
-            final String libPath;
             Optional<File> modulePath = Optional.absent();
             try {
                 modulePath = env.getModulePath(pathOrName);
@@ -98,17 +97,19 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
             if (modulePath.isPresent()) {
                 libName = pathOrName;
-                libPath = modulePath.get().getPath();
             } else {
                 MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
                         "Unable to locate '" + pathOrName + "' module. It seems that it is not contained"
                                 + " in PYTHONPATH of " + env.getFile() + " python installation.");
                 return false;
             }
+            final Path path = new Path(modulePath.get().getPath());
+
             addedLibrary = new ReferencedLibrary();
-            addedLibrary.setType(LibraryType.PYTHON.toString());
+            addedLibrary.setType(path.getFileExtension().equals("jar") ? LibraryType.JAVA.toString()
+                    : LibraryType.PYTHON.toString());
             addedLibrary.setName(libName);
-            addedLibrary.setPath(new Path(libPath).toPortableString());
+            addedLibrary.setPath(path.toPortableString());
             config.addReferencedLibrary(addedLibrary);
 
             return true;
