@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -30,6 +31,8 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 
 /**
@@ -39,6 +42,12 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 class RobotConsolePatternsListener implements IPatternMatchListener {
 
     private TextConsole console;
+
+    private final RobotProject robotProject;
+
+    public RobotConsolePatternsListener(final RobotProject robotProject) {
+        this.robotProject = robotProject;
+    }
 
     @Override
     public void connect(final TextConsole console) {
@@ -61,7 +70,7 @@ class RobotConsolePatternsListener implements IPatternMatchListener {
                 final int offset = event.getOffset() + (event.getLength() - strippedFile.length());
                 final int length = strippedFile.length();
 
-                console.addHyperlink(new ExecutionArtifactsHyperlink(file), offset, length);
+                console.addHyperlink(new ExecutionArtifactsHyperlink(robotProject.getProject(), file), offset, length);
             }
 
         } catch (final BadLocationException e) {
@@ -97,9 +106,11 @@ class RobotConsolePatternsListener implements IPatternMatchListener {
 
     private static final class ExecutionArtifactsHyperlink implements IHyperlink {
 
+        private final IProject project;
         private final File file;
 
-        private ExecutionArtifactsHyperlink(final File file) {
+        private ExecutionArtifactsHyperlink(final IProject project, final File file) {
+            this.project = project;
             this.file = file;
         }
 
@@ -115,29 +126,36 @@ class RobotConsolePatternsListener implements IPatternMatchListener {
 
         @Override
         public void linkActivated() {
-            final Path fileAsPath = new Path(file.getAbsolutePath());
+            final IPath fileAsPath = new Path(file.getAbsolutePath());
             final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(fileAsPath);
             final boolean wasConverted = !wsRelative.equals(fileAsPath);
 
-            if (wasConverted) {
-                final IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-                final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-
-                IFile wsFile = (IFile) root.findMember(wsRelative);
+            IFile wsFile;
+            if (!wasConverted) {
+                wsFile = LibspecsFolder.get(project).getFile(fileAsPath.lastSegment());
                 try {
-                    if (wsFile == null) {
-                        wsFile = refreshParentDir(root, wsRelative);
-                    }
-                    refreshFile(wsFile);
-                    openInEditor(workbenchWindow, wsFile);
+                    wsFile.createLink(wsRelative, IResource.REPLACE | IResource.HIDDEN, null);
                 } catch (final CoreException e) {
-                    final String message = "Unable to open editor for file: " + wsFile.getName();
-                    ErrorDialog.openError(workbenchWindow.getShell(), "Error opening file", message,
-                            new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e));
+                    throw new IllegalArgumentException("Unable to open file", e);
                 }
             } else {
-                // no need to handle since reports are currently always generated within
-                // workspace; change this and handle in case the situation would've changed
+                final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+                wsFile = (IFile) root.findMember(wsRelative);
+            }
+
+            final IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+            final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+            try {
+                if (wsFile == null) {
+                    wsFile = refreshParentDir(root, wsRelative);
+                }
+                refreshFile(wsFile);
+                openInEditor(workbenchWindow, wsFile);
+            } catch (final CoreException e) {
+                final String message = "Unable to open editor for file: " + wsFile.getName();
+                ErrorDialog.openError(workbenchWindow.getShell(), "Error opening file", message,
+                        new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e));
             }
         }
 

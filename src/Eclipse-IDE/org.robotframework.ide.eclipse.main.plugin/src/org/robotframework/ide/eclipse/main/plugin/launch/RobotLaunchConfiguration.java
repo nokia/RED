@@ -109,6 +109,10 @@ public class RobotLaunchConfiguration {
         this.configuration = config;
     }
 
+    public String getName() {
+        return configuration.getName();
+    }
+
     private ILaunchConfigurationWorkingCopy asWorkingCopy() {
         return configuration instanceof ILaunchConfigurationWorkingCopy ? (ILaunchConfigurationWorkingCopy) configuration
                 : null;

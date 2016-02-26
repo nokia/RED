@@ -49,7 +49,6 @@ import org.rf.ide.core.execution.IExecutionHandler;
 import org.rf.ide.core.executor.ILineHandler;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RunCommandLine;
-import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
@@ -176,7 +175,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         final RobotProject robotProject = robotConfig.getRobotProject();
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
-        final SuiteExecutor executor = robotConfig.getExecutor();
         List<IResource> suiteResources = getSuiteResources(robotConfig, robotProject.getProject());
 
         String host = robotConfig.getRemoteDebugHost();
@@ -233,7 +231,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
         
         final RobotConsoleFacade consoleFacade = new RobotConsoleFacade();
-        consoleFacade.connect(configuration, runtimeEnvironment, executor, cmdLine);
+        consoleFacade.connect(robotConfig, runtimeEnvironment, cmdLine);
 
         if (isRemoteDebugging) {
             if (isDebugServerSocketListening && socketManager.getServerSocket() != null) {
