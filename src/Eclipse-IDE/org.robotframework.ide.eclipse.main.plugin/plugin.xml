@@ -866,6 +866,16 @@
           isEditable="true"
           label="Text Font">
     </fontDefinition>
+    <colorDefinition
+          categoryId="org.robotframework.ide.eclipse.theme"
+          id="org.robotframework.ide.eclipse.robotConsoleRedStream"
+          isEditable="true"
+          label="Robot Console Red Stream"
+          value="0,0,0">
+       <description>
+          This color is used inside Robot test runs console for messages printed by RED
+       </description>
+    </colorDefinition>
  </extension>
  <extension
        point="org.eclipse.ui.contexts">
