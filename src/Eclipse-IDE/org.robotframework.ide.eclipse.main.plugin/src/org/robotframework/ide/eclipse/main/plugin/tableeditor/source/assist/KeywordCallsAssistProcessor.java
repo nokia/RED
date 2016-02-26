@@ -99,11 +99,9 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                         regionsForLinkedMode = calculateRegionsForLinkedModeForEmbeddedKeyword(
                                 offset - prefix.length() + keywordPrefix.length(), keywordName);
                     } else {
-                        final List<String> requiredArguments = keywordProposal.getRequiredArguments();
-                        final Range<Integer> noOfArgs = keywordProposal.getNumberOfArguments();
-
-                        final boolean addPlaceForOptional = !noOfArgs.hasUpperBound()
-                                || noOfArgs.upperEndpoint() > requiredArguments.size();
+                        final List<String> requiredArguments = getRequiredArguments(lineContent, keywordProposal);
+                        final boolean addPlaceForOptional = shouldAddPlaceForOptionalArguments(lineContent,
+                                keywordProposal, requiredArguments);
 
                         final String argumentsToInsert = requiredArguments.isEmpty() ? ""
                                 : separator + Joiner.on(separator).join(requiredArguments);
@@ -142,6 +140,16 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         } catch (final BadLocationException e) {
             return null;
         }
+    }
+
+    protected boolean shouldAddPlaceForOptionalArguments(final String lineContent,
+            final RedKeywordProposal keywordProposal, final List<String> requiredArguments) {
+        final Range<Integer> noOfArgs = keywordProposal.getNumberOfArguments();
+        return !noOfArgs.hasUpperBound() || noOfArgs.upperEndpoint() > requiredArguments.size();
+    }
+
+    protected List<String> getRequiredArguments(final String lineContent, final RedKeywordProposal keywordProposal) {
+        return keywordProposal.getRequiredArguments();
     }
 
     private boolean keywordIsNotInLocalScope(final RedKeywordProposal keywordProposal) {
