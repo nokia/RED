@@ -629,12 +629,12 @@ public class RobotRuntimeEnvironment {
         final List<String> cmdLine = new ArrayList<String>();
         if (executor == getInterpreter()) {
             cmdLine.add(getPythonExecutablePath((PythonInstallationDirectory) location));
-            argumentClasspath(cmdLine, executor, classpath);
+            augmentClasspath(cmdLine, executor, classpath);
             cmdLine.add("-m");
             cmdLine.add("robot.run");
         } else {
             cmdLine.add(executor.executableName());
-            argumentClasspath(cmdLine, executor, classpath);
+            augmentClasspath(cmdLine, executor, classpath);
             cmdLine.add("\""
                     + getRunModulePath((PythonInstallationDirectory) location)
                     + "\"");
@@ -645,12 +645,22 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    private void argumentClasspath(final List<String> cmdLine,
+    private void augmentClasspath(final List<String> cmdLine,
             final SuiteExecutor executor, final List<String> classpath) {
         if (executor == SuiteExecutor.Jython) {
             final String cpSeparator = isWindows() ? ";" : ":";
+
+            final String sysPath = System.getenv("CLASSPATH");
+            final List<String> wholeClasspath = newArrayList();
+            if (sysPath != null && !sysPath.isEmpty()) {
+                wholeClasspath.add(sysPath);
+            }
+            wholeClasspath.addAll(classpath);
+
+            final String cpath = "\"" + Joiner.on(cpSeparator).join(wholeClasspath) + "\"";
+
             cmdLine.add("-J-cp");
-            cmdLine.add("\"" + Joiner.on(cpSeparator).join(classpath) + "\"");
+            cmdLine.add(cpath);
         }
     }
 
