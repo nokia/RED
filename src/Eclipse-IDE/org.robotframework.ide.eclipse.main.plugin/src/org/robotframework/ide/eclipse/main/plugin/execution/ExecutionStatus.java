@@ -17,13 +17,13 @@ public class ExecutionStatus {
         RUNNING
     }
 
-    private String name;
+    private final String name;
 
     private Status status;
 
-    private ExecutionElementType type;
+    private final ExecutionElementType type;
 
-    private List<ExecutionStatus> children;
+    private final List<ExecutionStatus> children;
 
     private ExecutionStatus parent;
 
@@ -33,7 +33,7 @@ public class ExecutionStatus {
 
     private String source;
 
-    public ExecutionStatus(String name, Status status, ExecutionElementType type, List<ExecutionStatus> children) {
+    public ExecutionStatus(final String name, final Status status, final ExecutionElementType type, final List<ExecutionStatus> children) {
         this.name = name;
         this.status = status;
         this.children = children;
@@ -44,15 +44,11 @@ public class ExecutionStatus {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public Status getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(final Status status) {
         this.status = status;
     }
 
@@ -60,7 +56,7 @@ public class ExecutionStatus {
         return children;
     }
 
-    public void addChildren(ExecutionStatus child) {
+    public void addChildren(final ExecutionStatus child) {
         this.children.add(child);
     }
 
@@ -68,7 +64,7 @@ public class ExecutionStatus {
         return parent;
     }
 
-    public void setParent(ExecutionStatus parent) {
+    public void setParent(final ExecutionStatus parent) {
         this.parent = parent;
     }
 
@@ -76,15 +72,11 @@ public class ExecutionStatus {
         return type;
     }
 
-    public void setType(ExecutionElementType type) {
-        this.type = type;
-    }
-
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(final String message) {
         this.message = message;
     }
 
@@ -92,7 +84,7 @@ public class ExecutionStatus {
         return elapsedTime;
     }
 
-    public void setElapsedTime(String elapsedTime) {
+    public void setElapsedTime(final String elapsedTime) {
         this.elapsedTime = elapsedTime;
     }
 
@@ -100,7 +92,7 @@ public class ExecutionStatus {
         return source;
     }
 
-    public void setSource(String source) {
+    public void setSource(final String source) {
         this.source = source;
     }
 
