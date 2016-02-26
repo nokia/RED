@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-
 
 /**
  * @author Michal Anglart
@@ -40,5 +40,25 @@ public class KeywordsInSettingsAssistProcessor extends KeywordCallsAssistProcess
                 || lineContent.toLowerCase().startsWith("test setup")
                 || lineContent.toLowerCase().startsWith("test teardown")
                 || lineContent.toLowerCase().startsWith("test template"));
+    }
+
+    @Override
+    protected List<String> getRequiredArguments(final String lineContent, final RedKeywordProposal keywordProposal) {
+        if (lineContent.toLowerCase().startsWith("test template")) {
+            return newArrayList();
+        } else {
+            return super.getRequiredArguments(lineContent, keywordProposal);
+        }
+    }
+
+    @Override
+    protected boolean shouldAddPlaceForOptionalArguments(final String lineContent,
+            final RedKeywordProposal keywordProposal,
+            final List<String> requiredArguments) {
+        if (lineContent.toLowerCase().startsWith("test template")) {
+            return false;
+        } else {
+            return super.shouldAddPlaceForOptionalArguments(lineContent, keywordProposal, requiredArguments);
+        }
     }
 }
