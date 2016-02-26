@@ -1,22 +1,38 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _1lEyQF06EeWeit3EM6sPPA
-Element-Name: MessageViewDisplayCheck
+Element-Name: MessageViewAfterRestarting
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _IuOvoMaSEeWj5cLba_Ngag
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/1/16 1:42 PM
+Save-Time: 2/26/16 10:27 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+//check that Message View is acitve page
+with [get-tab-folder -index 4] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property activePage | equals "Message Log" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}   
 //run test to populate MessageLog view
 get-view "Project Explorer" | get-tree | select "ExecutionViewProject/stopped_tests.robot" 
     | get-menu "Run As/1 Robot Test" | click
+
+//check that Message View is still acitve page
+with [get-tab-folder -index 4] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property activePage | equals "Message Log" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}    
+    
 // check if message log consists any content by number of chars > 0
 get-view "Message Log" | get-editbox | get-property text | is-empty | verify-false
 
@@ -26,4 +42,6 @@ get-menu "Window/Show View/Message Log" | click
 
 // content should be visible
 get-view "Message Log" | get-editbox | get-property text | is-empty | verify-false
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
