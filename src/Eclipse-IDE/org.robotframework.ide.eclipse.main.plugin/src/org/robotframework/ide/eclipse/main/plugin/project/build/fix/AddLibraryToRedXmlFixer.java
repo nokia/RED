@@ -106,7 +106,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             final Path path = new Path(modulePath.get().getPath());
 
             addedLibrary = new ReferencedLibrary();
-            addedLibrary.setType(path.getFileExtension().equals("jar") ? LibraryType.JAVA.toString()
+            final String fileExt = path.getFileExtension();
+            addedLibrary.setType(fileExt != null && fileExt.equals("jar") ? LibraryType.JAVA.toString()
                     : LibraryType.PYTHON.toString());
             addedLibrary.setName(libName);
             addedLibrary.setPath(path.toPortableString());
