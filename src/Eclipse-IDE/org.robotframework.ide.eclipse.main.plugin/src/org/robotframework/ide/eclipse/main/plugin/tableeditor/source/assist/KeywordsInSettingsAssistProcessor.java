@@ -31,11 +31,6 @@ public class KeywordsInSettingsAssistProcessor extends KeywordCallsAssistProcess
     }
 
     @Override
-    protected String getSeparatorToFollow() {
-        return "";
-    }
-
-    @Override
     protected boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
         return isInProperContentType(document, offset)
