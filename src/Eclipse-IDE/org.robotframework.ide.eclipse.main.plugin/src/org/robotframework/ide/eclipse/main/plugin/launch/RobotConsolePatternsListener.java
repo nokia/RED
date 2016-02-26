@@ -5,7 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.File;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -156,7 +159,7 @@ class RobotConsolePatternsListener implements IPatternMatchListener {
 
             try {
                 if (wsFile == null) {
-                    wsFile = refreshParentDir(root, wsRelative);
+                    wsFile = refreshAllNeededResources(root, wsRelative);
                 }
                 refreshFile(wsFile);
                 openInEditor(workbenchWindow, wsFile);
@@ -167,8 +170,18 @@ class RobotConsolePatternsListener implements IPatternMatchListener {
             }
         }
 
-        private IFile refreshParentDir(final IWorkspaceRoot root, final IPath wsRelative) throws CoreException {
-            root.findMember(wsRelative.removeLastSegments(1)).refreshLocal(IResource.DEPTH_ONE, null);
+        private IFile refreshAllNeededResources(final IWorkspaceRoot root, final IPath wsRelative)
+                throws CoreException {
+            IPath path = wsRelative;
+            final List<String> removed = newArrayList();
+            while (root.findMember(path) == null) {
+                removed.add(0, path.lastSegment());
+                path = path.removeLastSegments(1);
+            }
+            for (final String segment : removed) {
+                root.findMember(path).refreshLocal(IResource.DEPTH_ONE, null);
+                path = path.append(segment);
+            }
             return (IFile) root.findMember(wsRelative);
         }
 
