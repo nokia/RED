@@ -26,7 +26,6 @@ import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.rf.ide.core.execution.ExecutionElementsParser;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext;
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordPosition;
@@ -35,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordContext;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.KeywordExecutionManager;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
@@ -59,16 +59,16 @@ public class RobotDebugEventDispatcher extends Job {
     
     private final KeywordExecutionManager keywordExecutionManager;
     
-    private final IOConsoleOutputStream remoteDebugConsole;
+    private final RobotConsoleFacade remoteDebugConsole;
     
     public RobotDebugEventDispatcher(final RobotDebugTarget target, final List<IResource> suiteFilesToDebug,
-            final RobotEventBroker robotEventBroker, final IOConsoleOutputStream remoteDebugConsole) {
+            final RobotEventBroker robotEventBroker, final RobotConsoleFacade consoleFacade) {
         super("Robot Event Dispatcher");
         setSystem(true);
 
         this.target = target;
         this.robotEventBroker = robotEventBroker;
-        this.remoteDebugConsole = remoteDebugConsole;
+        this.remoteDebugConsole = consoleFacade;
 
         executionContext = new RobotDebugExecutionContext();
         keywordExecutionManager = new KeywordExecutionManager(suiteFilesToDebug);
@@ -384,23 +384,21 @@ public class RobotDebugEventDispatcher extends Job {
     }
     
     private void printRemoteDebugSuiteMessage(final IPath suiteFilePath) {
-        if (remoteDebugConsole != null) {
-            try {
-                if (suiteFilePath != null && suiteFilePath.getFileExtension() != null) {
-                    remoteDebugConsole.write("Debugging test suite: " + suiteFilePath.toOSString() + "\n");
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        try {
+            if (suiteFilePath != null && suiteFilePath.getFileExtension() != null) {
+                remoteDebugConsole.writeLine("Debugging test suite: " + suiteFilePath.toOSString());
             }
+        } catch (final IOException e) {
+            e.printStackTrace();
         }
     }
     
     private void printRemoteDebugTestCaseMessage(final String testCaseName, final boolean isTestCaseAvailable) {
-        if (remoteDebugConsole != null && !isTestCaseAvailable) {
+        if (!isTestCaseAvailable) {
             try {
-                remoteDebugConsole.write("Test case \"" + testCaseName + "\" not available. Check the files content!"
-                        + "\n");
-            } catch (IOException e) {
+                remoteDebugConsole
+                        .writeLine("Test case \"" + testCaseName + "\" not available. Check the files content!");
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }

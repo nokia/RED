@@ -23,6 +23,7 @@ public class RedTheme {
     private static final String COMMENTS_IN_TABLES = "org.robotframework.ide.eclipse.comment";
     private static final String VARIABLES_IN_TABLES = "org.robotframework.ide.eclipse.variable";
     private static final String SETTING = "org.robotframework.ide.eclipse.setting";
+    private static final String ROBOT_CONSOLE_RED_MESSAGES = "org.robotframework.ide.eclipse.robotConsoleRedStream";
 
     private static ColorRegistry getColorRegistry() {
         return PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
@@ -30,6 +31,10 @@ public class RedTheme {
 
     private static FontRegistry getFontRegistry() {
         return PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getFontRegistry();
+    }
+
+    public static Color getRobotConsoleRedStreamColor() {
+        return getColorRegistry().get(ROBOT_CONSOLE_RED_MESSAGES);
     }
 
     public static Color getEclipseDecorationColor() {

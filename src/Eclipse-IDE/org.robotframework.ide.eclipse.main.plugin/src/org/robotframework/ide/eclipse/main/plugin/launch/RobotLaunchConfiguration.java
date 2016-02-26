@@ -12,8 +12,11 @@ import java.util.List;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
@@ -241,6 +244,24 @@ public class RobotLaunchConfiguration {
     
     public String getRemoteDebugTimeout() throws CoreException {
         return configuration.getAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, "");
+    }
+
+    public RobotProject getRobotProject() throws CoreException {
+        final IProject project = getProject();
+        return RedPlugin.getModelManager().getModel().createRobotProject(project);
+    }
+
+    private IProject getProject() throws CoreException {
+        final String projectName = getProjectName();
+        final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+        if (!project.exists()) {
+            throw newCoreException("Project '" + projectName + "' cannot be found in workspace", null);
+        }
+        return project;
+    }
+
+    private static CoreException newCoreException(final String message, final Throwable cause) {
+        return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
     }
 
     public boolean isSuitableFor(final List<IResource> resources) {
