@@ -11,8 +11,19 @@ def get_modules_search_paths():
 
 def get_module_path(modulename):
     import imp
-    _, path, _ = imp.find_module(modulename)
-    return path
+    try:
+        _, path, _ = imp.find_module(modulename)
+        return path
+    except ImportError as e:
+        # when trying to locate jar modules via jython
+        import sys
+        for path_hook in sys.path_hooks:
+            if str(path_hook).find('org.python.core.JavaImporter') != -1:
+                m = path_hook.load_module(modulename)
+                map(__import__, [modulename])
+                import inspect
+                return inspect.getsourcefile(m)
+        raise e
 
 def get_run_module_path():
     import robot
@@ -22,6 +33,7 @@ def get_run_module_path():
 if __name__ == '__main__':
     import sys
     import json
+
     if sys.argv[1] == '-pythonpath':
         print(json.dumps(get_modules_search_paths()))
     elif sys.argv[1] == '-modulepath':
