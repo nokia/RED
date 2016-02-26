@@ -7,14 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.io.IOException;
 
-import org.eclipse.debug.core.ILaunchConfiguration;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RunCommandLine;
-import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.red.swt.SwtThread;
 
@@ -29,11 +28,11 @@ public class RobotConsoleFacade {
 
     private Optional<IOConsoleOutputStream> redMessagesStream;
 
-    void connect(final ILaunchConfiguration configuration, final RobotRuntimeEnvironment runtimeEnvironment,
-            final SuiteExecutor executor, final RunCommandLine cmdLine) throws IOException {
-        final Optional<IOConsole> cons = getConsole(configuration, runtimeEnvironment.getFile().getAbsolutePath());
+    void connect(final RobotLaunchConfiguration robotConfig, final RobotRuntimeEnvironment runtimeEnvironment,
+            final RunCommandLine cmdLine) throws IOException, CoreException {
+        final Optional<IOConsole> cons = getConsole(robotConfig, runtimeEnvironment.getFile().getAbsolutePath());
         if (cons.isPresent()) {
-            cons.get().addPatternMatchListener(new RobotConsolePatternsListener());
+            cons.get().addPatternMatchListener(new RobotConsolePatternsListener(robotConfig.getRobotProject()));
             redMessagesStream = Optional.of(cons.get().newOutputStream());
         } else {
             redMessagesStream = Optional.absent();
@@ -46,12 +45,13 @@ public class RobotConsoleFacade {
                 }
             });
         }
-        printCommandOnConsole(redMessagesStream, cmdLine.getCommandLine(), runtimeEnvironment.getVersion(executor));
+        printCommandOnConsole(redMessagesStream, cmdLine.getCommandLine(),
+                runtimeEnvironment.getVersion(robotConfig.getExecutor()));
     }
 
-    private Optional<IOConsole> getConsole(final ILaunchConfiguration configuration, final String description)
+    private Optional<IOConsole> getConsole(final RobotLaunchConfiguration robotConfig, final String description)
             throws IOException {
-        final String consoleName = configuration.getName() + " [Robot] " + description;
+        final String consoleName = robotConfig.getName() + " [Robot] " + description;
         final IConsole[] existingConsoles = ConsolePlugin.getDefault().getConsoleManager().getConsoles();
         for (final IConsole console : existingConsoles) {
             if (console instanceof IOConsole && console.getName().contains(consoleName)) {
