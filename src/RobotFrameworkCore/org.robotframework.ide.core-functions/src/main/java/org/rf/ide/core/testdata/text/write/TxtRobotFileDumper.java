@@ -10,9 +10,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.rf.ide.core.testdata.IRobotFileDumper;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -26,7 +24,12 @@ import org.rf.ide.core.testdata.model.table.SettingTableElementsComparator;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.TableHeaderComparator;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
+import org.rf.ide.core.testdata.model.table.TestCaseTableElementsComparator;
+import org.rf.ide.core.testdata.model.table.UserKeywordTableElementsComparator;
 import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
@@ -65,8 +68,9 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
 
         List<RobotLine> newLines = newLines(model);
 
+        // System.out.println(String.format("%80s", " ").replaceAll(" ", "-"));
         for (final RobotLine line : newLines) {
-            System.out.println(line);
+            // System.out.println(line);
             // for (final IRobotLineElement elem : line.getLineElements()) {
             // strLine.append(elem.getRaw());
             // }
@@ -86,8 +90,10 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         dumpUntilRobotHeaderSection(model, sections, 0, lines);
 
         final SettingTable settingTable = model.getSettingTable();
-        final List<AModelElement<SettingTable>> sortedSetting = sortSetting(settingTable);
+        final List<AModelElement<SettingTable>> sortedSettings = sortSettings(settingTable);
         final VariableTable variableTable = model.getVariableTable();
+        final List<AModelElement<VariableTable>> sortedVariables = sortVariables(variableTable);
+
         final TestCaseTable testCaseTable = model.getTestCaseTable();
         final KeywordTable keywordTable = model.getKeywordTable();
 
@@ -102,13 +108,13 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
             int sectionWithHeader = getSectionWithHeader(sections, th);
 
             if (th.getModelType() == ModelType.SETTINGS_TABLE_HEADER) {
-
+                System.out.println("Settings");
             } else if (th.getModelType() == ModelType.VARIABLES_TABLE_HEADER) {
-
+                System.out.println("Variables");
             } else if (th.getModelType() == ModelType.TEST_CASE_TABLE_HEADER) {
-
+                System.out.println("TestCases");
             } else if (th.getModelType() == ModelType.KEYWORDS_TABLE_HEADER) {
-
+                System.out.println("Keywords");
             }
 
             if (sectionWithHeader > -1) {
@@ -124,7 +130,52 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         return lines;
     }
 
-    private List<AModelElement<SettingTable>> sortSetting(final SettingTable settingTable) {
+    private List<AModelElement<UserKeyword>> sortKeywordElements(final UserKeyword userKeyword) {
+        List<AModelElement<UserKeyword>> list = new ArrayList<>();
+
+        list.addAll(userKeyword.getArguments());
+        list.addAll(userKeyword.getDocumentation());
+        list.addAll(userKeyword.getReturns());
+        list.addAll(userKeyword.getTags());
+        list.addAll(userKeyword.getTeardowns());
+        list.addAll(userKeyword.getTimeouts());
+        list.addAll(userKeyword.getUnknownSettings());
+
+        list.addAll(userKeyword.getExecutionContext());
+
+        Collections.sort(list, new UserKeywordTableElementsComparator());
+
+        return list;
+    }
+
+    private List<AModelElement<TestCase>> sortTestCaseElements(final TestCase testCase) {
+        List<AModelElement<TestCase>> list = new ArrayList<>();
+
+        list.addAll(testCase.getDocumentation());
+        list.addAll(testCase.getSetups());
+        list.addAll(testCase.getTags());
+        list.addAll(testCase.getTeardowns());
+        list.addAll(testCase.getTemplates());
+        list.addAll(testCase.getTimeouts());
+        list.addAll(testCase.getUnknownSettings());
+
+        list.addAll(testCase.getExecutionContext());
+
+        Collections.sort(list, new TestCaseTableElementsComparator());
+
+        return list;
+    }
+
+    private List<AModelElement<VariableTable>> sortVariables(final VariableTable variableTable) {
+        List<AModelElement<VariableTable>> list = new ArrayList<>();
+        for (final AVariable var : variableTable.getVariables()) {
+            list.add(var);
+        }
+
+        return list;
+    }
+
+    private List<AModelElement<SettingTable>> sortSettings(final SettingTable settingTable) {
         List<AModelElement<SettingTable>> list = new ArrayList<>();
 
         list.addAll(settingTable.getDefaultTags());
@@ -143,24 +194,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
 
         Collections.sort(list, new SettingTableElementsComparator());
 
-        fixPositionBaseOnModelView(list, new ArrayList<AModelElement<SettingTable>>(settingTable.getMetadatas()));
         return list;
-    }
-
-    private <C extends AModelElement<SettingTable>> void fixPositionBaseOnModelView(final List<C> list,
-            final List<C> expectedSequence) {
-        final Map<C, Integer> positionsForElement = new LinkedHashMap<>();
-        int size = list.size();
-        for (int index = 0; index < size; index++) {
-            C elem = list.get(index);
-            if (expectedSequence.contains(elem)) {
-                positionsForElement.put(elem, index);
-            }
-        }
-
-        for (C d : positionsForElement.keySet()) {
-            System.out.println(d.getDeclaration() + " " + positionsForElement.get(d));
-        }
     }
 
     private int getSectionWithHeader(final List<Section> sections,
