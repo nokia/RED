@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Collection;
@@ -20,7 +21,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
@@ -63,21 +68,15 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         reportUnknownSettings();
-        reportDuplicatedArgumentSettings();
-        reportDuplicatedArguments();
-        reportArgumentsOrderProblems();
-        reportArgumentsDefaultValuesUnknownVariables();
-        reportKeywordUsageProblemsInUserKeywordSettings();
-    }
 
-    private void reportKeywordUsageProblemsInUserKeywordSettings() {
-        for (final KeywordTeardown keywordTeardown : keyword.getTeardowns()) {
-            final RobotToken keywordNameToken = keywordTeardown.getKeywordName();
-            if (keywordNameToken != null) {
-                TestCasesTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
-                        keywordNameToken, Optional.of(keywordTeardown.getArguments()));
-            }
-        }
+        reportReturnProblems();
+        reportTagsProblems();
+        reportTimeoutsProblems();
+        reportDocumentationsProblems();
+        reportTeardownProblems();
+        reportArgumentsProblems();
+
+        reportKeywordUsageProblemsInUserKeywordSettings();
     }
 
     private void reportUnknownSettings() {
@@ -90,24 +89,82 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         }
     }
 
-    private void reportDuplicatedArgumentSettings() {
-        final String kwName = keyword.getKeywordName().getText();
+    private void reportReturnProblems() {
+        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
+        for (final KeywordReturn returns : keyword.getReturns()) {
+            declarationIsEmpty.put(returns.getDeclaration(), returns.getReturnValues().isEmpty());
+        }
+        reportCommonProblems(declarationIsEmpty);
+    }
 
+    private void reportTagsProblems() {
+        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
+        for (final KeywordTags tag : keyword.getTags()) {
+            declarationIsEmpty.put(tag.getDeclaration(), tag.getTags().isEmpty());
+        }
+        reportCommonProblems(declarationIsEmpty);
+    }
+
+    private void reportTimeoutsProblems() {
+        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
+        for (final KeywordTimeout timeout : keyword.getTimeouts()) {
+            declarationIsEmpty.put(timeout.getDeclaration(), timeout.getTimeout() == null);
+        }
+        reportCommonProblems(declarationIsEmpty);
+    }
+
+    private void reportDocumentationsProblems() {
+        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
+        for (final KeywordDocumentation doc : keyword.getDocumentation()) {
+            declarationIsEmpty.put(doc.getDeclaration(), doc.getDocumentationText().isEmpty());
+        }
+        reportCommonProblems(declarationIsEmpty);
+    }
+
+    private void reportTeardownProblems() {
+        final Map<RobotToken, Boolean> declarationIsEmpty = newHashMap();
+        for (final KeywordTeardown teardown : keyword.getTeardowns()) {
+            declarationIsEmpty.put(teardown.getDeclaration(), teardown.getKeywordName() == null);
+        }
+        reportCommonProblems(declarationIsEmpty);
+    }
+
+    private void reportCommonProblems(final Map<RobotToken, Boolean> declarationTokens) {
+        final String kwName = keyword.getKeywordName().getText();
         final IFile file = validationContext.getFile();
-        final List<KeywordArguments> args = keyword.getArguments();
-        if (args != null && args.size() > 1) {
-            for (final KeywordArguments arg : args) {
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENT_SETTING_DEFINED_TWICE)
-                        .formatMessageWith(kwName);
-                reporter.handleProblem(problem, file, arg.getDeclaration());
+        final boolean tooManySettings = declarationTokens.size() > 1;
+
+        for (final RobotToken defToken : declarationTokens.keySet()) {
+            if (tooManySettings) {
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.DUPLICATED_KEYWORD_SETTING)
+                        .formatMessageWith(kwName, defToken.getText());
+                reporter.handleProblem(problem, file, defToken);
+            }
+
+            if (declarationTokens.get(defToken).booleanValue()) {
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD_SETTING)
+                        .formatMessageWith(defToken.getText());
+                reporter.handleProblem(problem, file, defToken);
             }
         }
+    }
+
+    private void reportArgumentsProblems() {
+        final IFile file = validationContext.getFile();
         final String fileName = file.getName();
-        if (args != null && !args.isEmpty() && hasEmbeddedArguments(fileName, keyword)) {
-            final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.ARGUMENT_SETTING_DEFINED_TWICE)
-                    .formatMessageWith(kwName);
-            reporter.handleProblem(problem, file, keyword.getKeywordName());
+
+        final Map<RobotToken, Boolean> declarationTokens = newHashMap();
+        for (final KeywordArguments arg : keyword.getArguments()) {
+            declarationTokens.put(arg.getDeclaration(), arg.getArguments().isEmpty());
         }
+        if (hasEmbeddedArguments(fileName, keyword)) {
+            declarationTokens.put(keyword.getKeywordName(), false);
+        }
+        reportCommonProblems(declarationTokens);
+
+        reportDuplicatedArguments();
+        reportArgumentsOrderProblems();
+        reportArgumentsDefaultValuesUnknownVariables();
     }
 
     private void reportDuplicatedArguments() {
@@ -254,5 +311,15 @@ class KeywordSettingsValidator implements ModelUnitValidator {
 
     private boolean isDefaultArgument(final RobotToken argumentToken) {
         return argumentToken.getText().contains("}=");
+    }
+
+    private void reportKeywordUsageProblemsInUserKeywordSettings() {
+        for (final KeywordTeardown keywordTeardown : keyword.getTeardowns()) {
+            final RobotToken keywordNameToken = keywordTeardown.getKeywordName();
+            if (keywordNameToken != null) {
+                TestCasesTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
+                        keywordNameToken, Optional.of(keywordTeardown.getArguments()));
+            }
+        }
     }
 }
