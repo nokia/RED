@@ -19,6 +19,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IMarkerDelta;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugException;
@@ -31,6 +32,7 @@ import org.eclipse.debug.core.model.IMemoryBlock;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.debug.core.model.IThread;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher;
 import org.robotframework.ide.eclipse.main.plugin.debug.RobotDebugEventDispatcher.ExecutionEvent;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
@@ -40,6 +42,8 @@ import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugValueMan
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariablesManager;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
+
+import com.google.common.collect.Iterables;
 
 /**
  * @author mmarzec
@@ -66,39 +70,53 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     private BufferedReader eventReader;
 
     // suspend state
-    private boolean isSuspended = false;
+    private boolean isSuspended;
 
     // threads
-    private final RobotThread thread;
+    private RobotThread thread;
 
-    private final IThread[] threads;
+    private IThread[] threads;
 
     private final Map<String, KeywordContext> currentKeywordDebugContextMap;
 
-    private int currentStepOverLevel = 0;
+    private int currentStepOverLevel;
     
-    private int currentStepReturnLevel = 0;
+    private int currentStepReturnLevel;
 
     private final RobotDebugVariablesManager robotVariablesManager;
     
     private final RobotDebugValueManager robotDebugValueManager;
     
-    private final RobotDebugStackFrameManager robotDebugStackFrameManager;
+    private RobotDebugStackFrameManager robotDebugStackFrameManager;
     
     private RobotConsoleFacade remoteDebugConsole;
     
-    public RobotDebugTarget(final ILaunch launch, final IProcess process, final List<IResource> suiteResources,
-            final RobotEventBroker robotEventBroker, final DebugSocketManager socketManager,
-            final RobotConsoleFacade consoleFacade) throws CoreException {
+    private final boolean isRemoteDebugging;
+
+    public RobotDebugTarget(final ILaunch launch, final IProcess process, final RobotConsoleFacade consoleFacade,
+            final boolean isRemoteDebugging) {
         super(null);
-        target = this;
+        super.target = this;
         this.launch = launch;
         this.process = process;
         this.remoteDebugConsole = consoleFacade;
         this.currentKeywordDebugContextMap = new LinkedHashMap<>();
         this.robotVariablesManager = new RobotDebugVariablesManager(this);
         this.robotDebugValueManager = new RobotDebugValueManager();
-        
+
+        this.thread = null;
+        this.threads = null;
+
+        this.isRemoteDebugging = isRemoteDebugging;
+        this.isSuspended = false;
+        this.currentStepOverLevel = 0;
+        this.currentStepReturnLevel = 0;
+
+        this.robotDebugStackFrameManager = null;
+    }
+
+    public void connect(final List<IResource> suiteResources, final RobotEventBroker robotEventBroker,
+            final DebugSocketManager socketManager) throws CoreException {
         int retryCounter = 0;
         try {  //wait for TestRunnerAgent
             while (socketManager.getEventSocket() == null ? true : (eventReader = new BufferedReader(
@@ -120,14 +138,15 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                 }
             }
             serverSocket = socketManager.getServerSocket();
-        	eventSocket = socketManager.getEventSocket();
+            eventSocket = socketManager.getEventSocket();
             if (eventSocket != null) {
                 remoteDebugConsole.writeLine("\nRemote connection from " + eventSocket.getInetAddress().getHostAddress()
                         + ":" + eventSocket.getLocalPort() + " established");
             }
-        	eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);
+            eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);
         } catch (final IOException e) {
-            e.printStackTrace();
+            throw new CoreException(
+                    new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Unable to connect with debug target", e));
         }
 
         thread = new RobotThread(this);
@@ -160,12 +179,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     @Override
     public String getName() throws DebugException {
         if (name == null) {
-            if (remoteDebugConsole == null) {
-                name = "Robot Test";
-            } else {
-                name = "Robot Remote Test";
-            }
-            name += " at " + eventSocket.getInetAddress().getHostAddress() + ":" + eventSocket.getLocalPort();
+            final String prefix = isRemoteDebugging ? "Robot Remote Test" : "Robot Test";
+            name = prefix + " at " + eventSocket.getInetAddress().getHostAddress() + ":" + eventSocket.getLocalPort();
         }
         return name;
     }
@@ -330,9 +345,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     @Override
     public void breakpointRemoved(final IBreakpoint breakpoint, final IMarkerDelta delta) {
-        if (supportsBreakpoint(breakpoint)) {
 
-        }
     }
 
     @Override
@@ -351,10 +364,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     @Override
     public boolean supportsBreakpoint(final IBreakpoint breakpoint) {
-        if (breakpoint.getModelIdentifier().equals(RobotDebugElement.DEBUG_MODEL_ID)) {
-            return true;
-        }
-        return false;
+        return breakpoint.getModelIdentifier().equals(RobotDebugElement.DEBUG_MODEL_ID);
     }
 
     @Override
@@ -373,7 +383,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @return the current stack frames in the target
      */
     protected IStackFrame[] getStackFrames() {
-
         return robotDebugStackFrameManager.getStackFrames(currentKeywordDebugContextMap);
     }
 
@@ -391,7 +400,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param breakpoint
      */
     public void breakpointHit(final IBreakpoint breakpoint) {
-
         if (breakpoint instanceof ILineBreakpoint) {
             thread.setBreakpoints(new IBreakpoint[] { breakpoint });
         }
@@ -403,7 +411,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param event
      */
     public void sendEventToAgent(final String event) {
-
         synchronized (eventSocket) {
             eventWriter.print(event);
             eventWriter.flush();
@@ -421,7 +428,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param value
      */
     public void sendChangeVariableRequest(final String variable, final String value) {
-
         sendEventToAgent("{\"" + variable + "\":[\"" + value + "\"]}");
     }
     
@@ -433,7 +439,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
      * @param value
      */
     public void sendChangeCollectionRequest(final String variable, final List<String> childList, final String value) {
-        
         final StringBuilder requestJson = new StringBuilder();
         requestJson.append("{\"" + variable + "\":[");
         for (int i = 0; i < childList.size(); i++) {
@@ -444,7 +449,6 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
     
     public void sendChangeRequest(final String expression, final String variableName, final RobotDebugVariable parent) {
-        
         if (parent != null) {
             final LinkedList<String> childNameList = new LinkedList<String>();
             final String root = robotVariablesManager.extractVariableRootAndChilds(parent, childNameList, variableName);
@@ -455,21 +459,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     }
 
     public boolean hasStepOver() {
-
-        if (thread.isSteppingOver() && currentStepOverLevel <= currentKeywordDebugContextMap.size()) {
-            return true;
-        }
-
-        return false;
+        return thread.isSteppingOver() && currentStepOverLevel <= currentKeywordDebugContextMap.size();
     }
     
     public boolean hasStepReturn() {
-
-        if (thread.isSteppingReturn() && currentStepReturnLevel <= currentKeywordDebugContextMap.size()+1) {
-            return true;
-        }
-
-        return false;
+        return thread.isSteppingReturn() && currentStepReturnLevel <= currentKeywordDebugContextMap.size() + 1;
     }
 
     public BufferedReader getEventReader() {
@@ -486,7 +480,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
 
     public KeywordContext getLastKeywordFromCurrentContextMap() {
         if(currentKeywordDebugContextMap.size() > 0) {
-            return (KeywordContext) currentKeywordDebugContextMap.values().toArray()[currentKeywordDebugContextMap.size() - 1];
+            return Iterables.getLast(currentKeywordDebugContextMap.values());
         }
         return new KeywordContext();
     }
