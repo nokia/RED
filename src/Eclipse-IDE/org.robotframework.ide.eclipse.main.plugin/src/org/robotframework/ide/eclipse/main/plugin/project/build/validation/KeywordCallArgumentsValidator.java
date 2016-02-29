@@ -171,7 +171,8 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
                 i++;
             }
             final List<IRobotTokenType> tokenTypes = currentToken.getTypes();
-            if (!(tokenTypes.contains(RobotTokenType.VARIABLES_LIST_DECLARATION) && !definingArg.isVarArg())) {
+            if (!(tokenTypes.contains(RobotTokenType.VARIABLES_LIST_DECLARATION) && !isNonCollectionVar(currentToken)
+                    && !definingArg.isVarArg())) {
                 j++;
             }
         }
