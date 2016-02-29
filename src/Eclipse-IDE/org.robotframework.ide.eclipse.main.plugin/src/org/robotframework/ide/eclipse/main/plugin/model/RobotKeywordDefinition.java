@@ -51,6 +51,10 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         super(parent, name, comment);
     }
 
+    public UserKeyword getLinkedElement() {
+        return keyword;
+    }
+
     public void link(final UserKeyword keyword) {
         this.keyword = keyword;
         // body
