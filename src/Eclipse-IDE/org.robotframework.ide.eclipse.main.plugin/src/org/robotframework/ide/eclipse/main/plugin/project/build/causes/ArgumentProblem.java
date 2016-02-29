@@ -20,7 +20,7 @@ public enum ArgumentProblem implements IProblemCause {
     INVALID_NUMBER_OF_PARAMETERS {
         @Override
         public String getProblemDescription() {
-            return "Invalid number of parameters. %s";
+            return "Invalid number of arguments. %s";
         }
     },
     POSITIONAL_ARGUMENT_AFTER_NAMED {
