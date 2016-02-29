@@ -28,7 +28,6 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchManager;
-import org.eclipse.debug.core.model.IDebugTarget;
 import org.eclipse.debug.core.model.ILaunchConfigurationDelegate;
 import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.core.model.LaunchConfigurationDelegate;
@@ -250,10 +249,10 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 suiteResources = newArrayList();
                 suiteResources.add(robotProject.getProject());
             }
-            IDebugTarget target = null;
+            RobotDebugTarget target = null;
             try {
-                target = new RobotDebugTarget(launch, eclipseProcess, suiteResources, robotEventBroker, socketManager,
-                        consoleFacade);
+                target = new RobotDebugTarget(launch, eclipseProcess, consoleFacade, isRemoteDebugging);
+                target.connect(suiteResources, robotEventBroker, socketManager);
             } catch (final CoreException e) {
                 if (socketManager.getServerSocket() != null) {
                     socketManager.getServerSocket().close();
