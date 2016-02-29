@@ -137,11 +137,10 @@ public enum KeywordsProblem implements IProblemCause {
             return "Keyword '%s' is from a library nested in a resource file";
         }
     },
-    ARGUMENT_SETTING_DEFINED_TWICE {
-
+    DUPLICATED_KEYWORD_SETTING {
         @Override
         public String getProblemDescription() {
-            return "Keyword '%s' arguments are defined in multiple ways";
+            return "Keyword '%s' %s setting are defined in multiple ways";
         }
     },
     ARGUMENT_DEFINED_TWICE {
@@ -292,6 +291,17 @@ public enum KeywordsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList();// new RemoveKeywordFixer(marker.getAttribute("name", null)));
+        }
+    },
+    EMPTY_KEYWORD_SETTING {
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "The %s keyword setting is empty";
         }
     };
 
