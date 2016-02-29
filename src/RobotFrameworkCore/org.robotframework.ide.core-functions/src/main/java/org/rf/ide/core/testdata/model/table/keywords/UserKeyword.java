@@ -12,6 +12,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -38,8 +39,11 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
 
     private final List<RobotExecutableRow<UserKeyword>> keywordContext = new ArrayList<>();
 
+    private final MoveElementHelper moveHelper;
+
     public UserKeyword(final RobotToken keywordName) {
         this.keywordName = keywordName;
+        this.moveHelper = new MoveElementHelper();
     }
 
     public RobotToken getKeywordName() {
@@ -61,6 +65,23 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
     public void addKeywordExecutionRow(final RobotExecutableRow<UserKeyword> executionRow) {
         executionRow.setParent(this);
         this.keywordContext.add(executionRow);
+    }
+
+    public void addKeywordExecutionRow(final RobotExecutableRow<UserKeyword> executionRow, final int position) {
+        executionRow.setParent(this);
+        this.keywordContext.set(position, executionRow);
+    }
+
+    public void removeExecutableRow(final RobotExecutableRow<UserKeyword> executionRow) {
+        this.keywordContext.remove(executionRow);
+    }
+
+    public boolean moveUpExecutableRow(final RobotExecutableRow<UserKeyword> executionRow) {
+        return moveHelper.moveUp(keywordContext, executionRow);
+    }
+
+    public boolean moveDownExecutableRow(final RobotExecutableRow<UserKeyword> executionRow) {
+        return moveHelper.moveDown(keywordContext, executionRow);
     }
 
     public void removeExecutableLineWithIndex(final int rowIndex) {

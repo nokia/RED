@@ -13,39 +13,33 @@ import java.util.Set;
 
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
-import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-
 
 public class VariableTable extends ARobotSectionTable {
 
     private final List<AVariable> variables = new ArrayList<>();
 
-
     public VariableTable(final RobotFile parent) {
         super(parent);
     }
 
-
     public List<AVariable> getVariables() {
         return Collections.unmodifiableList(variables);
     }
-
 
     public void addVariable(final AVariable variable) {
         variable.setParent(this);
         variables.add(variable);
     }
 
-
-    public void createScalarVariable(final int index, final String name,
-            final List<String> values, final String comment) {
-        final ScalarVariable scalar = new ScalarVariable(name, null,
-                VariableScope.TEST_SUITE);
+    public void createScalarVariable(final int index, final String name, final List<String> values,
+            final String comment) {
+        final ScalarVariable scalar = new ScalarVariable(name, null, VariableScope.TEST_SUITE);
         for (final String v : values) {
             final RobotToken t = new RobotToken();
             t.setText(v);
@@ -57,11 +51,9 @@ public class VariableTable extends ARobotSectionTable {
         variables.add(index, scalar);
     }
 
-
-    public void createListVariable(final int index, final String name,
-            final List<String> values, final String comment) {
-        final ListVariable list = new ListVariable(name, null,
-                VariableScope.TEST_SUITE);
+    public void createListVariable(final int index, final String name, final List<String> values,
+            final String comment) {
+        final ListVariable list = new ListVariable(name, null, VariableScope.TEST_SUITE);
         for (final String v : values) {
             final RobotToken t = new RobotToken();
             t.setText(v);
@@ -73,11 +65,9 @@ public class VariableTable extends ARobotSectionTable {
         variables.add(index, list);
     }
 
-
-    public void createDictionaryVariable(final int index, final String name,
-            final Map<String, String> items, final String comment) {
-        final DictionaryVariable dict = new DictionaryVariable(name, null,
-                VariableScope.TEST_SUITE);
+    public void createDictionaryVariable(final int index, final String name, final Map<String, String> items,
+            final String comment) {
+        final DictionaryVariable dict = new DictionaryVariable(name, null, VariableScope.TEST_SUITE);
         final Set<String> keySet = items.keySet();
         for (final String key : keySet) {
             final RobotToken keyT = new RobotToken();
@@ -96,6 +86,17 @@ public class VariableTable extends ARobotSectionTable {
         variables.add(index, dict);
     }
 
+    public void removeVariable(final AVariable variable) {
+        variables.remove(variable);
+    }
+
+    public boolean moveUpVariable(final AVariable variable) {
+        return getMoveHelper().moveUp(variables, variable);
+    }
+
+    public boolean moveDownVariable(final AVariable variable) {
+        return getMoveHelper().moveDown(variables, variable);
+    }
 
     public boolean isEmpty() {
         return (variables.isEmpty());

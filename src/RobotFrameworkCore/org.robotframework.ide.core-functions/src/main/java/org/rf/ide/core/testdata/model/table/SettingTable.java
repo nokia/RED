@@ -73,6 +73,23 @@ public class SettingTable extends ARobotSectionTable {
         imports.add(imported);
     }
 
+    public void addImported(final AImported imported, final int position) {
+        imported.setParent(this);
+        imports.set(position, imported);
+    }
+
+    public void removeImported(final AImported imported) {
+        imports.remove(imported);
+    }
+
+    public boolean moveUpImported(final AImported imported) {
+        return getMoveHelper().moveUp(imports, imported);
+    }
+
+    public boolean moveDownImported(final AImported imported) {
+        return getMoveHelper().moveDown(imports, imported);
+    }
+
     public List<SuiteDocumentation> getDocumentation() {
         return Collections.unmodifiableList(documentations);
     }
@@ -89,6 +106,23 @@ public class SettingTable extends ARobotSectionTable {
     public void addMetadata(final Metadata metadata) {
         metadata.setParent(this);
         metadatas.add(metadata);
+    }
+
+    public void addMetadata(final Metadata metadata, final int position) {
+        metadata.setParent(this);
+        metadatas.set(position, metadata);
+    }
+
+    public void removeMetadata(final Metadata metadata) {
+        metadatas.remove(metadata);
+    }
+
+    public boolean moveUpMetadata(final Metadata metadata) {
+        return getMoveHelper().moveUp(metadatas, metadata);
+    }
+
+    public boolean moveDownMetadata(final Metadata metadata) {
+        return getMoveHelper().moveDown(metadatas, metadata);
     }
 
     public List<SuiteSetup> getSuiteSetups() {

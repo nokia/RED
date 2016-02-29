@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DataDrivenKeywordName;
+import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
@@ -43,8 +44,11 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     private final DataDrivenKeywordName<TestCaseTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
 
+    private final MoveElementHelper moveHelper;
+
     public TestCase(final RobotToken testName) {
         this.testName = testName;
+        this.moveHelper = new MoveElementHelper();
     }
 
     public RobotToken getTestName() {
@@ -71,6 +75,23 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     public void addTestExecutionRow(final RobotExecutableRow<TestCase> executionRow) {
         executionRow.setParent(this);
         this.testContext.add(executionRow);
+    }
+
+    public void addKeywordExecutionRow(final RobotExecutableRow<TestCase> executionRow, final int position) {
+        executionRow.setParent(this);
+        this.testContext.set(position, executionRow);
+    }
+
+    public void removeExecutableRow(final RobotExecutableRow<TestCase> executionRow) {
+        this.testContext.remove(executionRow);
+    }
+
+    public boolean moveUpExecutableRow(final RobotExecutableRow<TestCase> executionRow) {
+        return moveHelper.moveUp(testContext, executionRow);
+    }
+
+    public boolean moveDownExecutableRow(final RobotExecutableRow<TestCase> executionRow) {
+        return moveHelper.moveDown(testContext, executionRow);
     }
 
     public void removeExecutableLineWithIndex(final int rowIndex) {
