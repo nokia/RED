@@ -116,7 +116,18 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     }
 
     private void addLibraryToWatch(final String fileName, final Path dir, final LibrarySpecification spec) {
-        librarySpecifications.put(spec, fileName);
+        final List<LibrarySpecification> specsToReplace = new ArrayList<>();
+        synchronized (librarySpecifications) {
+            for (Entry<LibrarySpecification, String> entry : librarySpecifications.entries()) {
+                if (entry.getValue().equals(fileName) && entry.getKey().equalsIgnoreKeywords(spec)) {
+                    specsToReplace.add(entry.getKey());
+                }
+            }
+            for (final LibrarySpecification specToReplace : specsToReplace) {
+                librarySpecifications.removeAll(specToReplace);
+            }
+            librarySpecifications.put(spec, fileName);
+        }
         registerPath(dir, fileName, this);
     }
 
@@ -159,7 +170,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 unregisterFile(modifiedFileName, this);
                 return;
             }
-
+            
             SwtThread.asyncExec(new Runnable() {
 
                 @Override
