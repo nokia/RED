@@ -31,6 +31,7 @@ import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.robotframework.ide.eclipse.main.plugin.LibrariesWatchHandler;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
@@ -64,9 +65,12 @@ public class RobotProject extends RobotContainer {
     private RobotProjectConfig configuration;
 
     private List<File> modulesSearchPath;
+    
+    private LibrariesWatchHandler librariesWatchHandler;
 
     RobotProject(final IProject project) {
         super(null, project);
+        librariesWatchHandler = new LibrariesWatchHandler(this);
     }
     
     public synchronized RobotProjectHolder getRobotProjectHolder() {
@@ -147,9 +151,15 @@ public class RobotProject extends RobotContainer {
         }
         refLibsSpecs = newLinkedHashMap();
         for (final ReferencedLibrary library : configuration.getLibraries()) {
-            refLibsSpecs.put(library, reflibToSpec(getProject()).apply(library));
+            final LibrarySpecification spec = reflibToSpec(getProject()).apply(library);
+            librariesWatchHandler.registerLibrary(library.getAbsolutePathToFile(), spec);
+            refLibsSpecs.put(library, spec);
         }
         return refLibsSpecs;
+    }
+    
+    public synchronized void unregisterWatchingOnReferencedLibraries(final List<ReferencedLibrary> libraries) {
+        librariesWatchHandler.unregisterLibraries(libraries);
     }
 
     private static Function<String, LibrarySpecification> stdLibToSpec(final IProject project) {

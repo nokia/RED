@@ -10,6 +10,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -17,10 +19,16 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.e4.core.contexts.ContextInjectionFactory;
+import org.eclipse.e4.core.contexts.IEclipseContext;
+import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.red.viewers.TreeContentProvider;
@@ -32,6 +40,9 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
     private final IResourceChangeListener listener;
 
     public NavigatorLibrariesContentProvider() {
+        final IEclipseContext activeContext = getContext().getActiveLeaf();
+        ContextInjectionFactory.inject(this, activeContext);
+        
         listener = new IResourceChangeListener() {
             @Override
             public void resourceChanged(final IResourceChangeEvent event) {
@@ -84,9 +95,15 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
         ResourcesPlugin.getWorkspace().addResourceChangeListener(listener,
                 IResourceChangeEvent.POST_BUILD | IResourceChangeEvent.POST_CHANGE);
     }
+    
+    private IEclipseContext getContext() {
+        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+    }
 
     @Override
     public void dispose() {
+        final IEclipseContext activeContext = getContext().getActiveLeaf();
+        ContextInjectionFactory.uninject(this, activeContext);
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(listener);
     }
 
@@ -127,4 +144,12 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
         return element instanceof RobotProjectDependencies;
     }
 
+    @Inject
+    @Optional
+    private void whenStructuralChangeWasMade(
+            @UIEventTopic(RobotModelEvents.ROBOT_LIBRARY_SPECIFICATION_CHANGE) final IProject project) {
+        if (viewer != null) {
+            viewer.refresh(project);
+        }
+    }
 }
