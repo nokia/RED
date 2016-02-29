@@ -118,6 +118,9 @@ public class RobotModelEvents {
 
     public static final String ROBOT_KEYWORD_CALL_COMMENT_CHANGE = "robot/model/editor/file/detail/cases/keywords/changed/comment";
     
+    
+    public static final String ROBOT_LIBRARY_SPECIFICATION_CHANGE = "robot/model/library/specification/changed";
+    
 
     public static final String EXTERNAL_MODEL_CHANGE = "robot/model/external";
 

@@ -35,6 +35,9 @@ public class LibrarySpecification {
 
     @XmlTransient
     private ReferencedLibrary referencedLibrary;
+    
+    @XmlTransient
+    private boolean isModified;
 
     private String name;
 
@@ -195,6 +198,15 @@ public class LibrarySpecification {
 
     public boolean isReferenced() {
         return referencedLibrary != null;
+    }
+    
+    public boolean isModified() {
+        return isModified;
+    }
+    
+    @XmlTransient
+    public void setIsModified(final boolean isModified) {
+        this.isModified = isModified;
     }
 
     @Override
