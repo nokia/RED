@@ -138,14 +138,7 @@ public class LibrariesBuilder {
             }
             monitor.worked(1);
         }
-        
-        final Collection<LibrarySpecification> librarySpecifications = robotProject.getReferencedLibraries().values();
-        if (librarySpecifications != null) {
-            for (final LibrarySpecification librarySpecification : librarySpecifications) {
-                librarySpecification.setIsModified(false);
-            }
-        }
-        
+
         monitor.done();
     }
 
