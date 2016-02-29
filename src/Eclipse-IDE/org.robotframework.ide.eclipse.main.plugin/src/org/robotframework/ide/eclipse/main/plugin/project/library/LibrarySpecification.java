@@ -208,6 +208,20 @@ public class LibrarySpecification {
     public void setIsModified(final boolean isModified) {
         this.isModified = isModified;
     }
+    
+    public boolean equalsIgnoreKeywords(final Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (LibrarySpecification.class == obj.getClass()) {
+            final LibrarySpecification that = (LibrarySpecification) obj;
+            return Objects.equal(this.name, that.name) && Objects.equal(this.secondaryKey, that.secondaryKey)
+                    && Objects.equal(this.version, that.version)
+                    && Objects.equal(this.referencedLibrary, that.referencedLibrary)
+                    && Objects.equal(this.remoteLocation, that.remoteLocation);
+        }
+        return false;
+    }
 
     @Override
     public boolean equals(final Object obj) {
@@ -218,7 +232,7 @@ public class LibrarySpecification {
             final LibrarySpecification that = (LibrarySpecification) obj;
             return Objects.equal(this.name, that.name) && Objects.equal(this.secondaryKey, that.secondaryKey)
                     && Objects.equal(this.keywords, that.keywords) && Objects.equal(this.version, that.version)
-                    && this.referencedLibrary == that.referencedLibrary
+                    && Objects.equal(this.referencedLibrary, that.referencedLibrary)
                     && Objects.equal(this.remoteLocation, that.remoteLocation);
         }
         return false;
