@@ -33,7 +33,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "variableMappings", "libraries", "remoteLocations",
-        "referencedVariableFiles", "excludedPath", "isValidatedFileSizeCheckingEnabled", "validatedFileMaxSize" })
+        "referencedVariableFiles", "excludedPath", "isValidatedFileSizeCheckingEnabled", "validatedFileMaxSize",
+        "isReferencedLibrariesAutoReloadEnabled" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
@@ -64,11 +65,14 @@ public class RobotProjectConfig {
     @XmlElementWrapper(name = "excludedForValidation", required = false)
     private List<ExcludedFolderPath> excludedPath = new ArrayList<>();
     
-    @XmlElement(name = "isValidatedFileSizeCheckingEnabled", required = true)
+    @XmlElement(name = "isValidatedFileSizeCheckingEnabled", required = false)
     private boolean isValidatedFileSizeCheckingEnabled = true;
     
-    @XmlElement(name = "validatedFileMaxSize", required = true)
+    @XmlElement(name = "validatedFileMaxSize", required = false)
     private String validatedFileMaxSize = VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB;
+    
+    @XmlElement(name = "isReferencedLibrariesAutoReloadEnabled", required = false)
+    private boolean isReferencedLibrariesAutoReloadEnabled = true;
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -149,6 +153,14 @@ public class RobotProjectConfig {
     
     public String getValidatedFileDefaultMaxSize() {
         return VALIDATED_FILE_DEFAULT_MAX_SIZE_IN_KB;
+    }
+    
+    public void setIsReferencedLibrariesAutoReloadEnabled(final boolean isReferencedLibrariesAutoReloadEnabled) {
+        this.isReferencedLibrariesAutoReloadEnabled = isReferencedLibrariesAutoReloadEnabled;
+    }
+
+    public boolean isReferencedLibrariesAutoReloadEnabled() {
+        return this.isReferencedLibrariesAutoReloadEnabled;
     }
 
     public void addExcludedPath(final IPath path) {
@@ -332,6 +344,9 @@ public class RobotProjectConfig {
 
         @XmlAttribute
         private String path;
+        
+        @XmlAttribute
+        private String absolutePathToFile;
 
         public void setType(final String type) {
             this.type = type;
@@ -355,6 +370,14 @@ public class RobotProjectConfig {
 
         public String getPath() {
             return path;
+        }
+        
+        public void setAbsolutePathToFile(final String path) {
+            this.absolutePathToFile = path;
+        }
+
+        public String getAbsolutePathToFile() {
+            return absolutePathToFile;
         }
 
         public IPath getFilepath() {

@@ -38,6 +38,7 @@ public class DeleteReferencedLibraryHandler extends DIParameterizedHandler<E4Del
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
             final List<ReferencedLibrary> libraries = Selections.getElements(selection, ReferencedLibrary.class);
             input.getProjectConfiguration().removeLibraries(libraries);
+            input.getRobotProject().unregisterWatchingOnReferencedLibraries(libraries);
 
             if (!libraries.isEmpty()) {
                 final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(

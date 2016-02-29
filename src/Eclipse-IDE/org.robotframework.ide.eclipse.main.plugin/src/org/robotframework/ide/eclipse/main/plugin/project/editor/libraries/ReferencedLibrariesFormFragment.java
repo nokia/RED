@@ -79,6 +79,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     private Button addJavaLibButton;
 
     private Button addLibspecButton;
+    
+    private Button autoLibReloadButton;
 
     private ControlDecoration decoration;
 
@@ -102,6 +104,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         createContextMenu();
 
         createButtons(internalComposite);
+        
+        createAutomaticLibReloadButton(internalComposite);
 
         setInput();
     }
@@ -169,6 +173,24 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addLibspecButton.setEnabled(false);
         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(addLibspecButton);
         addLibspecHandler();
+    }
+    
+    private void createAutomaticLibReloadButton(final Composite parent) {
+        final Composite autoReloadComposite = toolkit.createComposite(parent);
+        GridLayoutFactory.fillDefaults().margins(0, 5).applyTo(autoReloadComposite);
+
+        autoLibReloadButton = toolkit.createButton(autoReloadComposite,
+                "Automatically reload changed libraries", SWT.CHECK);
+        autoLibReloadButton.setSelection(editorInput.getProjectConfiguration().isReferencedLibrariesAutoReloadEnabled());
+        autoLibReloadButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final boolean selection = autoLibReloadButton.getSelection();
+                editorInput.getProjectConfiguration().setIsReferencedLibrariesAutoReloadEnabled(selection);
+                setDirty(true);
+            }
+        });
     }
 
     private void addPythonHandler() {
@@ -304,6 +326,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addPythonLibButton.setEnabled(false);
         addJavaLibButton.setEnabled(false);
         addLibspecButton.setEnabled(false);
+        autoLibReloadButton.setEnabled(false);
         viewer.getTable().setEnabled(false);
     }
 
@@ -319,6 +342,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addPythonLibButton.setEnabled(isEditable);
         addJavaLibButton.setEnabled(isEditable && projectIsInterpretedByJython);
         addLibspecButton.setEnabled(isEditable);
+        autoLibReloadButton.setEnabled(isEditable);
         viewer.getTable().setEnabled(isEditable);
 
         if (!addJavaLibButton.isEnabled()) {

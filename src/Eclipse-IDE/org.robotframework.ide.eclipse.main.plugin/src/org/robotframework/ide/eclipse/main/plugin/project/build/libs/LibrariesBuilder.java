@@ -87,6 +87,7 @@ public class LibrariesBuilder {
             return new RemoteLibraryLibdocGenerator(specification.getRemoteLocation().getUriAddress(),
                     libspecSourceFile);
         } else {
+            specification.setIsModified(false);
             final String path = specification.getSecondaryKey();
             final ReferencedLibrary refLib = specification.getReferencedLibrary();
             final LibraryType type = refLib.provideType();
@@ -137,6 +138,12 @@ public class LibrariesBuilder {
             }
             monitor.worked(1);
         }
+        
+        final Collection<LibrarySpecification> librarySpecifications = robotProject.getReferencedLibraries().values();
+        for (final LibrarySpecification librarySpecification : librarySpecifications) {
+            librarySpecification.setIsModified(false);
+        }
+        
         monitor.done();
     }
 
