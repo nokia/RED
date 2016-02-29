@@ -1,0 +1,234 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ContentAssistForKeywords
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _iyS6MNymEeWGC6qnJEsRYg
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 2/29/16 5:15 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	// add Settings
+    key-type Enter -times 2
+    key-type Up -times 2
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    
+    // add Suite setup
+    key-type "M1+SPACE"
+    type-text Su
+    key-type Enter
+    
+    //add Catante
+    key-type Down
+    key-type Enter
+    type-text "I  will be added  ${param}"
+    key-type Enter
+    
+    // add Test setup
+    type-text Te
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text Shou
+    key-type Down
+    key-type Enter
+    type-text item1
+    key-type Tab
+    type-text item2
+    key-type Enter -times 2
+    
+       // add new test
+    set-caret-pos 6 19
+    key-type Enter
+    type-text "test 1"
+    key-type Enter
+   	
+   	// add keyword Should be equal as integer
+    type-text SH
+    key-type "M1+SPACE"
+    key-type Down -times 2
+    key-type Enter
+    // remove first item
+    key-type Del
+    
+    //remove second item 
+    key-type Tab
+    key-type BackSpace
+    
+    //accept 
+    key-type Enter -times 2
+    
+    // add Log
+    type-text Lo
+    key-type "M1+SPACE"
+    key-type Enter
+    
+    //add coursor at the end - message should not be deleted
+    key-type Right
+    key-type Enter
+    key-type Enter
+    
+    //add log again and press enter - message is selected and willbe remove
+    type-text Log
+    key-type "M1+SPACE"
+    key-type Enter 
+    wait 300
+    key-type Enter -times 2
+}
+
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Suite Setup    Catenate    I  will be added  ${param}\n"
+    + "Test Setup    Should Be Equal    item1    item2\n"
+    + "    \n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    Should Be Equal As Integers        \n"
+    + "    Log    message\n"
+    + "    Log" | verify-true
+    
+    
+//------------------------------------------------- tsv file --------------------------------------------------------------------
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Test Suite" 
+    | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text "tsv_file"
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+//set content
+get-editor "tsv_file.tsv" | get-text-viewer | set-text "*** Settings ***\n\n\n"
+    + "*** Test Cases ***\n"
+    + "test 2\n\n"
+    + "*** Keywords ***\n"
+    + "two args\n"
+    + "\t[Arguments]\t${a}\t${b}\t${op}=7\n"
+    + "\tlog\tSimple kw\n"
+    + "\t${new_val}=\tSet Variable\t4\n"
+    + "\t[Return]\t${new_val}\n"
+    + "\t\n"
+    + "args as list\n"
+    + "\t[Arguments]\t@{my_list}\n"
+    + "\tlog\tList used\n"
+    + "\t\n"
+    + "kw with no args\n"
+    + "\tlog\tno args"    
+  
+    
+with [get-editor "tsv_file.tsv" | get-text-viewer] {
+	// adding keyword without changing args
+	// add user keyword "two args" to test 2
+    set-caret-pos 5 7
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text tw
+    key-type "M1+SPACE"
+    key-type Enter
+    // add "args as list"
+    set-caret-pos 6 25
+    key-type "NUMPAD_ENTER" "\\u000D" -times 2
+    type-text arg
+    key-type "M1+SPACE"
+    key-type Enter -times 2
+    // add "kw with no args"
+    type-text kw
+    key-type "M1+SPACE"
+    key-type Enter -times 2
+    
+    // add "two args" and change default args
+    type-text two
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "my arg 1"
+    key-type Tab
+    type-text "second arg"
+    key-type Enter -times 2
+    
+    // add args as list
+    type-text arg
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "${my list}"
+    key-type Enter
+    
+    // add Should Be Equal As Numbers with additional arg
+    type-text Sho
+    key-type "M1+SPACE"
+    key-type Down -times 3
+    key-type Enter
+    type-text 67
+    key-type Tab
+    type-text 89
+    
+    //here will be added new separator and use can add new value
+    key-type Tab
+    type-text text
+    key-type Enter -times 2
+    key-type "M1+s"
+}
+
+// add keyword to Setting section
+with [get-editor "tsv_file.tsv" | get-text-viewer] {
+    set-caret-pos 2 1
+    type-text Te
+    key-type "M1+SPACE"
+    key-type Enter
+    wait 300
+    key-type Enter
+}
+
+//add default keyword to keywords
+with [get-editor "tsv_file.tsv" | get-text-viewer] {
+    set-caret-pos 26 16
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text No
+    key-type "M1+SPACE"
+    key-type Enter -times 2
+    type-text Get
+    key-type "M1+SPACE"
+    key-type Enter
+}
+
+//add user keyword to user keyword
+with [get-editor "tsv_file.tsv" | get-text-viewer] {
+    set-caret-pos 28 30
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text two
+    key-type "M1+SPACE"
+    key-type Enter
+}
+get-editor "tsv_file.tsv" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Test Setup\tCall Method\tobject\tmethod_name\t\n\n"
+    + "*** Test Cases ***\n"
+    + "test 2\n"
+    + "\ttwo args\ta\tb\t\n"
+    + "\targs as list\t\n"
+    + "\tkw with no args\n"
+    + "\ttwo args\tmy arg 1\tsecond arg\n"
+    + "\targs as list\t${my list}\n"
+    + "\tShould Be Equal As Numbers\t67\t89\ttext\n"
+    + "\t\t\n\n"
+    + "*** Keywords ***\n"
+    + "two args\n"
+    + "\t[Arguments]\t${a}\t${b}\t${op}=7\n"
+    + "\tlog\tSimple kw\n"
+    + "\t${new_val}=\tSet Variable\t4\n"
+    + "\t[Return]\t${new_val}\n"
+    + "\t\n"
+    + "args as list\n"
+    + "\t[Arguments]\t@{my_list}\n"
+    + "\tlog\tList used\n"
+    + "\t\n"
+    + "kw with no args\n"
+    + "\tlog\tno args\n"
+    + "\tNo Operation\n"
+    + "\tGet Count\titem1\titem2\n"
+    + "\ttwo args\ta\tb" | verify-true
+       
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
