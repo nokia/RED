@@ -99,7 +99,9 @@ public class LibrariesBuilder {
                         .toOSString();
                 return new PythonLibraryLibdocGenerator(refLib.getName(), libPath, libspecSourceFile);
             } else if (type == LibraryType.JAVA) {
-                return new JavaLibraryLibdocGenerator(specification.getName(), path, libspecSourceFile);
+                final String libPath = PathsConverter
+                        .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(path)).toOSString();
+                return new JavaLibraryLibdocGenerator(specification.getName(), libPath, libspecSourceFile);
             }
             throw new IllegalStateException("Unknown library type: " + type);
         }
