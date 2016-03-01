@@ -107,7 +107,7 @@ public class HashCommentMapper implements IParsingMapper {
         final ParsingState commentHolder = findNearestCommentDeclaringModelElement(processingState);
         final RobotFile fileModel = robotFileOutput.getFileModel();
         final IHashCommentMapper commentMapper = findApplicableMapper(commentHolder);
-        if (commentHolder != ParsingState.TRASH || commentMapper != null) {
+        if (commentHolder != ParsingState.TRASH && commentMapper != null) {
             commentMapper.map(currentLine, rt, commentHolder, fileModel);
         }
 
