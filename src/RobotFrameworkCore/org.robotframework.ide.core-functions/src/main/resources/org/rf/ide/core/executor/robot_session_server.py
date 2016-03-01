@@ -144,10 +144,15 @@ def create_libdoc(result_filepath, libname, libpath):
     from robot import pythonpathsetter
     from robot import libdoc
 
-    if (libpath != ''):
+    if libpath.endswith('.jar'):
+        from classpath_updater import ClassPathUpdater
+        cp_updater = ClassPathUpdater()
+        cp_updater.add_file(libpath) 
+
+    if libpath != '':
         pythonpathsetter.add_path(libpath)
     robot.libdoc.libdoc(libname, result_filepath, format='XML')
-    if (libpath != ''):
+    if libpath != '':
         pythonpathsetter.remove_path(libpath)
 
 
