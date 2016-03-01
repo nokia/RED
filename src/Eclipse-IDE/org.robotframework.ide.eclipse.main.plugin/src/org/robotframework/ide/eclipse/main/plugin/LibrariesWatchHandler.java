@@ -10,11 +10,20 @@ import java.io.FilenameFilter;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -27,6 +36,7 @@ import org.rf.ide.core.fileWatcher.IWatchEventHandler;
 import org.rf.ide.core.fileWatcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
@@ -44,18 +54,26 @@ import com.google.common.collect.Multimaps;
  */
 public class LibrariesWatchHandler implements IWatchEventHandler {
 
-    private ListMultimap<LibrarySpecification, String> librarySpecifications = Multimaps
-            .synchronizedListMultimap(ArrayListMultimap.<LibrarySpecification, String> create());
+    private final RobotProject robotProject;
 
     private IEventBroker eventBroker = null;
 
-    private final RobotProject robotProject;
+    private ListMultimap<LibrarySpecification, String> librarySpecifications = Multimaps
+            .synchronizedListMultimap(ArrayListMultimap.<LibrarySpecification, String> create());
+
+    private Set<LibrarySpecification> dirtySpecs = Collections.synchronizedSet(new HashSet<LibrarySpecification>());
+    
+    private Map<ReferencedLibrary, String> registeredRefLibraries = Collections.synchronizedMap(new HashMap<ReferencedLibrary, String>());
+
+    private ConcurrentLinkedQueue<RebuildTask> rebuildTasksQueue = new ConcurrentLinkedQueue<>();
 
     public LibrariesWatchHandler(final RobotProject robotProject) {
         this.robotProject = robotProject;
     }
 
-    public void registerLibrary(final String absolutePathToLibraryFile, final LibrarySpecification spec) {
+    public void registerLibrary(ReferencedLibrary library, final LibrarySpecification spec) {
+
+        final String absolutePathToLibraryFile = findLibraryFileAbsolutePath(library);
 
         if (absolutePathToLibraryFile != null && spec != null && !librarySpecifications.containsKey(spec)) {
             final File libFile = new File(absolutePathToLibraryFile);
@@ -79,7 +97,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     public void unregisterLibraries(final List<ReferencedLibrary> libraries) {
         if (libraries != null) {
             for (ReferencedLibrary referencedLibrary : libraries) {
-                final String path = referencedLibrary.getAbsolutePathToFile();
+                final String path = registeredRefLibraries.get(referencedLibrary);
                 if (path != null) {
                     final File libFile = new File(path);
                     final File libDir = libFile.getParentFile();
@@ -96,6 +114,14 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 }
             }
         }
+    }
+
+    public boolean isLibSpecDirty(final LibrarySpecification spec) {
+        return dirtySpecs.contains(spec);
+    }
+
+    public void removeDirtySpecs(final Collection<LibrarySpecification> reloadedSpecs) {
+        dirtySpecs.removeAll(reloadedSpecs);
     }
 
     private boolean isPythonModule(final String absolutePathToLibraryFile) {
@@ -170,7 +196,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 unregisterFile(modifiedFileName, this);
                 return;
             }
-            
+
             SwtThread.asyncExec(new Runnable() {
 
                 @Override
@@ -185,9 +211,9 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                                 }
                             }
                         }
-                        rebuildLibrary(project, specsToRebuild);
+                        rebuildLibraries(project, specsToRebuild);
                     } else {
-                        changeSpecModifyFlag(modifiedFileName);
+                        changeLibSpecModifyFlag(modifiedFileName);
                     }
                     refreshNavigator(project);
                 }
@@ -195,38 +221,77 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         }
     }
 
-    private void rebuildLibrary(final IProject project, final List<LibrarySpecification> specs) {
-        final Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
-        try {
-            new ProgressMonitorDialog(shell).run(true, true, new IRunnableWithProgress() {
+    private void rebuildLibraries(final IProject project, final List<LibrarySpecification> specs) {
 
-                @Override
-                public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
-                    final Multimap<IProject, LibrarySpecification> groupedSpecifications = LinkedHashMultimap.create();
-                    groupedSpecifications.putAll(project, specs);
-                    new LibrariesBuilder(new BuildLogger()).forceLibrariesRebuild(groupedSpecifications,
-                            SubMonitor.convert(monitor));
-                    robotProject.clearConfiguration();
-                }
-            });
-        } catch (InvocationTargetException | InterruptedException e) {
-            MessageDialog.openError(shell, "Regenerating library specification",
-                    "Problems occured during library specification generation " + e.getCause().getMessage());
+        final RebuildTask newRebuildTask = new RebuildTask(project, specs);
+        
+        if (rebuildTasksQueue.isEmpty()) {
+            rebuildTasksQueue.add(newRebuildTask);
+            final Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
+            try {
+                new ProgressMonitorDialog(shell).run(true, true, new IRunnableWithProgress() {
+
+                    @Override
+                    public void run(final IProgressMonitor monitor)
+                            throws InvocationTargetException, InterruptedException {
+                        handleRebuildTask(monitor, newRebuildTask);
+                    }
+                });
+            } catch (InvocationTargetException | InterruptedException e) {
+                MessageDialog.openError(shell, "Regenerating library specification",
+                        "Problems occured during library specification generation " + e.getCause().getMessage());
+            }
+        } else {
+            rebuildTasksQueue.add(newRebuildTask);
         }
     }
 
-    private void changeSpecModifyFlag(final String modifiedFileName) {
-        final List<LibrarySpecification> specsToChange = new ArrayList<>();
-        final Map<ReferencedLibrary, LibrarySpecification> referencedLibraries = robotProject.getReferencedLibraries();
-        for (final ReferencedLibrary refLib : referencedLibraries.keySet()) {
-            final String absolutePathToFile = refLib.getAbsolutePathToFile();
-            if (absolutePathToFile != null && new File(absolutePathToFile).getName().equals(modifiedFileName)) {
-                specsToChange.add(referencedLibraries.get(refLib));
+    private void handleRebuildTask(final IProgressMonitor monitor, final RebuildTask rebuildTask) {
+
+        final Multimap<IProject, LibrarySpecification> groupedSpecifications = LinkedHashMultimap.create();
+        groupedSpecifications.putAll(rebuildTask.getProject(), rebuildTask.getSpecsToRebuild());
+        new LibrariesBuilder(new BuildLogger()).forceLibrariesRebuild(groupedSpecifications,
+                SubMonitor.convert(monitor));
+        robotProject.clearConfiguration();
+
+        rebuildTasksQueue.poll();
+
+        final RebuildTask nextRebuildTask = rebuildTasksQueue.peek();
+        if (nextRebuildTask != null) {
+            removePossibleDuplicatedRebuildTasks(nextRebuildTask);
+            handleRebuildTask(monitor, nextRebuildTask);
+        }
+    }
+
+    private void removePossibleDuplicatedRebuildTasks(final RebuildTask nextRebuildTask) {
+        final Iterator<RebuildTask> tasksIterator = rebuildTasksQueue.iterator();
+        if(tasksIterator.hasNext()) {tasksIterator.next();} //skip queue head
+        while (tasksIterator.hasNext()) {
+            if (tasksIterator.next().equals(nextRebuildTask)) {
+                tasksIterator.remove();
             }
         }
+    }
 
-        for (final LibrarySpecification spec : specsToChange) {
-            spec.setIsModified(true);
+    private void changeLibSpecModifyFlag(final String modifiedFileName) {
+
+        final List<LibrarySpecification> specsToChange = new ArrayList<>();
+        synchronized (librarySpecifications) {
+            for (Entry<LibrarySpecification, String> entry : librarySpecifications.entries()) {
+                if (entry.getValue().equals(modifiedFileName)) {
+                    specsToChange.add(entry.getKey());
+                    dirtySpecs.add(entry.getKey());
+                }
+            }
+
+            final Map<ReferencedLibrary, LibrarySpecification> referencedLibraries = robotProject
+                    .getReferencedLibraries();
+            for (final ReferencedLibrary refLib : referencedLibraries.keySet()) {
+                final LibrarySpecification librarySpecification = referencedLibraries.get(refLib);
+                if (specsToChange.contains(librarySpecification)) {
+                    librarySpecification.setIsModified(true);
+                }
+            }
         }
     }
 
@@ -238,5 +303,85 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             eventBroker.post(RobotModelEvents.ROBOT_LIBRARY_SPECIFICATION_CHANGE, project);
         }
     }
+    
+    private String findLibraryFileAbsolutePath(final ReferencedLibrary library) {
 
+        String absolutePath = registeredRefLibraries.get(library);
+        if (absolutePath != null) {
+            return absolutePath;
+        }
+
+        IPath libraryPath = new org.eclipse.core.runtime.Path(library.getPath());
+        if (!libraryPath.isAbsolute()) {
+            libraryPath = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
+        }
+        final File libraryFile = libraryPath.toFile();
+        if (libraryFile.exists()) {
+            if (!libraryFile.isDirectory()) {
+                absolutePath = libraryPath.toPortableString();
+            } else {
+                String libraryName = library.getName();
+                if (libraryName.contains(".")) {
+                    libraryName = libraryName.split("\\.")[0];
+                }
+                if (library.provideType() == LibraryType.PYTHON) {
+                    IPath libFilePath = libraryPath.append(libraryName + ".py");
+                    if (libFilePath.toFile().exists()) {
+                        absolutePath = libFilePath.toPortableString();
+                    }
+                } else if (library.provideType() == LibraryType.JAVA) {
+                    IPath libFilePath = libraryPath.append(libraryName + ".java");
+                    if (libFilePath.toFile().exists()) {
+                        absolutePath = libFilePath.toPortableString();
+                    }
+                }
+                if (absolutePath == null) {
+                    IPath libFilePath = libraryPath.append(libraryName).append("__init__.py");
+                    if (libFilePath.toFile().exists()) {
+                        absolutePath = libFilePath.toPortableString();
+                    }
+                }
+            }
+        }
+        if (absolutePath != null) {
+            registeredRefLibraries.put(library, absolutePath);
+        }
+        return absolutePath;
+    }
+
+    private class RebuildTask {
+
+        private IProject project;
+
+        private List<LibrarySpecification> specsToRebuild;
+
+        public RebuildTask(IProject project, List<LibrarySpecification> specsToRebuild) {
+            this.project = project;
+            this.specsToRebuild = specsToRebuild;
+        }
+
+        public IProject getProject() {
+            return project;
+        }
+
+        public List<LibrarySpecification> getSpecsToRebuild() {
+            return specsToRebuild;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj == null) {
+                return false;
+            } else if (obj.getClass() == getClass()) {
+                final RebuildTask other = (RebuildTask) obj;
+                return Objects.equals(project, other.project) && Objects.equals(specsToRebuild, other.specsToRebuild);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(project, specsToRebuild);
+        }
+    }
 }
