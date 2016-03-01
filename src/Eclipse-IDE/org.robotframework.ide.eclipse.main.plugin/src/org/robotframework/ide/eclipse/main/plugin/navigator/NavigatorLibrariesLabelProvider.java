@@ -72,6 +72,7 @@ public class NavigatorLibrariesLabelProvider extends ColumnLabelProvider impleme
         } else if (element instanceof LibrarySpecification) {
 
             final LibrarySpecification libSpec = (LibrarySpecification) element;
+           
             final String dirtyLibSpecIndicator = libSpec.isModified() ? "*":"";
             final StyledString styled = new StyledString(dirtyLibSpecIndicator + libSpec.getName());
             final String additonalInfo = libSpec.getSecondaryKey();

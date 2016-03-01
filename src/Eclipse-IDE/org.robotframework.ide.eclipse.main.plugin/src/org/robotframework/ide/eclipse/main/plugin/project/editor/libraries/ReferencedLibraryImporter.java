@@ -88,7 +88,6 @@ public class ReferencedLibraryImporter {
                     referencedLibrary.setName(pythonClass.getQualifiedName());
                     referencedLibrary.setPath(
                             PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
-                    referencedLibrary.setAbsolutePathToFile(fullLibraryPath.toString());
 
                     return referencedLibrary;
                 }
