@@ -202,10 +202,17 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     @Override
     public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath) {
         final String cpSeparator = RobotRuntimeEnvironment.isWindows() ? ";" : ":";
-        final String classPath = "\"" + Joiner.on(cpSeparator).join(Arrays.asList(".", libPath)) + "\"";
+
+        final List<String> wholeClasspath = newArrayList(".", libPath);
+        final String sysPath = System.getenv("CLASSPATH");
+        if (sysPath != null && !sysPath.isEmpty()) {
+            wholeClasspath.add(sysPath);
+        }
+
+        final String classPath = "\"" + Joiner.on(cpSeparator).join(wholeClasspath) + "\"";
 
         final List<String> cmdLine = Arrays.asList(interpreterPath, "-J-cp", classPath, "-m", "robot.libdoc", "-f",
-                "XML", libName, libPath);
+                "XML", libName, resultFilePath);
         runLibdoc(libName, cmdLine);
     }
 
