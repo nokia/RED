@@ -83,7 +83,8 @@ public class Rules {
     }
 
     static String getSectionHeader(final ICharacterScanner scanner) {
-        if (scanner.getColumn() > 1
+        if ((scanner.getColumn() > 1 && !CharacterScannerUtilities
+                .isPipedCellStartingSeparator(CharacterScannerUtilities.lookBack(scanner, scanner.getColumn())))
                 || scanner.getColumn() == 1 && CharacterScannerUtilities.lookBack(scanner, 1).equals("#")) {
             return "";
         }
