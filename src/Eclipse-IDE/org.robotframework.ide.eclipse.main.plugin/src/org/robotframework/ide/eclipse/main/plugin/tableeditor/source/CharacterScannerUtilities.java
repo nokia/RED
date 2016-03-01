@@ -12,6 +12,10 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
  */
 class CharacterScannerUtilities {
 
+    static boolean isPipedCellStartingSeparator(final String string) {
+        return string.matches("^\\|[ \\t]+$");
+    }
+
     static boolean isCellSeparator(final String string) {
         return string.startsWith("\t") || string.startsWith(" \t") || string.startsWith("  ")
                 || string.startsWith(" | ") || string.startsWith(" |\t");

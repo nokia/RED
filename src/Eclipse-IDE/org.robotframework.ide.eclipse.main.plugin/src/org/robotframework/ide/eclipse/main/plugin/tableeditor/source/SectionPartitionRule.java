@@ -61,12 +61,14 @@ class SectionPartitionRule implements IPredicateRule {
     }
 
     private boolean startDetected(final ICharacterScanner scanner) {
+        final int readAdditionally = eatPipedLineStart(scanner);
+
         final String sectionHeader = Rules.getSectionHeader(scanner);
         if (!sectionHeader.isEmpty()) {
             if (sectionType.matches(sectionHeader)) {
                 return true;
             } else {
-                for (int i = 0; i < sectionHeader.length(); i++) {
+                for (int i = 0; i < sectionHeader.length() + readAdditionally; i++) {
                     scanner.unread();
                 }
             }
@@ -75,14 +77,31 @@ class SectionPartitionRule implements IPredicateRule {
     }
 
     private boolean endDetected(final ICharacterScanner scanner) {
+        final int readAdditionally = eatPipedLineStart(scanner);
+
         final String sectionHeader = Rules.getSectionHeader(scanner);
         if (!sectionHeader.isEmpty()) {
-            for (int i = 0; i < sectionHeader.length(); i++) {
+            for (int i = 0; i < sectionHeader.length() + readAdditionally; i++) {
                 scanner.unread();
             }
             return true;
         }
         return false;
+    }
+
+    private int eatPipedLineStart(final ICharacterScanner scanner) {
+        int readAdditionally = 0;
+        if (CharacterScannerUtilities.lookAhead(scanner, 1).equals("|")) {
+            scanner.read();
+            readAdditionally++;
+            String next = CharacterScannerUtilities.lookAhead(scanner, 1);
+            while (next.equals(" ") || next == "\t") {
+                scanner.read();
+                readAdditionally++;
+                next = CharacterScannerUtilities.lookAhead(scanner, 1);
+            }
+        }
+        return readAdditionally;
     }
 
     static enum Section {
