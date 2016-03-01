@@ -152,7 +152,10 @@ public class RobotProject extends RobotContainer {
         refLibsSpecs = newLinkedHashMap();
         for (final ReferencedLibrary library : configuration.getLibraries()) {
             final LibrarySpecification spec = reflibToSpec(getProject()).apply(library);
-            librariesWatchHandler.registerLibrary(library.getAbsolutePathToFile(), spec);
+            librariesWatchHandler.registerLibrary(library, spec);
+            if(librariesWatchHandler.isLibSpecDirty(spec)) {
+                spec.setIsModified(true);
+            }
             refLibsSpecs.put(library, spec);
         }
         return refLibsSpecs;
@@ -160,6 +163,10 @@ public class RobotProject extends RobotContainer {
     
     public synchronized void unregisterWatchingOnReferencedLibraries(final List<ReferencedLibrary> libraries) {
         librariesWatchHandler.unregisterLibraries(libraries);
+    }
+    
+    public void clearDirtyLibSpecs(final Collection<LibrarySpecification> libSpecs) {
+        librariesWatchHandler.removeDirtySpecs(libSpecs);
     }
 
     private static Function<String, LibrarySpecification> stdLibToSpec(final IProject project) {

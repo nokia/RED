@@ -344,9 +344,6 @@ public class RobotProjectConfig {
 
         @XmlAttribute
         private String path;
-        
-        @XmlAttribute
-        private String absolutePathToFile;
 
         public void setType(final String type) {
             this.type = type;
@@ -370,14 +367,6 @@ public class RobotProjectConfig {
 
         public String getPath() {
             return path;
-        }
-        
-        public void setAbsolutePathToFile(final String path) {
-            this.absolutePathToFile = path;
-        }
-
-        public String getAbsolutePathToFile() {
-            return absolutePathToFile;
         }
 
         public IPath getFilepath() {

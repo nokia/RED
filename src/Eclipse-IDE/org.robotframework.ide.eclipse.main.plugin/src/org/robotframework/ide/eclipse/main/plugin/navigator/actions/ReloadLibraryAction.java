@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -74,7 +75,9 @@ public class ReloadLibraryAction extends Action implements IEnablementUpdatingAc
         new LibrariesBuilder(new BuildLogger()).forceLibrariesRebuild(groupedSpecifications,
                 SubMonitor.convert(monitor));
         for (final IProject project : groupedSpecifications.keySet()) {
-            RedPlugin.getModelManager().createProject(project).clearConfiguration();
+            final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
+            robotProject.clearDirtyLibSpecs(groupedSpecifications.values());
+            robotProject.clearConfiguration();
         }
 
         SwtThread.asyncExec(new Runnable() {
