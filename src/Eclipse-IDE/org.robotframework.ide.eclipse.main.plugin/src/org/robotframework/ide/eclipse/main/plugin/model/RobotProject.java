@@ -66,7 +66,7 @@ public class RobotProject extends RobotContainer {
 
     private List<File> modulesSearchPath;
     
-    private LibrariesWatchHandler librariesWatchHandler;
+    private final LibrariesWatchHandler librariesWatchHandler;
 
     RobotProject(final IProject project) {
         super(null, project);
@@ -332,7 +332,9 @@ public class RobotProject extends RobotContainer {
             final Set<String> cp = newHashSet(".");
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
                 if (lib.provideType() == LibraryType.JAVA) {
-                    cp.add(lib.getPath());
+                    final IPath absPath = PathsConverter
+                            .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath()));
+                    cp.add(absPath.toOSString());
                 }
             }
             return newArrayList(cp);
