@@ -37,7 +37,11 @@ public final class RedVariableProposal {
     }
 
     static RedVariableProposal createLocal(final String name, final String path) {
-        return new RedVariableProposal(name, path, "", "", VariableType.LOCAL);
+        if (name.contains("}=")) {
+            return new RedVariableProposal(name.substring(0, name.indexOf("}=") + 1), path, "", "", VariableType.LOCAL);
+        } else {
+            return new RedVariableProposal(name, path, "", "", VariableType.LOCAL);
+        }
     }
 
     static RedVariableProposal create(final String name, final String value, final String path) {
