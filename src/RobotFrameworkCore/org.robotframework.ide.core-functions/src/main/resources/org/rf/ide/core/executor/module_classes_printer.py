@@ -46,6 +46,7 @@ else:
     raise Exception('Unrecognized library path: ' + original_path)
 
 for module in modules:
+    print(module.__name__)
     for n, obj in inspect.getmembers(module):
         if inspect.isclass(obj) and obj.__module__.startswith(module_name):
             print(obj.__module__ + '.' + obj.__name__)
