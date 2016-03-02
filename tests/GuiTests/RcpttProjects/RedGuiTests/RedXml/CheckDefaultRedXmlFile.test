@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mHeMEKQYEeW4l-rLhvMqpg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/11/16 11:01 AM
+Save-Time: 3/2/16 12:15 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -79,26 +79,35 @@ get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced li
 with [get-editor "RobotProject/red.xml"] {
 
 	//check Referenced libreries
-    with [get-section "Referenced libraries"] {
-        get-property "getDescription()" 
-            | equals "Specify third party libraries to be used by the project. Libraries defined here will be accessible from all suites within the project." 
-            | verify-true
-        get-property "getText()" | equals "Referenced libraries" | verify-true
-        get-property "getChildren().Control[0].getText()" | equals "Referenced libraries" | verify-true
-        get-property "getChildren().Control[2].getChildren().length" | equals 4 | verify-true
-        get-property "getChildren().Control[2].getChildren().Control[0].getItems().length" | equals 0 | verify-true
-        get-property "getChildren().Control[2].getChildren().Control[1].getClassName()" 
-            | equals "org.eclipse.swt.widgets.Button" | verify-true
-        get-property "getChildren().Control[2].getChildren().Control[1].getText()" | equals "Add Python library" 
-            | verify-true
-        get-property "getChildren().Control[2].getChildren().Control[1].isEnabled()" | equals true | verify-true
-        get-property "getChildren().Control[2].getChildren().Control[2].getText()" | equals "Add Java library" 
-            | verify-true
-        get-property "getChildren().Control[2].getChildren().Control[2].isEnabled()" | equals false | verify-true
-        get-property "getChildren().Control[2].getChildren().Control[3].getText()" | equals "Add libspec file" 
-            | verify-true
-        get-property "getChildren().Control[2].getChildren().Control[3].isEnabled()" | equals true | verify-true
-    }
+	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
+	    get-property "getDescription()" 
+	        | equals "Specify third party libraries to be used by the project. Libraries defined here will be accessible from all suites within the project." 
+	        | verify-true
+	    get-property "getText()" | equals "Referenced libraries" | verify-true
+	    get-property "getChildren().length" | equals 3 | verify-true
+	    get-property "getChildren().Control[0].getText()" | equals "Referenced libraries" | verify-true
+	    get-property "getChildren().Control[1].getText()" 
+	        | equals "Specify third party libraries to be used by the project. Libraries defined here will be accessible from all suites within the project." 
+	        | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[1].getClassName()" 
+	        | equals "org.eclipse.swt.widgets.Button" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[1].getText()" | equals "Add Python library" 
+	        | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[2].getText()" | equals "Add Java library" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[3].getText()" | equals "Add libspec file" | verify-true
+	    get-property "getChildren().Control[2].getChildren().Control[4].getChildren().Control[0].getText()" 
+	        | equals "Automatically reload changed libraries" | verify-true
+	    
+	    //check that checkbox is selected    
+	    with [get-button "Automatically reload changed libraries"] {
+	        get-property enablement | equals true | verify-true
+	        get-property selected | equals true | verify-true
+	    }
+	    //if no jython installed than "Add Java library" is not enable
+	    get-button "Add Python library" | get-property enablement | equals true | verify-true
+	    get-button "Add Java library" | get-property enablement | equals false | verify-true
+	    get-button "Add libspec file" | get-property enablement | equals true | verify-true
+	}
     
     //check Remote lirary
     with [get-section "Remote library locations"] {
