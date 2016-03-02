@@ -231,41 +231,44 @@ class KeywordCallArgumentsValidator implements ModelUnitValidator {
 
         for (final RobotToken useSiteArg : arguments) {
             final List<Argument> defs = argsMapping.getUsageMapping(useSiteArg);
-            if (useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
-                    && !isNonCollectionVar(useSiteArg) && !defs.isEmpty()) {
-                final List<Argument> required = newArrayList(filter(defs, new Predicate<Argument>() {
-                    @Override
-                    public boolean apply(final Argument arg) {
-                        return arg.isRequired();
-                    }
-                }));
-                if (required.isEmpty()) {
-                    return;
-                }
-                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS)
-                        .formatMessageWith(useSiteArg.getText(), required.size(),
-                                "[" + Joiner.on(", ").join(required) + "]");
-                reporter.handleProblem(problem, file, useSiteArg);
-            } else if (useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION)
-                    && !isNonCollectionVar(useSiteArg)
-                    && !defs.isEmpty()) {
-                final List<Argument> required = newArrayList(filter(defs, new Predicate<Argument>() {
 
-                    @Override
-                    public boolean apply(final Argument arg) {
-                        return arg.isRequired();
-                    }
-                }));
-                if (required.isEmpty()) {
-                    return;
-                }
-                final RobotProblem problem = RobotProblem.causedBy(ArgumentProblem.DICT_ARGUMENT_SHOULD_PROVIDE_ARGS)
-                        .formatMessageWith(useSiteArg.getText(), required.size(),
+            if ((useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
+                    || useSiteArg.getTypes().contains(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION))
+                    && !isNonCollectionVar(useSiteArg)) {
+
+                if (!defs.isEmpty()) {
+                    final List<Argument> required = newArrayList(filter(defs, onlyRequired()));
+                    if (!required.isEmpty()) {
+                        final ArgumentProblem cause = useSiteArg.getTypes()
+                                .contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
+                                        ? ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS
+                                        : ArgumentProblem.DICT_ARGUMENT_SHOULD_PROVIDE_ARGS;
+                        final int noOfRequiredArgs = required.size();
+                        final RobotProblem problem = RobotProblem.causedBy(cause).formatMessageWith(
+                                useSiteArg.getText(), noOfRequiredArgs + toPluralIfNeeded(" value", noOfRequiredArgs),
                                 "[" + Joiner.on(", ").join(required) + "]");
-                reporter.handleProblem(problem, file, useSiteArg);
+                        reporter.handleProblem(problem, file, useSiteArg);
+                    }
+                } else {
+                    final ArgumentProblem cause = useSiteArg.getTypes()
+                            .contains(RobotTokenType.VARIABLES_LIST_DECLARATION)
+                                    ? ArgumentProblem.LIST_ARGUMENT_SHOULD_PROVIDE_ARGS
+                                    : ArgumentProblem.DICT_ARGUMENT_SHOULD_PROVIDE_ARGS;
+                    final RobotProblem problem = RobotProblem.causedBy(cause).formatMessageWith(useSiteArg.getText(),
+                            "0 values", "[]");
+                    reporter.handleProblem(problem, file, useSiteArg);
+                }
             }
         }
+    }
 
+    private static Predicate<Argument> onlyRequired() {
+        return new Predicate<Argument>() {
+            @Override
+            public boolean apply(final Argument arg) {
+                return arg.isRequired();
+            }
+        };
     }
 
     private boolean isNamed(final RobotToken arg, final Collection<String> argumentNames) {
