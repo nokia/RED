@@ -234,6 +234,24 @@
           </objectClass>
        </enablement>
     </decorator>
+    <decorator
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.MarkerLabelDecorator"
+          id="org.robotframework.red.decorator.version.markers"
+          label="Robot validation errors/warnings"
+          lightweight="true"
+          location="BOTTOM_LEFT"
+          state="true">
+       <description>
+          Indicates error/warning markers on resources
+       </description>
+       <enablement>
+            <or>
+               <objectClass name="org.eclipse.core.resources.IProject"/>
+               <objectClass name="org.eclipse.core.resources.IFolder"/>
+               <objectClass name="org.eclipse.core.resources.IFile"/>
+            </or>
+       </enablement>
+    </decorator>
  </extension>
 
 	<extension
