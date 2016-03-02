@@ -365,6 +365,12 @@
             restorable="true">
       </view>
  </extension>
+ <extension point="org.eclipse.core.runtime.adapters">
+      <factory class="org.eclipse.core.runtime.IAdaptable"
+           adaptableType="org.eclipse.core.resources.IResource">
+          <adapter type="org.eclipse.debug.ui.actions.ILaunchable"/>
+      </factory>
+ </extension>
  <extension
        point="org.eclipse.debug.core.launchConfigurationTypes">
     <launchConfigurationType
