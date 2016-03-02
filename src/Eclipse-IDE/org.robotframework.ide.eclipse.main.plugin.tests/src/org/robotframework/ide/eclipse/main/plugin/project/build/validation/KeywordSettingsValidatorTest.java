@@ -211,8 +211,8 @@ public class KeywordSettingsValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
         assertThat(reporter.getReportedProblems()).containsOnly(
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 33))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(44, 50))));
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 42))),
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(53, 68))));
     }
 
     @Test
@@ -260,8 +260,8 @@ public class KeywordSettingsValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
         assertThat(reporter.getReportedProblems()).containsOnly(
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 33))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(44, 50))));
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 36))),
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(47, 56))));
     }
 
     @Test
@@ -331,8 +331,8 @@ public class KeywordSettingsValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
         assertThat(reporter.getReportedProblems()).containsOnly(
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 33))),
-                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(44, 50))));
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(22, 32))),
+                new Problem(KeywordsProblem.DUPLICATED_KEYWORD_SETTING, new ProblemPosition(4, Range.closed(46, 56))));
     }
 
     @Test
@@ -632,7 +632,7 @@ public class KeywordSettingsValidatorTest {
     public void syntaxProblesAreReported_whenDefinitionIsInvalid() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
-                .appendLine("  [Arguments]  123  ${x  {y}  ${x} =123")
+                .appendLine("  [Arguments]  123  ${x  {y}  ${x} =123  ${}  ${a} ${b}  @{m}=0")
                 .appendLine("  [Return]  10")
                 .build();
 
@@ -640,12 +640,15 @@ public class KeywordSettingsValidatorTest {
         final KeywordSettingsValidator validator = new KeywordSettingsValidator(context, getKeyword(file), reporter);
         validator.validate(null);
 
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(4);
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(7);
         assertThat(reporter.getReportedProblems()).containsOnly(
                 new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(40, 43))),
                 new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(45, 48))),
                 new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(50, 53))),
-                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(55, 64))));
+                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(55, 64))),
+                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(66, 69))),
+                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(71, 80))),
+                new Problem(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX, new ProblemPosition(3, Range.closed(82, 88))));
     }
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
