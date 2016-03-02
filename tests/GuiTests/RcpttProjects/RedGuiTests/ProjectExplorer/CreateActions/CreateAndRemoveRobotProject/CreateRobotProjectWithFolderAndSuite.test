@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/19/16 4:07 PM
+Save-Time: 3/2/16 1:30 PM
 Testcase-Type: ecl
 Verifications: _ase_IGBvEeW-9bGOK0urnw
 
@@ -309,8 +309,8 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <excludedForValidation/>\n"
     + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
     + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
     + "</projectConfiguration>" | verify-true
-
 
 //-----------------------------------------------------------------------------------------------------------------------    
 //add Robot test suite folder
