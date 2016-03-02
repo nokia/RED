@@ -175,6 +175,10 @@ public class HashCommentMapper implements IParsingMapper {
             if (ParsingState.getSettingsStates().contains(s)) {
                 state = s;
                 break;
+            } else if (s == ParsingState.SETTING_TABLE_HEADER || s == ParsingState.VARIABLE_TABLE_HEADER
+                    || s == ParsingState.TEST_CASE_TABLE_HEADER || s == ParsingState.KEYWORD_TABLE_HEADER) {
+                state = s;
+                break;
             }
         }
 
