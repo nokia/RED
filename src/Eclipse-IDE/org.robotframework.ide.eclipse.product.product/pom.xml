@@ -10,6 +10,11 @@
     <relativePath>../org.robotframework.ide.eclipse.parent</relativePath>
   </parent>
 
+  <properties>
+   <timestamp>${maven.build.timestamp}</timestamp>
+   <maven.build.timestamp.format>yyyyMMddHHmmss</maven.build.timestamp.format>
+  </properties>
+
   <artifactId>org.robotframework.ide.eclipse.product.product</artifactId>
   <packaging>eclipse-repository</packaging>
   <version>1.0.0-SNAPSHOT</version>
@@ -46,7 +51,7 @@
 	      <products>
 	        <product>
 	          <id>org.robotframework.red</id>
-	          <archiveFileName>RED-${eclipse.version}-${BUILD_TIMESTAMP}</archiveFileName>
+	          <archiveFileName>RED-${eclipse.version}-${timestamp}</archiveFileName>
 	        </product>
 	      </products>
 	    </configuration>
