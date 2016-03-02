@@ -43,6 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.debug.utils.RobotDebugVariable
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
 
 /**
@@ -89,7 +90,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
     
     private RobotDebugStackFrameManager robotDebugStackFrameManager;
     
-    private RobotConsoleFacade remoteDebugConsole;
+    private RobotConsoleFacade consoleFacade;
     
     private final boolean isRemoteDebugging;
 
@@ -99,7 +100,7 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         super.target = this;
         this.launch = launch;
         this.process = process;
-        this.remoteDebugConsole = consoleFacade;
+        this.consoleFacade = consoleFacade;
         this.currentKeywordDebugContextMap = new LinkedHashMap<>();
         this.robotVariablesManager = new RobotDebugVariablesManager(this);
         this.robotDebugValueManager = new RobotDebugValueManager();
@@ -128,19 +129,19 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
                 }
                 retryCounter++;
                 if(process.isTerminated()) {
-                    remoteDebugConsole.writeLine("Debug server terminated by user");
+                    consoleFacade.writeLine("Debug server terminated by user");
                     throw new CoreException(Status.CANCEL_STATUS);
                 }
                 if(retryCounter > socketManager.getRetryCounterMaxValue()) {
-                    remoteDebugConsole.writeLine("A timeout was reached while waiting for a remote connection");
+                    consoleFacade.writeLine("A timeout was reached while waiting for a remote connection");
                     process.terminate();
                     throw new CoreException(Status.CANCEL_STATUS);
                 }
             }
             serverSocket = socketManager.getServerSocket();
             eventSocket = socketManager.getEventSocket();
-            if (eventSocket != null) {
-                remoteDebugConsole.writeLine("\nRemote connection from " + eventSocket.getInetAddress().getHostAddress()
+            if (eventSocket != null && isRemoteDebugging) {
+                consoleFacade.writeLine("\nRemote connection from " + eventSocket.getInetAddress().getHostAddress()
                         + ":" + eventSocket.getLocalPort() + " established");
             }
             eventWriter = new PrintWriter(eventSocket.getOutputStream(), true);
@@ -155,7 +156,8 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
         robotDebugStackFrameManager = new RobotDebugStackFrameManager(thread);
 
         final RobotDebugEventDispatcher eventDispatcher = new RobotDebugEventDispatcher(this, suiteResources,
-                robotEventBroker, remoteDebugConsole);
+                robotEventBroker,
+                isRemoteDebugging ? Optional.of(consoleFacade) : Optional.<RobotConsoleFacade> absent());
         eventDispatcher.schedule();
 
         DebugPlugin.getDefault().getBreakpointManager().addBreakpointListener(this);
@@ -321,9 +323,11 @@ public class RobotDebugTarget extends RobotDebugElement implements IDebugTarget 
             if (serverSocket != null) {
                 serverSocket.close();
             }
-            if (remoteDebugConsole != null) {
-                remoteDebugConsole.writeLine("Remote connection closed");
-                remoteDebugConsole = null;
+            if (consoleFacade != null) {
+                if (isRemoteDebugging) {
+                    consoleFacade.writeLine("Remote connection closed");
+                }
+                consoleFacade = null;
             }
         } catch (final IOException e) {
             e.printStackTrace();

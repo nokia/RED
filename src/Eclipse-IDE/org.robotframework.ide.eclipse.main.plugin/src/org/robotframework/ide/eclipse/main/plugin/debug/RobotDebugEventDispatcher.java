@@ -38,6 +38,8 @@ import org.robotframework.ide.eclipse.main.plugin.launch.RobotConsoleFacade;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotEventBroker;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.base.Optional;
+
 /**
  * Listens to events from the TestRunnerAgent and fires corresponding
  * debug events.
@@ -59,16 +61,16 @@ public class RobotDebugEventDispatcher extends Job {
     
     private final KeywordExecutionManager keywordExecutionManager;
     
-    private final RobotConsoleFacade remoteDebugConsole;
+    private final Optional<RobotConsoleFacade> consoleFacade;
     
     public RobotDebugEventDispatcher(final RobotDebugTarget target, final List<IResource> suiteFilesToDebug,
-            final RobotEventBroker robotEventBroker, final RobotConsoleFacade consoleFacade) {
+            final RobotEventBroker robotEventBroker, final Optional<RobotConsoleFacade> consoleFacade) {
         super("Robot Event Dispatcher");
         setSystem(true);
 
         this.target = target;
         this.robotEventBroker = robotEventBroker;
-        this.remoteDebugConsole = consoleFacade;
+        this.consoleFacade = consoleFacade;
 
         executionContext = new RobotDebugExecutionContext();
         keywordExecutionManager = new KeywordExecutionManager(suiteFilesToDebug);
@@ -385,18 +387,18 @@ public class RobotDebugEventDispatcher extends Job {
     
     private void printRemoteDebugSuiteMessage(final IPath suiteFilePath) {
         try {
-            if (suiteFilePath != null && suiteFilePath.getFileExtension() != null) {
-                remoteDebugConsole.writeLine("Debugging test suite: " + suiteFilePath.toOSString());
+            if (consoleFacade.isPresent() && suiteFilePath != null && suiteFilePath.getFileExtension() != null) {
+                consoleFacade.get().writeLine("Debugging test suite: " + suiteFilePath.toOSString());
             }
         } catch (final IOException e) {
             e.printStackTrace();
         }
     }
-    
+
     private void printRemoteDebugTestCaseMessage(final String testCaseName, final boolean isTestCaseAvailable) {
-        if (!isTestCaseAvailable) {
+        if (consoleFacade.isPresent() && !isTestCaseAvailable) {
             try {
-                remoteDebugConsole
+                consoleFacade.get()
                         .writeLine("Test case \"" + testCaseName + "\" not available. Check the files content!");
             } catch (final IOException e) {
                 e.printStackTrace();
