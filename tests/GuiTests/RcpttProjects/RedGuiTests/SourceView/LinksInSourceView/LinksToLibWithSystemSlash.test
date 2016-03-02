@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _4p6MQKS3EeWCSZzk3osblg
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/18/15 11:48 AM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 3/2/16 3:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -44,7 +44,10 @@ with [get-editor "Script.robot" | get-text-viewer] {
 
 // Kw should be recognised, content assist should show KW, there should be 0 problems
 get-tab-folder -index 4 | get-tab-item Problems | click
-get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+try -times 3 -delay 1000 -command{
+	get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+}
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
