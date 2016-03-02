@@ -565,6 +565,11 @@ public enum RobotTokenType implements IRobotTokenType {
         KEYWORDS;
     }
 
+    public static boolean isTableHeader(final IRobotTokenType type) {
+        return (type == SETTINGS_TABLE_HEADER || type == VARIABLES_TABLE_HEADER || type == TEST_CASES_TABLE_HEADER
+                || type == KEYWORDS_TABLE_HEADER || type == USER_OWN_TABLE_HEADER);
+    }
+
     public static List<RobotTokenType> getTypesForSettingsTable() {
         return getTypes(TableType.SETTINGS);
     }
