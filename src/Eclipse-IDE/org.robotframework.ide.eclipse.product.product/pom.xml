@@ -46,7 +46,7 @@
 	      <products>
 	        <product>
 	          <id>org.robotframework.red</id>
-	          <archiveFileName>RED-${eclipse.version}</archiveFileName>
+	          <archiveFileName>RED-${eclipse.version}-${BUILD_TIMESTAMP}</archiveFileName>
 	        </product>
 	      </products>
 	    </configuration>
