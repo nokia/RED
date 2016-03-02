@@ -24,7 +24,6 @@ affiliates. Other names may be trademarks of their respective owners.&#x0D;
             <property name="preferenceCustomization" value="plugin_customization.ini"/>
             <property name="applicationXMI" value="org.robotframework.ide.eclipse.product.plugin/red.e4xmi"/>
             <property name="applicationCSSResources" value="platform:/plugin/org.eclipse.platform/images/"/>
-            <property name="org.eclipse.update.reconcile" value="false" />
       </product>
    </extension>
 </plugin>
