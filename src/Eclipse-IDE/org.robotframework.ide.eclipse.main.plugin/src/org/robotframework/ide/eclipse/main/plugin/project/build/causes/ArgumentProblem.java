@@ -57,7 +57,7 @@ public enum ArgumentProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Dictionary argument '%s' has to provide %d values in order to ensure %s arguments of keyword definition";
+            return "Dictionary argument '%s' has to provide %s in order to ensure %s arguments of keyword definition";
         }
     },
     LIST_ARGUMENT_SHOULD_PROVIDE_ARGS {
@@ -68,7 +68,7 @@ public enum ArgumentProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "List argument '%s' has to provide %d values in order to ensure %s arguments of keyword definition";
+            return "List argument '%s' has to provide %s in order to ensure %s arguments of keyword definition";
         }
     },
     INVALID_TIME_FORMAT {
