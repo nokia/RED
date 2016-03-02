@@ -112,6 +112,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                     } else {
                         removeLibraryToWatch(libFile.getName());
                     }
+                    registeredRefLibraries.remove(referencedLibrary);
                 }
             }
         }
@@ -311,6 +312,9 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         if (absolutePath != null) {
             return absolutePath;
         }
+        if (library.provideType() == LibraryType.VIRTUAL) {
+            return null;
+        }
 
         IPath libraryPath = new org.eclipse.core.runtime.Path(library.getPath());
         if (!libraryPath.isAbsolute()) {
@@ -348,6 +352,20 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             registeredRefLibraries.put(library, absolutePath);
         }
         return absolutePath;
+    }
+
+    /**
+     * for testing purposes only
+     */
+    protected Map<ReferencedLibrary, String> getRegisteredRefLibraries() {
+        return registeredRefLibraries;
+    }
+    
+    /**
+     * for testing purposes only
+     */
+    protected ListMultimap<LibrarySpecification, String> getLibrarySpecifications() {
+        return librarySpecifications;
     }
 
     private class RebuildTask {
