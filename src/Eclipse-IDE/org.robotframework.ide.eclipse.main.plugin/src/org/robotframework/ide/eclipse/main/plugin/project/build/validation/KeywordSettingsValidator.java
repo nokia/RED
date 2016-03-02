@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -51,6 +53,8 @@ import com.google.common.collect.Multimap;
  *
  */
 class KeywordSettingsValidator implements ModelUnitValidator {
+
+    private static final Pattern VAR_ARG_PATTERN = Pattern.compile("^[$@&]\\{[^\\}]+\\}");
 
     private final FileValidationContext validationContext;
 
@@ -162,9 +166,37 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         }
         reportCommonProblems(declarationTokens);
 
-        reportDuplicatedArguments();
-        reportArgumentsOrderProblems();
-        reportArgumentsDefaultValuesUnknownVariables();
+        final boolean shouldContinue = reportArgumentsSyntaxProblems();
+        if (shouldContinue) {
+            reportDuplicatedArguments();
+            reportArgumentsOrderProblems();
+            reportArgumentsDefaultValuesUnknownVariables();
+        }
+    }
+
+    private boolean reportArgumentsSyntaxProblems() {
+        boolean shouldContinue = true;
+        for (final KeywordArguments argSetting : keyword.getArguments()) {
+            for (final RobotToken argToken : argSetting.getArguments()) {
+                final boolean isCorrect = hasValidArgumentSyntax(argToken);
+                if (!isCorrect) {
+                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX)
+                            .formatMessageWith(argToken.getText());
+                    reporter.handleProblem(problem, validationContext.getFile(), argToken);
+                }
+                shouldContinue &= isCorrect;
+            }
+        }
+        return shouldContinue;
+    }
+
+    private boolean hasValidArgumentSyntax(final RobotToken argToken) {
+        final Matcher matcher = VAR_ARG_PATTERN.matcher(argToken.getText());
+        if (matcher.find() && matcher.start() == 0) {
+            final String rest = argToken.getText().substring(matcher.end());
+            return rest.isEmpty() || rest.startsWith("=") && argToken.getText().startsWith("$");
+        }
+        return false;
     }
 
     private void reportDuplicatedArguments() {
@@ -258,52 +290,33 @@ class KeywordSettingsValidator implements ModelUnitValidator {
     }
 
     private void reportArgumentsDefaultValuesUnknownVariables() {
-        final List<KeywordArguments> arguments = keyword.getArguments();
-        if (arguments == null || arguments.isEmpty()) {
-            return;
-        }
-        for (final KeywordArguments argSetting : arguments) {
+        for (final KeywordArguments argSetting : keyword.getArguments()) {
             final Set<String> definedVariables = newHashSet(validationContext.getAccessibleVariables());
+
             for (final RobotToken argToken : argSetting.getArguments()) {
-                if (!argToken.getText().contains("}") || (!argToken.getText().startsWith("${")
-                        && !argToken.getText().startsWith("@{") && !argToken.getText().startsWith("&{"))) {
-                    final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX)
-                            .formatMessageWith(argToken.getText());
-                    reporter.handleProblem(problem, validationContext.getFile(), argToken);
-                } else {
-                    final boolean hasDefault = argToken.getText().contains("=");
-                    if (hasDefault) {
-                        final List<String> splitted = Splitter.on('=').limit(2).splitToList(argToken.getText());
-                        final String def = splitted.get(0);
-                        if (!def.trim().equals(def)) {
-                            final RobotProblem problem = RobotProblem
-                                    .causedBy(KeywordsProblem.INVALID_KEYWORD_ARG_SYNTAX)
-                                    .formatMessageWith(argToken.getText());
-                            reporter.handleProblem(problem, validationContext.getFile(), argToken);
-                        }
+                final boolean hasDefault = argToken.getText().contains("=");
+                if (hasDefault) {
+                    final List<String> splitted = Splitter.on('=').limit(2).splitToList(argToken.getText());
+                    final String def = splitted.get(0);
 
-                        final String unifiedDefinitionName = VariableNamesSupport.extractUnifiedVariableName(def);
-                        final Multimap<String, RobotToken> usedVariables = VariableNamesSupport.extractUnifiedVariables(
-                                newArrayList(argToken), new VariableExtractor(), validationContext.getFile().getName());
+                    final String unifiedDefinitionName = VariableNamesSupport.extractUnifiedVariableName(def);
+                    final Multimap<String, RobotToken> usedVariables = VariableNamesSupport.extractUnifiedVariables(
+                            newArrayList(argToken), new VariableExtractor(), validationContext.getFile().getName());
 
-                        for (final Entry<String, RobotToken> entry : usedVariables.entries()) {
-                            if (!unifiedDefinitionName.equals(entry.getKey())
-                                    && !VariableNamesSupport.isDefinedVariable(VariableNamesSupport
-                                            .extractUnifiedVariableNameWithoutBrackets(entry.getKey()), "$",
-                                            definedVariables)) {
-                                final RobotProblem problem = RobotProblem
-                                        .causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
-                                        .formatMessageWith(entry.getKey());
-                                final Map<String, Object> additional = ImmutableMap
-                                        .<String, Object> of(AdditionalMarkerAttributes.NAME, entry.getKey());
-                                reporter.handleProblem(problem, validationContext.getFile(), entry.getValue(),
-                                        additional);
-                            }
+                    for (final Entry<String, RobotToken> entry : usedVariables.entries()) {
+                        if (!unifiedDefinitionName.equals(entry.getKey()) && !VariableNamesSupport.isDefinedVariable(
+                                VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(entry.getKey()), "$",
+                                definedVariables)) {
+                            final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
+                                    .formatMessageWith(entry.getValue().getText());
+                            final Map<String, Object> additional = ImmutableMap
+                                    .<String, Object> of(AdditionalMarkerAttributes.NAME, entry.getKey());
+                            reporter.handleProblem(problem, validationContext.getFile(), entry.getValue(), additional);
                         }
-                        definedVariables.add(unifiedDefinitionName);
-                    } else {
-                        definedVariables.add(VariableNamesSupport.extractUnifiedVariableName(argToken.getText()));
                     }
+                    definedVariables.add(unifiedDefinitionName);
+                } else {
+                    definedVariables.add(VariableNamesSupport.extractUnifiedVariableName(argToken.getText()));
                 }
             }
         }
