@@ -14,6 +14,11 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.eclipse.core.runtime.Path;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+
 public class JarStructureBuilder {
 
     public List<JarClass> provideEntriesFromFile(final String path) {
@@ -63,6 +68,15 @@ public class JarStructureBuilder {
 
         public String getQualifiedName() {
             return qualifiedName;
+        }
+
+        ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
+            final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
+            referencedLibrary.setType(LibraryType.JAVA.toString());
+            referencedLibrary.setName(qualifiedName);
+            referencedLibrary.setPath(
+                    PathsConverter.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath)).toPortableString());
+            return referencedLibrary;
         }
     }
 }
