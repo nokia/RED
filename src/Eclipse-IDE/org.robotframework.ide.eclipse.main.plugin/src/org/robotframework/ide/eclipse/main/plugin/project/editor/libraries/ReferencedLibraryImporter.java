@@ -7,8 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
@@ -40,63 +41,58 @@ import org.robotframework.red.graphics.ImagesManager;
  */
 public class ReferencedLibraryImporter {
 
-    public ReferencedLibrary importPythonLib(final Shell shellForDialogs, final RobotRuntimeEnvironment environment,
-            final String fullLibraryPath) {
-        if (fullLibraryPath != null) {
-            final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment);
-            final List<PythonClass> pythonClasses = newArrayList();
+    public Collection<ReferencedLibrary> importPythonLib(final Shell shellForDialogs,
+            final RobotRuntimeEnvironment environment, final String fullLibraryPath) {
+        final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment);
+        final List<PythonClass> pythonClasses = newArrayList();
 
-            try {
-                PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
+        try {
+            PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {
 
-                    @Override
-                    public void run(final IProgressMonitor monitor)
-                            throws InvocationTargetException, InterruptedException {
-                        monitor.beginTask("Reading classes from module '" + fullLibraryPath + "'", 100);
-                        try {
-                            pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath));
-                        } catch (final RobotEnvironmentException e) {
-                            throw new InvocationTargetException(e);
-                        }
+                @Override
+                public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
+                    monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
+                    try {
+                        pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath));
+                    } catch (final RobotEnvironmentException e) {
+                        throw new InvocationTargetException(e);
                     }
-                });
-            } catch (InvocationTargetException | InterruptedException e) {
-                StatusManager.getManager()
-                        .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                                "RED was unable to find classes inside '" + fullLibraryPath + "' module", e.getCause()),
-                                StatusManager.SHOW);
-                return null;
-            }
+                }
+            });
+        } catch (InvocationTargetException | InterruptedException e) {
+            StatusManager.getManager()
+                    .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "RED was unable to find classes/modules inside '" + fullLibraryPath + "' module",
+                            e.getCause()), StatusManager.SHOW);
+            return new ArrayList<>();
+        }
 
-            if (pythonClasses.isEmpty()) {
-                final String name = new File(fullLibraryPath).getName();
-                pythonClasses.add(PythonClass.create(name.substring(0, name.lastIndexOf('.'))));
-            }
+        if (pythonClasses.isEmpty()) {
+            StatusManager.getManager()
+                    .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            "RED was unable to find classes/modules inside '" + fullLibraryPath + "' module"),
+                            StatusManager.SHOW);
+            return new ArrayList<>();
+        } else if (pythonClasses.size() == 1) {
+            return newArrayList(pythonClasses.get(0).toReferencedLibrary(fullLibraryPath));
+        } else {
             final ElementListSelectionDialog classesDialog = createSelectionDialog(shellForDialogs, fullLibraryPath,
                     pythonClasses, new PythonClassesLabelProvider());
             if (classesDialog.open() == Window.OK) {
                 final Object[] result = classesDialog.getResult();
 
+                final Collection<ReferencedLibrary> libraries = new ArrayList<>();
                 for (final Object selectedClass : result) {
                     final PythonClass pythonClass = (PythonClass) selectedClass;
-                    final IPath path = new Path(fullLibraryPath);
-                    final IPath pathWithoutModuleName = fullLibraryPath.endsWith("__init__.py")
-                            ? path.removeLastSegments(2) : path.removeLastSegments(1);
-
-                    final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-                    referencedLibrary.setType(LibraryType.PYTHON.toString());
-                    referencedLibrary.setName(pythonClass.getQualifiedName());
-                    referencedLibrary.setPath(
-                            PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
-
-                    return referencedLibrary;
+                    libraries.add(pythonClass.toReferencedLibrary(fullLibraryPath));
                 }
+                return libraries;
             }
+            return new ArrayList<>();
         }
-        return null;
     }
 
-    public ReferencedLibrary importJavaLib(final Shell shell, final String fullLibraryPath) {
+    public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final String fullLibraryPath) {
         final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder();
         final List<JarClass> classesFromJar = newArrayList();
         try {
@@ -113,7 +109,7 @@ public class ReferencedLibraryImporter {
                     .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
                             "RED was unable to find classes inside '" + fullLibraryPath + "' module", e.getCause()),
                             StatusManager.SHOW);
-            return null;
+            return new ArrayList<>();
         }
 
         if (classesFromJar.isEmpty()) {
@@ -121,28 +117,25 @@ public class ReferencedLibraryImporter {
                     .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
                             "RED was unable to find classes inside '" + fullLibraryPath + "' module"),
                             StatusManager.SHOW);
-            return null;
-        }
+            return new ArrayList<>();
+        } else if (classesFromJar.size() == 1) {
+            return newArrayList(classesFromJar.get(0).toReferencedLibrary(fullLibraryPath));
+        } else {
+            final ElementListSelectionDialog classesDialog = createSelectionDialog(shell, fullLibraryPath,
+                    classesFromJar, new JarClassesLabelProvider());
 
-        final ElementListSelectionDialog classesDialog = createSelectionDialog(shell, fullLibraryPath,
-                classesFromJar, new JarClassesLabelProvider());
+            if (classesDialog.open() == Window.OK) {
+                final Object[] result = classesDialog.getResult();
 
-        if (classesDialog.open() == Window.OK) {
-            final Object[] result = classesDialog.getResult();
-
-            for (final Object selectedClass : result) {
-                final JarClass jarClass = (JarClass) selectedClass;
-
-                final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-                referencedLibrary.setType(LibraryType.JAVA.toString());
-                referencedLibrary.setName(jarClass.getQualifiedName());
-                referencedLibrary.setPath(
-                        PathsConverter.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath)).toPortableString());
-
-                return referencedLibrary;
+                final Collection<ReferencedLibrary> libraries = new ArrayList<>();
+                for (final Object selectedClass : result) {
+                    final JarClass jarClass = (JarClass) selectedClass;
+                    libraries.add(jarClass.toReferencedLibrary(fullLibraryPath));
+                }
+                return libraries;
             }
+            return new ArrayList<>();
         }
-        return null;
     }
 
     public ReferencedLibrary importLibFromSpecFile(final String fullLibraryPath) {

@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -210,11 +211,9 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
                         final IPath path = new Path(dialog.getFilterPath()).append(file);
-                        final ReferencedLibrary lib = importer.importPythonLib(viewer.getTable().getShell(),
-                                environment, path.toString());
-                        if (lib != null) {
-                            libs.add(lib);
-                        }
+                        final Collection<ReferencedLibrary> importedLibs = importer
+                                .importPythonLib(viewer.getTable().getShell(), environment, path.toString());
+                        libs.addAll(importedLibs);
                     }
                     addLibraries(libs);
                 }
@@ -238,11 +237,10 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
                         final IPath path = new Path(dialog.getFilterPath()).append(file);
-                        final ReferencedLibrary lib = importer.importJavaLib(viewer.getTable().getShell(),
+                        final Collection<ReferencedLibrary> importedLibs = importer.importJavaLib(
+                                viewer.getTable().getShell(),
                                 path.toString());
-                        if (lib != null) {
-                            libs.add(lib);
-                        }
+                        libs.addAll(importedLibs);
                     }
                     addLibraries(libs);
                 }
