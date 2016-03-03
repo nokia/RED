@@ -46,7 +46,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 
-public class TestCasesTableValidatorTest {
+public class TestCaseTableValidatorTest {
 
 	private MockReporter reporter;
 
@@ -63,7 +63,7 @@ public class TestCasesTableValidatorTest {
                 .build();
 
 		final FileValidationContext context = prepareContext();
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -81,7 +81,7 @@ public class TestCasesTableValidatorTest {
                 .build();
 
 		final FileValidationContext context = prepareContext();
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -105,7 +105,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -130,7 +130,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -154,7 +154,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -181,7 +181,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -207,7 +207,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1, entity2));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -228,7 +228,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -249,7 +249,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -275,7 +275,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -309,7 +309,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1, entity2));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -335,7 +335,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1, entity2));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -360,7 +360,7 @@ public class TestCasesTableValidatorTest {
 		accessibleVariables.add("${var2}");
 
 		final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -383,7 +383,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -407,7 +407,7 @@ public class TestCasesTableValidatorTest {
 		accessibleVariables.add("${var}");
 
 		final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -429,7 +429,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -454,7 +454,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -476,7 +476,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -501,7 +501,7 @@ public class TestCasesTableValidatorTest {
 				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
 		final FileValidationContext context = prepareContext(accessibleKws);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -533,7 +533,7 @@ public class TestCasesTableValidatorTest {
 		accessibleVariables.add("${var1}");
 
 		final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
-		final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+		final TestCaseTableValidator validator = new TestCaseTableValidator(context,
 				file.findSection(RobotCasesSection.class), reporter);
 		validator.validate(null);
 
@@ -558,7 +558,7 @@ public class TestCasesTableValidatorTest {
         accessibleVariables.add("${var}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
-        final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
                 file.findSection(RobotCasesSection.class), reporter);
         validator.validate(null);
 
@@ -584,7 +584,7 @@ public class TestCasesTableValidatorTest {
                 (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
-        final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
                 file.findSection(RobotCasesSection.class), reporter);
         validator.validate(null);
 
@@ -607,7 +607,7 @@ public class TestCasesTableValidatorTest {
                 (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
-        final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
                 file.findSection(RobotCasesSection.class), reporter);
         validator.validate(null);
 
@@ -631,7 +631,7 @@ public class TestCasesTableValidatorTest {
         accessibleVariables.add("${var1}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
-        final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
                 file.findSection(RobotCasesSection.class), reporter);
         validator.validate(null);
 
@@ -660,7 +660,7 @@ public class TestCasesTableValidatorTest {
         accessibleVariables.add("${var1}");
 
         final FileValidationContext context = prepareContext(accessibleKws, accessibleVariables);
-        final TestCasesTableValidator validator = new TestCasesTableValidator(context,
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
                 file.findSection(RobotCasesSection.class), reporter);
         validator.validate(null);
 
