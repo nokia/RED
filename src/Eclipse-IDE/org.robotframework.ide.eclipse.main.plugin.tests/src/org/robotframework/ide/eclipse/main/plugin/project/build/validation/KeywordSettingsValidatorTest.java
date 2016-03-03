@@ -250,8 +250,8 @@ public class KeywordSettingsValidatorTest {
     public void duplicatedTimeoutsAreReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
-                .appendLine("  [Timeout]    doc1")
-                .appendLine("  [Timeout]    doc2")
+                .appendLine("  [Timeout]    1")
+                .appendLine("  [Timeout]    2")
                 .build();
 
         final FileValidationContext context = prepareContext();
@@ -656,6 +656,7 @@ public class KeywordSettingsValidatorTest {
         return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
                 ArgumentsDescriptor.createDescriptor(args));
     }
+
     private static UserKeyword getKeyword(final RobotSuiteFile file) {
         final Optional<RobotKeywordsSection> section = file.findSection(RobotKeywordsSection.class);
         return section.get().getChildren().get(0).getLinkedElement();
