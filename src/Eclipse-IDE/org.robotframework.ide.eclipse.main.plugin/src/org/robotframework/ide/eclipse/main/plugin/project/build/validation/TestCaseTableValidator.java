@@ -36,7 +36,6 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
@@ -65,7 +64,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Range;
 
-class TestCasesTableValidator implements ModelUnitValidator {
+class TestCaseTableValidator implements ModelUnitValidator {
 
     private final FileValidationContext validationContext;
 
@@ -73,7 +72,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
 
     private final ProblemsReportingStrategy reporter;
 
-    TestCasesTableValidator(final FileValidationContext validationContext, final Optional<RobotCasesSection> section,
+    TestCaseTableValidator(final FileValidationContext validationContext, final Optional<RobotCasesSection> section,
             final ProblemsReportingStrategy reporter) {
         this.validationContext = validationContext;
         this.testCaseSection = section;
@@ -90,24 +89,12 @@ class TestCasesTableValidator implements ModelUnitValidator {
         final List<TestCase> cases = casesTable.getTestCases();
 
         validateByExternal(robotCasesSection, monitor);
-        reportUnknownSettings(cases);
 
         reportEmptyCases(cases);
         reportDuplicatedCases(cases);
+        reportSettingsProblems(cases);
         reportKeywordUsageProblems(robotCasesSection.getChildren());
         reportUnknownVariables(cases);
-    }
-
-    private void reportUnknownSettings(final List<TestCase> cases) {
-        for (final TestCase testCase : cases) {
-            final List<TestCaseUnknownSettings> unknownSettings = testCase.getUnknownSettings();
-            for (final TestCaseUnknownSettings unknownSetting : unknownSettings) {
-                final RobotToken token = unknownSetting.getDeclaration();
-                final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.UNKNOWN_TEST_CASE_SETTING)
-                        .formatMessageWith(token.getText());
-                reporter.handleProblem(problem, validationContext.getFile(), token);
-            }
-        }
     }
 
     private void validateByExternal(final RobotCasesSection section, final IProgressMonitor monitor)
@@ -171,6 +158,12 @@ class TestCasesTableValidator implements ModelUnitValidator {
         }
     }
 
+    private void reportSettingsProblems(final List<TestCase> cases) throws CoreException {
+        for (final TestCase testCase : cases) {
+            new TestCaseSettingsValidator(validationContext, testCase, reporter).validate(null);
+        }
+    }
+
     void reportKeywordUsageProblems(final List<RobotCase> cases) {
         for (final RobotCase testCase : cases) {
             reportKeywordUsageProblemsInTestCaseSettings(testCase);
@@ -181,21 +174,6 @@ class TestCasesTableValidator implements ModelUnitValidator {
     }
     
     private void reportKeywordUsageProblemsInTestCaseSettings(final RobotCase testCase) {
-        for (final TestCaseSetup testCaseSetup : testCase.getLinkedElement().getSetups()) {
-            final RobotToken keywordNameToken = testCaseSetup.getKeywordName();
-            if (keywordNameToken != null) {
-                reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter, keywordNameToken,
-                        Optional.of(testCaseSetup.getArguments()));
-            }
-        }
-        for (final TestCaseTeardown testCaseTeardown : testCase.getLinkedElement().getTeardowns()) {
-            final RobotToken keywordNameToken = testCaseTeardown.getKeywordName();
-            if (keywordNameToken != null) {
-                reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter, keywordNameToken,
-                        Optional.of(testCaseTeardown.getArguments()));
-            }
-        }
-
         final RobotToken templateKeywordToken = testCase.getLinkedElement().getTemplateKeywordLocation();
         if (templateKeywordToken != null && !templateKeywordToken.getFilePosition().isNotSet()
                 && isTemplateFromTestCasesTable(testCase)
@@ -362,7 +340,7 @@ class TestCasesTableValidator implements ModelUnitValidator {
     
     private void reportUnknownVariablesInTimeoutSetting(final TestCase testCase, final Set<String> variables) {
         final List<TestCaseTimeout> timeouts = testCase.getTimeouts();
-        for (TestCaseTimeout testCaseTimeout : timeouts) {
+        for (final TestCaseTimeout testCaseTimeout : timeouts) {
             final RobotToken timeoutToken = testCaseTimeout.getTimeout();
             if (timeoutToken != null) {
                 validateTimeoutSetting(validationContext, reporter, variables, timeoutToken);
@@ -388,9 +366,9 @@ class TestCasesTableValidator implements ModelUnitValidator {
     
     private void reportUnknownVariablesInTagsSetting(final TestCase testCase, final Set<String> variables) {
         final List<TestCaseTags> tags = testCase.getTags();
-        for (TestCaseTags testCaseTags : tags) {
+        for (final TestCaseTags testCaseTags : tags) {
             final List<RobotToken> tagsTokens = testCaseTags.getTags();
-            for (RobotToken tagToken : tagsTokens) {
+            for (final RobotToken tagToken : tagsTokens) {
                 final List<VariableDeclaration> variablesDeclarationsInTag = new VariableExtractor()
                         .extract(tagToken, validationContext.getFile().getName()).getCorrectVariables();
                 if (!variablesDeclarationsInTag.isEmpty()) {
@@ -404,9 +382,8 @@ class TestCasesTableValidator implements ModelUnitValidator {
             final ProblemsReportingStrategy reporter, final List<VariableDeclaration> variablesDeclarations,
             final Set<String> variables) {
         final Set<String> definedVariables = newHashSet(variables);
-        for (VariableDeclaration variableDeclaration : variablesDeclarations) {
-            if (TestCasesTableValidator.isInvalidVariableDeclaration(validationContext, definedVariables,
-                    variableDeclaration)) {
+        for (final VariableDeclaration variableDeclaration : variablesDeclarations) {
+            if (TestCaseTableValidator.isInvalidVariableDeclaration(definedVariables, variableDeclaration)) {
                 final String variableName = variableDeclaration.getVariableName().getText();
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
                         .formatMessageWith(variableName);
@@ -452,22 +429,22 @@ class TestCasesTableValidator implements ModelUnitValidator {
         }
     }
     
-    static boolean isInvalidVariableDeclaration(final FileValidationContext validationContext,
-            final Set<String> definedVariables, final VariableDeclaration variableDeclaration) {
+    static boolean isInvalidVariableDeclaration(final Set<String> definedVariables,
+            final VariableDeclaration variableDeclaration) {
         return !variableDeclaration.isDynamic()
                 && !VariableNamesSupport.isDefinedVariable(variableDeclaration, definedVariables)
-                && !isSpecificVariableDeclaration(validationContext, definedVariables, variableDeclaration);
+                && !isSpecificVariableDeclaration(definedVariables, variableDeclaration);
     }
 
     static boolean isInvalidVariableDeclaration(final FileValidationContext validationContext,
             final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription,
             final VariableDeclaration variableDeclaration) {
-        return isInvalidVariableDeclaration(validationContext, definedVariables, variableDeclaration)
+        return isInvalidVariableDeclaration(definedVariables, variableDeclaration)
                 && !isVariableInSetterOrCommentKeyword(lineDescription, validationContext, definedVariables);
     }
 
-    private static boolean isSpecificVariableDeclaration(final FileValidationContext validationContext,
-            final Set<String> definedVariables, final VariableDeclaration variableDeclaration) {
+    private static boolean isSpecificVariableDeclaration(final Set<String> definedVariables,
+            final VariableDeclaration variableDeclaration) {
         return variableDeclaration.getVariableType() instanceof Number
                 || VariableNamesSupport.isDefinedVariableInsideComputation(variableDeclaration, definedVariables);
     }

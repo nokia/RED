@@ -173,7 +173,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             final RobotToken keywordToken = keywordBased.getKeywordName();
             if (keywordToken != null) {
                 wasAllEmpty = false;
-                TestCasesTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
+                TestCaseTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
                         keywordToken, Optional.of(keywordBased.getArguments()));
             }
         }
@@ -202,7 +202,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
                 if (keywordName.toLowerCase().equals("none")) {
                     continue;
                 }
-                TestCasesTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken,
+                TestCaseTableValidator.validateExistingKeywordCall(validationContext, reporter, keywordToken,
                         Optional.<List<RobotToken>> absent());
             }
             if (!template.getUnexpectedTrashArguments().isEmpty()) {
@@ -233,7 +233,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             final RobotToken timeoutToken = testTimeout.getTimeout();
             if (timeoutToken != null) {
                 wasAllEmpty = false;
-                TestCasesTableValidator.validateTimeoutSetting(validationContext, reporter,
+                TestCaseTableValidator.validateTimeoutSetting(validationContext, reporter,
                         validationContext.getAccessibleVariables(), timeoutToken);
             }
         }
@@ -305,7 +305,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     private void validateVariablesInSetupAndTeardownExeRows(final List<RobotExecutableRow<?>> executableRows) {
         if (!executableRows.isEmpty()) {
             final Set<String> variables = validationContext.getAccessibleVariables();
-            TestCasesTableValidator.reportUnknownVariables(validationContext, reporter, executableRows, variables);
+            TestCaseTableValidator.reportUnknownVariables(validationContext, reporter, executableRows, variables);
         }
     }
 
@@ -314,7 +314,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
         for (RobotToken tag : tags) {
             final List<VariableDeclaration> variablesDeclarationsInTag = new VariableExtractor()
                     .extract(tag, validationContext.getFile().getName()).getCorrectVariables();
-            TestCasesTableValidator.reportUnknownVariablesInSettingWithoutExeRows(validationContext, reporter,
+            TestCaseTableValidator.reportUnknownVariablesInSettingWithoutExeRows(validationContext, reporter,
                     variablesDeclarationsInTag, accessibleVariables);
         }
     }
