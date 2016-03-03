@@ -338,8 +338,10 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                         InterruptedException {
                     for (final IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects(0)) {
                         try {
-                            project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-                            project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+                            if (project.exists() && project.isOpen()) {
+                                project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+                                project.build(IncrementalProjectBuilder.FULL_BUILD, null);
+                            }
                         } catch (final CoreException e) {
                             MessageDialog.openError(getShell(), "Workspace rebuild",
                                     "Problems occured during workspace build " + e.getMessage());
