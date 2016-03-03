@@ -8,7 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.console;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.console.ConsolePlugin;
@@ -71,7 +73,9 @@ public final class RedSessionProcessListener implements PythonProcessListener {
     }
 
     private static RedSessionConsole openRobotServerConsole(final String interpreterName, final Process process) {
-        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        final IWorkbench workbench = PlatformUI.getWorkbench();
+        final IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
+        final IWorkbenchPage page = activeWindow.getActivePage();
         try {
             final IConsoleView consoleView = (IConsoleView) page.showView(IConsoleConstants.ID_CONSOLE_VIEW);
             final String name = createName(interpreterName);
