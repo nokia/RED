@@ -22,47 +22,31 @@ public enum TestCasesProblem implements IProblemCause {
     DUPLICATED_CASE {
 
         @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
         public String getProblemDescription() {
             return "Duplicated test case definition '%s'";
         }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList();// new RemoveKeywordFixer(marker.getAttribute("name", null)));
-        }
     },
     EMPTY_CASE {
-
         @Override
         public String getProblemDescription() {
             return "Test case '%s' contains no keywords to execute";
-        }
-
-        @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList();// new RemoveKeywordFixer(marker.getAttribute("name", null)));
         }
     },
     DOCUMENT_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public String getProblemDescription() {
+            return "Test Case setting '%s' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current.";
         }
 
         @Override
         public boolean hasResolution() {
             return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Test Case setting '%s' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current.";
         }
 
         @Override
@@ -73,18 +57,13 @@ public enum TestCasesProblem implements IProblemCause {
     PRECONDITION_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public String getProblemDescription() {
+            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Setup syntax instead of current.";
         }
 
         @Override
         public boolean hasResolution() {
             return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Setup syntax instead of current.";
         }
 
         @Override
@@ -95,18 +74,13 @@ public enum TestCasesProblem implements IProblemCause {
     POSTCONDITION_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public String getProblemDescription() {
+            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Teardown syntax instead of current.";
         }
 
         @Override
         public boolean hasResolution() {
             return true;
-        }
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is deprecated from Robot Framework 3.0. Use Teardown syntax instead of current.";
         }
 
         @Override
@@ -117,29 +91,43 @@ public enum TestCasesProblem implements IProblemCause {
     UNKNOWN_TEST_CASE_SETTING {
 
         @Override
+        public String getProblemDescription() {
+            return "Unknown test case's setting definition '%s'";
+        }
+    },
+    EMPTY_CASE_SETTING {
+
+        @Override
         public Severity getSeverity() {
-            return Severity.ERROR;
+            return Severity.WARNING;
         }
 
         @Override
         public String getProblemDescription() {
-            return "Unknown test case's setting definition '%s'";
+            return "The %s test case setting is empty";
         }
+    },
+    DUPLICATED_CASE_SETTING {
 
         @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList();// new RemoveKeywordFixer(marker.getAttribute("name", null)));
+        public String getProblemDescription() {
+            return "Test case '%s' %s setting is defined in multiple ways";
         }
     };
 
     @Override
     public Severity getSeverity() {
-        return Severity.WARNING;
+        return Severity.ERROR;
     }
 
     @Override
     public boolean hasResolution() {
         return false;
+    }
+
+    @Override
+    public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+        return newArrayList();
     }
 
     @Override
