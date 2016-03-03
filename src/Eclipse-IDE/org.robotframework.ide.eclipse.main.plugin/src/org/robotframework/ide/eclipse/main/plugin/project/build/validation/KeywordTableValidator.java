@@ -196,7 +196,7 @@ class KeywordTableValidator implements ModelUnitValidator {
     }
 
     private void reportKeywordUsageProblems(final List<UserKeyword> keywords) {
-        TestCasesTableValidator.reportKeywordUsageProblems(validationContext, reporter, findExecutableRows(keywords),
+        TestCaseTableValidator.reportKeywordUsageProblems(validationContext, reporter, findExecutableRows(keywords),
                 Optional.<String> absent());
     }
 
@@ -219,7 +219,7 @@ class KeywordTableValidator implements ModelUnitValidator {
 
             reportUnknownVariablesInTimeoutSetting(keyword, allVariables);
             reportUnknownVariablesInTagsSetting(keyword, allVariables);
-            TestCasesTableValidator.reportUnknownVariables(validationContext, reporter,
+            TestCaseTableValidator.reportUnknownVariables(validationContext, reporter,
                     collectKeywordExeRowsForVariablesChecking(keyword), allVariables);
         }
     }
@@ -258,13 +258,13 @@ class KeywordTableValidator implements ModelUnitValidator {
     
     private void reportUnknownVariablesInTagsSetting(final UserKeyword keyword, final Set<String> variables) {
         final List<KeywordTags> tags = keyword.getTags();
-        for (KeywordTags keywordTags : tags) {
+        for (final KeywordTags keywordTags : tags) {
             final List<RobotToken> tagsTokens = keywordTags.getTags();
-            for (RobotToken tagToken : tagsTokens) {
+            for (final RobotToken tagToken : tagsTokens) {
                 final List<VariableDeclaration> variablesDeclarationsInTag = new VariableExtractor()
                         .extract(tagToken, validationContext.getFile().getName()).getCorrectVariables();
                 if (!variablesDeclarationsInTag.isEmpty()) {
-                    TestCasesTableValidator.reportUnknownVariablesInSettingWithoutExeRows(validationContext, reporter,
+                    TestCaseTableValidator.reportUnknownVariablesInSettingWithoutExeRows(validationContext, reporter,
                             variablesDeclarationsInTag, variables);
                 }
             }
@@ -273,10 +273,10 @@ class KeywordTableValidator implements ModelUnitValidator {
     
     private void reportUnknownVariablesInTimeoutSetting(final UserKeyword keyword, final Set<String> variables) {
         final List<KeywordTimeout> timeouts = keyword.getTimeouts();
-        for (KeywordTimeout keywordTimeout : timeouts) {
+        for (final KeywordTimeout keywordTimeout : timeouts) {
             final RobotToken timeoutToken = keywordTimeout.getTimeout();
             if (timeoutToken != null) {
-                TestCasesTableValidator.validateTimeoutSetting(validationContext, reporter, variables, timeoutToken);
+                TestCaseTableValidator.validateTimeoutSetting(validationContext, reporter, variables, timeoutToken);
             }
         }
     }

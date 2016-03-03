@@ -330,7 +330,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
         for (final KeywordTeardown keywordTeardown : keyword.getTeardowns()) {
             final RobotToken keywordNameToken = keywordTeardown.getKeywordName();
             if (keywordNameToken != null) {
-                TestCasesTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
+                TestCaseTableValidator.reportKeywordUsageProblemsInSetupAndTeardownSetting(validationContext, reporter,
                         keywordNameToken, Optional.of(keywordTeardown.getArguments()));
             }
         }
