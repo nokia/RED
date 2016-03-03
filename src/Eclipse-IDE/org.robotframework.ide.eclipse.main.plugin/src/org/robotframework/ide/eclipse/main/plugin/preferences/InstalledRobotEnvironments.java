@@ -5,10 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -19,13 +19,16 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 public class InstalledRobotEnvironments {
 
     // active environment is cached, since its retrieval can take a little bit
     private static RobotRuntimeEnvironment active = null;
-    private static Map<File, RobotRuntimeEnvironment> all = null;
+
+    private static Map<File, EnvironmentEvaluation> all = null;
     static {
         InstanceScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID).addPreferenceChangeListener(
                 new IPreferenceChangeListener() {
@@ -51,39 +54,40 @@ public class InstalledRobotEnvironments {
     }
 
     public static RobotRuntimeEnvironment getRobotInstallation(final RedPreferences preferences, final File file) {
-        final String allRuntimes = preferences.getAllRuntimes();
-        final ArrayList<String> paths = newArrayList(allRuntimes.split(";"));
-        for (final String path : paths) {
-            if (new File(path).equals(file)) {
-                if (all != null && all.get(file) != null) {
-                    return all.get(file);
-                } else {
-                    final RobotRuntimeEnvironment env = createRuntimeEnvironment(file.getAbsolutePath());
-                    if (env != null) {
-                        if (all == null) {
-                            all = new ConcurrentHashMap<>();
-                        }
-                        all.put(file, env);
-                        return env;
-                    }
-                }
-            }
+        if (all == null) {
+            all = readAllFromPreferences(preferences);
         }
-        return null;
+        if (all.containsKey(file)) {
+            final EnvironmentEvaluation environmentEvaluation = all.get(file);
+            return toEnvs().apply(environmentEvaluation);
+        } else {
+            return null;
+        }
     }
 
     public static List<RobotRuntimeEnvironment> getAllRobotInstallation(final RedPreferences preferences) {
         if (all == null) {
             all = readAllFromPreferences(preferences);
         }
-        return newArrayList(all.values());
+        return newArrayList(transform(all.values(), toEnvs()));
+    }
+
+    private static Function<EnvironmentEvaluation, RobotRuntimeEnvironment> toEnvs() {
+        return new Function<EnvironmentEvaluation, RobotRuntimeEnvironment>() {
+            @Override
+            public RobotRuntimeEnvironment apply(final EnvironmentEvaluation environmentEvaluation) {
+                environmentEvaluation.run();
+                return environmentEvaluation.environment.orNull();
+            }
+        };
     }
 
     private static RobotRuntimeEnvironment readActiveFromPreferences(final RedPreferences preferences) {
         return createRuntimeEnvironment(preferences.getActiveRuntime());
     }
     
-    private static Map<File, RobotRuntimeEnvironment> readAllFromPreferences(final RedPreferences preferences) {
+    private static Map<File, EnvironmentEvaluation> readAllFromPreferences(
+            final RedPreferences preferences) {
         return createRuntimeEnvironments(preferences.getAllRuntimes());
     }
 
@@ -91,17 +95,32 @@ public class InstalledRobotEnvironments {
         return Strings.isNullOrEmpty(path) ? null : RobotRuntimeEnvironment.create(path);
     }
 
-    private static Map<File, RobotRuntimeEnvironment> createRuntimeEnvironments(final String allPaths) {
+    private static Map<File, EnvironmentEvaluation> createRuntimeEnvironments(final String allPaths) {
         if (Strings.isNullOrEmpty(allPaths)) {
             return new ConcurrentHashMap<>();
         }
-        final Map<File, RobotRuntimeEnvironment> envs = new ConcurrentHashMap<>();
+        final Map<File, EnvironmentEvaluation> envs = new ConcurrentHashMap<>();
         for (final String path : allPaths.split(";")) {
-            final RobotRuntimeEnvironment env = createRuntimeEnvironment(path);
-            if (env != null) {
-                envs.put(env.getFile(), env);
-            }
+            envs.put(new File(path), new EnvironmentEvaluation(path));
         }
         return envs;
+    }
+
+    private static class EnvironmentEvaluation implements Runnable {
+
+        private final String path;
+
+        Optional<RobotRuntimeEnvironment> environment = null;
+
+        EnvironmentEvaluation(final String path) {
+            this.path = path;
+        }
+
+        @Override
+        public void run() {
+            if (environment == null) {
+                environment = Optional.fromNullable(createRuntimeEnvironment(path));
+            }
+        }
     }
 }
