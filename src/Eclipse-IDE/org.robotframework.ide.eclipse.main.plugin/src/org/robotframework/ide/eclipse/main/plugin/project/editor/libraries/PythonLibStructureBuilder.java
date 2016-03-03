@@ -11,8 +11,13 @@ import static com.google.common.collect.Lists.transform;
 import java.io.File;
 import java.util.List;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -62,8 +67,21 @@ class PythonLibStructureBuilder {
             }
         }
 
-        public String getQualifiedName() {
+        String getQualifiedName() {
             return qualifiedName;
+        }
+
+        ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
+            final IPath path = new Path(fullLibraryPath);
+            final IPath pathWithoutModuleName = fullLibraryPath.endsWith("__init__.py") ? path.removeLastSegments(2)
+                    : path.removeLastSegments(1);
+
+            final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
+            referencedLibrary.setType(LibraryType.PYTHON.toString());
+            referencedLibrary.setName(qualifiedName);
+            referencedLibrary
+                    .setPath(PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
+            return referencedLibrary;
         }
     }
 }
