@@ -140,7 +140,7 @@ public enum KeywordsProblem implements IProblemCause {
     DUPLICATED_KEYWORD_SETTING {
         @Override
         public String getProblemDescription() {
-            return "Keyword '%s' %s setting are defined in multiple ways";
+            return "Keyword '%s' %s setting is defined in multiple ways";
         }
     },
     ARGUMENT_DEFINED_TWICE {
