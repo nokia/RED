@@ -5,11 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -70,7 +67,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         private String libName;
 
-        private ReferencedLibrary addedLibrary;
+        private Collection<ReferencedLibrary> addedLibraries;
 
         public AddLibraryProposal(final IMarker marker, final RobotSuiteFile suiteFile, final IFile externalFile,
                 final String shortDescritption) {
@@ -105,13 +102,15 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             }
             final Path path = new Path(modulePath.get().getPath());
 
-            addedLibrary = new ReferencedLibrary();
+            final ReferencedLibrary newLibrary = new ReferencedLibrary();
             final String fileExt = path.getFileExtension();
-            addedLibrary.setType(fileExt != null && fileExt.equals("jar") ? LibraryType.JAVA.toString()
+            newLibrary.setType(fileExt != null && fileExt.equals("jar") ? LibraryType.JAVA.toString()
                     : LibraryType.PYTHON.toString());
-            addedLibrary.setName(libName);
-            addedLibrary.setPath(path.toPortableString());
-            config.addReferencedLibrary(addedLibrary);
+            newLibrary.setName(libName);
+            newLibrary.setPath(path.toPortableString());
+            config.addReferencedLibrary(newLibrary);
+
+            addedLibraries.add(newLibrary);
 
             return true;
         }
@@ -120,13 +119,16 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             if (pathOrName.endsWith("/") || pathOrName.endsWith(".py")) {
                 final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile, pathOrName);
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
-                addedLibrary = importer.importPythonLib(Display.getCurrent().getActiveShell(),
+                addedLibraries = importer.importPythonLib(Display.getCurrent().getActiveShell(),
                         suiteFile.getProject().getRuntimeEnvironment(), resolvedAbsPath.toString());
-                if (addedLibrary != null) {
-                    config.addReferencedLibrary(addedLibrary);
-                    return true;
-                } else {
+
+                if (addedLibraries.isEmpty()) {
                     throw new ProposalApplyingException("Unable to apply proposal");
+                } else {
+                    for (final ReferencedLibrary addedLibrary : addedLibraries) {
+                        config.addReferencedLibrary(addedLibrary);
+                    }
+                    return true;
                 }
             } else {
                 MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
@@ -142,11 +144,9 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         @Override
         protected void fireEvents() {
-            final List<ReferencedLibrary> addedLibs = addedLibrary == null ? new ArrayList<ReferencedLibrary>()
-                    : newArrayList(addedLibrary);
-            if (!addedLibs.isEmpty()) {
-                final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                        externalFile, addedLibs);
+            if (!addedLibraries.isEmpty()) {
+                final RedProjectConfigEventData<Collection<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
+                        externalFile, addedLibraries);
                 eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
             }
         }

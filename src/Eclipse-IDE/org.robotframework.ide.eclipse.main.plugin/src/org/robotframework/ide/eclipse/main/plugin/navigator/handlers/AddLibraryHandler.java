@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -57,12 +58,14 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
                 }
 
                 final Shell shell = Display.getCurrent().getActiveShell();
-                final ReferencedLibrary newLibrary = importer.importPythonLib(shell,
+                final Collection<ReferencedLibrary> newLibraries = importer.importPythonLib(shell,
                         robotProject.getRuntimeEnvironment(), file.getLocation().toString());
 
                 final List<ReferencedLibrary> addedLibs = new ArrayList<>();
-                if (newLibrary != null && config.addReferencedLibrary(newLibrary)) {
-                    addedLibs.add(newLibrary);
+                for (final ReferencedLibrary library : newLibraries) {
+                    if (config.addReferencedLibrary(library)) {
+                        addedLibs.add(library);
+                    }
                 }
 
                 if (!addedLibs.isEmpty()) {
