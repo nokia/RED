@@ -7,8 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.io.File;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
@@ -21,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 
 class PythonLibStructureBuilder {
@@ -31,10 +34,10 @@ class PythonLibStructureBuilder {
         this.environment = environment;
     }
 
-    List<PythonClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
+    Collection<PythonClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
         
         final List<String> classes = environment.getClassesDefinedInModule(new File(path));
-        return newArrayList(transform(classes, new Function<String, PythonClass>() {
+        return newLinkedHashSet(transform(classes, new Function<String, PythonClass>() {
             @Override
             public PythonClass apply(final String name) {
                 return PythonClass.create(name);
@@ -42,7 +45,7 @@ class PythonLibStructureBuilder {
         }));
     }
 
-    static class PythonClass {
+    static final class PythonClass {
         private final String qualifiedName;
 
         private PythonClass(final String qualifiedName) {
@@ -82,6 +85,17 @@ class PythonLibStructureBuilder {
             referencedLibrary
                     .setPath(PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
             return referencedLibrary;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            return obj != null && PythonClass.class == obj.getClass()
+                    && Objects.equal(this.qualifiedName, ((PythonClass) obj).qualifiedName);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(qualifiedName);
         }
     }
 }
