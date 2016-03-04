@@ -27,6 +27,7 @@ import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
 import org.robotframework.red.swt.SwtThread;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 
@@ -71,7 +72,13 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
                 final List<ICompletionProposal> proposals = newArrayList();
                 for (final VarDef varDef : VARIABLE_DEFS) {
                     if (varDef.content.toLowerCase().startsWith(prefix.toLowerCase())) {
-                        final String textToInsert = varDef.content + separator + varDef.firstValue;
+                        String textToInsert;
+                        if (varDef.initialValues.isEmpty()) {
+                            textToInsert = varDef.content + separator;
+                        } else {
+                            textToInsert = varDef.content + separator + Joiner.on(separator).join(varDef.initialValues)
+                                    + separator;
+                        }
 
                         final Collection<IRegion> regions = getLinkedModeRegions(lineInformation, varDef);
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
@@ -113,26 +120,35 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
     }
 
     private Collection<IRegion> getLinkedModeRegions(final IRegion lineInformation, final VarDef varDef) {
-        final int offset = lineInformation.getOffset();
-        final int valueRegionOffset = offset + varDef.content.length() + assist.getSeparatorToFollow().length();
+        final int startingOffset = lineInformation.getOffset();
+        final int separatorLength = assist.getSeparatorToFollow().length();
+        int offset = startingOffset + varDef.content.length() + separatorLength;
 
-        final Region nameRegion = new Region(offset + 2, varDef.content.length() - 3);
+        final Region nameRegion = new Region(startingOffset + 2, varDef.content.length() - 3);
 
         final List<IRegion> linkedModeRegions = new ArrayList<>();
         linkedModeRegions.add(nameRegion);
         switch (varDef) {
             case SCALAR:
-                linkedModeRegions.add(new Region(valueRegionOffset, 0));
+                linkedModeRegions.add(new Region(offset, 0));
                 break;
             case LIST:
-                linkedModeRegions.add(new Region(valueRegionOffset, varDef.firstValue.length()));
+                for (final String initialValue : varDef.initialValues) {
+                    linkedModeRegions.add(new Region(offset, initialValue.length()));
+                    offset += initialValue.length() + separatorLength;
+                }
+                linkedModeRegions.add(new Region(offset, 0));
                 break;
             case DICT:
-                final List<String> splittedKeyVal = Splitter.on('=').limit(2).splitToList(varDef.firstValue);
+                for (final String initialValue : varDef.initialValues) {
+                    final List<String> splittedKeyVal = Splitter.on('=').limit(2).splitToList(initialValue);
+                    linkedModeRegions.add(new Region(offset, splittedKeyVal.get(0).length()));
+                    linkedModeRegions.add(
+                            new Region(offset + splittedKeyVal.get(0).length() + 1, splittedKeyVal.get(1).length()));
 
-                linkedModeRegions.add(new Region(valueRegionOffset, splittedKeyVal.get(0).length()));
-                linkedModeRegions.add(new Region(valueRegionOffset + splittedKeyVal.get(0).length() + 1,
-                        splittedKeyVal.get(1).length()));
+                    offset += initialValue.length() + separatorLength;
+                }
+                linkedModeRegions.add(new Region(offset, 0));
                 break;
             default:
                 throw new IllegalStateException("Unknown variable def value: " + varDef.toString());
@@ -160,16 +176,16 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
     }
 
     private enum VarDef {
-        SCALAR("${newScalar}", "", "Fresh scalar", 
+        SCALAR("${newScalar}", new ArrayList<String>(), "Fresh scalar", 
                 RedImages.getRobotScalarVariableImage(), "Creates fresh scalar variable"),
-        LIST("@{newList}", "item", "Fresh list", 
+        LIST("@{newList}", newArrayList("item"), "Fresh list", 
                 RedImages.getRobotListVariableImage(), "Creates fresh list variable"),
-        DICT("&{newDict}", "key=value", "Fresh dictionary", 
+        DICT("&{newDict}", newArrayList("key=value"), "Fresh dictionary", 
                 RedImages.getRobotDictionaryVariableImage(), "Creates fresh dictionary variable");
 
         private String content;
 
-        private String firstValue;
+        private Collection<String> initialValues;
 
         private String label;
 
@@ -177,10 +193,10 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
 
         private String info;
 
-        private VarDef(final String content, final String firstValue, final String label, final ImageDescriptor image,
-                final String info) {
+        private VarDef(final String content, final Collection<String> initialValues, final String label,
+                final ImageDescriptor image, final String info) {
             this.content = content;
-            this.firstValue = firstValue;
+            this.initialValues = initialValues;
             this.label = label;
             this.image = image;
             this.info = info;
