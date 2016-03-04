@@ -179,6 +179,9 @@ public class HashCommentMapper implements IParsingMapper {
                     || s == ParsingState.TEST_CASE_TABLE_HEADER || s == ParsingState.KEYWORD_TABLE_HEADER) {
                 state = s;
                 break;
+            } else if (s == ParsingState.VARIABLE_TABLE_INSIDE) {
+                state = s;
+                break;
             }
         }
 
