@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _iyS6MNymEeWGC6qnJEsRYg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/29/16 5:15 PM
+Save-Time: 3/4/16 5:29 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -121,7 +121,7 @@ get-editor "tsv_file.tsv" | get-text-viewer | set-text "*** Settings ***\n\n\n"
     + "kw with no args\n"
     + "\tlog\tno args"    
   
-    
+wait 2000    
 with [get-editor "tsv_file.tsv" | get-text-viewer] {
 	// adding keyword without changing args
 	// add user keyword "two args" to test 2
@@ -129,6 +129,7 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
     type-text tw
     key-type "M1+SPACE"
+    wait 200
     key-type Enter
     // add "args as list"
     set-caret-pos 6 25
