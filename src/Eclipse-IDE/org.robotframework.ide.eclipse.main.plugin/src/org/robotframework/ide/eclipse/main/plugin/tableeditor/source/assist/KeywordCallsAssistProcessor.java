@@ -22,10 +22,6 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.link.LinkedModeModel;
-import org.eclipse.jface.text.link.LinkedModeUI;
-import org.eclipse.jface.text.link.LinkedPosition;
-import org.eclipse.jface.text.link.LinkedPositionGroup;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
@@ -123,7 +119,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
                             .contextInformationShouldBeShownAfterAccepting(
                                     new ContextInformation(keywordName, keywordProposal.getArgumentsLabel()))
                             .performAfterAccepting(
-                                    createOperationsToPerformAfterAccepting(regionsForLinkedMode, viewer))
+                                    createOperationsToPerformAfterAccepting(viewer, regionsForLinkedMode))
                             .thenCursorWillStopAtTheEndOfInsertion()
                             .currentPrefixShouldBeDecorated()
                             .displayedLabelShouldBe(keywordName)
@@ -184,37 +180,23 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
         return regions;
     }
 
-    private Collection<Runnable> createOperationsToPerformAfterAccepting(final Collection<IRegion> regionsToLinkedEdit,
-            final ITextViewer viewer) {
-        final List<Runnable> operations = new ArrayList<>();
-        if (!regionsToLinkedEdit.isEmpty()) {
-            operations.add(new Runnable() {
-                @Override
-                public void run() {
-                    SwtThread.asyncExec(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            try {
-                                final LinkedModeModel model = new LinkedModeModel();
-                                for (final IRegion region : regionsToLinkedEdit) {
-                                    final LinkedPositionGroup group = new LinkedPositionGroup();
-                                    group.addPosition(new LinkedPosition(viewer.getDocument(), region.getOffset(),
-                                            region.getLength()));
-                                    model.addGroup(group);
-                                }
-                                model.forceInstall();
-                                final LinkedModeUI linkedModeUi = new RedEditorLinkedModeUI(model, viewer);
-                                linkedModeUi.enter();
-                            } catch (final BadLocationException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
-                }
-            });
+    private Collection<Runnable> createOperationsToPerformAfterAccepting(final ITextViewer viewer,
+            final Collection<IRegion> regionsToLinkedEdit) {
+        if (regionsToLinkedEdit.isEmpty()) {
+            return new ArrayList<>();
         }
-        return operations;
+        final Runnable operation = new Runnable() {
+            @Override
+            public void run() {
+                SwtThread.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit);
+                    }
+                });
+            }
+        };
+        return newArrayList(operation);
     }
 
     private boolean isReserved(final RedKeywordProposal keywordProposal) {
