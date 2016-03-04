@@ -32,6 +32,7 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.fileWatcher.IWatchEventHandler;
 import org.rf.ide.core.fileWatcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
@@ -118,14 +119,6 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         }
     }
 
-    public boolean isLibSpecDirty(final LibrarySpecification spec) {
-        return dirtySpecs.contains(spec);
-    }
-
-    public void removeDirtySpecs(final Collection<LibrarySpecification> reloadedSpecs) {
-        dirtySpecs.removeAll(reloadedSpecs);
-    }
-
     private boolean isPythonModule(final String absolutePathToLibraryFile) {
         return absolutePathToLibraryFile.endsWith("__init__.py");
     }
@@ -187,15 +180,22 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     public void unregisterFile(final String fileName, final IWatchEventHandler handler) {
         RedFileWatcher.getInstance().unregisterFile(fileName, this);
     }
+    
+    public boolean isLibSpecDirty(final LibrarySpecification spec) {
+        return dirtySpecs.contains(spec);
+    }
+
+    public void removeDirtySpecs(final Collection<LibrarySpecification> reloadedSpecs) {
+        dirtySpecs.removeAll(reloadedSpecs);
+    }
 
     @Override
     public void handleModifyEvent(final String modifiedFileName) {
         if (librarySpecifications.containsValue(modifiedFileName)) {
 
             final IProject project = robotProject.getProject();
-            if (!project.exists()) {
-                removeLibrarySpecification(modifiedFileName);
-                unregisterFile(modifiedFileName, this);
+            if (project == null || !project.exists()) {
+                clearHandler(modifiedFileName);
                 return;
             }
 
@@ -203,30 +203,34 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
                 @Override
                 public void run() {
-
+                    final List<LibrarySpecification> libSpecsToRebuild = collectModifiedLibSpecs(modifiedFileName);
                     if (robotProject.getRobotProjectConfig().isReferencedLibrariesAutoReloadEnabled()) {
-                        final List<LibrarySpecification> specsToRebuild = new ArrayList<>();
-                        synchronized (librarySpecifications) {
-                            for (Entry<LibrarySpecification, String> entry : librarySpecifications.entries()) {
-                                if (entry.getValue().equals(modifiedFileName)) {
-                                    specsToRebuild.add(entry.getKey());
-                                }
-                            }
-                        }
-                        rebuildLibraries(project, specsToRebuild);
+                        rebuildLibSpecs(project, libSpecsToRebuild);
                     } else {
-                        changeLibSpecModifyFlag(modifiedFileName);
+                        markLibSpecsAsModified(libSpecsToRebuild);
                     }
                     refreshNavigator(project);
+                }
+
+                private List<LibrarySpecification> collectModifiedLibSpecs(final String modifiedFileName) {
+                    final List<LibrarySpecification> specsToRebuild = new ArrayList<>();
+                    synchronized (librarySpecifications) {
+                        for (Entry<LibrarySpecification, String> entry : librarySpecifications.entries()) {
+                            if (entry.getValue().equals(modifiedFileName)) {
+                                specsToRebuild.add(entry.getKey());
+                            }
+                        }
+                    }
+                    return specsToRebuild;
                 }
             });
         }
     }
 
-    private void rebuildLibraries(final IProject project, final List<LibrarySpecification> specs) {
+    private void rebuildLibSpecs(final IProject project, final List<LibrarySpecification> specs) {
 
         final RebuildTask newRebuildTask = new RebuildTask(project, specs);
-        
+
         if (rebuildTasksQueue.isEmpty()) {
             rebuildTasksQueue.add(newRebuildTask);
             final Shell shell = PlatformUI.getWorkbench().getDisplay().getActiveShell();
@@ -252,8 +256,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
         final Multimap<IProject, LibrarySpecification> groupedSpecifications = LinkedHashMultimap.create();
         groupedSpecifications.putAll(rebuildTask.getProject(), rebuildTask.getSpecsToRebuild());
-        new LibrariesBuilder(new BuildLogger()).forceLibrariesRebuild(groupedSpecifications,
-                SubMonitor.convert(monitor));
+        invokeLibrariesBuilder(monitor, groupedSpecifications);
         robotProject.clearConfiguration();
 
         rebuildTasksQueue.poll();
@@ -262,6 +265,17 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         if (nextRebuildTask != null) {
             removePossibleDuplicatedRebuildTasks(nextRebuildTask);
             handleRebuildTask(monitor, nextRebuildTask);
+        }
+    }
+    
+    protected void invokeLibrariesBuilder(final IProgressMonitor monitor,
+            final Multimap<IProject, LibrarySpecification> groupedSpecifications) {
+        try {
+            new LibrariesBuilder(new BuildLogger()).forceLibrariesRebuild(groupedSpecifications,
+                    SubMonitor.convert(monitor));
+        } catch (final RobotEnvironmentException e) {
+            rebuildTasksQueue.clear();
+            throw e;
         }
     }
 
@@ -275,23 +289,17 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         }
     }
 
-    private void changeLibSpecModifyFlag(final String modifiedFileName) {
-
-        final List<LibrarySpecification> specsToChange = new ArrayList<>();
-        synchronized (librarySpecifications) {
-            for (Entry<LibrarySpecification, String> entry : librarySpecifications.entries()) {
-                if (entry.getValue().equals(modifiedFileName)) {
-                    specsToChange.add(entry.getKey());
-                    dirtySpecs.add(entry.getKey());
-                }
-            }
-
-            final Map<ReferencedLibrary, LibrarySpecification> referencedLibraries = robotProject
-                    .getReferencedLibraries();
-            for (final ReferencedLibrary refLib : referencedLibraries.keySet()) {
-                final LibrarySpecification librarySpecification = referencedLibraries.get(refLib);
-                if (specsToChange.contains(librarySpecification)) {
-                    librarySpecification.setIsModified(true);
+    private void markLibSpecsAsModified(final List<LibrarySpecification> specsToRebuild) {
+        synchronized (dirtySpecs) {
+            if(!dirtySpecs.containsAll(specsToRebuild)) {
+                dirtySpecs.addAll(specsToRebuild);
+                final Map<ReferencedLibrary, LibrarySpecification> referencedLibraries = robotProject
+                        .getReferencedLibraries();
+                for (final ReferencedLibrary refLib : referencedLibraries.keySet()) {
+                    final LibrarySpecification librarySpecification = referencedLibraries.get(refLib);
+                    if (specsToRebuild.contains(librarySpecification)) {
+                        librarySpecification.setIsModified(true);
+                    }
                 }
             }
         }
@@ -353,6 +361,12 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         }
         return absolutePath;
     }
+    
+    private void clearHandler(final String modifiedFileName) {
+        removeLibrarySpecification(modifiedFileName);
+        registeredRefLibraries.clear();
+        unregisterFile(modifiedFileName, this);
+    }
 
     /**
      * for testing purposes only
@@ -366,6 +380,13 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
      */
     protected ListMultimap<LibrarySpecification, String> getLibrarySpecifications() {
         return librarySpecifications;
+    }
+    
+    /**
+     * for testing purposes only
+     */
+    protected int getRebuildTasksQueueSize() {
+        return rebuildTasksQueue.size();
     }
 
     private class RebuildTask {
