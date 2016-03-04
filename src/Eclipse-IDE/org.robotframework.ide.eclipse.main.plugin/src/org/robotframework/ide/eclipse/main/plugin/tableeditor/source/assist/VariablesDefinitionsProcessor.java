@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
@@ -16,14 +17,18 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.text.link.RedEditorLinkedModeUI;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 
 /**
  * @author Michal Anglart
@@ -66,8 +71,9 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
                 final List<ICompletionProposal> proposals = newArrayList();
                 for (final VarDef varDef : VARIABLE_DEFS) {
                     if (varDef.content.toLowerCase().startsWith(prefix.toLowerCase())) {
-                        final String textToInsert = varDef.content + separator;
+                        final String textToInsert = varDef.content + separator + varDef.firstValue;
 
+                        final Collection<IRegion> regions = getLinkedModeRegions(lineInformation, varDef);
                         final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                                 .will(assist.getAcceptanceMode())
                                 .theText(textToInsert)
@@ -75,6 +81,7 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
                                 .givenThatCurrentPrefixIs(prefix)
                                 .andWholeContentIs(content)
                                 .secondaryPopupShouldBeDisplayed(varDef.info)
+                                .performAfterAccepting(createOperationsToPerformAfterAccepting(viewer, regions))
                                 .thenCursorWillStopAt(2, varDef.content.length() - 3)
                                 .displayedLabelShouldBe(varDef.label)
                                 .proposalsShouldHaveIcon(varDef.getImage())
@@ -105,15 +112,64 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
         return false;
     }
 
+    private Collection<IRegion> getLinkedModeRegions(final IRegion lineInformation, final VarDef varDef) {
+        final int offset = lineInformation.getOffset();
+        final int valueRegionOffset = offset + varDef.content.length() + assist.getSeparatorToFollow().length();
+
+        final Region nameRegion = new Region(offset + 2, varDef.content.length() - 3);
+
+        final List<IRegion> linkedModeRegions = new ArrayList<>();
+        linkedModeRegions.add(nameRegion);
+        switch (varDef) {
+            case SCALAR:
+                linkedModeRegions.add(new Region(valueRegionOffset, 0));
+                break;
+            case LIST:
+                linkedModeRegions.add(new Region(valueRegionOffset, varDef.firstValue.length()));
+                break;
+            case DICT:
+                final List<String> splittedKeyVal = Splitter.on('=').limit(2).splitToList(varDef.firstValue);
+
+                linkedModeRegions.add(new Region(valueRegionOffset, splittedKeyVal.get(0).length()));
+                linkedModeRegions.add(new Region(valueRegionOffset + splittedKeyVal.get(0).length() + 1,
+                        splittedKeyVal.get(1).length()));
+                break;
+            default:
+                throw new IllegalStateException("Unknown variable def value: " + varDef.toString());
+        }
+        return linkedModeRegions;
+    }
+
+    private Collection<Runnable> createOperationsToPerformAfterAccepting(final ITextViewer viewer,
+            final Collection<IRegion> regionsToLinkedEdit) {
+        if (regionsToLinkedEdit.isEmpty()) {
+            return new ArrayList<>();
+        }
+        final Runnable operation = new Runnable() {
+            @Override
+            public void run() {
+                SwtThread.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit);
+                    }
+                });
+            }
+        };
+        return newArrayList(operation);
+    }
+
     private enum VarDef {
-        SCALAR("${newScalar}", "Fresh scalar", 
+        SCALAR("${newScalar}", "", "Fresh scalar", 
                 RedImages.getRobotScalarVariableImage(), "Creates fresh scalar variable"),
-        LIST("@{newList}", "Fresh list", 
+        LIST("@{newList}", "item", "Fresh list", 
                 RedImages.getRobotListVariableImage(), "Creates fresh list variable"),
-        DICT("&{newDict}", "Fresh dictionary", 
+        DICT("&{newDict}", "key=value", "Fresh dictionary", 
                 RedImages.getRobotDictionaryVariableImage(), "Creates fresh dictionary variable");
 
         private String content;
+
+        private String firstValue;
 
         private String label;
 
@@ -121,8 +177,10 @@ public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
 
         private String info;
 
-        private VarDef(final String content, final String label, final ImageDescriptor image, final String info) {
+        private VarDef(final String content, final String firstValue, final String label, final ImageDescriptor image,
+                final String info) {
             this.content = content;
+            this.firstValue = firstValue;
             this.label = label;
             this.image = image;
             this.info = info;
