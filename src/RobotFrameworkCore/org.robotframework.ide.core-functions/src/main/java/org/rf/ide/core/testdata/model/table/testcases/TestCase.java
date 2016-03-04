@@ -77,7 +77,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         this.testContext.add(executionRow);
     }
 
-    public void addKeywordExecutionRow(final RobotExecutableRow<TestCase> executionRow, final int position) {
+    public void addTestExecutionRow(final RobotExecutableRow<TestCase> executionRow, final int position) {
         executionRow.setParent(this);
         this.testContext.set(position, executionRow);
     }
