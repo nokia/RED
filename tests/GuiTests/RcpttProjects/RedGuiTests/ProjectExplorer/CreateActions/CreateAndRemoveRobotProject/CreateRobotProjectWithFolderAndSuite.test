@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/2/16 1:30 PM
+Save-Time: 3/4/16 2:31 PM
 Testcase-Type: ecl
 Verifications: _ase_IGBvEeW-9bGOK0urnw
 
@@ -16,35 +16,52 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 //check list of manu "Project/New"
-proc "compare-menu" [val list_of_items]{
-	write-lines -uri "file:/root/Documents/al.txt"
-	repeat [val index] -times [get-menu "File/New"|  get-object  | invoke getMenu  | invoke	 	getItemCount |int]  -command
+proc "compare-items" [val item_amount] [val ref_list_of_items] {
+	repeat [val index] -times $item_amount  -command
 	{
-		get-menu "File/New"|  get-object  | invoke getMenu  | invoke	getItem $index | invoke toString | let [val item_from_menu -input]{	
-			$item_from_menu | write-lines -uri "file:/root/Documents/al.txt" -append
-			$list_of_items| get $index | write-lines -uri "file:/root/Documents/al.txt" -append
-			str "--------------" | write-lines -uri "file:/root/Documents/al.txt" -append
-			$item_from_menu | equals [ $list_of_items| get $index]
-				| assert-true -message [format "Item %s not equal. Should be: '%s' but is' %s'"  $index [ $list_of_items| get $index] $item_from_menu]
+		get-menu "File/New"|  get-object  | invoke getMenu  | invoke getItem $index | invoke toString | let [val item_from_menu -input]{	
+			$item_from_menu | equals [ $ref_list_of_items| get $index]
+				| assert-true -message [format "Item %s not equal. Should be: '%s' but is' %s'"  $index [ $ref_list_of_items| get $index] $item_from_menu]
 		}
 	}
+}
+
+proc "compare-menu-for_new-items"{
+
+	get-menu "File/New"|  get-object  | invoke getMenu  | invoke	 	getItemCount |int | let [val items_in_menu -input]{
+	
+		if [ $items_in_menu | eq 9]{
+			compare-items -item_amount 9 -ref_list_of_items [list "MenuItem {Robot Project}"
+					"MenuItem {P&roject...}"
+					"MenuItem {|}"
+					"MenuItem {Robot Test Suites folder}"
+					"MenuItem {Robot Resource file}"
+					"MenuItem {Robot Test Suite}"
+					"MenuItem {Robot python file}"
+					"MenuItem {|}"
+					"MenuItem {&Other...	M1+N}"] 
+					
+		}-else {
+			compare-items -item_amount 11 -ref_list_of_items [list "MenuItem {Robot Project}"
+					"MenuItem {P&roject...}"
+					"MenuItem {|}"
+					"MenuItem {Robot Test Suites folder}"
+					"MenuItem {Robot Resource file}"
+					"MenuItem {Robot Test Suite}"
+					"MenuItem {Robot python file}"
+					"MenuItem {|}"
+					"MenuItem {E&xample...}"
+					"MenuItem {|}"
+					"MenuItem {&Other...	M1+N}"]
+		}
+	}		
 }
 
 //this is workaround because RCPPT cannot click In File/New in procedure
 get-menu "File/New/Project..." | click
 get-window "New Project" | get-button Cancel | click
 
-compare-menu [list "MenuItem {Robot Project}"
-	"MenuItem {P&roject...}"
-	"MenuItem {|}"
-	"MenuItem {Robot Test Suites folder}"
-	"MenuItem {Robot Resource file}"
-	"MenuItem {Robot Test Suite}"
-	"MenuItem {Robot python file}"
-	"MenuItem {|}"
-	"MenuItem {E&xample...}"
-	"MenuItem {|}"
-	"MenuItem {&Other...	M1+N}"]
+compare-menu-for_new-items
 
 //create new project
 get-menu "File/New/Robot Project" | click
