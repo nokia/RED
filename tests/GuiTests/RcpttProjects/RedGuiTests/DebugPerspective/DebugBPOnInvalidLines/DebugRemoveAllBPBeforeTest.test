@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _SLjU0BEbEeWWSplrwZ3vkg
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/4/15 12:23 PM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 3/4/16 12:06 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -42,9 +42,12 @@ get-view Breakpoints | get-tree | get-property itemCount | equals 0 | verify-tru
 
 get-button "Open Perspective" | click
 with [get-window "Open Perspective"] {
-    get-table | select Robot
+    get-table | select "Robot( \\(default\\))?"
     get-button OK | click
 }
+
+//get-menu "Window/Perspective/Open Perspective/Other..." | click
+//get-window "Open Perspective" | get-table | select "Robot \\(default\\)" | double-click
 
 get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
     | click
