@@ -12,6 +12,10 @@ import java.util.List;
 
 public class MoveElementHelper {
 
+    public boolean moveLeft(@SuppressWarnings("rawtypes") final Collection list, final Object toMoveLeft) {
+        return moveUp(list, toMoveLeft);
+    }
+
     @SuppressWarnings("unchecked")
     public boolean moveUp(@SuppressWarnings("rawtypes") final Collection list, final Object toMoveUp) {
         boolean result = false;
@@ -28,6 +32,10 @@ public class MoveElementHelper {
             }
         }
         return result;
+    }
+
+    public boolean moveRight(@SuppressWarnings("rawtypes") final Collection list, final Object toMoveRight) {
+        return moveDown(list, toMoveRight);
     }
 
     @SuppressWarnings("unchecked")

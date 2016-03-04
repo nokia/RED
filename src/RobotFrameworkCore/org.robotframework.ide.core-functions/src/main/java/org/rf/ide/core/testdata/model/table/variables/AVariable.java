@@ -12,12 +12,13 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public abstract class AVariable extends AModelElement<VariableTable>implements IVariableHolder {
+public abstract class AVariable extends AModelElement<VariableTable> implements IVariableHolder {
 
     protected VariableType type;
 
@@ -29,12 +30,19 @@ public abstract class AVariable extends AModelElement<VariableTable>implements I
 
     private final List<RobotToken> comment = new ArrayList<>();
 
+    private final MoveElementHelper moveHelper;
+
     protected AVariable(final VariableType type, final String name, final RobotToken declaration,
             final VariableScope scope) {
         this.type = type;
         this.name = name;
         this.declaration = declaration;
         this.scope = scope;
+        this.moveHelper = new MoveElementHelper();
+    }
+
+    protected MoveElementHelper getMoveHelper() {
+        return this.moveHelper;
     }
 
     @Override
@@ -60,6 +68,22 @@ public abstract class AVariable extends AModelElement<VariableTable>implements I
     @Override
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
+    }
+
+    public void addCommentPart(final RobotToken rt, final int position) {
+        this.comment.set(position, rt);
+    }
+
+    public void removeCommentPart(final RobotToken rt) {
+        this.comment.remove(rt);
+    }
+
+    public boolean moveCommentPartLeft(final RobotToken rt) {
+        return getMoveHelper().moveLeft(comment, rt);
+    }
+
+    public boolean moveCommentPartRight(final RobotToken rt) {
+        return getMoveHelper().moveRight(comment, rt);
     }
 
     @Override
