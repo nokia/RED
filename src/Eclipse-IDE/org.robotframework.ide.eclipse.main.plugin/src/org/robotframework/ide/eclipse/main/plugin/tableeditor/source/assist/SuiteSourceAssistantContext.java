@@ -9,6 +9,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals.variablesSortedByTypesAndNames;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -17,6 +18,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
@@ -130,9 +132,41 @@ public class SuiteSourceAssistantContext {
                 }
             });
         } catch (final CoreException e) {
+            Collections.sort(matchingFiles, createComparator());
             return matchingFiles;
         }
+        Collections.sort(matchingFiles, createComparator());
         return matchingFiles;
+    }
+
+    private Comparator<IFile> createComparator() {
+        return new Comparator<IFile>() {
+            @Override
+            public int compare(final IFile file1, final IFile file2) {
+                final String currentProject = suiteModel.getProject().getProject().getFullPath().segment(0);
+
+                final IPath path1 = file1.getFullPath();
+                final IPath path2 = file2.getFullPath();
+
+                if (path1.segment(0).equals(currentProject) && !path2.segment(0).equals(currentProject)) {
+                    return -1;
+                } else if (!path1.segment(0).equals(currentProject) && path2.segment(0).equals(currentProject)) {
+                    return 1;
+                } else {
+                    int i = 0;
+                    for (; i < path1.segmentCount() && i < path2.segmentCount(); i++) {
+                        final int segmentResult = path1.segment(i).compareTo(path2.segment(i));
+                        if (segmentResult != 0) {
+                            return segmentResult;
+                        }
+                    }
+                    if (i >= path1.segmentCount() && i >= path2.segmentCount()) {
+                        return 0;
+                    }
+                    return i < path1.segmentCount() ? -1 : 1;
+                }
+            }
+        };
     }
 
     private interface FileMatcher {
