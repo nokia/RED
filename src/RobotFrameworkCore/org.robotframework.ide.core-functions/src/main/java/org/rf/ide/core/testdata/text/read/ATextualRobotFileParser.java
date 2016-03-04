@@ -362,9 +362,21 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
             parsingOutput.setStatus(Status.FAILED);
         } else {
             parsingOutput.setStatus(Status.PASSED);
+            clearDirtyFlags(parsingOutput);
         }
 
         return parsingOutput;
+    }
+
+    private void clearDirtyFlags(final RobotFileOutput parsingOutput) {
+        final List<RobotLine> fileContent = parsingOutput.getFileModel().getFileContent();
+        for (final RobotLine line : fileContent) {
+            for (final IRobotLineElement rle : line.getLineElements()) {
+                if (rle instanceof RobotToken) {
+                    ((RobotToken) rle).clearDirtyFlag();
+                }
+            }
+        }
     }
 
     public abstract boolean isPrettyAlignLineOnly(final String currentLineText);

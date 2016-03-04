@@ -14,43 +14,41 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
 
-
 public class RobotToken implements IRobotLineElement {
 
     private FilePosition fp = new FilePosition(NOT_SET, NOT_SET, NOT_SET);
-    private String raw = "";
-    private String text = "";
-    private final List<IRobotTokenType> types = new ArrayList<>(0);
-    private boolean isDirty = false;
-    private boolean wasFirstInit = false;
 
+    private String raw = "";
+
+    private String text = "";
+
+    private final List<IRobotTokenType> types = new ArrayList<>(0);
+
+    private boolean isDirty = false;
+
+    private boolean wasFirstInit = false;
 
     public RobotToken() {
         types.add(RobotTokenType.UNKNOWN);
     }
-
 
     @Override
     public int getLineNumber() {
         return fp.getLine();
     }
 
-
     public void setLineNumber(final int lineNumber) {
         fp = new FilePosition(lineNumber, fp.getColumn(), fp.getOffset());
     }
-
 
     @Override
     public int getStartColumn() {
         return fp.getColumn();
     }
 
-
     public void setStartColumn(final int startColumn) {
         fp = new FilePosition(fp.getLine(), startColumn, fp.getOffset());
     }
-
 
     @Override
     public int getEndColumn() {
@@ -63,27 +61,23 @@ public class RobotToken implements IRobotLineElement {
         return endColumn;
     }
 
-
     public void setStartOffset(final int startOffset) {
         fp = new FilePosition(fp.getLine(), fp.getColumn(), startOffset);
     }
-
 
     @Override
     public int getStartOffset() {
         return fp.getOffset();
     }
 
-
     @Override
     public String getText() {
         return text;
     }
 
-
     public void setText(final String text) {
-        if (!Objects.equals(this.text, text)) {
-            if (wasFirstInit) {
+        if (wasFirstInit) {
+            if (!Objects.equals(this.text, text)) {
                 isDirty = true;
             }
         }
@@ -91,49 +85,43 @@ public class RobotToken implements IRobotLineElement {
         this.text = text.intern();
     }
 
+    public void clearDirtyFlag() {
+        isDirty = false;
+    }
 
     @Override
     public String getRaw() {
         return raw;
     }
 
-
     public void setRaw(final String raw) {
         this.raw = raw.intern();
     }
-
 
     @Override
     public List<IRobotTokenType> getTypes() {
         return types;
     }
 
-
     public void setType(final IRobotTokenType type) {
         types.clear();
         types.add(type);
     }
 
-
     @Override
     public String toString() {
-        return String.format(
-                "RobotToken [filePosition=%s, text=%s, types=%s, isDirty=%s]",
-                fp, text, types, isDirty);
+        return String.format("RobotToken [filePosition=%s, text=%s, types=%s, isDirty=%s]", fp, text, types, isDirty);
     }
-
 
     @Override
     public FilePosition getFilePosition() {
         return fp;
     }
 
-
     @Override
     public boolean isDirty() {
         return isDirty;
     }
-
 
     public boolean isVariableDeclaration() {
         boolean result = false;
@@ -153,7 +141,6 @@ public class RobotToken implements IRobotLineElement {
 
         return result;
     }
-
 
     @Override
     public VersionAvailabilityInfo getVersionInformation() {
