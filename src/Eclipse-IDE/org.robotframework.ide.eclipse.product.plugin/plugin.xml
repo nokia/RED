@@ -12,7 +12,7 @@
             <property name="aboutImage" value="icons/about.bmp" />
             <property name="aboutText" value="RED - Robot Editor&#x0D;
 &#x0D;Development environment for Robot Framework http://www.robotframework.org/&#x0D;
-&#x0D;(c) Copyright 2008-2016 Nokia Solutions and Networks.&#x0D;
+&#x0D;(c) Copyright 2015-2016 Nokia Solutions and Networks.&#x0D;
 &#x0D;
 &#x0D;Eclipse and the Eclipse logo are trademarks of the Eclipse Foundation, Inc., https://www.eclipse.org/. 
 Oracle and Java are trademarks or registered trademarks of Oracle and/or its 
@@ -24,6 +24,15 @@ affiliates. Other names may be trademarks of their respective owners.&#x0D;
             <property name="preferenceCustomization" value="plugin_customization.ini"/>
             <property name="applicationXMI" value="org.robotframework.ide.eclipse.product.plugin/red.e4xmi"/>
             <property name="applicationCSSResources" value="platform:/plugin/org.eclipse.platform/images/"/>
+            <property name="introTitle" value="Welcome to RED"/>
+            <property name="introBrandingImage" value="product:icons/intro_logo.bmp"/>
       </product>
+   </extension>
+   <extension
+         point="org.eclipse.ui.intro">
+      <introProductBinding
+            introId="org.eclipse.ui.intro.universal"
+            productId="org.robotframework.red">
+      </introProductBinding>
    </extension>
 </plugin>
