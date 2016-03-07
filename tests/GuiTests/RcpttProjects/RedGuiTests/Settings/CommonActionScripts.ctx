@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/3/16 11:44 AM
+Save-Time: 3/7/16 4:04 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -39,6 +39,18 @@ let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
 		global [val RCPTT_project_path $user_RCPTT_project_path]
 	}-else{
 		global [val RCPTT_project_path $temp]
+	}
+}
+
+//set parameter is_product
+substitute-variables "${eclipse_home}" | let [val eclipse_home_path -input]{
+	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+		
+		global [val is_product [get-file [uri-from-path [concat $eclipse_home_path "RED.exe" ]]| get exists ]]
+		
+	}-else{
+		global [val is_product [get-file [uri-from-path [concat $eclipse_home_path "RED" ]]| get exists ]]
+	
 	}
 }
 
