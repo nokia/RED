@@ -74,8 +74,7 @@ public class JarStructureBuilder {
         
         private static JarClass createFromZipPythonEntry(final String name) {
             final String nameWithoutExtension = name.substring(0, name.length() - ".py".length());
-            final String qualifiedName = nameWithoutExtension.replaceAll("/", ".");
-            return new JarClass(qualifiedName);
+            return new JarClass(nameWithoutExtension);
         }
 
         public String getQualifiedName() {
