@@ -75,22 +75,23 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     public void registerLibrary(ReferencedLibrary library, final LibrarySpecification spec) {
 
-        final String absolutePathToLibraryFile = findLibraryFileAbsolutePath(library);
-
-        if (absolutePathToLibraryFile != null && spec != null && !librarySpecifications.containsKey(spec)) {
-            final File libFile = new File(absolutePathToLibraryFile);
-            final File libDir = libFile.getParentFile();
-            final String libFileName = libFile.getName();
-            if (libDir != null && libDir.exists() && libDir.isDirectory()) {
-                if (isPythonModule(absolutePathToLibraryFile)) {
-                    String[] moduleFilesList = extractPythonModuleFiles(libDir);
-                    if (moduleFilesList != null) {
-                        for (int i = 0; i < moduleFilesList.length; i++) {
-                            addLibraryToWatch(moduleFilesList[i], libDir.toPath(), spec);
+        if (spec != null && !librarySpecifications.containsKey(spec)) {
+            final String absolutePathToLibraryFile = findLibraryFileAbsolutePath(library);
+            if (absolutePathToLibraryFile != null) {
+                final File libFile = new File(absolutePathToLibraryFile);
+                final File libDir = libFile.getParentFile();
+                final String libFileName = libFile.getName();
+                if (libDir != null && libDir.exists() && libDir.isDirectory()) {
+                    if (isPythonModule(absolutePathToLibraryFile)) {
+                        String[] moduleFilesList = extractPythonModuleFiles(libDir);
+                        if (moduleFilesList != null) {
+                            for (int i = 0; i < moduleFilesList.length; i++) {
+                                addLibraryToWatch(moduleFilesList[i], libDir.toPath(), spec);
+                            }
                         }
+                    } else {
+                        addLibraryToWatch(libFileName, libDir.toPath(), spec);
                     }
-                } else {
-                    addLibraryToWatch(libFileName, libDir.toPath(), spec);
                 }
             }
         }
