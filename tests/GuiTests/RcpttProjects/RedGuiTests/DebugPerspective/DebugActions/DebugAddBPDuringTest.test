@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _fNWisBRGEeWWV9IuysVI_A
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/9/15 11:50 AM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 2/29/16 2:53 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -33,7 +33,8 @@ exec-with-options -disableJobWaiting -command {
 	try -times 10 -delay 300 -command{
 		get-view Debug | get-tree |get-item "Script.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount -raw | gt 0 | verify-true
 	}
-	
+	get-view Debug | get-tree | get-item "Script.robot \\[Robot\\]/Robot Remote Test at 127.0.0.1:51437" 
+    | get-property caption | equals "Robot Remote Test at 127.0.0.1:51437" | verify-true
     
 	//check if it test is paused on line 13
 	check-debug-marker-on-ruler -line 13 -script_name "Script.robot"
@@ -42,6 +43,7 @@ exec-with-options -disableJobWaiting -command {
 	exec-with-options -disableJobWaiting -command {
 		get-button "Resume (F8)" | click
 	}
+	
 	check-debug-marker-on-ruler -line 15 -script_name "Script.robot"
 	
 	
