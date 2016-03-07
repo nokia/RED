@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<introContent>
+  	<extensionContent id="red-overviewExtension" style="css/red_intro.css" 
+  	         name="RED Overview" path="overview/@">
+		<group style-id="content-group" id="red-overviewGroup">
+       		<link label="RED - Robot Framework editor"  style-id="content-link" id="red-overviewHelpLink"
+       		       url="http://org.eclipse.ui.intro/showHelpTopic?id=/org.robotframework.ide.eclipse.main.plugin.doc.user/doc/red_overview.html">
+          		<text>Learn how Robot Framework tests can be developed with RED environment</text>
+       		</link>
+       	</group>
+  	</extensionContent>
+</introContent>
