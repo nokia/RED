@@ -9,4 +9,18 @@
             primary="true">
       </toc>
    </extension>
+   <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="intro/red_overview.xml">
+      </configExtension>
+   </extension>
+   <extension
+         point="org.eclipse.ui.intro.configExtension">
+      <configExtension
+            configId="org.eclipse.ui.intro.universalConfig"
+            content="intro/red_webresources.xml">
+      </configExtension>
+   </extension>
 </plugin>

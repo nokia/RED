@@ -1,0 +1,23 @@
+
+a#red-overviewHelpLink img { 
+	background-image : url(graphics/icon.gif); 
+}
+a#red-overviewHelpLink:hover img { 
+	background-image : url(graphics/icon_hov.gif); 
+}
+
+
+a#red-externalLink-redGithub img { 
+    background-image : url(graphics/github.gif); 
+}
+a#red-externalLink-redGithub:hover img { 
+    background-image : url(graphics/github_hov.gif); 
+}
+
+
+a#red-externalLink-rf img { 
+    background-image : url(graphics/rf.gif); 
+}
+a#red-externalLink-rf:hover img { 
+    background-image : url(graphics/rf_hov.gif); 
+}
