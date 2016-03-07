@@ -155,11 +155,18 @@ public class SuiteSourceAssistantContext {
                 } else {
                     int i = 0;
                     for (; i < path1.segmentCount() && i < path2.segmentCount(); i++) {
+                        if (i == path1.segmentCount() - 1 && i < path2.segmentCount() - 1) {
+                            return -1;
+                        } else if (i < path1.segmentCount() - 1 && i == path2.segmentCount() - 1) {
+                            return 1;
+                        }
+
                         final int segmentResult = path1.segment(i).compareTo(path2.segment(i));
                         if (segmentResult != 0) {
                             return segmentResult;
                         }
                     }
+
                     if (i >= path1.segmentCount() && i >= path2.segmentCount()) {
                         return 0;
                     }
