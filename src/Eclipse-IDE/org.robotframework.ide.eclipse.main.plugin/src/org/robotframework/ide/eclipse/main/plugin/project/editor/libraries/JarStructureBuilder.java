@@ -39,7 +39,9 @@ public class JarStructureBuilder {
             ZipEntry entry = zipStream.getNextEntry();
             while (entry != null) {
                 if (isJavaClass(entry.getName())) {
-                    jarClasses.add(JarClass.createFromZipEntry(entry.getName()));
+                    jarClasses.add(JarClass.createFromZipJavaEntry(entry.getName()));
+                } else if(isPythonClass(entry.getName())) {
+                    jarClasses.add(JarClass.createFromZipPythonEntry(entry.getName()));
                 }
                 entry = zipStream.getNextEntry();
             }
@@ -52,6 +54,10 @@ public class JarStructureBuilder {
     private boolean isJavaClass(final String entryName) {
         return entryName.endsWith(".class");
     }
+    
+    private boolean isPythonClass(final String entryName) {
+        return entryName.endsWith(".py");
+    }
 
     public static class JarClass {
         private final String qualifiedName;
@@ -60,8 +66,14 @@ public class JarStructureBuilder {
             this.qualifiedName = qualifiedName;
         }
 
-        private static JarClass createFromZipEntry(final String name) {
+        private static JarClass createFromZipJavaEntry(final String name) {
             final String nameWithoutExtension = name.substring(0, name.length() - ".class".length());
+            final String qualifiedName = nameWithoutExtension.replaceAll("/", ".");
+            return new JarClass(qualifiedName);
+        }
+        
+        private static JarClass createFromZipPythonEntry(final String name) {
+            final String nameWithoutExtension = name.substring(0, name.length() - ".py".length());
             final String qualifiedName = nameWithoutExtension.replaceAll("/", ".");
             return new JarClass(qualifiedName);
         }
