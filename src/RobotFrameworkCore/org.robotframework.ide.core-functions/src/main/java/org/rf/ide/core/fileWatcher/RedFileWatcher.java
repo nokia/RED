@@ -186,7 +186,7 @@ public class RedFileWatcher {
         if (nextFileName != null && nextFileName.equals(fileName)) {
             modifiedFilesQueue.remove();
             try {
-                Thread.sleep(300);
+                Thread.sleep(200);
             } catch (InterruptedException e) {
                 return;
             }
@@ -196,4 +196,5 @@ public class RedFileWatcher {
             }
         }
     }
+
 }
