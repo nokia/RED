@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cr2voLk0EeWzJthH3JoEWQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/4/16 3:04 PM
+Save-Time: 3/7/16 4:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -29,15 +29,19 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
 }
 //check variables files
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "VariableProject/var.py" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "VariableProject/var 3.py" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "VariableProject/var 2.py" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "VariableProject/space in name/var here .py" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "VariableProject/space in name/after  .py" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "VariableProject/getVar.py" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "VariableProject/var 2.py" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "VariableProject/var 3.py" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "VariableProject/var.py" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "VariableProject/space in name/ abc.py" | verify-true
     get-property "getItems().TableItem[5].getText()" | equals "VariableProject/space in name/ def.py" | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals "VariableProject/space in name/ abc.py" | verify-true
-    get-property "getItems().TableItem[7].getText()" | equals "VariableProject/getVar.py" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "VariableProject/space in name/after  .py" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "VariableProject/space in name/var here .py" | verify-true
+    
+    //check if next are parameters
     get-property "getItems().TableItem[8].getText()" | equals "${a}" | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals "${sumof2digit}" | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals "&{mapfromvar3}" | verify-true
 }
 //add var with spaces in name
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
@@ -64,13 +68,22 @@ with [get-editor "tsv_test.tsv" | get-text-viewer] {
 }
 //check resources files
 with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "VariableProject/resources/txt_res.txt" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "VariableProject/resources/tsv_res.tsv" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "VariableProject/resources/res1.robot" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "VariableProject/resources/ space.tsv" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "VariableProject/resources/ space.tsv" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "VariableProject/resources/res1.robot" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "VariableProject/resources/tsv_res.tsv" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "VariableProject/resources/txt_res.txt" | verify-true
     get-property "getItems().TableItem[4].getText()" | equals "${anothervariable}" | verify-true
+    
+    //check variables
     get-property "getItems().TableItem[5].getText()" | equals "${a}" | verify-true
     get-property "getItems().TableItem[6].getText()" | equals "${integer}" | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "${sumof2digit}" | verify-true
+    get-property "getItems().TableItem[8].getText()" | equals "${variable}" | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals "&{mapfromvar3}" | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals "&{mapping}" | verify-true
+    get-property "getItems().TableItem[11].getText()" | equals "@{numbers}" | verify-true
+    get-property "getItems().TableItem[12].getText()" | equals "@{strings}" | verify-true
+    get-property "getItems().TableItem[13].getText()" | equals "${/}" | verify-true
 }
 
 //add tsv file with space
