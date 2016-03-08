@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _9rWNQHf-EeWYifgNPLzx_Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/7/16 4:33 PM
+Save-Time: 3/8/16 12:03 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -47,64 +47,62 @@ with [get-editor "resource_file.robot" | get-text-viewer] {
 
 with [get-editor "resource_file.robot" | get-text-viewer] {
     set-caret-pos 2 1
-    // add default scalar
+    //add default scalar
     key-type "M1+SPACE"
     key-type Enter
-    key-type Down
+    key-type Tab
+    // value
     type-text 1
     key-type Enter -times 2
-    // add list
+    //add default  list
     key-type "M1+SPACE"
     key-type Down
     key-type Enter
-    key-type Down
+    key-type Tab -times 2
     key-type Enter -times 2
-    
-    //add dict
+    // add dict
     key-type "M1+SPACE"
     key-type Down -times 2
     key-type Enter
-    key-type Down
+    key-type Tab -times 3
     key-type Enter -times 2
-    
-    //add scalar with new name
+    //add user scalar
     key-type "M1+SPACE"
     key-type Enter
     type-text "my_scalar"
     key-type Tab
     type-text text
     key-type Enter -times 2
-    
-    // add list with new values
+    // add user list
     key-type "M1+SPACE"
     key-type Down
     key-type Enter
-    type-text "my list"
+    type-text "new list"
     key-type Tab
-    type-text val1
+    type-text abc1
     key-type Tab
-    type-text val2
+    type-text def2
     key-type Enter -times 2
-    
-    //add dict wieth key=value
+    //add dict
     key-type "M1+SPACE"
     key-type Down -times 2
     key-type Enter
-    type-text "my_dict"
+    type-text dict2
     key-type Tab
-    type-text k1
+    type-text music
     key-type Tab
-    type-text light
-    key-type Enter -times 2
+    type-text metal
+    key-type Tab
+    key-type Enter
+    key-type Enter
 }
-
 get-editor "resource_file.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
     + "${newScalar}    1\n"
     + "@{newList}    item    \n"
     + "&{newDict}    key=value    \n"
     + "${my_scalar}    text\n"
-    + "@{my list}    val1    val2\n"
-    + "&{my_dict}    k1=light" | verify-true
+    + "@{new list}    abc1    def2\n"
+    + "&{dict2}    music=metal\n" | verify-true
        
     
 with [get-editor "resource_file.robot" | get-text-viewer] {
