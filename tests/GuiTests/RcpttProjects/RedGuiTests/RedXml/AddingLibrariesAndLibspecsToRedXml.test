@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-a_zUKfnEeWg6OFh_tHgTw
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/8/16 2:32 PM
+Save-Time: 3/8/16 2:50 PM
 Testcase-Type: ecl
 Verifications: _Oo-BUKfpEeWg6OFh_tHgTw
 
@@ -15,6 +15,7 @@ Verifications: _Oo-BUKfpEeWg6OFh_tHgTw
 Content-Type: text/ecl
 Entry-Name: .content
 
+get-view "Project Explorer" | get-tree | select RobotProject | double-click
 //open red.xml
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/red.xml" | double-click
@@ -137,20 +138,67 @@ with [get-tab-folder -index 1] {
     get-property activePage | equals "RobotProject/red.xml" | verify-true
 }
 
-//add class as file name
+
+//add file with class name as file
+get-view "Project Explorer" | get-tree | select "RobotProject/classes/DefaultLib.py"
 set-dialog-result File "platform:/resource/RobotProject/classes/DefaultLib.py"
 get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
-set-dialog-result File "platform:/resource/RobotProject/classes/NameAsClass.py"
+
+//add file with different class name
+set-dialog-result File "platform:/resource/RobotProject/classes/FileNOTAsClassName.py"
 get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
-get-window "Select library class" | get-table | select NameAsClass
+get-window "Select library class" | get-table | select FileNOTAsClassName
 with [get-window "Select library class" | get-table] {
     get-property itemCount | equals 2 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals NameAsClass | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "NameAsClass.DifferentName" | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals FileNOTAsClassName | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "FileNOTAsClassName.DifferentName" | verify-true
+}
+with [get-window "Select library class"] {
+    get-table | select FileNOTAsClassName
+    get-button OK | click
 }
 
-//add class as file name with get_variable
-get-window "Select library class" | get-table | select NameAsClass | click -default
+//add empty file
+set-dialog-result File "platform:/resource/RobotProject/empty.py"
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
+    click
+    key-type "M1+s"
+}
 
-
+//check project expolorer
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 8 | verify-true
+    get-item "RobotProject/Robot Referenced libraries/DefaultLib RobotProject\\/classes \\(1\\)/Nirvana" 
+        | get-property index | equals 0 | verify-true
+    get-item "RobotProject/Robot Referenced libraries/empty RobotProject \\(0\\)" | get-property childCount | equals 0 
+        | verify-true
+    get-item "RobotProject/Robot Referenced libraries/FileNOTAsClassName RobotProject\\/classes \\(0\\)" 
+        | get-property childCount | equals 0 | verify-true
+}
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
+        | get-property childCount | equals 3 | verify-true
+    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals Add | verify-true
+    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
+        | get-property "getItems().TreeItem[1].getText()" | equals Multiply | verify-true
+    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/generated_libspec\\/liby.xml \\(3\\)" 
+        | get-property "getItems().TreeItem[2].getText()" | equals Subtract | verify-true
+}
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/libs \\(3\\)" | get-property index | equals 4 
+        | verify-true
+    get-item "RobotProject/Robot Referenced libraries/liby RobotProject\\/libs \\(3\\)" | get-property childCount 
+        | equals 3 | verify-true
+}
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries/multiply RobotProject \\(1\\)" | get-property childCount 
+        | equals 1 | verify-true
+    get-item "RobotProject/Robot Referenced libraries/output.xml \\(non-accessible\\)" | get-property childCount 
+        | equals 0 | verify-true
+}
+get-view "Project Explorer" | get-tree | double-click
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/sum RobotProject\\/libs \\(1\\)" | get-property childCount 
+    | equals 1 | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
