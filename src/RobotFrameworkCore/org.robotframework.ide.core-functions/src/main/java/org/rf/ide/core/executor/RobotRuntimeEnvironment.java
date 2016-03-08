@@ -660,7 +660,7 @@ public class RobotRuntimeEnvironment {
             final String cpath = "\"" + Joiner.on(cpSeparator).join(wholeClasspath) + "\"";
 
             cmdLine.add("-J-cp");
-            cmdLine.add(cpath);
+            cmdLine.add(cpath.replaceAll("\n", ""));
         }
     }
 
