@@ -661,6 +661,8 @@ public class RobotRuntimeEnvironment {
 
             cmdLine.add("-J-cp");
             cmdLine.add(cpath.replaceAll("\n", ""));
+            
+            throw new RobotEnvironmentException("CLASSPATH:" + cpath.replaceAll("\n", ""));
         }
     }
 
