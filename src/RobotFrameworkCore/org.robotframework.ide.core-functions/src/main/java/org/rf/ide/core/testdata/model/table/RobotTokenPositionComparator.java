@@ -7,12 +7,12 @@ package org.rf.ide.core.testdata.model.table;
 
 import java.util.Comparator;
 
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 
-public class RobotTokenPositionComparator implements Comparator<RobotToken> {
+public class RobotTokenPositionComparator implements Comparator<IRobotLineElement> {
 
     @Override
-    public int compare(final RobotToken o1, final RobotToken o2) {
+    public int compare(final IRobotLineElement o1, final IRobotLineElement o2) {
         return o1.getFilePosition().compare(o2.getFilePosition());
     }
 }
