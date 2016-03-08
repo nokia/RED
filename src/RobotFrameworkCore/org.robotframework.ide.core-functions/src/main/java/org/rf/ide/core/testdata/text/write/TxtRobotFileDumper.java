@@ -10,7 +10,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -22,8 +21,8 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
-import org.rf.ide.core.testdata.model.table.ECompareResult;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.SettingTableElementsComparator;
 import org.rf.ide.core.testdata.model.table.TableHeader;
@@ -53,6 +52,12 @@ import com.google.common.io.Files;
 
 public class TxtRobotFileDumper implements IRobotFileDumper {
 
+    private static final int NUMBER_OF_AFTER_UNIT_ELEMENTS_TO_TREAT_AS_NEW_UNIT_START = 3;
+
+    private static final int MAX_NUMBER_OF_COLUMN_IN_LINE = 7;
+
+    private static final int MAX_NUMBER_OF_CHARS_IN_LINE = 120;
+
     @Override
     public boolean canDumpFile(final File file) {
         boolean result = false;
@@ -71,11 +76,15 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
     }
 
     @Override
-    public String dump(final RobotFile model) {
-        StringBuilder strLine = new StringBuilder();
-        List<RobotLine> newLines = newLines(model);
+    public List<RobotLine> dumpToLines(final RobotFile model) {
+        return newLines(model);
+    }
 
-        for (final RobotLine line : newLines) {
+    @Override
+    public String dump(final List<RobotLine> lines) {
+        final StringBuilder strLine = new StringBuilder();
+
+        for (final RobotLine line : lines) {
             System.out.println(line);
             for (final IRobotLineElement elem : line.getLineElements()) {
                 strLine.append(elem.getRaw());
@@ -85,6 +94,12 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         }
 
         return strLine.toString();
+    }
+
+    @Override
+    public String dump(final RobotFile model) {
+        final List<RobotLine> lines = dumpToLines(model);
+        return dump(lines);
     }
 
     private List<RobotLine> newLines(final RobotFile model) {
@@ -165,17 +180,15 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
 
                 final AModelElement<VariableTable> var = sortedVariables.get(varIndex);
                 final ModelType type = var.getModelType();
-                final List<RobotToken> varContentSorted = new ArrayList<>(var.getElementTokens());
-                Collections.sort(varContentSorted, new RobotTokenComperators());
 
                 if (type == ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE) {
-                    dumpScalarVariable(model, (ScalarVariable) var, varContentSorted, lines);
+                    dumpScalarVariable(model, (ScalarVariable) var, lines);
                 } else if (type == ModelType.LIST_VARIABLE_DECLARATION_IN_TABLE) {
-                    dumpListVariable(model, (ListVariable) var, varContentSorted, lines);
+                    dumpListVariable(model, (ListVariable) var, lines);
                 } else if (type == ModelType.DICTIONARY_VARIABLE_DECLARATION_IN_TABLE) {
-                    dumpDictionaryVariable(model, (DictionaryVariable) var, varContentSorted, lines);
+                    dumpDictionaryVariable(model, (DictionaryVariable) var, lines);
                 } else {
-                    dumpUnknownVariable(model, (UnknownVariable) var, varContentSorted, lines);
+                    dumpUnknownVariable(model, (UnknownVariable) var, lines);
                 }
             }
 
@@ -189,9 +202,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         }
     }
 
-    private void dumpScalarVariable(final RobotFile model, final ScalarVariable var,
-            final List<RobotToken> varContentSorted, final List<RobotLine> lines) {
-
+    private void dumpScalarVariable(final RobotFile model, final ScalarVariable var, final List<RobotLine> lines) {
         final RobotToken varDec = var.getDeclaration();
         final FilePosition filePosition = varDec.getFilePosition();
         int fileOffset = -1;
@@ -229,8 +240,21 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                     }
                 }
             }
+        } else {
+            updateLine(model, lines, varDec);
+            lastToken = varDec;
         }
-        varContentSorted.remove(varDec);
+
+        // start
+        RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
+        sorter.addPresaveSequenceForType(RobotTokenType.VARIABLES_VARIABLE_VALUE, 1, var.getValues());
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2, var.getComment());
+        final List<RobotToken> tokens = new ArrayList<>();
+        tokens.addAll(var.getValues());
+        tokens.addAll(var.getComment());
+        Collections.sort(tokens, sorter);
+        System.out.println(tokens);
+        // end
 
         dumpSeparatorsAfterToken(model, currentLine, lastToken, lines);
         final IRobotLineElement endOfLine = currentLine.getEndOfLine();
@@ -242,28 +266,21 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         }
     }
 
-    private void dumpListVariable(final RobotFile model, final ListVariable var,
-            final List<RobotToken> varContentSorted, final List<RobotLine> lines) {
+    private void dumpListVariable(final RobotFile model, final ListVariable var, final List<RobotLine> lines) {
         final RobotToken varDec = var.getDeclaration();
         updateLine(model, lines, varDec);
-        varContentSorted.remove(varDec);
 
     }
 
     private void dumpDictionaryVariable(final RobotFile model, final DictionaryVariable var,
-            final List<RobotToken> varContentSorted, final List<RobotLine> lines) {
+            final List<RobotLine> lines) {
         final RobotToken varDec = var.getDeclaration();
         updateLine(model, lines, varDec);
-        varContentSorted.remove(varDec);
     }
 
-    private void dumpUnknownVariable(final RobotFile model, final UnknownVariable var,
-            final List<RobotToken> varContentSorted, final List<RobotLine> lines) {
+    private void dumpUnknownVariable(final RobotFile model, final UnknownVariable var, final List<RobotLine> lines) {
         final RobotToken varDec = var.getDeclaration();
         updateLine(model, lines, varDec);
-        varContentSorted.remove(varDec);
-
-        System.out.println("D");
     }
 
     private int getLastSortedToDump(final List<Section> varSections,
@@ -308,7 +325,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                         if (nextStartFoundIndex == -1) {
                             nextStartFoundIndex = varIndex;
                             nextFound++;
-                        } else if (nextFound == 4) {
+                        } else if (nextFound == NUMBER_OF_AFTER_UNIT_ELEMENTS_TO_TREAT_AS_NEW_UNIT_START) {
                             index = nextStartFoundIndex;
                             break;
                         }
@@ -321,28 +338,6 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         }
 
         return index;
-    }
-
-    private class RobotTokenComperators implements Comparator<RobotToken> {
-
-        @Override
-        public int compare(RobotToken o1, RobotToken o2) {
-            int result = ECompareResult.EQUAL_TO.getValue();
-            FilePosition filePos1 = o1.getFilePosition();
-            FilePosition filePos2 = o2.getFilePosition();
-
-            if (filePos1.isNotSet() && filePos1.isNotSet()) {
-                result = ECompareResult.EQUAL_TO.getValue();
-            } else if (filePos1.isNotSet()) {
-                result = ECompareResult.LESS_THAN.getValue();
-            } else if (filePos2.isNotSet()) {
-                result = ECompareResult.GREATER_THAN.getValue();
-            } else {
-                result = filePos1.compare(filePos2);
-            }
-
-            return result;
-        }
     }
 
     private void dumpTestCaseTable(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
