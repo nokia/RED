@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _TLsXYOFJEeWu0tyN3Pwjmg
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 3/8/16 3:31 PM
+Save-Time: 3/9/16 10:55 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -20,6 +20,11 @@ Entry-Name: .content
 // set jython as interpreter  
 get-preferences-menu | click
 get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+get-window Preferences | get-button Cancel | click
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+
+
 // for windows:
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 
@@ -94,4 +99,7 @@ get-view "Execution View" | get-control Any -index 8 | get-property "getChildren
 get-view "Project Explorer" | get-tree 
     | get-item "jython_simple_project/Robot Referenced libraries/MathOperator jython_simple_project\\/RED_TEST_JavaLib.jar \\(2\\)" 
     | get-property caption | equals "MathOperator jython_simple_project/RED_TEST_JavaLib.jar (2)" | verify-true
+    
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
