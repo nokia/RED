@@ -254,11 +254,31 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         tokens.addAll(var.getValues());
         tokens.addAll(var.getComment());
         Collections.sort(tokens, sorter);
-        final Set<Integer> lineEndPos = getLineEndPos(varDec, tokens);
-        System.out.println(var.getName() + ", " + lineEndPos);
-        // sprawdzenie czy nie ma konca linii
 
         int nrOfTokens = tokens.size();
+
+        final List<Integer> lineEndPos = new ArrayList<>(getLineEndPos(varDec, tokens));
+        if (nrOfTokens > 0) {
+            boolean wasMyLine = false;
+            for (int i = 0; i < nrOfTokens; i++) {
+                final RobotToken robotToken = tokens.get(i);
+                final FilePosition fp = robotToken.getFilePosition();
+                if (!fp.isNotSet()) {
+                    if (filePosition.getLine() == fp.getLine()) {
+                        wasMyLine = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!wasMyLine) {
+                updateLine(model, lines, currentLine.getEndOfLine());
+                if (!tokens.isEmpty()) {
+                    // dodac (...) i separator jesli jest
+                }
+            }
+        }
+
         for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
             final IRobotLineElement tokElem = tokens.get(tokenId);
             Separator sep = getSeparator(model, lines, lastToken, tokElem);
@@ -312,6 +332,9 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
             }
 
             // sprawdzenie czy nie ma konca linii
+            if (lineEndPos.contains(tokenId)) {
+                updateLine(model, lines, currentLine.getEndOfLine());
+            }
         }
     }
 
