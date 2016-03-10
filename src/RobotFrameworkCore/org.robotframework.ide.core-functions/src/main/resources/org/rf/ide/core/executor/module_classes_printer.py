@@ -42,6 +42,28 @@ elif original_path.endswith('.py'):
     
     modules = [root_module]
 
+elif original_path.endswith(".zip") or original_path.endswith(".jar"):
+    toRemove = False
+    if not original_path in sys.path:
+        sys.path.append(original_path)
+        toRemove = True
+    for loader, name, _ in pkgutil.walk_packages([original_path]):
+        module = loader.load_module(name)
+        map(__import__, [name])
+        found = {}
+        for n, obj in inspect.getmembers(module):
+            if inspect.isfunction(obj):
+                found[obj.__module__] = module
+            if inspect.isclass(obj) and obj.__module__.startswith(name):
+                if (obj.__module__ != obj.__name__):
+                    found[obj.__module__ + "." + obj.__name__] = module
+                else:
+                    found[obj.__module__] = module
+        for v in found.keys():
+            print v
+    if toRemove:
+        sys.path.remove(original_path)
+
 else:
     raise Exception('Unrecognized library path: ' + original_path)
 
