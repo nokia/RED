@@ -10,16 +10,25 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 
 public class JarStructureBuilder {
+    
+    private final RobotRuntimeEnvironment environment;
+    
+    public JarStructureBuilder(final RobotRuntimeEnvironment environment) {
+        this.environment = environment;
+    }
 
     public List<JarClass> provideEntriesFromFile(final String path) {
         return provideEntriesFromFile(new File(path));
@@ -40,23 +49,33 @@ public class JarStructureBuilder {
             while (entry != null) {
                 if (isJavaClass(entry.getName())) {
                     jarClasses.add(JarClass.createFromZipJavaEntry(entry.getName()));
-                } else if(isPythonClass(entry.getName())) {
-                    jarClasses.add(JarClass.createFromZipPythonEntry(entry.getName()));
                 }
                 entry = zipStream.getNextEntry();
             }
-            return jarClasses;
         } catch (final IOException e) {
-            return jarClasses;
+            // nothing to do
         }
+        
+        jarClasses.addAll(providePythonEntriesFromJarFile(file));
+        
+        return jarClasses;
+    }
+    
+    private List<JarClass> providePythonEntriesFromJarFile(final File file) {
+        final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment);
+        final Collection<PythonClass> entriesFromFile = pythonLibStructureBuilder
+                .provideEntriesFromFile(file.getPath());
+
+        final List<JarClass> jarClasses = newArrayList();
+        for (final PythonClass pythonClass : entriesFromFile) {
+            jarClasses.add(JarClass.createFromZipPythonEntry(pythonClass.getQualifiedName()));
+        }
+
+        return jarClasses;
     }
 
     private boolean isJavaClass(final String entryName) {
         return entryName.endsWith(".class");
-    }
-    
-    private boolean isPythonClass(final String entryName) {
-        return entryName.endsWith(".py");
     }
 
     public static class JarClass {
@@ -73,8 +92,7 @@ public class JarStructureBuilder {
         }
         
         private static JarClass createFromZipPythonEntry(final String name) {
-            final String nameWithoutExtension = name.substring(0, name.length() - ".py".length());
-            return new JarClass(nameWithoutExtension);
+            return new JarClass(name);
         }
 
         public String getQualifiedName() {
