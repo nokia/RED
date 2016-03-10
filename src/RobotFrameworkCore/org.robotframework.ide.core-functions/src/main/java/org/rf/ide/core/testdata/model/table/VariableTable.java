@@ -92,11 +92,16 @@ public class VariableTable extends ARobotSectionTable {
             valueT.setText(value);
             valueT.setType(RobotTokenType.VARIABLES_DICTIONARY_VALUE);
 
-            dict.put(null, keyT, valueT);
+            RobotToken decKey = new RobotToken();
+            dict.put(decKey, keyT, valueT);
         }
 
         dict.setParent(this);
         variables.add(index, dict);
+    }
+
+    public void updateComment(final String text) {
+
     }
 
     public void removeVariable(final AVariable variable) {
