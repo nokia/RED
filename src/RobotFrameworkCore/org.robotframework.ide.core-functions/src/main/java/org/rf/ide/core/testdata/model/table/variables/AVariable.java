@@ -196,6 +196,6 @@ public abstract class AVariable extends AModelElement<VariableTable> implements 
 
     @Override
     public FilePosition getBeginPosition() {
-        return getDeclaration().getFilePosition();
+        return (getDeclaration() != null) ? getDeclaration().getFilePosition() : FilePosition.createNotSet();
     }
 }

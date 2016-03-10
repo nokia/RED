@@ -224,9 +224,9 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
             dumpSeparatorsBeforeToken(model, currentLine, varDec, lines);
         }
 
-        updateLine(model, lines, varDec);
         IRobotLineElement lastToken = varDec;
         if (!varDec.isDirty() && currentLine != null) {
+            updateLine(model, lines, varDec);
             final List<IRobotLineElement> lineElements = currentLine.getLineElements();
             final int tokenPosIndex = lineElements.indexOf(varDec);
             if (lineElements.size() - 1 > tokenPosIndex + 1) {
@@ -278,10 +278,22 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                 }
             }
 
-            if (!wasMyLine) {
+            if (!wasMyLine && currentLine != null) {
                 updateLine(model, lines, currentLine.getEndOfLine());
                 if (!tokens.isEmpty()) {
-                    // dodac (...) i separator jesli jest
+                    Separator sep = getSeparator(model, lines, lastToken, tokens.get(0));
+                    if (sep.getTypes().contains(SeparatorType.PIPE)) {
+                        updateLine(model, lines, sep);
+                    }
+
+                    RobotToken lineContinueToken = new RobotToken();
+                    lineContinueToken.setRaw("...");
+                    lineContinueToken.setText("...");
+                    lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+
+                    updateLine(model, lines, lineContinueToken);
+
+                    updateLine(model, lines, sep);
                 }
             }
         }
@@ -334,13 +346,33 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                 dumpAfterSep = true;
             }
 
-            if (dumpAfterSep) {
+            if (dumpAfterSep && currentLine != null) {
                 dumpSeparatorsAfterToken(model, currentLine, lastToken, lines);
             }
 
             // sprawdzenie czy nie ma konca linii
             if (lineEndPos.contains(tokenId)) {
-                updateLine(model, lines, currentLine.getEndOfLine());
+                if (currentLine != null) {
+                    updateLine(model, lines, currentLine.getEndOfLine());
+                } else {
+                    // new end of line
+                }
+
+                if (!tokens.isEmpty() && tokenId + 1 < nrOfTokens) {
+                    Separator sepNew = getSeparator(model, lines, lastToken, tokens.get(tokenId + 1));
+                    if (sepNew.getTypes().contains(SeparatorType.PIPE)) {
+                        updateLine(model, lines, sepNew);
+                    }
+
+                    RobotToken lineContinueToken = new RobotToken();
+                    lineContinueToken.setRaw("...");
+                    lineContinueToken.setText("...");
+                    lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+
+                    updateLine(model, lines, lineContinueToken);
+
+                    // updateLine(model, lines, sepNew);
+                }
             }
         }
     }
@@ -1101,7 +1133,19 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                 line = outLines.get(outLines.size() - 1);
             }
 
-            line.addLineElement(cloneWithPositionRecalculate(elem, line, outLines));
+            final IRobotLineElement artToken = cloneWithPositionRecalculate(elem, line, outLines);
+            if (elem instanceof Separator) {
+                if (line.getLineElements().isEmpty() && artToken.getTypes().contains(SeparatorType.PIPE)) {
+                    Separator elemSep = (Separator) artToken;
+                    int pipeIndex = elemSep.getRaw().indexOf('|');
+                    if (pipeIndex >= 1 && !(pipeIndex == 1 && elemSep.getRaw().charAt(0) == ' ')) {
+                        elemSep.setRaw(elemSep.getRaw().substring(pipeIndex));
+                        elemSep.setText(elemSep.getRaw());
+                    }
+                }
+            }
+
+            line.addLineElement(cloneWithPositionRecalculate(artToken, line, outLines));
         }
     }
 
@@ -1111,7 +1155,11 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         if (elem instanceof RobotToken) {
             RobotToken newToken = new RobotToken();
             newToken.setLineNumber(line.getLineNumber());
-            newToken.setRaw(elem.getRaw());
+            if (elem.getRaw().isEmpty()) {
+                newToken.setRaw(elem.getText());
+            } else {
+                newToken.setRaw(elem.getRaw());
+            }
             newToken.setText(elem.getText());
             if (!elem.getTypes().isEmpty()) {
                 newToken.getTypes().clear();
@@ -1124,9 +1172,13 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
             newElem = newToken;
         } else {
             Separator newSeparator = new Separator();
-
+            newSeparator.setType((SeparatorType) elem.getTypes().get(0));
             newSeparator.setLineNumber(line.getLineNumber());
-            newSeparator.setRaw(elem.getRaw());
+            if (elem.getRaw().isEmpty()) {
+                newSeparator.setRaw(elem.getText());
+            } else {
+                newSeparator.setRaw(elem.getRaw());
+            }
             newSeparator.setText(elem.getText());
             if (!elem.getTypes().isEmpty()) {
                 newSeparator.getTypes().clear();
