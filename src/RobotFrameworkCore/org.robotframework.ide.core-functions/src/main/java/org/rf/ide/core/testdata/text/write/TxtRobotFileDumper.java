@@ -40,6 +40,7 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.RobotLine.PositionCheck;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -254,6 +255,12 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         tokens.addAll(var.getValues());
         tokens.addAll(var.getComment());
         Collections.sort(tokens, sorter);
+        // dump as it is
+        if (!lastToken.getFilePosition().isNotSet() && !getFirstBrokenChainPosition(tokens, true).isPresent()
+                && !tokens.isEmpty()) {
+            dumpAsItIs(model, lastToken, tokens, lines);
+            return;
+        }
 
         int nrOfTokens = tokens.size();
 
@@ -338,6 +345,136 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         }
     }
 
+    private void dumpAsItIs(final RobotFile model, final IRobotLineElement startToken, final List<RobotToken> tokens,
+            final List<RobotLine> lines) {
+        final List<IRobotLineElement> dumps = new ArrayList<>(0);
+        final int tokSize = tokens.size();
+        int startOffset = startToken.getFilePosition().getOffset();
+        RobotLine lastLine = null;
+        IRobotLineElement lastToken = startToken;
+        int meatTokens = 0;
+        int offset = startOffset;
+        int currentSize = dumps.size();
+        boolean removeUpdated = false;
+
+        while (meatTokens < tokSize) {
+            lastLine = model.getFileContent().get(model.getRobotLineIndexBy(offset).get());
+            List<IRobotLineElement> lastToks = lastLine.getLineElements();
+            final int lastToksSize = lastToks.size();
+
+            final int elementPositionInLine;
+            if (offset != startOffset) {
+                elementPositionInLine = lastLine.getElementPositionInLine(offset, PositionCheck.STARTS).get();
+            } else {
+                elementPositionInLine = lastLine.getElementPositionInLine(lastToken).get() + 1;
+            }
+            currentSize = dumps.size();
+            removeUpdated = false;
+            for (int i = elementPositionInLine; i < lastToksSize; i++) {
+                final IRobotLineElement e = lastToks.get(i);
+                lastToken = e;
+                if (e instanceof Separator) {
+                    dumps.add(e);
+                } else {
+                    RobotToken rt = (RobotToken) e;
+                    if (rt == tokens.get(meatTokens)) {
+                        dumps.add(rt);
+                        meatTokens++;
+                    } else {
+                        if (rt.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
+                                || rt.getTypes().contains(RobotTokenType.ASSIGNMENT)) {
+                            dumps.add(rt);
+                        } else if (isVariableContinue(dumps, rt)) {
+                            dumps.add(rt);
+                        } else if (startToken == rt) {
+                            continue;
+                        } else {
+                            removeUpdated = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (removeUpdated) {
+                int dumpSize = dumps.size();
+                if (!dumps.isEmpty()) {
+                    for (int i = 0; i < dumpSize - currentSize; i++) {
+                        dumps.remove(dumps.size() - 1);
+                    }
+                }
+                meatTokens = tokSize;
+                break;
+            } else {
+                lastToken = lastLine.getEndOfLine();
+                dumps.add(lastLine.getEndOfLine());
+                IRobotLineElement end = dumps.get(dumps.size() - 1);
+                offset = end.getStartOffset() + (end.getEndColumn() - end.getStartColumn());
+            }
+        }
+
+        if (lastLine != null && lastToken != null && !isEndOfLine(lastToken)) {
+            final List<IRobotLineElement> lineElements = lastLine.getLineElements();
+            final int size = lineElements.size();
+            final int tokPosInLine = lastLine.getElementPositionInLine(lastToken).get();
+            currentSize = dumps.size();
+            removeUpdated = false;
+
+            for (int index = tokPosInLine + 1; index < size; index++) {
+                IRobotLineElement elem = lineElements.get(index);
+                if (elem instanceof Separator) {
+                    dumps.add(elem);
+                } else {
+                    removeUpdated = true;
+                }
+            }
+
+            if (removeUpdated) {
+                int dumpSize = dumps.size();
+                if (!dumps.isEmpty()) {
+                    for (int i = 0; i < dumpSize - currentSize; i++) {
+                        dumps.remove(dumps.size() - 1);
+                    }
+                }
+            } else {
+                if (lastLine.getEndOfLine() != lastToken) {
+                    dumps.add(lastLine.getEndOfLine());
+                }
+            }
+        }
+
+        for (final IRobotLineElement rle : dumps) {
+            updateLine(model, lines, rle);
+        }
+    }
+
+    private boolean isVariableContinue(final List<IRobotLineElement> dumps, final IRobotLineElement l) {
+        boolean result = false;
+
+        if (l.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+            if (dumps.isEmpty()) {
+                result = true;
+            } else {
+                int dumpsSize = dumps.size();
+                boolean sepsOnly = true;
+                for (int dumpId = 0; dumpId < dumpsSize; dumpId++) {
+                    final IRobotLineElement rle = dumps.get(dumpId);
+                    if (rle instanceof Separator) {
+                        continue;
+                    } else if (isEndOfLine(rle)) {
+                        break;
+                    } else {
+                        sepsOnly = false;
+                    }
+                }
+
+                result = sepsOnly;
+            }
+        }
+
+        return result;
+    }
+
     private void dumpListVariable(final RobotFile model, final ListVariable var, final List<RobotLine> lines) {
         final RobotToken varDec = var.getDeclaration();
         updateLine(model, lines, varDec);
@@ -384,7 +521,8 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         return lof;
     }
 
-    private Optional<Integer> getFirstBrokenChainPosition(final List<? extends IRobotLineElement> elems) {
+    private Optional<Integer> getFirstBrokenChainPosition(final List<? extends IRobotLineElement> elems,
+            boolean treatNewAsBrokenChain) {
         Optional<Integer> o = Optional.absent();
         int size = elems.size();
         FilePosition pos = FilePosition.createNotSet();
@@ -398,6 +536,11 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                         o = Optional.of(index);
                         break;
                     }
+                }
+            } else {
+                if (treatNewAsBrokenChain) {
+                    o = Optional.of(index);
+                    break;
                 }
             }
         }
