@@ -39,7 +39,12 @@ public class VariableTable extends ARobotSectionTable {
 
     public void createScalarVariable(final int index, final String name, final List<String> values,
             final String comment) {
-        final ScalarVariable scalar = new ScalarVariable(name, null, VariableScope.TEST_SUITE);
+        RobotToken dec = new RobotToken();
+        dec.setRaw(name);
+        dec.setText(name);
+        dec.setType(RobotTokenType.VARIABLES_SCALAR_DECLARATION);
+
+        final ScalarVariable scalar = new ScalarVariable(name, dec, VariableScope.TEST_SUITE);
         for (final String v : values) {
             final RobotToken t = new RobotToken();
             t.setText(v);
@@ -53,7 +58,11 @@ public class VariableTable extends ARobotSectionTable {
 
     public void createListVariable(final int index, final String name, final List<String> values,
             final String comment) {
-        final ListVariable list = new ListVariable(name, null, VariableScope.TEST_SUITE);
+        RobotToken dec = new RobotToken();
+        dec.setRaw(name);
+        dec.setText(name);
+        dec.setType(RobotTokenType.VARIABLES_LIST_DECLARATION);
+        final ListVariable list = new ListVariable(name, dec, VariableScope.TEST_SUITE);
         for (final String v : values) {
             final RobotToken t = new RobotToken();
             t.setText(v);
@@ -67,7 +76,11 @@ public class VariableTable extends ARobotSectionTable {
 
     public void createDictionaryVariable(final int index, final String name, final Map<String, String> items,
             final String comment) {
-        final DictionaryVariable dict = new DictionaryVariable(name, null, VariableScope.TEST_SUITE);
+        RobotToken dec = new RobotToken();
+        dec.setRaw(name);
+        dec.setText(name);
+        dec.setType(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
+        final DictionaryVariable dict = new DictionaryVariable(name, dec, VariableScope.TEST_SUITE);
         final Set<String> keySet = items.keySet();
         for (final String key : keySet) {
             final RobotToken keyT = new RobotToken();
