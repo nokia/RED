@@ -92,8 +92,8 @@ public class ReferencedLibraryImporter {
         }
     }
 
-    public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final String fullLibraryPath) {
-        final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder();
+    public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final RobotRuntimeEnvironment environment, final String fullLibraryPath) {
+        final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(environment);
         final List<JarClass> classesFromJar = newArrayList();
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {

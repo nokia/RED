@@ -162,7 +162,9 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
         final IPath absolutePath = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
         boolean containsClass = false;
-        for (final JarClass jarClass : new JarStructureBuilder().provideEntriesFromFile(absolutePath.toFile())) {
+        for (final JarClass jarClass : new JarStructureBuilder(
+                context.getModel().createRobotProject(configFile.getProject()).getRuntimeEnvironment())
+                        .provideEntriesFromFile(absolutePath.toFile())) {
             if (jarClass.getQualifiedName().equals(libName)) {
                 containsClass = true;
                 break;
