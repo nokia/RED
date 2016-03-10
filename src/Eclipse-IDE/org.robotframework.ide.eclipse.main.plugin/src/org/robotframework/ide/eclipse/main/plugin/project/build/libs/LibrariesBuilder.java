@@ -13,6 +13,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
@@ -65,12 +66,11 @@ public class LibrariesBuilder {
                 try {
                     generatorWithSource.generator.generateLibdocForcibly(runtimeEnvironment);
                 } catch (final RobotEnvironmentException e) {
-                    try {
-                        generatorWithSource.sourceLibdocFile.delete(true, null);
-                        throw e;
-                    } catch (final CoreException e1) {
-                        throw e;
+                    final IPath libspecFileLocation = generatorWithSource.sourceLibdocFile.getLocation();
+                    if (libspecFileLocation != null) {
+                        libspecFileLocation.toFile().delete();
                     }
+                    throw e;
                 }
                 monitor.worked(1);
             }
