@@ -237,9 +237,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
                         final IPath path = new Path(dialog.getFilterPath()).append(file);
-                        final Collection<ReferencedLibrary> importedLibs = importer.importJavaLib(
-                                viewer.getTable().getShell(),
-                                path.toString());
+                        final Collection<ReferencedLibrary> importedLibs = importer
+                                .importJavaLib(viewer.getTable().getShell(), environment, path.toString());
                         libs.addAll(importedLibs);
                     }
                     addLibraries(libs);
