@@ -66,6 +66,49 @@ public class RobotLine implements IChildElement<RobotFile> {
         this.lineElements.add(position, lineElement);
     }
 
+    public Optional<Integer> getElementPositionInLine(final int offset, final PositionCheck posCheckStrategy) {
+        Optional<Integer> pos = Optional.absent();
+        final int size = lineElements.size();
+        for (int i = 0; i < size; i++) {
+            final IRobotLineElement e = lineElements.get(i);
+            if (posCheckStrategy.meets(e, offset)) {
+                pos = Optional.of(i);
+                break;
+            }
+        }
+
+        return pos;
+    }
+
+    public static enum PositionCheck {
+        STARTS {
+
+            @Override
+            public boolean meets(final IRobotLineElement element, final int offset) {
+                return (element.getFilePosition().getOffset() == offset);
+            }
+        },
+        INSIDE {
+
+            @Override
+            public boolean meets(final IRobotLineElement element, final int offset) {
+                return (element.getStartOffset() >= offset
+                        && offset <= (element.getStartOffset() + (element.getEndColumn() - element.getStartColumn())));
+            }
+        },
+        ENDS
+
+        {
+
+            @Override
+            public boolean meets(final IRobotLineElement element, final int offset) {
+                return (element.getStartOffset() + (element.getEndColumn() - element.getStartColumn()) == offset);
+            }
+        };
+
+        public abstract boolean meets(final IRobotLineElement element, final int offset);
+    }
+
     public Optional<Integer> getElementPositionInLine(final IRobotLineElement elem) {
         Optional<Integer> pos = Optional.absent();
         final int size = lineElements.size();
