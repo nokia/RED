@@ -228,11 +228,11 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             };
             final int returnCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine, handler);
             if (returnCode != 0) {
-                throw new RobotEnvironmentException("Unable to generate library specification file for library "
-                        + libName + "\nDetailed information:\n" + Joiner.on('\n').join(lines));
+                throw new RobotEnvironmentException("Unable to generate library specification file for library '"
+                        + libName + "'" + "\nDetailed information:\n" + Joiner.on('\n').join(lines));
             }
         } catch (final IOException e) {
-            throw new RobotEnvironmentException("Unable to generate library specification file for library " + libName,
+            throw new RobotEnvironmentException("Unable to generate library specification file for library '" + libName + "'",
                     e);
         }
     }
