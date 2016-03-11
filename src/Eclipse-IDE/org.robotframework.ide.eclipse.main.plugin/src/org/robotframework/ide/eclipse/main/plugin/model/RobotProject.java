@@ -149,6 +149,7 @@ public class RobotProject extends RobotContainer {
         if (configuration == null) {
             return newLinkedHashMap();
         }
+
         refLibsSpecs = newLinkedHashMap();
         for (final ReferencedLibrary library : configuration.getLibraries()) {
             final LibrarySpecification spec = reflibToSpec(getProject()).apply(library);
@@ -158,9 +159,11 @@ public class RobotProject extends RobotContainer {
             }
             refLibsSpecs.put(library, spec);
         }
+        removeUnusedLibspecFiles(refLibsSpecs);
+
         return refLibsSpecs;
     }
-    
+
     public synchronized void unregisterWatchingOnReferencedLibraries(final List<ReferencedLibrary> libraries) {
         librariesWatchHandler.unregisterLibraries(libraries);
     }
@@ -451,5 +454,22 @@ public class RobotProject extends RobotContainer {
         return knownVariables;
     }
     
+    private void removeUnusedLibspecFiles(final Map<ReferencedLibrary, LibrarySpecification> refLibsSpecs) {
+        if(!librariesWatchHandler.getRemovedSpecs().isEmpty()) {
+            for (final LibrarySpecification removedSpec : librariesWatchHandler.getRemovedSpecs()) {
+                if(!refLibsSpecs.containsValue(removedSpec)) {
+                    final IFile libspecFile = removedSpec.getSourceFile();
+                    if (libspecFile != null) {
+                        final IPath libspecFileLocation = libspecFile.getLocation();
+                        if (libspecFileLocation != null) {
+                            libspecFileLocation.toFile().delete();
+                        }
+                    }
+                }
+            }
+            librariesWatchHandler.clearRemovedSpecs();
+            getRuntimeEnvironment().resetCommandExecutors();    //needed when user will add a library again after removal
+        }
+    }
     
 }

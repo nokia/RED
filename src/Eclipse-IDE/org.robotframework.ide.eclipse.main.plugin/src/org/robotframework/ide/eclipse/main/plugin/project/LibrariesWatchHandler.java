@@ -65,6 +65,8 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private Set<LibrarySpecification> dirtySpecs = Collections.synchronizedSet(new HashSet<LibrarySpecification>());
     
+    private Set<LibrarySpecification> removedSpecs = new HashSet<>();
+    
     private Map<ReferencedLibrary, String> registeredRefLibraries = Collections.synchronizedMap(new HashMap<ReferencedLibrary, String>());
 
     private ConcurrentLinkedQueue<RebuildTask> rebuildTasksQueue = new ConcurrentLinkedQueue<>();
@@ -73,24 +75,23 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         this.robotProject = robotProject;
     }
 
-    public void registerLibrary(ReferencedLibrary library, final LibrarySpecification spec) {
+    public void registerLibrary(final ReferencedLibrary library, final LibrarySpecification spec) {
 
         if (spec != null && !librarySpecifications.containsKey(spec)) {
             final String absolutePathToLibraryFile = findLibraryFileAbsolutePath(library);
             if (absolutePathToLibraryFile != null) {
                 final File libFile = new File(absolutePathToLibraryFile);
                 final File libDir = libFile.getParentFile();
-                final String libFileName = libFile.getName();
                 if (libDir != null && libDir.exists() && libDir.isDirectory()) {
                     if (isPythonModule(absolutePathToLibraryFile)) {
-                        String[] moduleFilesList = extractPythonModuleFiles(libDir);
+                        final String[] moduleFilesList = extractPythonModuleFiles(libDir);
                         if (moduleFilesList != null) {
                             for (int i = 0; i < moduleFilesList.length; i++) {
                                 addLibraryToWatch(moduleFilesList[i], libDir.toPath(), spec);
                             }
                         }
                     } else {
-                        addLibraryToWatch(libFileName, libDir.toPath(), spec);
+                        addLibraryToWatch(libFile.getName(), libDir.toPath(), spec);
                     }
                 }
             }
@@ -169,6 +170,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             for (final LibrarySpecification spec : specsToRemove) {
                 librarySpecifications.removeAll(spec);
             }
+            removedSpecs.addAll(specsToRemove);
         }
     }
 
@@ -367,6 +369,14 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         removeLibrarySpecification(modifiedFileName);
         registeredRefLibraries.clear();
         unregisterFile(modifiedFileName, this);
+    }
+    
+    public Set<LibrarySpecification> getRemovedSpecs() {
+        return removedSpecs;
+    }
+
+    public void clearRemovedSpecs() {
+        removedSpecs.clear();
     }
 
     /**
