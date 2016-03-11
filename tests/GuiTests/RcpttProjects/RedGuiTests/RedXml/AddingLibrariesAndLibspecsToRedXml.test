@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-a_zUKfnEeWg6OFh_tHgTw
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/8/16 2:50 PM
+Save-Time: 3/11/16 6:29 PM
 Testcase-Type: ecl
 Verifications: _Oo-BUKfpEeWg6OFh_tHgTw
 
@@ -23,8 +23,10 @@ with [get-view "Project Explorer" | get-tree] {
 //add 2 selected libs
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 set-dialog-result File "platform:/resource/RobotProject/libs/liby.py" "platform:/resource/RobotProject/libs/sum.py"
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
 
+try -times 10 -delay 1000 -command{
+	get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+}
 //add libspec
 set-dialog-result File "platform:/resource/RobotProject/generated_libspec/liby.xml"
 get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add libspec file" | click
