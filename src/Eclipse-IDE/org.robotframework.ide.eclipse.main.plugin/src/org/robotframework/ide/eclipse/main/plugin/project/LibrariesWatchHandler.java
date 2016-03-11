@@ -248,7 +248,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                 });
             } catch (InvocationTargetException | InterruptedException e) {
                 MessageDialog.openError(shell, "Regenerating library specification",
-                        "Problems occured during library specification generation " + e.getCause().getMessage());
+                        "Problems occured during library specification generation: " + e.getCause().getMessage());
             }
         } else {
             rebuildTasksQueue.add(newRebuildTask);

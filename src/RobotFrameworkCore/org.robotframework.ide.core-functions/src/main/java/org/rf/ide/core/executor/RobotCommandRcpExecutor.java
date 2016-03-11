@@ -307,7 +307,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             final String additional = libPath.isEmpty() ? ""
                     : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
             throw new RobotEnvironmentException(
-                    "Unable to generate library specification file for library " + libName + additional, e);
+                    "Unable to generate library specification file for library '" + libName + "'" + additional, e);
         }
     }
 
