@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _UUQjsLrCEeW29Kbu_epUIA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/14/16 10:57 AM
+Save-Time: 3/14/16 2:51 PM
 Testcase-Type: ecl
 Verifications: _ERtq8NWOEeWy4ZEoqcgipg,_KRyuULrEEeW29Kbu_epUIA
 
@@ -81,13 +81,13 @@ if [$is_product | eq true]{
 }-else{
 	with [get-view "Project Explorer" | get-tree] {
 	    get-item "RobotProject/empty_TC_KW.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item "RobotProject/empty_TC_KW.robot" | get-property "image.decorations[1].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	    get-item "RobotProject/incorrect_header.robot" | get-property "image.decorations[1].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/warning.png" | verify-true
 	    get-item "RobotProject/resource_invalid_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item "RobotProject/resource_invalid_settings.robot" | get-property "image.decorations[1].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_resource_file.png" | verify-true
 	    get-item "RobotProject/resource_invalid_settings.robot" | get-property "image.decorations[2].path" 
@@ -95,39 +95,39 @@ if [$is_product | eq true]{
 	    get-item "RobotProject/resource_invalid_settings.robot" | get-property backgroundColor | equals "#FFFFFF" 
 	        | verify-true
 	    get-item "RobotProject/test_case_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item "RobotProject/test_case_settings.robot" | get-property "image.decorations[1].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	    get-item "RobotProject/wrong_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item "RobotProject/wrong_settings.robot" | get-property "image.decorations[1].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	    get-item SecondRobotProject | get-property "image.decorations[0].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_suite_folder.png" | verify-true
 	    get-item SecondRobotProject | get-property "image.decorations[1].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item SecondRobotProject | get-property "image.decorations[2].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	    get-item "SecondRobotProject/all_settings.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item "SecondRobotProject/all_settings.robot" | get-property "image.decorations[1].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	    get-item "SecondRobotProject/missing_keyword.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item "SecondRobotProject/missing_keyword.robot" | get-property "image.decorations[1].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	    get-item "SecondRobotProject/set_variable_commands.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item "SecondRobotProject/set_variable_commands.robot" | get-property "image.decorations[1].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	    get-item "SecondRobotProject/variable_errors.robot" | get-property "image.decorations[0].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item "SecondRobotProject/variable_errors.robot" | get-property "image.decorations[1].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	    get-item RobotProject | get-property "image.decorations[0].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_suite_folder.png" | verify-true
 	    get-item RobotProject | get-property "image.decorations[1].path" 
-	        | equals "org.eclipse.jdt.ui/icons/full/ovr16/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui/.*/error_co.gif" | verify-true
 	    get-item RobotProject | get-property "image.decorations[2].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	}
