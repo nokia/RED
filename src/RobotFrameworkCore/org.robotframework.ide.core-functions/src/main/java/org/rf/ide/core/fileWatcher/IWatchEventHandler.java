@@ -16,6 +16,8 @@ public interface IWatchEventHandler {
     void registerPath(final Path dir, final String fileName, final IWatchEventHandler handler);
     
     void unregisterFile(final String fileName, final IWatchEventHandler handler);
+    
+    void watchServiceInterrupted();
 
     void handleModifyEvent(final String fileName);
 }
