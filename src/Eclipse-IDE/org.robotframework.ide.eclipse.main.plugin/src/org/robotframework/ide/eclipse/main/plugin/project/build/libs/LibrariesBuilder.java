@@ -64,7 +64,9 @@ public class LibrariesBuilder {
             for (final GeneratorWithSource generatorWithSource : groupedGenerators.get(project)) {
                 monitor.subTask(generatorWithSource.generator.getMessage());
                 try {
-                    generatorWithSource.generator.generateLibdocForcibly(runtimeEnvironment);
+                    if (project.exists()) {
+                        generatorWithSource.generator.generateLibdocForcibly(runtimeEnvironment);
+                    }
                 } catch (final RobotEnvironmentException e) {
                     final IPath libspecFileLocation = generatorWithSource.sourceLibdocFile.getLocation();
                     if (libspecFileLocation != null) {
