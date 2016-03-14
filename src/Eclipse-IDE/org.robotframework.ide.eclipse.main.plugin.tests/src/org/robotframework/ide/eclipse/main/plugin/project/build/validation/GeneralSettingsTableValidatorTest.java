@@ -32,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywo
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.KeywordsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.VariablesProblem;
@@ -289,6 +290,36 @@ public class GeneralSettingsTableValidatorTest {
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).contains(
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(31, 37))));
+    }
+    
+    @Test
+    public void undefinedTimeFormatInTimeoutIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Timeout  time")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
+                file.findSection(RobotSettingsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).contains(
+                new Problem(ArgumentProblem.INVALID_TIME_FORMAT, new ProblemPosition(2, Range.closed(31, 35))));
+    }
+    
+    @Test
+    public void definedTimeFormatInTimeoutIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Test Timeout  3 seconds")
+                .build();
+
+        final FileValidationContext context = prepareContext();
+        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
+                file.findSection(RobotSettingsSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
     }
     
     @Test
