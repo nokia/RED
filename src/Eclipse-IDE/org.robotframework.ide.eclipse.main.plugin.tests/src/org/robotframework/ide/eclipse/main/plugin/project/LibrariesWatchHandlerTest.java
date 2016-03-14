@@ -481,7 +481,6 @@ public class LibrariesWatchHandlerTest {
         assertTrue(librariesWatchHandler.getSpecificationsToRebuild().isEmpty());
         assertTrue(librariesWatchHandler.getLibrarySpecifications().isEmpty());
         assertTrue(librariesWatchHandler.getRegisteredRefLibraries().isEmpty());
-        assertFalse(librariesWatchHandler.getUnregisteredFiles().isEmpty());
     }
 
     private IProject createNewProjectMock(final boolean projectExists) {
