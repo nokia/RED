@@ -51,6 +51,10 @@ public class RedFileWatcher {
 
     public synchronized void registerPath(final Path fileDir, final String fileName,
             final IWatchEventHandler watchEventHandler) {
+        
+        if (watcher == null) {
+            restartWatcher();
+        }
 
         if (watcher != null && fileDir != null && fileName != null) {
             try {
@@ -69,8 +73,6 @@ public class RedFileWatcher {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else if (watcher == null) {
-            createAndStartWatchService();
         }
     }
 
@@ -85,6 +87,12 @@ public class RedFileWatcher {
                 }
             }
         }
+    }
+    
+    private void restartWatcher() {
+        registeredDirs.clear();
+        modifiedFilesQueue.clear();
+        createAndStartWatchService();
     }
 
     private void createAndStartWatchService() {
@@ -146,7 +154,7 @@ public class RedFileWatcher {
                 }
 
                 watcher = null;
-
+                sendWatchServiceInterruptedEvent();
             }
         }).start();
     }
@@ -172,6 +180,7 @@ public class RedFileWatcher {
                 }
 
                 watcher = null;
+                sendWatchServiceInterruptedEvent();
             }
         }).start();
     }
@@ -197,4 +206,14 @@ public class RedFileWatcher {
         }
     }
 
+    private void sendWatchServiceInterruptedEvent() {
+        for (final String file : registeredFiles.keySet()) {
+            final Collection<IWatchEventHandler> eventHandlers = registeredFiles.get(file);
+            if (eventHandlers != null && !eventHandlers.isEmpty()) {
+                for (final IWatchEventHandler handler : eventHandlers) {
+                    handler.watchServiceInterrupted();
+                }
+            }
+        }
+    }
 }
