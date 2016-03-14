@@ -60,7 +60,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private IEventBroker eventBroker = null;
 
-    private ListMultimap<LibrarySpecification, String> librarySpecifications = Multimaps
+    private ListMultimap<LibrarySpecification, String> registeredLibrarySpecifications = Multimaps
             .synchronizedListMultimap(ArrayListMultimap.<LibrarySpecification, String> create());
 
     private Set<LibrarySpecification> dirtySpecs = Collections.synchronizedSet(new HashSet<LibrarySpecification>());
@@ -77,7 +77,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     public void registerLibrary(final ReferencedLibrary library, final LibrarySpecification spec) {
 
-        if (spec != null && !librarySpecifications.containsKey(spec)) {
+        if (spec != null && !registeredLibrarySpecifications.containsKey(spec)) {
             final String absolutePathToLibraryFile = findLibraryFileAbsolutePath(library);
             if (absolutePathToLibraryFile != null) {
                 final File libFile = new File(absolutePathToLibraryFile);
@@ -140,16 +140,16 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private void addLibraryToWatch(final String fileName, final Path dir, final LibrarySpecification spec) {
         final List<LibrarySpecification> specsToReplace = new ArrayList<>();
-        synchronized (librarySpecifications) {
-            for (Entry<LibrarySpecification, String> entry : librarySpecifications.entries()) {
+        synchronized (registeredLibrarySpecifications) {
+            for (Entry<LibrarySpecification, String> entry : registeredLibrarySpecifications.entries()) {
                 if (entry.getValue().equals(fileName) && entry.getKey().equalsIgnoreKeywords(spec)) {
                     specsToReplace.add(entry.getKey());
                 }
             }
             for (final LibrarySpecification specToReplace : specsToReplace) {
-                librarySpecifications.removeAll(specToReplace);
+                registeredLibrarySpecifications.removeAll(specToReplace);
             }
-            librarySpecifications.put(spec, fileName);
+            registeredLibrarySpecifications.put(spec, fileName);
         }
         registerPath(dir, fileName, this);
     }
@@ -161,17 +161,25 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
     private void removeLibrarySpecification(final String fileName) {
         final List<LibrarySpecification> specsToRemove = new ArrayList<>();
-        synchronized (librarySpecifications) {
-            for (Entry<LibrarySpecification, String> entry : librarySpecifications.entries()) {
+        synchronized (registeredLibrarySpecifications) {
+            for (Entry<LibrarySpecification, String> entry : registeredLibrarySpecifications.entries()) {
                 if (entry.getValue().equals(fileName)) {
                     specsToRemove.add(entry.getKey());
                 }
             }
             for (final LibrarySpecification spec : specsToRemove) {
-                librarySpecifications.removeAll(spec);
+                registeredLibrarySpecifications.removeAll(spec);
             }
             removedSpecs.addAll(specsToRemove);
         }
+    }
+    
+    public boolean isLibSpecDirty(final LibrarySpecification spec) {
+        return dirtySpecs.contains(spec);
+    }
+
+    public void removeDirtySpecs(final Collection<LibrarySpecification> reloadedSpecs) {
+        dirtySpecs.removeAll(reloadedSpecs);
     }
 
     @Override
@@ -184,17 +192,15 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
         RedFileWatcher.getInstance().unregisterFile(fileName, this);
     }
     
-    public boolean isLibSpecDirty(final LibrarySpecification spec) {
-        return dirtySpecs.contains(spec);
-    }
-
-    public void removeDirtySpecs(final Collection<LibrarySpecification> reloadedSpecs) {
-        dirtySpecs.removeAll(reloadedSpecs);
+    @Override
+    public void watchServiceInterrupted() {
+        registeredLibrarySpecifications.clear();
+        registeredRefLibraries.clear();
     }
 
     @Override
     public void handleModifyEvent(final String modifiedFileName) {
-        if (librarySpecifications.containsValue(modifiedFileName)) {
+        if (registeredLibrarySpecifications.containsValue(modifiedFileName)) {
 
             final IProject project = robotProject.getProject();
             if (project == null || !project.exists()) {
@@ -217,8 +223,8 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
 
                 private List<LibrarySpecification> collectModifiedLibSpecs(final String modifiedFileName) {
                     final List<LibrarySpecification> specsToRebuild = new ArrayList<>();
-                    synchronized (librarySpecifications) {
-                        for (Entry<LibrarySpecification, String> entry : librarySpecifications.entries()) {
+                    synchronized (registeredLibrarySpecifications) {
+                        for (Entry<LibrarySpecification, String> entry : registeredLibrarySpecifications.entries()) {
                             if (entry.getValue().equals(modifiedFileName)) {
                                 specsToRebuild.add(entry.getKey());
                             }
@@ -278,7 +284,11 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
                     SubMonitor.convert(monitor));
         } catch (final RobotEnvironmentException e) {
             rebuildTasksQueue.clear();
-            throw e;
+            for (final IProject project : groupedSpecifications.keySet()) {
+                if (project.exists()) {
+                    throw e;
+                }
+            }
         }
     }
 
@@ -389,7 +399,7 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
      * for testing purposes only
      */
     protected ListMultimap<LibrarySpecification, String> getLibrarySpecifications() {
-        return librarySpecifications;
+        return registeredLibrarySpecifications;
     }
     
     /**
@@ -434,4 +444,5 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             return Objects.hash(project, specsToRebuild);
         }
     }
+
 }
