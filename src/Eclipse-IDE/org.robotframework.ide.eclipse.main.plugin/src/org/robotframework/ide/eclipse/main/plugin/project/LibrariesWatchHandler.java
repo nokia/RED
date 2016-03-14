@@ -368,7 +368,6 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
     private void clearHandler(final String modifiedFileName) {
         removeLibrarySpecification(modifiedFileName);
         registeredRefLibraries.clear();
-        unregisterFile(modifiedFileName, this);
     }
     
     public Set<LibrarySpecification> getRemovedSpecs() {
