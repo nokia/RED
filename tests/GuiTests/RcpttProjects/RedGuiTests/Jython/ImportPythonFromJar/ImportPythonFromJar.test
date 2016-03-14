@@ -1,0 +1,116 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Q5oUAOniEeWqgY2-QUmvuQ
+Element-Name: ImportPythonFromJar
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Ocx3EOniEeWqgY2-QUmvuQ
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 3/14/16 2:02 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+
+// try to run tests with jython libs
+
+// set jython as interpreter  
+
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+get-window Preferences | get-button Cancel | click
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+
+
+// for windows:
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+
+		set-dialog-result Folder "C:\\jython2.7.0\\bin"
+		with [get-window Preferences] {
+			wait 5000
+		    get-button "Add..." | click
+		    get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
+		    get-button OK | click
+		    get-window "Rebuild required" | get-button OK | click
+		}
+}-else{
+
+		set-dialog-result Folder "/usr/local/lib/jython/bin"
+		with [get-window Preferences] {
+			wait 5000
+		    get-button "Add..." | click
+		    get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
+		    get-button OK | click
+		    get-window "Rebuild required" | get-button OK | click
+		}
+
+}
+// check problems for unknown libs and KW
+get-tab-folder -index 3 | get-tab-item Problems | click
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Unknown 'ClassInClass' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "Unknown 'MyPython' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "Unknown 'StaticClass' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "Unknown keyword 'Call Libatron'" | verify-true
+    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+        | equals "Unknown keyword 'Class Pat'" | verify-true
+    get-item "Errors \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" | equals "Unknown keyword 'Go'" 
+        | verify-true
+}
+// open red.xml and add jar and python from jar file
+get-view "Project Explorer" | get-tree | select "PythonInJar/red.xml" | double-click
+get-editor "PythonInJar/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+set-dialog-result File "platform:/resource/PythonInJar/JythonLibraryWithPython.jar"
+get-editor "PythonInJar/red.xml" | get-section "Referenced libraries" | get-button "Add Java library" | click
+with [get-window "Select library class"] {
+    get-table 
+        | select ClassInClass "ClassInClass.Class1" "ClassInClass.Class2" "com.nokia.java.lib.Libatron" MyPython StaticClass "StaticClass.X"
+    get-button OK | click
+}
+set-dialog-result File "platform:/resource/PythonInJar/JythonLibraryWithPython.jar"
+get-editor "PythonInJar/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+with [get-window "Select library class"] {
+    get-table | select ClassInClass "ClassInClass.Class1" "ClassInClass.Class2" MyPython StaticClass "StaticClass.X"
+    get-button OK | click
+}
+with [get-editor "PythonInJar/red.xml"] {
+    get-section "Referenced libraries" | get-button "Add Python library" | key-type "M1+s"
+    close
+}
+// revalidate whole project
+get-view "Project Explorer" | get-tree | select "PythonInJar/test.robot" | double-click
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+// check for problems - all KW and libs should be recognised - no problems 
+get-view Problems | get-label "0 items" | get-property caption | equals "0 items" | verify-true
+// add KW from code assists
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 10 7
+    key-type Enter
+    key-type "M1+SPACE"
+    type-text Ca
+    key-type Enter
+}
+// verify output text to check if code assist added proper KW from imported lib
+get-editor "test.robot" | get-text-viewer | get-property "getText()" | equals "*** Settings ***\n"
+    + "Library    MyPython\n"
+    + "Library    ClassInClass\n"
+    + "Library    StaticClass\n\n"
+    + "*** Test Cases ***\n"
+    + "t1\n"
+    + "    Call Libatron    name \n"
+    + "    Class Pat\n"
+    + "    Go\n"
+    + "    Call Libatron    name" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
