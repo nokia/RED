@@ -205,9 +205,13 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     }
 
     void kill() {
-        serverProcess.destroy();
+        if (serverProcess != null) {
+            serverProcess.destroy();
+        }
         try {
-            serverProcess.waitFor();
+            if (serverProcess != null) {
+                serverProcess.waitFor();
+            }
         } catch (final InterruptedException e) {
             throw new RobotCommandExecutorException("Unable to kill rcp server", e);
         }
