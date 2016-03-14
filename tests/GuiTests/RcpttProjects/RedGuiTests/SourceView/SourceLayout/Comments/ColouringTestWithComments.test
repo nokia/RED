@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _LssiYIPXEeWImNPXuPy_LQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/18/16 5:03 PM
+Save-Time: 3/14/16 1:27 PM
 Testcase-Type: ecl
 Verifications: _Z93QAIPZEeWImNPXuPy_LQ,_YOOasI7XEeWetPU-dn-gxQ
 
@@ -121,5 +121,13 @@ get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Settings ***\n"
     + "#    Log  67" 
     
     
-wait 2000    
+wait 2000
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 109 13    
+
+exec-with-options {
+	get-editor "TestFile.robot" | get-text-viewer | key-type "NUMPAD_ENTER" "\\u000D"
+    verify-error {get-window "Problem Occurred"}
+} -allowStatusDialog    
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
