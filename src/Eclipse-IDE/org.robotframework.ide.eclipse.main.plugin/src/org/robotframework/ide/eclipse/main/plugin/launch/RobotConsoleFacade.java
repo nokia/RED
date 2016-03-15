@@ -13,11 +13,10 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IOConsole;
 import org.eclipse.ui.console.IOConsoleOutputStream;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RunCommandLine;
+import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.red.swt.SwtThread;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 
 /**
@@ -29,7 +28,7 @@ public class RobotConsoleFacade {
     private Optional<IOConsoleOutputStream> redMessagesStream;
 
     void connect(final RobotLaunchConfiguration robotConfig, final RobotRuntimeEnvironment runtimeEnvironment,
-            final RunCommandLine cmdLine) throws IOException, CoreException {
+            final RunCommandLine cmdLine, final String version) throws IOException, CoreException {
         final Optional<IOConsole> cons = getConsole(robotConfig, runtimeEnvironment.getFile().getAbsolutePath());
         if (cons.isPresent()) {
             cons.get().addPatternMatchListener(new RobotConsolePatternsListener(robotConfig.getRobotProject()));
@@ -45,8 +44,7 @@ public class RobotConsoleFacade {
                 }
             });
         }
-        printCommandOnConsole(redMessagesStream, cmdLine.getCommandLine(),
-                runtimeEnvironment.getVersion(robotConfig.getExecutor()));
+        printCommandOnConsole(redMessagesStream, cmdLine, version);
     }
 
     private Optional<IOConsole> getConsole(final RobotLaunchConfiguration robotConfig, final String description)
@@ -62,9 +60,9 @@ public class RobotConsoleFacade {
     }
 
     private static void printCommandOnConsole(final Optional<IOConsoleOutputStream> redMessagesStream,
-            final String[] commandLine, final String version) throws IOException {
+            final RunCommandLine cmdLine, final String version) throws IOException {
         if (redMessagesStream.isPresent()) {
-            final String command = "Command: " + Joiner.on(' ').join(commandLine) + "\n";
+            final String command = "Command: " + cmdLine.show() + "\n";
             final String env = "Suite Executor: " + version + "\n";
             redMessagesStream.get().write(command + env);
         }
