@@ -1,10 +1,10 @@
-# RED - Robot Editor v0.6.1
+# RED - Robot Editor v0.6.2
 ## Introduction
 RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
 Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
 
 ## Requirements 
-*  Oracle Java 1.7+  https://www.java.com/
+*  Oracle Java 1.7+, preferably 1.8+  https://www.java.com/
 *  Eclipse Mars (v 4.5) or Luna (v 4.4), preferably IDE foe Java Developers  https://www.eclipse.org/downloads/
 *  Python & RobotFramework installed
 
@@ -19,43 +19,42 @@ In short:
 `eclipse -application org.eclipse.equinox.p2.director -nosplash -consoleLog --launcher.suppressErrors -repository jar:file:<PATH_TO_ZIP>\!/,http://download.vogella.com/luna/e4tools,http://download.eclipse.org/releases/luna/   -installIU org.robotframework.ide.eclipse.main.feature.feature.group 
 
 ### Update existing RED installation
-We recommend to not to do direct update of newer version, instead perform unistall old RED and install new RED after Eclipse restart.
+We recommend to not to do direct update of newer version, instead perform uninstall old RED and install new RED after Eclipse restart.
 Uninstall:
-Open Help -> Installation Details, select old RED feature and perform unistall
+Open Help -> Installation Details, select old RED feature and perform uninstall
 
 ## Updates
-- Include python library to red.xml by right click on Project Explorer
-- Run selected test case by right click on testcase from editor and file outline
-- Allow to read and write on virtual folders (by SSH,FTP etc.) provided by RemoteSystemExplorer
-- Validation of Keywords [Arguments] section
-- Validation scope - exclude validations for files bigger than threshold
-- Run validation against project in headless - see help for details
-- Coloring performance improvements
-- Wizard to create sample python files for variables and libraries 
-- Updated User Guide help
+- Keyword arguments usage validation.
+- "Linked mode" assist for filling out KW arguments, new scalars,lists and dictionaries. Use TAB to navigate.
+- Fixed issues with Jython - now generating libspecs and test execution should work.
+- Python libs inside jar files are supported.
+- When editing libraries, lib file change is noticed - RED places icon on changed lib files and can reload libspecs automatically (option in red.xml).
+- When there is only one class in library when adding, class selection window is suppressed.
+- Console links from Robot execution are clickable
+
 - Check **changelog.txt** for details
 
 ## What's in the package
 - Robot Perspective & Robot nature (Project,files and other file artifacts)
-- Text Source editor with syntax coloring
+- Text Source editor with syntax coloring, code assistance and real-time validation
 - Table editors (non persistent for trial usage)
 - Debug Perspective for test case debugging with breakpoints, stepping, variable watch
 - Remote debug
 - Support for dictionaries & lists
-- Code assistance 
 - Eclipse help
 - File support: .robot, .txt, .tsv
 
 ## Known issues
+- Under Ubuntu/Xubuntu it was discovered that NPE is shown when opening file from Project Explorer and clicking on file structure instead of file name. Try to open file by clicking on filename. This is under investigation.
+- GTK3 seems to mess up with Eclipse under Linux. Force usage of GTK2 by executing command in terminal: export SWT_GTK3=0
 - Eclipse does not have UTF-8 support in editors by default. Check Preferences and RED help to get how to change it. 
 - Table editors edits are not persistent, changes done in Table editors will not be visible in source nor saved to file. Sync is done from Source -> Table only.
 - Library auto-discovery is not yet supported thus user needs to add any external library to red.xml by themselves, if not then validation will show unknown library error. Either you add it in red.xml or invoke option Quick Fix on item in Source editor or in Problems view.  
 - Due to difficult to comprehend and countless exceptions in RF syntax, validation can show false positive errors. In such case please provide us sample test case for us to have a look at.
-- Keyword with dot in the name is discovered properly, warning is rise for such case. Mind that still usage of such keywords with resource profix is unresloved.
 
 ## Short term plans
-- Keywords usage arguments validation
 - Table Editor
+- Library auto-discovery
 
 
 ## Notes
