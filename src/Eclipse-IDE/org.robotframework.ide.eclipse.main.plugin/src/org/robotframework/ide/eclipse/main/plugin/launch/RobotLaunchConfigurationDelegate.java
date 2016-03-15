@@ -6,12 +6,16 @@
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.resources.IFolder;
@@ -47,7 +51,9 @@ import org.rf.ide.core.execution.ExecutionElement;
 import org.rf.ide.core.execution.IExecutionHandler;
 import org.rf.ide.core.executor.ILineHandler;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.executor.RobotRuntimeEnvironment.RunCommandLine;
+import org.rf.ide.core.executor.RunCommandLineCallBuilder;
+import org.rf.ide.core.executor.RunCommandLineCallBuilder.IRunCommandLineBuilder;
+import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
 import org.robotframework.ide.eclipse.main.plugin.debug.utils.DebugSocketManager;
@@ -59,7 +65,9 @@ import org.robotframework.red.viewers.Selections;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 @SuppressWarnings("PMD.GodClass")
 public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements
@@ -148,7 +156,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     public void launch(final ILaunchConfiguration configuration, final String mode, final ILaunch launch,
             final IProgressMonitor monitor) throws CoreException {
         if (!ILaunchManager.RUN_MODE.equals(mode) && !ILaunchManager.DEBUG_MODE.equals(mode)) {
-            throw newCoreException("Unrecognized launch mode: '" + mode + "'", null);
+            throw newCoreException("Unrecognized launch mode: '" + mode + "'");
         }
 
         if (isConfigurationRunning.getAndSet(true)) {
@@ -174,33 +182,24 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         final RobotProject robotProject = robotConfig.getRobotProject();
         final RobotRuntimeEnvironment runtimeEnvironment = getRobotRuntimeEnvironment(robotProject);
-        List<IResource> suiteResources = getSuiteResources(robotConfig, robotProject.getProject());
+        Collection<IResource> suiteResources = getSuiteResources(robotConfig, robotProject.getProject());
 
-        String host = robotConfig.getRemoteDebugHost();
-        final String remoteDebugPort = robotConfig.getRemoteDebugPort();
-        String connectionTimeout = robotConfig.getRemoteDebugTimeout();
+        final Optional<Integer> remoteDebugPort = robotConfig.getRemoteDebugPort();
 
         final boolean isDebugging = ILaunchManager.DEBUG_MODE.equals(mode);
-        final boolean isRemoteDebugging = isDebugging && !remoteDebugPort.isEmpty() && !host.isEmpty();
+        final boolean isRemoteDebugging = isDebugging && remoteDebugPort.isPresent()
+                && !robotConfig.getRemoteDebugHost().isEmpty();
 
-        RunCommandLine cmdLine = null;
-        if(!isRemoteDebugging) {
-            cmdLine = createStandardModeCmd(robotConfig, robotProject, robotProject.getProject(), runtimeEnvironment,
-                    suiteResources, isDebugging);
-            host = "localhost";
-            connectionTimeout = "";
-        } else {
-            int debugServerPort = -1;
-            try {
-                debugServerPort = Integer.parseInt(remoteDebugPort);
-            } catch(final NumberFormatException e) {
-                throw newCoreException("Invalid port specified", e);
-            }
-            cmdLine = runtimeEnvironment.createRunRemoteDebugTempScriptCmd(debugServerPort);
-        }
+        final String host = isRemoteDebugging ? robotConfig.getRemoteDebugHost() : "localhost";
+        final Optional<Integer> connectionTimeout = isRemoteDebugging ? robotConfig.getRemoteDebugTimeout()
+                : Optional.<Integer> absent();
+
+        final RunCommandLine cmdLine = isRemoteDebugging
+                ? createRemoteModeCmd(runtimeEnvironment, remoteDebugPort.get())
+                : createStandardModeCmd(robotConfig, robotProject, suiteResources, isDebugging);
         
         if (cmdLine.getPort() < 0) {
-            throw newCoreException("Unable to find free port", null);
+            throw newCoreException("Unable to find free port");
         }
 
         DebugSocketManager socketManager = null;
@@ -225,12 +224,15 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
 
         final String description = runtimeEnvironment.getFile().getAbsolutePath();
+        final String version = robotConfig.isUsingInterpreterFromProject() ? runtimeEnvironment.getVersion()
+                : RobotRuntimeEnvironment.getVersion(robotConfig.getExecutor());
+
         final Process process = DebugPlugin.exec(cmdLine.getCommandLine(),
                 robotProject.getProject().getLocation().toFile());
         final IProcess eclipseProcess = DebugPlugin.newProcess(launch, process, description);
         
         final RobotConsoleFacade consoleFacade = new RobotConsoleFacade();
-        consoleFacade.connect(robotConfig, runtimeEnvironment, cmdLine);
+        consoleFacade.connect(robotConfig, runtimeEnvironment, cmdLine, version);
 
         if (isRemoteDebugging) {
             if (isDebugServerSocketListening && socketManager.getServerSocket() != null) {
@@ -240,7 +242,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 if (eclipseProcess != null) {
                     eclipseProcess.terminate();
                 }
-                throw newCoreException("Cannot run Debug server on " + host + ":" + remoteDebugPort + ".", null);
+                throw newCoreException("Cannot run Debug server on " + host + ":" + remoteDebugPort + ".");
             }
         }
         
@@ -249,16 +251,16 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
                 suiteResources = newArrayList();
                 suiteResources.add(robotProject.getProject());
             }
-            RobotDebugTarget target = null;
             try {
-                target = new RobotDebugTarget(launch, eclipseProcess, consoleFacade, isRemoteDebugging);
-                target.connect(suiteResources, robotEventBroker, socketManager);
+                final RobotDebugTarget target = new RobotDebugTarget(launch, eclipseProcess, consoleFacade,
+                        isRemoteDebugging);
+                target.connect(newArrayList(suiteResources), robotEventBroker, socketManager);
+                launch.addDebugTarget(target);
             } catch (final CoreException e) {
                 if (socketManager.getServerSocket() != null) {
                     socketManager.getServerSocket().close();
                 }
             }
-            launch.addDebugTarget(target);
         }
 
         try {
@@ -270,71 +272,86 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
     }
 
-    private RunCommandLine createStandardModeCmd(final RobotLaunchConfiguration robotConfig,
-            final RobotProject robotProject, final IProject project, final RobotRuntimeEnvironment runtimeEnvironment,
-            final List<IResource> suiteResources, final boolean isDebugging) throws CoreException, IOException {
-        final List<String> suites = getSuitesToRun(suiteResources);
-        final List<String> testCases = robotConfig.getTestCasesNames();
-        final String userArguments = robotConfig.getExecutorArguments();
-        List<String> includedTags = newArrayList();
-        if (robotConfig.isIncludeTagsEnabled()) {
-            includedTags = robotConfig.getIncludedTags();
-        }
-        List<String> excludedTags = newArrayList();
-        if (robotConfig.isExcludeTagsEnabled()) {
-            excludedTags = robotConfig.getExcludedTags();
-        }
-
-        final List<String> pythonpath = robotProject.getPythonpath();
-        final List<String> classpath = robotProject.getClasspath();
-        final List<String> variableFilesPath = robotProject.getVariableFilePaths();
-
-        return runtimeEnvironment.createCommandLineCall(robotConfig.getExecutor(), classpath, pythonpath,
-                variableFilesPath, project.getLocation().toFile(), suites, testCases, userArguments, includedTags,
-                excludedTags, isDebugging);
+    private RunCommandLine createRemoteModeCmd(final RobotRuntimeEnvironment env, final int port) throws IOException {
+        return RunCommandLineCallBuilder.forRemoteEnvironment(env, port).build();
     }
-    
+
+    private RunCommandLine createStandardModeCmd(final RobotLaunchConfiguration robotConfig,
+            final RobotProject robotProject, final Collection<IResource> suiteResources, final boolean isDebugging)
+            throws CoreException, IOException {
+
+        final IRunCommandLineBuilder builder = robotConfig.isUsingInterpreterFromProject()
+                ? RunCommandLineCallBuilder.forEnvironment(robotProject.getRuntimeEnvironment())
+                : RunCommandLineCallBuilder.forExecutor(robotConfig.getExecutor());
+
+        builder.withProject(robotProject.getProject().getLocation().toFile());
+        builder.addLocationsToClassPath(robotProject.getClasspath());
+        builder.addLocationsToPythonPath(robotProject.getPythonpath());
+        builder.addUserArgumentsForInterpreter(robotConfig.getInterpeterArguments());
+        builder.addUserArgumentsForRobot(robotConfig.getExecutorArguments());
+
+        builder.addVariableFiles(robotProject.getVariableFilePaths());
+
+        builder.suitesToRun(getSuitesToRun(suiteResources));
+        builder.testsToRun(getTestsToRun(robotConfig));
+
+        if (robotConfig.isIncludeTagsEnabled()) {
+            builder.includeTags(robotConfig.getIncludedTags());
+        }
+        if (robotConfig.isExcludeTagsEnabled()) {
+            builder.excludeTags(robotConfig.getExcludedTags());
+        }
+        builder.enableDebug(isDebugging);
+        return builder.build();
+    }
+
     private RobotRuntimeEnvironment getRobotRuntimeEnvironment(final RobotProject robotProject) throws CoreException {
         
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         if (runtimeEnvironment == null) {
-            throw newCoreException("There is no active runtime environment for project '" + robotProject.getName() + "'",
-                    null);
+            throw newCoreException(
+                    "There is no active runtime environment for project '" + robotProject.getName() + "'");
         }
         if (!runtimeEnvironment.hasRobotInstalled()) {
             throw newCoreException("The runtime environment " + runtimeEnvironment.getFile().getAbsolutePath()
-                    + " is either not a python installation or it has no Robot installed", null);
+                    + " is either not a python installation or it has no Robot installed");
         }
         return runtimeEnvironment;
     }
 
-    private List<IResource> getSuiteResources(final RobotLaunchConfiguration robotConfig, final IProject project)
+    private Collection<IResource> getSuiteResources(final RobotLaunchConfiguration robotConfig, final IProject project)
             throws CoreException {
-        final List<String> suitePaths = robotConfig.getSuitePaths();
+        final Collection<String> suitePaths = robotConfig.getSuitePaths().keySet();
 
-        final List<IResource> suiteResources = Lists.transform(suitePaths, new Function<String, IResource>() {
+        final Map<String, IResource> resources = Maps.asMap(newHashSet(suitePaths), new Function<String, IResource>() {
             @Override
             public IResource apply(final String suitePath) {
                 return project.findMember(org.eclipse.core.runtime.Path.fromPortableString(suitePath));
             }
         });
 
-        for (int i = 0; i < suitePaths.size(); i++) {
-            final String path = suitePaths.get(i);
-            final IResource resource = suiteResources.get(i);
-            if (resource == null || !resource.exists()) {
-                throw newCoreException("Suite '" + path + "' does not exist in project '"
-                        + project.getName() + "'", null);
+        final List<String> problems = new ArrayList<>();
+        for (final Entry<String, IResource> entry : resources.entrySet()) {
+            if (entry.getValue() == null || !entry.getValue().exists()) {
+                problems.add("Suite '" + entry.getKey() + "' does not exist in project '"
+                        + project.getName() + "'");
             }
         }
-        return suiteResources;
+        if (!problems.isEmpty()) {
+            throw newCoreException(Joiner.on('\n').join(problems));
+        }
+        return resources.values();
+    }
+
+    private static CoreException newCoreException(final String message) {
+        return newCoreException(message, null);
     }
 
     private static CoreException newCoreException(final String message, final Throwable cause) {
         return new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, cause));
     }
 
-    private List<String> getSuitesToRun(final List<IResource> suites) {
+    private List<String> getSuitesToRun(final Collection<IResource> suites) {
         final List<String> suiteNames = new ArrayList<String>();
 
         for (final IResource suite : suites) {
@@ -345,20 +362,27 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
     public static String createSuiteName(final IResource suite) {
         final String actualProjectName = suite.getProject().getLocation().lastSegment();
+        return createSuiteName(actualProjectName, suite.getProjectRelativePath());
+    }
 
-        final IPath path = suite.getFullPath().removeFileExtension();
-        final List<String> upperCased = newArrayList(
-                Lists.transform(Arrays.asList(path.segments()), new Function<String, String>() {
+    public static String createSuiteName(final String projectName, final IPath path) {
+        final List<String> upperCased = newArrayList(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, projectName));
+        upperCased.addAll(
+                Lists.transform(Arrays.asList(path.removeFileExtension().segments()), new Function<String, String>() {
             @Override
             public String apply(final String segment) {
                 return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, segment);
             }
-                }));
-        if (!actualProjectName.equals(upperCased.get(0))) {
-            upperCased.remove(0);
-            upperCased.add(0, actualProjectName);
-        }
+        }));
         return Joiner.on('.').join(upperCased);
+    }
+
+    private Collection<String> getTestsToRun(final RobotLaunchConfiguration robotConfig) throws CoreException {
+        final List<String> tests = new ArrayList<>();
+        for (final List<String> suiteTests : robotConfig.getSuitePaths().values()) {
+            tests.addAll(suiteTests);
+        }
+        return tests;
     }
 
     private boolean waitForDebugServerSocket(final DebugSocketManager socketManager) {

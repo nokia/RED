@@ -320,7 +320,7 @@ public class RobotProject extends RobotContainer {
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
                 if (lib.provideType() == LibraryType.PYTHON) {
                     final String path = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
-                            new Path(lib.getPath())).toPortableString();
+                            new Path(lib.getPath())).toOSString();
                     pp.add(path);
                 }
             }
