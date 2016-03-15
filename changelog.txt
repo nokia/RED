@@ -1,34 +1,29 @@
-RED 0.6.1 - 2016/02/16
+RED 0.6.2 - 2016/03/15
 
-Bug
+Bugs
 
-    Improve validation performance and progress reporting
-    Missing automatic parameters in content assist
-    Not supported characters in resource path
-    Hyperlinks point to keyword base on appearance in file not base on Robot order
-    Support files from remote locations
-    Fix errors from validation project
-    Resource is not parsed and colored correctly
-    Adding error when Test case has no content (lines with comments)
-    RSE - Project Validation does not work under RSE
-    No error when keywords are duplicated but in other case
-	
-Enhancement
+    Keyword not recognized if dot is in the name
+    No possible to add library by filename, when inside file classes exists
+    Jython - proper generating libdoc and running tests
+    Problem with Java Libraries run and libdoc generation in RED
+    jython - fix running tests with external libs under python
+    
 
-    Scroll bar in manpage from libspecs
-    Adding python files to Content assist for Variables and section
-    Add action to add libs from project explorer directly to red.xml by file and folder
-    Proper value for robot env variables - ${EXECDIR}, ${OUTPUTDIR}
-    Possible to run test(s) from Source Editor base on cursor location
-    In case of duplicated keywords it will be nice to see declaration of all
-    Variable mapping and paths - there should be no error/warning about absolute path
-    Add support for keywords which in parameters get name of created by own variables
-    Disable validation for commented part of line
-    Mark deprecated or removed elements from section Settings to be exactly on same place like RF 3.0
-    Support for importing variables, which exists as module
-    Extend RED to recognize unknown settings in TestCases and Keywords
-	Keywords with dots are recognized properly although RED still rise error when such keyword is used together with resource prefix
-Feature
+Enhancements
 
-    Provide headless application which will validate projects
-    Add wizard for creating new .py files
+	Arguments validation - arguments and keyword call
+    Extend current RobotFileValidation to show an information get from parser
+    provide validation for items in [sections] like teardown
+    Make report files links clickable in robot console
+    When adding lib, suppress class selection window when only one class is found
+    Discover python libs inside jar when adding java libs in red.xml
+
+Features
+
+    Adding linked mode for creating variables in Variable section
+    Reload library when lib file is changed
+
+
+    
+
+
