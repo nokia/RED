@@ -5,10 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.getFirst;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -27,25 +31,31 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
+import com.google.common.base.Joiner;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
 
 @SuppressWarnings("PMD.GodClass")
 public class RobotLaunchConfiguration {
 
     static final String TYPE_ID = "org.robotframework.ide.robotLaunchConfiguration";
 
+    private static final String USE_PROJECT_EXECUTOR = "Project executor";
     private static final String EXECUTOR_NAME = "Executor";
     private static final String EXECUTOR_ARGUMENTS_ATTRIBUTE = "Executor arguments";
+    private static final String INTERPRETER_ARGUMENTS_ATTRIBUTE = "Interpreter arguments";
     private static final String INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Include option enabled";
     private static final String INCLUDED_TAGS_ATTRIBUTE = "Included tags";
     private static final String EXCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE = "Exclude option enabled";
     private static final String EXCLUDED_TAGS_ATTRIBUTE = "Excluded tags";
     private static final String PROJECT_NAME_ATTRIBUTE = "Project name";
     private static final String TEST_SUITES_ATTRIBUTE = "Test suites";
-    private static final String TEST_CASES_ATTRIBUTE = "Test cases";
     private static final String REMOTE_DEBUG_HOST_ATTRIBUTE = "Remote debug host";
     private static final String REMOTE_DEBUG_PORT_ATTRIBUTE = "Remote debug port";
     private static final String REMOTE_DEBUG_TIMEOUT_ATTRIBUTE = "Remote debug timeout";
+
 
     private final ILaunchConfiguration configuration;
     
@@ -58,7 +68,11 @@ public class RobotLaunchConfiguration {
                 .generateLaunchConfigurationName(name);
         final ILaunchConfigurationWorkingCopy configuration = launchConfigurationType.newInstance(null,
                 configurationName);
-        fillDefaults(configuration, resources);
+        final Map<IResource, List<String>> resourcesMapping = new HashMap<>();
+        for (final IResource resource : resources) {
+            resourcesMapping.put(resource, new ArrayList<String>());
+        }
+        fillDefaults(configuration, resourcesMapping);
         configuration.doSave();
         return configuration;
     }
@@ -68,41 +82,35 @@ public class RobotLaunchConfiguration {
         robotConfig.setExecutor(SuiteExecutor.Python);
         robotConfig.setExecutorArguments("");
         robotConfig.setProjectName("");
-        robotConfig.setSuitePaths(new ArrayList<String>());
-        robotConfig.setTestCasesNames(new ArrayList<String>());
+        robotConfig.setSuitePaths(new HashMap<String, List<String>>());
         robotConfig.setIsIncludeTagsEnabled(false);
         robotConfig.setIsExcludeTagsEnabled(false);
         robotConfig.setIncludedTags(new ArrayList<String>());
         robotConfig.setExcludedTags(new ArrayList<String>());
         robotConfig.setRemoteDebugHost("");
-        robotConfig.setRemoteDebugPort("");
-        robotConfig.setRemoteDebugTimeout("");
     }
 
-    private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig, final List<IResource> resources) {
+    private static void fillDefaults(final ILaunchConfigurationWorkingCopy launchConfig,
+            final Map<IResource, List<String>> suitesMapping) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
-        final IProject project = resources.get(0).getProject();
+        final IProject project = getFirst(suitesMapping.keySet(), null).getProject();
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
         final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
         robotConfig.setExecutor(interpreter);
         robotConfig.setExecutorArguments("");
         robotConfig.setProjectName(project.getName());
         
-        robotConfig.setSuitePaths(newArrayList(Lists.transform(resources, new Function<IResource, String>() {
-            @Override
-            public String apply(final IResource resource) {
-                return resource.getProjectRelativePath().toPortableString();
-            }
-        })));
-        robotConfig.setTestCasesNames(new ArrayList<String>());
+        final Map<String, List<String>> suitesNamesMapping = new HashMap<>();
+        for (final IResource resource : suitesMapping.keySet()) {
+            suitesNamesMapping.put(resource.getProjectRelativePath().toPortableString(), suitesMapping.get(resource));
+        }
+        robotConfig.setSuitePaths(suitesNamesMapping);
         
         robotConfig.setIsIncludeTagsEnabled(false);
         robotConfig.setIsExcludeTagsEnabled(false);
         robotConfig.setIncludedTags(new ArrayList<String>());
         robotConfig.setExcludedTags(new ArrayList<String>());
         robotConfig.setRemoteDebugHost("");
-        robotConfig.setRemoteDebugPort("");
-        robotConfig.setRemoteDebugTimeout("");
     }
     
     public RobotLaunchConfiguration(final ILaunchConfiguration config) {
@@ -116,6 +124,13 @@ public class RobotLaunchConfiguration {
     private ILaunchConfigurationWorkingCopy asWorkingCopy() {
         return configuration instanceof ILaunchConfigurationWorkingCopy ? (ILaunchConfigurationWorkingCopy) configuration
                 : null;
+    }
+
+    public void setUsingInterpreterFromProject(final boolean usesProjectExecutor) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(USE_PROJECT_EXECUTOR, usesProjectExecutor);
+        }
     }
     
     public void setExecutor(final SuiteExecutor executor) {
@@ -132,6 +147,13 @@ public class RobotLaunchConfiguration {
         }
     }
 
+    public void setInterpeterArguments(final String arguments) {
+        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
+        if (launchCopy != null) {
+            launchCopy.setAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, arguments);
+        }
+    }
+
     public void setProjectName(final String projectName) {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
@@ -139,17 +161,16 @@ public class RobotLaunchConfiguration {
         }
     }
 
-    public void setSuitePaths(final List<String> names) {
+    public void setSuitePaths(final Map<String, List<String>> suitesToCases) {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
-            launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, names);
-        }
-    }
-    
-    public void setTestCasesNames(final List<String> names) {
-        final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
-        if (launchCopy != null) {
-            launchCopy.setAttribute(TEST_CASES_ATTRIBUTE, names);
+            final Map<String, String> suites = Maps.asMap(suitesToCases.keySet(), new Function<String, String>() {
+                @Override
+                public String apply(final String path) {
+                    return Joiner.on("::").join(filter(suitesToCases.get(path), Predicates.notNull()));
+                }
+            });
+            launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, suites);
         }
     }
     
@@ -188,18 +209,22 @@ public class RobotLaunchConfiguration {
         }
     }
     
-    public void setRemoteDebugPort(final String port) {
+    public void setRemoteDebugPort(final int port) {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
             launchCopy.setAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, port);
         }
     }
     
-    public void setRemoteDebugTimeout(final String timeout) {
+    public void setRemoteDebugTimeout(final int timeout) {
         final ILaunchConfigurationWorkingCopy launchCopy = asWorkingCopy();
         if (launchCopy != null) {
             launchCopy.setAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, timeout);
         }
+    }
+
+    public boolean isUsingInterpreterFromProject() throws CoreException {
+        return configuration.getAttribute(USE_PROJECT_EXECUTOR, true);
     }
 
     public SuiteExecutor getExecutor() throws CoreException {
@@ -210,18 +235,25 @@ public class RobotLaunchConfiguration {
         return configuration.getAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, "");
     }
 
+    public String getInterpeterArguments() throws CoreException {
+        return configuration.getAttribute(INTERPRETER_ARGUMENTS_ATTRIBUTE, "");
+    }
+
     public String getProjectName() throws CoreException {
         return configuration.getAttribute(PROJECT_NAME_ATTRIBUTE, "");
     }
 
-    public List<String> getSuitePaths() throws CoreException {
-        return configuration.getAttribute(TEST_SUITES_ATTRIBUTE, new ArrayList<String>());
+    public Map<String, List<String>> getSuitePaths() throws CoreException {
+        final Map<String, String> mapping = configuration.getAttribute(TEST_SUITES_ATTRIBUTE,
+                new HashMap<String, String>());
+        final Map<String, List<String>> suitesToTestsMapping = new HashMap<>();
+        for (final Entry<String, String> entry : mapping.entrySet()) {
+            final List<String> splittedTestNames = Splitter.on("::").omitEmptyStrings().splitToList(entry.getValue());
+            suitesToTestsMapping.put(entry.getKey(), splittedTestNames);
+        }
+        return suitesToTestsMapping;
     }
-    
-    public List<String> getTestCasesNames() throws CoreException {
-        return configuration.getAttribute(TEST_CASES_ATTRIBUTE, new ArrayList<String>());
-    }
-    
+
     public boolean isIncludeTagsEnabled() throws CoreException {
         return configuration.getAttribute(INCLUDE_TAGS_OPTION_ENABLED_ATTRIBUTE, false);
     }
@@ -242,12 +274,18 @@ public class RobotLaunchConfiguration {
         return configuration.getAttribute(REMOTE_DEBUG_HOST_ATTRIBUTE, "");
     }
     
-    public String getRemoteDebugPort() throws CoreException {
-        return configuration.getAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, "");
+    public Optional<Integer> getRemoteDebugPort() throws CoreException {
+        if (configuration.hasAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE)) {
+            return Optional.of(configuration.getAttribute(REMOTE_DEBUG_PORT_ATTRIBUTE, -1));
+        }
+        return Optional.absent();
     }
     
-    public String getRemoteDebugTimeout() throws CoreException {
-        return configuration.getAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, "");
+    public Optional<Integer> getRemoteDebugTimeout() throws CoreException {
+        if (configuration.hasAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE)) {
+            return Optional.of(configuration.getAttribute(REMOTE_DEBUG_TIMEOUT_ATTRIBUTE, -1));
+        }
+        return Optional.absent();
     }
 
     public RobotProject getRobotProject() throws CoreException {
@@ -276,7 +314,7 @@ public class RobotLaunchConfiguration {
                     return false;
                 }
                 boolean exists = false;
-                for (final String path : getSuitePaths()) {
+                for (final String path : getSuitePaths().keySet()) {
                     final IResource res = project.findMember(Path.fromPortableString(path));
                     if (res != null && res.equals(resource)) {
                         exists = true;
@@ -295,21 +333,20 @@ public class RobotLaunchConfiguration {
     
     public static void prepareRerunFailedTestsConfiguration(final ILaunchConfigurationWorkingCopy launchCopy,
             final String outputFilePath) throws CoreException {
-        launchCopy.setAttribute(EXECUTOR_ARGUMENTS_ATTRIBUTE, "-R" + " " + outputFilePath);
-        launchCopy.setAttribute(TEST_SUITES_ATTRIBUTE, new ArrayList<String>());
-        launchCopy.setAttribute(TEST_CASES_ATTRIBUTE, new ArrayList<String>());
+        final RobotLaunchConfiguration robotLaunchConfig = new RobotLaunchConfiguration(launchCopy);
+        robotLaunchConfig.setExecutorArguments("-R" + " " + outputFilePath);
+        robotLaunchConfig.setSuitePaths(new HashMap<String, List<String>>());
     }
-    
+
     public static ILaunchConfigurationWorkingCopy createLaunchConfigurationForSelectedTestCases(
-            final List<IResource> resources, final List<String> testCasesNames) throws CoreException {
+            final Map<IResource, List<String>> resourcesToTestCases) throws CoreException {
 
         final ILaunchManager manager = DebugPlugin.getDefault().getLaunchManager();
         final String configurationName = manager.generateLaunchConfigurationName("New Configuration");
-        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID).newInstance(
-                null, configurationName);
-        fillDefaults(configuration, resources);
+        final ILaunchConfigurationWorkingCopy configuration = manager.getLaunchConfigurationType(TYPE_ID)
+                .newInstance(null, configurationName);
 
-        configuration.setAttribute(TEST_CASES_ATTRIBUTE, testCasesNames);
+        fillDefaults(configuration, resourcesToTestCases);
 
         return configuration;
     }

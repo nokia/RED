@@ -10,6 +10,8 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import com.google.common.base.Optional;
+
 /**
  * @author mmarzec
  *
@@ -32,10 +34,17 @@ public class DebugSocketManager implements Runnable {
     
     private boolean hasServerException;
     
-    public DebugSocketManager(final String host, final int port, final String connectionTimeout) {
+    public DebugSocketManager(final String host, final int port, final Optional<Integer> connectionTimeout) {
         this.host = host;
         this.port = port;
-        connectionTimeoutInMilliseconds = parseTimeout(connectionTimeout);
+        this.connectionTimeoutInMilliseconds = getTimeout(connectionTimeout);
+    }
+
+    private int getTimeout(final Optional<Integer> connectionTimeout) {
+        if (connectionTimeout.isPresent() && connectionTimeout.get() > 1) {
+            return connectionTimeout.get();
+        }
+        return DEBUG_SERVER_DEFAULT_CONNECTION_TIMEOUT;
     }
 
     @Override
@@ -79,20 +88,6 @@ public class DebugSocketManager implements Runnable {
     
     public int getRetryCounterMaxValue() {
         return connectionTimeoutInMilliseconds / WAIT_FOR_AGENT_TIME;
-    }
-
-    private int parseTimeout(final String connectionTimeout) {
-        if (connectionTimeout != null && !connectionTimeout.isEmpty()) {
-            try {
-                int timeoutInMilliseconds = Integer.parseInt(connectionTimeout) * 1000;
-                if(timeoutInMilliseconds > 0) {
-                    return timeoutInMilliseconds;
-                }
-            } catch (NumberFormatException e) {
-                // return default timeout
-            }
-        }
-        return DEBUG_SERVER_DEFAULT_CONNECTION_TIMEOUT;
     }
 
 }
