@@ -49,6 +49,10 @@ public enum SuiteExecutor {
         return names;
     }
 
+    public String getPathsSeparator() {
+        return isWindows() ? ";" : ":";
+    }
+
     public abstract String executableName();
 
     private static String getExtension() {
