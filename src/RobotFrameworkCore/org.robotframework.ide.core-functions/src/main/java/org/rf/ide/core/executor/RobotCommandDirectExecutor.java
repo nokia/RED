@@ -159,33 +159,6 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public String getRunModulePath() {
-        final StringBuilder output = new StringBuilder();
-        final ILineHandler linesHandler = new ILineHandler() {
-            @Override
-            public void processLine(final String line) {
-                output.append(line);
-            }
-        };
-        try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_modules.py");
-            final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-runmodulepath");
-
-            RobotRuntimeEnvironment.runExternalProcess(cmdLine, linesHandler);
-            final String fileAsString = output.toString();
-
-            for (final File file : new File(fileAsString).getParentFile().listFiles()) {
-                if (file.getName().equals("run.py")) {
-                    return file.getAbsolutePath();
-                }
-            }
-            throw new IllegalArgumentException("Unable to find robot.run module");
-        } catch (final IOException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    @Override
     public void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath) {
         final List<String> cmdLine = Arrays.asList(interpreterPath, "-m", "robot.libdoc", "-f", "XML", libName,
                 resultFilePath);

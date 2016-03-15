@@ -31,8 +31,6 @@ interface RobotCommandExecutor {
 
     String getRobotVersion();
 
-    String getRunModulePath();
-
     void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath);
 
     void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath);
