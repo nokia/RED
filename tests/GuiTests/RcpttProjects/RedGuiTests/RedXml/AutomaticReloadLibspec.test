@@ -1,0 +1,274 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _hArNQOVGEeWkVpqnVhTYmg
+Element-Name: AutomaticReloadLibspec
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _pTFvYOVGEeWkVpqnVhTYmg
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 3/15/16 5:11 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// open red.xml
+with [get-view "Project Explorer" | get-tree] {
+    select NewProject | double-click
+    select "NewProject/red.xml" | double-click
+}
+// wiat for jython
+try -times 10 -delay 1000 -command{
+	get-editor "NewProject/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
+    | verify-true
+}  
+get-editor "NewProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+
+//add file with functions
+set-dialog-result File "platform:/resource/NewProject/only_function.py"
+with [get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
+    click
+    key-type "M1+s"
+}
+
+//check PE
+get-view "Project Explorer" | get-tree | get-item "NewProject/Robot Referenced libraries" | get-property childCount 
+    | equals 1 | verify-true
+get-view "Project Explorer" | get-tree 
+    | get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(1\\)/Flower" 
+    | get-property index | equals 0 | verify-true
+    
+// change function name and add one more    
+get-view "Project Explorer" | get-tree | select "NewProject/only_function.py" | get-menu "Open With/Text Editor" 
+    | click
+    
+
+//remove all
+with [get-editor "only_function.py" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type "M1+a"
+    key-type Del
+}
+//add 2 new functions
+get-editor "only_function.py" | get-text-viewer | set-text "def Laptop():\n"
+    + "\t\"\"\"Laptop keyword\n"
+    + "\t\"\"\"\n"
+    + "\treturn 77\n"
+    + "\t\n"
+    + "def PC():\n"
+    + "\t\"\"\"PC keyword\n"
+    + "\t\"\"\"\n"
+    + "\treturn 99"
+	    
+with [get-editor "only_function.py" | get-text-viewer] {
+    key-type "M1+s"
+}
+
+wait 2000
+//check if new libs are adde to PE
+with [get-view "Project Explorer" | get-tree] {
+    get-item "NewProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
+    get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)/Laptop" | get-property index 
+        | equals 0 | verify-true
+    get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)/PC" | get-property index 
+        | equals 1 | verify-true
+}
+
+//add file with class
+get-tab-folder -index 1 | get-tab-item "NewProject/red.xml" | click
+set-dialog-result File "platform:/resource/NewProject/here_is_class.py"
+get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+get-window "Select library class" | get-table | select "here_is_class.Dog" | click -default
+get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" 
+    | key-type "M1+s"
+    
+//remove class Cat
+get-view "Project Explorer" | get-tree | select "NewProject/here_is_class.py" | get-menu "Open With/Text Editor" 
+    | click
+with [get-editor "here_is_class.py" | get-text-viewer] {
+    set-caret-pos 10 5
+    select-range 11 5 4 1
+    key-type BackSpace
+    key-type "M1+s"
+}
+//check that is now only one keyword
+with [get-view "Project Explorer" | get-tree] {
+    get-item "NewProject/Robot Referenced libraries" | get-property childCount | equals 2 | verify-true
+    get-item "NewProject/Robot Referenced libraries/here_is_class.Dog NewProject \\(1\\)/Lessie" 
+        | get-property caption | equals Lessie | verify-true
+}
+//rest is not changed
+with [get-view "Project Explorer" | get-tree] {
+    get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)" | get-property index 
+        | equals 1 | verify-true
+    get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)/Laptop" | get-property index 
+        | equals 0 | verify-true
+    get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)/PC" | get-property index 
+        | equals 1 | verify-true
+}
+//change class name to Dog2
+with [get-editor "here_is_class.py" | get-text-viewer] {
+    set-caret-pos 8 10
+    type-text 2
+    key-type "M1+s"
+}
+// check error
+get-window "Regenerating library specification" 
+    | get-label "Problems occured during library specification generation: Unable to generate library specification file for library 'here_is_class.Dog'Detailed information:Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'.Try --help for usage information." 
+    | get-property caption 
+    | equals "Problems occured during library specification generation: Unable to generate library specification file for library 'here_is_class.Dog'\n"
+    + "Detailed information:\n"
+    + "Importing test library 'here_is_class.Dog' failed: Module 'here_is_class' does not contain 'Dog'.\n\n"
+    + "Try --help for usage information." | verify-true
+get-window "Regenerating library specification" | get-button OK | click
+
+//check that libery is not-accesible
+get-view "Project Explorer" | get-tree 
+    | get-item "NewProject/Robot Referenced libraries/here_is_class.Dog \\(non-accessible\\)" | get-property index 
+    | equals 0 | verify-true
+    
+// revert to class name Dog 
+with [get-editor "here_is_class.py" | get-text-viewer] {
+    set-caret-pos 8 11
+    key-type BackSpace
+    key-type "M1+s"
+}
+
+// check that lib is generated
+get-view "Project Explorer" | get-tree 
+    | get-item "NewProject/Robot Referenced libraries/here_is_class.Dog NewProject \\(1\\)/Lessie" 
+    | get-property index | equals 0 | verify-true
+    
+// add file with import    
+get-tab-folder -index 1 | get-tab-item "NewProject/red.xml" | click
+set-dialog-result File "platform:/resource/NewProject/imports/test.py"
+with [get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
+    click
+    key-type "M1+s"
+}
+//check PE
+with [get-view "Project Explorer" | get-tree] {
+    get-item "NewProject/Robot Referenced libraries" | get-property childCount | equals 3 | verify-true
+    get-item "NewProject/Robot Referenced libraries/here_is_class.Dog NewProject \\(1\\)" | get-property index 
+        | equals 0 | verify-true
+    get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)" | get-property index 
+        | equals 1 | verify-true
+    get-item "NewProject/Robot Referenced libraries/test NewProject\\/imports \\(1\\)" | get-property index 
+        | equals 2 | verify-true
+    get-item "NewProject/Robot Referenced libraries/test NewProject\\/imports \\(1\\)/Perfect" | get-property index 
+        | equals 0 | verify-true
+}
+
+// open file that is imported and change function name    
+get-view "Project Explorer" | get-tree | select "NewProject/imports/file_to_import.py" 
+    | get-menu "Open With/Text Editor" | click
+with [get-editor "file_to_import.py" | get-text-viewer] {
+    set-caret-pos 1 9
+    type-text 67
+    key-type "M1+s"
+}
+//check that Libs are reloaded (libs are collapsed)
+get-view "Project Explorer" | get-tree | get-item "NewProject/Robot Referenced libraries" 
+    | get-property "getExpanded()" | equals false | verify-true
+    
+//check PE    
+with [get-view "Project Explorer" | get-tree] {
+    get-item "NewProject/Robot Referenced libraries/test NewProject\\/imports \\(1\\)" | get-property childCount 
+        | equals 1 | verify-true
+    get-item "NewProject/Robot Referenced libraries/test NewProject\\/imports \\(1\\)" 
+        | get-property "getItems().TreeItem[0].getText()" | equals Perfect | verify-true
+}
+
+// add file with class
+get-tab-folder -index 1 | get-tab-item "NewProject/red.xml" | click
+set-dialog-result File "platform:/resource/NewProject/imports/MainClass.py"
+with [get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
+    click
+    key-type "M1+s"
+}
+
+//chage method in class that is imported
+get-view "Project Explorer" | get-tree | select "NewProject/imports/class_to_import.py" 
+    | get-menu "Open With/Text Editor" | click
+with [get-editor "class_to_import.py" | get-text-viewer] {
+    set-caret-pos 5 16
+    key-type BackSpace
+    type-text 34
+    key-type "M1+s"
+}
+
+//check that Libs are reloaded (libs are collapsed)
+get-view "Project Explorer" | get-tree | get-item "NewProject/Robot Referenced libraries" 
+    | get-property "getExpanded()" | equals false | verify-true
+    
+// check that is no changes in PE
+with [get-view "Project Explorer" | get-tree] {
+    get-item "NewProject/Robot Referenced libraries" | get-property childCount | equals 4 | verify-true
+    get-item "NewProject/Robot Referenced libraries/here_is_class.Dog NewProject \\(1\\)" | get-property index 
+        | equals 0 | verify-true
+    get-item "NewProject/Robot Referenced libraries/MainClass NewProject\\/imports \\(1\\)" | get-property index 
+        | equals 1 | verify-true
+    get-item "NewProject/Robot Referenced libraries/only_function NewProject \\(2\\)" | get-property index 
+        | equals 2 | verify-true
+    get-item "NewProject/Robot Referenced libraries/test NewProject\\/imports \\(1\\)" | get-property index 
+        | equals 3 | verify-true
+}
+
+with [get-tab-folder -index 1] {
+
+    get-tab-item "class_to_import.py" | click
+}
+with [get-editor "class_to_import.py" | get-text-viewer] {
+    set-caret-pos 1 18
+    type-text 2
+    key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select "NewProject/imports/MainClass.py" 
+    | select "NewProject/imports/MainClass.py" | select "NewProject/imports/MainClass.py" 
+    | get-menu "Open With/Text Editor" | click
+    
+with [get-editor "MainClass.py" | get-text-viewer] {
+    set-caret-pos 11 20
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+s"
+}
+   
+get-window "Regenerating library specification" 
+    | get-label -index 1
+    | get-property caption 
+    | equals "Problems occured during library specification generation: Unable to generate library specification file for library 'MainClass'\n"
+    + "Detailed information:\n"
+    + "Importing test library 'MainClass' failed: ImportError: cannot import name SimpleClass\n"
+    + "Traceback (most recent call last):\n"
+    + "  File \"D:\\aut-RED_ficzer_32_bit\\NewProject\\imports\\MainClass.py\", line 1, in <module>\n"
+    + "    from class_to_import import SimpleClass\n"
+    + "PYTHONPATH:\n"
+    + "  D:\\aut-RED_ficzer_32_bit\\NewProject\\imports\n"
+    + "  c:\\Python27\\lib\\site-packages\\setuptools-18.0.1-py2.7.egg\n"
+    + "  C:\\WINDOWS\\system32\\python27.zip\n"
+    + "  c:\\Python27\\DLLs\n"
+    + "  c:\\Python27\\lib\n"
+    + "  c:\\Python27\\lib\\plat-win\n"
+    + "  c:\\Python27\\lib\\lib-tk\n"
+    + "  c:\\Python27\n"
+    + "  c:\\Python27\\lib\\site-packages\n"
+    + "  c:\\Python27\\lib\\site-packages\\wx-2.8-msw-unicode\n\n"
+    + "Try --help for usage information." | verify-true
+get-window "Regenerating library specification" | get-button OK | click
+
+//------------------------
+
+// remove entire project (for one file RCPPT cannot see window with error)
+exec-with-options {
+get-view "Project Explorer" | get-tree | select NewProject | get-menu Delete | click
+with [get-window "Delete Resources"] {
+    get-button "Delete project contents on disk (cannot be undone)" | check
+    get-button OK | click
+    
+    }
+   verify-error {get-window "Problem Occurred"}
+} -allowStatusDialog   
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
