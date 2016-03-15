@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.ServerSocket;
 import java.net.URI;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -34,6 +33,7 @@ import org.rf.ide.core.execution.IExecutionHandler;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 
 
 @SuppressWarnings({ "PMD.GodClass", "PMD.TooManyMethods" })
@@ -94,6 +94,18 @@ public class RobotRuntimeEnvironment {
             paths.addAll(whereIsPythonInterpreter(interpreter));
         }
         return paths;
+    }
+
+    public static String getVersion(final SuiteExecutor executor) throws RobotEnvironmentException {
+        final Collection<PythonInstallationDirectory> interpreterLocations = whereIsPythonInterpreter(executor);
+        final PythonInstallationDirectory installationDirectory = Iterables.getFirst(interpreterLocations, null);
+        if (installationDirectory == null) {
+            throw new RobotEnvironmentException(
+                    "There is no " + executor.name() + " interpreter in system PATH environment variable");
+        }
+        final RobotCommandExecutor cmdExec = PythonInterpretersCommandExecutors.getInstance()
+                .getDirectRobotCommandExecutor(installationDirectory);
+        return cmdExec.getRobotVersion();
     }
 
 
@@ -193,20 +205,11 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    private static String getRunModulePath(
-            final PythonInstallationDirectory pythonLocation) {
-        final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                        .getRobotCommandExecutor(pythonLocation);
-        return executor.getRunModulePath();
+    String getPythonExecutablePath() {
+        final PythonInstallationDirectory pyLocation = (PythonInstallationDirectory) location;
+        final String pythonExec = pyLocation.interpreter.executableName();
+        return findFile(pyLocation, pythonExec).getAbsolutePath();
     }
-
-
-    private static String getPythonExecutablePath(
-            final PythonInstallationDirectory location) {
-        final String pythonExec = location.interpreter.executableName();
-        return findFile(location, pythonExec).getAbsolutePath();
-    }
-
 
     private static File findFile(
             final PythonInstallationDirectory pythonLocation, final String name) {
@@ -337,44 +340,14 @@ public class RobotRuntimeEnvironment {
         return Optional.absent();
     }
 
-
-    public String getVersion(final SuiteExecutor executor) {
-        final boolean isSameInterpreter = executor == getInterpreter();
-        if (isSameInterpreter) {
-            return version;
-        } else {
-            final List<String> cmdLine = getRunCommandLine(executor);
-            cmdLine.add("--version");
-            try {
-                final StringBuilder versionOutput = new StringBuilder();
-                final ILineHandler linesHandler = new ILineHandler(){
-
-                    @Override
-                    public void processLine(final String line) {
-                        versionOutput.append(line);
-                    }
-                };
-                runExternalProcess(cmdLine, linesHandler);
-                final String ver = versionOutput.toString();
-                return ver.startsWith("Robot") ? ver
-                        + " (using Robot installation from "
-                        + location.getAbsolutePath() + ")" : version;
-            } catch (final IOException e) {
-                return version;
-            }
-        }
-    }
-
-
     public File getFile() {
         return location;
     }
 
-
     public void installRobotUsingPip(final ILineHandler linesHandler,
             final boolean useStableVersion) throws RobotEnvironmentException {
         if (isValidPythonInstallation()) {
-            final String cmd = getPythonExecutablePath((PythonInstallationDirectory) location);
+            final String cmd = getPythonExecutablePath();
             final List<String> cmdLine = new ArrayList<>();
             cmdLine.addAll(Arrays.asList(cmd, "-m", "pip", "install",
                     "--upgrade"));
@@ -569,144 +542,6 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    public RunCommandLine createCommandLineCall(final SuiteExecutor executor,
-            final List<String> classpath, final List<String> pythonpath,
-            final List<String> variableFilesPath, final File projectLocation,
-            final List<String> suites, final List<String> testCases,
-            final String userArguments, final List<String> includedTags,
-            final List<String> excludedTags, final boolean isDebugging)
-            throws IOException {
-
-        final String debugInfo = isDebugging ? "True" : "False";
-        final int port = findFreePort();
-
-        final List<String> cmdLine = new ArrayList<String>(getRunCommandLine(
-                executor, classpath, pythonpath, variableFilesPath));
-
-        addTags(cmdLine, includedTags, excludedTags);
-
-        cmdLine.add("--listener");
-        cmdLine.add(copyResourceFile("TestRunnerAgent.py").toPath() + ":"
-                + port + ":" + debugInfo);
-
-        for (final String suite : suites) {
-            cmdLine.add("-s");
-            cmdLine.add(suite);
-        }
-        for (final String testCase : testCases) {
-            cmdLine.add("-t");
-            cmdLine.add(testCase.trim());
-        }
-        if (!userArguments.trim().isEmpty()) {
-            cmdLine.addAll(ArgumentsConverter
-                    .fromJavaArgsToPythonLike(ArgumentsConverter
-                            .convertToJavaMainLikeArgs(userArguments)));
-        }
-        cmdLine.add(projectLocation.getAbsolutePath());
-        return new RunCommandLine(cmdLine, port);
-    }
-
-
-    private List<String> getRunCommandLine(final SuiteExecutor executor) {
-        final List<String> cmdLine = new ArrayList<String>();
-        if (executor == getInterpreter()) {
-            cmdLine.add(getPythonExecutablePath((PythonInstallationDirectory) location));
-            cmdLine.add("-m");
-            cmdLine.add("robot.run");
-        } else {
-            cmdLine.add(executor.executableName());
-            cmdLine.add("\""
-                    + getRunModulePath((PythonInstallationDirectory) location)
-                    + "\"");
-        }
-        return cmdLine;
-    }
-
-
-    private List<String> getRunCommandLine(final SuiteExecutor executor,
-            final List<String> classpath, final List<String> pythonpath,
-            final List<String> variableFilesPath) {
-        final List<String> cmdLine = new ArrayList<String>();
-        if (executor == getInterpreter()) {
-            cmdLine.add(getPythonExecutablePath((PythonInstallationDirectory) location));
-            augmentClasspath(cmdLine, executor, classpath);
-            cmdLine.add("-m");
-            cmdLine.add("robot.run");
-        } else {
-            cmdLine.add(executor.executableName());
-            augmentClasspath(cmdLine, executor, classpath);
-            cmdLine.add("\""
-                    + getRunModulePath((PythonInstallationDirectory) location)
-                    + "\"");
-        }
-        addPythonpath(cmdLine, pythonpath);
-        addVariableFilesPath(cmdLine, variableFilesPath);
-        return cmdLine;
-    }
-
-
-    private void augmentClasspath(final List<String> cmdLine,
-            final SuiteExecutor executor, final List<String> classpath) {
-        if (executor == SuiteExecutor.Jython) {
-            final String cpSeparator = isWindows() ? ";" : ":";
-
-            final String sysPath = System.getenv("CLASSPATH");
-            final List<String> wholeClasspath = newArrayList();
-            if (sysPath != null && !sysPath.isEmpty()) {
-                wholeClasspath.add(sysPath);
-            }
-            wholeClasspath.addAll(classpath);
-
-            final String cpath = Joiner.on(cpSeparator).join(wholeClasspath);
-
-            cmdLine.add("-J-cp");
-            cmdLine.add(cpath);
-        }
-    }
-
-
-    private void addPythonpath(final List<String> cmdLine,
-            final List<String> pythonpath) {
-        if (!pythonpath.isEmpty()) {
-            cmdLine.add("-P");
-            cmdLine.add(Joiner.on(":").join(pythonpath));
-        }
-    }
-
-
-    private void addVariableFilesPath(final List<String> cmdLine,
-            final List<String> variableFilesPath) {
-        if (!variableFilesPath.isEmpty()) {
-            for (final String path : variableFilesPath) {
-                cmdLine.add("-V");
-                cmdLine.add(path);
-            }
-        }
-    }
-
-
-    private void addTags(final List<String> cmdLine,
-            final List<String> includedTags, final List<String> excludedTags) {
-        for (final String tag : includedTags) {
-            cmdLine.add("-i");
-            cmdLine.add(tag);
-        }
-        for (final String tag : excludedTags) {
-            cmdLine.add("-e");
-            cmdLine.add(tag);
-        }
-    }
-
-
-    private static int findFreePort() {
-        try (ServerSocket socket = new ServerSocket(0)) {
-            return socket.getLocalPort();
-        } catch (final IOException e) {
-            return -1;
-        }
-    }
-
-
     public void startTestRunnerAgentHandler(final int port,
             final ILineHandler lineHandler,
             final IExecutionHandler executionHandler) {
@@ -719,27 +554,10 @@ public class RobotRuntimeEnvironment {
         handlerThread.start();
     }
     
-    public RunCommandLine createRunRemoteDebugTempScriptCmd(final int port) {
-        try {
-            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("RemoteDebugTempScript.py");
-            if (scriptFile != null) {
-                final String interpreterPath = location.toPath()
-                        .resolve(((PythonInstallationDirectory) location).getInterpreter().executableName())
-                        .toAbsolutePath()
-                        .toString();
-                return new RunCommandLine(Arrays.asList(interpreterPath, scriptFile.getAbsolutePath()), port);
-            }
-            return new RunCommandLine(new ArrayList<String>(), -1);
-        } catch (final IOException e) {
-            return new RunCommandLine(new ArrayList<String>(), -1);
-        }
-    }
-
     @Override
     public int hashCode() {
         return Objects.hash(location, version);
     }
-
 
     @Override
     public boolean equals(final Object obj) {
@@ -764,8 +582,7 @@ public class RobotRuntimeEnvironment {
             super(message);
         }
 
-        public RobotEnvironmentException(final String message,
-                final Throwable cause) {
+        public RobotEnvironmentException(final String message, final Throwable cause) {
             super(message, cause);
         }
     }
@@ -775,41 +592,16 @@ public class RobotRuntimeEnvironment {
 
         private final SuiteExecutor interpreter;
 
-
         // we dont' want anyone to create those objects; they should only be
         // created
         // when given uri is valid python location
-        private PythonInstallationDirectory(final URI uri,
-                final SuiteExecutor interpreter) {
+        private PythonInstallationDirectory(final URI uri, final SuiteExecutor interpreter) {
             super(uri);
             this.interpreter = interpreter;
         }
 
-
         SuiteExecutor getInterpreter() {
             return interpreter;
-        }
-    }
-
-    public static class RunCommandLine {
-
-        private final List<String> commandLine;
-        private final int port;
-
-
-        RunCommandLine(final List<String> commandLine, final int port) {
-            this.commandLine = new ArrayList<String>(commandLine);
-            this.port = port;
-        }
-
-
-        public String[] getCommandLine() {
-            return commandLine.toArray(new String[0]);
-        }
-
-
-        public int getPort() {
-            return port;
         }
     }
 }
