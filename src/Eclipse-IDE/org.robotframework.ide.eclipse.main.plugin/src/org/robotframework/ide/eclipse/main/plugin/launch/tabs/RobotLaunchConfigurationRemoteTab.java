@@ -34,6 +34,9 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 import org.robotframework.red.graphics.ImagesManager;
 
+import com.google.common.base.Optional;
+import com.google.common.primitives.Ints;
+
 /**
  * @author mmarzec
  *
@@ -66,7 +69,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
             @Override
             public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
+                scheduleUpdateJob();
             }
         });
 
@@ -79,7 +82,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
             @Override
             public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
+                scheduleUpdateJob();
             }
         });
         
@@ -92,7 +95,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
 
             @Override
             public void modifyText(final ModifyEvent e) {
-                updateLaunchConfigurationDialog();
+                scheduleUpdateJob();
             }
         });
         
@@ -102,7 +105,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         exportBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void widgetSelected(SelectionEvent e) {
+            public void widgetSelected(final SelectionEvent e) {
                 final DirectoryDialog dirDialog = new DirectoryDialog(parent.getShell());
                 final String fileName = "TestRunnerAgent.py";
                 dirDialog.setMessage("Choose \"" + fileName + "\" export destination.");
@@ -112,7 +115,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
                     try {
                         Files.copy(RobotRuntimeEnvironment.class.getResourceAsStream(fileName), scriptFile.toPath(),
                                 StandardCopyOption.REPLACE_EXISTING);
-                    } catch (IOException e1) {
+                    } catch (final IOException e1) {
                         e1.printStackTrace();
                     }
                 }
@@ -123,17 +126,20 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     }
 
     @Override
-    public void setDefaults(ILaunchConfigurationWorkingCopy configuration) {
+    public void setDefaults(final ILaunchConfigurationWorkingCopy configuration) {
         RobotLaunchConfiguration.fillDefaults(configuration);
     }
 
     @Override
-    public void initializeFrom(ILaunchConfiguration configuration) {
+    public void initializeFrom(final ILaunchConfiguration configuration) {
         try {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
+            final Optional<Integer> port = robotConfig.getRemoteDebugPort();
+            final Optional<Integer> timeout = robotConfig.getRemoteDebugTimeout();
+
             hostTxt.setText(robotConfig.getRemoteDebugHost());
-            portTxt.setText(robotConfig.getRemoteDebugPort());
-            timeoutTxt.setText(robotConfig.getRemoteDebugTimeout());
+            portTxt.setText(port.isPresent() ? port.get().toString() : "");
+            timeoutTxt.setText(timeout.isPresent() ? timeout.get().toString() : "");
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
@@ -160,11 +166,15 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     }
 
     @Override
-    public void performApply(ILaunchConfigurationWorkingCopy configuration) {
+    public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
         robotConfig.setRemoteDebugHost(hostTxt.getText().trim());
-        robotConfig.setRemoteDebugPort(portTxt.getText().trim());
-        robotConfig.setRemoteDebugTimeout(timeoutTxt.getText().trim());
+        if (Ints.tryParse(portTxt.getText().trim()) != null) {
+            robotConfig.setRemoteDebugPort(Ints.tryParse(portTxt.getText().trim()));
+        }
+        if (Ints.tryParse(timeoutTxt.getText().trim()) != null) {
+            robotConfig.setRemoteDebugTimeout(Ints.tryParse(timeoutTxt.getText().trim()));
+        }
     }
     
     @Override
@@ -182,7 +192,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             int port = -1;
             try {
                 port = Integer.parseInt(portTxt.getText());
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 return false;
             }
             if (port < 1 || port > 65535) {
@@ -197,7 +207,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
             int timeout = -1;
             try {
                 timeout = Integer.parseInt(timeoutTxt.getText());
-            } catch (NumberFormatException e) {
+            } catch (final NumberFormatException e) {
                 return false;
             }
             if (timeout < 1) {

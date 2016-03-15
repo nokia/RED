@@ -46,6 +46,10 @@ public class RedImages {
         return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_ETOOL_SAVE_EDIT);
     }
 
+    public static ImageDescriptor getFolderImage() {
+        return PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER);
+    }
+
     public static ImageDescriptor getRefreshImage() {
         return RedPlugin.getImageDescriptor("resources/refresh.png");
     }
