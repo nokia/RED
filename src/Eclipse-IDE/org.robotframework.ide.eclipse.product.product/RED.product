@@ -3,7 +3,6 @@
 
 <product name="RED" uid="org.robotframework.red" id="org.robotframework.red" application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
 
-
    <configIni use="default">
    </configIni>
 
@@ -36,7 +35,6 @@
             winExtraLargeHigh="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon256_32.bmp"/>
       </win>
    </launcher>
-
 
    <vm>
    </vm>
@@ -90,6 +88,7 @@ limitations under the License.
 
    <repositories>
       <repository location="http://master.dl.sourceforge.net/project/red-robot-editor/repository" enabled="true" />
+      <repository location="http://download.eclipse.org/eclipse/updates/4.5" enabled="true" />
    </repositories>
 
    <preferencesInfo>
