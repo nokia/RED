@@ -11,7 +11,7 @@ Bugs
 
 Enhancements
 
-	Arguments validation - arguments and keyword call
+    Arguments validation - arguments and keyword call
     Extend current RobotFileValidation to show an information get from parser
     provide validation for items in [sections] like teardown
     Make report files links clickable in robot console
