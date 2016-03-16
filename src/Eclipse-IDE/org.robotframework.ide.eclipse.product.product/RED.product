@@ -3,6 +3,7 @@
 
 <product name="RED" uid="org.robotframework.red" id="org.robotframework.red" application="org.eclipse.ui.ide.workbench" version="1.0.0.qualifier" useFeatures="true" includeLaunchers="true">
 
+
    <configIni use="default">
    </configIni>
 
@@ -35,6 +36,7 @@
             winExtraLargeHigh="../org.robotframework.ide.eclipse.product.plugin/icons/red_icon256_32.bmp"/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
@@ -72,6 +74,7 @@ limitations under the License.
       <feature id="org.eclipse.equinox.p2.extras.feature"/>
       <feature id="org.robotframework.ide.eclipse.main.feature" version="1.0.0.qualifier"/>
       <feature id="org.robotframework.ide.eclipse.product.feature" version="1.0.0.qualifier"/>
+      <feature id="org.eclipse.epp.mpc"/>
    </features>
 
    <configurations>
@@ -84,6 +87,10 @@ limitations under the License.
       <plugin id="org.eclipse.update.configurator" autoStart="true" startLevel="3" />
       <property name="org.eclipse.update.reconcile" value="false" />
    </configurations>
+
+   <repositories>
+      <repository location="http://master.dl.sourceforge.net/project/red-robot-editor/repository" enabled="true" />
+   </repositories>
 
    <preferencesInfo>
       <targetfile overwrite="false"/>
