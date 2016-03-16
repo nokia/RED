@@ -20,6 +20,11 @@
 	            <url>http://download.eclipse.org/releases/luna/</url>
 	            <layout>p2</layout>
 	        </repository>
+            <repository>
+                <id>marketplace-client</id>
+                <url>http://download.eclipse.org/mpc/luna/</url>
+                <layout>p2</layout>
+            </repository>
 	    </repositories>
     </profile>
     <profile>
@@ -36,6 +41,11 @@
                 <url>http://download.eclipse.org/releases/mars/</url>
                 <layout>p2</layout>
             </repository>
+            <repository>
+                <id>marketplace-client</id>
+                <url>http://download.eclipse.org/mpc/mars/</url>
+                <layout>p2</layout>
+            </repository>
         </repositories>
     </profile>
     <profile>
@@ -50,6 +60,12 @@
             <repository>
                 <id>eclipse-neon</id>
                 <url>http://download.eclipse.org/releases/neon/</url>
+                <layout>p2</layout>
+            </repository>
+            <repository>
+                <id>marketplace-client</id>
+                <!--  change to neon when update site will become available -->
+                <url>http://download.eclipse.org/mpc/mars/</url>
                 <layout>p2</layout>
             </repository>
         </repositories>
