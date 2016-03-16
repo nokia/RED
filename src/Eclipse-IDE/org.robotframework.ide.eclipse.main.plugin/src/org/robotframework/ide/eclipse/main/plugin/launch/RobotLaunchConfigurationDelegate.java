@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
@@ -377,10 +378,14 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         return Joiner.on('.').join(upperCased);
     }
 
-    private Collection<String> getTestsToRun(final RobotLaunchConfiguration robotConfig) throws CoreException {
+    private Collection<String> getTestsToRun(final RobotLaunchConfiguration robotConfig)
+            throws CoreException {
+        final String projectName = robotConfig.getProjectName();
         final List<String> tests = new ArrayList<>();
-        for (final List<String> suiteTests : robotConfig.getSuitePaths().values()) {
-            tests.addAll(suiteTests);
+        for (final Entry<String, List<String>> entries : robotConfig.getSuitePaths().entrySet()) {
+            for (final String testName : entries.getValue()) {
+                tests.add(createSuiteName(projectName, Path.fromPortableString(entries.getKey())) + "." + testName);
+            }
         }
         return tests;
     }
