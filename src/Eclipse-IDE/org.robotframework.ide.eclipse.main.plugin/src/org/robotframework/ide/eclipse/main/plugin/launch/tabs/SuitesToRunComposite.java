@@ -68,7 +68,6 @@ import com.google.common.base.Predicate;
 
 /**
  * @author mmarzec
- *
  */
 class SuitesToRunComposite extends Composite {
 
@@ -108,16 +107,13 @@ class SuitesToRunComposite extends Composite {
         viewer = new CheckboxTreeViewer(this, SWT.MULTI | SWT.BORDER | SWT.CHECK);
         viewer.setUseHashlookup(true);
         ViewersConfigurator.enableDeselectionPossibility(viewer);
-        GridDataFactory.fillDefaults()
-                .grab(true, true)
-                .span(1, 5)
-                .minSize(200, 130)
-                .applyTo(viewer.getTree());
+        GridDataFactory.fillDefaults().grab(true, true).span(1, 5).minSize(200, 130).applyTo(viewer.getTree());
 
         viewer.setCheckStateProvider(new CheckStateProvider());
         viewer.setLabelProvider(new DelegatingStyledCellLabelProvider(new CheckboxTreeViewerLabelProvider()));
         viewer.setContentProvider(new CheckboxTreeViewerContentProvider());
         viewer.addCheckStateListener(new ICheckStateListener() {
+
             @Override
             public void checkStateChanged(final CheckStateChangedEvent event) {
                 final Object element = event.getElement();
@@ -132,6 +128,7 @@ class SuitesToRunComposite extends Composite {
             }
         });
         viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
                 final Button removeButton = buttons.get(EButton.REMOVE);
@@ -182,6 +179,7 @@ class SuitesToRunComposite extends Composite {
                 dialog.setTitle("Select test suite");
                 dialog.setMessage("Select the test suite to execute:");
                 dialog.addFilter(new ViewerFilter() {
+
                     @Override
                     public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
                         return element instanceof IResource
@@ -195,16 +193,17 @@ class SuitesToRunComposite extends Composite {
                         if (chosenResource.getType() == IResource.PROJECT) {
                             continue;
                         }
-                        
+
                         final SuiteLaunchElement suite = new SuiteLaunchElement(chosenResource);
                         final List<RobotCase> cases = extractCases(chosenResource);
                         final List<TestCaseLaunchElement> tests = transform(cases,
                                 new Function<RobotCase, TestCaseLaunchElement>() {
-                            @Override
-                            public TestCaseLaunchElement apply(final RobotCase test) {
+
+                                    @Override
+                                    public TestCaseLaunchElement apply(final RobotCase test) {
                                         return new TestCaseLaunchElement(suite, test.getName(), false, false);
-                            }
-                        });
+                                    }
+                                });
                         for (final TestCaseLaunchElement test : tests) {
                             suite.addChild(test);
                         }
@@ -269,6 +268,7 @@ class SuitesToRunComposite extends Composite {
         GridDataFactory.fillDefaults().applyTo(deselectAll);
         deselectAll.setText("Deselect All");
         deselectAll.addSelectionListener(new SelectionAdapter() {
+
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 setLaunchElementsChecked(false);
@@ -322,13 +322,13 @@ class SuitesToRunComposite extends Composite {
                 final IResource resource = entry.getKey();
                 final SuiteLaunchElement suite = new SuiteLaunchElement(resource);
 
-                final List<String> allCases = newArrayList(suitesToRun.get(resource));
+                final List<String> allCases = newArrayList(entry.getValue());
 
                 final List<RobotCase> casesFromFile = extractCases(resource);
                 for (final RobotCase testCase : casesFromFile) {
                     final String name = testCase.getName();
-                    suite.addChild(new TestCaseLaunchElement(suite, name, entry.getValue().contains(name.toLowerCase()),
-                            false));
+                    suite.addChild(new TestCaseLaunchElement(suite, name,
+                            entry.getValue().isEmpty() || entry.getValue().contains(name.toLowerCase()), false));
                     allCases.remove(name);
                 }
                 for (final String missingSuite : allCases) {
@@ -353,7 +353,7 @@ class SuitesToRunComposite extends Composite {
 
         viewer.refresh();
     }
-    
+
     private static List<RobotCase> extractCases(final IResource resource) {
         final List<RobotCase> cases = new ArrayList<>();
 
@@ -371,13 +371,17 @@ class SuitesToRunComposite extends Composite {
         final LinkedHashMap<String, List<String>> suitesToRun = new LinkedHashMap<>();
 
         for (final SuiteLaunchElement suite : suitesToLaunch) {
-            final ArrayList<String> tests = new ArrayList<String>();
-            for (final TestCaseLaunchElement test : suite.getChildren()) {
-                if (test.isChecked()) {
-                    tests.add(test.getName().toLowerCase());
+            if (suite.isChecked()) {
+                final ArrayList<String> tests = new ArrayList<String>();
+                if (!suite.hasCheckedAllChildren()) {
+                    for (final TestCaseLaunchElement test : suite.getChildren()) {
+                        if (test.isChecked()) {
+                            tests.add(test.getName().toLowerCase());
+                        }
+                    }
                 }
+                suitesToRun.put(suite.getPath(), tests);
             }
-            suitesToRun.put(suite.getPath(), tests);
         }
         return suitesToRun;
     }
@@ -555,7 +559,7 @@ class SuitesToRunComposite extends Composite {
     private static final class TestCaseLaunchElement {
 
         private final String name;
-        
+
         private final SuiteLaunchElement parent;
 
         private boolean isChecked;
