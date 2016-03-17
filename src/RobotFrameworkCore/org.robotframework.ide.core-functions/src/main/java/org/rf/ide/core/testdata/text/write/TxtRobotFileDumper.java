@@ -177,7 +177,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
 
         if (!sortedSettings.isEmpty()) {
             final List<Section> settingSections = filterByType(sections, sectionWithHeaderPos, SectionType.SETTINGS);
-            final int lastIndexToDump = getLastSortedToDump(settingSections, sortedSettings);
+            final int lastIndexToDump = getLastSortedToDump(model, settingSections, sortedSettings);
             for (int settingIndex = 0; settingIndex <= lastIndexToDump; settingIndex++) {
                 if (!lines.isEmpty()) {
                     RobotLine lastLine = lines.get(lines.size() - 1);
@@ -2421,7 +2421,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
 
         if (!sortedVariables.isEmpty()) {
             final List<Section> varSections = filterByType(sections, sectionWithHeaderPos, SectionType.VARIABLES);
-            final int lastIndexToDump = getLastSortedToDump(varSections, sortedVariables);
+            final int lastIndexToDump = getLastSortedToDump(model, varSections, sortedVariables);
             for (int varIndex = 0; varIndex <= lastIndexToDump; varIndex++) {
                 if (!lines.isEmpty()) {
                     RobotLine lastLine = lines.get(lines.size() - 1);
@@ -3450,7 +3450,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         return EMPTY;
     }
 
-    private <T extends ARobotSectionTable> int getLastSortedToDump(final List<Section> sections,
+    private <T extends ARobotSectionTable> int getLastSortedToDump(final RobotFile model, final List<Section> sections,
             final List<AModelElement<T>> sortedElements) {
         final int size = sortedElements.size();
         int index = size - 1;
@@ -3483,6 +3483,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                         nextFound = 0;
                         nextStartFoundIndex = -1;
                     }
+
                 } else if (startPosForElements.contains(pos.getOffset())) {
                     index = elemIndex;
                     nextFound = 0;
@@ -3497,6 +3498,28 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                             break;
                         }
                     } else {
+                        Optional<Integer> line = model.getRobotLineIndexBy(pos.getOffset());
+                        if (line.isPresent()) {
+                            final int lineIndex = line.get();
+                            final RobotLine robotLine = model.getFileContent().get(lineIndex);
+                            final Optional<Integer> elementPositionInLine = robotLine
+                                    .getElementPositionInLine(var.getDeclaration());
+                            boolean wasSeparatorsOnly = false;
+                            if (elementPositionInLine.isPresent()) {
+                                for (int i = elementPositionInLine.get() - 1; i >= 0; i--) {
+                                    if (robotLine.getLineElements().get(i) instanceof Separator) {
+                                        wasSeparatorsOnly = true;
+                                    } else {
+                                        wasSeparatorsOnly = false;
+                                        break;
+                                    }
+                                }
+
+                                if (wasSeparatorsOnly) {
+                                    index = elemIndex;
+                                }
+                            }
+                        }
                         nextFound = 0;
                         nextStartFoundIndex = -1;
                     }
@@ -3693,7 +3716,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         }
 
         if (dumpEndIndex >= 0) {
-            for (int myIndex = tokenPosIndex + 1; myIndex < lineElements.size() && myIndex < dumpEndIndex; myIndex++) {
+            for (int myIndex = tokenPosIndex + 1; myIndex < lineElements.size() && myIndex <= dumpEndIndex; myIndex++) {
                 updateLine(model, lines, lineElements.get(myIndex));
             }
         }
