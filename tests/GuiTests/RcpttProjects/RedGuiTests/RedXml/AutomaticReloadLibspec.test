@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/15/16 5:11 PM
+Save-Time: 3/17/16 11:51 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -238,24 +238,13 @@ with [get-editor "MainClass.py" | get-text-viewer] {
 get-window "Regenerating library specification" 
     | get-label -index 1
     | get-property caption 
-    | equals "Problems occured during library specification generation: Unable to generate library specification file for library 'MainClass'\n"
-    + "Detailed information:\n"
-    + "Importing test library 'MainClass' failed: ImportError: cannot import name SimpleClass\n"
-    + "Traceback (most recent call last):\n"
-    + "  File \"D:\\aut-RED_ficzer_32_bit\\NewProject\\imports\\MainClass.py\", line 1, in <module>\n"
-    + "    from class_to_import import SimpleClass\n"
-    + "PYTHONPATH:\n"
-    + "  D:\\aut-RED_ficzer_32_bit\\NewProject\\imports\n"
-    + "  c:\\Python27\\lib\\site-packages\\setuptools-18.0.1-py2.7.egg\n"
-    + "  C:\\WINDOWS\\system32\\python27.zip\n"
-    + "  c:\\Python27\\DLLs\n"
-    + "  c:\\Python27\\lib\n"
-    + "  c:\\Python27\\lib\\plat-win\n"
-    + "  c:\\Python27\\lib\\lib-tk\n"
-    + "  c:\\Python27\n"
-    + "  c:\\Python27\\lib\\site-packages\n"
-    + "  c:\\Python27\\lib\\site-packages\\wx-2.8-msw-unicode\n\n"
-    + "Try --help for usage information." | verify-true
+    | matches "Problems occured during library specification generation: Unable to generate library specification file for library 'MainClass'\n"
+     + "Detailed information:\n"
+     + "Importing test library 'MainClass' failed: ImportError: cannot import name SimpleClass\n"
+     + "Traceback \(most recent call last\):\n(.*\n)+\n"
+     + "Try --help for usage information\." | verify-true
+     
+     
 get-window "Regenerating library specification" | get-button OK | click
 
 //------------------------
