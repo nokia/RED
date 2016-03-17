@@ -150,11 +150,11 @@ class TagsComposite extends Composite {
     }
 
     void installTagsProposalsSupport(final Map<IResource, List<String>> suitesToRun) {
-        if (tagsSupport == null || shouldRebuildProposals) {
-            tagsSupport = new TagsProposalsSupport(suitesToRun);
-            tagsSupport.install(tagNameText);
-        }
-        shouldRebuildProposals = false;
+//        if (tagsSupport == null || shouldRebuildProposals) {
+//            tagsSupport = new TagsProposalsSupport(suitesToRun);
+//            tagsSupport.install(tagNameText);
+//        }
+//        shouldRebuildProposals = false;
     }
 
     void markProposalsToRebuild() {
