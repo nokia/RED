@@ -6,18 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -36,18 +29,25 @@ import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.CheckStateChangedEvent;
+import org.eclipse.jface.viewers.ICheckStateListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
@@ -60,18 +60,14 @@ import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuitesListener;
-import org.robotframework.ide.eclipse.main.plugin.launch.tabs.TagsComposite.TagsListener;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
+import org.robotframework.ide.eclipse.main.plugin.launch.tabs.SuitesToRunComposite.SuiteLaunchElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 
 /**
@@ -86,18 +82,18 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     private Button checkEnvironmentBtn;
     private Text argumentsText;
     private Text interpreterArgumentsText;
+    private Text projectText;
+    private SuitesToRunComposite launchElementsTreeViewer;
     
     private Button includeTagsBtn;
     private Button excludeTagsBtn;
-    private TagsComposite includedTagsComposite;
-    private TagsComposite excludedTagsComposite;
-    private final Set<String> includedTags = newLinkedHashSet();
-    private final Set<String> excludedTags = newLinkedHashSet();
+    private ScrolledComposite excludedTagsScrolledComposite;
+    private ScrolledComposite includedTagsScrolledComposite;
+    private Composite excludedTagsComposite;
+    private Composite includedTagsComposite;
+    private List<String> includedTags = newArrayList();
+    private List<String> excludedTags = newArrayList();
 
-    private Text projectText;
-
-    private SuitesToRunComposite suitesToRunComposite;
-    
     @Override
     public void setDefaults(final ILaunchConfigurationWorkingCopy configuration) {
         RobotLaunchConfiguration.fillDefaults(configuration);
@@ -108,7 +104,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         try {
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
             final String projectName = robotConfig.getProjectName();
-
+            
             final boolean usesProjectInterpreter = robotConfig.isUsingInterpreterFromProject();
             useProjectExecutorButton.setSelection(usesProjectInterpreter);
             useSystemExecutorButton.setSelection(!usesProjectInterpreter);
@@ -118,44 +114,27 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             final List<String> executorNames = getSuiteExecutorNames();
             comboExecutorName.setItems(executorNames.toArray(new String[0]));
             comboExecutorName.select(executorNames.indexOf(robotConfig.getExecutor().name()));
-            argumentsText.setText(robotConfig.getExecutorArguments());
-            interpreterArgumentsText.setText(robotConfig.getInterpeterArguments());
-
-            final Map<IResource, List<String>> suitesToRun = collectSuitesToRun(robotConfig);
-            includeTagsBtn.setSelection(robotConfig.isIncludeTagsEnabled());
-            includedTags.clear();
-            includedTags.addAll(robotConfig.getIncludedTags());
-            includedTagsComposite.setInput(includedTags);
-            includedTagsComposite.installTagsProposalsSupport(suitesToRun);
-
-            excludeTagsBtn.setSelection(robotConfig.isExcludeTagsEnabled());
-            excludedTags.clear();
-            excludedTags.addAll(robotConfig.getExcludedTags());
-            excludedTagsComposite.setInput(excludedTags);
-            excludedTagsComposite.installTagsProposalsSupport(suitesToRun);
 
             projectText.setText(projectName);
-            suitesToRunComposite.initialize(projectName, suitesToRun);
+            argumentsText.setText(robotConfig.getExecutorArguments());
+            interpreterArgumentsText.setText(robotConfig.getInterpeterArguments());
+            
+            TagsProposalsSupport.clearTagProposals();
+            launchElementsTreeViewer.initLaunchElements(projectName, robotConfig.getSuitePaths(),
+                    robotConfig.getTestCasesNames());
 
+            clearNotSavedTags();
+            includeTagsBtn.setSelection(robotConfig.isIncludeTagsEnabled());
+            for (String tag : robotConfig.getIncludedTags()) {
+                createTag(includedTagsScrolledComposite, includedTagsComposite, includedTags, tag);
+            }
+            excludeTagsBtn.setSelection(robotConfig.isExcludeTagsEnabled());
+            for (String tag : robotConfig.getExcludedTags()) {
+                createTag(excludedTagsScrolledComposite, excludedTagsComposite, excludedTags, tag);
+            }
         } catch (final CoreException e) {
             setErrorMessage("Invalid launch configuration: " + e.getMessage());
         }
-    }
-
-    private Map<IResource, List<String>> collectSuitesToRun(final RobotLaunchConfiguration robotConfig)
-            throws CoreException {
-        final IProject project = robotConfig.getRobotProject().getProject();
-        
-        final Map<IResource, List<String>> suitesToRun = new HashMap<>();
-
-        final Map<String, List<String>> suitePaths = robotConfig.getSuitePaths();
-        for (final Entry<String, List<String>> entry : suitePaths.entrySet()) {
-            final IPath path = Path.fromPortableString(entry.getKey());
-            final IResource resource = path.getFileExtension() == null ? project.getFolder(path)
-                    : project.getFile(path);
-            suitesToRun.put(resource, entry.getValue());
-        }
-        return suitesToRun;
     }
 
     private List<String> getSuiteExecutorNames() {
@@ -171,7 +150,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
     @Override
     public void performApply(final ILaunchConfigurationWorkingCopy configuration) {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
-
+        
         robotConfig.setUsingInterpreterFromProject(useProjectExecutorButton.getSelection());
         if (comboExecutorName.getSelectionIndex() >= 0) {
             robotConfig.setExecutor(SuiteExecutor.fromName(comboExecutorName.getItem(comboExecutorName.getSelectionIndex())));
@@ -180,12 +159,13 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         robotConfig.setExecutorArguments(argumentsText.getText());
         robotConfig.setInterpeterArguments(interpreterArgumentsText.getText());
         
-        robotConfig.setSuitePaths(suitesToRunComposite.extractSuitesToRun());
+        robotConfig.setSuitePaths(launchElementsTreeViewer.extractCheckedSuitesPaths());
+        robotConfig.setTestCasesNames(launchElementsTreeViewer.extractCheckedTestCasesNames());
         
         robotConfig.setIsIncludeTagsEnabled(includeTagsBtn.getSelection());
-        robotConfig.setIncludedTags(newArrayList(includedTags));
+        robotConfig.setIncludedTags(includedTags);
         robotConfig.setIsExcludeTagsEnabled(excludeTagsBtn.getSelection());
-        robotConfig.setExcludedTags(newArrayList(excludedTags));
+        robotConfig.setExcludedTags(excludedTags);
     }
     
     @Override
@@ -196,9 +176,8 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
             final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(configuration);
 
             final String projectName = robotConfig.getProjectName();
-            suitesToRunComposite.switchTo(projectName);
             if (projectName.isEmpty()) {
-                setErrorMessage("Project '' does not exist in workspace");
+                setErrorMessage("Invalid project specified");
                 return false;
             }
             final IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
@@ -206,66 +185,34 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 setErrorMessage("Project '" + projectName + "' does not exist in workspace");
                 return false;
             }
-            if (!project.isOpen()) {
-                setErrorMessage("Project '" + projectName + "' is currently closed");
-                return false;
-            }
 
-            final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
-            final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
-
-            if (env == null || !env.isValidPythonInstallation() || !env.hasRobotInstalled()) {
-                final String additional = env.hasRobotInstalled() ? "" : " (missing Robot Framework)";
-                setErrorMessage("Project '" + projectName + "' is using invalid Python environment" + additional);
-                return false;
+            final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
+            final SuiteExecutor selectedExecutor = SuiteExecutor.fromName(comboExecutorName.getText());
+            final SuiteExecutor projectInterpreter = robotProject.getRuntimeEnvironment().getInterpreter();
+            if (selectedExecutor != projectInterpreter) {
+                setWarningMessage("The selected '" + comboExecutorName.getText() + "' interpreter is different "
+                        + "than the interpreter used by '" + projectName + "' (" + projectInterpreter + "). The test "
+                        + "will  be launched using " + comboExecutorName.getText()
+                        + " interpreter as defined in PATH environment variable");
             }
-            
-            final Map<IResource, List<String>> suitesToRun = collectSuitesToRun(robotConfig);
-            if (suitesToRun.isEmpty()) {
+            final List<String> suitePaths = robotConfig.getSuitePaths();
+
+            if (suitePaths.isEmpty()) {
                 setWarningMessage("There are no suites specified");
             }
 
-            includedTagsComposite.installTagsProposalsSupport(suitesToRun);
-            excludedTagsComposite.installTagsProposalsSupport(suitesToRun);
-
-            final List<String> problematicSuites = new ArrayList<>();
-            final List<String> problematicTests = new ArrayList<>();
-            for (final IResource resource : suitesToRun.keySet()) {
-                if (!resource.exists()) {
-                    problematicSuites.add(resource.getFullPath().toString());
-                } else if (resource.getType() == IResource.FILE) {
-                    final RobotSuiteFile suiteModel = RobotModelManager.getInstance().createSuiteFile((IFile) resource);
-                    final List<RobotCase> cases = new ArrayList<>();
-                    final Optional<RobotCasesSection> section = suiteModel.findSection(RobotCasesSection.class);
-                    if (section.isPresent()) {
-                        cases.addAll(section.get().getChildren());
-                    }
-
-                    for (final String caseName : suitesToRun.get(resource)) {
-                        boolean exist = false;
-                        for (final RobotCase test : cases) {
-                            if (test.getName().equalsIgnoreCase(caseName)) {
-                                exist = true;
-                                break;
-                            }
-                        }
-                        if (!exist) {
-                            problematicTests.add(caseName);
-                        }
-                    }
+            final List<String> problematic = newArrayList();
+            for (final String path : suitePaths) {
+                final IResource member = project.findMember(Path.fromPortableString(path));
+                if (member == null) {
+                    problematic.add(path);
                 }
             }
-            if (!problematicSuites.isEmpty()) {
-                setErrorMessage("Following suites does not exist: " + Joiner.on(", ").join(problematicSuites));
+            if (!problematic.isEmpty()) {
+                setErrorMessage("Following suites does not exist: " + Joiner.on(',').join(problematic));
                 return false;
             }
-            if (!problematicTests.isEmpty()) {
-                setErrorMessage("Following tests does not exist: " + Joiner.on(", ").join(problematicTests));
-                return false;
-            }
-
-            // we don't want to Enter key launch whole configuration when user is editing tags
-            return !excludedTagsComposite.userIsFocusingOnNewTab() && !includedTagsComposite.userIsFocusingOnNewTab();
+            return true;
         } catch (final Exception e) {
             setErrorMessage("Invalid file selected");
             return false;
@@ -305,7 +252,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         createExecutorGroup(composite);
         createTagsGroup(composite);
         createProjectGroup(composite);
-        createSuitesGroup(composite);
+        createTestSuitesGroup(composite);
 
         setControl(composite);
     }
@@ -314,7 +261,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         final Group executorGroup = new Group(topControl, SWT.NONE);
         executorGroup.setText("Executor");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executorGroup);
-        GridLayoutFactory.fillDefaults().numColumns(4).spacing(2, 2).margins(5, 5).applyTo(executorGroup);
+        GridLayoutFactory.fillDefaults().numColumns(3).margins(2, 1).applyTo(executorGroup);
 
         useProjectExecutorButton = new Button(executorGroup, SWT.RADIO);
         useProjectExecutorButton.setText("Use interpreter as defined in project configuration");
@@ -339,18 +286,17 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 updateLaunchConfigurationDialog();
             }
         });
-
+        
         comboExecutorName = new Combo(executorGroup, SWT.DROP_DOWN | SWT.READ_ONLY);
         comboExecutorName.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
-                scheduleUpdateJob();
+                updateLaunchConfigurationDialog();
             }
         });
         GridDataFactory.fillDefaults().applyTo(comboExecutorName);
         final Label systemExecutorLbl = new Label(executorGroup, SWT.NONE);
         systemExecutorLbl.setText("interpreter taken from sytem PATH environment variable");
-
 
         checkEnvironmentBtn = new Button(executorGroup, SWT.PUSH);
         checkEnvironmentBtn.setText("Check interpreter");
@@ -382,11 +328,11 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                 }
             }
         });
-
+        
         interpreterArgumentsText = createArgumentsFields(executorGroup, "Additional Python interpreter arguments:", 10);
         argumentsText = createArgumentsFields(executorGroup, "Additional Robot Framework arguments:", 0);
     }
-
+    
     private Text createArgumentsFields(final Composite parent, final String label, final int vIndent) {
         final Label lblArgs = new Label(parent, SWT.NONE);
         lblArgs.setText(label);
@@ -407,91 +353,40 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         });
         return argText;
     }
-
+    
     private void createTagsGroup(final Composite topControl) {
         final Group executorGroup = new Group(topControl, SWT.NONE);
         executorGroup.setText("Tags");
         GridDataFactory.fillDefaults().grab(true, false).applyTo(executorGroup);
         GridLayoutFactory.fillDefaults().numColumns(3).margins(2, 1).applyTo(executorGroup);
-
-        createTagsToIncludeControls(executorGroup);
-        createTagsToExcludeControls(executorGroup);
-    }
-
-    private void createTagsToIncludeControls(final Group executorGroup) {
-        includeTagsBtn = createTagsRadioButton(executorGroup, "Only run tests with these tags:");
-
-        includedTagsComposite = new TagsComposite(executorGroup);
-        GridDataFactory.fillDefaults()
-                .hint(200, SWT.DEFAULT)
-                .grab(true, true)
-                .span(2, 1)
-                .applyTo(includedTagsComposite);
-        includedTagsComposite.addTagsListener(new TagsListener() {
-            @Override
-            public void addTagRequested(final String tag) {
-                includedTags.add(tag);
-                includedTagsComposite.setInput(includedTags);
-                updateLaunchConfigurationDialog();
-            }
+        
+        includeTagsBtn = new Button(executorGroup, SWT.CHECK);
+        includeTagsBtn.setText("Only run tests with these tags:");
+        includeTagsBtn.addSelectionListener(new SelectionAdapter() {
 
             @Override
-            public void removeTagRequested(final String tag) {
-                includedTags.remove(tag);
-                includedTagsComposite.setInput(includedTags);
-                updateLaunchConfigurationDialog();
-            }
-
-            @Override
-            public void newTagIsEdited() {
-                scheduleUpdateJob();
-            }
-        });
-    }
-
-    private void createTagsToExcludeControls(final Group executorGroup) {
-        excludeTagsBtn = createTagsRadioButton(executorGroup, "Skip tests with these tags:");
-
-        excludedTagsComposite = new TagsComposite(executorGroup);
-        GridDataFactory.fillDefaults()
-                .hint(200, SWT.DEFAULT)
-                .grab(true, true)
-                .span(2, 1)
-                .applyTo(excludedTagsComposite);
-        excludedTagsComposite.addTagsListener(new TagsListener() {
-            @Override
-            public void addTagRequested(final String tag) {
-                excludedTags.add(tag);
-                excludedTagsComposite.setInput(excludedTags);
-                updateLaunchConfigurationDialog();
-            }
-
-            @Override
-            public void removeTagRequested(final String tag) {
-                excludedTags.remove(tag);
-                excludedTagsComposite.setInput(excludedTags);
-                updateLaunchConfigurationDialog();
-            }
-
-            @Override
-            public void newTagIsEdited() {
-                scheduleUpdateJob();
-            }
-        });
-    }
-
-    private Button createTagsRadioButton(final Composite parent, final String text) {
-        final Button button = new Button(parent, SWT.CHECK);
-        GridDataFactory.fillDefaults().indent(5, 3).align(SWT.BEGINNING, SWT.BEGINNING).applyTo(button);
-        button.setText(text);
-        button.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
+            public void widgetSelected(SelectionEvent e) {
                 updateLaunchConfigurationDialog();
             }
         });
-        return button;
+        GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(includeTagsBtn);
+        includedTagsScrolledComposite = new ScrolledComposite(executorGroup, SWT.H_SCROLL);
+        includedTagsComposite = new Composite(includedTagsScrolledComposite, SWT.NONE);
+        initScrolledComposite(includedTagsScrolledComposite, includedTagsComposite, includedTags);
+        
+        excludeTagsBtn = new Button(executorGroup, SWT.CHECK);
+        excludeTagsBtn.setText("Skip tests with these tags:");
+        excludeTagsBtn.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                updateLaunchConfigurationDialog();
+            }
+        });
+        GridDataFactory.fillDefaults().align(SWT.BEGINNING, SWT.BEGINNING).applyTo(excludeTagsBtn);
+        excludedTagsScrolledComposite = new ScrolledComposite(executorGroup, SWT.H_SCROLL);
+        excludedTagsComposite = new Composite(excludedTagsScrolledComposite, SWT.NONE);
+        initScrolledComposite(excludedTagsScrolledComposite, excludedTagsComposite, excludedTags);
     }
     
     private void createProjectGroup(final Composite composite) {
@@ -505,9 +400,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         projectText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
-                includedTagsComposite.markProposalsToRebuild();
-                excludedTagsComposite.markProposalsToRebuild();
-                scheduleUpdateJob();
+                updateLaunchConfigurationDialog();
             }
         });
 
@@ -539,30 +432,192 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
                         comboExecutorName.select(index);
                     }
                     projectText.setText(project.getName());
-
-                    includedTagsComposite.markProposalsToRebuild();
-                    excludedTagsComposite.markProposalsToRebuild();
+                    TagsProposalsSupport.clearProjectTagProposals();
+                    TagsProposalsSupport.setProject(project);
                     updateLaunchConfigurationDialog();
                 }
             }
         });
     }
 
-    private void createSuitesGroup(final Composite composite) {
+    private void createTestSuitesGroup(final Composite composite) {
         final Group projectGroup = new Group(composite, SWT.NONE);
         projectGroup.setText("Test Suite(s)");
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(projectGroup);
-        GridLayoutFactory.fillDefaults().applyTo(projectGroup);
+        GridDataFactory.fillDefaults().applyTo(projectGroup);
+        GridLayoutFactory.fillDefaults().numColumns(2).margins(2, 1).applyTo(projectGroup);
 
-        suitesToRunComposite = new SuitesToRunComposite(projectGroup);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(suitesToRunComposite);
-        suitesToRunComposite.addSuitesListener(new SuitesListener() {
+        launchElementsTreeViewer = new SuitesToRunComposite();
+        launchElementsTreeViewer.createCheckboxTreeViewer(projectGroup);
+        launchElementsTreeViewer.getViewer().addCheckStateListener(new ICheckStateListener() {
+            
             @Override
-            public void suitesChanged() {
-                includedTagsComposite.markProposalsToRebuild();
-                excludedTagsComposite.markProposalsToRebuild();
+            public void checkStateChanged(CheckStateChangedEvent event) {
+                launchElementsTreeViewer.updateCheckState(event.getElement(), event.getChecked());
+                updateLaunchConfigurationDialog();
+            }
+        });
+
+        final Button browseSuites = new Button(projectGroup, SWT.PUSH);
+        browseSuites.setText("Browse...");
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(browseSuites);
+        browseSuites.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final ElementTreeSelectionDialog dialog = new ElementTreeSelectionDialog(getShell(),
+                        new WorkbenchLabelProvider(), new BaseWorkbenchContentProvider());
+                dialog.setAllowMultiple(true);
+                dialog.setTitle("Select test suite");
+                dialog.setMessage("Select the test suite to execute:");
+                dialog.addFilter(new ViewerFilter() {
+                    @Override
+                    public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+                        return element instanceof IResource
+                                && ((IResource) element).getProject().getName().equals(projectText.getText());
+                    }
+                });
+                dialog.setInput(ResourcesPlugin.getWorkspace().getRoot());
+                if (dialog.open() == Window.OK) {
+                    for (final Object obj : dialog.getResult()) {
+                        final IPath pathToAdd = ((IResource) obj).getProjectRelativePath();
+                        final String suiteName = RobotLaunchConfigurationDelegate.createSuiteName(((IResource) obj));
+                        launchElementsTreeViewer.addSuiteElement(obj, pathToAdd.toPortableString(), suiteName);
+                    }
+                    updateLaunchConfigurationDialog();
+                }
+            }
+        });
+
+        final Button removeSuite = new Button(projectGroup, SWT.PUSH);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(removeSuite);
+        removeSuite.setText("Remove");
+        removeSuite.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final List<SuiteLaunchElement> selectedElements = Selections.getElements(
+                        (IStructuredSelection) launchElementsTreeViewer.getViewer().getSelection(), SuiteLaunchElement.class);
+                if (!selectedElements.isEmpty()) {
+                    launchElementsTreeViewer.removeSuiteElements(selectedElements);
+                    updateLaunchConfigurationDialog();
+                }
+            }
+        });
+        final Button selectAll = new Button(projectGroup, SWT.PUSH);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(selectAll);
+        selectAll.setText("Select All");
+        selectAll.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                launchElementsTreeViewer.setLaunchElementsChecked(true);
+                updateLaunchConfigurationDialog();
+            }
+        });
+        final Button deselectAll = new Button(projectGroup, SWT.PUSH);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(deselectAll);
+        deselectAll.setText("Deselect All");
+        deselectAll.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                launchElementsTreeViewer.setLaunchElementsChecked(false);
                 updateLaunchConfigurationDialog();
             }
         });
     }
+    
+    private void initScrolledComposite(final ScrolledComposite scrolledComposite, final Composite tagsComposite, final List<String> tags) {
+        scrolledComposite.setExpandHorizontal(true);
+        scrolledComposite.setExpandVertical(true);
+        scrolledComposite.setAlwaysShowScrollBars(false);
+        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).hint(0, 24).applyTo(scrolledComposite);
+        scrolledComposite.setContent(tagsComposite);
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(tagsComposite);
+        GridLayoutFactory.fillDefaults().numColumns(1).spacing(3, 0).applyTo(tagsComposite);
+        createAddTagComposite(scrolledComposite, tagsComposite, tags);
+    }
+    
+    private Composite createAddTagComposite(final ScrolledComposite parent, final Composite tagsComposite, final List<String> tags) {
+        final Composite addTagComposite = new Composite(tagsComposite, SWT.NONE);
+        GridDataFactory.fillDefaults().applyTo(addTagComposite);
+        GridLayoutFactory.fillDefaults().numColumns(2).spacing(1, 0).applyTo(addTagComposite);
+
+        final Text tagNameTxt = new Text(addTagComposite, SWT.BORDER);
+        GridDataFactory.fillDefaults().grab(false, false).hint(60, SWT.DEFAULT).applyTo(tagNameTxt);
+        TagsProposalsSupport.install(tagNameTxt);
+        
+        final Button addTagBtn = new Button(addTagComposite, SWT.PUSH);
+        addTagBtn.setImage(ImagesManager.getImage(RedImages.getAddImage()));
+        addTagBtn.setToolTipText("Add new tag");
+        GridDataFactory.fillDefaults().hint(22, 18).applyTo(addTagBtn);
+        addTagBtn.addSelectionListener(new SelectionAdapter() {
+            
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                createTag(parent, tagsComposite, tags, tagNameTxt.getText().trim());
+                tagNameTxt.setText("");
+            }
+        });
+        
+        parent.setMinSize(tagsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        return tagsComposite;
+    }
+    
+    private void createTag(final ScrolledComposite scrolledComposite, final Composite tagsComposite, final List<String> tags, final String text) {
+        
+        if (!text.equals("") && !tags.contains(text)) {
+            tags.add(text);
+            updateLaunchConfigurationDialog();
+
+            final GridLayout tagsCompositeLayout = (GridLayout) tagsComposite.getLayout();
+            tagsCompositeLayout.numColumns = tagsCompositeLayout.numColumns + 1;
+            final int childrenLengthBeforeAdding = tagsComposite.getChildren().length;
+
+            final Composite newTag = new Composite(tagsComposite, SWT.BORDER);
+            newTag.setBackground(tagsComposite.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+            newTag.setBackgroundMode(SWT.INHERIT_FORCE);
+            GridDataFactory.fillDefaults().grab(false, false).applyTo(newTag);
+            GridLayoutFactory.fillDefaults().numColumns(2).spacing(1, 0).applyTo(newTag);
+            
+            final CLabel newTagLabel = new CLabel(newTag, SWT.NONE);
+            newTagLabel.setImage(ImagesManager.getImage(RedImages.getTagImage()));
+            newTagLabel.setText(text);
+            GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 20).applyTo(newTagLabel);
+            
+            final Button newTagRemoveBtn = new Button(newTag, SWT.PUSH);
+            newTagRemoveBtn.setImage(ImagesManager.getImage(RedImages.getRemoveTagImage()));
+            newTagRemoveBtn.setToolTipText("Remove tag");
+            GridDataFactory.fillDefaults().hint(18, 16).applyTo(newTagRemoveBtn);
+            newTagRemoveBtn.addSelectionListener(new SelectionAdapter() {
+
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    tags.remove(newTagLabel.getText());
+                    newTag.dispose();
+                    tagsComposite.layout();
+                    updateLaunchConfigurationDialog();
+                }
+            });
+            
+            final Control[] children = tagsComposite.getChildren();
+            newTag.moveAbove(children[childrenLengthBeforeAdding-1]);
+
+            scrolledComposite.setMinSize(tagsComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+            tagsComposite.layout();
+            scrolledComposite.layout();
+        }
+    }
+    
+    private void clearNotSavedTags() {
+        includedTags.clear();
+        excludedTags.clear();
+        Control[] children = includedTagsComposite.getChildren();
+        for (int i = 0; i < children.length-1; i++) {
+            children[i].dispose();
+        }
+        children = excludedTagsComposite.getChildren();
+        for (int i = 0; i < children.length-1; i++) {
+            children[i].dispose();
+        }
+    }
+
 }
