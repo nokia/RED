@@ -238,12 +238,13 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         if (isRemoteDebugging) {
             if (isDebugServerSocketListening && socketManager.getServerSocket() != null) {
                 consoleFacade.writeLine(
-                        "Debug server is listening on " + host + ":" + remoteDebugPort + ", you can run a remote test");
+                        "Debug server is listening on " + host + ":" + remoteDebugPort.get()
+                                + ", you can run a remote test");
             } else {
                 if (eclipseProcess != null) {
                     eclipseProcess.terminate();
                 }
-                throw newCoreException("Cannot run Debug server on " + host + ":" + remoteDebugPort + ".");
+                throw newCoreException("Cannot run Debug server on " + host + ":" + remoteDebugPort.get() + ".");
             }
         }
         
