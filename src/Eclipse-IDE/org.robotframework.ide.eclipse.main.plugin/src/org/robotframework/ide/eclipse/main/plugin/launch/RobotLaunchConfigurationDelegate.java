@@ -295,7 +295,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         builder.addVariableFiles(robotProject.getVariableFilePaths());
 
         builder.suitesToRun(getSuitesToRun(suiteResources));
-        builder.testsToRun(getTestsToRun(robotConfig));
+        builder.testsToRun(robotConfig.getTestCasesNames());
 
         if (robotConfig.isIncludeTagsEnabled()) {
             builder.includeTags(robotConfig.getIncludedTags());
@@ -323,7 +323,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
     private Collection<IResource> getSuiteResources(final RobotLaunchConfiguration robotConfig, final IProject project)
             throws CoreException {
-        final Collection<String> suitePaths = robotConfig.getSuitePaths().keySet();
+        final Collection<String> suitePaths = robotConfig.getSuitePaths();
 
         final Map<String, IResource> resources = Maps.asMap(newHashSet(suitePaths), new Function<String, IResource>() {
             @Override
@@ -377,18 +377,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             }
         }));
         return Joiner.on('.').join(upperCased);
-    }
-
-    private Collection<String> getTestsToRun(final RobotLaunchConfiguration robotConfig)
-            throws CoreException {
-        final String projectName = robotConfig.getProjectName();
-        final List<String> tests = new ArrayList<>();
-        for (final Entry<String, List<String>> entries : robotConfig.getSuitePaths().entrySet()) {
-            for (final String testName : entries.getValue()) {
-                tests.add(createSuiteName(projectName, Path.fromPortableString(entries.getKey())) + "." + testName);
-            }
-        }
-        return tests;
     }
 
     private boolean waitForDebugServerSocket(final DebugSocketManager socketManager) {

@@ -6,9 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.navigator.actions;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
@@ -24,6 +22,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.red.viewers.Selections;
 
@@ -50,17 +49,20 @@ public class RunTestCaseAction extends Action implements IEnablementUpdatingActi
             @Override
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
 
-                final Map<IResource, List<String>> resourcesMapping = new HashMap<>();
-
                 final List<RobotCase> selectedTestCases = Selections.getElements(selection, RobotCase.class);
+
+                final List<IResource> suiteFiles = new ArrayList<IResource>();
+                final List<String> testCasesNames = new ArrayList<String>();
                 for (final RobotCase robotCase : selectedTestCases) {
                     final IResource suiteFile = robotCase.getSuiteFile().getFile();
-                    if (!resourcesMapping.containsKey(suiteFile)) {
-                        resourcesMapping.put(suiteFile, new ArrayList<String>());
+                    if (!suiteFiles.contains(suiteFile)) {
+                        suiteFiles.add(suiteFile);
                     }
-                    resourcesMapping.get(suiteFile).add(robotCase.getName());
+                    testCasesNames.add(RobotLaunchConfigurationDelegate.createSuiteName(suiteFile) + "."
+                            + robotCase.getName());
                 }
-                RobotLaunchConfiguration.createLaunchConfigurationForSelectedTestCases(resourcesMapping)
+
+                RobotLaunchConfiguration.createLaunchConfigurationForSelectedTestCases(suiteFiles, testCasesNames)
                         .launch(mode.launchMgrName, monitor);
 
                 return Status.OK_STATUS;
