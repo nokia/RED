@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
@@ -105,5 +106,17 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
         }
 
         return result;
+    }
+
+    public List<RobotToken> getTokensInElement() {
+        final List<RobotToken> tokens = new ArrayList<>(0);
+
+        for (final IRobotLineElement rle : typeToTokens.values()) {
+            if (rle instanceof RobotToken) {
+                tokens.add((RobotToken) rle);
+            }
+        }
+
+        return tokens;
     }
 }
