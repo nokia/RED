@@ -17,8 +17,11 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+
+import com.google.common.base.Optional;
 
 public class VariableTable extends ARobotSectionTable {
 
@@ -100,10 +103,6 @@ public class VariableTable extends ARobotSectionTable {
         variables.add(index, dict);
     }
 
-    public void updateComment(final String text) {
-
-    }
-
     public void removeVariable(final AVariable variable) {
         variables.remove(variable);
     }
@@ -118,5 +117,21 @@ public class VariableTable extends ARobotSectionTable {
 
     public boolean isEmpty() {
         return (variables.isEmpty());
+    }
+
+    public Optional<AVariable> findVariable(final IRobotLineElement partOfVariable) {
+        Optional<AVariable> res = Optional.absent();
+
+        for (final AVariable var : variables) {
+            final List<RobotToken> elems = var.getElementTokens();
+            for (final IRobotLineElement e : elems) {
+                if (e == partOfVariable) {
+                    res = Optional.of(var);
+                    break;
+                }
+            }
+        }
+
+        return res;
     }
 }
