@@ -1,0 +1,70 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _ps4noO0WEeWqTNBmS5Gi4w
+Element-Name: AutimaticReloadAfterRemovingProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _fGM4sOxZEeWqTNBmS5Gi4w
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 3/18/16 3:58 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open python file and change function name
+get-view "Project Explorer" | get-tree | select "RobotProject/file1.py" | select "RobotProject/file1.py" 
+    | select "RobotProject/file1.py" | get-menu "Open With/Text Editor" | click
+with [get-editor "file1.py" | get-text-viewer] {
+    set-caret-pos 1 8
+    type-text 2
+    key-type "M1+s"
+}
+
+//se if new value is in PE
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/file1 RobotProject \\(1\\)/Sum 2" | get-property index 
+    | equals 0 | verify-true
+get-view "Project Explorer" | get-tree | select "SecondProject/file2.py" | select "SecondProject/file2.py" 
+    | get-menu "Open With/Text Editor" | click
+
+//change function name in second project    
+with [get-editor "file2.py" | get-text-viewer] {
+    set-caret-pos 1 13
+    type-text 2
+    key-type "M1+s"
+}
+//check PE
+get-view "Project Explorer" | get-tree 
+    | get-item "SecondProject/Robot Referenced libraries/file2 SecondProject \\(1\\)" | get-property index | equals 0 
+    | verify-true
+    
+//delete first project    
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu Delete | click
+with [get-window "Delete Resources"] {
+    get-button "Delete project contents on disk (cannot be undone)" | check
+    get-button OK | click
+    get-window "Delete Resources" | get-button Continue | click
+}
+
+//clear to set watcher on second project
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+
+//change python file one more time
+with [get-editor "file2.py" | get-text-viewer] {
+    set-caret-pos 1 14
+    key-type BackSpace
+    type-text 3
+    key-type "M1+s"
+}
+//check if new lib was generated
+get-view "Project Explorer" | get-tree 
+    | get-item "SecondProject/Robot Referenced libraries/file2 SecondProject \\(1\\)/Multiply 3" | get-property index 
+    | equals 0 | verify-true
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
