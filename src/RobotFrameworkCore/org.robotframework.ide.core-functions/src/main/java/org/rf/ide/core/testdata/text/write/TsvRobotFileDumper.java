@@ -10,7 +10,7 @@ import java.io.File;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
-public class TxtRobotFileDumper extends ARobotFileDumper {
+public class TsvRobotFileDumper extends ARobotFileDumper {
 
     @Override
     public boolean canDumpFile(final File file) {
@@ -18,7 +18,7 @@ public class TxtRobotFileDumper extends ARobotFileDumper {
 
         if (file != null && file.isFile()) {
             final String fileName = file.getName().toLowerCase();
-            result = (fileName.endsWith(".txt") || fileName.endsWith(".robot"));
+            result = (fileName.endsWith(".tsv"));
         }
 
         return result;
