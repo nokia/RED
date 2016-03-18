@@ -237,12 +237,359 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
     }
 
     private void dumpSettingUnknown(final RobotFile model, final UnknownSetting unknown, final List<RobotLine> lines) {
+        final RobotToken unknownDec = unknown.getDeclaration();
+        final FilePosition filePosition = unknownDec.getFilePosition();
+        int fileOffset = -1;
+        if (filePosition != null && !filePosition.isNotSet()) {
+            fileOffset = filePosition.getOffset();
+        }
 
+        RobotLine currentLine = null;
+        if (fileOffset >= 0) {
+            Optional<Integer> lineIndex = model.getRobotLineIndexBy(fileOffset);
+            if (lineIndex.isPresent()) {
+                currentLine = model.getFileContent().get(lineIndex.get());
+            }
+        }
+
+        if (currentLine != null) {
+            dumpSeparatorsBeforeToken(model, currentLine, unknownDec, lines);
+        }
+
+        IRobotLineElement lastToken = unknownDec;
+        if (!unknownDec.isDirty() && currentLine != null) {
+            updateLine(model, lines, unknownDec);
+            final List<IRobotLineElement> lineElements = currentLine.getLineElements();
+            final int tokenPosIndex = lineElements.indexOf(unknownDec);
+            if (lineElements.size() - 1 > tokenPosIndex + 1) {
+                for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
+                    final IRobotLineElement nextElem = lineElements.get(index);
+                    final List<IRobotTokenType> types = nextElem.getTypes();
+                    if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
+                            || types.contains(RobotTokenType.ASSIGNMENT)) {
+                        updateLine(model, lines, nextElem);
+                        lastToken = nextElem;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        } else {
+            updateLine(model, lines, unknownDec);
+            lastToken = unknownDec;
+        }
+
+        RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
+        sorter.addPresaveSequenceForType(RobotTokenType.SETTING_UNKNOWN, 1, unknown.getTrashs());
+
+        final List<RobotToken> tokens = new ArrayList<>();
+
+        tokens.addAll(unknown.getTrashs());
+
+        Collections.sort(tokens, sorter);
+        // dump as it is
+        if (!lastToken.getFilePosition().isNotSet() && !getFirstBrokenChainPosition(tokens, true).isPresent()
+                && !tokens.isEmpty()) {
+            dumpAsItIs(model, lastToken, tokens, lines);
+            return;
+        }
+
+        int nrOfTokens = tokens.size();
+
+        final List<Integer> lineEndPos = new ArrayList<>(getLineEndPos(unknownDec, tokens));
+        if (nrOfTokens > 0) {
+            boolean wasMyLine = false;
+            for (int i = 0; i < nrOfTokens; i++) {
+                final RobotToken robotToken = tokens.get(i);
+                final FilePosition fp = robotToken.getFilePosition();
+                if (!fp.isNotSet()) {
+                    if (filePosition.getLine() == fp.getLine()) {
+                        wasMyLine = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!wasMyLine && currentLine != null) {
+                updateLine(model, lines, currentLine.getEndOfLine());
+                if (!tokens.isEmpty()) {
+                    Separator sep = getSeparator(model, lines, lastToken, tokens.get(0));
+                    if (sep.getTypes().contains(SeparatorType.PIPE)) {
+                        updateLine(model, lines, sep);
+                    }
+
+                    RobotToken lineContinueToken = new RobotToken();
+                    lineContinueToken.setRaw("...");
+                    lineContinueToken.setText("...");
+                    lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+
+                    updateLine(model, lines, lineContinueToken);
+
+                    updateLine(model, lines, sep);
+                }
+            }
+        }
+
+        for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
+            final IRobotLineElement tokElem = tokens.get(tokenId);
+            Separator sep = getSeparator(model, lines, lastToken, tokElem);
+            updateLine(model, lines, sep);
+            lastToken = sep;
+
+            updateLine(model, lines, tokElem);
+            lastToken = tokElem;
+
+            RobotLine currentLineTok = null;
+            if (!tokElem.getFilePosition().isNotSet()) {
+                currentLineTok = null;
+                if (fileOffset >= 0) {
+                    Optional<Integer> lineIndex = model.getRobotLineIndexBy(tokElem.getFilePosition().getOffset());
+                    if (lineIndex.isPresent()) {
+                        currentLineTok = model.getFileContent().get(lineIndex.get());
+                    }
+                }
+
+                if (currentLineTok != null && !tokElem.isDirty()) {
+                    List<IRobotLineElement> lineElements = currentLineTok.getLineElements();
+                    int thisTokenPosIndex = lineElements.indexOf(tokElem);
+                    if (thisTokenPosIndex >= 0) {
+                        if (lineElements.size() - 1 > thisTokenPosIndex + 1) {
+                            final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);
+                            if (nextElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                                updateLine(model, lines, nextElem);
+                                lastToken = nextElem;
+                            }
+                        }
+                    }
+                }
+            }
+
+            boolean dumpAfterSep = false;
+            if (tokenId + 1 < nrOfTokens) {
+                if (!tokElem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                        && !tokElem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+                    IRobotLineElement nextElem = tokens.get(tokenId + 1);
+                    if (nextElem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                            || nextElem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+                        dumpAfterSep = true;
+                    }
+                }
+            } else {
+                dumpAfterSep = true;
+            }
+
+            if (dumpAfterSep && currentLine != null) {
+                dumpSeparatorsAfterToken(model, currentLine, lastToken, lines);
+            }
+
+            // sprawdzenie czy nie ma konca linii
+            if (lineEndPos.contains(tokenId)) {
+                if (currentLine != null) {
+                    updateLine(model, lines, currentLine.getEndOfLine());
+                } else {
+                    // new end of line
+                }
+
+                if (!tokens.isEmpty() && tokenId + 1 < nrOfTokens) {
+                    Separator sepNew = getSeparator(model, lines, lastToken, tokens.get(tokenId + 1));
+                    if (sepNew.getTypes().contains(SeparatorType.PIPE)) {
+                        updateLine(model, lines, sepNew);
+                    }
+
+                    RobotToken lineContinueToken = new RobotToken();
+                    lineContinueToken.setRaw("...");
+                    lineContinueToken.setText("...");
+                    lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+
+                    updateLine(model, lines, lineContinueToken);
+
+                    // updateLine(model, lines, sepNew);
+                }
+            }
+        }
     }
 
     private void dumpSettingVariablesImport(final RobotFile model, final VariablesImport variables,
             final List<RobotLine> lines) {
+        final RobotToken varImp = variables.getDeclaration();
+        final FilePosition filePosition = varImp.getFilePosition();
+        int fileOffset = -1;
+        if (filePosition != null && !filePosition.isNotSet()) {
+            fileOffset = filePosition.getOffset();
+        }
 
+        RobotLine currentLine = null;
+        if (fileOffset >= 0) {
+            Optional<Integer> lineIndex = model.getRobotLineIndexBy(fileOffset);
+            if (lineIndex.isPresent()) {
+                currentLine = model.getFileContent().get(lineIndex.get());
+            }
+        }
+
+        if (currentLine != null) {
+            dumpSeparatorsBeforeToken(model, currentLine, varImp, lines);
+        }
+
+        IRobotLineElement lastToken = varImp;
+        if (!varImp.isDirty() && currentLine != null) {
+            updateLine(model, lines, varImp);
+            final List<IRobotLineElement> lineElements = currentLine.getLineElements();
+            final int tokenPosIndex = lineElements.indexOf(varImp);
+            if (lineElements.size() - 1 > tokenPosIndex + 1) {
+                for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
+                    final IRobotLineElement nextElem = lineElements.get(index);
+                    final List<IRobotTokenType> types = nextElem.getTypes();
+                    if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
+                            || types.contains(RobotTokenType.ASSIGNMENT)) {
+                        updateLine(model, lines, nextElem);
+                        lastToken = nextElem;
+                    } else {
+                        break;
+                    }
+                }
+            }
+        } else {
+            updateLine(model, lines, varImp);
+            lastToken = varImp;
+        }
+
+        List<RobotToken> varsPaths = new ArrayList<>(0);
+        if (variables.getPathOrName() != null) {
+            varsPaths.add(variables.getPathOrName());
+        }
+
+        RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
+        sorter.addPresaveSequenceForType(RobotTokenType.SETTING_VARIABLES_FILE_NAME, 1, varsPaths);
+        sorter.addPresaveSequenceForType(RobotTokenType.SETTING_VARIABLES_ARGUMENT, 2, variables.getArguments());
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3, variables.getComment());
+
+        final List<RobotToken> tokens = new ArrayList<>();
+
+        tokens.addAll(varsPaths);
+        tokens.addAll(variables.getArguments());
+        tokens.addAll(variables.getComment());
+
+        Collections.sort(tokens, sorter);
+        // dump as it is
+        if (!lastToken.getFilePosition().isNotSet() && !getFirstBrokenChainPosition(tokens, true).isPresent()
+                && !tokens.isEmpty()) {
+            dumpAsItIs(model, lastToken, tokens, lines);
+            return;
+        }
+
+        int nrOfTokens = tokens.size();
+
+        final List<Integer> lineEndPos = new ArrayList<>(getLineEndPos(varImp, tokens));
+        if (nrOfTokens > 0) {
+            boolean wasMyLine = false;
+            for (int i = 0; i < nrOfTokens; i++) {
+                final RobotToken robotToken = tokens.get(i);
+                final FilePosition fp = robotToken.getFilePosition();
+                if (!fp.isNotSet()) {
+                    if (filePosition.getLine() == fp.getLine()) {
+                        wasMyLine = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!wasMyLine && currentLine != null) {
+                updateLine(model, lines, currentLine.getEndOfLine());
+                if (!tokens.isEmpty()) {
+                    Separator sep = getSeparator(model, lines, lastToken, tokens.get(0));
+                    if (sep.getTypes().contains(SeparatorType.PIPE)) {
+                        updateLine(model, lines, sep);
+                    }
+
+                    RobotToken lineContinueToken = new RobotToken();
+                    lineContinueToken.setRaw("...");
+                    lineContinueToken.setText("...");
+                    lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+
+                    updateLine(model, lines, lineContinueToken);
+
+                    updateLine(model, lines, sep);
+                }
+            }
+        }
+
+        for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
+            final IRobotLineElement tokElem = tokens.get(tokenId);
+            Separator sep = getSeparator(model, lines, lastToken, tokElem);
+            updateLine(model, lines, sep);
+            lastToken = sep;
+
+            updateLine(model, lines, tokElem);
+            lastToken = tokElem;
+
+            RobotLine currentLineTok = null;
+            if (!tokElem.getFilePosition().isNotSet()) {
+                currentLineTok = null;
+                if (fileOffset >= 0) {
+                    Optional<Integer> lineIndex = model.getRobotLineIndexBy(tokElem.getFilePosition().getOffset());
+                    if (lineIndex.isPresent()) {
+                        currentLineTok = model.getFileContent().get(lineIndex.get());
+                    }
+                }
+
+                if (currentLineTok != null && !tokElem.isDirty()) {
+                    List<IRobotLineElement> lineElements = currentLineTok.getLineElements();
+                    int thisTokenPosIndex = lineElements.indexOf(tokElem);
+                    if (thisTokenPosIndex >= 0) {
+                        if (lineElements.size() - 1 > thisTokenPosIndex + 1) {
+                            final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);
+                            if (nextElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                                updateLine(model, lines, nextElem);
+                                lastToken = nextElem;
+                            }
+                        }
+                    }
+                }
+            }
+
+            boolean dumpAfterSep = false;
+            if (tokenId + 1 < nrOfTokens) {
+                if (!tokElem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                        && !tokElem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+                    IRobotLineElement nextElem = tokens.get(tokenId + 1);
+                    if (nextElem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                            || nextElem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+                        dumpAfterSep = true;
+                    }
+                }
+            } else {
+                dumpAfterSep = true;
+            }
+
+            if (dumpAfterSep && currentLine != null) {
+                dumpSeparatorsAfterToken(model, currentLine, lastToken, lines);
+            }
+
+            // sprawdzenie czy nie ma konca linii
+            if (lineEndPos.contains(tokenId)) {
+                if (currentLine != null) {
+                    updateLine(model, lines, currentLine.getEndOfLine());
+                } else {
+                    // new end of line
+                }
+
+                if (!tokens.isEmpty() && tokenId + 1 < nrOfTokens) {
+                    Separator sepNew = getSeparator(model, lines, lastToken, tokens.get(tokenId + 1));
+                    if (sepNew.getTypes().contains(SeparatorType.PIPE)) {
+                        updateLine(model, lines, sepNew);
+                    }
+
+                    RobotToken lineContinueToken = new RobotToken();
+                    lineContinueToken.setRaw("...");
+                    lineContinueToken.setText("...");
+                    lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+
+                    updateLine(model, lines, lineContinueToken);
+
+                    // updateLine(model, lines, sepNew);
+                }
+            }
+        }
     }
 
     private void dumpSettingResourceImport(final RobotFile model, final ResourceImport resource,
@@ -2677,7 +3024,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                         if (rt.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
                                 || rt.getTypes().contains(RobotTokenType.ASSIGNMENT)) {
                             dumps.add(rt);
-                        } else if (isVariableContinue(dumps, rt)) {
+                        } else if (isContinue(dumps, rt)) {
                             dumps.add(rt);
                         } else if (startToken == rt) {
                             continue;
@@ -2741,7 +3088,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         }
     }
 
-    private boolean isVariableContinue(final List<IRobotLineElement> dumps, final IRobotLineElement l) {
+    private boolean isContinue(final List<IRobotLineElement> dumps, final IRobotLineElement l) {
         boolean result = false;
 
         if (l.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
@@ -3475,8 +3822,8 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
             }
 
             for (int elemIndex = 0; elemIndex < size; elemIndex++) {
-                final AModelElement<T> var = sortedElements.get(elemIndex);
-                FilePosition pos = var.getBeginPosition();
+                final AModelElement<T> e = sortedElements.get(elemIndex);
+                FilePosition pos = e.getBeginPosition();
                 if (pos.isNotSet()) {
                     if (size == index || elemIndex - 1 == index) {
                         index = elemIndex;
@@ -3484,12 +3831,14 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                         nextStartFoundIndex = -1;
                     }
 
-                } else if (startPosForElements.contains(pos.getOffset())) {
+                } else if (startPosForElements.contains(pos.getOffset())
+                        || containsOneOfElementOffset(e, startPosForElements)) {
                     index = elemIndex;
                     nextFound = 0;
                     nextStartFoundIndex = -1;
                 } else {
-                    if (nextStartPosForElements.contains(pos.getOffset())) {
+                    if (nextStartPosForElements.contains(pos.getOffset())
+                            || containsOneOfElementOffset(e, nextStartPosForElements)) {
                         if (nextStartFoundIndex == -1) {
                             nextStartFoundIndex = elemIndex;
                             nextFound++;
@@ -3503,7 +3852,7 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
                             final int lineIndex = line.get();
                             final RobotLine robotLine = model.getFileContent().get(lineIndex);
                             final Optional<Integer> elementPositionInLine = robotLine
-                                    .getElementPositionInLine(var.getDeclaration());
+                                    .getElementPositionInLine(e.getDeclaration());
                             boolean wasSeparatorsOnly = false;
                             if (elementPositionInLine.isPresent()) {
                                 for (int i = elementPositionInLine.get() - 1; i >= 0; i--) {
@@ -3528,6 +3877,20 @@ public class TxtRobotFileDumper implements IRobotFileDumper {
         }
 
         return index;
+    }
+
+    public <T extends ARobotSectionTable> boolean containsOneOfElementOffset(final AModelElement<T> e,
+            final Set<Integer> startPositions) {
+        boolean result = false;
+        final List<RobotToken> elementTokens = e.getElementTokens();
+        for (final RobotToken rt : elementTokens) {
+            if (startPositions.contains(rt.getFilePosition().getOffset())) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
     }
 
     private void dumpTestCaseTable(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
