@@ -13,11 +13,14 @@ import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver;
 import org.rf.ide.core.testdata.mapping.table.ElementPositionResolver.PositionExpected;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+
+import com.google.common.base.Optional;
 
 public class SectionBuilder {
 
@@ -65,7 +68,7 @@ public class SectionBuilder {
                         sections.get(sections.size() - 1).addSubSection(section);
                     }
                 } else if (currentSectionType == SectionType.VARIABLES || currentSectionType == SectionType.VARIABLE) {
-                    if (isVariableDeclaration(line, elemIndex)) {
+                    if (isVariableDeclaration(model, line, elemIndex)) {
                         currentSectionType = SectionType.VARIABLE;
                         section = new Section(currentSectionType, lineElements.get(0).getFilePosition());
                         sections.get(sections.size() - 1).addSubSection(section);
@@ -189,7 +192,7 @@ public class SectionBuilder {
             for (final IRobotTokenType tokenType : types) {
                 if (tokenType instanceof RobotTokenType) {
                     RobotTokenType type = (RobotTokenType) tokenType;
-                    if (type.isSettingDeclaration() && type.getTypesForKeywordsTable().contains(type)) {
+                    if (type.isSettingDeclaration() && RobotTokenType.getTypesForKeywordsTable().contains(type)) {
                         result = true;
                         break;
                     }
@@ -240,7 +243,7 @@ public class SectionBuilder {
             for (final IRobotTokenType tokenType : types) {
                 if (tokenType instanceof RobotTokenType) {
                     RobotTokenType type = (RobotTokenType) tokenType;
-                    if (type.isSettingDeclaration() && type.getTypesForTestCasesTable().contains(type)) {
+                    if (type.isSettingDeclaration() && RobotTokenType.getTypesForTestCasesTable().contains(type)) {
                         result = true;
                         break;
                     }
@@ -261,7 +264,7 @@ public class SectionBuilder {
         return result && isCorrectTestCaseDeclaration(line, elementIndex);
     }
 
-    private boolean isVariableDeclaration(final RobotLine line, int elementIndex) {
+    private boolean isVariableDeclaration(final RobotFile model, final RobotLine line, int elementIndex) {
         boolean result = false;
         IRobotLineElement elem = line.getLineElements().get(elementIndex);
         if (elem instanceof RobotToken) {
@@ -269,7 +272,9 @@ public class SectionBuilder {
             for (final IRobotTokenType tokenType : types) {
                 if (tokenType instanceof RobotTokenType) {
                     RobotTokenType type = (RobotTokenType) tokenType;
-                    if (type.isSettingDeclaration() && type.getTypesForVariablesTable().contains(type)) {
+                    if ((type.isSettingDeclaration() && RobotTokenType.getTypesForVariablesTable().contains(type))
+                            || (type == RobotTokenType.START_HASH_COMMENT
+                                    && isUnknownVariableStart(model, line, elem))) {
                         result = true;
                         break;
                     }
@@ -277,6 +282,22 @@ public class SectionBuilder {
             }
         }
         return result && isCorrectVariableDeclaration(line, elementIndex);
+    }
+
+    private boolean isUnknownVariableStart(final RobotFile model, final RobotLine line, final IRobotLineElement elem) {
+        boolean result = false;
+        FilePosition filePosition = elem.getFilePosition();
+        if (!filePosition.isNotSet()) {
+            final Optional<AVariable> var = model.getVariableTable().findVariable(elem);
+            if (var.isPresent()) {
+                AVariable v = var.get();
+                if (v.getDeclaration().getRaw().isEmpty()) {
+                    result = (v.getElementTokens().indexOf(elem) == 1);
+                }
+            }
+        }
+
+        return result;
     }
 
     private boolean isSettingDeclaration(final RobotLine line, int elementIndex) {
@@ -287,7 +308,7 @@ public class SectionBuilder {
             for (final IRobotTokenType tokenType : types) {
                 if (tokenType instanceof RobotTokenType) {
                     RobotTokenType type = (RobotTokenType) tokenType;
-                    if (type.isSettingDeclaration() && type.getTypesForSettingsTable().contains(type)) {
+                    if (type.isSettingDeclaration() && RobotTokenType.getTypesForSettingsTable().contains(type)) {
                         result = true;
                         break;
                     }
