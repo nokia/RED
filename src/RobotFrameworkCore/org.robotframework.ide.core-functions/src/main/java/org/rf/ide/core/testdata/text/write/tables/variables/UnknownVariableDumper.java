@@ -17,7 +17,7 @@ import org.rf.ide.core.testdata.text.write.tables.ANotExecutableTableElementDump
 public class UnknownVariableDumper extends ANotExecutableTableElementDumper {
 
     public UnknownVariableDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, ModelType.SCALAR_VARIABLE_DECLARATION_IN_TABLE);
+        super(aDumpHelper, ModelType.UNKNOWN_VARIABLE_DECLARATION_IN_TABLE);
     }
 
     @Override
