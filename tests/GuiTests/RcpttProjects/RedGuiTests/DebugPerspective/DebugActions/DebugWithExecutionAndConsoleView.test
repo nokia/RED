@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OVxNoN8BEeWvV6AMcH1t9Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/14/16 2:54 PM
+Save-Time: 3/21/16 5:17 PM
 Tags: Debug
 Testcase-Type: ecl
 Verifications: _ytMH0N-fEeWvV6AMcH1t9Q
@@ -60,12 +60,15 @@ exec-with-options -disableJobWaiting -command {
 	    get-item "RobotProject/TestFile/test 2" | get-property "image.path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/testrun.png" | verify-true
 	}
+	get-tab-folder -index 6 | get-tab-item "Message Log" | click
     get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 6 15
     wait 1000
     get-button "Resume (F8)" | click
+    
+  
 }
 
-wait 4000
+wait 5000
 
 get-view Console | get-text-viewer | get-property text 
     | matches "Command: .*\n"
@@ -93,10 +96,11 @@ get-view Console | get-text-viewer | get-property text
     + "Log:     .*log.html\n"
     + "Report:  .*report.html" | verify-true
 
-wait 2000
+get-view Console | get-text-viewer | set-caret-pos 17 3
+wait 500
+
 //wait for execution view    
-try -times 4 -delay 1000 -command{
-	get-view "Execution View" | get-tree | get-item "RobotProject.*" | get-property "image.path" 
-       | equals "org.robotframework.ide.eclipse.main.plugin/resources/tsuiteok.png" | verify-true
-}
+get-view "Execution View" | get-tree | get-item "RobotProject.*" | get-property "image.path" 
+   | equals "org.robotframework.ide.eclipse.main.plugin/resources/tsuiteok.png" | verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
