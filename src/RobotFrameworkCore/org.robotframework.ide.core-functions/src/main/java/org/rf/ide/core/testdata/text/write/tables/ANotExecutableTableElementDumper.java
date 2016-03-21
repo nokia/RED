@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
@@ -34,8 +35,11 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
 
     private final DumperHelper aDumpHelper;
 
-    public ANotExecutableTableElementDumper(final DumperHelper aDumpHelper) {
+    private final ModelType servedType;
+
+    public ANotExecutableTableElementDumper(final DumperHelper aDumpHelper, final ModelType servedType) {
         this.aDumpHelper = aDumpHelper;
+        this.servedType = servedType;
     }
 
     protected DumperHelper getDumperHelper() {
@@ -44,11 +48,11 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
 
     @Override
     public boolean isServedType(final AModelElement<? extends ARobotSectionTable> element) {
-        return false;
+        return (element.getModelType() == servedType);
     }
 
     public abstract RobotElementsComparatorWithPositionChangedPresave getSorter(
-            final AModelElement<ARobotSectionTable> currentElement);
+            final AModelElement<? extends ARobotSectionTable> currentElement);
 
     @Override
     public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
@@ -196,7 +200,7 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
                 getDumperHelper().dumpSeparatorsAfterToken(model, currentLine, lastToken, lines);
             }
 
-            // sprawdzenie czy nie ma konca linii
+            // check if is not end of line
             if (lineEndPos.contains(tokenId)) {
                 if (currentLine != null) {
                     getDumperHelper().updateLine(model, lines, currentLine.getEndOfLine());
