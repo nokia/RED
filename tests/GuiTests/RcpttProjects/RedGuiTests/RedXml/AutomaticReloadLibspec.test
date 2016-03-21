@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/21/16 12:01 PM
+Save-Time: 3/21/16 2:43 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -260,15 +260,14 @@ get-window "Regenerating library specification" | get-button OK | click
 
 // remove entire project (for one file RCPPT cannot see window with error)
 exec-with-options {
-get-view "Project Explorer" | get-tree | select NewProject | get-menu Delete | click
-with [get-window "Delete Resources"] {
-    get-button "Delete project contents on disk (cannot be undone)" | check
-    get-button OK | click
-    if [$is_product]{
-    	get-window "Delete Resources" | get-button Continue | click
-    }
-}
-   verify-error {get-window "Problem Occurred"}
+	get-view "Project Explorer" | get-tree | select NewProject | get-menu Refresh | click
+	get-view "Project Explorer" | get-tree | select NewProject | get-menu Delete | click
+	with [get-window "Delete Resources"] {
+	    get-button "Delete project contents on disk (cannot be undone)" | check
+	    get-button OK | click
+	    
+	}
+	   verify-error {get-window "Problem Occurred"}
 } -allowStatusDialog   
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
