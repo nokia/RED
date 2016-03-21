@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _PG3S0DE7EeWbDptfbJdvqQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/17/16 11:28 AM
+Save-Time: 3/21/16 3:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -28,10 +28,22 @@ if [$is_product |eq true]{
 	    get-item OnlyRobotSuiteFile | get-property "image.decorations[0].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_suite_folder.png" | verify-true
 	    get-item OnlyRobotSuiteFile | get-property "image.decorations[1].path" 
-	        | equals "org.eclipse.jdt.ui.*/error_co.gif" | verify-true
+	        | equals "org.eclipse.jdt.ui.*error_co.*" | verify-true
 	    get-item OnlyRobotSuiteFile | get-property "image.decorations[2].path" 
 	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
 	}
+//	
+//	get-view "Project Explorer" | get-tree | select OnlyRobotSuiteFile
+//	with [get-view "Project Explorer" | get-tree] {
+//	    get-item OnlyRobotSuiteFile | get-property "image.decorations[0].path" 
+//	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/decorator_suite_folder.png" | verify-true
+//	    get-item OnlyRobotSuiteFile | get-property "image.decorations[1].path" 
+//	        | equals "org.eclipse.jdt.ui/$nl$/icons/full/ovr16/error_co.png" | verify-true
+//	    get-item OnlyRobotSuiteFile | get-property "image.decorations[2].path" 
+//	        | equals "org.robotframework.ide.eclipse.main.plugin/resources/error.png" | verify-true
+//}
+	
+	
 }	
 
 get-eclipse-window | get-object | save-screenshot [substitute-variables "${workspace_loc}/images/actual.png"]  
