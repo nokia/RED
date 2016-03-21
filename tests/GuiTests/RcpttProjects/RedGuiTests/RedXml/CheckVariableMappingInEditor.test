@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yxxmEJHxEeWEZYgZQ8Au9A
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 12/17/15 9:51 AM
+Save-Time: 3/21/16 12:33 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,23 +18,24 @@ Entry-Name: .content
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/TestSuite.robot" | double-click
 // check if there are zero problems
 get-tab-folder -index 4 | get-tab-item Problems | click
+
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
 get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 
 // modify resource path to include variable ${path}
 with [get-editor "TestSuite.robot" | get-text-viewer] {
-    set-caret-pos 7 13
-    key-type Del -times 15
+    set-caret-pos 7 25
+    select-range 7 28 7 13
+    wait 100
+    key-type BackSpace
     type-text "${path}"
-
 }
 
 // error shows that resource path is parametrised 
 get-view Problems | get-tree | get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
     | equals "The library name/path '${path}/res_1.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
     | verify-true
-get-eclipse-window | key-type "TRAVERSE_ESCAPE"
-get-eclipse-window | key-type ESC
-
 
 // open red.xml and add Variable mapping  ${path} => resource_folder
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
