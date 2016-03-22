@@ -68,7 +68,7 @@ public class RobotArtifactsValidator {
 
         try {
             final Optional<? extends ModelUnitValidator> validator = createValidationUnits(context, file,
-                    ProblemsReportingStrategy.reportOnly(), true);
+                    ProblemsReportingStrategy.reportOnly(), true, false);
             if (validator.isPresent()) {
                 final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
 
@@ -181,7 +181,7 @@ public class RobotArtifactsValidator {
             @Override
             public boolean visit(final IResource resource) throws CoreException {
                 final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context, resource,
-                        reporter, false);
+                        reporter, false, true);
                 if (validationUnit.isPresent()) {
                     final ModelUnitValidator unit = validationUnit.get();
                     validators.add(unit);
@@ -202,7 +202,7 @@ public class RobotArtifactsValidator {
                 if (delta.getKind() != IResourceDelta.REMOVED && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
                     final IResource file = delta.getResource();
                     final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context, file,
-                            reporter, false);
+                            reporter, false, false);
                     if (validationUnit.isPresent()) {
                         validators.add(new ModelUnitValidator() {
 
@@ -221,8 +221,9 @@ public class RobotArtifactsValidator {
     }
 
     private static Optional<? extends ModelUnitValidator> createValidationUnits(final ValidationContext context,
-            final IResource resource, final ProblemsReportingStrategy reporter, final boolean isRevalidating)
-            throws CoreException {
+            final IResource resource, final ProblemsReportingStrategy reporter, final boolean isRevalidating,
+            final boolean isValidatingWholeProject) throws CoreException {
+        context.setIsValidatingChangedFiles(!isRevalidating && !isValidatingWholeProject);
         return shouldValidate(context.getProjectConfiguration(), resource, isRevalidating) ? createProperValidator(
                 context, (IFile) resource, reporter) : Optional.<ModelUnitValidator> absent();
     }

@@ -81,6 +81,10 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     private Button addLibspecButton;
     
+    private Button autoLibDiscoverButton;
+    
+    private Button showAutoLibDiscoverDialogButton;
+    
     private Button autoLibReloadButton;
 
     private ControlDecoration decoration;
@@ -106,7 +110,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
         createButtons(internalComposite);
         
-        createAutomaticLibReloadButton(internalComposite);
+        createAutoReloadAndDiscoverButtons(internalComposite);
 
         setInput();
     }
@@ -176,11 +180,43 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addLibspecHandler();
     }
     
-    private void createAutomaticLibReloadButton(final Composite parent) {
-        final Composite autoReloadComposite = toolkit.createComposite(parent);
-        GridLayoutFactory.fillDefaults().margins(0, 5).applyTo(autoReloadComposite);
+    private void createAutoReloadAndDiscoverButtons(final Composite parent) {
+        final Composite composite = toolkit.createComposite(parent);
+        GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 3).applyTo(composite);
 
-        autoLibReloadButton = toolkit.createButton(autoReloadComposite,
+        autoLibDiscoverButton = toolkit.createButton(composite, "Auto discover libraries after test suite save action",
+                SWT.CHECK);
+        autoLibDiscoverButton
+                .setSelection(editorInput.getProjectConfiguration().isReferencedLibrariesAutoDiscoveringEnabled());
+        showAutoLibDiscoverDialogButton = toolkit.createButton(composite,
+                "Show discovering summary after test suite save action", SWT.CHECK);
+        showAutoLibDiscoverDialogButton
+                .setSelection(editorInput.getProjectConfiguration().isLibrariesAutoDiscoveringSummaryWindowEnabled());
+
+        autoLibDiscoverButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final boolean selection = autoLibDiscoverButton.getSelection();
+                editorInput.getProjectConfiguration().setReferencedLibrariesAutoDiscoveringEnabled(selection);
+                if (!selection) {
+                    showAutoLibDiscoverDialogButton.setSelection(selection);
+                    editorInput.getProjectConfiguration().setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
+                }
+                setDirty(true);
+            }
+        });
+        showAutoLibDiscoverDialogButton.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final boolean selection = showAutoLibDiscoverDialogButton.getSelection();
+                editorInput.getProjectConfiguration().setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
+                setDirty(true);
+            }
+        });
+        
+        autoLibReloadButton = toolkit.createButton(composite,
                 "Automatically reload changed libraries", SWT.CHECK);
         autoLibReloadButton.setSelection(editorInput.getProjectConfiguration().isReferencedLibrariesAutoReloadEnabled());
         autoLibReloadButton.addSelectionListener(new SelectionAdapter() {
@@ -323,6 +359,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addPythonLibButton.setEnabled(false);
         addJavaLibButton.setEnabled(false);
         addLibspecButton.setEnabled(false);
+        autoLibDiscoverButton.setEnabled(false);
+        showAutoLibDiscoverDialogButton.setEnabled(false);
         autoLibReloadButton.setEnabled(false);
         viewer.getTable().setEnabled(false);
     }
@@ -339,6 +377,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addPythonLibButton.setEnabled(isEditable);
         addJavaLibButton.setEnabled(isEditable && projectIsInterpretedByJython);
         addLibspecButton.setEnabled(isEditable);
+        autoLibDiscoverButton.setEnabled(isEditable);
+        showAutoLibDiscoverDialogButton.setEnabled(isEditable);
         autoLibReloadButton.setEnabled(isEditable);
         viewer.getTable().setEnabled(isEditable);
 

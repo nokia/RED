@@ -26,15 +26,15 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.base.Splitter;
 
-class PythonLibStructureBuilder {
+public class PythonLibStructureBuilder {
     
     private final RobotRuntimeEnvironment environment;
 
-    PythonLibStructureBuilder(final RobotRuntimeEnvironment environment) {
+    public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment) {
         this.environment = environment;
     }
 
-    Collection<PythonClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
+    public Collection<PythonClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
         
         final List<String> classes = environment.getClassesDefinedInModule(new File(path));
         return newLinkedHashSet(transform(classes, new Function<String, PythonClass>() {
@@ -45,7 +45,7 @@ class PythonLibStructureBuilder {
         }));
     }
 
-    static final class PythonClass {
+    public static final class PythonClass {
         private final String qualifiedName;
 
         private PythonClass(final String qualifiedName) {
@@ -70,11 +70,11 @@ class PythonLibStructureBuilder {
             }
         }
 
-        String getQualifiedName() {
+        public String getQualifiedName() {
             return qualifiedName;
         }
 
-        ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
+        public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
             final IPath path = new Path(fullLibraryPath);
             final IPath pathWithoutModuleName = fullLibraryPath.endsWith("__init__.py") ? path.removeLastSegments(2)
                     : path.removeLastSegments(1);
