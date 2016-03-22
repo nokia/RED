@@ -67,6 +67,8 @@ public class ValidationContext {
     private final Map<ReferencedLibrary, LibrarySpecification> referencedAccessibleLibraries;
 
     private BuildLogger logger;
+    
+    private boolean isValidatingChangedFiles;
 
     public ValidationContext(final IProject project, final BuildLogger logger) {
         this(RedPlugin.getModelManager().getModel(), project, logger);
@@ -123,6 +125,14 @@ public class ValidationContext {
 
     public Map<ReferencedLibrary, LibrarySpecification> getReferencedLibrarySpecifications() {
         return referencedAccessibleLibraries;
+    }
+
+    public boolean isValidatingChangedFiles() {
+        return isValidatingChangedFiles;
+    }
+
+    public void setIsValidatingChangedFiles(boolean isValidatingChangedFiles) {
+        this.isValidatingChangedFiles = isValidatingChangedFiles;
     }
 
     public FileValidationContext createUnitContext(final IFile file) {

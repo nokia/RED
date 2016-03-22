@@ -690,6 +690,11 @@
                 visible="true">
           </separator>
           <command
+                commandId="org.robotframework.red.autoDiscoverLibraries"
+                label="Automatically discover and add libraries to red.xml"
+                style="push">
+          </command>
+          <command
                 commandId="org.robotframework.red.addLibraryFromNavigator"
                 label="Add Library to red.xml"
                 style="push">
@@ -813,6 +818,39 @@
 		  </with>
 	   </activeWhen>
 	</handler>
+	
+	<handler
+		  class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.LibrariesAutoDiscoverHandler"
+		  commandId="org.robotframework.red.autoDiscoverLibraries">
+	   <activeWhen>
+		  <with
+				variable="selection">
+			 <iterate
+				   ifEmpty="false"
+				   operator="or">
+				<or>
+				   <instanceof
+						 value="org.eclipse.core.resources.IFile">
+				   </instanceof>
+				   <test
+						 property="org.eclipse.core.resources.projectNature"
+						 value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+				   </test>
+				</or>
+				<or>
+				   <instanceof
+						 value="org.eclipse.core.resources.IProject">
+				   </instanceof>
+				   <test
+						 property="org.eclipse.core.resources.projectNature"
+						 value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+				   </test>
+				</or>
+			 </iterate>
+		  </with>
+	   </activeWhen>
+	</handler>
+	
  </extension>
  <extension
        point="org.eclipse.ui.themes">
@@ -1026,6 +1064,11 @@
           categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.addLibraryFromNavigator"
           name="Add Library">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.autoDiscoverLibraries"
+          name="Auto Discover Libraries">
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
