@@ -6,8 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4M2r0AB_EeWittqS49qH2Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/17/16 5:29 PM
-Tags: Unstable
+Save-Time: 3/22/16 5:08 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -93,38 +92,33 @@ let [val RobotDisplayedVersion [get-window Preferences | get-table | get-item "R
 	
 	
 	    
-	//check librery description
+	//check library description
 	get-view "Project Explorer" | get-tree | select [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"]
 	with [get-view "Project Explorer" | get-tree] {
 	    get-item [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"]
 	        | equals [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"]
 	}
+	
+	//create new project
 	get-menu "File/New/Robot Project" | click
 	with [get-window "New Robot project"] {
 	    get-editbox -after [get-label "Project name:"] | set-text "To_remove"
 	    get-button Finish | click
 	}
 	
-	//check if has label
-	if [get-by-os -linux "Linux" -win "Windows"|equals "Windows"]{ 
-		with [get-view "Project Explorer" | get-tree] {
-		    get-item [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
-		        | get-property caption | equals [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
-		      
-		}
-	}-else{
-		 get-view "Project Explorer" | get-tree 
-	    | get-item [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
-	    | get-property caption | equals [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
-	    
+	//check labels fro 2 projects
+	with [get-view "Project Explorer" | get-tree] {
+	    get-item [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
+	        | get-property caption | equals [concat "RobotProject/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
+	      
+	}
+
+	get-view "Project Explorer" | get-tree 
+    	| get-item [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
+    		| get-property caption | equals [concat "To_remove/Robot Standard libraries [" $RobotDisplayedVersion "]"] 
+    
 		
-	}
-	
-	get-view "Project Explorer" | get-tree | select "To_remove" | get-menu Delete | click
-	with [get-window "Delete Resources"] {
-	    get-button "Delete project contents on disk (cannot be undone)" | check
-	    get-button OK | click
-	}
+
 }
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
