@@ -34,7 +34,8 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "variableMappings", "libraries", "remoteLocations",
         "referencedVariableFiles", "excludedPath", "isValidatedFileSizeCheckingEnabled", "validatedFileMaxSize",
-        "isReferencedLibrariesAutoReloadEnabled" })
+        "isReferencedLibrariesAutoReloadEnabled", "isReferencedLibrariesAutoDiscoveringEnabled",
+        "isLibrariesAutoDiscoveringSummaryWindowEnabled" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
@@ -73,6 +74,12 @@ public class RobotProjectConfig {
     
     @XmlElement(name = "isReferencedLibrariesAutoReloadEnabled", required = false)
     private boolean isReferencedLibrariesAutoReloadEnabled = true;
+    
+    @XmlElement(name = "isReferencedLibrariesAutoDiscoveringEnabled", required = false)
+    private boolean isReferencedLibrariesAutoDiscoveringEnabled = true;
+    
+    @XmlElement(name = "isLibrariesAutoDiscoveringSummaryWindowEnabled", required = false)
+    private boolean isLibrariesAutoDiscoveringSummaryWindowEnabled = false;
 
     public static RobotProjectConfig create() {
         final RobotProjectConfig configuration = new RobotProjectConfig();
@@ -161,6 +168,22 @@ public class RobotProjectConfig {
 
     public boolean isReferencedLibrariesAutoReloadEnabled() {
         return this.isReferencedLibrariesAutoReloadEnabled;
+    }
+
+    public boolean isReferencedLibrariesAutoDiscoveringEnabled() {
+        return isReferencedLibrariesAutoDiscoveringEnabled;
+    }
+
+    public void setReferencedLibrariesAutoDiscoveringEnabled(boolean isReferencedLibrariesAutoDiscoveringEnabled) {
+        this.isReferencedLibrariesAutoDiscoveringEnabled = isReferencedLibrariesAutoDiscoveringEnabled;
+    }
+    
+    public boolean isLibrariesAutoDiscoveringSummaryWindowEnabled() {
+        return isLibrariesAutoDiscoveringSummaryWindowEnabled;
+    }
+
+    public void setLibrariesAutoDiscoveringSummaryWindowEnabled(boolean isLibrariesAutoDiscoveringSummaryWindowEnabled) {
+        this.isLibrariesAutoDiscoveringSummaryWindowEnabled = isLibrariesAutoDiscoveringSummaryWindowEnabled;
     }
 
     public void addExcludedPath(final IPath path) {

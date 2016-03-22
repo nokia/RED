@@ -99,7 +99,7 @@ public class JarStructureBuilder {
             return qualifiedName;
         }
 
-        ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
+        public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
             final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
             referencedLibrary.setType(LibraryType.JAVA.toString());
             referencedLibrary.setName(qualifiedName);

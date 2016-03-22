@@ -257,9 +257,17 @@ public class RedImages {
     public static ImageDescriptor getSuccessImage() {
         return RedPlugin.getImageDescriptor("resources/success.png");
     }
+    
+    public static ImageDescriptor getBigSuccessImage() {
+        return RedPlugin.getImageDescriptor("resources/success_big.png");
+    }
 
     public static ImageDescriptor getErrorImage() {
         return RedPlugin.getImageDescriptor("resources/error.png");
+    }
+    
+    public static ImageDescriptor getFatalErrorImage() {
+        return RedPlugin.getImageDescriptor("resources/error_fatal.png");
     }
 
     public static ImageDescriptor getWarningImage() {
@@ -297,7 +305,11 @@ public class RedImages {
     public static ImageDescriptor getRemoteDisconnectedImage() {
         return RedPlugin.getImageDescriptor("resources/remote_disconnected.png");
     }
-
+    
+    public static ImageDescriptor getElementImage() {
+        return RedPlugin.getImageDescriptor("resources/generic_element.png");
+    }
+    
     public static ImageDescriptor getImageForFileWithExtension(final String extension) {
         final String extWithoutDot = extension.startsWith(".") ? extension.substring(1) : extension;
         return PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor("file." + extWithoutDot);

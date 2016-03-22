@@ -26,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -36,6 +37,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 
 /**
@@ -166,9 +168,13 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     static class LibraryImportValidator extends GeneralSettingsImportsValidator {
 
+        private Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer;
+        
         public LibraryImportValidator(final FileValidationContext validationContext, final RobotSuiteFile suiteFile,
-                final List<LibraryImport> imports, final ProblemsReportingStrategy reporter) {
+                final List<LibraryImport> imports, final ProblemsReportingStrategy reporter,
+                final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer) {
             super(validationContext, suiteFile, imports, reporter);
+            this.librariesAutoDiscoverer = librariesAutoDiscoverer;
         }
 
         @Override
@@ -239,6 +245,10 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 final Map<String, Object> additional = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
                         pathOrName, AdditionalMarkerAttributes.IS_PATH, isPath);
                 reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
+                
+                if(librariesAutoDiscoverer.isPresent()) {
+                    librariesAutoDiscoverer.get().start();
+                }
             }
         }
     }
