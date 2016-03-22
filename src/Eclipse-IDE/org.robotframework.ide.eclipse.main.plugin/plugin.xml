@@ -577,7 +577,7 @@
           visibleInUI="true">
     </commonFilter>
     <commonFilter
-          activeByDefault="true"
+          activeByDefault="false"
           class="org.robotframework.ide.eclipse.main.plugin.navigator.filters.NonRobotProjectsFilter"
           description="Hide all non-Robot projects"
           id="org.robotframework.filters.nonRobotProjectsFilter"
