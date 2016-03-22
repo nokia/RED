@@ -60,7 +60,7 @@ elif original_path.endswith(".zip") or original_path.endswith(".jar"):
                 else:
                     found[obj.__module__] = module
         for v in found.keys():
-            print v
+            print(v)
     if toRemove:
         sys.path.remove(original_path)
 
