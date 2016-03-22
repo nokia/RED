@@ -1,0 +1,113 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: QuickFixForAddingVariableToVariableMapping
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _GMqJwPAeEeWaPYsPoxpwyA
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 3/22/16 12:24 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open editor
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+//set Library with non-existing variable
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Library    ${folder}/file.py\n"
+    + "*** Test Cases ***" 
+//use quick fix    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    hover-text 2 20
+    set-caret-pos 2 24
+    get-menu "Quick Fix" | click
+}
+//check window
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Define '${folder}' variable" 
+    | click -default
+with [get-window "Add variable mapping"] {
+    get-label "Specify name and value of variable which will be used in parameterized imports." | get-property caption 
+        | equals "Specify name and value of variable which will be used in parameterized imports." | verify-true
+    with [get-control Any] {
+        get-property "getChildren().Control[0].getChildren().Control[0].getText()" 
+            | equals "Specify name and value of variable which will be used in parameterized imports." | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[1].getText()" | equals Name | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[2].getText()" | equals "${folder}" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[3].getText()" | equals Value | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[4].getText()" | equals value | verify-true
+    }
+    get-button OK | get-property enablement | equals true | verify-true
+    get-button Cancel | get-property caption | equals Cancel | verify-true
+}
+
+//press cancel
+get-window "Add variable mapping" | get-button Cancel | click
+
+//check that no new window was open
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "*TestFile.robot" | verify-true
+    get-property activePage | equals "*TestFile.robot" | verify-true
+    get-property tabCount | equals 1 | verify-true
+}
+
+//open red.xml and see in no new variable was added
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-section "Variables mappings" | get-table | get-property itemCount | equals 1 
+    | verify-true
+
+//switch to other tab in red.xml and close view   
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Variable files" | click
+    close
+}
+
+//use quick fix one more time
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 2 27
+    hover-text 2 20
+    get-menu "Quick Fix" | click
+}
+
+//add value
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "Define '${folder}' variable" 
+    | click -default
+with [get-window "Add variable mapping"] {
+    get-editbox -after [get-label Value] | set-text "folder_path"
+    get-button OK | click
+}
+
+//check that red.xml was opened
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "*TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "*RobotProject/red.xml" | verify-true
+    get-property activePage | equals "*RobotProject/red.xml" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+
+//see that active page is General
+with [get-editor "RobotProject/red.xml" | get-tab-folder] {
+    get-property activePage | equals General | verify-true
+    get-property tabCount | equals 4 | verify-true
+}
+
+//check param and value in table
+with [get-editor "RobotProject/red.xml" | get-section "Variables mappings" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-item "${folder}" | get-property "values['Variable name']" | equals "${folder}" | verify-true
+    get-item "${folder}" | get-property "values['Value']" | equals "folder_path" | verify-true
+}
+//clean and check error (variable is now resolved)
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+get-tab-folder -index 1 | get-tab-item "*TestFile.robot" | click
+get-tab-folder -index 4 | get-tab-item Problems | click
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(1 item\\)/Unknown 'folder_path\\/file.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        | get-property index | equals 0 | verify-true
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
