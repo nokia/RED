@@ -22,6 +22,7 @@ import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -52,6 +53,10 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
     public IFile getFile() {
         return file;
     }
+    
+    public RobotProjectConfig getProjectConfiguration() {
+        return context.getProjectConfiguration();
+    }
 
     public RobotVersion getVersion() {
         return context.getVersion();
@@ -70,6 +75,10 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
             accessibleVariables = context.collectAccessibleVariables(file);
         }
         return accessibleVariables;
+    }
+    
+    public boolean isValidatingChangedFiles() {
+        return context.isValidatingChangedFiles();
     }
 
     private static final class ValidationKeywordCollector implements AccessibleKeywordsCollector {

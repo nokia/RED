@@ -338,9 +338,12 @@ class TestRunnerAgent:
         
     def resource_import(self, name, attributes):
         self._send_socket("resource_import", name, attributes)
+        
+    def library_import(self, name, attributes):
+        self._send_socket("library_import", name, attributes)
 
     def message(self, message):
-        pass
+        self._send_socket("message", message)
 
     def log_message(self, message):
         if _is_logged(message['level']):
