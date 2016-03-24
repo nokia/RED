@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/21/16 12:35 PM
+Save-Time: 3/24/16 2:41 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -27,15 +27,16 @@ with [get-editor "Script.robot" | get-text-viewer] {
     key-type Enter
     type-text "empty_file/empty.py"
     key-type "M1+s"
-    hover-text 4 24
-    set-caret-pos 4 24
-    get-menu "Quick Fix" | click
-    wait 300
 }
 
 //add this file to red.xml
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Discover 'empty_file\\/empty.py' and add to configuration" | click -default
+get-view Problems | get-tree 
+    | select "Errors (1 item)/Unknown 'empty_file\\/empty.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+    | get-menu "Quick Fix" | click
+with [get-window "Quick Fix"] {
+    get-table | select "Discover 'empty_file\\/empty.py' and add to configuration"
+    get-button Finish | click
+}
     
 try -times 10 -delay 1000 -command{
 	get-editor "RobotProject/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
