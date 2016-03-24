@@ -23,7 +23,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
@@ -406,21 +405,21 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             possiblePathsToLib = PathsResolver.resolveToAbsolutePossiblePaths(this,
                     PathsResolver.resolveParametrizedPath(getProject(), toImportPathOrName).toPortableString());
         }
-        if (possiblePathsToLib != null && !possiblePathsToLib.isEmpty()) {
-            for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibraries()
-                    .entrySet()) {
-                if (entry.getValue() != null) {
-                    final IPath refLibPath = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(new Path(
-                            entry.getKey().getFilepath().toString()));
-                    for (final IPath possiblePath : possiblePathsToLib) {
-                        if (possiblePath.equals(refLibPath)) {
-                            return entry.getValue();
-                        } else if (possiblePath.equals(PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
-                                new Path(entry.getKey().getFilepath().toString())).addFileExtension("py"))) {
-                            return entry.getValue();
-                        }
-
-                    }
+        if (possiblePathsToLib == null || possiblePathsToLib.isEmpty()) {
+            return null;
+        }
+        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibraries()
+                .entrySet()) {
+            if (entry.getValue() == null) {
+                continue;
+            }
+            final IPath entryPath = entry.getKey().getFilepath();
+            final IPath libPath1 = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
+            final IPath libPath2 = PathsConverter
+                    .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
+            for (final IPath candidate : possiblePathsToLib) {
+                if (candidate.equals(libPath1) || candidate.equals(libPath2)) {
+                    return entry.getValue();
                 }
             }
         }
