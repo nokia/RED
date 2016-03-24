@@ -9,6 +9,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -80,8 +81,9 @@ public class PathsConverter {
         if (workspaceRelativePath.isAbsolute()) {
             return workspaceRelativePath;
         } else {
-            final IPath wsPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
-            return wsPath.append(workspaceRelativePath);
+            final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+            final IResource member = root.findMember(workspaceRelativePath);
+            return member == null ? root.getLocation().append(workspaceRelativePath) : member.getLocation();
         }
     }
 
