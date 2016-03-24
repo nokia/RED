@@ -21,6 +21,8 @@ import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
  * @author mmarzec
  */
 public class RobotDryRunHandler {
+    
+    private Process dryRunProcess;
 
     public RunCommandLine buildDryRunCommand(final RobotRuntimeEnvironment environment, final File projectLocation,
             final Collection<String> suites, final Collection<String> pythonPathLocations,
@@ -33,9 +35,8 @@ public class RobotDryRunHandler {
         builder.addLocationsToPythonPath(pythonPathLocations);
         builder.addLocationsToClassPath(classPathLocations);
         builder.enableDebug(false);
-
-        builder.addUserArgumentsForRobot("--dryrun");
-
+        builder.enableDryRun(true);
+        
         return builder.build();
     }
 
@@ -51,14 +52,20 @@ public class RobotDryRunHandler {
     public void executeDryRunProcess(final RunCommandLine dryRunCommandLine) throws InvocationTargetException {
         if (dryRunCommandLine != null) {
             try {
-                final Process process = new ProcessBuilder(dryRunCommandLine.getCommandLine()).start();
-                drainProcessOutputAndErrorStreams(process);
-                if (process != null) {
-                    process.waitFor();
+                dryRunProcess = new ProcessBuilder(dryRunCommandLine.getCommandLine()).start();
+                drainProcessOutputAndErrorStreams(dryRunProcess);
+                if (dryRunProcess != null) {
+                    dryRunProcess.waitFor();
                 }
             } catch (InterruptedException | IOException e) {
                 throw new InvocationTargetException(e);
             }
+        }
+    }
+    
+    public void destroyDryRunProcess() {
+        if (dryRunProcess != null) {
+            dryRunProcess.destroy();
         }
     }
 

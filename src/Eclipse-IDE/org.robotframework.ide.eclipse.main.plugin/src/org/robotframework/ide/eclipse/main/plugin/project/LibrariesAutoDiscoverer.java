@@ -61,7 +61,9 @@ public class LibrariesAutoDiscoverer {
     private List<String> suiteFiles;
 
     private RobotDryRunOutputParser dryRunOutputParser;
-    
+
+    private RobotDryRunHandler robotDryRunHandler;
+
     private boolean isSummaryWindowEnabled;
 
     private static AtomicBoolean isWorkspaceJobRunning = new AtomicBoolean(false);
@@ -84,6 +86,7 @@ public class LibrariesAutoDiscoverer {
         this.suiteFiles = suiteFiles;
         this.isSummaryWindowEnabled = isSummaryWindowEnabled;
         dryRunOutputParser = new RobotDryRunOutputParser(robotProject.getStandardLibraries().keySet());
+        robotDryRunHandler = new RobotDryRunHandler();
     }
 
     public void start() {
@@ -114,7 +117,15 @@ public class LibrariesAutoDiscoverer {
                     } finally {
                         isWorkspaceJobRunning.set(false);
                     }
+                    
                     return Status.OK_STATUS;
+                }
+                
+                @Override
+                protected void canceling() {
+                    isSummaryWindowEnabled = false;
+                    robotDryRunHandler.destroyDryRunProcess();
+                    this.cancel();
                 }
             };
             wsJob.setUser(true);
@@ -128,19 +139,16 @@ public class LibrariesAutoDiscoverer {
         subMonitor.subTask("Preparing Robot dry run execution...");
         subMonitor.setWorkRemaining(3);
 
-        final RobotDryRunHandler robotDryRunHandler = new RobotDryRunHandler();
-
         final Set<String> pythonpathDirs = collectPythonPathDirs();
         subMonitor.worked(1);
 
-        final RunCommandLine dryRunCommandLine = createDryRunCommandLine(pythonpathDirs, robotDryRunHandler);
-
+        final RunCommandLine dryRunCommandLine = createDryRunCommandLine(pythonpathDirs);
         subMonitor.worked(1);
+
         subMonitor.subTask("Executing Robot dry run...");
-
-        executeDryRun(robotDryRunHandler, dryRunCommandLine);
-
+        executeDryRun(dryRunCommandLine);
         subMonitor.worked(1);
+
         subMonitor.done();
     }
 
@@ -176,10 +184,8 @@ public class LibrariesAutoDiscoverer {
         }
     }
 
-    private RunCommandLine createDryRunCommandLine(final Set<String> pythonpathDirs,
-            RobotDryRunHandler robotDryRunHandler) throws InvocationTargetException {
+    private RunCommandLine createDryRunCommandLine(final Set<String> pythonpathDirs) throws InvocationTargetException {
         RunCommandLine runCommandLine = null;
-
         try {
             runCommandLine = robotDryRunHandler.buildDryRunCommand(robotProject.getRuntimeEnvironment(),
                     robotProject.getProject().getLocation().toFile(), suiteFiles, pythonpathDirs,
@@ -190,8 +196,7 @@ public class LibrariesAutoDiscoverer {
         return runCommandLine;
     }
 
-    private void executeDryRun(final RobotDryRunHandler robotDryRunHandler, final RunCommandLine dryRunCommandLine)
-            throws InvocationTargetException {
+    private void executeDryRun(final RunCommandLine dryRunCommandLine) throws InvocationTargetException {
         if (dryRunCommandLine != null) {
             final List<ILineHandler> dryRunOutputlisteners = newArrayList();
             dryRunOutputlisteners.add(dryRunOutputParser);
@@ -209,7 +214,8 @@ public class LibrariesAutoDiscoverer {
             if (config == null) {
                 config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
             }
-            final List<DryRunLibraryImport> dryRunLibrariesToAdd = filterExistingReferencedLibraries(importedLibraries, config);
+            final List<DryRunLibraryImport> dryRunLibrariesToAdd = filterExistingReferencedLibraries(importedLibraries,
+                    config);
 
             SubMonitor subMonitor = SubMonitor.convert(monitor);
             subMonitor.setWorkRemaining(dryRunLibrariesToAdd.size() + 1);
