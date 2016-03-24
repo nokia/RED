@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cr2voLk0EeWzJthH3JoEWQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/11/16 6:30 PM
+Save-Time: 3/24/16 2:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -152,9 +152,9 @@ get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
 get-editor "tsv_test.tsv" | get-text-viewer | key-type "M1+s"
 
 //check Problems
-wait 2000
-get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
-
+try -times 5 -delay 1000 -command{
+	get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+}
 //check text
 get-editor "tsv_test.tsv" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "*** Settings ***\n"
