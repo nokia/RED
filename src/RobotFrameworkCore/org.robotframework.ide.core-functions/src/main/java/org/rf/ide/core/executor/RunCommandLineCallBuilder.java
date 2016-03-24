@@ -49,6 +49,8 @@ public class RunCommandLineCallBuilder {
         public IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments);
 
         public IRunCommandLineBuilder enableDebug(final boolean shouldEnableDebug);
+        
+        public IRunCommandLineBuilder enableDryRun(final boolean shouldEnableDryRun);
 
         public IRunCommandLineBuilder withProject(final File project);
 
@@ -79,6 +81,7 @@ public class RunCommandLineCallBuilder {
         private File project = null;
 
         private boolean enableDebug = false;
+        private boolean enableDryRun = false;
 
         private String robotUserArgs = "";
 
@@ -166,6 +169,12 @@ public class RunCommandLineCallBuilder {
             this.enableDebug = shouldEnableDebug;
             return this;
         }
+        
+        @Override
+        public IRunCommandLineBuilder enableDryRun(final boolean shouldEnableDryRun) {
+            this.enableDryRun = shouldEnableDryRun;
+            return this;
+        }
 
         @Override
         public IRunCommandLineBuilder withProject(final File project) {
@@ -212,6 +221,11 @@ public class RunCommandLineCallBuilder {
             cmdLine.add("--listener");
             cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("TestRunnerAgent.py").toPath() + ":" + port + ":"
                     + debugInfo);
+            if (enableDryRun) {
+                cmdLine.add("--prerunmodifier");
+                cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("SuiteVisitatorImportProxy.py").toPath().toString());
+                cmdLine.add("--dryrun");
+            }
             cmdLine.addAll(suitesToRun);
             cmdLine.addAll(testsToRun);
             if (!robotUserArgs.isEmpty()) {
