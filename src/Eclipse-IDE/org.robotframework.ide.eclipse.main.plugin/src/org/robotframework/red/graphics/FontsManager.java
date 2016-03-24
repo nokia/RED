@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.widgets.Display;
 
 public class FontsManager {
@@ -34,6 +35,14 @@ public class FontsManager {
             FONTS_TABLE.put(fontDescriptor, font);
         }
         return font;
+    }
+
+    public static Font getFont(final FontData fontData) {
+        return getFont(Display.getCurrent(), fontData);
+    }
+
+    public static Font getFont(final Display display, final FontData fontData) {
+        return getFont(display, FontDescriptor.createFrom(fontData));
     }
 
     /**
