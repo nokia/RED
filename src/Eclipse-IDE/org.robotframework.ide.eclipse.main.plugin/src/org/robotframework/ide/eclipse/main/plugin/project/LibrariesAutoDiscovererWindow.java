@@ -15,10 +15,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.FontDescriptor;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
@@ -32,8 +34,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunErrorMessage;
 import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunLibraryImport;
 import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunLibraryImportStatus;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -55,22 +55,18 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     private static final String ADDITIONAL_INFO_ELEMENT_NAME = "Additional info";
 
     private static final String ELEMENT_SEPARATOR = ":";
-    
-    private static final int MAX_ERRORS_DISPLAYED = 100;
 
     private TreeViewer discoveredLibrariesViewer;
 
+    private Text detailsText;
+
     private List<DryRunLibraryImport> importedLibraries;
 
-    private List<DryRunErrorMessage> errorMessages;
-
-    public LibrariesAutoDiscovererWindow(final Shell parent, final List<DryRunLibraryImport> importedLibraries,
-            final List<DryRunErrorMessage> errorMessages) {
+    public LibrariesAutoDiscovererWindow(final Shell parent, final List<DryRunLibraryImport> importedLibraries) {
         super(parent);
         setShellStyle(SWT.CLOSE | SWT.MODELESS | SWT.BORDER | SWT.TITLE | SWT.RESIZE);
         setBlockOnOpen(false);
         this.importedLibraries = importedLibraries;
-        this.errorMessages = errorMessages;
     }
 
     @Override
@@ -88,7 +84,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     @Override
     protected Point getInitialSize() {
-        return new Point(600, 600);
+        return new Point(600, 550);
     }
 
     @Override
@@ -108,12 +104,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         createLibrariesViewer(mainComposite);
 
-        if (!errorMessages.isEmpty()) {
-            final Label errorsLabel = new Label(mainComposite, SWT.NONE);
-            final String maxErrorsSizeExceeded = errorMessages.size() > MAX_ERRORS_DISPLAYED ? ", displayed:" + MAX_ERRORS_DISPLAYED : "";
-            errorsLabel.setText("Discovered Errors (" + errorMessages.size() + maxErrorsSizeExceeded + "):");
-            createErrorsForm(mainComposite);
-        }
+        createDetailsComposite(mainComposite);
 
         return mainComposite;
     }
@@ -121,11 +112,11 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     private void createLibrariesViewer(final Composite mainComposite) {
         discoveredLibrariesViewer = new TreeViewer(mainComposite);
         discoveredLibrariesViewer.getTree().setHeaderVisible(false);
-        GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 300).minSize(SWT.DEFAULT, 200).applyTo(
-                discoveredLibrariesViewer.getTree());
+        GridDataFactory.fillDefaults()
+                .grab(true, true)
+                .minSize(SWT.DEFAULT, 300)
+                .applyTo(discoveredLibrariesViewer.getTree());
         GridLayoutFactory.fillDefaults().numColumns(1).applyTo(discoveredLibrariesViewer.getTree());
-
-        ColumnViewerToolTipSupport.enableFor(discoveredLibrariesViewer);
 
         discoveredLibrariesViewer.setContentProvider(new DiscoveredLibrariesViewerContentProvider());
         discoveredLibrariesViewer.setLabelProvider(new DiscoveredLibrariesViewerLabelProvider());
@@ -133,28 +124,33 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         Collections.sort(importedLibraries, new DiscoveredLibrariesComparator());
         discoveredLibrariesViewer
                 .setInput(importedLibraries.toArray(new DryRunLibraryImport[importedLibraries.size()]));
+
+        discoveredLibrariesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+
+            @Override
+            public void selectionChanged(final SelectionChangedEvent event) {
+                final Object selection = ((TreeSelection) event.getSelection()).getFirstElement();
+                if (selection != null && selection instanceof String) {
+                    final String selectionText = (String) selection;
+                    if (selectionText != null) {
+                        detailsText.setText(selectionText);
+                        detailsText.setVisible(true);
+                        return;
+                    }
+                }
+                detailsText.setVisible(false);
+            }
+        });
     }
 
-    private void createErrorsForm(final Composite mainComposite) {
-        final ScrolledForm form = new ScrolledForm(mainComposite, SWT.H_SCROLL | SWT.V_SCROLL);
-        GridDataFactory.fillDefaults().grab(true, true).minSize(SWT.DEFAULT, 100).applyTo(form);
-        GridLayoutFactory.fillDefaults().applyTo(form);
-        form.setExpandVertical(true);
-        form.setExpandHorizontal(true);
+    private void createDetailsComposite(final Composite mainComposite) {
+        final Composite detailsComposite = new Composite(mainComposite, SWT.NONE);
+        GridLayoutFactory.fillDefaults().numColumns(1).margins(3, 3).applyTo(detailsComposite);
+        GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 100).grab(true, false).applyTo(detailsComposite);
 
-        final Composite formBody = form.getBody();
-        GridLayoutFactory.fillDefaults().numColumns(1).applyTo(formBody);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(formBody);
-
-        for (int i = 0; i < errorMessages.size(); i++) {
-            final Text text = new Text(formBody, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-            GridDataFactory.fillDefaults().hint(510, 70).grab(true, false).applyTo(text);
-            text.setText(errorMessages.get(i).getMessage());
-            form.reflow(true);
-            if(i > MAX_ERRORS_DISPLAYED) {
-                return;
-            }
-        }
+        detailsText = new Text(detailsComposite, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+        GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 80).grab(true, false).applyTo(detailsText);
+        detailsText.setVisible(false);
     }
 
     private class DiscoveredLibrariesViewerContentProvider extends TreeContentProvider {
@@ -173,8 +169,10 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 if (libraryImport.getStatus() != null) {
                     children.add(STATUS_ELEMENT_NAME + ELEMENT_SEPARATOR + libraryImport.getStatus().getMessage());
                 }
-                if (libraryImport.getSourcePath() != null) {
+                if (libraryImport.getSourcePath() != null && !libraryImport.getSourcePath().isEmpty()) {
                     children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + libraryImport.getSourcePath());
+                } else {
+                    children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + "Unknown");
                 }
                 final List<String> importersPaths = libraryImport.getImportersPaths();
                 if (importersPaths.size() == 1) {
@@ -211,17 +209,6 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     class DiscoveredLibrariesViewerLabelProvider extends StyledCellLabelProvider {
-
-        @Override
-        public String getToolTipText(final Object element) {
-            if (element instanceof String) {
-                final String text = (String) element;
-                if (text.startsWith(ADDITIONAL_INFO_ELEMENT_NAME)) {
-                    return text;
-                }
-            }
-            return null;
-        }
 
         @Override
         public void update(final ViewerCell cell) {
