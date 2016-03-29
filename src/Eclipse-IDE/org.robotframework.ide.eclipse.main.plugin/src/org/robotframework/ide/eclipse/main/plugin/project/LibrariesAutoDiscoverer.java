@@ -62,7 +62,7 @@ public class LibrariesAutoDiscoverer {
 
     private RobotDryRunOutputParser dryRunOutputParser;
 
-    private RobotDryRunHandler robotDryRunHandler;
+    private RobotDryRunHandler dryRunHandler;
 
     private boolean isSummaryWindowEnabled;
 
@@ -86,7 +86,7 @@ public class LibrariesAutoDiscoverer {
         this.suiteFiles = suiteFiles;
         this.isSummaryWindowEnabled = isSummaryWindowEnabled;
         dryRunOutputParser = new RobotDryRunOutputParser(robotProject.getStandardLibraries().keySet());
-        robotDryRunHandler = new RobotDryRunHandler();
+        dryRunHandler = new RobotDryRunHandler();
     }
 
     public void start() {
@@ -106,8 +106,7 @@ public class LibrariesAutoDiscoverer {
                                 @Override
                                 public void run() {
                                     new LibrariesAutoDiscovererWindow(getActiveShell(),
-                                            dryRunOutputParser.getImportedLibraries(),
-                                            dryRunOutputParser.getErrorMessages()).open();
+                                            dryRunOutputParser.getImportedLibraries()).open();
                                 }
                             });
                         }
@@ -124,7 +123,7 @@ public class LibrariesAutoDiscoverer {
                 @Override
                 protected void canceling() {
                     isSummaryWindowEnabled = false;
-                    robotDryRunHandler.destroyDryRunProcess();
+                    dryRunHandler.destroyDryRunProcess();
                     this.cancel();
                 }
             };
@@ -187,7 +186,7 @@ public class LibrariesAutoDiscoverer {
     private RunCommandLine createDryRunCommandLine(final Set<String> pythonpathDirs) throws InvocationTargetException {
         RunCommandLine runCommandLine = null;
         try {
-            runCommandLine = robotDryRunHandler.buildDryRunCommand(robotProject.getRuntimeEnvironment(),
+            runCommandLine = dryRunHandler.buildDryRunCommand(robotProject.getRuntimeEnvironment(),
                     robotProject.getProject().getLocation().toFile(), suiteFiles, pythonpathDirs,
                     robotProject.getClasspath());
         } catch (IOException e) {
@@ -200,14 +199,21 @@ public class LibrariesAutoDiscoverer {
         if (dryRunCommandLine != null) {
             final List<ILineHandler> dryRunOutputlisteners = newArrayList();
             dryRunOutputlisteners.add(dryRunOutputParser);
-            robotDryRunHandler.startDryRunHandlerThread(dryRunCommandLine.getPort(), dryRunOutputlisteners);
+            dryRunHandler.startDryRunHandlerThread(dryRunCommandLine.getPort(), dryRunOutputlisteners);
 
-            robotDryRunHandler.executeDryRunProcess(dryRunCommandLine);
+            dryRunHandler.executeDryRunProcess(dryRunCommandLine);
         }
     }
 
     private void startAddingLibrariesToProjectConfiguration(final IProgressMonitor monitor) {
-        final List<DryRunLibraryImport> importedLibraries = dryRunOutputParser.getImportedLibraries();
+        final List<DryRunLibraryImport> importedLibraries = newArrayList();
+        
+        for (final DryRunLibraryImport dryRunLibraryImport : dryRunOutputParser.getImportedLibraries()) {
+            if(dryRunLibraryImport.getType() != DryRunLibraryType.UNKNOWN) {
+                importedLibraries.add(dryRunLibraryImport);
+            }
+        }
+        
         if (!importedLibraries.isEmpty()) {
             RobotProjectConfig config = robotProject.getOpenedProjectConfig();
             final boolean inEditor = config != null;

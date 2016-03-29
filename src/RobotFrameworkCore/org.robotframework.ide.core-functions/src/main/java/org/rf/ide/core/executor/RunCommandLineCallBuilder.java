@@ -223,7 +223,8 @@ public class RunCommandLineCallBuilder {
                     + debugInfo);
             if (enableDryRun) {
                 cmdLine.add("--prerunmodifier");
-                cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("SuiteVisitatorImportProxy.py").toPath().toString());
+                cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("SuiteVisitorImportProxy.py").toPath().toString());
+                cmdLine.add("--runemptysuite");
                 cmdLine.add("--dryrun");
             }
             cmdLine.addAll(suitesToRun);
