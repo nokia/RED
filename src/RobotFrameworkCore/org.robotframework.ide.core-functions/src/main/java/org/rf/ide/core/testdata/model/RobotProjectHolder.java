@@ -23,19 +23,20 @@ import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 public class RobotProjectHolder {
 
     private final RobotRuntimeEnvironment robotRuntime;
+
     private final List<RobotFileOutput> readableProjectFiles = new ArrayList<>();
+
     private final List<ARobotInternalVariable<?>> globalVariables = new ArrayList<>();
+
     private Map<String, String> variableMappings = new HashMap<>();
 
     public RobotProjectHolder(final RobotRuntimeEnvironment robotRuntime) {
         this.robotRuntime = robotRuntime;
         initGlobalVariables();
     }
-
 
     /**
      * Design for test.
@@ -45,11 +46,9 @@ public class RobotProjectHolder {
         this.robotRuntime = null;
     }
 
-
     public RobotRuntimeEnvironment getRobotRuntime() {
         return robotRuntime;
     }
-
 
     public List<ARobotInternalVariable<?>> getGlobalVariables() {
         return globalVariables;
@@ -70,9 +69,7 @@ public class RobotProjectHolder {
         globalVariables.addAll(map(variables));
     }
 
-
-    private List<ARobotInternalVariable<?>> map(
-            final Map<String, Object> varsRead) {
+    private List<ARobotInternalVariable<?>> map(final Map<String, Object> varsRead) {
         final List<ARobotInternalVariable<?>> variables = new ArrayList<>();
         for (final String varName : varsRead.keySet()) {
             final Object varValue = varsRead.get(varName);
@@ -82,21 +79,18 @@ public class RobotProjectHolder {
                 variables.add(new ListRobotInternalVariable(varName, value));
             } else if (varValue instanceof Map) {
                 final Map<String, Object> value = convert((Map<?, ?>) varValue);
-                variables.add(new DictionaryRobotInternalVariable(varName,
-                        value));
+                variables.add(new DictionaryRobotInternalVariable(varName, value));
             } else if (varValue != null && varValue.getClass().isArray()) {
                 final List<Object> value = new ArrayList<>();
                 final Object[] array = ((Object[]) varValue);
                 value.addAll(Arrays.asList(array));
                 variables.add(new ListRobotInternalVariable(varName, value));
             } else {
-                variables.add(new ScalarRobotInternalVariable(varName, ""
-                        + varValue));
+                variables.add(new ScalarRobotInternalVariable(varName, "" + varValue));
             }
         }
         return variables;
     }
-
 
     private Map<String, Object> convert(final Map<?, ?> m) {
         final Map<String, Object> map = new LinkedHashMap<>();
@@ -105,7 +99,6 @@ public class RobotProjectHolder {
         }
         return map;
     }
-
 
     public void addModelFile(final RobotFileOutput robotOutput) {
         if (robotOutput != null) {
@@ -127,39 +120,28 @@ public class RobotProjectHolder {
         readableProjectFiles.remove(robotOutput);
     }
 
-
-    public void addImportedResources(
-            final List<ResourceImportReference> referenced) {
+    public void addImportedResources(final List<ResourceImportReference> referenced) {
         for (final ResourceImportReference ref : referenced) {
             addImportedResource(ref);
         }
     }
 
-
     public void addImportedResource(final ResourceImportReference referenced) {
         readableProjectFiles.add(referenced.getReference());
     }
 
-
     public boolean shouldBeLoaded(final RobotFileOutput robotOutput) {
-        return (robotOutput != null && shouldBeLoaded(robotOutput
-                .getProcessedFile()));
+        return (robotOutput != null && shouldBeLoaded(robotOutput.getProcessedFile()));
     }
-
 
     public boolean shouldBeLoaded(final File file) {
         final RobotFileOutput foundFile = findFileByName(file);
-        return (foundFile == null)
-                || (file.lastModified() != foundFile
-                        .getLastModificationEpochTime());
+        return (foundFile == null) || (file.lastModified() != foundFile.getLastModificationEpochTime());
     }
 
-
-    public List<RobotFileOutput> findFilesWithImportedVariableFile(
-            final File variableFile) {
+    public List<RobotFileOutput> findFilesWithImportedVariableFile(final File variableFile) {
         final List<RobotFileOutput> found = new ArrayList<>();
-        final List<Integer> foundFiles = findFile(new SearchByVariablesImport(
-                variableFile));
+        final List<Integer> foundFiles = findFile(new SearchByVariablesImport(variableFile));
         for (final Integer fileId : foundFiles) {
             found.add(readableProjectFiles.get(fileId));
         }
@@ -171,20 +153,18 @@ public class RobotProjectHolder {
 
         private final File toFound;
 
-
         public SearchByVariablesImport(final File toFound) {
             this.toFound = toFound;
         }
 
-
         @Override
         public boolean matchCriteria(final RobotFileOutput robotFile) {
             boolean matchResult = false;
-            final List<VariablesFileImportReference> varImports = robotFile
-                    .getVariablesImportReferences();
+            final List<VariablesFileImportReference> varImports = robotFile.getVariablesImportReferences();
             for (final VariablesFileImportReference variablesFileImportReference : varImports) {
                 if (variablesFileImportReference.getVariablesFile()
-                        .getAbsolutePath().equals(toFound.getAbsolutePath())) {
+                        .getAbsolutePath()
+                        .equals(toFound.getAbsolutePath())) {
                     matchResult = true;
                     break;
                 }
@@ -194,7 +174,6 @@ public class RobotProjectHolder {
         }
 
     }
-
 
     public RobotFileOutput findFileByName(final File file) {
         RobotFileOutput found = null;
@@ -210,19 +189,20 @@ public class RobotProjectHolder {
 
         private final File toFound;
 
-
         public SearchByName(final File toFound) {
             this.toFound = toFound;
         }
 
-
         @Override
         public boolean matchCriteria(final RobotFileOutput robotFile) {
-            return (robotFile.getProcessedFile().getAbsolutePath()
-                    .equals(toFound.getAbsolutePath()));
+            boolean result = false;
+            if (robotFile != null && robotFile.getProcessedFile() != null) {
+                result = robotFile.getProcessedFile().getAbsolutePath().equals(toFound.getAbsolutePath());
+            }
+
+            return result;
         }
     }
-
 
     protected List<Integer> findFile(final ISearchCriteria criteria) {
         final List<Integer> foundFiles = new ArrayList<>();
