@@ -7,6 +7,7 @@ package org.rf.ide.core.executor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -17,9 +18,10 @@ import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
+import com.google.common.io.Files;
+
 /**
  * @author mmarzec
- *
  */
 public class RobotDryRunOutputParser implements ILineHandler {
 
@@ -32,8 +34,6 @@ public class RobotDryRunOutputParser implements ILineHandler {
     private Map<String, Object> parsedLine;
 
     private List<DryRunLibraryImport> importedLibraries = new LinkedList<>();
-
-    private List<DryRunErrorMessage> errorMessages = newArrayList();
 
     private Set<String> standardLibrariesNames;
 
@@ -56,16 +56,21 @@ public class RobotDryRunOutputParser implements ILineHandler {
             final Map<String, String> details = (Map<String, String>) libraryImportList.get(1);
             final String libraryName = (String) libraryImportList.get(0);
             final String importer = details.get("importer");
+            final String source = details.get("source");
             if (importer != null) {
-                final DryRunLibraryImport dryRunLibraryImport = new DryRunLibraryImport(libraryName,
-                        details.get("source"), importer);
+                DryRunLibraryImport dryRunLibraryImport = null;
+                if (source != null) {
+                    dryRunLibraryImport = new DryRunLibraryImport(libraryName, source, importer);
+                } else {
+                    dryRunLibraryImport = new DryRunLibraryImport(libraryName);
+                }
                 int index = importedLibraries.indexOf(dryRunLibraryImport);
                 if (index < 0) {
                     if (!standardLibrariesNames.contains(libraryName)) {
                         importedLibraries.add(dryRunLibraryImport);
                     }
                 } else {
-                    importedLibraries.get(index).getImportersPaths().add(importer);
+                    importedLibraries.get(index).addImporterPath(importer);
                 }
             }
         }
@@ -73,18 +78,62 @@ public class RobotDryRunOutputParser implements ILineHandler {
             final List<Object> messageList = (List<Object>) parsedLine.get(MESSAGE_EVENT_NAME);
             final Map<String, String> details = (Map<String, String>) messageList.get(0);
             final String messageLevel = details.get("level");
-            if (messageLevel != null && messageLevel.equalsIgnoreCase("ERROR")) {
-                errorMessages.add(new DryRunErrorMessage(details.get("message")));
+            if (messageLevel != null && messageLevel.equalsIgnoreCase("FAIL")) {
+                String message = details.get("message");
+                if (message != null) {
+                    String libraryName = extractLibName(message);
+                    if (!libraryName.isEmpty()) {
+                        final DryRunLibraryImport dryRunLibraryImport = new DryRunLibraryImport(libraryName);
+                        int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
+                        final String failReason = extractFailReason(message);
+                        if (libIndex >= 0) {
+                            importedLibraries.get(libIndex)
+                                    .setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, failReason);
+                        } else {
+                            dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
+                                    failReason);
+                            importedLibraries.add(dryRunLibraryImport);
+                        }
+                    }
+                }
             }
         }
     }
 
-    public List<DryRunLibraryImport> getImportedLibraries() {
-        return importedLibraries;
+    private String extractLibName(final String message) {
+        final String key = "LIB_ERROR:";
+        int keyIndex = message.indexOf(key);
+        if (keyIndex >= 0) {
+            int endIndex = message.indexOf(",", keyIndex);
+            if (endIndex > keyIndex) {
+                final String path = message.substring(keyIndex + key.length(), endIndex).trim();
+                if (Files.isFile().apply(new File(path))) {
+                    return Files.getNameWithoutExtension(path);
+                }
+                return path;
+            }
+        }
+        return "";
     }
 
-    public List<DryRunErrorMessage> getErrorMessages() {
-        return errorMessages;
+    private String extractFailReason(final String message) {
+        if (message != null) {
+            String failReason = message.replaceAll("\\\\n", "\n").replaceAll("\\\\'", "'");
+            final String startText = "VALUE_START";
+            final String endText = "VALUE_END";
+            int beginIndex = failReason.indexOf(startText);
+            int endIndex = failReason.lastIndexOf(endText);
+            if (beginIndex >= 0 && endIndex > 0) {
+                return failReason.substring(beginIndex + startText.length() + 1, endIndex)
+                        .replace("<class 'robot.errors.DataError'>, DataError", "");
+            }
+            return failReason;
+        }
+        return "";
+    }
+
+    public List<DryRunLibraryImport> getImportedLibraries() {
+        return importedLibraries;
     }
 
     public static class DryRunLibraryImport {
@@ -94,22 +143,31 @@ public class RobotDryRunOutputParser implements ILineHandler {
         private String sourcePath;
 
         private String additionalInfo;
-        
+
         private List<String> importersPaths = newArrayList();
 
         private DryRunLibraryImportStatus status;
 
         private DryRunLibraryType type;
 
+        public DryRunLibraryImport(final String name) {
+            this(name, "", "");
+        }
+
         public DryRunLibraryImport(final String name, final String sourcePath, final String importerPath) {
             this.name = name;
             this.sourcePath = checkLibSourcePathAndType(sourcePath);
-            if (importerPath != null) {
+            if (importerPath != null && !importerPath.isEmpty() && !importersPaths.contains(importerPath)) {
                 this.importersPaths.add(importerPath);
             }
         }
 
         private String checkLibSourcePathAndType(final String sourcePath) {
+            if (sourcePath == null || sourcePath.isEmpty()) {
+                type = DryRunLibraryType.UNKNOWN;
+                return "";
+            }
+
             if (sourcePath.endsWith(".pyc")) {
                 return sourcePath.substring(0, sourcePath.length() - 1);
             } else if (sourcePath.endsWith("$py.class")) {
@@ -152,6 +210,12 @@ public class RobotDryRunOutputParser implements ILineHandler {
         public void setStatusAndAdditionalInfo(final DryRunLibraryImportStatus status, final String additionalInfo) {
             this.status = status;
             this.additionalInfo = additionalInfo;
+        }
+        
+        public void addImporterPath(final String path) {
+            if(!importersPaths.contains(path)) {
+                importersPaths.add(path);
+            }
         }
 
         @Override
@@ -204,6 +268,7 @@ public class RobotDryRunOutputParser implements ILineHandler {
 
     public enum DryRunLibraryType {
         PYTHON,
-        JAVA
+        JAVA,
+        UNKNOWN
     }
 }
