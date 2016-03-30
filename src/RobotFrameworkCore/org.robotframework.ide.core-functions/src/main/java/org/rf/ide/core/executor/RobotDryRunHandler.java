@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.List;
@@ -26,7 +27,8 @@ public class RobotDryRunHandler {
 
     public RunCommandLine buildDryRunCommand(final RobotRuntimeEnvironment environment, final File projectLocation,
             final Collection<String> suites, final Collection<String> pythonPathLocations,
-            final Collection<String> classPathLocations) throws IOException {
+            final Collection<String> classPathLocations, final Collection<String> additionalProjectsLocations)
+                    throws IOException {
 
         final IRunCommandLineBuilder builder = RunCommandLineCallBuilder.forEnvironment(environment);
 
@@ -36,7 +38,8 @@ public class RobotDryRunHandler {
         builder.addLocationsToClassPath(classPathLocations);
         builder.enableDebug(false);
         builder.enableDryRun(true);
-        
+        builder.withAdditionalProjectsLocations(additionalProjectsLocations);
+
         return builder.build();
     }
 
@@ -67,6 +70,28 @@ public class RobotDryRunHandler {
         if (dryRunProcess != null) {
             dryRunProcess.destroy();
         }
+    }
+
+    public File createTempSuiteFile(final List<String> resourcesPaths) {
+        File file = null;
+        PrintWriter printWriter = null;
+        try {
+            file = RobotRuntimeEnvironment.copyResourceFile("DryRunTempSuite.robot");
+            printWriter = new PrintWriter(file);
+            printWriter.println("*** Test Cases ***");
+            printWriter.println("T1");
+            printWriter.println("*** Settings ***");
+            for (final String path : resourcesPaths) {
+                printWriter.println("Resource  " + path);
+            }
+        } catch (IOException e) {
+            // nothing to do
+        } finally {
+            if (printWriter != null) {
+                printWriter.close();
+            }
+        }
+        return file;
     }
 
     private void drainProcessOutputAndErrorStreams(final Process process) {
