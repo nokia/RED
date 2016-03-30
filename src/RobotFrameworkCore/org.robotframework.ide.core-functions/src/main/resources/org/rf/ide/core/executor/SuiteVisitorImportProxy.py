@@ -1,8 +1,3 @@
-#
-# Copyright 2016 Nokia Solutions and Networks
-# Licensed under the Apache License, Version 2.0,
-# see license.txt file for details.
-#
 from __future__ import with_statement
 import robot
 from robot.output import LOGGER, Message
@@ -14,9 +9,17 @@ from robot.running import TestLibrary
 from robot.running.testlibraries import _BaseTestLibrary
 from types import MethodType
 from threading import Lock
+from robot.running.builder import TestSuiteBuilder
 import time
 import sys
+import os.path
 import threading
+
+class MyTestSuiteBuilder(TestSuiteBuilder):
+    ''' switch off empty suite removing '''
+    def _parse_and_build(self, path):
+        suite = self._build_suite(self._parse(path))
+        return suite
 
 class SuiteVisitorImportProxy(SuiteVisitor):
     def __init__(self, lib_import_timeout=5):
@@ -30,6 +33,10 @@ class SuiteVisitorImportProxy(SuiteVisitor):
                 suite.tests.clear()
                 t = TestCase(name='Fake_' + str(int(round(time.time() * 1000))))
                 suite.tests.append(t)
+            else:
+                if os.path.isdir(suite.source) and suite.test_count == 0:
+                    current_suite = MyTestSuiteBuilder().build(suite.source)
+                    suite.suites = current_suite.suites
             suite.keywords.clear()
 
     def start_test(self, test):
