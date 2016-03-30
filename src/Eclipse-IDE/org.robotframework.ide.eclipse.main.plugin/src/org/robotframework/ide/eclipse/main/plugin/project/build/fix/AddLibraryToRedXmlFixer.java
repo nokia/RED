@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.core.resources.IFile;
@@ -18,6 +19,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -67,7 +69,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         private String libName;
 
-        private Collection<ReferencedLibrary> addedLibraries;
+        private final Collection<ReferencedLibrary> addedLibraries = new ArrayList<>();
 
         public AddLibraryProposal(final IMarker marker, final RobotSuiteFile suiteFile, final IFile externalFile,
                 final String shortDescritption) {
@@ -95,9 +97,11 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             if (modulePath.isPresent()) {
                 libName = pathOrName;
             } else {
+                final String location = env.getInterpreter() == SuiteExecutor.Jython ? "PYTHONPATH/CLASSPATH"
+                        : "PYTHONPATH";
                 MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
                         "Unable to locate '" + pathOrName + "' module. It seems that it is not contained"
-                                + " in PYTHONPATH of " + env.getFile() + " python installation.");
+                                + " in " + location + " of " + env.getFile() + " python installation.");
                 return false;
             }
             final Path path = new Path(modulePath.get().getPath());
@@ -119,8 +123,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             if (pathOrName.endsWith("/") || pathOrName.endsWith(".py")) {
                 final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile, pathOrName);
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
-                addedLibraries = importer.importPythonLib(Display.getCurrent().getActiveShell(),
-                        suiteFile.getProject().getRuntimeEnvironment(), resolvedAbsPath.toString());
+                addedLibraries.addAll(importer.importPythonLib(Display.getCurrent().getActiveShell(),
+                        suiteFile.getProject().getRuntimeEnvironment(), resolvedAbsPath.toString()));
 
                 if (addedLibraries.isEmpty()) {
                     throw new ProposalApplyingException("Unable to apply proposal");
