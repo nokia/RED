@@ -53,6 +53,8 @@ public class RunCommandLineCallBuilder {
         public IRunCommandLineBuilder enableDryRun(final boolean shouldEnableDryRun);
 
         public IRunCommandLineBuilder withProject(final File project);
+        
+        public IRunCommandLineBuilder withAdditionalProjectsLocations(final Collection<String> additionalProjectsLocations);
 
         public RunCommandLine build() throws IOException;
     }
@@ -77,6 +79,8 @@ public class RunCommandLineCallBuilder {
         private final List<String> tagsToInclude = new ArrayList<>();
 
         private final List<String> tagsToExclude = new ArrayList<>();
+        
+        private final List<String> additionalProjectsLocations = new ArrayList<>();
 
         private File project = null;
 
@@ -181,6 +185,12 @@ public class RunCommandLineCallBuilder {
             this.project = project;
             return this;
         }
+        
+        @Override
+        public IRunCommandLineBuilder withAdditionalProjectsLocations(final Collection<String> additionalProjectsLocations) {
+            this.additionalProjectsLocations.addAll(additionalProjectsLocations);
+            return this;
+        }
 
         @Override
         public RunCommandLine build() throws IOException {
@@ -234,6 +244,9 @@ public class RunCommandLineCallBuilder {
                         .fromJavaArgsToPythonLike(ArgumentsConverter.convertToJavaMainLikeArgs(robotUserArgs)));
             }
             cmdLine.add(project.getAbsolutePath());
+            for (final String projectLocation : additionalProjectsLocations) {
+                cmdLine.add(projectLocation);
+            }
             return new RunCommandLine(cmdLine, port);
         }
 

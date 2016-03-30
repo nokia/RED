@@ -18,7 +18,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.LibrariesAutoDiscoverHandler.E4LibrariesAutoDiscoverHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
@@ -40,14 +39,14 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
         public Object addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getElements(selection, IResource.class);
 
-            final List<String> suiteList = new ArrayList<>();
+            final List<IResource> suitesList = new ArrayList<>();
             IProject suitesProject = null;
 
             for (final IResource resource : selectedResources) {
                 if (resource.getType() == IResource.PROJECT) {
                     final IProject project = (IProject) resource;
                     final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
-                    new LibrariesAutoDiscoverer(robotProject, Collections.<String> emptyList(), eventBroker).start();
+                    new LibrariesAutoDiscoverer(robotProject, Collections.<IResource> emptyList(), eventBroker).start();
                     return null;
 
                 } else if (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER) {
@@ -55,14 +54,14 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
                         suitesProject = resource.getProject();
                     }
                     if (resource.getProject().equals(suitesProject)) {
-                        suiteList.add(RobotLaunchConfigurationDelegate.createSuiteName(resource));
+                        suitesList.add(resource);
                     }
                 }
             }
 
-            if (!suiteList.isEmpty()) {
+            if (!suitesList.isEmpty()) {
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(suitesProject);
-                new LibrariesAutoDiscoverer(robotProject, suiteList, eventBroker).start();
+                new LibrariesAutoDiscoverer(robotProject, suitesList, eventBroker).start();
             }
 
             return null;

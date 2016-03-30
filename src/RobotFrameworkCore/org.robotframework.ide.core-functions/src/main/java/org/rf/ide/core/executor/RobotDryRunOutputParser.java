@@ -166,18 +166,18 @@ public class RobotDryRunOutputParser implements ILineHandler {
             if (sourcePath == null || sourcePath.isEmpty()) {
                 type = DryRunLibraryType.UNKNOWN;
                 return "";
+            } else {
+                if (sourcePath.endsWith(".jar") || sourcePath.endsWith(".java") || sourcePath.endsWith(".class")) {
+                    type = DryRunLibraryType.JAVA;
+                } else {
+                    type = DryRunLibraryType.PYTHON;
+                }
             }
 
             if (sourcePath.endsWith(".pyc")) {
                 return sourcePath.substring(0, sourcePath.length() - 1);
             } else if (sourcePath.endsWith("$py.class")) {
                 return sourcePath.replace("$py.class", ".py");
-            }
-
-            if (sourcePath.endsWith(".jar") || sourcePath.endsWith(".java")) {
-                type = DryRunLibraryType.JAVA;
-            } else {
-                type = DryRunLibraryType.PYTHON;
             }
 
             return sourcePath;

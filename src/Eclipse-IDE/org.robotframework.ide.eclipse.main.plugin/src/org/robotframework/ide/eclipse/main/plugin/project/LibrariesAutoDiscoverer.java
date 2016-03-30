@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -17,10 +18,12 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -39,6 +42,8 @@ import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunLibraryImportStatu
 import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunLibraryType;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -49,6 +54,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Pytho
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.red.swt.SwtThread;
 
+import com.google.common.io.Files;
+
 /**
  * @author mmarzec
  */
@@ -58,7 +65,7 @@ public class LibrariesAutoDiscoverer {
 
     private RobotProject robotProject;
 
-    private List<String> suiteFiles;
+    private List<IResource> suiteFiles = newArrayList();
 
     private RobotDryRunOutputParser dryRunOutputParser;
 
@@ -68,22 +75,16 @@ public class LibrariesAutoDiscoverer {
 
     private static AtomicBoolean isWorkspaceJobRunning = new AtomicBoolean(false);
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final RobotSuiteFile suiteFile,
-            final boolean isSummaryWindowEnabled) {
-        this(robotProject, newArrayList(RobotLaunchConfigurationDelegate.createSuiteName(suiteFile.getFile())),
-                isSummaryWindowEnabled);
-    }
-
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<String> suiteFiles,
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
             final IEventBroker eventBroker) {
         this(robotProject, suiteFiles, true);
         this.eventBroker = eventBroker;
     }
 
-    public LibrariesAutoDiscoverer(final RobotProject robotProject, final List<String> suiteFiles,
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
             final boolean isSummaryWindowEnabled) {
         this.robotProject = robotProject;
-        this.suiteFiles = suiteFiles;
+        this.suiteFiles.addAll(suiteFiles);
         this.isSummaryWindowEnabled = isSummaryWindowEnabled;
         dryRunOutputParser = new RobotDryRunOutputParser(robotProject.getStandardLibraries().keySet());
         dryRunHandler = new RobotDryRunHandler();
@@ -184,15 +185,46 @@ public class LibrariesAutoDiscoverer {
     }
 
     private RunCommandLine createDryRunCommandLine(final Set<String> pythonpathDirs) throws InvocationTargetException {
+        
+        final List<String> resourcesPaths = newArrayList();
+        final List<String> suiteNames = newArrayList();
+        collectSuiteNamesAndResourcesPaths(suiteNames, resourcesPaths);
+        final List<String> additionalProjectsLocations = newArrayList();
+        if(!resourcesPaths.isEmpty()) {
+            final File tempSuiteFileWithResources = dryRunHandler.createTempSuiteFile(resourcesPaths);
+            if(tempSuiteFileWithResources != null) {
+                suiteNames.add(Files.getNameWithoutExtension(tempSuiteFileWithResources.getPath()));
+                additionalProjectsLocations.add(tempSuiteFileWithResources.getParent());
+            }
+        }
+        
         RunCommandLine runCommandLine = null;
         try {
             runCommandLine = dryRunHandler.buildDryRunCommand(robotProject.getRuntimeEnvironment(),
-                    robotProject.getProject().getLocation().toFile(), suiteFiles, pythonpathDirs,
-                    robotProject.getClasspath());
+                    robotProject.getProject().getLocation().toFile(), suiteNames, pythonpathDirs,
+                    robotProject.getClasspath(), additionalProjectsLocations);
         } catch (IOException e) {
             throw new InvocationTargetException(e);
         }
         return runCommandLine;
+    }
+
+    private void collectSuiteNamesAndResourcesPaths(final List<String> suiteNames, final List<String> resourcesPaths) {
+        for (final IResource resource : suiteFiles) {
+            if (resource.getType() == IResource.FILE) {
+                final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
+                if (suiteFile != null && suiteFile.isResourceFile()) {
+                    final IPath resourceFilePath = PathsConverter
+                            .toWorkspaceRelativeIfPossible(resource.getProjectRelativePath());
+                    resourcesPaths.add(resourceFilePath.toString());
+
+                } else {
+                    suiteNames.add(RobotLaunchConfigurationDelegate.createSuiteName(resource));
+                }
+            } else if (resource.getType() == IResource.FOLDER) {
+                suiteNames.add(RobotLaunchConfigurationDelegate.createSuiteName(resource));
+            }
+        }
     }
 
     private void executeDryRun(final RunCommandLine dryRunCommandLine) throws InvocationTargetException {
