@@ -172,7 +172,7 @@ public class LibrariesAutoDiscoverer {
                     final String fileExtension = resource.getFileExtension();
                     if (fileExtension != null && fileExtension.equals("py")) {
                         final IContainer parent = resource.getParent();
-                        if (parent != null) {
+                        if (parent != null && parent.getLocation() != null) {
                             pythonpathDirs.add(parent.getLocation().toOSString());
                         }
                     }
