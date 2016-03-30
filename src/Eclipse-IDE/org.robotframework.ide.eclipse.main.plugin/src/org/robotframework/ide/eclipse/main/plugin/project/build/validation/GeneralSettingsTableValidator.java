@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
@@ -158,9 +159,10 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     private Optional<LibrariesAutoDiscoverer> createLibrariesAutoDiscoverer(final RobotSuiteFile suiteFile) {
         final RobotProjectConfig robotProjectConfig = validationContext.getProjectConfiguration();
         if (robotProjectConfig != null && validationContext.isValidatingChangedFiles()
-                && suiteFile.isSuiteFile() && robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()) {
-            return Optional.of(new LibrariesAutoDiscoverer(suiteFile.getProject(), suiteFile,
-                    robotProjectConfig.isLibrariesAutoDiscoveringSummaryWindowEnabled()));
+                && robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()) {
+            return Optional.of(
+                    new LibrariesAutoDiscoverer(suiteFile.getProject(), newArrayList((IResource) suiteFile.getFile()),
+                            robotProjectConfig.isLibrariesAutoDiscoveringSummaryWindowEnabled()));
         }
         return Optional.absent();
     }
