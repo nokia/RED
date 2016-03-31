@@ -5,13 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.layout.RowDataFactory;
@@ -37,32 +38,32 @@ import org.robotframework.red.graphics.ImagesManager;
  */
 class TagsComposite extends Composite {
 
-    private Map<String, Composite> tagComposites = new HashMap<>();
+    private final TagsProposalsSupport tagsSupport;
+    private final TagsListener listener;
 
-    private final List<TagsListener> tagsListeners;
-
+    private final Map<String, Composite> tagComposites;
     private Text tagNameText;
-
     private Button addTagButton;
 
-    private TagsProposalsSupport tagsSupport;
+    TagsComposite(final Composite parent, final TagsProposalsSupport tagsSupport) {
+        this(parent, tagsSupport, null);
+    }
 
-    private boolean shouldRebuildProposals = false;
-
-    TagsComposite(final Composite parent) {
+    TagsComposite(final Composite parent, final TagsProposalsSupport tagsSupport, final TagsListener listener) {
         super(parent, SWT.NONE);
-        this.tagComposites = new HashMap<>();
-        this.tagsListeners = new ArrayList<>();
+        this.listener = listener;
+        this.tagComposites = new LinkedHashMap<>();
+        this.tagsSupport = tagsSupport;
 
         RowLayoutFactory.fillDefaults().fill(true).type(SWT.HORIZONTAL).spacing(2).wrap(true).applyTo(this);
-
-        createTags(new ArrayList<String>());
+        createTagsConstrols(new ArrayList<String>());
         createDefinitionText();
         createAddingButton();
     }
 
     private void createDefinitionText() {
         tagNameText = new Text(this, SWT.BORDER);
+        RowDataFactory.swtDefaults().hint(60, 17).applyTo(tagNameText);
         tagNameText.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(final KeyEvent e) {
@@ -74,15 +75,13 @@ class TagsComposite extends Composite {
         tagNameText.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(final ModifyEvent e) {
-                for (final TagsListener tagsListener : tagsListeners) {
-                    tagsListener.newTagIsEdited();
-                }
+                listener.newTagIsEdited();
             }
         });
-        RowDataFactory.swtDefaults().hint(60, 17).applyTo(tagNameText);
+        tagsSupport.install(tagNameText);
     }
 
-    private void createTags(final Collection<String> tags) {
+    private void createTagsConstrols(final Collection<String> tags) {
         for (final String tag : tags) {
             tagComposites.put(tag, createTagControlFor(tag));
         }
@@ -107,12 +106,9 @@ class TagsComposite extends Composite {
         newTagRemoveBtn.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                for (final TagsListener listener : tagsListeners) {
-                    listener.removeTagRequested(tag);
-                }
+                removeTag(tag);
             }
         });
-        
         return newTag;
     }
 
@@ -129,36 +125,10 @@ class TagsComposite extends Composite {
         });
     }
 
-    private void addTag() {
-        final String text = tagNameText.getText().trim();
-        if (text.isEmpty()) {
-            return;
-        }
-        for (final TagsListener listener : tagsListeners) {
-            listener.addTagRequested(text);
-        }
-        tagNameText.setText("");
-        tagNameText.setFocus();
-    }
-
     @Override
     public void dispose() {
-        super.dispose();
-
         tagComposites.clear();
-        tagsListeners.clear();
-    }
-
-    void installTagsProposalsSupport(final Map<IResource, List<String>> suitesToRun) {
-//        if (tagsSupport == null || shouldRebuildProposals) {
-//            tagsSupport = new TagsProposalsSupport(suitesToRun);
-//            tagsSupport.install(tagNameText);
-//        }
-//        shouldRebuildProposals = false;
-    }
-
-    void markProposalsToRebuild() {
-        this.shouldRebuildProposals = true;
+        super.dispose();
     }
 
     void setInput(final Collection<String> tags) {
@@ -167,8 +137,8 @@ class TagsComposite extends Composite {
             for (final Composite tagComp : tagComposites.values()) {
                 tagComp.dispose();
             }
-            createTags(tags);
-            
+            tagComposites.clear();
+            createTagsConstrols(tags);
             
             final Control[] childrens = getChildren();
             final Control currentLast = childrens[childrens.length - 1];
@@ -180,30 +150,55 @@ class TagsComposite extends Composite {
         }
     }
 
-    void addTagsListener(final TagsListener listener) {
-        tagsListeners.add(listener);
+    List<String> getInput() {
+        return newArrayList(tagComposites.keySet());
     }
 
-    void removeTagsListener(final TagsListener listener) {
-        tagComposites.remove(listener);
+    private void addTag() {
+        final String text = tagNameText.getText().trim();
+        if (text.isEmpty()) {
+            return;
+        }
+        tagNameText.setText("");
+        tagNameText.setFocus();
+        if (tagComposites.keySet().contains(text)) {
+            return;
+        }
+        try {
+            setRedraw(false);
+            tagComposites.put(text, createTagControlFor(text));
+
+            final Control[] childrens = getChildren();
+            final Control currentLast = childrens[childrens.length - 1];
+
+            tagNameText.moveBelow(currentLast);
+            addTagButton.moveBelow(tagNameText);
+        } finally {
+            setRedraw(true);
+            listener.tagAdded(text);
+        }
+    }
+
+    private void removeTag(final String tag) {
+        try {
+            setRedraw(false);
+            tagComposites.remove(tag).dispose();
+        } finally {
+            setRedraw(true);
+            listener.tagRemoved(tag);
+        }
     }
 
     boolean userIsFocusingOnNewTab() {
         return tagNameText.isFocusControl() && !tagNameText.getText().isEmpty();
     }
 
-    void applyCurrentTag() {
-        if (!tagNameText.getText().isEmpty()) {
-            addTag();
-        }
-    }
-
-    interface TagsListener {
+    public interface TagsListener {
 
         void newTagIsEdited();
 
-        void addTagRequested(String tag);
+        void tagAdded(String tag);
 
-        void removeTagRequested(String tag);
+        void tagRemoved(String tag);
     }
 }

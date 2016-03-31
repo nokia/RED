@@ -70,7 +70,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-@SuppressWarnings("PMD.GodClass")
 public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegate implements
         ILaunchConfigurationDelegate, ILaunchShortcut {
 
@@ -295,7 +294,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         builder.addVariableFiles(robotProject.getVariableFilePaths());
 
         builder.suitesToRun(getSuitesToRun(suiteResources));
-        builder.testsToRun(robotConfig.getTestCasesNames());
+        builder.testsToRun(getTestsToRun(robotConfig));
 
         if (robotConfig.isIncludeTagsEnabled()) {
             builder.includeTags(robotConfig.getIncludedTags());
@@ -323,7 +322,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
 
     private Collection<IResource> getSuiteResources(final RobotLaunchConfiguration robotConfig, final IProject project)
             throws CoreException {
-        final Collection<String> suitePaths = robotConfig.getSuitePaths();
+        final Collection<String> suitePaths = robotConfig.getSuitePaths().keySet();
 
         final Map<String, IResource> resources = Maps.asMap(newHashSet(suitePaths), new Function<String, IResource>() {
             @Override
@@ -371,12 +370,24 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final List<String> upperCased = newArrayList(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, projectName));
         upperCased.addAll(
                 Lists.transform(Arrays.asList(path.removeFileExtension().segments()), new Function<String, String>() {
-            @Override
-            public String apply(final String segment) {
-                return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, segment);
-            }
-        }));
+
+                    @Override
+                    public String apply(final String segment) {
+                        return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, segment);
+                    }
+                }));
         return Joiner.on('.').join(upperCased);
+    }
+
+    private Collection<String> getTestsToRun(final RobotLaunchConfiguration robotConfig) throws CoreException {
+        final String projectName = robotConfig.getProjectName();
+        final List<String> tests = new ArrayList<>();
+        for (final Entry<String, List<String>> entries : robotConfig.getSuitePaths().entrySet()) {
+            for (final String testName : entries.getValue()) {
+                tests.add(createSuiteName(projectName, Path.fromPortableString(entries.getKey())) + "." + testName);
+            }
+        }
+        return tests;
     }
 
     private boolean waitForDebugServerSocket(final DebugSocketManager socketManager) {
