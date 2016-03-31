@@ -294,7 +294,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             final DryRunLibraryImportStatus firstStatus = import1.getStatus();
             final DryRunLibraryImportStatus secStatus = import2.getStatus();
             if(firstStatus == secStatus) {
-                return import1.getName().compareTo(import2.getName());
+                return import1.getName().compareToIgnoreCase(import2.getName());
             }
             if (firstStatus == DryRunLibraryImportStatus.ADDED && secStatus != DryRunLibraryImportStatus.ADDED) {
                 return -1;
