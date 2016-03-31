@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch;
 
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -67,6 +68,7 @@ import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -367,15 +369,9 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     public static String createSuiteName(final String projectName, final IPath path) {
-        final List<String> upperCased = newArrayList(CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, projectName));
+        final List<String> upperCased = newArrayList(toRobotFrameworkName(projectName));
         upperCased.addAll(
-                Lists.transform(Arrays.asList(path.removeFileExtension().segments()), new Function<String, String>() {
-
-                    @Override
-                    public String apply(final String segment) {
-                        return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, segment);
-                    }
-                }));
+                Lists.transform(Arrays.asList(path.removeFileExtension().segments()), toRobotFrameworkName()));
         return Joiner.on('.').join(upperCased);
     }
 
@@ -384,10 +380,40 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final List<String> tests = new ArrayList<>();
         for (final Entry<String, List<String>> entries : robotConfig.getSuitePaths().entrySet()) {
             for (final String testName : entries.getValue()) {
-                tests.add(createSuiteName(projectName, Path.fromPortableString(entries.getKey())) + "." + testName);
+                final String rfTestName = toRobotFrameworkName(testName);
+                tests.add(createSuiteName(projectName, Path.fromPortableString(entries.getKey())) + "." + rfTestName);
             }
         }
         return tests;
+    }
+
+    private static Function<String, String> toRobotFrameworkName() {
+        return new Function<String, String>() {
+
+            @Override
+            public String apply(final String name) {
+                return toRobotFrameworkName(name);
+            }
+        };
+    }
+
+    private static String toRobotFrameworkName(final String name) {
+        // converts suite/test name to name used by RF
+        String resultName = name;
+        final int prefixIndex = resultName.indexOf("__");
+        if (prefixIndex != -1) {
+            resultName = resultName.substring(prefixIndex + 2);
+        }
+        resultName.replaceAll("_", " ");
+        final List<String> splittedNames = Splitter.on(' ').splitToList(resultName);
+        final Iterable<String> titled = transform(splittedNames, new Function<String, String>() {
+
+            @Override
+            public String apply(final String name) {
+                return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
+            }
+        });
+        return Joiner.on(' ').join(titled);
     }
 
     private boolean waitForDebugServerSocket(final DebugSocketManager socketManager) {
