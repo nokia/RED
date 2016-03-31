@@ -9,9 +9,16 @@
 
 <h3>External libraries installed by pip or included in testcase by file path</h3>
 
-In order to provide validation and keyword assistance of external libraries ( any library not bundled with RobotFramework), external library <b>needs</b> to be included in <b> red.xml </b> file in the Referenced libraries part. </br>RED Editor does not add external library by itself by default - there are cases where tester is working with multiple versions of libraries and needs to have exact control which library is taken to validation and keyword assistance in RED. <br>
+In order to provide validation and keyword assistance of external libraries ( any library not bundled with RobotFramework), external library <b>needs</b> to be included in <b> red.xml </b> file in the Referenced libraries part. </br>
 <br>
 There are few ways to include library into red.xml
+<h3>Library autodiscovery</h3>
+Main mechanism to include libraries' keywords in RED is done by autodiscovery mechanism. Mechanism works on two levels - during test edition and executed in Project Explorer on group of files and folders. </br>
+Every time when user edits test suite which has error markers on library declaration, autodiscovery is executed together with save action.<br>
+When there is a need to run autodiscovery on list of files,folders or whole project, this can be achieved by using right click menu in Project Explorer from Robot Framework option.  
+<br><br><img src="libs/autodiscovery_menu.png"> <br><br>
+
+Autodiscovery mechanism is configured per project, its preferences are stored in red.xml file under Referenced Libraries tab.
 <h3>Add library from Project Explorer</h3>
 External libraries as python files can be directly included to red.xml file by right clicking on file and using option <br>
 <i>Robot Framework -> Add Library to red.xml </i>
@@ -35,14 +42,12 @@ Libspec file can be included instead of link to external library by using red.xm
 For more information about LibDoc please refer to <a href="https://robot-framework.readthedocs.org/en/2.9/_modules/robot/libdoc.html">https://robot-framework.readthedocs.org/en/2.9/_modules/robot/libdoc.html</a> <br>
 <h3>Errors while importing Referenced Libraries </h3>
 During library import, RED is generating LibDoc from given python file using local python interpreter. 
-Whenever python encounter problem, it will be shown as popup window with Python exception
+Under the hood RED is executing following command to RobotFramework to get list of Keywords from give library:<br>
+<i>python -m robot.libdoc &ltPATH_TO_LIBNAME&gt &ltOPTIONS&gt</i><br>
+Whenever RED encounters problem, it will be shown as popup window from Python execution:
 <br><br><img src="libs/libs_8.png"> <br><br>
 This indicates that some of the dependencies are missing on your local machine which may affect testcase execution.    
-<h2>Importing Python Variable files into code assistance</h2>
-
-Python variable files can be imported to RED by adding path in red.xml<br>
-Such imported variable file is seen anywhere across project and behaves as Global Variable. <br>
-Any file included in Variable Files section in red.xml will be taken into use during run or debug from RED.
-
+To verify you can try to execute libdoc in console:<br>
+<i>python -m robot.libdoc &ltPATH_TO_LIBNAME&gt list
 </body>
 </html>
