@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -101,8 +102,15 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     public void initialize(final Composite parent) {
         final Section section = createSection(parent);
 
-        final Composite internalComposite = toolkit.createComposite(section);
-        section.setClient(internalComposite);
+        final ScrolledComposite scrolledParent = new ScrolledComposite(section, SWT.H_SCROLL | SWT.V_SCROLL);
+        toolkit.adapt(scrolledParent);
+        section.setClient(scrolledParent);
+
+        final Composite internalComposite = toolkit.createComposite(scrolledParent);
+        scrolledParent.setContent(internalComposite);
+        scrolledParent.setExpandVertical(true);
+        scrolledParent.setExpandHorizontal(true);
+
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
         GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 5).applyTo(internalComposite);
 
@@ -114,6 +122,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         
         createAutoReloadAndDiscoverButtons(internalComposite);
 
+        scrolledParent.setMinSize(internalComposite.computeSize(-1, -1));
         setInput();
     }
 
