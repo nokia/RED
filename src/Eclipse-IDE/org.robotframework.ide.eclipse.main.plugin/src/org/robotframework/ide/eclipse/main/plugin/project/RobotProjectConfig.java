@@ -174,7 +174,7 @@ public class RobotProjectConfig {
         return isReferencedLibrariesAutoDiscoveringEnabled;
     }
 
-    public void setReferencedLibrariesAutoDiscoveringEnabled(boolean isReferencedLibrariesAutoDiscoveringEnabled) {
+    public void setReferencedLibrariesAutoDiscoveringEnabled(final boolean isReferencedLibrariesAutoDiscoveringEnabled) {
         this.isReferencedLibrariesAutoDiscoveringEnabled = isReferencedLibrariesAutoDiscoveringEnabled;
     }
     
@@ -182,7 +182,7 @@ public class RobotProjectConfig {
         return isLibrariesAutoDiscoveringSummaryWindowEnabled;
     }
 
-    public void setLibrariesAutoDiscoveringSummaryWindowEnabled(boolean isLibrariesAutoDiscoveringSummaryWindowEnabled) {
+    public void setLibrariesAutoDiscoveringSummaryWindowEnabled(final boolean isLibrariesAutoDiscoveringSummaryWindowEnabled) {
         this.isLibrariesAutoDiscoveringSummaryWindowEnabled = isLibrariesAutoDiscoveringSummaryWindowEnabled;
     }
 
@@ -457,7 +457,7 @@ public class RobotProjectConfig {
             try {
                 this.uri = new URI(path);
             } catch (final URISyntaxException e) {
-                throw new IllegalStateException("Invalid URI '" + path + "'", e);
+                throw new IllegalArgumentException("Invalid URI '" + path + "'", e);
             }
         }
 
