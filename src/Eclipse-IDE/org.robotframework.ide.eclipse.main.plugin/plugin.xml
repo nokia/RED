@@ -1024,11 +1024,6 @@
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
     </context>
     <context
-          id="org.robotframework.ide.eclipse.redxmleditor.remotelocations.context"
-          name="Context for Remote locations section editor page"
-          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
-    </context>
-    <context
           id="org.robotframework.ide.eclipse.redxmleditor.varfiles.context"
           name="Context for Variable files section editor page"
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
@@ -2317,26 +2312,6 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteRemoteLocationHandler"
-          commandId="org.eclipse.ui.edit.delete">
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.redxml.remoteLocationsPartIsActiveAndEditable">
-          </reference></activeWhen>
-       <enabledWhen>
-          <with
-                variable="selection">
-             <iterate
-                   ifEmpty="false"
-                   operator="and">
-                <instanceof
-                      value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$RemoteLocation">
-                </instanceof>
-             </iterate>
-          </with>
-       </enabledWhen>
-    </handler>
-    <handler
           class="org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteReferencedLibraryHandler"
           commandId="org.eclipse.ui.edit.delete">
        <activeWhen>
@@ -2350,9 +2325,14 @@
              <iterate
                    ifEmpty="true"
                    operator="and">
-                <instanceof
-                      value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$ReferencedLibrary">
-                </instanceof>
+                <or>
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$ReferencedLibrary">
+                   </instanceof>
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$RemoteLocation">
+                   </instanceof>
+                </or>
              </iterate>
           </with>
        </enabledWhen>
