@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _sucj8JHsEeWEZYgZQ8Au9A
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 1/12/16 10:26 AM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 4/1/16 3:13 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,11 +17,15 @@ Entry-Name: .content
 
 
 //open red.xml
+
+
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 with [get-editor "RobotProject/red.xml"] {
     get-tab-folder | get-tab-item "Referenced libraries" | click
-    get-section "Remote library locations" | get-table | select "...add new remote location" | key-type Enter
+    get-section "Referenced libraries" | get-button "Add Remote location" | click
 }
+
+
 
 //check how window looks like
 with [get-window "Add Remote location" | get-control Any] {
@@ -40,33 +44,47 @@ with [get-window "Add Remote location" | get-control Any] {
 get-window "Add Remote location" | get-button Cancel | click
 
 //check that nothing was added
-with [get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table] {
-    get-property itemCount | equals 1 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "...add new remote location" | verify-true
-}
+
+get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | get-property itemCount | equals 0 
+    | verify-true
 
 
 //add default
-get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
-get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table 
-    | select "...add new remote location" |key-type Enter
+
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" | get-button "Add Remote location" | click
+}
 get-window "Add Remote location" | get-button OK | click
 
 
-//add with another port   
-get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
-get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table 
-    | select "...add new remote location" | key-type Enter
-        
-with [get-window "Add Remote location"] {
-    get-editbox -after [get-label URI] | set-text "http://127.0.0.1:8660/"
-    get-button OK | click
-}    
 
-//add address with "/repo"
+//add with another port   
+
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
-get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table 
-    | select "...add new remote location" |key-type Enter
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" |  get-button "Add Remote location" | click
+}
+with [get-window "Add Remote location"] {
+    with [get-editbox -after [get-label URI]] {
+        set-text "http://127.0.0.1:8660/"
+    }
+    get-button OK | click
+}
+
+
+
+
+ 
+//add address with "/repo"
+
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" |  get-button "Add Remote location" | click
+}
 with [get-window "Add Remote location"] {
     with [get-editbox -after [get-label URI]] {
         set-text "http://127.0.0.1:15/repo"
@@ -74,81 +92,120 @@ with [get-window "Add Remote location"] {
     get-button OK | click
 }
 
+ 
 //remove last "/" and check warning
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
-get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table 
-    | select "...add new remote location" |key-type Enter
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" |  get-button "Add Remote location" | click
+}
 get-window "Add Remote location" | get-editbox -after [get-label URI] | set-text "http://127.0.0.1:8270"
 get-window "Add Remote location" | get-label "URI have an empty path. Path '/RPC2' will be used" | get-property caption 
     | equals "URI have an empty path. Path '/RPC2' will be used" | verify-true
 get-window "Add Remote location" | get-button OK | click
 
 
+
 //add repon "text"
+
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
-get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table 
-    | select "...add new remote location" |key-type Enter
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" |  get-button "Add Remote location" | click
+}
 with [get-window "Add Remote location"] {
-    get-editbox -after [get-label URI] | set-text text
+    with [get-editbox -after [get-label URI]] {
+        set-text text
+    }
     get-button OK | click
 }
+
+
+
 
 //add onet.pl
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
-get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table 
-    | select "...add new remote location" |key-type Enter
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" |  get-button "Add Remote location" | click
+}
 with [get-window "Add Remote location"] {
-    get-editbox -after [get-label URI] | set-text "onet.pl/"
+    with [get-editbox -after [get-label URI]] {
+        set-text "onet.pl/"
+    }
     get-button OK | click
 }
+
+
+
 
 //add https
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
-get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table 
-    | select "...add new remote location" |key-type Enter
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" |  get-button "Add Remote location" | click
+}
 with [get-window "Add Remote location"] {
-    get-editbox -after [get-label URI] | set-text "https://127.0.0.1:8270/"
+    with [get-editbox -after [get-label URI]] {
+        set-text "https://127.0.0.1:8270/"
+    }
     get-button OK | click
 }
 
+
+
+
+
 //add duplicate of default value
-get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
-get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table 
-    | select "...add new remote location" |key-type Enter
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" | get-button "Add Remote location" | click
+}
 get-window "Add Remote location" | get-button OK | click
+
+
 
 //add duplicate of onet.pl
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
-get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table 
-    | select "...add new remote location" |key-type Enter
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    get-section "Referenced libraries" |  get-button "Add Remote location" | click
+}
 with [get-window "Add Remote location"] {
-    get-editbox -after [get-label URI] | set-text "onet.pl/"
+    with [get-editbox -after [get-label URI]] {
+        set-text "onet.pl/"
+    }
     get-button OK | click
 }
 
 
 //check if all items are (duplicate were not added):
-with [get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:8270/" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8660/" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "http://127.0.0.1:15/repo" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "http://127.0.0.1:8270/RPC2" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals text | verify-true
-    get-property "getItems().TableItem[5].getText()" | equals "onet.pl/" | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals "https://127.0.0.1:8270/" | verify-true
-    get-property "getItems().TableItem[7].getText()" | equals "...add new remote location" | verify-true
-    get-property "getItemCount()" | equals 8 | verify-true
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property itemCount | equals 7 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:8270/ - Remote" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8660/ - Remote" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "http://127.0.0.1:15/repo - Remote" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "http://127.0.0.1:8270/RPC2 - Remote" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "text - Remote" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "onet.pl/ - Remote" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals "https://127.0.0.1:8270/ - Remote" | verify-true
 }
 
+
+
 //remove with 3 items
-with [get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table] {
-    select "http:\\/\\/127.0.0.1:8270\\/" "http:\\/\\/127.0.0.1:15\\/repo" "https:\\/\\/127.0.0.1:8270\\/"
+
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "http:\\/\\/127.0.0.1:8270\\/ - Remote" | key-type Del
+    select "http:\\/\\/127.0.0.1:15\\/repo - Remote" "https:\\/\\/127.0.0.1:8270\\/ - Remote"
     key-type Del
 }
 
-with [get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table] {
-    select "http:\\/\\/127.0.0.1:8660\\/" | double-click
-    select "http:\\/\\/127.0.0.1:8660\\/" | activate-cell-edit
+// edit entry and add /new to URL
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "http:\\/\\/127.0.0.1:8660\\/ - Remote" | double-click
+    select "http:\\/\\/127.0.0.1:8660\\/ - Remote" | activate-cell-edit
     with [get-editbox] {
         set-text "http://127.0.0.1:8660/new"
         key-type Enter
@@ -156,29 +213,24 @@ with [get-editor "RobotProject/red.xml" | get-section "Remote library locations"
     apply-cell-edit -deactivate
 }
 
-with [get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table] {
-    get-property itemCount | equals 5 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:8660/new" | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8270/RPC2" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals text | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "onet.pl/" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "...add new remote location" | verify-true
+// check items and properties
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property itemCount | equals 4 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "http://127.0.0.1:8660/new - Remote" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "http://127.0.0.1:8270/RPC2 - Remote" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "text - Remote" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "onet.pl/ - Remote" | verify-true
+    get-item "http:\\/\\/127.0.0.1:8660\\/new - Remote" | get-property "image.path" 
+        | equals "org.robotframework.ide.eclipse.main.plugin/resources/remote_connected.png" | verify-true
+    get-item "http:\\/\\/127.0.0.1:8660\\/new - Remote" | get-property "styles[0].fontStyle" | equals normal 
+        | verify-true
 }
 
-//check imgae and font style (canot be done in verifiation due to graphic is dispose
-with [get-editor "RobotProject/red.xml" | get-section "Remote library locations" | get-table] {
-    get-item "http:\\/\\/127.0.0.1:8660\\/new" | get-property "image.path" 
-        | equals "org.robotframework.ide.eclipse.main.plugin/resources/remote_connected.png" | verify-true
-    get-item "http:\\/\\/127.0.0.1:8660\\/new" | get-property "styles[0].fontStyle" | equals normal | verify-true
-    get-item "http:\\/\\/127.0.0.1:8270\\/RPC2" | get-property "image.path" 
-        | equals "org.robotframework.ide.eclipse.main.plugin/resources/remote_connected.png" | verify-true
-    get-item "http:\\/\\/127.0.0.1:8270\\/RPC2" | get-property "styles[0].fontStyle" | equals normal | verify-true
-    get-item text | get-property "image.path" 
-        | equals "org.robotframework.ide.eclipse.main.plugin/resources/remote_connected.png" | verify-true
-    get-item text | get-property "styles[0].fontStyle" | equals normal | verify-true
-    get-item "onet.pl\\/" | get-property "image.path" 
-        | equals "org.robotframework.ide.eclipse.main.plugin/resources/remote_connected.png" | verify-true
-    get-item "onet.pl\\/" | get-property "styles[0].fontStyle" | equals normal | verify-true
-}
+
+
+
+
+
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
