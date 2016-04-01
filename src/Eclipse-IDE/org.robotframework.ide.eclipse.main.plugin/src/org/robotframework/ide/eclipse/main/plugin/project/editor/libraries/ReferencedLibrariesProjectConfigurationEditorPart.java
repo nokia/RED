@@ -26,18 +26,16 @@ public class ReferencedLibrariesProjectConfigurationEditorPart
     static class LibrariesProjectConfigurationEditor extends RedProjectEditorPage {
 
         private ReferencedLibrariesFormFragment referencedFragment;
-        private RemoteLibraryLocationsFormFragment remoteFragment;
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
             referencedFragment = new ReferencedLibrariesFormFragment();
-            remoteFragment = new RemoteLibraryLocationsFormFragment();
-            return newArrayList(referencedFragment, remoteFragment);
+            return newArrayList(referencedFragment);
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return new ViewersCombiningSelectionProvider(referencedFragment.getViewer(), remoteFragment.getViewer());
+            return new ViewersCombiningSelectionProvider(referencedFragment.getViewer());
         }
     }
 }
