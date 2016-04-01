@@ -9,6 +9,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.ActivationCharPreservingTextCellEditor;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
@@ -17,21 +18,24 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Rem
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
-import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 
 
 /**
  * @author Michal Anglart
  *
  */
-public class RemoteLibraryLocationEditingSupport extends ElementsAddingEditingSupport {
+public class ReferencedLibrariesEditingSupport extends EditingSupport {
 
     private final RedProjectEditorInput editorInput;
 
-    public RemoteLibraryLocationEditingSupport(final ColumnViewer viewer, final RedProjectEditorInput editorInput,
-            final NewElementsCreator<?> creator) {
-        super(viewer, -1, creator);
+    public ReferencedLibrariesEditingSupport(final ColumnViewer viewer, final RedProjectEditorInput editorInput) {
+        super(viewer);
         this.editorInput = editorInput;
+    }
+
+    @Override
+    protected boolean canEdit(final Object element) {
+        return element instanceof RemoteLocation;
     }
 
     @Override
@@ -40,9 +44,8 @@ public class RemoteLibraryLocationEditingSupport extends ElementsAddingEditingSu
             final Composite parent = (Composite) getViewer().getControl();
             return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
                     RobotElementEditingSupport.DETAILS_EDITING_CONTEXT_ID);
-        } else {
-            return super.getCellEditor(element);
         }
+        return null;
     }
 
     @Override
@@ -68,12 +71,10 @@ public class RemoteLibraryLocationEditingSupport extends ElementsAddingEditingSu
             } catch (final IllegalArgumentException e) {
                 // uri syntax was wrong...
             }
-        } else {
-            super.setValue(element, value);
         }
     }
 
     private IEventBroker getEventBroker() {
-        return (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        return PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 }

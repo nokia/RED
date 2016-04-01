@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,9 +30,11 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
@@ -45,6 +49,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -76,15 +81,12 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     private RowExposingTableViewer viewer;
 
     private Button addPythonLibButton;
-
     private Button addJavaLibButton;
-
     private Button addLibspecButton;
+    private Button addRemoteButton;
     
     private Button autoLibDiscoverButton;
-    
     private Button showAutoLibDiscoverDialogButton;
-    
     private Button autoLibReloadButton;
 
     private ControlDecoration decoration;
@@ -102,7 +104,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         final Composite internalComposite = toolkit.createComposite(section);
         section.setClient(internalComposite);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 5).applyTo(internalComposite);
 
         createViewer(internalComposite);
         createColumns();
@@ -119,8 +121,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         final Section section = toolkit.createSection(parent,
                 ExpandableComposite.EXPANDED | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
         section.setText("Referenced libraries");
-        section.setDescription("Specify third party libraries to be used by the project. "
-                + "Libraries defined here will be accessible from all suites within the project.");
+        section.setDescription(
+                "Specify third party libraries and/or locations for Remote standard library to be used by the project");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
         return section;
     }
@@ -131,7 +133,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        GridDataFactory.fillDefaults().grab(true, true).span(1, 3).indent(0, 10).applyTo(viewer.getTable());
+        GridDataFactory.fillDefaults().grab(true, true).span(1, 4).indent(0, 10).applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
         viewer.getTable().setLinesVisible(false);
@@ -146,10 +148,12 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
 
     private void createColumns() {
         ViewerColumnsFactory.newColumn("")
-                .withWidth(100)
+                .withWidth(200)
+                .withMinWidth(200)
                 .shouldGrabAllTheSpaceLeft(true)
-                .withMinWidth(100)
                 .labelsProvidedBy(new ReferencedLibrariesLabelProvider(editorInput))
+                .editingEnabledOnlyWhen(editorInput.isEditable())
+                .editingSupportedBy(new ReferencedLibrariesEditingSupport(viewer, editorInput))
                 .createFor(viewer);
     }
 
@@ -178,56 +182,11 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addLibspecButton.setEnabled(false);
         GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(addLibspecButton);
         addLibspecHandler();
-    }
-    
-    private void createAutoReloadAndDiscoverButtons(final Composite parent) {
-        final Composite composite = toolkit.createComposite(parent);
-        GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 3).applyTo(composite);
 
-        autoLibDiscoverButton = toolkit.createButton(composite, "Auto discover libraries after test suite save action",
-                SWT.CHECK);
-        autoLibDiscoverButton
-                .setSelection(editorInput.getProjectConfiguration().isReferencedLibrariesAutoDiscoveringEnabled());
-        showAutoLibDiscoverDialogButton = toolkit.createButton(composite,
-                "Show discovering summary after test suite save action", SWT.CHECK);
-        showAutoLibDiscoverDialogButton
-                .setSelection(editorInput.getProjectConfiguration().isLibrariesAutoDiscoveringSummaryWindowEnabled());
-
-        autoLibDiscoverButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final boolean selection = autoLibDiscoverButton.getSelection();
-                editorInput.getProjectConfiguration().setReferencedLibrariesAutoDiscoveringEnabled(selection);
-                if (!selection) {
-                    showAutoLibDiscoverDialogButton.setSelection(selection);
-                    editorInput.getProjectConfiguration().setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
-                }
-                setDirty(true);
-            }
-        });
-        showAutoLibDiscoverDialogButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final boolean selection = showAutoLibDiscoverDialogButton.getSelection();
-                editorInput.getProjectConfiguration().setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
-                setDirty(true);
-            }
-        });
-        
-        autoLibReloadButton = toolkit.createButton(composite,
-                "Automatically reload changed libraries", SWT.CHECK);
-        autoLibReloadButton.setSelection(editorInput.getProjectConfiguration().isReferencedLibrariesAutoReloadEnabled());
-        autoLibReloadButton.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(final SelectionEvent e) {
-                final boolean selection = autoLibReloadButton.getSelection();
-                editorInput.getProjectConfiguration().setIsReferencedLibrariesAutoReloadEnabled(selection);
-                setDirty(true);
-            }
-        });
+        addRemoteButton = toolkit.createButton(parent, "Add Remote location", SWT.PUSH);
+        addRemoteButton.setEnabled(false);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 20).applyTo(addRemoteButton);
+        addRemoteHandler();
     }
 
     private void addPythonHandler() {
@@ -309,6 +268,27 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         });
     }
 
+    private void addRemoteHandler() {
+        addRemoteButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                final RemoteLocationDialog dialog = new RemoteLocationDialog(viewer.getTable().getShell());
+                if (dialog.open() == Window.OK) {
+                    final RemoteLocation remoteLocation = dialog.getRemoteLocation();
+
+                    final List<RemoteLocation> locations = editorInput.getProjectConfiguration().getRemoteLocations();
+                    if (!locations.contains(remoteLocation)) {
+                        editorInput.getProjectConfiguration().addRemoteLocation(remoteLocation);
+
+                        final RedProjectConfigEventData<List<RemoteLocation>> eventData = new RedProjectConfigEventData<List<RemoteLocation>>(
+                                editorInput.getRobotProject().getConfigurationFile(), newArrayList(remoteLocation));
+                        eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
+                    }
+                }
+            }
+        });
+    }
+
     private void addLibraries(final List<ReferencedLibrary> libs) {
         final List<ReferencedLibrary> added = new ArrayList<>();
         for (final ReferencedLibrary library : libs) {
@@ -331,9 +311,69 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         return dialog;
     }
 
+    private void createAutoReloadAndDiscoverButtons(final Composite parent) {
+        autoLibDiscoverButton = createCheckButton(parent, "Auto discover libraries after test suite save action",
+                new SelectionAdapter() {
+
+                    @Override
+                    public void widgetSelected(final SelectionEvent e) {
+                        final boolean selection = autoLibDiscoverButton.getSelection();
+                        editorInput.getProjectConfiguration().setReferencedLibrariesAutoDiscoveringEnabled(selection);
+                        if (!selection) {
+                            showAutoLibDiscoverDialogButton.setSelection(selection);
+                            editorInput.getProjectConfiguration()
+                                    .setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
+                        }
+                        setDirty(true);
+                    }
+                });
+
+        showAutoLibDiscoverDialogButton = createCheckButton(parent,
+                "Show discovering summary after test suite save action", new SelectionAdapter() {
+
+                    @Override
+                    public void widgetSelected(final SelectionEvent e) {
+                        final boolean selection = showAutoLibDiscoverDialogButton.getSelection();
+                        editorInput.getProjectConfiguration()
+                                .setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
+                        setDirty(true);
+                    }
+                });
+
+        autoLibReloadButton = createCheckButton(parent, "Automatically reload changed libraries",
+                new SelectionAdapter() {
+
+                    @Override
+                    public void widgetSelected(final SelectionEvent e) {
+                        final boolean selection = autoLibReloadButton.getSelection();
+                        editorInput.getProjectConfiguration().setIsReferencedLibrariesAutoReloadEnabled(selection);
+                        setDirty(true);
+                    }
+                });
+    }
+
+    private Button createCheckButton(final Composite parent, final String label,
+            final SelectionListener selectionListener) {
+        final Button button = toolkit.createButton(parent, label, SWT.CHECK | SWT.WRAP);
+        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(button);
+        button.addSelectionListener(selectionListener);
+        return button;
+    }
+
     private void setInput() {
-        final List<ReferencedLibrary> libspecs = editorInput.getProjectConfiguration().getLibraries();
-        viewer.setInput(libspecs);
+        setInput(editorInput.getProjectConfiguration());
+    }
+
+    private void setInput(final RobotProjectConfig config) {
+        final List<Object> input = new ArrayList<>();
+        input.addAll(config.getRemoteLocations());
+        input.addAll(config.getLibraries());
+        viewer.setInput(input);
+
+        autoLibDiscoverButton.setSelection(config.isReferencedLibrariesAutoDiscoveringEnabled());
+        showAutoLibDiscoverDialogButton.setSelection(config.isLibrariesAutoDiscoveringSummaryWindowEnabled());
+        autoLibReloadButton.setSelection(config.isReferencedLibrariesAutoReloadEnabled());
+
     }
 
     @Override
@@ -354,11 +394,12 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        setInput();
+        setInput(config);
 
         addPythonLibButton.setEnabled(false);
         addJavaLibButton.setEnabled(false);
         addLibspecButton.setEnabled(false);
+        addRemoteButton.setEnabled(false);
         autoLibDiscoverButton.setEnabled(false);
         showAutoLibDiscoverDialogButton.setEnabled(false);
         autoLibReloadButton.setEnabled(false);
@@ -377,6 +418,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addPythonLibButton.setEnabled(isEditable);
         addJavaLibButton.setEnabled(isEditable && projectIsInterpretedByJython);
         addLibspecButton.setEnabled(isEditable);
+        addRemoteButton.setEnabled(isEditable);
         autoLibDiscoverButton.setEnabled(isEditable);
         showAutoLibDiscoverDialogButton.setEnabled(isEditable);
         autoLibReloadButton.setEnabled(isEditable);
@@ -401,7 +443,6 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE) final String string) {
         editorInput.refreshProjectConfiguration();
         setInput();
-        viewer.refresh();
     }
 
     @Inject
@@ -410,7 +451,27 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 final RedProjectConfigEventData<List<ReferencedLibrary>> eventData) {
         if (eventData.getUnderlyingFile().equals(editorInput.getRobotProject().getConfigurationFile())) {
             setDirty(true);
-            viewer.refresh();
+            setInput();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenRemoteLocationDetailChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED) final RedProjectConfigEventData<RemoteLocation> eventData) {
+        if (editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+            setDirty(true);
+            setInput();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenRemoteLocationChanged(
+            @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED) final RedProjectConfigEventData<List<RemoteLocation>> eventData) {
+        if (editorInput.getRobotProject().getConfigurationFile().equals(eventData.getUnderlyingFile())) {
+            setDirty(true);
+            setInput();
         }
     }
 }
