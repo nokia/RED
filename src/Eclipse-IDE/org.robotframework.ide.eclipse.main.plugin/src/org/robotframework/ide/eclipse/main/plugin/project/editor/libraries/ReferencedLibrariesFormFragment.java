@@ -153,7 +153,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                 .shouldGrabAllTheSpaceLeft(true)
                 .labelsProvidedBy(new ReferencedLibrariesLabelProvider(editorInput))
                 .editingEnabledOnlyWhen(editorInput.isEditable())
-                .editingSupportedBy(new ReferencedLibrariesEditingSupport(viewer, editorInput))
+                .editingSupportedBy(new ReferencedLibrariesEditingSupport(viewer, editorInput, eventBroker))
                 .createFor(viewer);
     }
 
