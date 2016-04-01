@@ -271,7 +271,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             if (element instanceof DryRunLibraryImport) {
                 final DryRunLibraryImport libraryImport = (DryRunLibraryImport) element;
                 if (libraryImport.getStatus() == null) {
-                    return null;
+                    return ImagesManager.getImage(RedImages.getFatalErrorImage());
                 }
                 if (libraryImport.getStatus() == DryRunLibraryImportStatus.ADDED) {
                     return ImagesManager.getImage(RedImages.getBigSuccessImage());
