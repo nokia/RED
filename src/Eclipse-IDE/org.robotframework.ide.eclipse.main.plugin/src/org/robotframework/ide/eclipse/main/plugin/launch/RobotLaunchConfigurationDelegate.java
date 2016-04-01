@@ -64,6 +64,7 @@ import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.MessageLogView;
 import org.robotframework.red.viewers.Selections;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -279,7 +280,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         return RunCommandLineCallBuilder.forRemoteEnvironment(env, port).build();
     }
 
-    private RunCommandLine createStandardModeCmd(final RobotLaunchConfiguration robotConfig,
+    @VisibleForTesting
+    RunCommandLine createStandardModeCmd(final RobotLaunchConfiguration robotConfig,
             final RobotProject robotProject, final Collection<IResource> suiteResources, final boolean isDebugging)
             throws CoreException, IOException {
 
@@ -380,8 +382,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         final List<String> tests = new ArrayList<>();
         for (final Entry<String, List<String>> entries : robotConfig.getSuitePaths().entrySet()) {
             for (final String testName : entries.getValue()) {
-                final String rfTestName = toRobotFrameworkName(testName);
-                tests.add(createSuiteName(projectName, Path.fromPortableString(entries.getKey())) + "." + rfTestName);
+                tests.add(createSuiteName(projectName, Path.fromPortableString(entries.getKey())) + "." + testName);
             }
         }
         return tests;
@@ -404,7 +405,6 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         if (prefixIndex != -1) {
             resultName = resultName.substring(prefixIndex + 2);
         }
-        resultName.replaceAll("_", " ");
         final List<String> splittedNames = Splitter.on(' ').splitToList(resultName);
         final Iterable<String> titled = transform(splittedNames, new Function<String, String>() {
 
