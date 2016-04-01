@@ -109,6 +109,32 @@ public class RobotDryRunOutputParser implements ILineHandler {
                         currentLibraryImportWithFail = dryRunLibraryImport;
                     }
                 }
+            } else if (messageLevel != null && messageLevel.equalsIgnoreCase("ERROR")) {
+                String message = details.get("message");
+                if (message != null) {
+                    final String nameStartTxt = "': Test library '";
+                    final int nameStartIndex = message.lastIndexOf(nameStartTxt);
+                    final int endIndex = message.lastIndexOf("' does not exist");
+                    if(nameStartIndex > 0 && endIndex > nameStartIndex) {
+                        final String libName = message.substring(nameStartIndex + nameStartTxt.length(), endIndex);
+                        final DryRunLibraryImport dryRunLibraryImport = new DryRunLibraryImport(libName,
+                                new ArrayList<String>());
+                        final String errorStartTxt = "Error in file '";
+                        final int errorStartIndex = message.indexOf(errorStartTxt);
+                        String importer = "";
+                        if(errorStartIndex >= 0) {
+                            importer = message.substring(errorStartIndex+errorStartTxt.length(), nameStartIndex);
+                        }
+                        int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
+                        if(libIndex<0) {
+                            dryRunLibraryImport.addImporterPath(importer);
+                            dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, message);
+                            importedLibraries.add(dryRunLibraryImport);
+                        } else {
+                            importedLibraries.get(libIndex).addImporterPath(importer);
+                        }
+                    }
+                }
             }
         }
     }
