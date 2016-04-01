@@ -205,7 +205,7 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    String getPythonExecutablePath() {
+    public String getPythonExecutablePath() {
         final PythonInstallationDirectory pyLocation = (PythonInstallationDirectory) location;
         final String pythonExec = pyLocation.interpreter.executableName();
         return findFile(pyLocation, pythonExec).getAbsolutePath();
