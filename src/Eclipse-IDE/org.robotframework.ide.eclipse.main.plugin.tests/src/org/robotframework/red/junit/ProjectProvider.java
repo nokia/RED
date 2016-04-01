@@ -12,7 +12,6 @@ import java.io.InputStream;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -38,6 +37,10 @@ public class ProjectProvider implements TestRule {
         return project;
     }
     
+    public IProject getProject() {
+        return project;
+    }
+
     @Override
     public Statement apply(final Statement base, final Description description) {
         return new Statement() {
@@ -72,7 +75,7 @@ public class ProjectProvider implements TestRule {
         return project.getFile(filePath);
     }
 
-    public IResource getDir(final IPath dirPath) {
+    public IFolder getDir(final IPath dirPath) {
         return project.getFolder(dirPath);
     }
 
