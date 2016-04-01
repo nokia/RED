@@ -11,7 +11,6 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
@@ -24,13 +23,17 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditin
  * @author Michal Anglart
  *
  */
-public class ReferencedLibrariesEditingSupport extends EditingSupport {
+class ReferencedLibrariesEditingSupport extends EditingSupport {
 
     private final RedProjectEditorInput editorInput;
 
-    public ReferencedLibrariesEditingSupport(final ColumnViewer viewer, final RedProjectEditorInput editorInput) {
+    private final IEventBroker eventBroker;
+
+    ReferencedLibrariesEditingSupport(final ColumnViewer viewer, final RedProjectEditorInput editorInput,
+            final IEventBroker eventBroker) {
         super(viewer);
         this.editorInput = editorInput;
+        this.eventBroker = eventBroker;
     }
 
     @Override
@@ -67,14 +70,10 @@ public class ReferencedLibrariesEditingSupport extends EditingSupport {
 
                 final RedProjectConfigEventData<RemoteLocation> eventData = new RedProjectConfigEventData<RobotProjectConfig.RemoteLocation>(
                         editorInput.getRobotProject().getConfigurationFile(), remoteLocation);
-                getEventBroker().send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED, eventData);
+                eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_PATH_CHANGED, eventData);
             } catch (final IllegalArgumentException e) {
                 // uri syntax was wrong...
             }
         }
-    }
-
-    private IEventBroker getEventBroker() {
-        return PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 }
