@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
+package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 
 /**
  * @author Michal Anglart
@@ -58,5 +57,25 @@ public class RobotLaunchConfigurationMock extends RobotLaunchConfiguration {
 
     public void addSuite(final String suitePath, final List<String> cases) {
         suites.put(suitePath, cases);
+    }
+
+    @Override
+    public String getExecutorArguments() throws CoreException {
+        return "";
+    }
+
+    @Override
+    public String getInterpeterArguments() throws CoreException {
+        return "";
+    }
+
+    @Override
+    public boolean isIncludeTagsEnabled() throws CoreException {
+        return false;
+    }
+
+    @Override
+    public boolean isExcludeTagsEnabled() throws CoreException {
+        return false;
     }
 }

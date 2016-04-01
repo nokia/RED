@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.SuiteExecutor;
 
 /**
  * @author Michal Anglart
@@ -37,6 +38,8 @@ public class RuntimeEnvironmentsMocks {
         when(mock.isValidPythonInstallation()).thenReturn(true);
         when(mock.hasRobotInstalled()).thenReturn(true);
         when(mock.getVersion()).thenReturn(version);
+        when(mock.getInterpreter()).thenReturn(SuiteExecutor.Python);
+        when(mock.getPythonExecutablePath()).thenReturn("some/path/to/python");
         return mock;
     }
 
