@@ -30,12 +30,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.dryrun.RobotDryRunHandler;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
+import org.rf.ide.core.dryrun.RobotDryRunOutputParser;
 import org.rf.ide.core.executor.ILineHandler;
-import org.rf.ide.core.executor.RobotDryRunHandler;
-import org.rf.ide.core.executor.RobotDryRunOutputParser;
-import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunLibraryImport;
-import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunLibraryImportStatus;
-import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunLibraryType;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
@@ -231,20 +231,20 @@ public class LibrariesAutoDiscoverer {
     }
 
     private void startAddingLibrariesToProjectConfiguration(final IProgressMonitor monitor) {
-        final List<DryRunLibraryImport> importedLibraries = filterUnknownReferencedLibraries();
+        final List<RobotDryRunLibraryImport> importedLibraries = filterUnknownReferencedLibraries();
         if (!importedLibraries.isEmpty()) {
             RobotProjectConfig config = robotProject.getOpenedProjectConfig();
             final boolean inEditor = config != null;
             if (config == null) {
                 config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
             }
-            final List<DryRunLibraryImport> dryRunLibrariesToAdd = filterExistingReferencedLibraries(importedLibraries,
-                    config);
+            final List<RobotDryRunLibraryImport> dryRunLibrariesToAdd = filterExistingReferencedLibraries(
+                    importedLibraries, config);
 
             SubMonitor subMonitor = SubMonitor.convert(monitor);
             subMonitor.setWorkRemaining(dryRunLibrariesToAdd.size() + 1);
             final List<ReferencedLibrary> addedLibs = new ArrayList<>();
-            for (final DryRunLibraryImport libraryImport : dryRunLibrariesToAdd) {
+            for (final RobotDryRunLibraryImport libraryImport : dryRunLibrariesToAdd) {
                 subMonitor.subTask("Adding discovered library to project configuration: " + libraryImport.getName());
                 if (libraryImport.getType() == DryRunLibraryType.JAVA) {
                     addJavaLibraryToProjectConfiguration(config, libraryImport, addedLibs);
@@ -274,10 +274,10 @@ public class LibrariesAutoDiscoverer {
         }
     }
 
-    private List<DryRunLibraryImport> filterUnknownReferencedLibraries() {
-        final List<DryRunLibraryImport> importedLibraries = newArrayList();
+    private List<RobotDryRunLibraryImport> filterUnknownReferencedLibraries() {
+        final List<RobotDryRunLibraryImport> importedLibraries = newArrayList();
 
-        for (final DryRunLibraryImport dryRunLibraryImport : dryRunOutputParser.getImportedLibraries()) {
+        for (final RobotDryRunLibraryImport dryRunLibraryImport : dryRunOutputParser.getImportedLibraries()) {
             if (dryRunLibraryImport.getType() != DryRunLibraryType.UNKNOWN) {
                 importedLibraries.add(dryRunLibraryImport);
             }
@@ -285,15 +285,15 @@ public class LibrariesAutoDiscoverer {
         return importedLibraries;
     }
 
-    private List<DryRunLibraryImport> filterExistingReferencedLibraries(
-            final List<DryRunLibraryImport> importedLibraries, RobotProjectConfig config) {
-        final List<DryRunLibraryImport> dryRunLibrariesToAdd = newArrayList();
+    private List<RobotDryRunLibraryImport> filterExistingReferencedLibraries(
+            final List<RobotDryRunLibraryImport> importedLibraries, RobotProjectConfig config) {
+        final List<RobotDryRunLibraryImport> dryRunLibrariesToAdd = newArrayList();
         if (config != null) {
             final List<String> currentLibrariesNames = newArrayList();
             for (final ReferencedLibrary referencedLibrary : config.getLibraries()) {
                 currentLibrariesNames.add(referencedLibrary.getName());
             }
-            for (final DryRunLibraryImport dryRunLibraryImport : importedLibraries) {
+            for (final RobotDryRunLibraryImport dryRunLibraryImport : importedLibraries) {
                 if (!currentLibrariesNames.contains(dryRunLibraryImport.getName())) {
                     dryRunLibrariesToAdd.add(dryRunLibraryImport);
                 } else {
@@ -307,7 +307,7 @@ public class LibrariesAutoDiscoverer {
     }
 
     private void addPythonLibraryToProjectConfiguration(final RobotProjectConfig config,
-            final DryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
+            final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
 
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
                 robotProject.getRuntimeEnvironment());
@@ -340,7 +340,7 @@ public class LibrariesAutoDiscoverer {
     }
 
     private void addJavaLibraryToProjectConfiguration(final RobotProjectConfig config,
-            final DryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
+            final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
         final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(robotProject.getRuntimeEnvironment());
         List<JarClass> classesFromJar = newArrayList();
         try {
@@ -370,7 +370,7 @@ public class LibrariesAutoDiscoverer {
     }
 
     private void addReferencedLibrariesToProjectConfiguration(final RobotProjectConfig config,
-            final DryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs,
+            final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs,
             final Collection<ReferencedLibrary> librariesToAdd) {
         for (final ReferencedLibrary library : librariesToAdd) {
             if (config.addReferencedLibrary(library)) {
