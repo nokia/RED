@@ -115,8 +115,12 @@ class IntepretersComposite extends Composite {
                     final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
                     new ProgressMonitorDialog(shell).run(false, false,
                             new CheckEnvironmentRunnable(shell, chosenExecutorName));
-                } catch (InvocationTargetException | InterruptedException e) {
-                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage()),
+                } catch (final InterruptedException e) {
+                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e),
+                            StatusManager.BLOCK);
+                } catch (final InvocationTargetException e) {
+                    StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                            e.getTargetException().getMessage(), e.getTargetException()),
                             StatusManager.BLOCK);
                 }
             }
