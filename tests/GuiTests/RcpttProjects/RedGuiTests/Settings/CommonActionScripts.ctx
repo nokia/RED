@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/7/16 4:04 PM
+Save-Time: 3/25/16 4:15 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -16,21 +16,22 @@ Entry-Name: .ecl.context
 //make full screen
 get-eclipse-window | maximize 
 
+
 //get python path
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-	global [val python_exe_path [exec-process  "\"python.exe\"" "-c"  "\"import sys,os.path; print os.path.dirname(sys.executable)\"" | get stdout| split "!" -trimResults ]]
+	global [val python_exe_path [exec-process  "\"python.exe\"" "-c"  "\"import sys,os.path; print os.path.dirname(sys.executable)\"" | get stdout| invoke trim]]
 
 }-else{
-	global [val python_exe_path [exec-process  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)" | get stdout |split "!" -trimResults]]
+	global [val python_exe_path [exec-process  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)" | get stdout |invoke trim]]
 }	
 
 
 //get robot version
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-	global [val robot_version [exec-process "\"pybot.bat\"" "\"--version\"" -ignoreStderr -ignoreExitCode | get stdout  |split -sep "!"   -trimResults]]
+	global [val robot_version [exec-process "\"pybot.bat\"" "\"--version\"" -ignoreStderr -ignoreExitCode | get stdout  |invoke trim]]
 
 }-else{
-	global [val robot_version [exec-process  "pybot" "--version"  -ignoreStderr -ignoreExitCode  | get stdout |split -sep "!"   -trimResults]]
+	global [val robot_version [exec-process  "pybot" "--version"  -ignoreStderr -ignoreExitCode  | get stdout |invoke trim]]
 }	
 
 
@@ -308,15 +309,10 @@ proc "check-debug-marker-on-ruler" [val line] [val script_name]{
 }
 
 proc replace [val input] [val old] [val new]{
-
-	if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-		exec-process  "\"python.exe\"" "-c"  "\"import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])\"" $input $old $new | get stdout | split "!" -trimResults 
-
-	}-else{
-		exec-process  "python" "-c"  "import sys; print sys.argv[1].replace(sys.argv[2], sys.argv[3])" $input $old $new | get stdout |split "!" -trimResults 
-	}	
+	$input |str| invoke replace $old $new
 
 }
+
 
 proc "compare-message-log2" [val ref_content]{
 	get-view "Message Log" | get-editbox | get-property text -raw| let [val original_content -input]
