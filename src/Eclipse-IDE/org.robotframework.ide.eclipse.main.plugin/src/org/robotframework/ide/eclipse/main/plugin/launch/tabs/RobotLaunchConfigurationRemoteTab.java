@@ -151,11 +151,11 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         setErrorMessage(null);
         setWarningMessage(null);
         if(!isPortValid()) {
-            setErrorMessage("Invalid port specified");
+            setErrorMessage("Invalid port specified.");
             return false;
         }
         if(!isConnectionTimeoutValid()) {
-            setErrorMessage("Invalid connection timeout specified");
+            setErrorMessage("Invalid connection timeout specified.");
             return false;
         }
         return true;
