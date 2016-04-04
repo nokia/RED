@@ -34,7 +34,7 @@ class SuiteVisitorImportProxy(SuiteVisitor):
                 t = TestCase(name='Fake_' + str(int(round(time.time() * 1000))))
                 suite.tests.append(t)
             else:
-                if len(suite.tests) == 0 or suite.test_count == 0:
+                if os.path.isdir(suite.source) and suite.test_count == 0:
                     current_suite = MyTestSuiteBuilder().build(suite.source)
                     suite.suites = current_suite.suites
             suite.keywords.clear()
