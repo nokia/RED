@@ -170,7 +170,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
 
     @Override
     public String getMessage() {
-        return "Please select a project";
+        return "Create or edit a configuration to launch Robot Framework tests";
     }
 
     @Override
