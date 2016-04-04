@@ -222,7 +222,7 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    static File copyResourceFile(final String filename) throws IOException {
+    public static File copyResourceFile(final String filename) throws IOException {
         final Path tempDir = createTemporaryDirectory();
         final File scriptFile = new File(tempDir.toString() + File.separator
                 + filename);

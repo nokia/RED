@@ -34,8 +34,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunLibraryImport;
-import org.rf.ide.core.executor.RobotDryRunOutputParser.DryRunLibraryImportStatus;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
+import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -60,9 +60,9 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private Text detailsText;
 
-    private List<DryRunLibraryImport> importedLibraries;
+    private List<RobotDryRunLibraryImport> importedLibraries;
 
-    public LibrariesAutoDiscovererWindow(final Shell parent, final List<DryRunLibraryImport> importedLibraries) {
+    public LibrariesAutoDiscovererWindow(final Shell parent, final List<RobotDryRunLibraryImport> importedLibraries) {
         super(parent);
         setShellStyle(SWT.CLOSE | SWT.MODELESS | SWT.BORDER | SWT.TITLE | SWT.RESIZE);
         setBlockOnOpen(false);
@@ -123,7 +123,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         Collections.sort(importedLibraries, new DiscoveredLibrariesComparator());
         discoveredLibrariesViewer
-                .setInput(importedLibraries.toArray(new DryRunLibraryImport[importedLibraries.size()]));
+                .setInput(importedLibraries.toArray(new RobotDryRunLibraryImport[importedLibraries.size()]));
 
         discoveredLibrariesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
@@ -157,17 +157,18 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         @Override
         public Object[] getElements(final Object inputElement) {
-            return (DryRunLibraryImport[]) inputElement;
+            return (RobotDryRunLibraryImport[]) inputElement;
         }
 
         @Override
         public Object[] getChildren(final Object parentElement) {
-            if (parentElement instanceof DryRunLibraryImport) {
-                final DryRunLibraryImport libraryImport = (DryRunLibraryImport) parentElement;
+            if (parentElement instanceof RobotDryRunLibraryImport) {
+                final RobotDryRunLibraryImport libraryImport = (RobotDryRunLibraryImport) parentElement;
                 final List<Object> children = new ArrayList<>();
 
                 if (libraryImport.getStatus() != null) {
-                    children.add(STATUS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getStatus().getMessage());
+                    children.add(
+                            STATUS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getStatus().getMessage());
                 }
                 if (libraryImport.getSourcePath() != null && !libraryImport.getSourcePath().isEmpty()) {
                     children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getSourcePath());
@@ -224,8 +225,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
             StyledString label = new StyledString("");
 
-            if (element instanceof DryRunLibraryImport) {
-                label = new StyledString(((DryRunLibraryImport) element).getName());
+            if (element instanceof RobotDryRunLibraryImport) {
+                label = new StyledString(((RobotDryRunLibraryImport) element).getName());
             } else if (element instanceof String) {
                 String text = (String) element;
                 String[] textSplit = text.split(ELEMENT_SEPARATOR);
@@ -244,7 +245,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                         StringBuilder secElement = new StringBuilder("");
                         for (int i = 1; i < textSplit.length; i++) {
                             secElement.append(textSplit[i]);
-                            if(i < textSplit.length-1) {
+                            if (i < textSplit.length - 1) {
                                 secElement.append(ELEMENT_SEPARATOR);
                             }
                         }
@@ -271,17 +272,14 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         }
 
         private Image getImage(final Object element) {
-            if (element instanceof DryRunLibraryImport) {
-                final DryRunLibraryImport libraryImport = (DryRunLibraryImport) element;
-                if (libraryImport.getStatus() == null) {
+            if (element instanceof RobotDryRunLibraryImport) {
+                final RobotDryRunLibraryImport libraryImport = (RobotDryRunLibraryImport) element;
+                if (libraryImport.getStatus() == null || libraryImport.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
                     return ImagesManager.getImage(RedImages.getFatalErrorImage());
-                }
-                if (libraryImport.getStatus() == DryRunLibraryImportStatus.ADDED) {
+                } else if (libraryImport.getStatus() == DryRunLibraryImportStatus.ADDED) {
                     return ImagesManager.getImage(RedImages.getBigSuccessImage());
                 } else if (libraryImport.getStatus() == DryRunLibraryImportStatus.ALREADY_EXISTING) {
                     return ImagesManager.getImage(RedImages.getBigWarningImage());
-                } else if (libraryImport.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
-                    return ImagesManager.getImage(RedImages.getFatalErrorImage());
                 }
             } else if (element instanceof String || element instanceof List<?>) {
                 return ImagesManager.getImage(RedImages.getElementImage());
@@ -290,13 +288,13 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         }
     }
 
-    private static class DiscoveredLibrariesComparator implements Comparator<DryRunLibraryImport> {
+    private static class DiscoveredLibrariesComparator implements Comparator<RobotDryRunLibraryImport> {
 
         @Override
-        public int compare(final DryRunLibraryImport import1, final DryRunLibraryImport import2) {
+        public int compare(final RobotDryRunLibraryImport import1, final RobotDryRunLibraryImport import2) {
             final DryRunLibraryImportStatus firstStatus = import1.getStatus();
             final DryRunLibraryImportStatus secStatus = import2.getStatus();
-            if(firstStatus == secStatus) {
+            if (firstStatus == secStatus) {
                 return import1.getName().compareToIgnoreCase(import2.getName());
             }
             if (firstStatus == DryRunLibraryImportStatus.ADDED && secStatus != DryRunLibraryImportStatus.ADDED) {
