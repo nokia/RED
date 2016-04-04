@@ -41,7 +41,7 @@ public class RobotLaunchConfigurationValidatorTest {
     @Test
     public void whenProjectNameIsEmpty_fatalExceptionIsThrown() {
         thrown.expect(RobotLaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project '' does not exist in workspace");
+        thrown.expectMessage("Project '' does not exist in workspace.");
 
         validator.validate(new RobotLaunchConfigurationMock(""));
     }
@@ -49,7 +49,7 @@ public class RobotLaunchConfigurationValidatorTest {
     @Test
     public void whenProjectDoesNotExist_fatalExceptionIsThrown() {
         thrown.expect(RobotLaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project 'foo' does not exist in workspace");
+        thrown.expectMessage("Project 'foo' does not exist in workspace.");
 
         validator.validate(new RobotLaunchConfigurationMock("foo"));
     }
@@ -57,7 +57,7 @@ public class RobotLaunchConfigurationValidatorTest {
     @Test
     public void whenProjectIsClosed_fatalExceptionIsThrown() throws Exception {
         thrown.expect(RobotLaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project 'foo' is currently closed");
+        thrown.expectMessage("Project 'foo' is currently closed.");
         projectProvider.create("foo").close(null);
 
         validator.validate(new RobotLaunchConfigurationMock("foo"));
@@ -66,7 +66,7 @@ public class RobotLaunchConfigurationValidatorTest {
     @Test
     public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_1() throws Exception {
         thrown.expect(RobotLaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project 'foo' is using invalid Python environment");
+        thrown.expectMessage("Project 'foo' is using invalid Python environment.");
         final IProject fooProject = projectProvider.create("foo");
 
         final RobotProject robotProject = mock(RobotProject.class);
@@ -81,7 +81,7 @@ public class RobotLaunchConfigurationValidatorTest {
     @Test
     public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_2() throws Exception {
         thrown.expect(RobotLaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project 'foo' is using invalid Python environment");
+        thrown.expectMessage("Project 'foo' is using invalid Python environment.");
         final IProject fooProject = projectProvider.create("foo");
 
         final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidPythonEnvironment();
@@ -97,7 +97,7 @@ public class RobotLaunchConfigurationValidatorTest {
     @Test
     public void whenProjectIsUsingInvalidEnvironment_fatalExceptionIsThrown_3() throws Exception {
         thrown.expect(RobotLaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage("Project 'foo' is using invalid Python environment (missing Robot Framework)");
+        thrown.expectMessage("Project 'foo' is using invalid Python environment (missing Robot Framework).");
         final IProject fooProject = projectProvider.create("foo");
 
         final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createInvalidRobotEnvironment();
@@ -113,7 +113,7 @@ public class RobotLaunchConfigurationValidatorTest {
     @Test
     public void whenThereAreNoSuitesSpecified_warningExceptionIsThrown() throws Exception {
         thrown.expect(RobotLaunchConfigurationValidationException.class);
-        thrown.expectMessage("There are no suites specified. All suites in 'foo' will be executed");
+        thrown.expectMessage("There are no suites specified. All suites in 'foo' will be executed.");
 
         final IProject fooProject = projectProvider.create("foo");
 
@@ -131,7 +131,7 @@ public class RobotLaunchConfigurationValidatorTest {
     public void whenSystemIntepreterIsUsed_warningExceptionIsThrown() throws Exception {
         thrown.expect(RobotLaunchConfigurationValidationException.class);
         thrown.expectMessage(CoreMatchers
-                .equalTo("Tests will be launched using 'Python' interpreter as defined in PATH environment variable"));
+                .equalTo("Tests will be launched using 'Python' interpreter as defined in PATH environment variable."));
 
         final IPath filePath = Path.fromPortableString("file.robot");
         projectProvider.create("foo");
@@ -149,8 +149,8 @@ public class RobotLaunchConfigurationValidatorTest {
     public void warningsAreCombinedTogetherInSingleException() throws Exception {
         thrown.expect(RobotLaunchConfigurationValidationException.class);
         thrown.expectMessage(CoreMatchers
-                .equalTo("Tests will be launched using 'Python' interpreter as defined in PATH environment variable\n"
-                        + "There are no suites specified. All suites in 'foo' will be executed"));
+                .equalTo("Tests will be launched using 'Python' interpreter as defined in PATH environment variable.\n"
+                        + "There are no suites specified. All suites in 'foo' will be executed."));
 
         projectProvider.create("foo");
 
@@ -164,7 +164,7 @@ public class RobotLaunchConfigurationValidatorTest {
     public void whenSuitesSpecifiedToRunDoesNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
         thrown.expect(RobotLaunchConfigurationValidationFatalException.class);
         thrown.expectMessage(CoreMatchers
-                .equalTo("Following suites does not exist: /foo/suite/dir, /foo/file2.robot"));
+                .equalTo("Following suites does not exist: /foo/suite/dir, /foo/file2.robot."));
 
         final IPath filePath = Path.fromPortableString("file.robot");
         final IProject fooProject = projectProvider.create("foo");
@@ -188,7 +188,7 @@ public class RobotLaunchConfigurationValidatorTest {
     @Test
     public void whenTestsSpecifiedInSuiteDoNotExist_fatalExceptionIsThrown() throws Exception, CoreException {
         thrown.expect(RobotLaunchConfigurationValidationFatalException.class);
-        thrown.expectMessage(CoreMatchers.equalTo("Following tests does not exist: case4, case5"));
+        thrown.expectMessage(CoreMatchers.equalTo("Following tests does not exist: case4, case5."));
 
         final IPath filePath = Path.fromPortableString("file.robot");
         final IProject fooProject = projectProvider.create("foo");
