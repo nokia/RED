@@ -53,31 +53,31 @@ class RobotLaunchConfigurationValidator {
             final Optional<IProject> project = getProject(projectName);
             if (!project.isPresent() || !project.get().exists()) {
                 throw new RobotLaunchConfigurationValidationFatalException(
-                        "Project '" + projectName + "' does not exist in workspace");
+                        "Project '" + projectName + "' does not exist in workspace.");
             }
             if (!project.get().isOpen()) {
                 throw new RobotLaunchConfigurationValidationFatalException(
-                        "Project '" + projectName + "' is currently closed");
+                        "Project '" + projectName + "' is currently closed.");
             }
             if (robotConfig.isUsingInterpreterFromProject()) {
                 final RobotProject robotProject = model.createRobotProject(project.get());
                 final RobotRuntimeEnvironment env = robotProject.getRuntimeEnvironment();
                 if (env == null || !env.isValidPythonInstallation()) {
                     throw new RobotLaunchConfigurationValidationFatalException(
-                            "Project '" + projectName + "' is using invalid Python environment");
+                            "Project '" + projectName + "' is using invalid Python environment.");
                 } else if (!env.hasRobotInstalled()) {
                     throw new RobotLaunchConfigurationValidationFatalException("Project '" + projectName
-                            + "' is using invalid Python environment (missing Robot Framework)");
+                            + "' is using invalid Python environment (missing Robot Framework).");
                 }
             } else {
                 warnings.add("Tests will be launched using '" + robotConfig.getExecutor().name()
-                        + "' interpreter as defined in PATH environment variable");
+                        + "' interpreter as defined in PATH environment variable.");
             }
 
 
             final Map<IResource, List<String>> suitesToRun = robotConfig.collectSuitesToRun();
             if (suitesToRun.isEmpty()) {
-                warnings.add("There are no suites specified. All suites in '" + projectName + "' will be executed");
+                warnings.add("There are no suites specified. All suites in '" + projectName + "' will be executed.");
             }
             validateSuitesToRun(suitesToRun);
 
@@ -87,7 +87,7 @@ class RobotLaunchConfigurationValidator {
 
         } catch (final CoreException e) {
             throw new RobotLaunchConfigurationValidationFatalException(
-                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage(), e);
+                    "Run configuration '" + robotConfig.getName() + "' contains problems: " + e.getMessage() + ".", e);
         }
     }
 
@@ -125,11 +125,11 @@ class RobotLaunchConfigurationValidator {
         }
         if (!problematicSuites.isEmpty()) {
             throw new RobotLaunchConfigurationValidationFatalException(
-                    "Following suites does not exist: " + Joiner.on(", ").join(problematicSuites));
+                    "Following suites does not exist: " + Joiner.on(", ").join(problematicSuites) + ".");
         }
         if (!problematicTests.isEmpty()) {
             throw new RobotLaunchConfigurationValidationFatalException(
-                    "Following tests does not exist: " + Joiner.on(", ").join(problematicTests));
+                    "Following tests does not exist: " + Joiner.on(", ").join(problematicTests) + ".");
         }
     }
 
