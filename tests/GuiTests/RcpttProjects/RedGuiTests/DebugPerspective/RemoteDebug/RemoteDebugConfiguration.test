@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _LJw90Jm3EeWwXrMNKVDTwg
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 12/14/15 11:00 AM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/4/16 12:52 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -51,13 +51,14 @@ with [get-window "Debug Configurations" | get-group "Remote Debugging"] {
 }
 proc "check-if-no-error-is-shown"{
 	get-window "Debug Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
-	    | get-property text | equals "" | verify-true
+	    | get-property text | equals "Create or edit a configuration to launch Robot Framework tests" | verify-true
 
 }
 
 proc "check-port-error-and-clear-field"{
 	get-window "Debug Configurations" | get-editbox -after [get-label "Create, manage, and run configurations"] 
     	| get-property text | equals "Invalid port specified." | verify-true
+
     //clear port	
 	with [get-window "Debug Configurations" | get-group "Remote Debugging" | get-editbox -after [get-label "Local port:"]] {
     	set-text ""
