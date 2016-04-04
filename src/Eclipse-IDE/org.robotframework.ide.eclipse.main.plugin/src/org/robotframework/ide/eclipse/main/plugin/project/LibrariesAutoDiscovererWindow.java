@@ -167,22 +167,22 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 final List<Object> children = new ArrayList<>();
 
                 if (libraryImport.getStatus() != null) {
-                    children.add(STATUS_ELEMENT_NAME + ELEMENT_SEPARATOR + libraryImport.getStatus().getMessage());
+                    children.add(STATUS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getStatus().getMessage());
                 }
                 if (libraryImport.getSourcePath() != null && !libraryImport.getSourcePath().isEmpty()) {
-                    children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + libraryImport.getSourcePath());
+                    children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getSourcePath());
                 } else {
-                    children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + "Unknown");
+                    children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + "Unknown");
                 }
                 final List<String> importersPaths = libraryImport.getImportersPaths();
                 if (importersPaths.size() == 1) {
-                    children.add(IMPORTERS_ELEMENT_NAME + ELEMENT_SEPARATOR + importersPaths.get(0));
+                    children.add(IMPORTERS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + importersPaths.get(0));
                 } else {
                     children.add(importersPaths);
                 }
                 final String additionalInfo = libraryImport.getAdditionalInfo();
                 if (additionalInfo != null && !additionalInfo.isEmpty()) {
-                    children.add(ADDITIONAL_INFO_ELEMENT_NAME + ELEMENT_SEPARATOR + additionalInfo);
+                    children.add(ADDITIONAL_INFO_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + additionalInfo);
                 }
                 return children.toArray(new Object[children.size()]);
             } else if (parentElement instanceof List<?>) {
@@ -244,8 +244,11 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                         StringBuilder secElement = new StringBuilder("");
                         for (int i = 1; i < textSplit.length; i++) {
                             secElement.append(textSplit[i]);
+                            if(i < textSplit.length-1) {
+                                secElement.append(ELEMENT_SEPARATOR);
+                            }
                         }
-                        label.append(" " + ELEMENT_SEPARATOR + " " + secElement.toString());
+                        label.append(" " + ELEMENT_SEPARATOR + secElement.toString());
                     }
                 }
             } else if (element instanceof List<?>) {
