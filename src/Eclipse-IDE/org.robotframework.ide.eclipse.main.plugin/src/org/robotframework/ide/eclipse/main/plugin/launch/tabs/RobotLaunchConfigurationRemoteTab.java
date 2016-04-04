@@ -196,6 +196,11 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
     }
 
     @Override
+    public String getMessage() {
+        return "Create or edit a configuration to launch Robot Framework tests";
+    }
+
+    @Override
     public Image getImage() {
         return ImagesManager.getImage(RedImages.getRobotImage());
     }
