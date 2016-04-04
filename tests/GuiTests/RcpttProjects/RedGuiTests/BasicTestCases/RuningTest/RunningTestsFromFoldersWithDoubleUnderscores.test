@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Al2wgPf5EeW2mo2OkrhV1Q
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/4/16 10:31 AM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 4/4/16 11:27 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,19 +21,19 @@ Entry-Name: .content
 // execute whole folder tree : start/ 000__test & 111__test => 2 tests should be executed
 get-view "Project Explorer" | get-tree | select "FoldersWithDoubleUnderscores/start" | get-menu "Run As/1 Robot Test" 
     | click
-wait 5000
-get-view "Execution View" | get-label "Passed: 2" | get-property caption | equals "Passed: 2" | verify-true
+try -times 10 -delay 300 -command {
+get-view "Execution View" | get-label "Passed: 2" | get-property caption | equals "Passed: 2" | verify-true }
 
 // execute double underscore folder 000__tests, one test should be executed
 get-view "Project Explorer" | get-tree | select "FoldersWithDoubleUnderscores/start/000__test" 
     | get-menu "Run As/1 Robot Test" | click
-wait 1500   
-get-view "Execution View" | get-label "Passed: 2" | get-property caption | equals "Passed: 2" | verify-true
+try -times 10 -delay 300 -command {
+get-view "Execution View" | get-label "Passed: 2" | get-property caption | equals "Passed: 2" | verify-true }
 
 // execute double underscore folder 111__tests, one test should be executed
 get-view "Project Explorer" | get-tree | select "FoldersWithDoubleUnderscores/start/111__test" 
     | get-menu "Run As/1 Robot Test" | click
-wait 1500       
-get-view "Execution View" | get-label "Passed: 2" | get-property caption | equals "Passed: 2" | verify-true
+try -times 10 -delay 300 -command {
+get-view "Execution View" | get-label "Passed: 2" | get-property caption | equals "Passed: 2" | verify-true}
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
