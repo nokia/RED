@@ -200,7 +200,7 @@ public class RobotLaunchConfigurationMainTab extends AbstractLaunchConfiguration
         });
         GridDataFactory.fillDefaults().grab(true, false).applyTo(interpretersComposite);
 
-        interpreterArgumentsText = createArgumentsFields(executorGroup, "Additional Python interpreter arguments:", 5);
+        interpreterArgumentsText = createArgumentsFields(executorGroup, "Additional interpreter arguments:", 5);
         argumentsText = createArgumentsFields(executorGroup, "Additional Robot Framework arguments:", 0);
     }
 
