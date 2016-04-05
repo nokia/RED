@@ -1,0 +1,67 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _nus0MPsuEeW7_PzjO98BIw,_d8aMACuvEeW667Afdo4DcA
+Element-Name: ArgumentsInRunCinfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _DbKBQPs8EeW7_PzjO98BIw
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/5/16 5:33 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//run test
+get-view "Project Explorer" | get-tree | select "SecondProject/SingleTest.tsv" | get-menu "Run As/1 Robot Test" | click
+
+//add args to interpreter and robot
+get-button "Run SingleTest.tsv" | click -arrow
+get-menu "Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/SingleTest.tsv"
+    with [get-group Executor] {
+        get-editbox -after [get-label "Additional interpreter arguments:"] | set-text "-d"
+        with [get-editbox -after [get-label "Additional Robot Framework arguments:"]] {
+            set-text "-L Debug -e all --output NONE --report NONE --log NONE"
+        }
+    }
+    //run test
+    get-button Apply | click
+    get-button Run | click
+}
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .* -d -m robot\.run --listener .* -s SecondProject.SingleTest -L Debug -e all --output NONE --report NONE --log NONE .*SecondProject\n"
+    + "Suite Executor: Robot Framework .*\n"
+    + "==============================================================================\n"
+    + "SecondProject                                                                 \n"
+    + "==============================================================================\n"
+    + "SecondProject.SingleTest                                                      \n"
+    + "==============================================================================\n"
+    + "test1                                                                 \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "test2                                                                 \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "SecondProject.SingleTest                                              \| PASS \|\n"
+    + "2 critical tests, 2 passed, 0 failed\n"
+    + "2 tests total, 2 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "SecondProject                                                         \| PASS \|\n"
+    + "2 critical tests, 2 passed, 0 failed\n"
+    + "2 tests total, 2 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  None" | verify-true
+    
+//open run configuration and check if args are still in fields    
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations" | get-group Executor] {
+    get-editbox -after [get-label "Additional interpreter arguments:"] | get-property text | equals "-d" | verify-true
+    get-editbox -after [get-label "Additional Robot Framework arguments:"] | get-property text 
+        | equals "-L Debug -e all --output NONE --report NONE --log NONE" | verify-true
+}
+get-window "Run Configurations" | get-button Close | click
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
