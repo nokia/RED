@@ -226,7 +226,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             StyledString label = new StyledString("");
 
             if (element instanceof RobotDryRunLibraryImport) {
-                label = new StyledString(((RobotDryRunLibraryImport) element).getName());
+                final String name = ((RobotDryRunLibraryImport) element).getName().replaceAll("\\n", "/n");
+                label = new StyledString(name);
             } else if (element instanceof String) {
                 String text = (String) element;
                 String[] textSplit = text.split(ELEMENT_SEPARATOR);
