@@ -240,6 +240,10 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     }
 
     private void setInput() {
+        if (viewer.getTree() == null && viewer.getTree().isDisposed()) {
+            return;
+        }
+
         try {
             viewer.getTree().setRedraw(false);
 
