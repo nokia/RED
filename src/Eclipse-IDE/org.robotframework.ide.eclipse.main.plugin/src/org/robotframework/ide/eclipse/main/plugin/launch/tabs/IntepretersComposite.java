@@ -111,10 +111,9 @@ class IntepretersComposite extends Composite {
             @Override
             public void widgetSelected(final SelectionEvent event) {
                 try {
-                    final Shell shell = getShell();
                     final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
-                    new ProgressMonitorDialog(shell).run(false, false,
-                            new CheckEnvironmentRunnable(shell, chosenExecutorName));
+                    new ProgressMonitorDialog(getShell()).run(false, false,
+                            new CheckEnvironmentRunnable(chosenExecutorName));
                 } catch (final InterruptedException e) {
                     StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage(), e),
                             StatusManager.BLOCK);
@@ -146,12 +145,9 @@ class IntepretersComposite extends Composite {
 
     private static final class CheckEnvironmentRunnable implements IRunnableWithProgress {
 
-        private final Shell shell;
-
         private final String chosenExecutorName;
 
-        private CheckEnvironmentRunnable(final Shell shell, final String chosenExecutorName) {
-            this.shell = shell;
+        private CheckEnvironmentRunnable(final String chosenExecutorName) {
             this.chosenExecutorName = chosenExecutorName;
         }
 
@@ -164,8 +160,8 @@ class IntepretersComposite extends Composite {
                 throw new IllegalStateException(
                         "The " + executor.name() + " interpreter has no Robot installed");
             } else {
-                MessageDialog.openInformation(shell, "Interpreter checked", "The "
-                        + executor.name() + " interpreter has " + version + " installed");
+                MessageDialog.openInformation(null, "Interpreter checked",
+                        "The " + executor.name() + " interpreter has " + version + " installed");
             }
         }
     }
