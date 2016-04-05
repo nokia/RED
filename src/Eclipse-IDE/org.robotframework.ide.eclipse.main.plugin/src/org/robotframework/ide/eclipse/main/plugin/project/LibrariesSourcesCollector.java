@@ -33,7 +33,10 @@ public class LibrariesSourcesCollector {
 
         collectLocationsWithPythonAndJavaMembers(robotProject.getProject().members());
 
-        pythonpathLocations.add(robotProject.getProject().getLocation().toOSString());
+        final IPath projectLocation = robotProject.getProject().getLocation();
+        if(projectLocation != null) {
+            pythonpathLocations.add(projectLocation.toOSString());
+        }
         pythonpathLocations.addAll(robotProject.getPythonpath());
         
         classpathLocations.addAll(robotProject.getClasspath());

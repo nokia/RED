@@ -56,10 +56,14 @@ public class RobotDryRunHandler {
         handlerThread.start();
     }
 
-    public void executeDryRunProcess(final RunCommandLine dryRunCommandLine) throws InvocationTargetException {
+    public void executeDryRunProcess(final RunCommandLine dryRunCommandLine, final File projectDir) throws InvocationTargetException {
         if (dryRunCommandLine != null) {
             try {
-                dryRunProcess = new ProcessBuilder(dryRunCommandLine.getCommandLine()).start();
+                ProcessBuilder processBuilder = new ProcessBuilder(dryRunCommandLine.getCommandLine());
+                if(projectDir != null && projectDir.exists()) {
+                    processBuilder = processBuilder.directory(projectDir);
+                }
+                dryRunProcess = processBuilder.start();
                 drainProcessOutputAndErrorStreams(dryRunProcess);
                 if (dryRunProcess != null) {
                     dryRunProcess.waitFor();
