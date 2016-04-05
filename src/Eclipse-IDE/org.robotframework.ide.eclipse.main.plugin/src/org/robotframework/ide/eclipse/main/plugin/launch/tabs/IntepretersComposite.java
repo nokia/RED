@@ -26,7 +26,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
