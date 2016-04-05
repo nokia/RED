@@ -153,7 +153,7 @@ public class RedFileWatcher {
                     }
                 }
 
-                watcher = null;
+                tryToCloseWatchService();
                 sendWatchServiceInterruptedEvent();
             }
         }).start();
@@ -179,7 +179,7 @@ public class RedFileWatcher {
                     }
                 }
 
-                watcher = null;
+                tryToCloseWatchService();
                 sendWatchServiceInterruptedEvent();
             }
         }).start();
@@ -203,6 +203,18 @@ public class RedFileWatcher {
             if (nextFileName != null && nextFileName.equals(fileName)) {
                 modifiedFilesQueue.remove();
             }
+        }
+    }
+    
+    private void tryToCloseWatchService() {
+        try {
+            if (watcher != null) {
+                watcher.close();
+            }
+        } catch (IOException e) {
+            // nothing to do
+        } finally {
+            watcher = null;
         }
     }
 
