@@ -167,8 +167,7 @@ public class LibrariesAutoDiscoverer {
         RunCommandLine runCommandLine = null;
         try {
             runCommandLine = dryRunHandler.buildDryRunCommand(robotProject.getRuntimeEnvironment(),
-                    robotProject.getProject().getLocation().toFile(), suiteNames,
-                    librariesSourcesCollector.getPythonpathLocations(),
+                    getProjectLocationFile(), suiteNames, librariesSourcesCollector.getPythonpathLocations(),
                     librariesSourcesCollector.getClasspathLocations(), additionalProjectsLocations);
         } catch (IOException e) {
             throw new InvocationTargetException(e);
@@ -226,7 +225,7 @@ public class LibrariesAutoDiscoverer {
             dryRunOutputlisteners.add(dryRunOutputParser);
             dryRunHandler.startDryRunHandlerThread(dryRunCommandLine.getPort(), dryRunOutputlisteners);
 
-            dryRunHandler.executeDryRunProcess(dryRunCommandLine);
+            dryRunHandler.executeDryRunProcess(dryRunCommandLine, getProjectLocationFile());
         }
     }
 
@@ -387,4 +386,12 @@ public class LibrariesAutoDiscoverer {
         return workbenchWindow != null ? workbenchWindow.getShell() : null;
     }
 
+    private File getProjectLocationFile() {
+        File file = null;
+        final IPath projectLocation = robotProject.getProject().getLocation();
+        if (projectLocation != null) {
+            file = projectLocation.toFile();
+        }
+        return file;
+    }
 }
