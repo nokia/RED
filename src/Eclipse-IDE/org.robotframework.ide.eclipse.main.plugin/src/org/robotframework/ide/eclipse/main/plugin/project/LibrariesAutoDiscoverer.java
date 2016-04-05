@@ -256,15 +256,7 @@ public class LibrariesAutoDiscoverer {
 
             subMonitor.subTask("Updating project configuration...");
             if (!addedLibs.isEmpty()) {
-                final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
-                        robotProject.getConfigurationFile(), addedLibs);
-                if (eventBroker == null) {
-                    eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
-                }
-                if (eventBroker != null) {
-                    eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
-                }
-
+                sendProjectConfigChangedEvent(addedLibs);
                 if (!inEditor) {
                     new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
                 }
@@ -274,9 +266,19 @@ public class LibrariesAutoDiscoverer {
         }
     }
 
+    private void sendProjectConfigChangedEvent(final List<ReferencedLibrary> addedLibs) {
+        final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
+                robotProject.getConfigurationFile(), addedLibs);
+        if (eventBroker == null) {
+            eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        }
+        if (eventBroker != null) {
+            eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
+        }
+    }
+
     private List<RobotDryRunLibraryImport> filterUnknownReferencedLibraries() {
         final List<RobotDryRunLibraryImport> importedLibraries = newArrayList();
-
         for (final RobotDryRunLibraryImport dryRunLibraryImport : dryRunOutputParser.getImportedLibraries()) {
             if (dryRunLibraryImport.getType() != DryRunLibraryType.UNKNOWN) {
                 importedLibraries.add(dryRunLibraryImport);
@@ -308,7 +310,6 @@ public class LibrariesAutoDiscoverer {
 
     private void addPythonLibraryToProjectConfiguration(final RobotProjectConfig config,
             final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
-
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
                 robotProject.getRuntimeEnvironment());
         Collection<PythonClass> pythonClasses = newArrayList();
