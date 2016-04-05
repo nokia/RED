@@ -44,6 +44,8 @@ public class RedFileWatcher {
             .synchronizedMap(new HashMap<String, Collection<IWatchEventHandler>>());
 
     private LinkedBlockingQueue<String> modifiedFilesQueue = new LinkedBlockingQueue<>(100);
+    
+    private Thread eventConsumerThread;
 
     private RedFileWatcher() {
         createAndStartWatchService();
@@ -152,7 +154,6 @@ public class RedFileWatcher {
                         break;
                     }
                 }
-
                 tryToCloseWatchService();
                 sendWatchServiceInterruptedEvent();
             }
@@ -160,7 +161,10 @@ public class RedFileWatcher {
     }
 
     private void startEventConsumerThread() {
-        new Thread(new Runnable() {
+        if(eventConsumerThread != null) {
+            eventConsumerThread.interrupt();
+        }
+        eventConsumerThread = new Thread(new Runnable() {
 
             @Override
             public void run() {
@@ -178,11 +182,11 @@ public class RedFileWatcher {
                         break;
                     }
                 }
-
                 tryToCloseWatchService();
                 sendWatchServiceInterruptedEvent();
             }
-        }).start();
+        });
+        eventConsumerThread.start();
     }
 
     private void waitForAndRemovePossibleDuplicatedEvents(final String fileName) {
