@@ -15,6 +15,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.resource.FontDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
@@ -24,6 +25,7 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -33,7 +35,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -58,7 +59,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     private TreeViewer discoveredLibrariesViewer;
 
-    private Text detailsText;
+    private StyledText detailsText;
 
     private List<RobotDryRunLibraryImport> importedLibraries;
 
@@ -130,27 +131,74 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             @Override
             public void selectionChanged(final SelectionChangedEvent event) {
                 final Object selection = ((TreeSelection) event.getSelection()).getFirstElement();
-                if (selection != null && selection instanceof String) {
-                    final String selectionText = (String) selection;
-                    if (selectionText != null) {
-                        detailsText.setText(selectionText);
-                        detailsText.setVisible(true);
-                        return;
+                if (selection != null) {
+                    if (selection instanceof String) {
+                        final String selectionText = (String) selection;
+                        if (selectionText != null) {
+                            detailsText.setText(selectionText);
+                        }
+                    } else if (selection instanceof RobotDryRunLibraryImport) {
+                        final StringBuilder libraryImportTxtBuilder = convertDryRunLibraryImportToText(selection);
+                        detailsText.setText(libraryImportTxtBuilder.toString());
+                    } else {
+                        detailsText.setText("");
                     }
                 }
-                detailsText.setVisible(false);
             }
+
         });
     }
 
     private void createDetailsComposite(final Composite mainComposite) {
         final Composite detailsComposite = new Composite(mainComposite, SWT.NONE);
-        GridLayoutFactory.fillDefaults().numColumns(1).margins(3, 3).applyTo(detailsComposite);
+        GridLayoutFactory.fillDefaults().numColumns(1).applyTo(detailsComposite);
         GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 100).grab(true, false).applyTo(detailsComposite);
 
-        detailsText = new Text(detailsComposite, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-        GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 80).grab(true, false).applyTo(detailsText);
-        detailsText.setVisible(false);
+        detailsText = new StyledText(detailsComposite, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.WRAP);
+        detailsText.setFont(JFaceResources.getTextFont());
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(detailsText);
+        GridLayoutFactory.fillDefaults().applyTo(detailsText);
+        detailsText.setEditable(false);
+        detailsText.setAlwaysShowScrollBars(false);
+    }
+
+    @SuppressWarnings("unchecked")
+    private StringBuilder convertDryRunLibraryImportToText(final Object selection) {
+        final StringBuilder libraryImportTxtBuilder = new StringBuilder("");
+        for (final Object child : extractDryRunLibraryImportChildren((RobotDryRunLibraryImport) selection)) {
+            if (child instanceof String) {
+                libraryImportTxtBuilder.append(child + "\n");
+            } else if (child instanceof List<?>) {
+                libraryImportTxtBuilder.append(IMPORTERS_ELEMENT_NAME + ":\n");
+                for (final String listChild : (List<String>) child) {
+                    libraryImportTxtBuilder.append(listChild + "\n");
+                }
+            }
+        }
+        return libraryImportTxtBuilder;
+    }
+
+    private List<Object> extractDryRunLibraryImportChildren(final RobotDryRunLibraryImport libraryImport) {
+        final List<Object> children = new ArrayList<>();
+        if (libraryImport.getStatus() != null) {
+            children.add(STATUS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getStatus().getMessage());
+        }
+        if (libraryImport.getSourcePath() != null && !libraryImport.getSourcePath().isEmpty()) {
+            children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getSourcePath());
+        } else {
+            children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + "Unknown");
+        }
+        final List<String> importersPaths = libraryImport.getImportersPaths();
+        if (importersPaths.size() == 1) {
+            children.add(IMPORTERS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + importersPaths.get(0));
+        } else {
+            children.add(importersPaths);
+        }
+        final String additionalInfo = libraryImport.getAdditionalInfo();
+        if (additionalInfo != null && !additionalInfo.isEmpty()) {
+            children.add(ADDITIONAL_INFO_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + additionalInfo);
+        }
+        return children;
     }
 
     private class DiscoveredLibrariesViewerContentProvider extends TreeContentProvider {
@@ -163,28 +211,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         @Override
         public Object[] getChildren(final Object parentElement) {
             if (parentElement instanceof RobotDryRunLibraryImport) {
-                final RobotDryRunLibraryImport libraryImport = (RobotDryRunLibraryImport) parentElement;
-                final List<Object> children = new ArrayList<>();
-
-                if (libraryImport.getStatus() != null) {
-                    children.add(
-                            STATUS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getStatus().getMessage());
-                }
-                if (libraryImport.getSourcePath() != null && !libraryImport.getSourcePath().isEmpty()) {
-                    children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getSourcePath());
-                } else {
-                    children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + "Unknown");
-                }
-                final List<String> importersPaths = libraryImport.getImportersPaths();
-                if (importersPaths.size() == 1) {
-                    children.add(IMPORTERS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + importersPaths.get(0));
-                } else {
-                    children.add(importersPaths);
-                }
-                final String additionalInfo = libraryImport.getAdditionalInfo();
-                if (additionalInfo != null && !additionalInfo.isEmpty()) {
-                    children.add(ADDITIONAL_INFO_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + additionalInfo);
-                }
+                final List<Object> children = extractDryRunLibraryImportChildren(
+                        (RobotDryRunLibraryImport) parentElement);
                 return children.toArray(new Object[children.size()]);
             } else if (parentElement instanceof List<?>) {
                 @SuppressWarnings("unchecked")
@@ -275,7 +303,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         private Image getImage(final Object element) {
             if (element instanceof RobotDryRunLibraryImport) {
                 final RobotDryRunLibraryImport libraryImport = (RobotDryRunLibraryImport) element;
-                if (libraryImport.getStatus() == null || libraryImport.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
+                if (libraryImport.getStatus() == null
+                        || libraryImport.getStatus() == DryRunLibraryImportStatus.NOT_ADDED) {
                     return ImagesManager.getImage(RedImages.getFatalErrorImage());
                 } else if (libraryImport.getStatus() == DryRunLibraryImportStatus.ADDED) {
                     return ImagesManager.getImage(RedImages.getBigSuccessImage());
