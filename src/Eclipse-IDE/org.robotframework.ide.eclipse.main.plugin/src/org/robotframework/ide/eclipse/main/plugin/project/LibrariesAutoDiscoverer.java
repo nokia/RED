@@ -160,63 +160,20 @@ public class LibrariesAutoDiscoverer {
 
     private RunCommandLine createDryRunCommandLine(final LibrariesSourcesCollector librariesSourcesCollector)
             throws InvocationTargetException {
-        final List<String> suiteNames = newArrayList();
-        final List<String> additionalProjectsLocations = newArrayList();
-        collectSuiteNamesAndProjectsLocations(suiteNames, additionalProjectsLocations);
+        DryRunTargetsCollector dryRunTargetsCollector = new DryRunTargetsCollector();
+        dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations();
 
         RunCommandLine runCommandLine = null;
         try {
             runCommandLine = dryRunHandler.buildDryRunCommand(robotProject.getRuntimeEnvironment(),
-                    getProjectLocationFile(), suiteNames, librariesSourcesCollector.getPythonpathLocations(),
-                    librariesSourcesCollector.getClasspathLocations(), additionalProjectsLocations);
+                    getProjectLocationFile(), dryRunTargetsCollector.getSuiteNames(),
+                    librariesSourcesCollector.getPythonpathLocations(),
+                    librariesSourcesCollector.getClasspathLocations(),
+                    dryRunTargetsCollector.getAdditionalProjectsLocations());
         } catch (IOException e) {
             throw new InvocationTargetException(e);
         }
         return runCommandLine;
-    }
-
-    private void collectSuiteNamesAndProjectsLocations(final List<String> suiteNames,
-            final List<String> additionalProjectsLocations) {
-        final List<String> resourcesPaths = newArrayList();
-        for (final IResource resource : suiteFiles) {
-            RobotSuiteFile suiteFile = null;
-            if (resource.getType() == IResource.FILE) {
-                suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
-            }
-            if (suiteFile != null && suiteFile.isResourceFile()) {
-                final IPath resourceFilePath = PathsConverter
-                        .toWorkspaceRelativeIfPossible(resource.getProjectRelativePath());
-                resourcesPaths.add(resourceFilePath.toString());
-            } else {
-                if (resource.isLinked()) {
-                    collectLinkedSuiteNamesAndProjectsLocations(resource, suiteNames, additionalProjectsLocations);
-                } else {
-                    suiteNames.add(RobotLaunchConfigurationDelegate.createSuiteName(resource));
-                }
-            }
-        }
-        if (!resourcesPaths.isEmpty()) {
-            final File tempSuiteFileWithResources = dryRunHandler.createTempSuiteFile(resourcesPaths);
-            if (tempSuiteFileWithResources != null) {
-                suiteNames.add(Files.getNameWithoutExtension(tempSuiteFileWithResources.getPath()));
-                additionalProjectsLocations.add(tempSuiteFileWithResources.getParent());
-            }
-        }
-    }
-
-    private void collectLinkedSuiteNamesAndProjectsLocations(final IResource resource, final List<String> suiteNames,
-            final List<String> additionalProjectsLocations) {
-        final IPath linkedFileLocation = resource.getLocation();
-        if (linkedFileLocation != null) {
-            final File linkedFile = linkedFileLocation.toFile();
-            if (linkedFile.exists()) {
-                suiteNames.add(Files.getNameWithoutExtension(linkedFile.getName()));
-                final String linkedFileParentPath = linkedFile.getParent();
-                if (!additionalProjectsLocations.contains(linkedFileParentPath)) {
-                    additionalProjectsLocations.add(linkedFileParentPath);
-                }
-            }
-        }
     }
 
     private void executeDryRun(final RunCommandLine dryRunCommandLine) throws InvocationTargetException {
@@ -394,4 +351,62 @@ public class LibrariesAutoDiscoverer {
         }
         return file;
     }
+    
+    private class DryRunTargetsCollector {
+
+        private List<String> suiteNames = newArrayList();
+
+        private List<String> additionalProjectsLocations = newArrayList();
+
+        public void collectSuiteNamesAndAdditionalProjectsLocations() {
+            final List<String> resourcesPaths = newArrayList();
+            for (final IResource resource : suiteFiles) {
+                RobotSuiteFile suiteFile = null;
+                if (resource.getType() == IResource.FILE) {
+                    suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
+                }
+                if (suiteFile != null && suiteFile.isResourceFile()) {
+                    final IPath resourceFilePath = PathsConverter
+                            .toWorkspaceRelativeIfPossible(resource.getProjectRelativePath());
+                    resourcesPaths.add(resourceFilePath.toString());
+                } else {
+                    if (resource.isLinked()) {
+                        collectLinkedSuiteNamesAndProjectsLocations(resource);
+                    } else {
+                        suiteNames.add(RobotLaunchConfigurationDelegate.createSuiteName(resource));
+                    }
+                }
+            }
+            if (!resourcesPaths.isEmpty()) {
+                final File tempSuiteFileWithResources = dryRunHandler.createTempSuiteFile(resourcesPaths);
+                if (tempSuiteFileWithResources != null) {
+                    suiteNames.add(Files.getNameWithoutExtension(tempSuiteFileWithResources.getPath()));
+                    additionalProjectsLocations.add(tempSuiteFileWithResources.getParent());
+                }
+            }
+        }
+
+        private void collectLinkedSuiteNamesAndProjectsLocations(final IResource resource) {
+            final IPath linkedFileLocation = resource.getLocation();
+            if (linkedFileLocation != null) {
+                final File linkedFile = linkedFileLocation.toFile();
+                if (linkedFile.exists()) {
+                    suiteNames.add(Files.getNameWithoutExtension(linkedFile.getName()));
+                    final String linkedFileParentPath = linkedFile.getParent();
+                    if (!additionalProjectsLocations.contains(linkedFileParentPath)) {
+                        additionalProjectsLocations.add(linkedFileParentPath);
+                    }
+                }
+            }
+        }
+
+        public List<String> getSuiteNames() {
+            return suiteNames;
+        }
+
+        public List<String> getAdditionalProjectsLocations() {
+            return additionalProjectsLocations;
+        }
+    }
+    
 }
