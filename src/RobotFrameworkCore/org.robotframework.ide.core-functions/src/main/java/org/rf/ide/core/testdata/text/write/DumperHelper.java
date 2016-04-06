@@ -67,6 +67,17 @@ public class DumperHelper {
         return currentDumper.getSeparator(model, lines, lastToken, currentToken);
     }
 
+    public void dumpLineDirectly(final RobotFile model, final List<RobotLine> outLines, final RobotLine currentLine) {
+        for (final IRobotLineElement elem : currentLine.getLineElements()) {
+            updateLine(model, outLines, elem);
+        }
+
+        final IRobotLineElement endOfLine = currentLine.getEndOfLine();
+        if (endOfLine != null && !endOfLine.getFilePosition().isNotSet()) {
+            updateLine(model, outLines, endOfLine);
+        }
+    }
+
     public void updateLine(final RobotFile model, final List<RobotLine> outLines, final IRobotLineElement elem) {
         if (isEndOfLine(elem)) {
             if (outLines.isEmpty()) {
