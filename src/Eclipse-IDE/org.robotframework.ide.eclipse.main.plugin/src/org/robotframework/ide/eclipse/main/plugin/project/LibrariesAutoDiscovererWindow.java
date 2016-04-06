@@ -133,13 +133,9 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 final Object selection = ((TreeSelection) event.getSelection()).getFirstElement();
                 if (selection != null) {
                     if (selection instanceof String) {
-                        final String selectionText = (String) selection;
-                        if (selectionText != null) {
-                            detailsText.setText(selectionText);
-                        }
+                        detailsText.setText((String) selection);
                     } else if (selection instanceof RobotDryRunLibraryImport) {
-                        final StringBuilder libraryImportTxtBuilder = convertDryRunLibraryImportToText(selection);
-                        detailsText.setText(libraryImportTxtBuilder.toString());
+                        detailsText.setText(convertDryRunLibraryImportToText(selection));
                     } else {
                         detailsText.setText("");
                     }
@@ -163,7 +159,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     @SuppressWarnings("unchecked")
-    private StringBuilder convertDryRunLibraryImportToText(final Object selection) {
+    private String convertDryRunLibraryImportToText(final Object selection) {
         final StringBuilder libraryImportTxtBuilder = new StringBuilder("");
         for (final Object child : extractDryRunLibraryImportChildren((RobotDryRunLibraryImport) selection)) {
             if (child instanceof String) {
@@ -175,7 +171,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 }
             }
         }
-        return libraryImportTxtBuilder;
+        return libraryImportTxtBuilder.toString();
     }
 
     private List<Object> extractDryRunLibraryImportChildren(final RobotDryRunLibraryImport libraryImport) {
