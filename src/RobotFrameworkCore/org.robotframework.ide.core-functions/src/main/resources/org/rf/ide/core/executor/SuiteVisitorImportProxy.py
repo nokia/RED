@@ -16,11 +16,14 @@ import time
 import sys
 import threading
 
+
 class MyTestSuiteBuilder(TestSuiteBuilder):
     ''' switch off empty suite removing '''
+
     def _parse_and_build(self, path):
         suite = self._build_suite(self._parse(path))
         return suite
+
 
 class SuiteVisitorImportProxy(SuiteVisitor):
     def __init__(self, lib_import_timeout=5):
@@ -28,7 +31,7 @@ class SuiteVisitorImportProxy(SuiteVisitor):
         robot.running.namespace.IMPORTER = MyIMPORTER(robot.running.namespace.IMPORTER, self.lib_import_timeout)
         self.options, self.arguments = RobotFramework().parse_arguments(sys.argv[1:])
         self.settings = RobotSettings(**self.options)
-        self.suites = self.settings.suite_config['include_suites']
+        self.f_suites = self.settings.suite_config['include_suites']
 
     def start_suite(self, suite):
         if suite:
@@ -40,7 +43,7 @@ class SuiteVisitorImportProxy(SuiteVisitor):
             else:
                 if len(suite.tests) == 0 or suite.test_count == 0:
                     current_suite = MyTestSuiteBuilder().build(suite.source)
-                    if len(self.suites) == 0:
+                    if len(self.f_suites) == 0:
                         suite.suites = current_suite.suites
                     else:
                         suite.suites = self.filter_by_name(current_suite.suites)
@@ -51,14 +54,21 @@ class SuiteVisitorImportProxy(SuiteVisitor):
         matched_suites = []
 
         for suite in suites:
-            for s_name in self.suites:
+            for s_name in self.f_suites:
                 longpath = suite.longname.lower().replace('_', ' ')
                 normalized_s_name = s_name.lower().replace('_', ' ')
-                if longpath.startswith(normalized_s_name):
+                meet = False
+                if (len(longpath) >= len(normalized_s_name) and longpath.startswith(normalized_s_name)):
+                    meet = True
                     after_remove = longpath.replace(normalized_s_name, '')
-                    if after_remove == '' or after_remove.startswith('.') or after_remove.startswith('*') or after_remove.startswith('?'):
-                        matched_suites.append(suite)
-                        suite.suites = self.filter_by_name(suite.suites)
+                elif (len(longpath) < len(normalized_s_name) and normalized_s_name.startswith(longpath)):
+                    meet = True
+                    after_remove = normalized_s_name.replace(longpath, '')
+
+                if meet and (after_remove == '' or after_remove.startswith('.') or after_remove.startswith(
+                        '*') or after_remove.startswith('?')):
+                    matched_suites.append(suite)
+                    suite.suites = self.filter_by_name(suite.suites)
 
         return matched_suites
 
@@ -67,6 +77,7 @@ class SuiteVisitorImportProxy(SuiteVisitor):
             test.name = 'Fake_' + str(int(round(time.time() * 1000)))
             test.keywords.clear()
             test.keywords.append(Keyword(name='BuiltIn.No Operation'))
+
 
 class LibItem(object):
     def __init__(self, name, args):
@@ -77,6 +88,7 @@ class LibItem(object):
 
     def get_result_test_object(self):
         return self.result
+
 
 class MyIMPORTER(object):
     def __init__(self, obj, lib_import_timeout):
@@ -115,7 +127,7 @@ class MyIMPORTER(object):
     def _wrap(self, func, argser, kwargs):
         if type(func) == MethodType:
             if func.__name__ == 'import_library':
-                #print str(argser)
+                # print str(argser)
                 q = []
                 errors = []
                 lib_cached = self.get_from_cache(argser[0], argser[1])
@@ -137,9 +149,11 @@ class MyIMPORTER(object):
                         result = TestLibrary(argser[0], argser[1], argser[2], create_handlers=False)
                     except:
                         try:
-                            result = _BaseTestLibrary(libcode=None, name=argser[0], args=argser[1], source=None, variables=argser[2])
+                            result = _BaseTestLibrary(libcode=None, name=argser[0], args=argser[1], source=None,
+                                                      variables=argser[2])
                         except:
-                            result = _BaseTestLibrary(libcode=None, name=argser[0], args=[], source=None, variables=argser[2])
+                            result = _BaseTestLibrary(libcode=None, name=argser[0], args=[], source=None,
+                                                      variables=argser[2])
                             errors.append(sys.exc_info())
 
                 if lib_cached is None:
@@ -149,7 +163,8 @@ class MyIMPORTER(object):
                     self.cached_lib_items.append(lib)
 
                 for p in errors:
-                    msg = Message(message='{LIB_ERROR: ' + argser[0] + ', value: VALUE_START(' + str(p) + ')VALUE_END, lib_file_import:' +
+                    msg = Message(message='{LIB_ERROR: ' + argser[0] + ', value: VALUE_START(' + str(
+                        p) + ')VALUE_END, lib_file_import:' +
                                           str(result.source) + '}', level='FAIL')
                     LOGGER.message(msg)
             else:
@@ -166,10 +181,3 @@ class MyIMPORTER(object):
         except:
             ''' (type, value, traceback) '''
             errors.append(sys.exc_info())
-
-
-
-
-
-
-
