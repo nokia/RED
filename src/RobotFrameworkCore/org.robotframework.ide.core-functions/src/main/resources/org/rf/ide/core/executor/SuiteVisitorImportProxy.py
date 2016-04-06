@@ -52,11 +52,13 @@ class SuiteVisitorImportProxy(SuiteVisitor):
 
         for suite in suites:
             for s_name in self.suites:
-                longpath = suite.longname
-                after_remove = longpath.replace(s_name, '', 1)
-                if longpath.startswith(s_name) and (after_remove == '' or after_remove.startswith('.') or after_remove.startswith('*') or after_remove.startswith('?')):
-                    matched_suites.append(suite)
-                    suite.suites = self.filter_by_name(suite.suites)
+                longpath = suite.longname.lower().replace('_', ' ')
+                normalized_s_name = s_name.lower().replace('_', ' ')
+                if longpath.startswith(normalized_s_name):
+                    after_remove = longpath.replace(normalized_s_name, '')
+                    if after_remove == '' or after_remove.startswith('.') or after_remove.startswith('*') or after_remove.startswith('?'):
+                        matched_suites.append(suite)
+                        suite.suites = self.filter_by_name(suite.suites)
 
         return matched_suites
 
