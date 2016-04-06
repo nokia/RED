@@ -7,60 +7,80 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tAQV0PpcEeWSorJ4SRUI3Q
 Runtime-Version: 2.0.0.201506120617
-Save-Time: 4/4/16 3:47 PM
+Save-Time: 4/6/16 11:07 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-/*
 
-get-tab-folder -index 3 | get-tab-item Problems | click
-get-view Problems | get-label "1 error, 0 warnings, 0 others" | get-property caption 
-    | equals "1 error, 0 warnings, 0 others" | verify-true
-get-view "Project Explorer" | get-tree | select "ImportLibFromPythonPath/test.robot" | double-click
-with [get-editor "test.robot" | get-text-viewer] {
-    hover-text 2 20
-    set-caret-pos 2 24
-    get-menu "Quick Fix" | click
-}
-wait 10000
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Discover 'LibFromPythonPath' and add to configuration" | click -default
-    
-with [get-editor "ImportLibFromPythonPath/red.xml" | get-section "Referenced libraries"] {
-    mouse-release 341 10 button1 524288
-    get-editbox | key-type "M1+s"
-}
-get-editor "ImportLibFromPythonPath/red.xml" | get-section "Referenced libraries" | get-table 
-    | get-item "LibFromPythonPath - d:\\/3\\/LibFromPythonPath.py" | get-property caption 
-    | equals "LibFromPythonPath - d:/3/LibFromPythonPath.py" | verify-true
-get-editor "ImportLibFromPythonPath/red.xml" | close
-get-view Problems | get-label "0 errors, 1 warning, 0 others" | get-property caption 
-    | maches "0 errors, 1 warning, 0 others" | verify-true
-    
-*/
-if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-wait 100
-}-else{
-get-view "Project Explorer" | get-tree | select "ImportLibFromPythonPath/red.xml" | double-click
-with [get-editor "ImportLibFromPythonPath/red.xml"] {
-    get-tab-folder | get-tab-item "Referenced libraries" | click
-    with [get-section "Referenced libraries" | get-button "Auto discover libraries after test suite save action"] {
-        check
-        key-type "M1+s"
-    }
-    close
-}
-get-view "Project Explorer" | get-tree | select "ImportLibFromPythonPath/test.robot" | double-click
-with [get-editor "test.robot" | get-text-viewer] {
-    set-caret-pos 3 19
-    key-type Enter
-    key-type "M1+s"
-}
-wait 5000
-get-view "Project Explorer" | get-tree | get-item "ImportLibFromPythonPath/Robot Referenced libraries" 
-    | get-property caption | equals "Robot Referenced libraries" | verify-true
-}
+
+       // open red.xml check autodiscovery 
+		get-view "Project Explorer" | get-tree | select "ImportLibFromPythonPath/red.xml" | double-click
+		with [get-editor "ImportLibFromPythonPath/red.xml"] {
+		    get-tab-folder | get-tab-item "Referenced libraries" | click
+		    with [get-section "Referenced libraries" | get-button "Auto discover libraries after test suite save action"] {
+		        check
+		        key-type "M1+s"
+		    }
+		    close
+		}
+		// open test case and make it dirty, save will start autodiscovery 
+		get-view "Project Explorer" | get-tree | select "ImportLibFromPythonPath/test.robot" | double-click
+		with [get-editor "test.robot" | get-text-viewer] {
+		    set-caret-pos 3 19
+		    key-type Enter
+		    key-type "M1+s"
+		}
+		wait 5000
+		// check if LibFromPythonPath is present in Referenced Libs section in Project Explorer
+		get-view "Project Explorer" | get-tree | get-item "ImportLibFromPythonPath/Robot Referenced libraries" 
+		    | get-property "getItems().TreeItem[0].getText()" | matches "LibFromPythonPath.*" 
+		    | verify-true
+
+		// uncheck Autodiscovery to allow quick fix
+		get-view "Project Explorer" | get-tree | select "ImportLibFromPythonPath/red.xml" | double-click
+		with [get-editor "ImportLibFromPythonPath/red.xml"] {
+		    with [get-section "Referenced libraries"] {
+		        with [get-button "Auto discover libraries after test suite save action"] {
+		            uncheck
+		            key-type "M1+s"
+		        }
+		    // remove LibFromPythonPath entry from Rerefenced Lib table in red.xml
+	        with [get-table] {
+		            select [get-item ".*" -index 0]
+		            key-type Del
+		            key-type "M1+s"
+		       }
+		    }
+		   close
+		}
+		// verify that LibFromPythonPath and Robot eferenced Library is gone from Project Explorer
+		get-view "Project Explorer" | get-tree | get-item ImportLibFromPythonPath | get-property "getItemCount()" | equals 3 
+		    | verify-true
+		
+		// Go to file and do Quick Fix on lib
+		with [get-editor "test.robot" | get-text-viewer] {
+		    hover-text 2 20
+		    set-caret-pos 2 22
+		    get-menu "Quick Fix" | click
+		}
+		
+		get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+		    | select "Discover 'LibFromPythonPath' and add to configuration" | click -default
+		get-editor "ImportLibFromPythonPath/red.xml" | get-section "Referenced libraries" | mouse-release 266 11 button1 524288
+		// save file
+		get-editor "test.robot" | get-text-viewer | key-type "M1+s"
+		
+		
+		// verify if LibFromPythonPath is visible in Project Explorer under Robot Referenced library
+		get-view "Project Explorer" | get-tree | get-item "ImportLibFromPythonPath/Robot Referenced libraries" 
+		    | get-property "getItems().TreeItem[0].getText()" | matches "LibFromPythonPath.*" 
+		    | verify-true
+
+
+
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
