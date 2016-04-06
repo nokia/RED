@@ -40,8 +40,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -51,7 +49,7 @@ import com.google.common.collect.Multimap;
  */
 class TagsProposalsSupport {
 
-    private final Multimap<IPath, String> allTagsCache;
+    private final Multimap<IPath, SourcedTag> allTagsCache;
 
     private final Map<IResource, List<String>> currentSuitesToRun;
 
@@ -107,19 +105,19 @@ class TagsProposalsSupport {
         }
 
         private Collection<String> extractTagProposals() {
-            final Multimap<IPath, String> groupedTags = groupTagsBySuites();
+            final Multimap<IPath, SourcedTag> groupedTags = groupTagsBySuites();
 
             final List<String> tags = new ArrayList<>();
-            for (final Entry<IPath, String> entry : groupedTags.entries()) {
-                final String tag = entry.getValue();
-                allTagsCache.put(entry.getKey(), tag);
-                tags.add(tag);
+            for (final Entry<IPath, SourcedTag> entry : groupedTags.entries()) {
+                final SourcedTag sourcedTag = entry.getValue();
+                // allTagsCache.put(entry.getKey(), sourcedTag);
+                tags.add(sourcedTag.tag);
             }
             return tags;
         }
 
-        private Multimap<IPath, String> groupTagsBySuites() {
-            final Multimap<IPath, String> groupedTags = LinkedHashMultimap.create();
+        private Multimap<IPath, SourcedTag> groupTagsBySuites() {
+            final Multimap<IPath, SourcedTag> groupedTags = LinkedHashMultimap.create();
 
             for (final Entry<IResource, List<String>> entry : currentSuitesToRun.entrySet()) {
                 try {
@@ -134,12 +132,26 @@ class TagsProposalsSupport {
                                 final RobotSuiteFile suiteModel = RedPlugin.getModelManager()
                                         .createSuiteFile((IFile) resource);
                                 if (suiteModel != null && suiteModel.isSuiteFile()) {
+
                                     final IPath groupingPath = suiteModel.getFile().getFullPath();
-                                    if (allTagsCache.containsKey(groupingPath)) {
-                                        groupedTags.putAll(groupingPath, allTagsCache.get(groupingPath));
+
+                                    if (!allTagsCache.containsKey(groupingPath)) {
+                                        allTagsCache.putAll(groupingPath, extractTagsFromSuite(suiteModel));
+                                    }
+                                    final Collection<SourcedTag> tags = allTagsCache.get(groupingPath);
+                                    if (entry.getValue().isEmpty()) {
+                                        groupedTags.putAll(groupingPath, tags);
                                     } else {
-                                        groupedTags.putAll(groupingPath,
-                                                extractTagsFromSuite(suiteModel, entry.getValue()));
+                                        final List<String> sources = newArrayList(SourcedTag.SETTINGS_SOURCE);
+                                        sources.addAll(entry.getValue());
+
+                                        for (final SourcedTag sourcedTag : tags) {
+                                            for (final String source : sources) {
+                                                if (source.equals(sourcedTag.source)) {
+                                                    groupedTags.put(groupingPath, sourcedTag);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -153,61 +165,72 @@ class TagsProposalsSupport {
             return groupedTags;
         }
 
-        private Collection<String> extractTagsFromSuite(final RobotSuiteFile suiteModel, final List<String> caseNames) {
-            final List<String> tags = new ArrayList<>();
+        private Collection<SourcedTag> extractTagsFromSuite(final RobotSuiteFile suiteModel) {
+            final Collection<SourcedTag> tags = new ArrayList<>();
             tags.addAll(extractTagProposalsFromSettingsTable(suiteModel));
-            tags.addAll(extractTagsFromCases(suiteModel, caseNames));
+            tags.addAll(extractTagsFromCases(suiteModel));
             return tags;
         }
 
-        private Collection<String> extractTagProposalsFromSettingsTable(final RobotSuiteFile robotSuiteFile) {
+        private Collection<SourcedTag> extractTagProposalsFromSettingsTable(final RobotSuiteFile robotSuiteFile) {
             final Optional<RobotSettingsSection> section = robotSuiteFile.findSection(RobotSettingsSection.class);
             if (!section.isPresent()) {
                 return new ArrayList<>();
             }
-            final List<String> tags = new ArrayList<>();
+            final List<SourcedTag> tags = new ArrayList<>();
             final RobotSettingsSection settingsSection = section.get();
             for (final RobotKeywordCall setting : settingsSection.getChildren()) {
                 final ModelType settingType = setting.getLinkedElement().getModelType();
                 if (settingType == ModelType.FORCE_TAGS_SETTING || settingType == ModelType.DEFAULT_TAGS_SETTING) {
-                    tags.addAll(setting.getArguments());
+                    for (final String tag : setting.getArguments()) {
+                        tags.add(new SourcedTag(SourcedTag.SETTINGS_SOURCE, tag));
+                    }
                 }
             }
             return tags;
         }
 
-        private Collection<String> extractTagsFromCases(final RobotSuiteFile suiteModel, final List<String> caseNames) {
-            final Collection<RobotCase> cases = collectCases(suiteModel, caseNames);
-            final List<String> tags = new ArrayList<>();
+        private Collection<SourcedTag> extractTagsFromCases(final RobotSuiteFile suiteModel) {
+            final Collection<RobotCase> cases = collectCases(suiteModel);
+            final Collection<SourcedTag> tags = new ArrayList<>();
             for (final RobotCase testCase : cases) {
                 tags.addAll(extractTagProposalsFromTestCase(testCase));
             }
             return tags;
         }
 
-        private Collection<RobotCase> collectCases(final RobotSuiteFile suiteModel, final List<String> caseNames) {
+        private Collection<RobotCase> collectCases(final RobotSuiteFile suiteModel) {
             final Optional<RobotCasesSection> testCasesSection = suiteModel.findSection(RobotCasesSection.class);
             if (!testCasesSection.isPresent()) {
                 return new ArrayList<>();
             }
-            if (caseNames.isEmpty()) {
-                return newArrayList(testCasesSection.get().getChildren());
-            } else {
-                return Collections2.filter(testCasesSection.get().getChildren(), new Predicate<RobotCase>() {
-                    @Override
-                    public boolean apply(final RobotCase test) {
-                        return caseNames.contains(test.getName().toLowerCase());
-                    }
-                });
-            }
+            return newArrayList(testCasesSection.get().getChildren());
         }
 
-        private Collection<String> extractTagProposalsFromTestCase(final RobotCase testCasesElement) {
-            final RobotDefinitionSetting tagsSetting = testCasesElement.getTagsSetting();
+        private Collection<SourcedTag> extractTagProposalsFromTestCase(final RobotCase testCases) {
+            final RobotDefinitionSetting tagsSetting = testCases.getTagsSetting();
             if (tagsSetting != null && tagsSetting.getArguments() != null) {
-                return newArrayList(tagsSetting.getArguments());
+                final List<SourcedTag> tags = new ArrayList<>();
+                for (final String tag : tagsSetting.getArguments()) {
+                    tags.add(new SourcedTag(testCases.getName().toLowerCase(), tag));
+                }
+                return tags;
             }
             return new ArrayList<>();
+        }
+    }
+
+    private static final class SourcedTag {
+
+        public final static String SETTINGS_SOURCE = "##SETTINGS##";
+
+        private final String source;
+
+        private final String tag;
+
+        public SourcedTag(final String source, final String tag) {
+            this.source = source;
+            this.tag = tag;
         }
     }
 }
