@@ -10,9 +10,10 @@ from robot.running.testlibraries import _BaseTestLibrary
 from types import MethodType
 from threading import Lock
 from robot.running.builder import TestSuiteBuilder
+from robot.run import RobotFramework
+from robot.conf import RobotSettings
 import time
 import sys
-import os.path
 import threading
 
 class MyTestSuiteBuilder(TestSuiteBuilder):
@@ -25,6 +26,9 @@ class SuiteVisitorImportProxy(SuiteVisitor):
     def __init__(self, lib_import_timeout=5):
         self.lib_import_timeout = int(lib_import_timeout)
         robot.running.namespace.IMPORTER = MyIMPORTER(robot.running.namespace.IMPORTER, self.lib_import_timeout)
+        self.options, self.arguments = RobotFramework().parse_arguments(sys.argv[1:])
+        self.settings = RobotSettings(**self.options)
+        self.suites = self.settings.suite_config['include_suites']
 
     def start_suite(self, suite):
         if suite:
@@ -34,10 +38,27 @@ class SuiteVisitorImportProxy(SuiteVisitor):
                 t = TestCase(name='Fake_' + str(int(round(time.time() * 1000))))
                 suite.tests.append(t)
             else:
-                if os.path.isdir(suite.source) and suite.test_count == 0:
+                if len(suite.tests) == 0 or suite.test_count == 0:
                     current_suite = MyTestSuiteBuilder().build(suite.source)
-                    suite.suites = current_suite.suites
+                    if len(self.suites) == 0:
+                        suite.suites = current_suite.suites
+                    else:
+                        suite.suites = self.filter_by_name(current_suite.suites)
+
             suite.keywords.clear()
+
+    def filter_by_name(self, suites):
+        matched_suites = []
+
+        for suite in suites:
+            for s_name in self.suites:
+                longpath = suite.longname
+                after_remove = longpath.replace(s_name, '', 1)
+                if longpath.startswith(s_name) and (after_remove == '' or after_remove.startswith('.') or after_remove.startswith('*') or after_remove.startswith('?')):
+                    matched_suites.append(suite)
+                    suite.suites = self.filter_by_name(suite.suites)
+
+        return matched_suites
 
     def start_test(self, test):
         if test:
