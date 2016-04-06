@@ -109,11 +109,17 @@ public class TagsProposalsSupportTest {
 
         support.switchTo("A", new HashMap<IResource, List<String>>());
 
-        final HashMap<IResource, List<String>> suites = new HashMap<IResource, List<String>>();
-        suites.put(projectProvider.getFile(Path.fromPortableString("s3.robot")), newArrayList("case4"));
-        support.switchTo("A", suites);
+        final HashMap<IResource, List<String>> suites1 = new HashMap<IResource, List<String>>();
+        suites1.put(projectProvider.getFile(Path.fromPortableString("s3.robot")), newArrayList("case4"));
+        support.switchTo("A", suites1);
 
         assertThat(transform(support.getProposals(""), toContents())).containsOnly("tag4");
+
+        final HashMap<IResource, List<String>> suites2 = new HashMap<IResource, List<String>>();
+        suites2.put(projectProvider.getFile(Path.fromPortableString("s3.robot")), newArrayList("case3"));
+        support.switchTo("A", suites2);
+
+        assertThat(transform(support.getProposals(""), toContents())).containsOnly("tag5");
     }
 
     private static void createProject() throws Exception {
