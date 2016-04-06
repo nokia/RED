@@ -109,8 +109,8 @@ class IntepretersComposite extends Composite {
 
             @Override
             public void widgetSelected(final SelectionEvent event) {
+                final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
                 try {
-                    final String chosenExecutorName = comboExecutorName.getItem(comboExecutorName.getSelectionIndex());
                     new ProgressMonitorDialog(getShell()).run(false, false,
                             new CheckEnvironmentRunnable(chosenExecutorName));
                 } catch (final InterruptedException e) {
@@ -118,7 +118,9 @@ class IntepretersComposite extends Composite {
                             StatusManager.BLOCK);
                 } catch (final InvocationTargetException e) {
                     StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            e.getTargetException().getMessage(), e.getTargetException()),
+                                    "Unable to find " + SuiteExecutor.fromName(chosenExecutorName).executableName()
+                                            + " executable in the system.",
+                            e.getTargetException()),
                             StatusManager.BLOCK);
                 }
             }
