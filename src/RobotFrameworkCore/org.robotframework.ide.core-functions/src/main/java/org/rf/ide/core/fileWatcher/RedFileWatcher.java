@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author mmarzec
@@ -44,8 +45,10 @@ public class RedFileWatcher {
             .synchronizedMap(new HashMap<String, Collection<IWatchEventHandler>>());
 
     private LinkedBlockingQueue<String> modifiedFilesQueue = new LinkedBlockingQueue<>(100);
-    
-    private Thread eventConsumerThread;
+
+    private AtomicBoolean isEventProducerThreadStarted = new AtomicBoolean(false);
+
+    private AtomicBoolean isEventConsumerThreadStarted = new AtomicBoolean(false);
 
     private RedFileWatcher() {
         createAndStartWatchService();
@@ -53,14 +56,15 @@ public class RedFileWatcher {
 
     public synchronized void registerPath(final Path fileDir, final String fileName,
             final IWatchEventHandler watchEventHandler) {
-        
+
         if (watcher == null) {
             restartWatcher();
         }
 
         if (watcher != null && fileDir != null && fileName != null) {
             try {
-                if (!registeredDirs.contains(fileDir.toString())) {
+                if (!registeredDirs.contains(fileDir.toString()) && isEventProducerThreadStarted.get()
+                        && isEventConsumerThreadStarted.get()) {
                     fileDir.register(watcher, StandardWatchEventKinds.ENTRY_MODIFY);
                     registeredDirs.add(fileDir.toString());
                 }
@@ -90,7 +94,7 @@ public class RedFileWatcher {
             }
         }
     }
-    
+
     private void restartWatcher() {
         registeredDirs.clear();
         modifiedFilesQueue.clear();
@@ -112,81 +116,83 @@ public class RedFileWatcher {
     }
 
     private void startEventProducerThread() {
-        new Thread(new Runnable() {
+        if (!isEventProducerThreadStarted.getAndSet(true)) {
+            new Thread(new Runnable() {
 
-            @Override
-            public void run() {
+                @Override
+                public void run() {
 
-                while (true) {
-                    if (watcher == null) {
-                        break;
-                    }
-                    WatchKey key;
-                    try {
-                        key = watcher.take();
-                    } catch (InterruptedException e) {
-                        break;
-                    }
-                    for (WatchEvent<?> event : key.pollEvents()) {
-                        WatchEvent.Kind<?> kind = event.kind();
-                        @SuppressWarnings("unchecked")
-                        WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                        final Path fileNameFromEvent = ev.context();
+                    while (true) {
+                        if (watcher == null) {
+                            break;
+                        }
+                        WatchKey key;
+                        try {
+                            key = watcher.take();
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                        for (WatchEvent<?> event : key.pollEvents()) {
+                            WatchEvent.Kind<?> kind = event.kind();
+                            @SuppressWarnings("unchecked")
+                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
+                            final Path fileNameFromEvent = ev.context();
 
-                        if (kind == StandardWatchEventKinds.OVERFLOW) {
-                            continue;
-                        } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
+                            if (kind == StandardWatchEventKinds.OVERFLOW) {
+                                continue;
+                            } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
 
-                            final String fileName = fileNameFromEvent.getFileName().toString();
-                            if (registeredFiles.get(fileName) != null) {
-                                try {
-                                    if (!modifiedFilesQueue.contains(fileName)) {
-                                        modifiedFilesQueue.put(fileName);
+                                final String fileName = fileNameFromEvent.getFileName().toString();
+                                if (registeredFiles.get(fileName) != null) {
+                                    try {
+                                        if (!modifiedFilesQueue.contains(fileName)) {
+                                            modifiedFilesQueue.put(fileName);
+                                        }
+                                    } catch (InterruptedException e) {
+                                        break;
                                     }
-                                } catch (InterruptedException e) {
-                                    break;
                                 }
                             }
                         }
+                        boolean valid = key.reset();
+                        if (!valid) {
+                            break;
+                        }
                     }
-                    boolean valid = key.reset();
-                    if (!valid) {
-                        break;
-                    }
+                    isEventProducerThreadStarted.set(false);
+                    tryToCloseWatchService();
+                    sendWatchServiceInterruptedEvent();
                 }
-                tryToCloseWatchService();
-                sendWatchServiceInterruptedEvent();
-            }
-        }).start();
+            }).start();
+        }
     }
 
     private void startEventConsumerThread() {
-        if(eventConsumerThread != null) {
-            eventConsumerThread.interrupt();
-        }
-        eventConsumerThread = new Thread(new Runnable() {
+        if (!isEventConsumerThreadStarted.getAndSet(true)) {
+            new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        final String fileName = modifiedFilesQueue.take();
-                        final Collection<IWatchEventHandler> eventHandlers = registeredFiles.get(fileName);
-                        if (eventHandlers != null && !eventHandlers.isEmpty()) {
-                            for (IWatchEventHandler watchEventHandler : eventHandlers) {
-                                watchEventHandler.handleModifyEvent(fileName);
+                @Override
+                public void run() {
+                    while (true) {
+                        try {
+                            final String fileName = modifiedFilesQueue.take();
+                            final Collection<IWatchEventHandler> eventHandlers = registeredFiles.get(fileName);
+                            if (eventHandlers != null && !eventHandlers.isEmpty()) {
+                                for (IWatchEventHandler watchEventHandler : eventHandlers) {
+                                    watchEventHandler.handleModifyEvent(fileName);
+                                }
                             }
+                            waitForAndRemovePossibleDuplicatedEvents(fileName);
+                        } catch (InterruptedException e) {
+                            break;
                         }
-                        waitForAndRemovePossibleDuplicatedEvents(fileName);
-                    } catch (InterruptedException e) {
-                        break;
                     }
+                    isEventConsumerThreadStarted.set(false);
+                    tryToCloseWatchService();
+                    sendWatchServiceInterruptedEvent();
                 }
-                tryToCloseWatchService();
-                sendWatchServiceInterruptedEvent();
-            }
-        });
-        eventConsumerThread.start();
+            }).start();
+        }
     }
 
     private void waitForAndRemovePossibleDuplicatedEvents(final String fileName) {
@@ -209,7 +215,7 @@ public class RedFileWatcher {
             }
         }
     }
-    
+
     private void tryToCloseWatchService() {
         try {
             if (watcher != null) {
