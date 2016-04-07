@@ -1033,6 +1033,16 @@
           name="Context for Validation section editor page"
           parentId="org.robotframework.ide.eclipse.redxmleditor.context">
     </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.pythonpath.context"
+          name="Context for pythonpaths section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
+    <context
+          id="org.robotframework.ide.eclipse.redxmleditor.classpath.context"
+          name="Context for classpaths section editor page"
+          parentId="org.robotframework.ide.eclipse.redxmleditor.context">
+    </context>
  </extension>
  <extension
        point="org.eclipse.ui.commands">
@@ -2338,6 +2348,60 @@
        </enabledWhen>
     </handler>
     <handler
+          class="org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeletePythonPathHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.redxml.pythonpathPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <and>
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$SearchPath">
+                   </instanceof>
+                   <test
+                         property="org.robotframework.redxml.libraries.isSystemPath"
+                         value="false">
+                   </test>
+                </and>
+             </iterate>
+          </with>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteClassPathHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.redxml.classpathPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+                <and>
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$SearchPath">
+                   </instanceof>
+                   <test
+                         property="org.robotframework.redxml.libraries.isSystemPath"
+                         value="false">
+                   </test>
+                </and>
+             </iterate>
+          </with>
+       </enabledWhen>
+    </handler>
+    <handler
           class="org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.IncludePathHandler"
           commandId="org.robotframework.red.include">
        <activeWhen>
@@ -2558,6 +2622,24 @@
        <command
              commandId="org.robotframework.red.exclude"
              label="Exclude"
+             style="push">
+       </command>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.classpath.contextMenu?before=additions">
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
+             style="push">
+       </command>
+    </menuContribution>
+    <menuContribution
+          allPopups="false"
+          locationURI="popup:org.robotframework.ide.eclipse.redxmleditor.pythonpath.contextMenu?before=additions">
+       <command
+             commandId="org.eclipse.ui.edit.delete"
+             label="Delete"
              style="push">
        </command>
     </menuContribution>
@@ -3411,6 +3493,13 @@
           type="org.robotframework.ide.eclipse.main.plugin.project.editor.validation.ProjectTreeElement">
     </propertyTester>
     <propertyTester
+          class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlSearchPathsPropertyTester"
+          id="org.robotframework.redxml.searchPathsConfigPropertyTester"
+          namespace="org.robotframework.redxml.libraries"
+          properties="isSystemPath"
+          type="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$SearchPath">
+    </propertyTester>
+    <propertyTester
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlForNavigatorPropertyTester"
           id="org.robotframework.redxml.navigatorProjectConfigPropertyTester"
           namespace="org.robotframework.redxml.navigator"
@@ -4129,6 +4218,64 @@
                    operator="or">
                 <equals
                       value="org.robotframework.ide.eclipse.redxmleditor.validation.context">
+                </equals>
+             </iterate>
+             <not>
+                <iterate>
+                   <equals
+                         value="org.robotframework.ide.eclipse.details.context">
+                   </equals>
+                </iterate>
+             </not>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.redXmlIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.redxml.classpathPartIsActiveAndEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.redxmleditor.classpath.context">
+                </equals>
+             </iterate>
+             <not>
+                <iterate>
+                   <equals
+                         value="org.robotframework.ide.eclipse.details.context">
+                   </equals>
+                </iterate>
+             </not>
+          </with>
+          <with
+                variable="activeEditor">
+             <test
+                   property="org.robotframework.redXmlIsEditable"
+                   value="true">
+             </test>
+          </with>
+       </and>
+    </definition>
+    <definition
+          id="org.robotframework.redxml.pythonpathPartIsActiveAndEditable">
+       <and>
+          <with
+                variable="activeContexts">
+             <iterate
+                   ifEmpty="false"
+                   operator="or">
+                <equals
+                      value="org.robotframework.ide.eclipse.redxmleditor.pythonpath.context">
                 </equals>
              </iterate>
              <not>

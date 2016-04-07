@@ -28,6 +28,13 @@ public class RobotProjectConfigEvents {
 
     public static final String ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED = "robot/redxml/structural/libs/changed";
 
+    public static final String ROBOT_CONFIG_PYTHONPATH_STRUCTURE_CHANGED = "robot/redxml/structural/pythonpath/changed";
+    public static final String ROBOT_CONFIG_PYTHONPATH_CHANGED = "robot/redxml/detail/pythonpath/changed";
+
+    public static final String ROBOT_CONFIG_CLASSPATH_STRUCTURE_CHANGED = "robot/redxml/structural/classpath/changed";
+    public static final String ROBOT_CONFIG_CLASSPATH_CHANGED = "robot/redxml/detail/classpath/changed";
+
     public static final String ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED = "robot/redxml/structural/validationexclusions/changed";
+
 
 }
