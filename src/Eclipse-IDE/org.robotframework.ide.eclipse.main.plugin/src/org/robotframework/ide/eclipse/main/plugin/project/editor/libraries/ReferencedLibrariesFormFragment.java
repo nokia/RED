@@ -112,7 +112,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         scrolledParent.setExpandHorizontal(true);
 
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 0, 0, 5).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().numColumns(2).extendedMargins(0, 10, 0, 5).applyTo(internalComposite);
 
         createViewer(internalComposite);
         createColumns();
@@ -179,22 +179,22 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     private void createButtons(final Composite parent) {
         addPythonLibButton = toolkit.createButton(parent, "Add Python library", SWT.PUSH);
         addPythonLibButton.setEnabled(false);
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 10).applyTo(addPythonLibButton);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(3, 10).applyTo(addPythonLibButton);
         addPythonHandler();
 
         addJavaLibButton = toolkit.createButton(parent, "Add Java library", SWT.PUSH);
         addJavaLibButton.setEnabled(false);
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(addJavaLibButton);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(3, 0).applyTo(addJavaLibButton);
         addJavaHandler();
 
         addLibspecButton = toolkit.createButton(parent, "Add libspec file", SWT.PUSH);
         addLibspecButton.setEnabled(false);
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).applyTo(addLibspecButton);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(3, 0).applyTo(addLibspecButton);
         addLibspecHandler();
 
         addRemoteButton = toolkit.createButton(parent, "Add Remote location", SWT.PUSH);
         addRemoteButton.setEnabled(false);
-        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(0, 20).applyTo(addRemoteButton);
+        GridDataFactory.fillDefaults().align(SWT.FILL, SWT.BEGINNING).indent(3, 20).applyTo(addRemoteButton);
         addRemoteHandler();
     }
 
