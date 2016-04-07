@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -43,6 +44,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
@@ -50,6 +52,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Pytho
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.red.swt.SwtThread;
 
+import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
 /**
@@ -272,7 +275,9 @@ public class LibrariesAutoDiscoverer {
         try {
             pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath());
         } catch (RobotEnvironmentException e) {
-            libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
+            if(!isPythonLibraryRecognizedByName(config, libraryImport, addedLibs)) {
+                libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
+            }
             return;
         }
 
@@ -294,6 +299,28 @@ public class LibrariesAutoDiscoverer {
         }
 
         addReferencedLibrariesToProjectConfiguration(config, libraryImport, addedLibs, librariesToAdd);
+    }
+    
+    private boolean isPythonLibraryRecognizedByName(final RobotProjectConfig config,
+            final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
+        Optional<File> modulePath = Optional.absent();
+        try {
+            modulePath = robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName());
+        } catch (final RobotEnvironmentException e1) {
+            // that's fine
+        }
+        if (modulePath.isPresent()) {
+            final Path path = new Path(modulePath.get().getPath());
+            final ReferencedLibrary newLibrary = new ReferencedLibrary();
+            newLibrary.setType(LibraryType.PYTHON.toString());
+            newLibrary.setName(libraryImport.getName());
+            newLibrary.setPath(path.toPortableString());
+            final Collection<ReferencedLibrary> librariesToAdd = new ArrayList<>();
+            librariesToAdd.add(newLibrary);
+            addReferencedLibrariesToProjectConfiguration(config, libraryImport, addedLibs, librariesToAdd);
+            return true;
+        }
+        return false;
     }
 
     private void addJavaLibraryToProjectConfiguration(final RobotProjectConfig config,
