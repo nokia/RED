@@ -39,6 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Lib
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
@@ -339,6 +340,9 @@ public class RobotProject extends RobotContainer {
                             .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath()));
                     cp.add(absPath.toOSString());
                 }
+            }
+            for (final SearchPath searchPath : configuration.getClassPath()) {
+                cp.add(searchPath.getPath());
             }
             return newArrayList(cp);
         }
