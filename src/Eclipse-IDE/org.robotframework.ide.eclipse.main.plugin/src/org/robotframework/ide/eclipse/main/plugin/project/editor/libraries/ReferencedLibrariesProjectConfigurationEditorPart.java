@@ -27,15 +27,19 @@ public class ReferencedLibrariesProjectConfigurationEditorPart
 
         private ReferencedLibrariesFormFragment referencedFragment;
 
+        private PathsFormFragment pathsFragment;
+
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
             referencedFragment = new ReferencedLibrariesFormFragment();
-            return newArrayList(referencedFragment);
+            pathsFragment = new PathsFormFragment();
+            return newArrayList(referencedFragment, pathsFragment);
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return new ViewersCombiningSelectionProvider(referencedFragment.getViewer());
+            return new ViewersCombiningSelectionProvider(referencedFragment.getViewer(),
+                    pathsFragment.getPythonPathViewer(), pathsFragment.getClassPathViewer());
         }
     }
 }

@@ -25,6 +25,7 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.XmlValue;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -32,9 +33,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 @XmlRootElement(name = "projectConfiguration")
-@XmlType(propOrder = { "version", "executionEnvironment", "variableMappings", "libraries", "remoteLocations",
-        "referencedVariableFiles", "excludedPath", "isValidatedFileSizeCheckingEnabled", "validatedFileMaxSize",
-        "isReferencedLibrariesAutoReloadEnabled", "isReferencedLibrariesAutoDiscoveringEnabled",
+@XmlType(propOrder = { "version", "executionEnvironment", "variableMappings", "libraries", "pythonPaths", "classPaths",
+        "remoteLocations", "referencedVariableFiles", "excludedPath", "isValidatedFileSizeCheckingEnabled",
+        "validatedFileMaxSize", "isReferencedLibrariesAutoReloadEnabled", "isReferencedLibrariesAutoDiscoveringEnabled",
         "isLibrariesAutoDiscoveringSummaryWindowEnabled" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
@@ -53,6 +54,14 @@ public class RobotProjectConfig {
 
     @XmlElement(name = "referencedLibrary", required = false)
     private List<ReferencedLibrary> libraries = new ArrayList<>();
+
+    @XmlElementWrapper(name = "pythonpath", required = false)
+    @XmlElement(name = "path", type = SearchPath.class)
+    private List<SearchPath> pythonPaths = new ArrayList<>();
+
+    @XmlElementWrapper(name = "classpath", required = false)
+    @XmlElement(name = "path", type = SearchPath.class)
+    private List<SearchPath> classPaths = new ArrayList<>();
 
     @XmlElement(name = "remoteLocations", required = false)
     private List<RemoteLocation> remoteLocations = new ArrayList<>();
@@ -116,6 +125,56 @@ public class RobotProjectConfig {
 
     public List<ReferencedLibrary> getLibraries() {
         return libraries;
+    }
+
+    public void setPythonPath(final List<SearchPath> pythonPaths) {
+        this.pythonPaths = pythonPaths;
+    }
+
+    public List<SearchPath> getPythonPath() {
+        return pythonPaths;
+    }
+
+    public boolean addPythonPath(final SearchPath searchPath) {
+        if (pythonPaths == null) {
+            pythonPaths = new ArrayList<>();
+        }
+        if (!pythonPaths.contains(searchPath)) {
+            pythonPaths.add(searchPath);
+            return true;
+        }
+        return false;
+    }
+
+    public void removePythonPath(final List<SearchPath> paths) {
+        if (pythonPaths != null) {
+            pythonPaths.removeAll(paths);
+        }
+    }
+
+    public void setClassPath(final List<SearchPath> classPaths) {
+        this.classPaths = classPaths;
+    }
+
+    public boolean addClassPath(final SearchPath searchPath) {
+        if (classPaths == null) {
+            classPaths = new ArrayList<>();
+        }
+        if (!classPaths.contains(searchPath)) {
+            classPaths.add(searchPath);
+            return true;
+        }
+        return false;
+    }
+
+    public void removeClassPath(final List<SearchPath> paths) {
+        if (classPaths != null) {
+            classPaths.removeAll(paths);
+        }
+    }
+
+    public List<SearchPath> getClassPath() {
+        return classPaths;
     }
 
     public void setRemoteLocations(final List<RemoteLocation> remoteLocations) {
@@ -635,6 +694,59 @@ public class RobotProjectConfig {
         public boolean equals(final Object obj) {
             if (obj instanceof ExcludedFolderPath) {
                 final ExcludedFolderPath that = (ExcludedFolderPath) obj;
+                return Objects.equals(this.path, that.path);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(path);
+        }
+    }
+
+    @XmlRootElement(name = "searchPath")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class SearchPath {
+
+        public static SearchPath create(final String path) {
+            return create(path, false);
+        }
+
+        public static SearchPath create(final String path, final boolean isSystem) {
+            final SearchPath searchPath = new SearchPath();
+            searchPath.setPath(path);
+            searchPath.setSystem(isSystem);
+            return searchPath;
+        }
+
+        @XmlValue
+        private String path;
+
+        @XmlTransient
+        private boolean isSystem = false;
+
+        public void setPath(final String path) {
+            this.path = path;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        @XmlTransient
+        public void setSystem(final boolean isSystem) {
+            this.isSystem = isSystem;
+        }
+
+        public boolean isSystem() {
+            return isSystem;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof SearchPath) {
+                final SearchPath that = (SearchPath) obj;
                 return Objects.equals(this.path, that.path);
             }
             return false;
