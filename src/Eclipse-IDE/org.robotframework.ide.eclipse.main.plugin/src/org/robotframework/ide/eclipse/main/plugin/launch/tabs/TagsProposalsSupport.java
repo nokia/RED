@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.launch.tabs;
 
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -94,10 +96,10 @@ class TagsProposalsSupport {
                 proposals.get().addAll(extractTagProposals());
             }
 
-            final String trimmedFieldContent = contents.trim();
+            final String trimmedFieldContent = contents.trim().toLowerCase();
             final List<IContentProposal> filteredProposals = new ArrayList<>();
             for (final String proposal : proposals.get()) {
-                if (proposal.toLowerCase().contains(trimmedFieldContent.toLowerCase())) {
+                if (proposal.toLowerCase().contains(trimmedFieldContent)) {
                     filteredProposals.add(new ContentProposal(proposal));
                 }
             }
@@ -106,14 +108,7 @@ class TagsProposalsSupport {
 
         private Collection<String> extractTagProposals() {
             final Multimap<IPath, SourcedTag> groupedTags = groupTagsBySuites();
-
-            final List<String> tags = new ArrayList<>();
-            for (final Entry<IPath, SourcedTag> entry : groupedTags.entries()) {
-                final SourcedTag sourcedTag = entry.getValue();
-                // allTagsCache.put(entry.getKey(), sourcedTag);
-                tags.add(sourcedTag.tag);
-            }
-            return tags;
+            return newArrayList(transform(groupedTags.values(), SourcedTag.toTag()));
         }
 
         private Multimap<IPath, SourcedTag> groupTagsBySuites() {
@@ -132,27 +127,13 @@ class TagsProposalsSupport {
                                 final RobotSuiteFile suiteModel = RedPlugin.getModelManager()
                                         .createSuiteFile((IFile) resource);
                                 if (suiteModel != null && suiteModel.isSuiteFile()) {
-
                                     final IPath groupingPath = suiteModel.getFile().getFullPath();
 
                                     if (!allTagsCache.containsKey(groupingPath)) {
                                         allTagsCache.putAll(groupingPath, extractTagsFromSuite(suiteModel));
                                     }
                                     final Collection<SourcedTag> tags = allTagsCache.get(groupingPath);
-                                    if (entry.getValue().isEmpty()) {
-                                        groupedTags.putAll(groupingPath, tags);
-                                    } else {
-                                        final List<String> sources = newArrayList(SourcedTag.SETTINGS_SOURCE);
-                                        sources.addAll(entry.getValue());
-
-                                        for (final SourcedTag sourcedTag : tags) {
-                                            for (final String source : sources) {
-                                                if (source.equals(sourcedTag.source)) {
-                                                    groupedTags.put(groupingPath, sourcedTag);
-                                                }
-                                            }
-                                        }
-                                    }
+                                    groupedTags.putAll(groupingPath, filterMatchingTags(tags, entry.getValue()));
                                 }
                             }
                             return true;
@@ -163,6 +144,26 @@ class TagsProposalsSupport {
                 }
             }
             return groupedTags;
+        }
+
+        private Collection<SourcedTag> filterMatchingTags(final Collection<SourcedTag> tags,
+                final Collection<String> testNames) {
+            if (testNames.isEmpty()) {
+                return tags;
+            } else {
+                final List<SourcedTag> filteredTags = new ArrayList<>();
+                final List<String> sources = newArrayList(SourcedTag.SETTINGS_SOURCE);
+                sources.addAll(testNames);
+
+                for (final SourcedTag sourcedTag : tags) {
+                    for (final String source : sources) {
+                        if (source.equals(sourcedTag.source)) {
+                            filteredTags.add(sourcedTag);
+                        }
+                    }
+                }
+                return filteredTags;
+            }
         }
 
         private Collection<SourcedTag> extractTagsFromSuite(final RobotSuiteFile suiteModel) {
@@ -231,6 +232,16 @@ class TagsProposalsSupport {
         public SourcedTag(final String source, final String tag) {
             this.source = source;
             this.tag = tag;
+        }
+
+        public static Function<SourcedTag, String> toTag() {
+            return new Function<SourcedTag, String>() {
+
+                @Override
+                public String apply(final SourcedTag sourcedTag) {
+                    return sourcedTag.tag;
+                }
+            };
         }
     }
 }
