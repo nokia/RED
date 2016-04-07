@@ -515,6 +515,21 @@ public class DumperHelper {
         return EndOfLineBuilder.newInstance().setEndOfLines(Constant.get(tempEOL)).buildEOL();
     }
 
+    public IRobotLineElement getLineSeparator(final RobotFile model, final FilePosition fPosEnd) {
+        IRobotLineElement eol = null;
+        final List<RobotLine> fileContent = model.getFileContent();
+        if (!fileContent.isEmpty() && fPosEnd.getLine() != FilePosition.NOT_SET) {
+            final RobotLine robotLine = fileContent.get(fPosEnd.getLine() - 1);
+            eol = robotLine.getEndOfLine();
+        }
+
+        if (eol == null) {
+            eol = getLineSeparator(model);
+        }
+
+        return eol;
+    }
+
     public int getLastSortedToDump(final RobotFile model, final List<Section> sections,
             final List<AModelElement<ARobotSectionTable>> sortedElements) {
         final int size = sortedElements.size();
