@@ -325,6 +325,9 @@ public class RobotProject extends RobotContainer {
                     pp.add(path);
                 }
             }
+            for (final SearchPath searchPath : configuration.getPythonPath()) {
+                pp.add(searchPath.getPath());
+            }
             return newArrayList(pp);
         }
         return newArrayList();
