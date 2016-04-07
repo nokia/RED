@@ -56,11 +56,12 @@ public class RobotArtifactsValidator {
     }
 
     public static void revalidate(final RobotSuiteFile suiteModel) {
-        if (suiteModel.getProject().getRobotProjectHolder().getRobotRuntime().getVersion() == null) {
+        final IFile file = suiteModel.getFile();
+        if (file == null || !file.exists() || file.getProject() == null || !file.getProject().exists()
+                || !RobotProjectNature.hasRobotNature(file.getProject())) {
             return;
         }
-        final IFile file = suiteModel.getFile();
-        if (file == null || !file.exists() || !RobotProjectNature.hasRobotNature(file.getProject())) {
+        if (suiteModel.getProject().getRobotProjectHolder().getRobotRuntime().getVersion() == null) {
             return;
         }
 
