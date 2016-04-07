@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _sucj8JHsEeWEZYgZQ8Au9A
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 4/1/16 3:13 PM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/7/16 4:34 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -17,14 +17,11 @@ Entry-Name: .content
 
 
 //open red.xml
-
-
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 with [get-editor "RobotProject/red.xml"] {
     get-tab-folder | get-tab-item "Referenced libraries" | click
     get-section "Referenced libraries" | get-button "Add Remote location" | click
 }
-
 
 
 //check how window looks like
@@ -44,13 +41,11 @@ with [get-window "Add Remote location" | get-control Any] {
 get-window "Add Remote location" | get-button Cancel | click
 
 //check that nothing was added
-
 get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | get-property itemCount | equals 0 
     | verify-true
 
 
 //add default
-
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 with [get-editor "RobotProject/red.xml"] {
     get-tab-folder | get-tab-item "Referenced libraries" | click
@@ -61,7 +56,6 @@ get-window "Add Remote location" | get-button OK | click
 
 
 //add with another port   
-
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
 with [get-editor "RobotProject/red.xml"] {
     get-tab-folder | get-tab-item "Referenced libraries" | click
@@ -75,11 +69,7 @@ with [get-window "Add Remote location"] {
 }
 
 
-
-
- 
 //add address with "/repo"
-
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
 with [get-editor "RobotProject/red.xml"] {
     get-tab-folder | get-tab-item "Referenced libraries" | click
@@ -106,8 +96,7 @@ get-window "Add Remote location" | get-button OK | click
 
 
 
-//add repon "text"
-
+//add repo: "text"
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
 with [get-editor "RobotProject/red.xml"] {
     get-tab-folder | get-tab-item "Referenced libraries" | click
@@ -119,8 +108,6 @@ with [get-window "Add Remote location"] {
     }
     get-button OK | click
 }
-
-
 
 
 //add onet.pl
@@ -137,8 +124,6 @@ with [get-window "Add Remote location"] {
 }
 
 
-
-
 //add https
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" 
 with [get-editor "RobotProject/red.xml"] {
@@ -153,9 +138,6 @@ with [get-window "Add Remote location"] {
 }
 
 
-
-
-
 //add duplicate of default value
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 with [get-editor "RobotProject/red.xml"] {
@@ -163,7 +145,6 @@ with [get-editor "RobotProject/red.xml"] {
     get-section "Referenced libraries" | get-button "Add Remote location" | click
 }
 get-window "Add Remote location" | get-button OK | click
-
 
 
 //add duplicate of onet.pl
@@ -179,7 +160,6 @@ with [get-window "Add Remote location"] {
     get-button OK | click
 }
 
-
 //check if all items are (duplicate were not added):
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
     get-property itemCount | equals 7 | verify-true
@@ -192,10 +172,7 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
     get-property "getItems().TableItem[6].getText()" | equals "https://127.0.0.1:8270/ - Remote" | verify-true
 }
 
-
-
 //remove with 3 items
-
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
     select "http:\\/\\/127.0.0.1:8270\\/ - Remote" | key-type Del
     select "http:\\/\\/127.0.0.1:15\\/repo - Remote" "https:\\/\\/127.0.0.1:8270\\/ - Remote"
@@ -225,11 +202,6 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
     get-item "http:\\/\\/127.0.0.1:8660\\/new - Remote" | get-property "styles[0].fontStyle" | equals normal 
         | verify-true
 }
-
-
-
-
-
 
 
 
