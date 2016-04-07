@@ -102,7 +102,10 @@ public class RobotLaunchConfiguration {
         
         final Map<String, List<String>> suitesNamesMapping = new HashMap<>();
         for (final IResource resource : suitesMapping.keySet()) {
-            suitesNamesMapping.put(resource.getProjectRelativePath().toPortableString(), suitesMapping.get(resource));
+            if (!(resource instanceof IProject)) {
+                suitesNamesMapping.put(resource.getProjectRelativePath().toPortableString(),
+                        suitesMapping.get(resource));
+            }
         }
         robotConfig.setSuitePaths(suitesNamesMapping);
         
