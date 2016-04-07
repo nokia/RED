@@ -61,7 +61,7 @@ public class RobotArtifactsValidator {
                 || !RobotProjectNature.hasRobotNature(file.getProject())) {
             return;
         }
-        if (suiteModel.getProject().getRobotProjectHolder().getRobotRuntime().getVersion() == null) {
+        if (suiteModel.getProject().getRuntimeEnvironment().getVersion() == null) {
             return;
         }
 
@@ -88,7 +88,7 @@ public class RobotArtifactsValidator {
             // so we won't revalidate
         }
     }
-
+    
     public Job createValidationJob(final Job dependentJob, final IResourceDelta delta, final int kind,
             final ProblemsReportingStrategy reporter) {
         return new Job("Validating") {
