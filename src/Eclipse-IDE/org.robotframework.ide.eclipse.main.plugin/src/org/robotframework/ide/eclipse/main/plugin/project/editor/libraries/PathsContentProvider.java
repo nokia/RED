@@ -18,6 +18,7 @@ import org.robotframework.red.viewers.StructuredContentProvider;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 
 /**
  * @author Michal Anglart
@@ -68,7 +69,7 @@ class PathsContentProvider extends StructuredContentProvider {
 
     static class SystemVariableAccessor {
         List<String> getPaths(final String variableName) {
-            return Splitter.on(File.pathSeparatorChar).splitToList(System.getenv(variableName));
+            return Splitter.on(File.pathSeparatorChar).splitToList(Strings.nullToEmpty(System.getenv(variableName)));
         }
     }
 }
