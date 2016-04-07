@@ -1,0 +1,147 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _nus0MPsuEeW7_PzjO98BIw,_d8aMACuvEeW667Afdo4DcA
+Element-Name: TestSelectionInRunConfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _HjyvoPyyEeW7_PzjO98BIw
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/7/16 1:46 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//run test to create run configuration
+get-view "Project Explorer" | get-tree | select SecondProject | get-menu "Run As/1 Robot Test" | click
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot/SecondProject"
+
+//check if project was selected than no tests are in window
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | get-property itemCount | equals 0 | verify-true
+
+//select test
+with [get-window "Run Configurations"] {
+    get-group "Test Suite(s)" | get-button "Browse..." | click
+    with [get-window "Select test suite"] {
+        get-tree | select "SecondProject/SingleTest.tsv"
+        get-button OK | click
+    }
+}
+//check if all tests were added. Test are not selected (only Suite)
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "SingleTest.tsv" | get-property childCount | equals 2 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[0].getText()" | equals test1 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[1].getText()" | equals test2 | verify-true
+    get-item "SingleTest.tsv/test1" | get-property checked | equals false | verify-true
+    get-item "SingleTest.tsv/test2" | get-property checked | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property checked | equals true | verify-true
+}
+//select all
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-button "Select All" | click
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "SingleTest.tsv/test1" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test2" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv" | get-property checked | equals true | verify-true
+}
+//deselect all
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-button "Deselect All" | click
+with [get-window "Run Configurations"] {
+    with [get-group "Test Suite(s)" | get-tree] {
+        get-item "SingleTest.tsv" | get-property checked | equals false | verify-true
+        get-item "SingleTest.tsv/test1" | get-property checked | equals false | verify-true
+        get-item "SingleTest.tsv/test2" | get-property checked | equals false | verify-true
+    }
+    //check user warning
+    get-editbox -after [get-label "Create, manage, and run configurations"] | get-property text 
+        | equals "There are no suites specified. All suites in 'SecondProject' will be executed." | verify-true
+}
+//check Remove button enablement when test is selected
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | select "SingleTest.tsv/test2"
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-button Remove | get-property enablement 
+    | equals false | verify-true
+
+//check Remove button enablement when Suite is selected    
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | select "SingleTest.tsv"
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-button Remove | get-property enablement | equals true 
+    | verify-true
+    
+//add not existing project name    
+with [get-window "Run Configurations"] {
+    get-group "Test Suite(s)" | get-tree | select "SingleTest.tsv"
+    get-group Project | get-editbox | set-text NoProject
+}
+
+//check that Run button is disable
+get-window "Run Configurations" | get-button Run | get-property enablement | equals false | verify-true
+
+//Apply and close window
+with [get-window "Run Configurations"] {
+    get-button Apply | click
+    get-button Close | click
+}
+//open Run Config and check that suits is empty
+get-menu "Run/Run Configurations..." | click
+get-window "Run Configurations" | get-tree | select "Robot/SecondProject"
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | get-property itemCount | equals 0 | verify-true
+
+//add SecondProject
+with [get-window "Run Configurations"] {
+    get-group Project | get-button "Browse..." | click
+    with [get-window "Select project"] {
+        get-tree | select SecondProject
+        get-button OK | click
+    }
+    //add Suite
+    get-group "Test Suite(s)" | get-button "Browse..." | click
+    with [get-window "Select test suite"] {
+        get-tree | select "SecondProject/SingleTest.tsv"
+        get-button OK | click
+    }
+    //select all tests and remove Suite
+    with [get-group "Test Suite(s)"] {
+        get-button "Select All" | click
+        get-tree | select "SingleTest.tsv"
+        get-button Remove | click
+    }
+    //apply and run
+    get-button Apply | click
+    get-button Run | click
+}
+
+//check that entire Suite was run
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: SecondProject.SingleTest.test1\n"
+    + ".* : INFO : 12\n"
+    + "Ending test: SecondProject.SingleTest.test1\n\n"
+    + "Starting test: SecondProject.SingleTest.test2\n"
+    + ".* : INFO : 13\n"
+    + "Ending test: SecondProject.SingleTest.test2" | verify-true
+    
+ //select now test not project   
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | get-menu "Run As/1 Robot Test" | click
+
+//check that new run config was added
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations" | get-tree] {
+    get-item Robot | get-property childCount | equals 2 | verify-true
+    get-item Robot | get-property "getItems().TreeItem[0].getText()" | equals "Script.robot" | verify-true
+    get-item Robot | get-property "getItems().TreeItem[1].getText()" | equals SecondProject | verify-true
+}
+//check that all test are selected
+get-window "Run Configurations" | get-tree | select "Robot/Script.robot"
+
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "Script.robot/CAPITAL LETTER" | get-property checked | equals true | verify-true
+    get-item "Script.robot/test1" | get-property checked | equals true | verify-true
+}
+
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals "CAPITAL LETTER" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" | equals test1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Script.robot" | verify-true
+}
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
