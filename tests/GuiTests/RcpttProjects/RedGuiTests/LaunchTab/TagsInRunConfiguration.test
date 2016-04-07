@@ -1,0 +1,304 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _nus0MPsuEeW7_PzjO98BIw,_d8aMACuvEeW667Afdo4DcA
+Element-Name: TagsInRunConfiguration
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _kgXUQPwQEeW7_PzjO98BIw
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/7/16 12:33 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//opne test and add content
+get-view "Project Explorer" | get-tree | select "SecondProject/SingleTest.tsv" | double-click
+get-editor "SingleTest.tsv" | get-text-viewer | set-text "*** Variables ***\n"
+    + "${index}\t1\n"
+    + "*** Test Cases ***\n"
+    + "test1\n"
+    + "\t[Tags]\tabc\n"
+    + "\tlog\t12\n\n"
+    + "test2\n"
+    + "\t[Tags]\t123\n"
+    + "\tlog\t13\n\n"
+    + "test3\n"
+    + "\t[Tags]\tsimple tag\n"
+    + "\tlog\t13\n"
+    + "\t\n"
+    + "test4\n"
+    + "\t[Tags]\tvalue-${index}\n"
+    + "\tlog\t13\n"
+    + "\t\n"
+    + "test5\n"
+    + "\t[Tags]\ttag1\ttag2\n"
+    + "\tlog\t13\n\n"
+    + "test6\n"
+    + "\t[Tags]\n"
+    + "\tlog\t13\n\n"
+    + "test7\n"
+    + "\t[Tags]\ttag1\n"
+    + "\tlog\t13\n"
+    + "\t\n"
+    + "test8\n"
+    + "\tlog\t13\n"
+    + "\t\n"
+    + "test9\n"
+    + "\t[Tags]\tlast\n"
+    + "\tlog\t13"
+    
+//add new test    
+get-menu "File/New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text Test2
+    get-button Finish | click
+}
+//add content
+get-tab-folder -index 1 | get-tab-item "Test2.robot" | click
+get-editor "Test2.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "case1\n"
+    + "    [Tags]    second_script\n"
+    + "    log  7" 
+    
+        
+get-button "Save All (M1+M2+S)" | click
+
+//run test
+get-view "Project Explorer" | get-tree | select SecondProject | get-menu "Run As/1 Robot Test" 
+    | click
+
+//add those 2 tests to run config    
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-tree | select "Robot/SecondProject"
+    get-group "Test Suite(s)" | get-button "Browse..." | click
+    with [get-window "Select test suite"] {
+        get-tree | select "SecondProject/SingleTest.tsv"
+        get-button OK | click
+    }
+    get-group "Test Suite(s)" | get-button "Browse..." | click
+    with [get-window "Select test suite"] {
+        get-tree | select "SecondProject/Test2.robot"
+        get-button OK | click
+    }
+}
+
+//check if where added but where not checked
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "SingleTest.tsv" | get-property childCount | equals 9 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[0].getText()" | equals test1 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[0].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[1].getText()" | equals test2 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[1].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[2].getText()" | equals test3 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[2].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[3].getText()" | equals test4 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[3].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[4].getText()" | equals test5 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[4].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[5].getText()" | equals test6 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[5].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[6].getText()" | equals test7 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[6].getChecked()" | equals false | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[7].getText()" | equals test8 | verify-true
+    get-item "SingleTest.tsv" | get-property "getItems().TreeItem[7].getChecked()" | equals false | verify-true
+}
+//check content assist in Tag "Only run tests.."
+with [get-window "Run Configurations" | get-group Tags | get-editbox] {
+    click-text
+    key-type "M1+SPACE"
+    set-text " "
+}
+with [get-window "Run Configurations" | get-window -class ContentProposalPopup | get-table] {
+    get-property itemCount | equals 8 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals abc | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals 123 | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "simple tag" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "value-${index}" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals tag1 | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals tag2 | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals last | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "second_script" | verify-true
+    
+}
+//check content assist in Tag "Skip tests.."
+with [get-window "Run Configurations"] {
+    with [get-group Tags | get-editbox -index 1] {
+        click-text
+        key-type "M1+SPACE"
+        set-text " "
+    }
+}
+with [get-window "Run Configurations" | get-window -class ContentProposalPopup | get-table] {
+    get-property itemCount | equals 8 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals abc | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals 123 | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "simple tag" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "value-${index}" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals tag1 | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals tag2 | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals last | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "second_script" | verify-true
+    
+}
+//select 2 test and check content assist
+with [get-window "Run Configurations"]{
+    with [get-group "Test Suite(s)" | get-tree] {
+        get-item "SingleTest.tsv/test1" | check
+        get-item "SingleTest.tsv/test7" | check
+    }
+    with [get-group Tags | get-editbox] {
+        click-text 2
+        key-type "M1+SPACE"
+        set-text " "
+    }
+}
+with [get-window "Run Configurations" | get-window -class ContentProposalPopup | get-table] {
+    get-property itemCount | equals 3 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals abc | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals tag1 | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "second_script" | verify-true
+}
+
+//uselect 2 tests and and new one. Check content assist in Tags for skipping test
+with [get-window "Run Configurations"] {
+    with [get-group "Test Suite(s)" | get-tree] {
+        get-item "SingleTest.tsv/test7" | uncheck
+        get-item "SingleTest.tsv/test1" | uncheck
+        get-item "Test2.robot/case1" | check
+    }
+    with [get-group Tags | get-editbox -index 1] {
+        click-text 2
+        key-type "M1+SPACE"
+        set-text " "
+    }
+}
+with [get-window "Run Configurations" | get-window -class ContentProposalPopup | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "second_script" | verify-true
+}
+
+//select all test by clicking suite name
+get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree | get-item "SingleTest.tsv" | check
+with [get-window "Run Configurations" | get-group "Test Suite(s)" | get-tree] {
+    get-item "SingleTest.tsv/test1" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test2" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test3" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test4" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test5" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test6" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test7" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test8" | get-property checked | equals true | verify-true
+    get-item "SingleTest.tsv/test9" | get-property checked | equals true | verify-true
+    get-item "Test2.robot/case1" | get-property checked | equals true | verify-true
+}
+
+//select from content assist: "value-${index}"
+with [get-window "Run Configurations"] {
+    with [get-group Tags | get-editbox] {
+        click-text
+        key-type "M1+SPACE"
+        set-text " "
+    }
+    //press Enter
+    get-window -class ContentProposalPopup | get-table | select "value-${index}" | click -default
+    get-group Project | get-editbox | click-text 1
+    with [get-group Tags | get-editbox] {
+        key-type "NUMPAD_ENTER" "\\u000D"
+        set-text ""
+    }
+}
+//check if Enter adds new textbox
+get-window "Run Configurations" | get-group Tags | get-editbox -after [get-label "value-${index}"] | get-property text 
+    | equals "" | verify-true
+    
+//add 'tags2' tag to second window
+with [get-window "Run Configurations"] {
+    with [get-group Tags | get-editbox -after [get-label "value-${index}"]] {
+        set-text tag2
+        key-type Enter -times 2
+        set-text ""
+    }
+    //run test
+    get-button Apply | click
+    get-button Run | click
+}
+//check if all tests were run (checkbox to runwas not selected)
+get-tab-folder -index 5 | get-tab-item "Message Log" | click
+get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 41 | verify-true
+
+//select checkbox to run tests with tags and run test
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    get-group Tags | get-button "Only run tests with these tags:" | check
+    get-button Apply | click
+    get-button Run | click
+}
+//check message log
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: SecondProject.SingleTest.test4\n"
+    + ".* : INFO : 13\n"
+    + "Ending test: SecondProject.SingleTest.test4\n\n"
+    + "Starting test: SecondProject.SingleTest.test5\n"
+    + ".*: INFO : 13\n"
+    + "Ending test: SecondProject.SingleTest.test5" | verify-true
+    
+//add 'simple tag' to skipped tests and aplly buy button not pressing Enter
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    with [get-group Tags] {
+        get-button "Skip tests with these tags:" | check
+        with [get-editbox -after [get-label tag2] -index 1] {
+            click-text
+            key-type "M1+SPACE"
+            set-text " "
+        }
+    }
+    get-window -class ContentProposalPopup | get-table | select "simple tag" | click -default
+    get-group Tags | get-button "Add new tag" -after [get-label tag2] -index 1 | click
+}
+//check that new editbox weas added
+get-window "Run Configurations" | get-group Tags | get-editbox -after [get-label "simple tag"] | get-property text 
+    | equals "" | verify-true
+
+//addd 'tag2' to skipped test and press Enter
+get-window "Run Configurations" | get-button Run | click
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    with [get-group Tags] {
+        get-button "Remove tag" -after [get-label "simple tag"] | click
+        with [get-editbox -after [get-label tag2] -index 1] {
+            set-text tag2
+            key-type "NUMPAD_ENTER" "\\u000D" -times 2
+            set-text ""
+        }
+    }
+    //run tests
+    get-button Apply | click
+    get-button Run | click
+}
+
+//check that only one tes was run
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: SecondProject.SingleTest.test4\n"
+    + ".* : INFO : 13\n"
+    + "Ending test: SecondProject.SingleTest.test4" | verify-true
+    
+//remove all tags but leave checkboxes selected    
+get-menu "Run/Run Configurations..." | click
+with [get-window "Run Configurations"] {
+    with [get-group Tags] {
+        get-button "Remove tag" | click
+        get-button "Remove tag" | click
+        get-button "Remove tag" | click
+    }
+    get-button Apply | click
+    get-button Run | click
+}
+//check that all tests were run
+get-view "Message Log" | get-editbox | get-property "getLineCount()" | equals 41 | verify-true
+    
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
