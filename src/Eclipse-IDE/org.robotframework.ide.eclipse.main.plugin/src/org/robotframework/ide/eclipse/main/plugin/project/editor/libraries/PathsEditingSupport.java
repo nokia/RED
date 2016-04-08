@@ -32,6 +32,11 @@ class PathsEditingSupport extends ElementsAddingEditingSupport {
     }
 
     @Override
+    protected int getColumnShift() {
+        return 1;
+    }
+
+    @Override
     protected boolean canEdit(final Object element) {
         return !(element instanceof SearchPath && ((SearchPath) element).isSystem());
     }
