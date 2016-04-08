@@ -24,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Ref
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 
 public class PythonLibStructureBuilder {
@@ -34,9 +35,10 @@ public class PythonLibStructureBuilder {
         this.environment = environment;
     }
 
-    public Collection<PythonClass> provideEntriesFromFile(final String path) throws RobotEnvironmentException {
-        
-        final List<String> classes = environment.getClassesDefinedInModule(new File(path));
+    public Collection<PythonClass> provideEntriesFromFile(final String path, final Optional<String> moduleName)
+            throws RobotEnvironmentException {
+    
+        final List<String> classes = environment.getClassesDefinedInModule(new File(path), moduleName);
         return newLinkedHashSet(transform(classes, new Function<String, PythonClass>() {
             @Override
             public PythonClass apply(final String name) {
