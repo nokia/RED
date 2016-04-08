@@ -474,7 +474,7 @@ public class RobotRuntimeEnvironment {
      * @return
      * @throws RobotEnvironmentException
      */
-    public List<String> getClassesDefinedInModule(final File moduleLocation)
+    public List<String> getClassesDefinedInModule(final File moduleLocation, final Optional<String> moduleName)
             throws RobotEnvironmentException {
         // DO NOT split & move to direct/rpc executors since this code may
         // import quite a lot of
@@ -482,8 +482,8 @@ public class RobotRuntimeEnvironment {
         // maybe we could restart xml-rpc server from time to time; then we can
         // consider moving this
         try {
-            final File scriptFile = RobotRuntimeEnvironment
-                    .copyResourceFile("module_classes_printer.py");
+            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("module_classes_printer.py");
+            RobotRuntimeEnvironment.copyResourceFile("extend_pythonpath.py");
 
             if (scriptFile != null) {
                 final String interpreterPath = location.toPath()
@@ -493,25 +493,24 @@ public class RobotRuntimeEnvironment {
 
                 String modulePath = moduleLocation.getAbsolutePath();
                 modulePath = modulePath.contains(" ") ? "\"" + modulePath + "\"" : modulePath;
-                final List<String> cmdLine = Arrays.asList(interpreterPath,
-                        scriptFile.getAbsolutePath(),
-                        modulePath);
+                final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), modulePath);
+                if (moduleName.isPresent()) {
+                    cmdLine.add(moduleName.get());
+                }
                 final List<String> output = newArrayList();
-                final ILineHandler linesHandler = new ILineHandler(){
+                final ILineHandler linesHandler = new ILineHandler() {
 
                     @Override
                     public void processLine(final String line) {
                         output.add(line);
                     }
                 };
-                final int result = RobotRuntimeEnvironment.runExternalProcess(
-                        cmdLine, linesHandler);
+                final int result = RobotRuntimeEnvironment.runExternalProcess(cmdLine, linesHandler);
                 if (result == 0) {
                     return output;
                 } else {
                     throw new RobotEnvironmentException(
-                            "Python interpreter returned following errors:\n\n"
-                                    + Joiner.on('\n').join(output));
+                            "Python interpreter returned following errors:\n\n" + Joiner.on('\n').join(output));
                 }
             }
             return newArrayList();

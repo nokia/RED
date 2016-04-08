@@ -273,7 +273,8 @@ public class LibrariesAutoDiscoverer {
                 robotProject.getRuntimeEnvironment());
         Collection<PythonClass> pythonClasses = newArrayList();
         try {
-            pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath());
+            pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath(),
+                    Optional.of(libraryImport.getName()));
         } catch (RobotEnvironmentException e) {
             if(!isPythonLibraryRecognizedByName(config, libraryImport, addedLibs)) {
                 libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());

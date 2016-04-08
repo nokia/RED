@@ -22,6 +22,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Lib
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 
+import com.google.common.base.Optional;
+
 public class JarStructureBuilder {
     
     private final RobotRuntimeEnvironment environment;
@@ -64,7 +66,7 @@ public class JarStructureBuilder {
     private List<JarClass> providePythonEntriesFromJarFile(final File file) {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment);
         final Collection<PythonClass> entriesFromFile = pythonLibStructureBuilder
-                .provideEntriesFromFile(file.getPath());
+                .provideEntriesFromFile(file.getPath(), Optional. <String>absent());
 
         final List<JarClass> jarClasses = newArrayList();
         for (final PythonClass pythonClass : entriesFromFile) {

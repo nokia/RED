@@ -36,6 +36,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarSt
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.red.graphics.ImagesManager;
 
+import com.google.common.base.Optional;
+
 /**
  * @author Michal Anglart
  */
@@ -53,7 +55,7 @@ public class ReferencedLibraryImporter {
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
                     try {
-                        pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath));
+                        pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath, Optional. <String>absent()));
                     } catch (final RobotEnvironmentException e) {
                         throw new InvocationTargetException(e);
                     }
