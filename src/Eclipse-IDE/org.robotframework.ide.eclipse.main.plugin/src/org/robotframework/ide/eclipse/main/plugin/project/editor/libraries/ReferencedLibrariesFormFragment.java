@@ -370,19 +370,15 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     }
 
     private void setInput() {
-        setInput(editorInput.getProjectConfiguration());
-    }
-
-    private void setInput(final RobotProjectConfig config) {
+        final RobotProjectConfig config = editorInput.getProjectConfiguration();
         final List<Object> input = new ArrayList<>();
         input.addAll(config.getRemoteLocations());
         input.addAll(config.getLibraries());
         viewer.setInput(input);
-
+        
         autoLibDiscoverButton.setSelection(config.isReferencedLibrariesAutoDiscoveringEnabled());
         showAutoLibDiscoverDialogButton.setSelection(config.isLibrariesAutoDiscoveringSummaryWindowEnabled());
         autoLibReloadButton.setSelection(config.isReferencedLibrariesAutoReloadEnabled());
-
     }
 
     @Override
@@ -403,7 +399,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
     @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        setInput(config);
+        setInput();
 
         addPythonLibButton.setEnabled(false);
         addJavaLibButton.setEnabled(false);
