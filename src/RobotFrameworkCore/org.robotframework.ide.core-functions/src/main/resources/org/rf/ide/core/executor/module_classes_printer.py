@@ -9,7 +9,7 @@ import os.path
 import inspect
 import pkgutil
 import imp
-
+import extend_pythonpath
 '''
 This script prints all the classes contained in given module and submodules rooted in given path. 
 In case of package modules the path has to point to __init__.py file of this module.
@@ -40,18 +40,20 @@ if original_path.endswith('__init__.py'):
 elif original_path.endswith('.py'):
     module_name = os.path.basename(original_path)[:-3]
     sys.path.append(path)
-
     try:
         module_file, module_path, module_desc = imp.find_module(module_name)
         root_module = imp.load_module(module_name, module_file, module_path, module_desc)
     except Exception, e:
-        if moduleNameFromImport != '':
-            import importlib
-            import extend_pythonpath
+        if moduleNameFromImport == '':
+            moduleNameFromImport = os.path.basename(original_path)[:-3]
+        import importlib
+        try:
             extend_pythonpath.extend(original_path, moduleNameFromImport)
             root_module = importlib.import_module(moduleNameFromImport)
-        else:
-            raise e
+        except Exception, e:
+            tempModuleName = extend_pythonpath.get_module_name_by_path(original_path)
+            extend_pythonpath.extend(original_path, tempModuleName)
+            root_module = importlib.import_module(tempModuleName)
 
     modules = [root_module]
 
@@ -80,9 +82,15 @@ elif original_path.endswith(".zip") or original_path.endswith(".jar"):
 else:
     raise Exception('Unrecognized library path: ' + original_path)
 
+to_print = list()
+
 for module in modules:
-    print(module.__name__)
+    to_print.append(module.__name__)
     for n, obj in inspect.getmembers(module):
         if inspect.isclass(obj) and obj.__module__.startswith(module_name):
-            print(obj.__module__ + '.' + obj.__name__)
+            to_print.append(obj.__module__ + '.' + obj.__name__)
 
+if original_path.endswith('.py'):
+    to_print = extend_pythonpath.get_module_combinations(to_print, extend_pythonpath.get_module_name_by_path(original_path))
+
+print '\n'.join(to_print)
