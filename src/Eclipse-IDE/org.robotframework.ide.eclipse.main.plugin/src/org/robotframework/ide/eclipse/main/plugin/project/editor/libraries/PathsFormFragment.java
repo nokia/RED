@@ -201,16 +201,16 @@ class PathsFormFragment implements ISectionFormFragment {
         return null;
     }
 
-    private void setInput(final RobotProjectConfig config) {
-        pythonPathViewer.setInput(config.getPythonPath());
-        classPathViewer.setInput(config.getClassPath());
+    private void setInput() {
+        pythonPathViewer.setInput(editorInput.getProjectConfiguration().getPythonPath());
+        classPathViewer.setInput(editorInput.getProjectConfiguration().getClassPath());
     }
 
     @Inject
     @Optional
     private void whenEnvironmentLoadingStarted(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
-        setInput(config);
+        setInput();
 
         pythonPathViewer.getTable().setEnabled(false);
         classPathViewer.getTable().setEnabled(false);
