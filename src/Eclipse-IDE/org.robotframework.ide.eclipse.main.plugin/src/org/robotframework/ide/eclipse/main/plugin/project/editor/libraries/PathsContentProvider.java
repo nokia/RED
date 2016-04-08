@@ -69,7 +69,9 @@ class PathsContentProvider extends StructuredContentProvider {
 
     static class SystemVariableAccessor {
         List<String> getPaths(final String variableName) {
-            return Splitter.on(File.pathSeparatorChar).splitToList(Strings.nullToEmpty(System.getenv(variableName)));
+            return Splitter.on(File.pathSeparatorChar)
+                    .omitEmptyStrings()
+                    .splitToList(Strings.nullToEmpty(System.getenv(variableName)));
         }
     }
 }
