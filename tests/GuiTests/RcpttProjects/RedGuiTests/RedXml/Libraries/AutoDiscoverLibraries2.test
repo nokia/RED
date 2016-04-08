@@ -1,0 +1,174 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _eXb6MPp7EeW7_PzjO98BIw
+Element-Name: AutoDiscoverLibraries2
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _CN_vwP2bEeW7_PzjO98BIw
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/8/16 6:30 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "remove-all-libraries-from-xml"{
+	get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+	get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+
+	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
+	    with [get-table] {
+	        select ".*" -all
+	        key-type Del
+	    }
+	}
+}
+
+//open resource file and add new line
+get-view "Project Explorer" | get-tree | select "RobotProject/resources/resource.robot" | double-click
+with [get-editor "resource.robot" | get-text-viewer] {
+    set-caret-pos 2 37
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+s"
+}
+
+//check icon that lib was added
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item res1 | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+    get-property itemCount | equals 1 | verify-true
+}
+//select "Source" item
+get-window "Discovering libraries summary" | get-tree 
+    | select [format "res1/Source : %s\\RobotProject\\libs\\for_resource\\res1.py" $RED_workspace_path]
+
+//check all items    
+with [get-window "Discovering libraries summary"] {
+    with [get-tree] {
+        get-property "getItems().TreeItem[0].getText()" | equals res1 | verify-true
+        get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+            | equals "Status : Added to project configuration" | verify-true
+        get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+            | equals [format "Source : %s\\RobotProject\\libs\\for_resource\\res1.py" $RED_workspace_path] | verify-true
+        get-property "getItems().TreeItem[0].getItems().TreeItem[2].getText()" 
+            | equals [format "Importers : %s\\RobotProject\\resources\\resource.robot" $RED_workspace_path]| verify-true
+    }
+    //check text in window below
+    get-editbox -after [get-label "Discovered libraries (1):"] | get-property text 
+        | equals [format "Source: %s\\RobotProject\\libs\\for_resource\\res1.py" $RED_workspace_path] | verify-true
+}
+
+//switch between items in tree and check text in window below
+get-window "Discovering libraries summary" | get-tree | select "res1/Status : Added to project configuration"
+get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (1):"] 
+    | get-property text | equals "Status: Added to project configuration" | verify-true
+get-window "Discovering libraries summary" | get-tree 
+    | select [format "res1/Importers : %s\\RobotProject\\resources\\resource.robot" $RED_workspace_path]
+get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (1):"] 
+    | get-property text | equals [format "Importers: %s\\RobotProject\\resources\\resource.robot" $RED_workspace_path] | verify-true
+get-window "Discovering libraries summary" | get-button OK | click
+
+//check red.xml
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property itemCount | equals 1 | verify-true
+    get-item "res1 - RobotProject\\/libs\\/for_resource" | get-property index | equals 0 | verify-true
+}
+
+
+//==============================================================================================================================
+//suite with libs containing error (python file contains syntax error, arg is not defined for second lib)
+
+remove-all-libraries-from-xml
+
+//open file and add value
+get-view "Project Explorer" | get-tree | select "RobotProject/other_tests/lib_with_error.robot" | double-click
+with [get-editor "lib_with_error.robot" | get-text-viewer] {
+    set-caret-pos 7 11
+    type-text 7
+    key-type "M1+s"
+}
+//check icons
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-property itemCount | equals 2 | verify-true
+    get-item error | get-property "image.path" 
+        | equals ".*/error_fatal.png" | verify-true
+    get-item "lib_with_args" | get-property "image.path" 
+        | equals ".*/error_fatal.png" | verify-true
+}
+
+//check items for lib_wit_error
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item "error/Status : Not added to project configuration" | get-property index | equals 0 | verify-true
+    get-item "error/Source : Unknown" | get-property index | equals 1 | verify-true
+    get-item [format "error/Importers : %s\\RobotProject\\other_tests\\lib_with_error.robot" $RED_workspace_path]
+        | get-property index | equals 2 | verify-true
+    get-item [format "error/Importers : %s\\RobotProject\\other_tests\\lib_with_error.robot" $RED_workspace_path]
+        | get-property index | equals 2 | verify-true
+}
+//select main node of "lib_with_args"
+get-window "Discovering libraries summary" | get-tree | select "lib_with_args"
+
+//check window below
+get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (2):"] 
+    | get-property text | equals [format "Status: Not added to project configuration\n"
+		+ "Source: Unknown\n"
+		+ "Importers: .*lib_with_error\.robot\n"
+		+ "Additional info: .*"  $RED_workspace_path]
+    | verify-true
+
+//check all items in tree    
+get-window "Discovering libraries summary" | get-tree 
+    | select "lib_with_args/Status : Not added to project configuration"
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item "lib_with_args/Status : Not added to project configuration" | get-property index | equals 0 | verify-true
+    get-item "lib_with_args/Source : Unknown" | get-property index | equals 1 | verify-true
+    get-item [format "lib_with_args/Importers : %s\\RobotProject\\other_tests\\lib_with_error.robot" $RED_workspace_path]
+        | get-property index | equals 2 | verify-true
+    get-item "lib_with_args/Additional info : \\(u\"Test Library 'lib_with_args' expected 1 argument, got 0.\",\\), <traceback object at .*>\\)\\)" 
+        | get-property index | equals 3 | verify-true
+}
+//select main node of "lib_with_atgs" amd check window below
+get-window "Discovering libraries summary" | get-tree | select error
+get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (2):"] 
+    | get-property text | equals "Status: Not added to project configuration\n"
+    + "Source: Unknown\n"
+    + "Importers: .*RobotProject\\other_tests\\lib_with_error\.robot\nAdditional info: \(.* failed: SyntaxError: invalid syntax \(error.py, line 1\)\nTraceback \(most recent call last\):\n"
+    +"  None\nPYTHONPATH:\n(.*\n)*"
+      
+get-window "Discovering libraries summary" | get-button OK | click
+
+//==============================================================================================================================
+//suite contains library with many clasess
+
+//open file and add value
+get-view "Project Explorer" | get-tree | select "RobotProject/other_tests/lib_with_many_classes.tsv" 
+    | select "RobotProject/other_tests/lib_with_many_classes.tsv" | double-click
+with [get-editor "lib_with_many_classes.tsv" | get-text-viewer] {
+    set-caret-pos 6 11
+    key-type "NUMPAD_6" 6
+    key-type "M1+s"
+}
+
+//check icons
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item "many_classes" | get-property "image.path" 
+        | equals ".*/success_big.png" | verify-true
+    get-property itemCount | equals 1 | verify-true
+}
+
+//check all items in tree
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item "many_classes/Status : Added to project configuration" | get-property index | equals 0 | verify-true
+    get-item [format "many_classes/Source : %s\\RobotProject\\libs\\subfolder\\many_classes.py" $RED_workspace_path]
+        | get-property index | equals 1 | verify-true
+    get-item [format "many_classes/Importers : %s\\RobotProject\\other_tests\\lib_with_many_classes.tsv" $RED_workspace_path]
+        | get-property index | equals 2 | verify-true
+}
+get-window "Discovering libraries summary" | get-button OK | click
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
