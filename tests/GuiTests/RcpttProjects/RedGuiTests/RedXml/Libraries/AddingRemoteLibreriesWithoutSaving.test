@@ -20,7 +20,7 @@ Entry-Name: .content
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
 
 try -times 10 -delay 1000 -command{
-	get-editor "Lib/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
+	get-editor "RobotProject/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
     | verify-true
 }
 
