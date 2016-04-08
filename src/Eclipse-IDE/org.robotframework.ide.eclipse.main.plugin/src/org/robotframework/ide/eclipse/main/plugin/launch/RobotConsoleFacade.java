@@ -29,7 +29,8 @@ public class RobotConsoleFacade {
 
     void connect(final RobotLaunchConfiguration robotConfig, final RobotRuntimeEnvironment runtimeEnvironment,
             final RunCommandLine cmdLine, final String version) throws IOException, CoreException {
-        final Optional<IOConsole> cons = getConsole(robotConfig, runtimeEnvironment.getFile().getAbsolutePath());
+        final Optional<IOConsole> cons = getConsole(robotConfig,
+                robotConfig.createConsoleDescription(runtimeEnvironment));
         if (cons.isPresent()) {
             cons.get().addPatternMatchListener(new RobotConsolePatternsListener(robotConfig.getRobotProject()));
             redMessagesStream = Optional.of(cons.get().newOutputStream());
