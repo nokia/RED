@@ -20,7 +20,7 @@ def get_path_to_walk(start_path, found_path, lib_name=None):
 
     return path
 
-def extend(start_path='.', libImp=''):
+def find_module_path(start_path):
     path = os.path.abspath(start_path.split(os.sep)[0])
 
     do = True
@@ -36,6 +36,34 @@ def extend(start_path='.', libImp=''):
                 do = False
                 break
 
+    return path
+
+def get_module_name_by_path(start_path):
+    module_name = start_path
+    path_to_module = find_module_path(start_path)
+    if (path_to_module != start_path):
+        path_to_module = start_path.replace(path_to_module + os.sep, '', 1)
+        module_name = path_to_module.replace(os.sep, '.')
+        if (os.path.isfile(start_path)):
+            module_name = module_name[:-3]
+
+    return module_name
+
+def get_module_combinations(got_from_inspect=list(), module_path=''):
+    paths_to_print = list(got_from_inspect)
+    module_names = module_path.split('.')[:-1]
+    inspect_len = len(got_from_inspect)
+
+    if len(module_names) > 0:
+        for mod_index in range(len(module_names) - 1, -1, -1):
+            pre_index = '.'.join(module_names[mod_index:])
+            for get_index in range(0, inspect_len):
+                paths_to_print.append(pre_index + '.' + got_from_inspect[get_index])
+
+    return paths_to_print
+
+def extend(start_path='.', libImp=''):
+    path = find_module_path(start_path)
     path_walk = get_path_to_walk(start_path, path, libImp)
 
     for k  in pkgutil.walk_packages(path=[path_walk]):
