@@ -101,19 +101,37 @@ public class PathsResolver {
 
     private static IPath resolveToAbsolutePath(final RobotSuiteFile file, final IPath path)
             throws PathResolvingException {
-        if (isParameterized(path)) {
+        return resolveToAbsolutePath(file.getFile().getLocation(), path);
+    }
+
+    /**
+     * Resolves given relative path to absolute path. The path is treated as relative to
+     * the path given in {@code absolute} parameter. The {@code relative} path is returned
+     * if it is absolute.
+     * 
+     * @param absolute
+     * @param relative
+     * @return
+     * @throws PathResolvingException is hrown when:
+     *  - path is RF-parameterized (using ${var}) 
+     *  - when given absolute path is null
+     *  - in case of paths syntax problems 
+     */
+    public static IPath resolveToAbsolutePath(final IPath absolute, final IPath relative)
+            throws PathResolvingException {
+        if (isParameterized(relative)) {
             throw new PathResolvingException("Given path is parameterized");
-        } else if (path.isAbsolute()) {
-            return path;
-        } else if (file.getFile().getLocation() == null) {
-            throw new PathResolvingException("Given file is not located physically in the file system");
+        } else if (relative.isAbsolute()) {
+            return relative;
+        } else if (absolute == null) {
+            throw new PathResolvingException("Given path is not located physically in the file system");
         } else {
             try {
                 final Escaper escaper = PathsConverter.getUriSpecialCharsEscaper();
 
-                final String portablePath = file.getFile().getLocation().toPortableString();
+                final String portablePath = absolute.toPortableString();
                 final URI filePath = new URI(escaper.escape(portablePath));
-                final URI pathUri = filePath.resolve(escaper.escape(path.toString()));
+                final URI pathUri = filePath.resolve(escaper.escape(relative.toString()));
 
                 return new Path(pathUri.toString().replaceAll("%20", " "));
             } catch (final URISyntaxException | IllegalArgumentException e) {
