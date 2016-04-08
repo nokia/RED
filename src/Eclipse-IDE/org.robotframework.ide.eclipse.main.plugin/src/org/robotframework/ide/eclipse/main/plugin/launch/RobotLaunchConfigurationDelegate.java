@@ -226,7 +226,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
             isDebugServerSocketListening = waitForDebugServerSocket(socketManager);
         }
 
-        final String description = runtimeEnvironment.getFile().getAbsolutePath();
+        final String description = robotConfig.createConsoleDescription(runtimeEnvironment);
         final String version = robotConfig.isUsingInterpreterFromProject() ? runtimeEnvironment.getVersion()
                 : RobotRuntimeEnvironment.getVersion(robotConfig.getExecutor());
 
