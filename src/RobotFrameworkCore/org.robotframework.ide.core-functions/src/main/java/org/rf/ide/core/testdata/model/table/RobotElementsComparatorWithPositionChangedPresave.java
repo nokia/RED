@@ -77,6 +77,7 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
         final Optional<IRobotTokenType> o1TypeOP = findType(o1);
         final Optional<IRobotTokenType> o2TypeOP = findType(o2);
 
+        int posComperatorResult = posComperator.compare(o1, o2);
         if (o1TypeOP.isPresent() && o2TypeOP.isPresent()) {
             if (o1TypeOP.get() == o2TypeOP.get()) {
                 Multimap<IRobotLineElement, Integer> indexes = indexesOf(typeToTokens.get(o1TypeOP.get()), o1, o2);
@@ -88,13 +89,12 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
 
                 result = Integer.compare(o1Index, o2Index);
             } else {
-                if (o1.getFilePosition().isBefore(o2.getFilePosition())) {
-                    result = ECompareResult.LESS_THAN.getValue();
-                } else {
-                    Integer typeO1hierarchy = typesToHierarchy.get(o1TypeOP.get());
-                    Integer typeO2hierarchy = typesToHierarchy.get(o2TypeOP.get());
+                Integer typeO1hierarchy = typesToHierarchy.get(o1TypeOP.get());
+                Integer typeO2hierarchy = typesToHierarchy.get(o2TypeOP.get());
 
-                    result = Integer.compare(typeO1hierarchy, typeO2hierarchy);
+                result = Integer.compare(typeO1hierarchy, typeO2hierarchy);
+                if (result != posComperatorResult) {
+                    result = posComperatorResult;
                 }
             }
         } else if (!o1TypeOP.isPresent()) {
@@ -102,7 +102,7 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
         } else if (!o2TypeOP.isPresent()) {
             result = ECompareResult.GREATER_THAN.getValue();
         } else {
-            result = posComperator.compare(o1, o2);
+            result = posComperatorResult;
         }
 
         return result;

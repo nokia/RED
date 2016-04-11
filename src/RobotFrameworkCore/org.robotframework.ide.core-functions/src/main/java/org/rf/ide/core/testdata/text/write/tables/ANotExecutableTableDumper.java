@@ -103,8 +103,7 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
                             || endOfLine.getTypes().contains(EndOfLineTypes.NON)
                             || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
                             && !lastLine.getLineElements().isEmpty()) {
-                        final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                        getDumperHelper().updateLine(model, lines, lineSeparator);
+                        getDumperHelper().updateLine(model, lines, getDumperHelper().getLineSeparator(model, fPosEnd));
                     }
                 }
             }

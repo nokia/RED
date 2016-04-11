@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model;
 import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
 
@@ -25,6 +26,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         this.parent = parent;
     }
 
+    @Override
     public T getParent() {
         return parent;
     }
@@ -48,5 +50,20 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         }
 
         return pos;
+    }
+
+    protected void fixComment(final List<RobotToken> comment, final RobotToken rt) {
+        if (comment.isEmpty() && !rt.getText().startsWith("#")) {
+            rt.setText("#" + rt.getText());
+        }
+
+        if (!rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                && !rt.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+            if (comment.isEmpty()) {
+                rt.setType(RobotTokenType.START_HASH_COMMENT);
+            } else {
+                rt.setType(RobotTokenType.COMMENT_CONTINUE);
+            }
+        }
     }
 }
