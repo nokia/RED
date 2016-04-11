@@ -67,10 +67,12 @@ public abstract class AVariable extends AModelElement<VariableTable> implements 
 
     @Override
     public void addCommentPart(final RobotToken rt) {
+        this.fixComment(comment, rt);
         this.comment.add(rt);
     }
 
     public void addCommentPart(final RobotToken rt, final int position) {
+        this.fixComment(comment, rt);
         this.comment.set(position, rt);
     }
 
