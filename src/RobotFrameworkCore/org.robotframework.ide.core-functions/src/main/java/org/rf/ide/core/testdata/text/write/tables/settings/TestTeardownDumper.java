@@ -37,7 +37,10 @@ public class TestTeardownDumper extends ANotExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_NAME, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TEST_TEARDOWN_KEYWORD_ARGUMENT, 2,
                 testTeardown.getArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3, testTeardown.getComment());
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
+                getElementHelper().filter(testTeardown.getComment(), RobotTokenType.START_HASH_COMMENT));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
+                getElementHelper().filter(testTeardown.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

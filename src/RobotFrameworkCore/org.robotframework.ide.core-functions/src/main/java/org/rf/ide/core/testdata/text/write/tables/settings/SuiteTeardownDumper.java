@@ -37,7 +37,10 @@ public class SuiteTeardownDumper extends ANotExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_NAME, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_SUITE_TEARDOWN_KEYWORD_ARGUMENT, 2,
                 suiteTeardown.getArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3, suiteTeardown.getComment());
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
+                getElementHelper().filter(suiteTeardown.getComment(), RobotTokenType.START_HASH_COMMENT));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
+                getElementHelper().filter(suiteTeardown.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }
