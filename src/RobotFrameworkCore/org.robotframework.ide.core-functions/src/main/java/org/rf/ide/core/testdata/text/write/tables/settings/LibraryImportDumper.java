@@ -52,7 +52,10 @@ public class LibraryImportDumper extends ANotExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_LIBRARY_ARGUMENT, 2, library.getArguments());
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_LIBRARY_ALIAS, 3, libAliasDec);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE, 4, libAliasNames);
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 5, library.getComment());
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 5,
+                getElementHelper().filter(library.getComment(), RobotTokenType.START_HASH_COMMENT));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 5,
+                getElementHelper().filter(library.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

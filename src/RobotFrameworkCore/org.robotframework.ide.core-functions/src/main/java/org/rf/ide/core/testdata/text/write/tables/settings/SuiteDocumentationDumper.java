@@ -26,7 +26,10 @@ public class SuiteDocumentationDumper extends ANotExecutableTableElementDumper {
         SuiteDocumentation suiteDoc = (SuiteDocumentation) currentElement;
         RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_DOCUMENTATION_TEXT, 1, suiteDoc.getDocumentationText());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2, suiteDoc.getComment());
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
+                getElementHelper().filter(suiteDoc.getComment(), RobotTokenType.START_HASH_COMMENT));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
+                getElementHelper().filter(suiteDoc.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }
