@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -35,15 +36,22 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
 
     private final DumperHelper aDumpHelper;
 
+    private final ElementsUtility anElementHelper;
+
     private final ModelType servedType;
 
     public ANotExecutableTableElementDumper(final DumperHelper aDumpHelper, final ModelType servedType) {
         this.aDumpHelper = aDumpHelper;
+        this.anElementHelper = new ElementsUtility();
         this.servedType = servedType;
     }
 
     protected DumperHelper getDumperHelper() {
         return this.aDumpHelper;
+    }
+
+    protected ElementsUtility getElementHelper() {
+        return this.anElementHelper;
     }
 
     @Override
