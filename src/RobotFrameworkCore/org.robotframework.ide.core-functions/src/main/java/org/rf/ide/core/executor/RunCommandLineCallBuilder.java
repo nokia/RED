@@ -19,7 +19,6 @@ import com.google.common.base.Joiner;
 
 /**
  * @author Michal Anglart
- *
  */
 public class RunCommandLineCallBuilder {
 
@@ -49,12 +48,13 @@ public class RunCommandLineCallBuilder {
         public IRunCommandLineBuilder addUserArgumentsForRobot(final String arguments);
 
         public IRunCommandLineBuilder enableDebug(final boolean shouldEnableDebug);
-        
+
         public IRunCommandLineBuilder enableDryRun(final boolean shouldEnableDryRun);
 
         public IRunCommandLineBuilder withProject(final File project);
-        
-        public IRunCommandLineBuilder withAdditionalProjectsLocations(final Collection<String> additionalProjectsLocations);
+
+        public IRunCommandLineBuilder withAdditionalProjectsLocations(
+                final Collection<String> additionalProjectsLocations);
 
         public RunCommandLine build() throws IOException;
     }
@@ -64,7 +64,6 @@ public class RunCommandLineCallBuilder {
         private final SuiteExecutor executor;
 
         private final String executablePath;
-
 
         private final List<String> pythonPath = new ArrayList<>();
 
@@ -79,12 +78,13 @@ public class RunCommandLineCallBuilder {
         private final List<String> tagsToInclude = new ArrayList<>();
 
         private final List<String> tagsToExclude = new ArrayList<>();
-        
+
         private final List<String> additionalProjectsLocations = new ArrayList<>();
 
         private File project = null;
 
         private boolean enableDebug = false;
+
         private boolean enableDryRun = false;
 
         private String robotUserArgs = "";
@@ -173,7 +173,7 @@ public class RunCommandLineCallBuilder {
             this.enableDebug = shouldEnableDebug;
             return this;
         }
-        
+
         @Override
         public IRunCommandLineBuilder enableDryRun(final boolean shouldEnableDryRun) {
             this.enableDryRun = shouldEnableDryRun;
@@ -185,9 +185,10 @@ public class RunCommandLineCallBuilder {
             this.project = project;
             return this;
         }
-        
+
         @Override
-        public IRunCommandLineBuilder withAdditionalProjectsLocations(final Collection<String> additionalProjectsLocations) {
+        public IRunCommandLineBuilder withAdditionalProjectsLocations(
+                final Collection<String> additionalProjectsLocations) {
             this.additionalProjectsLocations.addAll(additionalProjectsLocations);
             return this;
         }
@@ -236,6 +237,12 @@ public class RunCommandLineCallBuilder {
                 cmdLine.add(RobotRuntimeEnvironment.copyResourceFile("SuiteVisitorImportProxy.py").toPath().toString());
                 cmdLine.add("--runemptysuite");
                 cmdLine.add("--dryrun");
+                cmdLine.add("--output");
+                cmdLine.add("NONE");
+                cmdLine.add("--report");
+                cmdLine.add("NONE");
+                cmdLine.add("--log");
+                cmdLine.add("NONE");
             }
             cmdLine.addAll(suitesToRun);
             cmdLine.addAll(testsToRun);
