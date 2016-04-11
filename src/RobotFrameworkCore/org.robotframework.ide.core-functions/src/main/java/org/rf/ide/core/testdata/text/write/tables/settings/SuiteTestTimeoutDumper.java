@@ -37,7 +37,10 @@ public class SuiteTestTimeoutDumper extends ANotExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TEST_TIMEOUT_VALUE, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE, 2,
                 testTimeout.getMessageArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3, testTimeout.getComment());
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
+                getElementHelper().filter(testTimeout.getComment(), RobotTokenType.START_HASH_COMMENT));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
+                getElementHelper().filter(testTimeout.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }

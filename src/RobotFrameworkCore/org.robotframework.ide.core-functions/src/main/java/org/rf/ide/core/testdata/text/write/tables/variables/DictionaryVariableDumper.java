@@ -49,7 +49,10 @@ public class DictionaryVariableDumper extends ANotExecutableTableElementDumper {
 
         RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
         sorter.addPresaveSequenceForType(RobotTokenType.VARIABLES_VARIABLE_VALUE, 1, itemsAsValue);
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2, var.getComment());
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
+                getElementHelper().filter(var.getComment(), RobotTokenType.START_HASH_COMMENT));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
+                getElementHelper().filter(var.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }
