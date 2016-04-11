@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _l6X6QPy3EeW7_PzjO98BIw
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/11/16 4:19 PM
+Save-Time: 4/11/16 7:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -181,7 +181,7 @@ os-specific [get-java-property "user.home" |invoke replace "\\" "\\\\"] [get-jav
 
 
 	get-editor "windows_path.robot" | get-text-viewer | key-type "M1+s"
-	
+	wait 2000
 	//check icons
 	with [get-window "Discovering libraries summary" | get-tree] {
 	    get-property itemCount | equals 3 | verify-true
@@ -196,30 +196,35 @@ os-specific [get-java-property "user.home" |invoke replace "\\" "\\\\"] [get-jav
 	get-window "Discovering libraries summary" | get-tree | select "add/Status : Added to project configuration"
 	with [get-window "Discovering libraries summary" | get-tree] {
 	    get-item "add/Status : Added to project configuration" | get-property index | equals 0 | verify-true
-	    get-item [format "add/Source : %s%sRobotProject%slibs\\add.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep] | get-property index | equals 1 
-	        | verify-true
-	    get-item [format "add/Importers : %s%sRobotProject%stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep] | get-property index 
-	        | equals 2 | verify-true
+	    
+	    get-item "add/Source :.*" | get-property caption 
+	      | equals [format "Source : %s%sRobotProject%slibs%sadd.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep]| verify-true
+	    
+//	    get-item "add/Importers : .*" | get-property caption 
+//	    equals [format "Importers : %s%sRobotProject%stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+//	        | verify-true
 	}
 	//check fields for extarnal lib outside workspace
 	with [get-window "Discovering libraries summary" | get-tree] {
 	    get-item "external_lib/Status : Added to project configuration" | get-property index | equals 0 | verify-true
-	    get-item [os-specific [format "external_lib/Source : %s\ext_lib\\external_lib.py" $user_folder] [format "external_lib/Source : %s/ext_lib/external_lib.py" $user_folder]]
-	    	| get-property index | equals 1 | verify-true
-	    get-item [format "external_lib/Importers : %s%sRobotProject%Stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
-	        | get-property index | equals 2 | verify-true
+
+		get-item "external_lib/Source : \\/root\\/ext_lib\\/external_lib.py" | get-property caption 
+		| equals [format "Source : %s%sext_lib%sexternal_lib.py" $user_folder $sys_sep $sys_sep] | verify-true
+				    	
+	    get-item "external_lib/Importers : .*" | get-property caption | equals [format "Importers : %s%sRobotProject%Stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+	         | verify-true
 	}
 	//check wondos path
 	with [get-window "Discovering libraries summary" | get-tree] {
 	    get-item "c:folderfile.py/Status : Not added to project configuration" | get-property index | equals 0 | verify-true
 	    get-item "c:folderfile.py/Source : Unknown" | get-property index | equals 1 | verify-true
-	    get-item [format "c:folderfile.py/Importers : %s%sRobotProject%stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
-	        | get-property index | equals 2 | verify-true
-	    get-item [format "c:folderfile.py/Additional info : Error in file '%s%sRobotProject%stests%swindows_path.robot': Test library 'c:folderfile.py' does not exist." $RED_workspace_path $sys_sep $sys_sep $sys_sep]
-	        | get-property index | equals 3 | verify-true
+	    get-item "c:folderfile.py/Importers :.*"| get-property caption | equals [format "Importers : %s%sRobotProject%stests%swindows_path.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+	        | verify-true
+	    get-item "c:folderfile.py/Additional info : .*" | get-property caption | equals [format "Additional info : Error in file '%s%sRobotProject%stests%swindows_path.robot': Test library 'c:folderfile.py' does not exist." $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+	         | verify-true
 	}
 	get-window "Discovering libraries summary" | get-tree 
-	    | select [format "c:folderfile.py/Additional info : Error in file '%s%sRobotProject%stests%swindows_path.robot': Test library 'c:folderfile.py' does not exist." $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+	    | select "c:folderfile.py/Additional info .*"
 	get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (3):"] 
 	    | get-property text 
 	    | equals [format "Additional info: Error in file '%s%sRobotProject%stests%swindows_path.robot': Test library 'c:folderfile.py' does not exist." $RED_workspace_path $sys_sep $sys_sep $sys_sep]
@@ -331,7 +336,7 @@ with [get-editor "lib_with_EXECDIR.robot" | get-text-viewer] {
     key-type "NUMPAD_ENTER" "\\u000D"
     key-type "M1+s"
 }
-
+wait 2000
 //see if lib was added
 with [get-window "Discovering libraries summary" | get-tree] {
     get-property itemCount | equals 1 | verify-true
@@ -340,10 +345,10 @@ with [get-window "Discovering libraries summary" | get-tree] {
 }
 with [get-window "Discovering libraries summary" | get-tree] {
     get-item "divide/Status : Added to project configuration" | get-property index | equals 0 | verify-true
-    get-item [format "divide/Source : %s%sRobotProject%slibs%st%sdivide.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep] | get-property index | equals 1 
+    get-item "divide/Source :.*" | get-property caption | equals [format "Source : %s%sRobotProject%slibs%st%sdivide.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep $sys_sep]
         | verify-true
-    get-item [format "divide/Importers : %s%sRobotProject%stests%slib_with_EXECDIR.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]| get-property index 
-        | equals 2 | verify-true
+    get-item "divide/Importers : .*" | get-property caption | equals [format "Importers : %s%sRobotProject%stests%slib_with_EXECDIR.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+        | verify-true
 }
 get-window "Discovering libraries summary" | get-button OK | click
 
