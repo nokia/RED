@@ -465,21 +465,47 @@ public class DumperHelper {
     public void dumpSeparatorsAfterToken(final RobotFile model, final RobotLine currentLine,
             final IRobotLineElement currentToken, final List<RobotLine> lines) {
         int dumpEndIndex = -1;
-        final List<IRobotLineElement> lineElements = currentLine.getLineElements();
-        final int tokenPosIndex = lineElements.indexOf(currentToken);
-        for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
-            if (lineElements.get(index) instanceof RobotToken) {
-                break;
-            } else {
-                dumpEndIndex = index;
+        List<IRobotLineElement> lineElements = currentLine.getLineElements();
+
+        Optional<Integer> forCurrentLine = getDumpEndIndex(lineElements, currentToken);
+        if (forCurrentLine.isPresent()) {
+            dumpEndIndex = forCurrentLine.get();
+        } else {
+            if (currentToken.getLineNumber() != FilePosition.NOT_SET) {
+                final RobotLine robotLine = model.getFileContent().get(currentToken.getLineNumber() - 1);
+                lineElements = robotLine.getLineElements();
+                Optional<Integer> forTokenLine = getDumpEndIndex(lineElements, currentToken);
+                if (forTokenLine.isPresent()) {
+                    dumpEndIndex = forTokenLine.get();
+                }
             }
         }
 
         if (dumpEndIndex >= 0) {
+            int tokenPosIndex = lineElements.indexOf(currentToken);
             for (int myIndex = tokenPosIndex + 1; myIndex < lineElements.size() && myIndex <= dumpEndIndex; myIndex++) {
                 updateLine(model, lines, lineElements.get(myIndex));
             }
         }
+
+    }
+
+    private Optional<Integer> getDumpEndIndex(final List<IRobotLineElement> lineElements,
+            final IRobotLineElement currentToken) {
+        Optional<Integer> dumpEndIndex = Optional.absent();
+
+        int tokenPosIndex = lineElements.indexOf(currentToken);
+        if (tokenPosIndex > -1) {
+            for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
+                if (lineElements.get(index) instanceof RobotToken) {
+                    break;
+                } else {
+                    dumpEndIndex = Optional.of(index);
+                }
+            }
+        }
+
+        return dumpEndIndex;
     }
 
     public void dumpSeparatorsBeforeToken(final RobotFile model, final RobotLine currentLine,

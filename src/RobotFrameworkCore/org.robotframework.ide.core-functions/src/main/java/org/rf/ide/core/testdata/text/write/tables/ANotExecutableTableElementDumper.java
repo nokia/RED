@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.rf.ide.core.testdata.mapping.table.ElementsUtility;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -122,7 +123,7 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
 
         int nrOfTokens = tokens.size();
 
-        final List<Integer> lineEndPos = new ArrayList<>(getLineEndPos(elemDeclaration, tokens));
+        final List<Integer> lineEndPos = new ArrayList<>(getLineEndPos(model, tokens));
         if (nrOfTokens > 0) {
             boolean wasMyLine = false;
             for (int i = 0; i < nrOfTokens; i++) {
@@ -343,12 +344,21 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         }
     }
 
-    private Set<Integer> getLineEndPos(final IRobotLineElement currentDec,
-            final List<? extends IRobotLineElement> elems) {
-        final Set<Integer> lof = new HashSet<>();
+    private Set<Integer> getLineEndPos(final RobotFile model, final List<? extends IRobotLineElement> elems) {
+        final Set<Integer> lof = new TreeSet<>();
 
-        IRobotTokenType type = null;
         int size = elems.size();
+        lof.addAll(getLineEndPosByComment(elems));
+        lof.addAll(getLineEndPosFromModel(model, elems));
+        lof.add(size - 1);
+
+        return lof;
+    }
+
+    private Set<Integer> getLineEndPosByComment(final List<? extends IRobotLineElement> elems) {
+        final Set<Integer> lof = new HashSet<>();
+        int size = elems.size();
+        IRobotTokenType type = null;
         for (int index = 0; index < size; index++) {
             final IRobotLineElement el = elems.get(index);
             boolean isComment = el.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
@@ -366,9 +376,60 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
             }
         }
 
-        lof.add(size - 1);
+        return lof;
+    }
+
+    private Set<Integer> getLineEndPosFromModel(final RobotFile model, final List<? extends IRobotLineElement> elems) {
+        final Set<Integer> lof = new HashSet<>();
+
+        int size = elems.size();
+        if (size > 1) {
+            IRobotLineElement prevElement = elems.get(0);
+            for (int tokenId = 1; tokenId < size; tokenId++) {
+                final IRobotLineElement currentElement = elems.get(tokenId);
+                if (isLineContinuedInModel(model, elems, prevElement, currentElement)) {
+                    lof.add(tokenId - 1);
+                }
+            }
+        }
 
         return lof;
+    }
+
+    private boolean isLineContinuedInModel(final RobotFile model, final List<? extends IRobotLineElement> elems,
+            final IRobotLineElement prevElement, final IRobotLineElement currentElement) {
+        boolean result = false;
+
+        int prevLineNumber = prevElement.getLineNumber();
+        int curLineNumber = currentElement.getLineNumber();
+        if (prevLineNumber != FilePosition.NOT_SET && curLineNumber != FilePosition.NOT_SET
+                && prevLineNumber + 1 == curLineNumber) {
+            final RobotLine currentLine = model.getFileContent().get(curLineNumber - 1);
+            final List<IRobotLineElement> lineElements = currentLine.getLineElements();
+            boolean wasLineContinue = false;
+            for (final IRobotLineElement rle : lineElements) {
+                if (rle instanceof RobotToken) {
+                    if (rle.getTypes().size() == 1 && rle.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+                        wasLineContinue = true;
+                        continue;
+                    } else if (wasLineContinue) {
+                        if (rle == currentElement) {
+                            result = true;
+                            break;
+                        } else {
+                            if (elems.indexOf(rle) >= 0) {
+                                result = false;
+                                break;
+                            }
+                        }
+                    } else {
+                        break;
+                    }
+                }
+            }
+        }
+
+        return result;
     }
 
     private Optional<Integer> getFirstBrokenChainPosition(final List<? extends IRobotLineElement> elems,
