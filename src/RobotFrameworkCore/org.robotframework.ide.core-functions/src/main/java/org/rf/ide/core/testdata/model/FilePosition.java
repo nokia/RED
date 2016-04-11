@@ -100,9 +100,9 @@ public class FilePosition {
         if (valuePosO1 != NOT_SET && valuePosO2 != NOT_SET) {
             result = ECompareResult.map(Integer.compare(valuePosO1, valuePosO2));
         } else if (valuePosO1 != NOT_SET) {
-            result = ECompareResult.GREATER_THAN;
-        } else if (valuePosO2 != NOT_SET) {
             result = ECompareResult.LESS_THAN;
+        } else if (valuePosO2 != NOT_SET) {
+            result = ECompareResult.GREATER_THAN;
         } else {
             result = ECompareResult.COMPARE_NOT_SET;
         }
