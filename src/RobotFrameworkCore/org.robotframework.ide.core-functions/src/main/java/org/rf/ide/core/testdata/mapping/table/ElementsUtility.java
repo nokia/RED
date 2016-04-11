@@ -48,6 +48,18 @@ public class ElementsUtility {
         this.varExtractor = new VariableExtractor();
     }
 
+    public List<RobotToken> filter(final List<RobotToken> toks, final IRobotTokenType type) {
+        final List<RobotToken> filtered = new ArrayList<>(0);
+
+        for (final RobotToken token : toks) {
+            if (token.getTypes().contains(type)) {
+                filtered.add(token);
+            }
+        }
+
+        return filtered;
+    }
+
     public boolean isNewExecutableSection(final ALineSeparator separator, final RobotLine line) {
         boolean result = false;
         if (separator.getProducedType() == SeparatorType.PIPE) {
