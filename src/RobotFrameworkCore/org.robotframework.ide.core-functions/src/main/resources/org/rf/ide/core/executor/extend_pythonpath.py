@@ -63,7 +63,7 @@ def get_module_combinations(got_from_inspect=list(), module_path=''):
                 for get_index in range(0, inspect_len):
                     paths_to_print.append(pre_index + '.' + got_from_inspect[get_index])
 
-    return paths_to_printt
+    return paths_to_print
 
 def extend(start_path='.', libImp=''):
     path = find_module_path(start_path)
