@@ -11,6 +11,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.FileRegion;
 
 public class LineReader extends Reader {
 
@@ -38,6 +42,45 @@ public class LineReader extends Reader {
         }
 
         return endOfLine;
+    }
+
+    public List<FileRegion> getLinesRegion() {
+        final List<FileRegion> eols = new ArrayList<>();
+
+        int column = 0;
+        int line = 0;
+        int offset = 0;
+        boolean skipNext = false;
+
+        final Set<Integer> offsets = this.eOLs.keySet();
+        for (final Integer currentOffset : offsets) {
+            line++;
+            column = 0;
+
+            if (skipNext) {
+                skipNext = false;
+                continue;
+            }
+
+            final List<Constant> eol = getLineEnd(currentOffset);
+            int eolSize = eol.size();
+            if (eolSize > 1) {
+                skipNext = true;
+            } else {
+                if (eol.get(0) == Constant.EOF) {
+                    eolSize = 0;
+                }
+            }
+
+            int textLength = (currentOffset - offset) + eolSize;
+            FilePosition fpStart = new FilePosition(line, column, offset);
+            offset = currentOffset + eolSize;
+            FilePosition fpEnd = new FilePosition(line, column + textLength, offset);
+
+            eols.add(new FileRegion(fpStart, fpEnd));
+        }
+
+        return eols;
     }
 
     @Override
@@ -110,6 +153,19 @@ public class LineReader extends Reader {
             }
 
             return converted;
+        }
+
+        public static int getEndOfLineLength(final List<Constant> eols) {
+            int size = 0;
+            for (final Constant c : eols) {
+                if (c != Constant.EOF) {
+                    size++;
+                } else {
+                    break;
+                }
+            }
+
+            return size;
         }
     }
 }

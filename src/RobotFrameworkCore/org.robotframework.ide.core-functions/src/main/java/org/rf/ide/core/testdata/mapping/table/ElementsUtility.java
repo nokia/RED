@@ -25,7 +25,6 @@ import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
-import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.ParsingState.TableType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -674,19 +673,6 @@ public class ElementsUtility {
         public int getDataEndIndex() {
             return dataEndIndex;
         }
-    }
-
-    public int getEndOfLineLength(final List<Constant> eols) {
-        int size = 0;
-        for (final Constant c : eols) {
-            if (c != Constant.EOF) {
-                size++;
-            } else {
-                break;
-            }
-        }
-
-        return size;
     }
 
     public void fixNotSetPositions(final RobotToken token, final FilePosition fp) {
