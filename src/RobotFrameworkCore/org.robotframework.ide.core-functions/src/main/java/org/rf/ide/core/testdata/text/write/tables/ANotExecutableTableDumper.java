@@ -78,7 +78,7 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
 
                 elemDumper.dump(model, settingSections, sectionWithHeaderPos, th, sorted, setting, lines);
 
-                dumpEmptyLines(model, lines, setting, lastIndexToDump == settingIndex);
+                dumpEmptyLines(model, lines, setting);
             }
 
             if (lastIndexToDump == sorted.size() - 1) {
@@ -92,19 +92,17 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
     }
 
     private void dumpEmptyLines(final RobotFile model, final List<RobotLine> lines,
-            final AModelElement<ARobotSectionTable> setting, boolean isEndOfSection) {
+            final AModelElement<ARobotSectionTable> setting) {
         final FilePosition fPosEnd = setting.getEndPosition();
         if (!fPosEnd.isNotSet()) {
-            if (isEndOfSection) {
-                if (!lines.isEmpty()) {
-                    RobotLine lastLine = lines.get(lines.size() - 1);
-                    IRobotLineElement endOfLine = lastLine.getEndOfLine();
-                    if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
-                            || endOfLine.getTypes().contains(EndOfLineTypes.NON)
-                            || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
-                            && !lastLine.getLineElements().isEmpty()) {
-                        getDumperHelper().updateLine(model, lines, getDumperHelper().getLineSeparator(model, fPosEnd));
-                    }
+            if (!lines.isEmpty()) {
+                RobotLine lastLine = lines.get(lines.size() - 1);
+                IRobotLineElement endOfLine = lastLine.getEndOfLine();
+                if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
+                        || endOfLine.getTypes().contains(EndOfLineTypes.NON)
+                        || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
+                        && !lastLine.getLineElements().isEmpty()) {
+                    getDumperHelper().updateLine(model, lines, getDumperHelper().getLineSeparator(model, fPosEnd));
                 }
             }
 
