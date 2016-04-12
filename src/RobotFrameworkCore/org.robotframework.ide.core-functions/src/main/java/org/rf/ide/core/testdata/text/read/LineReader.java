@@ -54,14 +54,13 @@ public class LineReader extends Reader {
 
         final Set<Integer> offsets = this.eOLs.keySet();
         for (final Integer currentOffset : offsets) {
-            line++;
-            column = 0;
-
             if (skipNext) {
                 skipNext = false;
                 continue;
             }
 
+            line++;
+            column = 0;
             final List<Constant> eol = getLineEnd(currentOffset);
             int eolSize = eol.size();
             if (eolSize > 1) {

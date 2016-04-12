@@ -45,9 +45,15 @@ public class TokenSeparatorBuilder {
     }
 
     public enum FileFormat {
-        UNKNOWN,
-        TXT_OR_ROBOT,
-        TSV;
+        UNKNOWN(null),
+        TXT_OR_ROBOT("robot"),
+        TSV("tsv");
+
+        private final String extension;
+
+        private FileFormat(final String extension) {
+            this.extension = extension;
+        }
 
         public static FileFormat getByExtension(final String fileExtension) {
             FileFormat format = FileFormat.UNKNOWN;
@@ -60,6 +66,10 @@ public class TokenSeparatorBuilder {
                 }
             }
             return format;
+        }
+
+        public String getExtension() {
+            return this.extension;
         }
     }
 }
