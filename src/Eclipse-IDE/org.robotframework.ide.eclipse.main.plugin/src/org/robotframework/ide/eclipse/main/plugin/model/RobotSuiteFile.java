@@ -23,6 +23,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.content.IContentDescription;
+import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
@@ -55,7 +57,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     private String contentTypeId;
 
     private RobotFileOutput fileOutput;
-    
+
     private List<RobotSuiteFileSection> sections = null;
 
     public RobotSuiteFile(final RobotElement parent, final IFile file) {
@@ -95,6 +97,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     private ParsingStrategy createFileParsingStrategy() {
         return new ParsingStrategy() {
+
             @Override
             public RobotFileOutput parse() {
                 if (getProject().getProject().exists()) {
@@ -118,7 +121,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         }
         return sections == null ? new ArrayList<RobotSuiteFileSection>() : sections;
     }
-    
+
     public void parse() {
         getSections(); // this will parse the file if needed
     }
@@ -146,7 +149,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             sections.add(section);
         }
     }
-    
+
     protected RobotFileOutput parseModel(final ParsingStrategy parsingStrategy) {
         return parsingStrategy.parse();
     }
@@ -167,6 +170,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     protected ParsingStrategy createReparsingStrategy(final String newContent) {
         return new ParsingStrategy() {
+
             @Override
             public RobotFileOutput parse() {
                 if (getProject().getProject().exists()) {
@@ -202,7 +206,6 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         getSections();
     }
 
-
     List<RobotElementChange> synchronizeChanges(final IResourceDelta delta) {
         if ((delta.getFlags() & IResourceDelta.MARKERS) != IResourceDelta.MARKERS) {
             refreshOnFileChange();
@@ -229,8 +232,14 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         }
         if (file != null) {
             try {
-                contentTypeId = file.getContentDescription().getContentType().getId();
-                return contentTypeId;
+                final IContentDescription contentDescription = file.getContentDescription();
+                if (contentDescription != null) {
+                    final IContentType contentType = contentDescription.getContentType();
+                    if (contentType != null) {
+                        contentTypeId = contentType.getId();
+                        return contentTypeId;
+                    }
+                }
             } catch (final CoreException e) {
                 return null;
             }
@@ -342,12 +351,13 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             if (candidate.isPresent()) {
                 return candidate;
             }
-//            final Position position = section.getPosition();
-//            if (position.getOffset() <= offset && offset <= position.getOffset() + position.getLength()) {
-                // final Optional<? extends RobotElement> candidate = section.findElement(offset);
-                // if (candidate.isPresent()) {
-                // return candidate;
-                // }
+            // final Position position = section.getPosition();
+            // if (position.getOffset() <= offset && offset <= position.getOffset() +
+            // position.getLength()) {
+            // final Optional<? extends RobotElement> candidate = section.findElement(offset);
+            // if (candidate.isPresent()) {
+            // return candidate;
+            // }
             // }
         }
         return Optional.of(this);
@@ -372,7 +382,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
         final Map<LibrarySpecification, String> imported = newHashMap();
         for (final LibrarySpecification spec : getProject().getLibrariesSpecifications()) {
-            if(toImport.containsKey(spec.getName())) {
+            if (toImport.containsKey(spec.getName())) {
                 imported.put(spec, toImport.get(spec.getName()));
                 toImport.remove(spec.getName());
             } else if (spec.isAccessibleWithoutImport()) {
@@ -433,7 +443,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         }
         return newArrayList();
     }
-    
+
     public List<IPath> getResourcesPaths() {
         final Optional<RobotSettingsSection> optionalSettings = findSection(RobotSettingsSection.class);
         if (optionalSettings.isPresent()) {
@@ -449,11 +459,12 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         }
         return newArrayList();
     }
-    
+
     public List<VariablesFileImportReference> getVariablesFromLocalReferencedFiles() {
-        return fileOutput != null ? fileOutput.getVariablesImportReferences() : new ArrayList<VariablesFileImportReference>();
+        return fileOutput != null ? fileOutput.getVariablesImportReferences()
+                : new ArrayList<VariablesFileImportReference>();
     }
-    
+
     public List<ImportedVariablesFile> getImportedVariables() {
         final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
         final List<ImportedVariablesFile> alreadyImported = newArrayList();
@@ -482,7 +493,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         public void setArgs(final List<String> args) {
             this.args = args;
         }
-        
+
         @Override
         public boolean equals(final Object obj) {
             if (obj != null && obj.getClass() == ImportedVariablesFile.class) {
