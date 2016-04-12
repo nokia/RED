@@ -346,33 +346,40 @@ public class LibrariesWatchHandler implements IWatchEventHandler {
             if (!libraryFile.isDirectory()) {
                 absolutePath = libraryPath.toPortableString();
             } else {
-                String libraryName = library.getName();
-                if (libraryName.contains(".")) {
-                    libraryName = libraryName.split("\\.")[0];
-                }
-                if (library.provideType() == LibraryType.PYTHON) {
-                    IPath libFilePath = libraryPath.append(libraryName + ".py");
-                    if (libFilePath.toFile().exists()) {
-                        absolutePath = libFilePath.toPortableString();
-                    }
-                } else if (library.provideType() == LibraryType.JAVA) {
-                    IPath libFilePath = libraryPath.append(libraryName + ".java");
-                    if (libFilePath.toFile().exists()) {
-                        absolutePath = libFilePath.toPortableString();
-                    }
-                }
-                if (absolutePath == null) {
-                    IPath libFilePath = libraryPath.append(libraryName).append("__init__.py");
-                    if (libFilePath.toFile().exists()) {
-                        absolutePath = libFilePath.toPortableString();
-                    }
-                }
+                absolutePath = extractLibraryAbsolutePathFromDir(library, libraryPath);
             }
         }
         if (absolutePath != null) {
             registeredRefLibraries.put(library, absolutePath);
         }
         return absolutePath;
+    }
+    
+    private String extractLibraryAbsolutePathFromDir(final ReferencedLibrary library, final IPath libraryPath) {
+        final String fileExtension = library.provideType() == LibraryType.PYTHON ? ".py" : ".java";
+        final String libraryName = library.getName();
+        if (libraryName.contains(".")) {
+            final String[] libraryNameElements = libraryName.split("\\.");
+            for (int i = libraryNameElements.length - 1; i >= 0; i--) {
+                IPath libFilePath = libraryPath.append(libraryNameElements[i] + fileExtension);
+                if (libFilePath.toFile().exists()) {
+                    return libFilePath.toPortableString();
+                }
+            }
+        } else {
+            IPath libFilePath = libraryPath.append(libraryName + fileExtension);
+            if (libFilePath.toFile().exists()) {
+                return libFilePath.toPortableString();
+            }
+        }
+
+        // try to find module init file
+        IPath libFilePath = libraryPath.append(library.getName()).append("__init__.py");
+        if (libFilePath.toFile().exists()) {
+            return libFilePath.toPortableString();
+        }
+
+        return null;
     }
     
     private void clearHandler(final String modifiedFileName) {
