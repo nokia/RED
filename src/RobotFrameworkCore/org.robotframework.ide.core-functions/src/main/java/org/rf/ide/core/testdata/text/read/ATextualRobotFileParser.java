@@ -304,7 +304,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
 
                 final List<Constant> endOfLine = lineHolder.getLineEnd(currentOffset);
                 line.setEndOfLine(endOfLine, currentOffset, lastColumnProcessed);
-                currentOffset += utility.getEndOfLineLength(endOfLine);
+                currentOffset += Constant.getEndOfLineLength(endOfLine);
                 lineNumber++;
                 lastColumnProcessed = 0;
                 libraryFixer.checkAndFixLine(parsingOutput, processingState);
