@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
@@ -26,7 +27,7 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
     @Override
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException {
         final File libFile = new File(libPath);
-        final String additionalLocation = libFile.isFile() ? libFile.getParent() : libPath;
+        final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         runtimeEnvironment.createLibdocForPythonLibrary(libName, additionalLocation,
                 targetSpecFile.getLocation().toFile());
     }
@@ -35,7 +36,7 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
     public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment)
             throws RobotEnvironmentException {
         final File libFile = new File(libPath);
-        final String additionalLocation = libFile.isFile() ? libFile.getParent() : libPath;
+        final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         runtimeEnvironment.createLibdocForPythonLibraryForcibly(libName, additionalLocation,
                 targetSpecFile.getLocation().toFile());
     }
@@ -43,5 +44,18 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
     @Override
     public String getMessage() {
         return "generating libdoc for " + libName + " library contained in " + libPath;
+    }
+    
+    private String extractLibParent() { //e.g. libPath=Project1/Plib/ca libName=Plib.ca.ab => parent=Project1
+        String parent = libPath;
+        String[] libNameElements = libName.split("\\.");
+        if (libNameElements.length > 1) {
+            for (int i = libNameElements.length - 2; i >= 0; i--) {
+                if (libNameElements[i].equals(new Path(parent).lastSegment())) {
+                    parent = new Path(parent).removeLastSegments(1).toPortableString();
+                }
+            }
+        }
+        return parent;
     }
 }
