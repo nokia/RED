@@ -54,13 +54,16 @@ def get_module_combinations(got_from_inspect=list(), module_path=''):
     module_names = module_path.split('.')[:-1]
     inspect_len = len(got_from_inspect)
 
-    if len(module_names) > 0:
-        for mod_index in range(len(module_names) - 1, -1, -1):
-            pre_index = '.'.join(module_names[mod_index:])
-            for get_index in range(0, inspect_len):
-                paths_to_print.append(pre_index + '.' + got_from_inspect[get_index])
+    if len(got_from_inspect) == 1 and got_from_inspect[0] == module_path:
+        pass
+    else:
+        if len(module_names) > 0:
+            for mod_index in range(len(module_names) - 1, -1, -1):
+                pre_index = '.'.join(module_names[mod_index:])
+                for get_index in range(0, inspect_len):
+                    paths_to_print.append(pre_index + '.' + got_from_inspect[get_index])
 
-    return paths_to_print
+    return paths_to_printt
 
 def extend(start_path='.', libImp=''):
     path = find_module_path(start_path)
