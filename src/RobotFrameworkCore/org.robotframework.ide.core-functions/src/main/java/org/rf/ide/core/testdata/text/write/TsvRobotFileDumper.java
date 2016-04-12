@@ -16,9 +16,16 @@ public class TsvRobotFileDumper extends ARobotFileDumper {
     public boolean canDumpFile(final File file) {
         boolean result = false;
 
-        if (file != null && file.isFile()) {
-            final String fileName = file.getName().toLowerCase();
-            result = (fileName.endsWith(".tsv"));
+        if (file != null) {
+            boolean check = true;
+            if (file.exists()) {
+                check = file.isFile();
+            }
+
+            if (check) {
+                final String fileName = file.getName().toLowerCase();
+                result = (fileName.endsWith(".tsv"));
+            }
         }
 
         return result;
