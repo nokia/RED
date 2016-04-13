@@ -13,5 +13,7 @@ public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobot
 
     List<RobotExecutableRow<T>> getExecutionContext();
 
+    List<AModelElement<T>> getUnitSettings();
+
     T getHolder();
 }
