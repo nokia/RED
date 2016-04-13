@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _tAQV0PpcEeWSorJ4SRUI3Q
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/12/16 11:10 AM
+Runtime-Version: 2.0.0.201506120617
+Save-Time: 4/13/16 2:31 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -32,8 +32,7 @@ Entry-Name: .content
 		}
 		
 		get-view "Project Explorer" | get-tree | select "ImportLibFromPythonPath/red.xml" | double-click
-		get-editor "ImportLibFromPythonPath/red.xml" | get-section Paths | get-table | get-property itemCount -raw| not-eq 1
-		    | verify-true
+
 		// open test case and make it dirty, save will start autodiscovery 
 		get-view "Project Explorer" | get-tree | select "ImportLibFromPythonPath/test.robot" | double-click
 		with [get-editor "test.robot" | get-text-viewer] {
@@ -41,6 +40,11 @@ Entry-Name: .content
 		    key-type Enter
 		    key-type "M1+s"
 		}
+		
+		get-tab-folder -index 1 | get-tab-item "*ImportLibFromPythonPath/red.xml" | click
+		get-editor "ImportLibFromPythonPath/red.xml" | get-section "Referenced libraries" | get-table | key-type "M1+s"
+		get-tab-folder -index 1 | get-tab-item "test.robot" | click
+		
 		
 		
 		// check if LibFromPythonPath is present in Referenced Libs section in Project Explorer
@@ -88,6 +92,7 @@ Entry-Name: .content
 		get-view "Project Explorer" | get-tree | get-item "ImportLibFromPythonPath/Robot Referenced libraries" 
 		    | get-property "getItems().TreeItem[0].getText()" | matches "LibFromPythonPath.*" 
 		    | verify-true
+
 
 
 
