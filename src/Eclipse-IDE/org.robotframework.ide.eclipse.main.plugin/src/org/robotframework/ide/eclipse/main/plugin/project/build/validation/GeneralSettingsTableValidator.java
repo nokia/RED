@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
@@ -31,7 +30,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -153,16 +151,12 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
     private void validateLibraries(final RobotSuiteFile suiteFile, final List<LibraryImport> libraryImports,
             final IProgressMonitor monitor) throws CoreException {
         new GeneralSettingsImportsValidator.LibraryImportValidator(validationContext, suiteFile, libraryImports,
-                reporter, createLibrariesAutoDiscoverer(suiteFile)).validate(monitor);
+                reporter, getLibrariesAutoDiscoverer()).validate(monitor);
     }
 
-    private Optional<LibrariesAutoDiscoverer> createLibrariesAutoDiscoverer(final RobotSuiteFile suiteFile) {
-        final RobotProjectConfig robotProjectConfig = validationContext.getProjectConfiguration();
-        if (robotProjectConfig != null && validationContext.isValidatingChangedFiles()
-                && robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()) {
-            return Optional.of(
-                    new LibrariesAutoDiscoverer(suiteFile.getProject(), newArrayList((IResource) suiteFile.getFile()),
-                            robotProjectConfig.isLibrariesAutoDiscoveringSummaryWindowEnabled()));
+    private Optional<LibrariesAutoDiscoverer> getLibrariesAutoDiscoverer() {
+        if (validationContext.isValidatingChangedFiles()) {
+            return validationContext.getLibrariesAutoDiscoverer();
         }
         return Optional.absent();
     }
