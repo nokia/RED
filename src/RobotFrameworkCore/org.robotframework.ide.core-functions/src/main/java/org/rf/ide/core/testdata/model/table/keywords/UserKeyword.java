@@ -221,4 +221,18 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
     public UserKeyword getHolder() {
         return this;
     }
+
+    @Override
+    public List<AModelElement<UserKeyword>> getUnitSettings() {
+        List<AModelElement<UserKeyword>> settings = new ArrayList<>();
+        settings.addAll(getDocumentation());
+        settings.addAll(getTags());
+        settings.addAll(getArguments());
+        settings.addAll(getReturns());
+        settings.addAll(getTeardowns());
+        settings.addAll(getTimeouts());
+        settings.addAll(getUnknownSettings());
+
+        return settings;
+    }
 }

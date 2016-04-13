@@ -281,4 +281,18 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     public TestCase getHolder() {
         return this;
     }
+
+    @Override
+    public List<AModelElement<TestCase>> getUnitSettings() {
+        List<AModelElement<TestCase>> settings = new ArrayList<>();
+        settings.addAll(getDocumentation());
+        settings.addAll(getTags());
+        settings.addAll(getSetups());
+        settings.addAll(getTeardowns());
+        settings.addAll(getTemplates());
+        settings.addAll(getTimeouts());
+        settings.addAll(getUnknownSettings());
+
+        return settings;
+    }
 }
