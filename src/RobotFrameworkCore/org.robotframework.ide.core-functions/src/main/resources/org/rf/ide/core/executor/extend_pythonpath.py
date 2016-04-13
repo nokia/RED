@@ -35,6 +35,9 @@ def find_module_path(start_path):
                 path = current_path
                 do = False
                 break
+        else:
+            do = False
+            break
 
     return path
 
