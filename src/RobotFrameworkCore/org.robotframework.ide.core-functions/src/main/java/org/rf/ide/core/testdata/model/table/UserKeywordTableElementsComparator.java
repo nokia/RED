@@ -12,11 +12,10 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 
-
-public class UserKeywordTableElementsComparator extends
-        AModelTypeComparator<AModelElement<UserKeyword>> {
+public class UserKeywordTableElementsComparator extends AModelTypeComparator<AModelElement<UserKeyword>> {
 
     private final static Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
+
     static {
         int startPosition = 1;
         POSITION.put(ModelType.USER_KEYWORD, startPosition);
@@ -27,8 +26,8 @@ public class UserKeywordTableElementsComparator extends
         POSITION.put(ModelType.USER_KEYWORD_EXECUTABLE_ROW, ++startPosition);
         POSITION.put(ModelType.USER_KEYWORD_TEARDOWN, ++startPosition);
         POSITION.put(ModelType.USER_KEYWORD_RETURN, ++startPosition);
+        POSITION.put(ModelType.USER_KEYWORD_SETTING_UNKNOWN, ++startPosition);
     }
-
 
     public UserKeywordTableElementsComparator() {
         super(POSITION);

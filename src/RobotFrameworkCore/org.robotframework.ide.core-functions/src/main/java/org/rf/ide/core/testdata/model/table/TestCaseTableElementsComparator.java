@@ -12,11 +12,10 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
-
-public class TestCaseTableElementsComparator extends
-        AModelTypeComparator<AModelElement<TestCase>> {
+public class TestCaseTableElementsComparator extends AModelTypeComparator<AModelElement<TestCase>> {
 
     private final static Map<ModelType, Integer> POSITION = new LinkedHashMap<>();
+
     static {
         int startPosition = 1;
         POSITION.put(ModelType.TEST_CASE, startPosition);
@@ -27,8 +26,8 @@ public class TestCaseTableElementsComparator extends
         POSITION.put(ModelType.TEST_CASE_TIMEOUT, ++startPosition);
         POSITION.put(ModelType.TEST_CASE_EXECUTABLE_ROW, ++startPosition);
         POSITION.put(ModelType.TEST_CASE_TEARDOWN, ++startPosition);
+        POSITION.put(ModelType.TEST_CASE_SETTING_UNKNOWN, ++startPosition);
     }
-
 
     public TestCaseTableElementsComparator() {
         super(POSITION);
