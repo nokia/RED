@@ -1,0 +1,163 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _eXb6MPp7EeW7_PzjO98BIw
+Element-Name: AddingValuseToPATHONPATH
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _xmkpUP_xEeWRL4nRKA71zA
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/13/16 3:53 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//remove autodiscover
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    with [get-section "Referenced libraries" | get-button "Auto discover libraries after test suite save action"] {
+        uncheck
+        key-type "M1+s"
+    }
+}
+
+//add Library "add" to Suite
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | double-click
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    set-caret-pos 3 20
+    select-range 4 19 2 11
+    type-text add
+    key-type "M1+s"
+}
+
+//run test
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" 
+    | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" | click
+    
+//check error on console    
+get-view Console | get-text-viewer | get-property text 
+    | contains " Importing test library 'add' failed: ImportError: No module named add\n" | verify-true
+get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
+
+//add path to lib to red.xml
+get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-item "...add new search path" |double-click
+with [get-window "Add new search path"] {
+    get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
+        | set-text [format "%s/RobotProject/libs" $RED_workspace_path]
+    get-button OK | click
+ 
+}
+get-button "Save \((Ctrl|M1)\+S\)" | click
+//run test
+get-tab-folder -index 1 | get-tab-item "lib_with_variable.robot" | click
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" 
+    | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" | click
+
+//check that error is not shown
+get-view Console | get-text-viewer | get-property text 
+    | contains " Importing test library 'add' failed: ImportError: No module named add\n" | verify-false
+get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
+
+
+//add diffrent path ("a" is double)
+get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-item "...add new search path" | double-click
+with [get-window "Add new search path"] {
+    with [get-editbox 
+        -after [get-label "Provide search paths to be added. Each path should be specified in separate line."]] {
+        set-text "not existing\n"
+            + "C:\\folder\\folder2\n"
+            + "/!@#$%path/new.file.txt\n"
+            + "\"escpaed\\\\text\"\n\n"
+            + "correct\ttab\t/folder\n"
+            + "a\n"
+            + "b\n"
+            + "a"
+    }
+    get-button OK | click
+}
+
+get-button "Save \((Ctrl|M1)\+S\)" | click
+
+//run test and check that pythonpath args were added do robot
+get-tab-folder -index 1 | get-tab-item "lib_with_variable.robot" | click
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 
+    | click
+replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
+	get-view Console | get-text-viewer | get-property text 
+	    | equals [format "Command:.* -P a:/!@#\$%%path/new.file.txt:b:not existing:%s/RobotProject/libs:\"escpaed\\\\\\\\text\":correct\ttab\t/folder:C:\\\\folder\\\\folder2.*\n"  
+	    + "Suite Executor: Robot Framework .*\n"
+	    + "==============================================================================\n"
+	    + "RobotProject                                                                  \n"
+	    + "==============================================================================\n"
+	    + "RobotProject.Lib With Variable                                                \n"
+	    + "==============================================================================\n"
+	    + "test                                                                  \| PASS \|\n"
+	    + "------------------------------------------------------------------------------\n"
+	    + "RobotProject.Lib With Variable                                        \| PASS \|\n"
+	    + "1 critical test, 1 passed, 0 failed\n"
+	    + "1 test total, 1 passed, 0 failed\n"
+	    + "==============================================================================\n"
+	    + "RobotProject                                                          \| PASS \|\n"
+	    + "1 critical test, 1 passed, 0 failed\n"
+	    + "1 test total, 1 passed, 0 failed\n"
+	    + "==============================================================================\n"
+	    + "Output:  .*output.xml\n"
+	    + "Log:     .*log.html\n"
+	    + "Report:  .*report.html" $new_ws_path]| verify-true
+	    
+}
+//add more items to path    
+get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
+get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-item "...add new search path" | double-click
+with [get-window "Add new search path"] {
+    with [get-editbox 
+        -after [get-label "Provide search paths to be added. Each path should be specified in separate line."]] {
+        set-text "scrolbar\na\nb\nc\n"
+            + "d"
+    }
+    get-button OK | click
+}
+
+//check that scrollbbar is shown
+get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-property "getVerticalBar().isEnabled()" 
+    | equals true | verify-true
+    
+//check if new items were added (b is duplicated)    
+with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+    get-property itemCount | equals 12 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals [format "%s/RobotProject/libs" $RED_workspace_path] | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "not existing" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "C:\\folder\\folder2" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "/!@#$%path/new.file.txt" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "\"escpaed\\\\text\"" | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals "correct\\9tab\\9/folder" | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals a | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals b | verify-true
+    get-property "getItems().TableItem[8].getText()" | equals scrolbar | verify-true
+    get-property "getItems().TableItem[9].getText()" | equals c | verify-true
+    get-property "getItems().TableItem[10].getText()" | equals d | verify-true
+    get-property "getItems().TableItem[11].getText()" | equals "...add new search path" | verify-true
+}
+
+with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+	//select 2 item next to each other and one not
+    select "\\/!@#$%path\\/new.file.txt" "\"escpaed\\\\text\"" "d"
+    key-type Del
+    
+    //select one
+    select scrolbar | key-type Del
+}
+with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals [format "%s/RobotProject/libs" $RED_workspace_path] | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "not existing" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "C:\\folder\\folder2" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "correct\\9tab\\9/folder" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals a | verify-true
+    get-property "getItems().TableItem[5].getText()" | equals b | verify-true
+    get-property "getItems().TableItem[6].getText()" | equals c | verify-true
+    get-property "getItems().TableItem[7].getText()" | equals "...add new search path" | verify-true
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

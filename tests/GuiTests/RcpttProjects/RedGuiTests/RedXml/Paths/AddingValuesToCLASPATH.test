@@ -1,0 +1,173 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _Wjy7oOFJEeWu0tyN3Pwjmg
+Element-Name: AddingValuesToCLASPATH
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Fh1mIAFsEeaQD_aaetnnqw
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/13/16 3:52 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open red.xml and check if CLASSPATH is disabled
+get-view "Project Explorer" | get-tree | select "jython_simple_project/red.xml" | double-click
+get-editor "jython_simple_project/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1 | get-property enablement 
+    | equals false | verify-true
+
+//change interpreter to jython    
+with [get-editor "jython_simple_project/red.xml"] {
+    get-tab-folder | get-tab-item General | click
+    with [get-section "Robot framework"] {
+        get-button "Use local settings for this project" | check
+        with [get-table] {
+            get-item "Robot Framework .*\\(Jython .*\\)" | check
+            key-type "M1+s"
+        }
+    }
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+}
+
+//check if now user can add CLASSPATH
+get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1 | get-property enablement 
+    | equals true | verify-true
+
+//add path 
+get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1 | get-item "...add new search path" 
+    | double-click
+with [get-window "Add new search path"] {
+    with [get-editbox 
+        -after [get-label "Provide search paths to be added. Each path should be specified in separate line."]] {
+        click-text
+        set-text [format "%s/jython_simple_project/RED_TEST_JavaLib.jar" $RED_workspace_path]
+    }
+    get-button OK | click
+}
+//save file and run test
+get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1 | key-type "M1+s"
+get-view "Project Explorer" | get-tree | select "jython_simple_project/test.robot" | double-click
+get-view "Project Explorer" | get-tree | select "jython_simple_project/test.robot" | get-menu "Run As/1 Robot Test" 
+    | click
+
+//check console
+replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{
+	get-view Console | get-text-viewer | get-property text 
+	    | matches [format "Command: jython.* -J-cp %s/jython_simple_project/RED_TEST_JavaLib.jar;\. -m .*\n"
+	    + "Suite Executor: Robot Framework .* \(Jython .*\)\n"
+	    + "==============================================================================\n"
+	    + "Jython Simple Project                                                         \n"
+	    + "==============================================================================\n"
+	    + "Jython Simple Project.Test                                                    \n"
+	    + "==============================================================================\n"
+	    + "t1                                                                    \| PASS \|\n"
+	    + "------------------------------------------------------------------------------\n"
+	    + "Jython Simple Project.Test                                            \| PASS \|\n"
+	    + "1 critical test, 1 passed, 0 failed\n"
+	    + "1 test total, 1 passed, 0 failed\n"
+	    + "==============================================================================\n"
+	    + "Jython Simple Project                                                 \| PASS \|\n"
+	    + "1 critical test, 1 passed, 0 failed\n"
+	    + "1 test total, 1 passed, 0 failed\n"
+	    + "==============================================================================\n"
+	    + "Output:  .*output.xml\n"
+	    + "Log:     .*log.html\n"
+	    + "Report:  .*report.html" $new_ws_path ]| verify-true
+} 
+
+//add new items to CLASSPATH  (double a)
+get-tab-folder -index 1 | get-tab-item "jython_simple_project/red.xml" | click
+get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1 | get-item "...add new search path" 
+    | double-click
+with [get-window "Add new search path"] {
+    with [get-editbox 
+        -after [get-label "Provide search paths to be added. Each path should be specified in separate line."]] {
+        set-text "folder/folder2\n\n"
+            + "/new/folder\n"
+            + "a\n"
+            + "a"
+    }
+    get-button OK | click
+}
+
+//check if 5 items were added (new empty line is omitted)
+with [get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1] {
+    get-property itemCount | equals 5 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals [format "%s/jython_simple_project/RED_TEST_JavaLib.jar" $RED_workspace_path] | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "folder/folder2" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "/new/folder" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals a | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "...add new search path" | verify-true
+}
+
+//change item
+with [get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1] {
+    select "folder\\/folder2" | double-click
+    select "folder\\/folder2" | activate-cell-edit
+    with [get-editbox] {
+        set-text "changed_folder/new"
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+    select a | double-click
+    select a | activate-cell-edit
+    with [get-editbox] {
+        set-text b
+        key-type Enter
+    }
+    apply-cell-edit -deactivate
+}
+with [get-editor "jython_simple_project/red.xml" | get-section Paths | get-table -index 1] {
+    get-property itemCount | equals 5 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals "D:\\aut-red_produkt/jython_simple_project/RED_TEST_JavaLib.jar" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "changed_folder/new" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "/new/folder" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals b | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "...add new search path" | verify-true
+}
+
+//add Python path
+get-editor "jython_simple_project/red.xml" | get-section Paths | get-table | get-item "...add new search path" 
+    | double-click
+with [get-window "Add new search path"] {
+    get-editbox -after [get-label "Provide search paths to be added. Each path should be specified in separate line."] 
+        | set-text "my_python_path"
+    get-button OK | click
+}
+get-button "Save \((Ctrl|M1)\+S\)" | click
+
+//run test and check if pathon path was added
+get-view "Project Explorer" | get-tree | select "jython_simple_project/test.robot" 
+    | select "jython_simple_project/test.robot" | get-menu "Run As/1 Robot Test" | click   
+
+replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{
+	get-view Console | get-text-viewer | get-property text 
+	    | matches [format "Command: jython.* -J-cp %s/jython_simple_project/RED_TEST_JavaLib.jar;b;changed_folder/new;/new/folder;. -m .* -P my_python_path .*\n"
+	    + "Suite Executor: Robot Framework .* \(Jython .*\)\n"
+	    + "==============================================================================\n"
+	    + "Jython Simple Project                                                         \n"
+	    + "==============================================================================\n"
+	    + "Jython Simple Project.Test                                                    \n"
+	    + "==============================================================================\n"
+	    + "t1                                                                    \| PASS \|\n"
+	    + "------------------------------------------------------------------------------\n"
+	    + "Jython Simple Project.Test                                            \| PASS \|\n"
+	    + "1 critical test, 1 passed, 0 failed\n"
+	    + "1 test total, 1 passed, 0 failed\n"
+	    + "==============================================================================\n"
+	    + "Jython Simple Project                                                 \| PASS \|\n"
+	    + "1 critical test, 1 passed, 0 failed\n"
+	    + "1 test total, 1 passed, 0 failed\n"
+	    + "==============================================================================\n"
+	    + "Output:  .*output.xml\n"
+	    + "Log:     .*log.html\n"
+	    + "Report:  .*report.html" $new_ws_path ]| verify-true
+	    
+}	    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
