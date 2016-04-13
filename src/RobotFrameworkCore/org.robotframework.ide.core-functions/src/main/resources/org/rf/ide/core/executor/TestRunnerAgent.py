@@ -340,6 +340,12 @@ class TestRunnerAgent:
         self._send_socket("resource_import", name, attributes)
         
     def library_import(self, name, attributes):
+        # equals org.python.core.ClasspathPyImporter.PYCLASSPATH_PREFIX
+        import platform
+        if 'Jython' in platform.python_implementation() and '__pyclasspath__' in attributes['source']:
+            import org.python.core.imp as jimp
+            res = attributes['source'].split('__pyclasspath__')[1].replace(os.sep, '')
+            attributes['source'] = jimp.getSyspathJavaLoader().getResources(res).nextElement()
         self._send_socket("library_import", name, attributes)
 
     def message(self, message):
