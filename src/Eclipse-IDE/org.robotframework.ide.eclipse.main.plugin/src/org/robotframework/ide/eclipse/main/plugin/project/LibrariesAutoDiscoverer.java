@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -64,7 +65,7 @@ public class LibrariesAutoDiscoverer {
 
     private RobotProject robotProject;
 
-    private List<IResource> suiteFiles = newArrayList();
+    private List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
 
     private RobotDryRunOutputParser dryRunOutputParser;
 
@@ -378,6 +379,18 @@ public class LibrariesAutoDiscoverer {
             file = projectLocation.toFile();
         }
         return file;
+    }
+    
+    public void addSuiteFileToDiscovering(final IResource suiteFile) {
+        synchronized (suiteFiles) {
+            if (!suiteFiles.contains(suiteFile)) {
+                suiteFiles.add(suiteFile);
+            }
+        }
+    }
+    
+    public boolean hasSuiteFilesToDiscovering() {
+        return !suiteFiles.isEmpty();
     }
     
     private class DryRunTargetsCollector {

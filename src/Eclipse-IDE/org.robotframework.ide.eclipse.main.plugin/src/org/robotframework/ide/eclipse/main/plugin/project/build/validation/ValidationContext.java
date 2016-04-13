@@ -11,6 +11,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,6 +19,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.testdata.model.RobotVersion;
@@ -37,6 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordDefiniti
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
+import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -47,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
 /**
@@ -69,6 +73,8 @@ public class ValidationContext {
     private BuildLogger logger;
     
     private boolean isValidatingChangedFiles;
+    
+    private Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = Optional.absent();
 
     public ValidationContext(final IProject project, final BuildLogger logger) {
         this(RedPlugin.getModelManager().getModel(), project, logger);
@@ -80,6 +86,12 @@ public class ValidationContext {
         final RobotProject robotProject = model.createRobotProject(project);
         this.projectConfig = robotProject.getRobotProjectConfig();
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+        
+        if (projectConfig.isReferencedLibrariesAutoDiscoveringEnabled()) {
+            librariesAutoDiscoverer = Optional
+                    .of(new LibrariesAutoDiscoverer(robotProject, Collections.<IResource> emptyList(),
+                            projectConfig.isLibrariesAutoDiscoveringSummaryWindowEnabled()));
+        }
 
         final String versionGot = robotProject.getVersion();
         this.version = (runtimeEnvironment != null && versionGot != null) ? RobotVersion.from(versionGot) : null;
@@ -133,6 +145,10 @@ public class ValidationContext {
 
     public void setIsValidatingChangedFiles(boolean isValidatingChangedFiles) {
         this.isValidatingChangedFiles = isValidatingChangedFiles;
+    }
+
+    public Optional<LibrariesAutoDiscoverer> getLibrariesAutoDiscoverer() {
+        return librariesAutoDiscoverer;
     }
 
     public FileValidationContext createUnitContext(final IFile file) {
