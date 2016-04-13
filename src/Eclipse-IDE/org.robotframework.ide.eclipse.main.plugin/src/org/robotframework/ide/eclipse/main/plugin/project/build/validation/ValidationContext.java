@@ -87,7 +87,7 @@ public class ValidationContext {
         this.projectConfig = robotProject.getRobotProjectConfig();
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
         
-        if (projectConfig.isReferencedLibrariesAutoDiscoveringEnabled()) {
+        if (projectConfig != null && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled()) {
             librariesAutoDiscoverer = Optional
                     .of(new LibrariesAutoDiscoverer(robotProject, Collections.<IResource> emptyList(),
                             projectConfig.isLibrariesAutoDiscoveringSummaryWindowEnabled()));
