@@ -38,6 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -447,9 +448,12 @@ public class RobotFileValidatorCheckBuildMessagesTest {
     private ValidationContext createValidationContext(final RobotModel model, final BuildLogger logger) {
         final IProject project = mock(IProject.class);
         final RobotProject robotProject = mock(RobotProject.class);
+        final RobotProjectConfig robotProjectConfig = mock(RobotProjectConfig.class);
         final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
 
         when(model.createRobotProject(project)).thenReturn(robotProject);
+        when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
+        when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
         when(robotProject.getRuntimeEnvironment()).thenReturn(robotRuntime);
         when(robotProject.getVersion()).thenReturn("3.0");
 
