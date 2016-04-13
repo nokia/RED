@@ -15,6 +15,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 
 public class ValidationContextTest {
@@ -25,9 +26,12 @@ public class ValidationContextTest {
         final RobotModel model = mock(RobotModel.class);
         final IProject project = mock(IProject.class);
         final RobotProject robotProject = mock(RobotProject.class);
+        final RobotProjectConfig robotProjectConfig = mock(RobotProjectConfig.class);
         final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
 
         when(model.createRobotProject(project)).thenReturn(robotProject);
+        when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
+        when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
         when(robotProject.getRuntimeEnvironment()).thenReturn(robotRuntime);
         when(robotProject.getVersion()).thenReturn("3.0");
 
@@ -44,9 +48,12 @@ public class ValidationContextTest {
         final RobotModel model = mock(RobotModel.class);
         final IProject project = mock(IProject.class);
         final RobotProject robotProject = mock(RobotProject.class);
+        final RobotProjectConfig robotProjectConfig = mock(RobotProjectConfig.class);
         final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
 
         when(model.createRobotProject(project)).thenReturn(robotProject);
+        when(robotProject.getRobotProjectConfig()).thenReturn(robotProjectConfig);
+        when(robotProjectConfig.isReferencedLibrariesAutoDiscoveringEnabled()).thenReturn(false);
         when(robotProject.getRuntimeEnvironment()).thenReturn(robotRuntime);
         when(robotProject.getVersion()).thenReturn(null);
 
