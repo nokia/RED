@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.dryrun.IDryRunStartSuiteHandler;
 import org.rf.ide.core.dryrun.RobotDryRunHandler;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
@@ -146,7 +147,7 @@ public class LibrariesAutoDiscoverer {
         subMonitor.worked(1);
 
         subMonitor.subTask("Executing Robot dry run...");
-        executeDryRun(dryRunCommandLine);
+        executeDryRun(dryRunCommandLine, subMonitor);
         subMonitor.worked(1);
 
         subMonitor.done();
@@ -180,8 +181,17 @@ public class LibrariesAutoDiscoverer {
         return runCommandLine;
     }
 
-    private void executeDryRun(final RunCommandLine dryRunCommandLine) throws InvocationTargetException {
+    private void executeDryRun(final RunCommandLine dryRunCommandLine, final SubMonitor subMonitor) throws InvocationTargetException {
         if (dryRunCommandLine != null) {
+            dryRunOutputParser.setStartSuiteHandler(new IDryRunStartSuiteHandler() {
+                
+                @Override
+                public void processStartSuiteEvent(final String suiteName) {
+                    subMonitor.subTask("Executing Robot dry run on suite:" + suiteName);
+                }
+            });
+            
+            
             final List<ILineHandler> dryRunOutputlisteners = newArrayList();
             dryRunOutputlisteners.add(dryRunOutputParser);
             dryRunHandler.startDryRunHandlerThread(dryRunCommandLine.getPort(), dryRunOutputlisteners);

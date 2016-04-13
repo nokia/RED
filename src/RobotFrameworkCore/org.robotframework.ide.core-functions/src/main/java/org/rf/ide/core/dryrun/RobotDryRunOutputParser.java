@@ -22,12 +22,16 @@ public class RobotDryRunOutputParser implements ILineHandler {
     private static final String MESSAGE_EVENT_NAME = "message";
 
     private static final String LIBRARY_IMPORT_EVENT_NAME = "library_import";
+    
+    private static final String START_SUITE_EVENT_NAME = "start_suite";
 
     private final ObjectMapper mapper;
 
     private Map<String, Object> parsedLine;
 
     private RobotDryRunLibraryImportCollector dryRunLibraryImportCollector;
+    
+    private IDryRunStartSuiteHandler startSuiteHandler;
 
     public RobotDryRunOutputParser(final Set<String> standardLibrariesNames) {
         this.mapper = new ObjectMapper();
@@ -52,9 +56,8 @@ public class RobotDryRunOutputParser implements ILineHandler {
             final List<String> args = (List<String>) details.get("args");
 
             dryRunLibraryImportCollector.collectFromLibraryImportEvent(libraryName, importer, source, args);
-        }
-
-        if (parsedLine.containsKey(MESSAGE_EVENT_NAME)) {
+            
+        } else if (parsedLine.containsKey(MESSAGE_EVENT_NAME)) {
             final List<Object> messageList = (List<Object>) parsedLine.get(MESSAGE_EVENT_NAME);
             final Map<String, String> details = (Map<String, String>) messageList.get(0);
             final String messageLevel = details.get("level");
@@ -67,10 +70,22 @@ public class RobotDryRunOutputParser implements ILineHandler {
                 String errorMessage = details.get("message");
                 dryRunLibraryImportCollector.collectFromErrorMessageEvent(errorMessage);
             }
+            
+        } else if (parsedLine.containsKey(START_SUITE_EVENT_NAME)) {
+            final List<?> suiteList = (List<?>) parsedLine.get(START_SUITE_EVENT_NAME);
+            final String suiteName = (String) suiteList.get(0);
+            if (startSuiteHandler != null && suiteName != null) {
+                startSuiteHandler.processStartSuiteEvent(suiteName);
+            }
         }
     }
 
     public List<RobotDryRunLibraryImport> getImportedLibraries() {
         return dryRunLibraryImportCollector.getImportedLibraries();
     }
+
+    public void setStartSuiteHandler(final IDryRunStartSuiteHandler startSuiteHandler) {
+        this.startSuiteHandler = startSuiteHandler;
+    }
+
 }
