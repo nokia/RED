@@ -187,7 +187,7 @@ public class LibrariesAutoDiscoverer {
                 
                 @Override
                 public void processStartSuiteEvent(final String suiteName) {
-                    subMonitor.subTask("Executing Robot dry run on suite:" + suiteName);
+                    subMonitor.subTask("Executing Robot dry run on suite: " + suiteName);
                 }
             });
             
