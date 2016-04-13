@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/13/16 3:53 PM
+Save-Time: 4/13/16 7:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -126,22 +126,23 @@ get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-property
     | equals true | verify-true
     
 //check if new items were added (b is duplicated)    
-with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
-    get-property itemCount | equals 12 | verify-true
-    get-property "getItems().TableItem[0].getText()" | equals [format "%s/RobotProject/libs" $RED_workspace_path] | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "not existing" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "C:\\folder\\folder2" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "/!@#$%path/new.file.txt" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals "\"escpaed\\\\text\"" | verify-true
-    get-property "getItems().TableItem[5].getText()" | equals "correct\\9tab\\9/folder" | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals a | verify-true
-    get-property "getItems().TableItem[7].getText()" | equals b | verify-true
-    get-property "getItems().TableItem[8].getText()" | equals scrolbar | verify-true
-    get-property "getItems().TableItem[9].getText()" | equals c | verify-true
-    get-property "getItems().TableItem[10].getText()" | equals d | verify-true
-    get-property "getItems().TableItem[11].getText()" | equals "...add new search path" | verify-true
+get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-property itemCount -raw | int | minus 12| let [val nr_of_paths -input]{
+	
+	with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 0 $nr_of_paths]] | equals [format "%s/RobotProject/libs" $RED_workspace_path] | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 1 $nr_of_paths]] | equals "not existing" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 2 $nr_of_paths]] | equals "C:\\folder\\folder2" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 3 $nr_of_paths]] | equals "/!@#$%path/new.file.txt" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 4 $nr_of_paths]]| equals "\"escpaed\\\\text\"" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 5 $nr_of_paths]] | equals "correct\\9tab\\9/folder" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 6 $nr_of_paths]] | equals a | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 7 $nr_of_paths]] | equals b | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 8 $nr_of_paths]] | equals scrolbar | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 9 $nr_of_paths]] | equals c | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 10 $nr_of_paths]] | equals d | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 11 $nr_of_paths]]| equals "...add new search path" | verify-true
+	}
 }
-
 with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
 	//select 2 item next to each other and one not
     select "\\/!@#$%path\\/new.file.txt" "\"escpaed\\\\text\"" "d"
@@ -150,14 +151,17 @@ with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
     //select one
     select scrolbar | key-type Del
 }
-with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
-    get-property "getItems().TableItem[0].getText()" | equals [format "%s/RobotProject/libs" $RED_workspace_path] | verify-true
-    get-property "getItems().TableItem[1].getText()" | equals "not existing" | verify-true
-    get-property "getItems().TableItem[2].getText()" | equals "C:\\folder\\folder2" | verify-true
-    get-property "getItems().TableItem[3].getText()" | equals "correct\\9tab\\9/folder" | verify-true
-    get-property "getItems().TableItem[4].getText()" | equals a | verify-true
-    get-property "getItems().TableItem[5].getText()" | equals b | verify-true
-    get-property "getItems().TableItem[6].getText()" | equals c | verify-true
-    get-property "getItems().TableItem[7].getText()" | equals "...add new search path" | verify-true
-}
+get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-property itemCount -raw | int | minus  8 | let [val nr_of_paths -input]{
+	with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 0 $nr_of_paths]] | equals [format "%s/RobotProject/libs" $RED_workspace_path] | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 1 $nr_of_paths]]| equals "not existing" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 2 $nr_of_paths]] | equals "C:\\folder\\folder2" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 3 $nr_of_paths]] | equals "correct\\9tab\\9/folder" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 4 $nr_of_paths]] | equals a | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 5 $nr_of_paths]] | equals b | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 6 $nr_of_paths]] | equals c | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()" [plus 7 $nr_of_paths]]| equals "...add new search path" | verify-true
+	}
+}	
+	
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
