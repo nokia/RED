@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
@@ -139,6 +140,11 @@ public class RobotArtifactsValidator {
                     threadPool.shutdown();
                     threadPool.awaitTermination(1, TimeUnit.HOURS);
 
+                    final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = context.getLibrariesAutoDiscoverer();
+                    if (librariesAutoDiscoverer.isPresent() && librariesAutoDiscoverer.get().hasSuiteFilesToDiscovering()) {
+                        librariesAutoDiscoverer.get().start();
+                    }
+                    
                     return Status.OK_STATUS;
                 } catch (final CoreException | InterruptedException e) {
                     RedPlugin.logError("Project validation was corrupted", e);

@@ -247,7 +247,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
                 
                 if(librariesAutoDiscoverer.isPresent()) {
-                    librariesAutoDiscoverer.get().start();
+                    librariesAutoDiscoverer.get().addSuiteFileToDiscovering(suiteFile.getFile());
                 }
             }
         }
