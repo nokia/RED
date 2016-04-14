@@ -806,9 +806,6 @@
 				   ifEmpty="false"
 				   operator="and">
 				<and>
-				   <instanceof
-						 value="org.eclipse.core.resources.IFile">
-				   </instanceof>
 				   <test
 						 property="org.eclipse.core.resources.projectNature"
 						 value="org.robotframework.ide.eclipse.main.plugin.robotNature">
@@ -817,38 +814,51 @@
 			 </iterate>
 		  </with>
 	   </activeWhen>
+	   <enabledWhen>
+		  <with
+				variable="selection">
+			 <iterate ifEmpty="false">
+		 		<adapt type="org.eclipse.core.resources.IFile">
+		            <test property="org.eclipse.core.resources.name" value="*.py"/>
+		      	</adapt>
+			  </iterate>
+		   </with>
+        </enabledWhen>
 	</handler>
-	
 	<handler
 		  class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.LibrariesAutoDiscoverHandler"
 		  commandId="org.robotframework.red.autoDiscoverLibraries">
 	   <activeWhen>
 		  <with
 				variable="selection">
-			 <iterate
-				   ifEmpty="false"
-				   operator="or">
-				<or>
-				   <instanceof
-						 value="org.eclipse.core.resources.IFile">
-				   </instanceof>
-				   <test
-						 property="org.eclipse.core.resources.projectNature"
-						 value="org.robotframework.ide.eclipse.main.plugin.robotNature">
-				   </test>
-				</or>
-				<or>
-				   <instanceof
-						 value="org.eclipse.core.resources.IProject">
-				   </instanceof>
-				   <test
-						 property="org.eclipse.core.resources.projectNature"
-						 value="org.robotframework.ide.eclipse.main.plugin.robotNature">
-				   </test>
-				</or>
-			 </iterate>
+			<iterate
+                   ifEmpty="false"
+                   operator="and">
+                <test
+                      property="org.eclipse.core.resources.projectNature"
+                      value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                </test>
+             </iterate>
 		  </with>
 	   </activeWhen>
+	   <enabledWhen>
+		  <with
+				variable="selection">
+			 <iterate operator="or" ifEmpty="false">
+			 	<or>
+			 		<adapt type="org.eclipse.core.resources.IFile">
+			         <or>
+			            <test property="org.eclipse.core.resources.name" value="*.robot"/> 
+			            <test property="org.eclipse.core.resources.name" value="*.txt"/> 
+			            <test property="org.eclipse.core.resources.name" value="*.tsv"/> 
+			         </or>
+			      	</adapt>
+			      	<adapt type="org.eclipse.core.resources.IFolder" />
+			      	<adapt type="org.eclipse.core.resources.IProject" />
+			   	</or>
+			   </iterate>
+		  	</with>
+         </enabledWhen>
 	</handler>
 	
  </extension>
