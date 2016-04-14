@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
@@ -44,7 +45,7 @@ public class RedPlugin extends AbstractUIPlugin {
     public void start(final BundleContext context) {
         try {
             super.start(context);
-            if (Boolean.valueOf(System.getProperty("red.showSessionConsole")).booleanValue()) {
+            if (RedSystemProperties.shouldShowSessionConsole()) {
                 RobotRuntimeEnvironment.addProcessListener(new RedSessionProcessListener());
             }
         } catch (final Exception e) {

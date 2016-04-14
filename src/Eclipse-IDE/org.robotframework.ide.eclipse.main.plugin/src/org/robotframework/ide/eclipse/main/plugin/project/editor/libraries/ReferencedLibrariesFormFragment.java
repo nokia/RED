@@ -216,7 +216,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     for (final String file : chosenFiles) {
                         final IPath path = new Path(dialog.getFilterPath()).append(file);
                         final Collection<ReferencedLibrary> importedLibs = importer
-                                .importPythonLib(viewer.getTable().getShell(), environment, path.toString());
+                                .importPythonLib(viewer.getTable().getShell(), environment,
+                                        editorInput.getProjectConfiguration(), path.toString());
                         libs.addAll(importedLibs);
                     }
                     addLibraries(libs);
@@ -242,7 +243,8 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     for (final String file : chosenFiles) {
                         final IPath path = new Path(dialog.getFilterPath()).append(file);
                         final Collection<ReferencedLibrary> importedLibs = importer
-                                .importJavaLib(viewer.getTable().getShell(), environment, path.toString());
+                                .importJavaLib(viewer.getTable().getShell(), environment,
+                                        editorInput.getProjectConfiguration(), path.toString());
                         libs.addAll(importedLibs);
                     }
                     addLibraries(libs);
@@ -429,7 +431,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         autoLibReloadButton.setEnabled(isEditable);
         viewer.getTable().setEnabled(isEditable);
 
-        if (!addJavaLibButton.isEnabled()) {
+        if (projectIsInterpretedByJython) {
             decoration = new ControlDecoration(addJavaLibButton, SWT.RIGHT | SWT.TOP);
             decoration.setDescriptionText("Project is configured to use " + environment.getInterpreter().toString()
                     + " interpreter, but Jython is needed for Java libraries.");

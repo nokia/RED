@@ -30,6 +30,7 @@ import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentExceptio
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
@@ -44,8 +45,8 @@ import com.google.common.base.Optional;
 public class ReferencedLibraryImporter {
 
     public Collection<ReferencedLibrary> importPythonLib(final Shell shellForDialogs,
-            final RobotRuntimeEnvironment environment, final String fullLibraryPath) {
-        final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment);
+            final RobotRuntimeEnvironment environment, final RobotProjectConfig config, final String fullLibraryPath) {
+        final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config);
         final List<PythonClass> pythonClasses = newArrayList();
 
         try {
@@ -94,8 +95,9 @@ public class ReferencedLibraryImporter {
         }
     }
 
-    public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final RobotRuntimeEnvironment environment, final String fullLibraryPath) {
-        final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(environment);
+    public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final RobotRuntimeEnvironment environment,
+            final RobotProjectConfig config, final String fullLibraryPath) {
+        final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(environment, config);
         final List<JarClass> classesFromJar = newArrayList();
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {

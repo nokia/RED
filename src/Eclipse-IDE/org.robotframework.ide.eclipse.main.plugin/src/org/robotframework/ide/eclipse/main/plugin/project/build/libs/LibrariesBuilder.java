@@ -65,7 +65,8 @@ public class LibrariesBuilder {
                 monitor.subTask(generatorWithSource.generator.getMessage());
                 try {
                     if (project.exists()) {
-                        generatorWithSource.generator.generateLibdocForcibly(runtimeEnvironment);
+                        generatorWithSource.generator.generateLibdocForcibly(runtimeEnvironment,
+                                robotProject.getRobotProjectConfig().createEnvironmentSearchPaths());
                     }
                 } catch (final RobotEnvironmentException e) {
                     final IPath libspecFileLocation = generatorWithSource.sourceLibdocFile.getLocation();
@@ -134,7 +135,7 @@ public class LibrariesBuilder {
             logger.log("BUILDING: " + generator.getMessage());
             monitor.subTask(generator.getMessage());
             try {
-                generator.generateLibdoc(runtimeEnvironment);
+                generator.generateLibdoc(runtimeEnvironment, configuration.createEnvironmentSearchPaths());
             } catch (final RobotEnvironmentException e) {
                 final RobotProblem problem = RobotProblem.causedBy(
                         ProjectConfigurationProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED).formatMessageWith(e.getMessage());

@@ -59,7 +59,7 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
 
                 final Shell shell = Display.getCurrent().getActiveShell();
                 final Collection<ReferencedLibrary> newLibraries = importer.importPythonLib(shell,
-                        robotProject.getRuntimeEnvironment(), file.getLocation().toString());
+                        robotProject.getRuntimeEnvironment(), config, file.getLocation().toString());
 
                 final List<ReferencedLibrary> addedLibs = new ArrayList<>();
                 for (final ReferencedLibrary library : newLibraries) {

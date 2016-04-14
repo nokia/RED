@@ -25,6 +25,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
@@ -161,10 +162,10 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         javaLibProblems.addAll(validateLibraryPath(libraryPath, ConfigFileProblem.MISSING_LIBRARY_FILE));
 
         final IPath absolutePath = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
+        final RobotProject robotProject = context.getModel().createRobotProject(configFile.getProject());
         boolean containsClass = false;
-        for (final JarClass jarClass : new JarStructureBuilder(
-                context.getModel().createRobotProject(configFile.getProject()).getRuntimeEnvironment())
-                        .provideEntriesFromFile(absolutePath.toFile())) {
+        for (final JarClass jarClass : new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
+                robotProject.getRobotProjectConfig()).provideEntriesFromFile(absolutePath.toFile())) {
             if (jarClass.getQualifiedName().equals(libName)) {
                 containsClass = true;
                 break;
