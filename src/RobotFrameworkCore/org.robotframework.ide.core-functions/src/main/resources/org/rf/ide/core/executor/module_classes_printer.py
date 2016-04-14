@@ -5,6 +5,8 @@
 #
 
 import sys
+import platform
+import os
 import os.path
 import inspect
 import pkgutil
@@ -13,12 +15,29 @@ import extend_pythonpath
 '''
 This script prints all the classes contained in given module and submodules rooted in given path. 
 In case of package modules the path has to point to __init__.py file of this module.
+
+Call the script with arguments:
+   interpreter module_classes_printer.py <module_path> [-pythonpath p1;p2;..;pk] [-modulename name]
+
 '''
 original_path = sys.argv[1]
+module_name_from_import = ''
+
+i = 2
+while i < len(sys.argv):
+    if sys.argv[i] == '-pythonpath':
+        sys.path.extend(sys.argv[i + 1].split(';'))
+        i += 2
+    elif sys.argv[i] == '-modulename':
+        module_name_from_import = sys.argv[i + 1]
+        i += 2
+    else:
+        i += 1    
+
 if len(sys.argv) > 2:
-    moduleNameFromImport = sys.argv[2]
+    module_name_from_import = sys.argv[2]
 else:
-    moduleNameFromImport = ''
+    module_name_from_import = ''
 if original_path.startswith('"') and original_path.endswith('"'):
     original_path = original_path[1:-1]
 
@@ -43,14 +62,14 @@ elif original_path.endswith('.py'):
     try:
         module_file, module_path, module_desc = imp.find_module(module_name)
         root_module = imp.load_module(module_name, module_file, module_path, module_desc)
-    except Exception, e:
-        if moduleNameFromImport == '':
-            moduleNameFromImport = os.path.basename(original_path)[:-3]
+    except Exception as e:
+        if module_name_from_import == '':
+            module_name_from_import = os.path.basename(original_path)[:-3]
         import importlib
         try:
-            extend_pythonpath.extend(original_path, moduleNameFromImport)
-            root_module = importlib.import_module(moduleNameFromImport)
-        except Exception, e:
+            extend_pythonpath.extend(original_path, module_name_from_import)
+            root_module = importlib.import_module(module_name_from_import)
+        except Exception as e:
             tempModuleName = extend_pythonpath.get_module_name_by_path(original_path)
             extend_pythonpath.extend(original_path, tempModuleName)
             root_module = importlib.import_module(tempModuleName)
@@ -93,4 +112,4 @@ for module in modules:
 if original_path.endswith('.py'):
     to_print = extend_pythonpath.get_module_combinations(to_print, extend_pythonpath.get_module_name_by_path(original_path))
 
-print '\n'.join(to_print)
+print('\n'.join(to_print))
