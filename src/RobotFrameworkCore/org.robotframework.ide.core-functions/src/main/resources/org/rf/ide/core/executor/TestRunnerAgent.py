@@ -349,7 +349,14 @@ class TestRunnerAgent:
                     res = attributes['source'].split('__pyclasspath__')[1].replace(os.sep, '')
                     attributes['source'] = jimp.getSyspathJavaLoader().getResources(res).nextElement()
             else:
-                attributes['source'] = jimp.getSyspathJavaLoader().getResources(name + '.class').nextElement()
+                source_uri = str(jimp.getSyspathJavaLoader().getResources(name + '.class').nextElement())
+                if source_uri and 'file:/' in source_uri:
+                    import re
+                    filePath = re.split('.*file[:][/]', source_uri)
+                    if len(filePath) > 1:
+                        path = re.split('[!][/]', filePath[1])
+                        source_uri = path[0]
+                attributes['source'] = source_uri
         self._send_socket("library_import", name, attributes)
 
     def message(self, message):
