@@ -50,4 +50,9 @@ class PathsLabelProvider extends RedCommonLabelProvider {
         }
         return null;
     }
+
+    @Override
+    public String getToolTipText(final Object element) {
+        return getStyledText(element).getString();
+    }
 }

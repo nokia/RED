@@ -142,9 +142,8 @@ class PathsFormFragment implements ISectionFormFragment {
 
     private void createColumns(final TableViewer viewer, final ViewerConfiguration config) {
         ViewerColumnsFactory.newColumn("")
-                .withWidth(200)
-                .withMinWidth(200)
-                .shouldGrabAllTheSpaceLeft(true)
+                .withWidth(400)
+                .withMinWidth(100)
                 .labelsProvidedBy(new PathsLabelProvider(config.getVariableName()))
                 .editingEnabledOnlyWhen(editorInput.isEditable())
                 .editingSupportedBy(new PathsEditingSupport(viewer, elementsCreator(config.getPathAddingStrategy()),
