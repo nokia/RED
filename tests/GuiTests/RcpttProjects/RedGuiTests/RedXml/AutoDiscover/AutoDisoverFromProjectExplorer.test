@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5wbGUP_mEeWRL4nRKA71zA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/14/16 3:21 PM
+Save-Time: 4/14/16 3:46 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -83,7 +83,7 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
     get-property "getItems().TableItem[4].getText()" | equals "lib_with_args - RobotProject/libs" | verify-true
 }
 
-//use autodiscver on .py - is now disable
+//use autodiscver on .py - is  disable
 get-view "Project Explorer" | get-tree | select "RobotProject/libs/add.py"
 exec-with-options {
     get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" 
@@ -91,10 +91,34 @@ exec-with-options {
 	verify-error{get-window "Problem Occurred"}
 } -allowStatusDialog
 
-//red.xml
+//red.xml -disable
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml"
 get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" 
     | get-property enablement | equals false | verify-true
     
+//.txt - enable
+get-view "Project Explorer" | get-tree | select "RobotProject/other_tests/text_file.txt"
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" 
+    | get-property enablement | equals true | verify-true    
+
+//.txt - enable
+get-view "Project Explorer" | get-tree | select "RobotProject/other_tests/lib_with_many_classes.tsv"
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" 
+    | get-property enablement | equals true | verify-true    
+        
+//.ROBOT - enable
+get-view "Project Explorer" | get-tree | select "RobotProject/other_tests/capital_letter.ROBOT"
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" 
+    | get-property enablement | equals true | verify-true      
+
+//entire project
+get-view "Project Explorer" | get-tree | select RobotProject
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" 
+    | get-property enablement | equals true | verify-true
+
+
+
+
 //autodiscover on suite with no libs
 get-view "Project Explorer" | get-tree | select "RobotProject/other_tests/no_lib.robot" 
     | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
