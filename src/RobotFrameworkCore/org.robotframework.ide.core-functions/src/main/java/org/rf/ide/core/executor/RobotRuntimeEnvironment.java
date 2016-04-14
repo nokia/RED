@@ -45,11 +45,6 @@ public class RobotRuntimeEnvironment {
 
     private String version;
 
-
-    static boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
-    }
-
     public static void addProcessListener(final PythonProcessListener listener) {
         PythonInterpretersCommandExecutors.getInstance().addProcessListener(listener);
     }
@@ -120,7 +115,7 @@ public class RobotRuntimeEnvironment {
             }
         };
         try {
-            final String cmd = isWindows() ? "where" : "which";
+            final String cmd = RedSystemProperties.isWindowsPlatform() ? "where" : "which";
             final int returnCode = runExternalProcess(
                     Arrays.asList(cmd, interpreter.executableName()),
                     linesProcessor);
@@ -278,6 +273,9 @@ public class RobotRuntimeEnvironment {
         });
     }
 
+    static String wrapArgumentIfNeeded(final String argument) {
+        return argument.contains(" ") ? "\"" + argument + "\"" : argument;
+    }
 
     private RobotRuntimeEnvironment(final File location, final String version) {
         this.location = location;
@@ -331,11 +329,11 @@ public class RobotRuntimeEnvironment {
     }
 
 
-    public Optional<File> getModulePath(final String moduleName) {
+    public Optional<File> getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            return executor.getModulePath(moduleName);
+            return executor.getModulePath(moduleName, additionalPaths);
         }
         return Optional.absent();
     }
@@ -375,56 +373,57 @@ public class RobotRuntimeEnvironment {
         }
     }
 
-    public void createLibdocForStdLibrary(final String libName, final File file) throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForStdLibrary(file.getAbsolutePath(), libName, "");
-        }
-    }
-
-    public void createLibdocForStdLibraryForcibly(final String libName, final File file)
-            throws RobotEnvironmentException {
-        if (hasRobotInstalled()) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                    .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForStdLibrary(file.getAbsolutePath(), libName, "");
-        }
-    }
-
-    public void createLibdocForPythonLibrary(final String libName, final String libPath, final File file)
+    public void createLibdocForStdLibrary(final String libName, final File outputFile)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForPythonLibrary(file.getAbsolutePath(), libName, libPath);
+            executor.createLibdocForStdLibrary(outputFile.getAbsolutePath(), libName, "");
         }
     }
 
-    public void createLibdocForPythonLibraryForcibly(final String libName, final String libPath, final File file)
+    public void createLibdocForStdLibraryForcibly(final String libName, final File outputFile)
             throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForPythonLibrary(file.getAbsolutePath(), libName, libPath);
+            executor.createLibdocForStdLibrary(outputFile.getAbsolutePath(), libName, "");
         }
     }
 
-    public void createLibdocForJavaLibrary(final String libName, final String jarPath, final File file)
-            throws RobotEnvironmentException {
+    public void createLibdocForPythonLibrary(final String libName, final String libPath,
+            final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForPythonLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
+        }
+    }
+
+    public void createLibdocForPythonLibraryForcibly(final String libName, final String libPath,
+            final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
+            executor.createLibdocForPythonLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
+        }
+    }
+
+    public void createLibdocForJavaLibrary(final String libName, final String jarPath,
+            final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
         if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForJavaLibrary(file.getAbsolutePath(), libName, jarPath);
+            executor.createLibdocForJavaLibrary(outputFile.getAbsolutePath(), libName, jarPath, additionalPaths);
         }
     }
 
-    public void createLibdocForJavaLibraryForcibly(final String libName, final String jarPath, final File file)
-            throws RobotEnvironmentException {
+    public void createLibdocForJavaLibraryForcibly(final String libName, final String jarPath,
+            final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
         if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForJavaLibrary(file.getAbsolutePath(), libName, jarPath);
+            executor.createLibdocForJavaLibrary(outputFile.getAbsolutePath(), libName, jarPath, additionalPaths);
         }
     }
 
@@ -474,29 +473,47 @@ public class RobotRuntimeEnvironment {
      * @return
      * @throws RobotEnvironmentException
      */
-    public List<String> getClassesDefinedInModule(final File moduleLocation, final Optional<String> moduleName)
-            throws RobotEnvironmentException {
+    public List<String> getClassesDefinedInModule(final File moduleLocation, final Optional<String> moduleName,
+            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         // DO NOT split & move to direct/rpc executors since this code may
-        // import quite a lot of
-        // modules;
-        // maybe we could restart xml-rpc server from time to time; then we can
-        // consider moving this
+        // import quite a lot of modules; maybe we could restart xml-rpc
+        // server from time to time; then we can consider moving this
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("module_classes_printer.py");
             RobotRuntimeEnvironment.copyResourceFile("extend_pythonpath.py");
 
             if (scriptFile != null) {
+                final SuiteExecutor interpreter = ((PythonInstallationDirectory) location).getInterpreter();
                 final String interpreterPath = location.toPath()
-                        .resolve(((PythonInstallationDirectory) location).getInterpreter().executableName())
+                        .resolve(interpreter.executableName())
                         .toAbsolutePath()
                         .toString();
 
-                String modulePath = moduleLocation.getAbsolutePath();
-                modulePath = modulePath.contains(" ") ? "\"" + modulePath + "\"" : modulePath;
-                final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), modulePath);
+                final List<String> cmdLine = newArrayList(interpreterPath);
+                if (interpreter == SuiteExecutor.Jython && additionalPaths.hasClassPaths()) {
+                    cmdLine.add("-J-cp");
+                    final String classpath = Joiner.on(RedSystemProperties.getPathsSeparator())
+                            .join(additionalPaths.getClassPaths());
+                    cmdLine.add(wrapArgumentIfNeeded(classpath));
+                }
+                cmdLine.add(scriptFile.getAbsolutePath());
+                cmdLine.add(wrapArgumentIfNeeded(moduleLocation.getAbsolutePath()));
                 if (moduleName.isPresent()) {
+                    cmdLine.add("-modulename");
                     cmdLine.add(moduleName.get());
                 }
+                if (additionalPaths.hasPythonPaths()) {
+                    cmdLine.add("-pythonpath");
+                    final List<String> additions = newArrayList(additionalPaths.getPythonPaths());
+                    if (interpreter == SuiteExecutor.Jython || interpreter == SuiteExecutor.IronPython) {
+                        // Both Jython and IronPython does not include paths from PYTHONPATH into
+                        // sys.path list
+                        additions.addAll(RedSystemProperties.getPythonPaths());
+                    }
+                    final String pythonpath = Joiner.on(';').join(additions);
+                    cmdLine.add(wrapArgumentIfNeeded(pythonpath));
+                }
+
                 final List<String> output = newArrayList();
                 final ILineHandler linesHandler = new ILineHandler() {
 

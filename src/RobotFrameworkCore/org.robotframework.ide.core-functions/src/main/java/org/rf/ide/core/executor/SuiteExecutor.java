@@ -49,18 +49,9 @@ public enum SuiteExecutor {
         return names;
     }
 
-    public String getPathsSeparator() {
-        return isWindows() ? ";" : ":";
-    }
-
     public abstract String executableName();
 
     private static String getExtension() {
-        return isWindows() ? ".exe" : "";
+        return RedSystemProperties.isWindowsPlatform() ? ".exe" : "";
     }
-
-    private static boolean isWindows() {
-        return System.getProperty("os.name").toLowerCase().indexOf("win") >= 0;
-    }
-
 }
