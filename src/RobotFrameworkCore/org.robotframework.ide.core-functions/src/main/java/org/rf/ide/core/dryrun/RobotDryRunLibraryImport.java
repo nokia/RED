@@ -7,6 +7,7 @@ package org.rf.ide.core.dryrun;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -30,8 +31,12 @@ public class RobotDryRunLibraryImport {
 
     private DryRunLibraryType type;
 
-    public RobotDryRunLibraryImport(final String name, final List<String> args) {
-        this(name, "", "", args);
+    public RobotDryRunLibraryImport(final String name) {
+        this(name, "", "", new ArrayList<String>());
+    }
+    
+    public RobotDryRunLibraryImport(final String name, final String importerPath, final List<String> args) {
+        this(name, "", importerPath, args);
     }
 
     public RobotDryRunLibraryImport(final String name, final String sourcePath, final String importerPath, final List<String> args) {
