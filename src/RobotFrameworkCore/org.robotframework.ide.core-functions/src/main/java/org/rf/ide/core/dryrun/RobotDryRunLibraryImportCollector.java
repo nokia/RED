@@ -6,7 +6,6 @@
 package org.rf.ide.core.dryrun;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +41,7 @@ public class RobotDryRunLibraryImportCollector {
                     dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName, source, importer, args);
                 }
             } else {
-                dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName, args);
+                dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName, importer, args);
             }
             int index = importedLibraries.indexOf(dryRunLibraryImport);
             if (index < 0) {
@@ -62,8 +61,7 @@ public class RobotDryRunLibraryImportCollector {
             if (!libraryName.isEmpty()) {
                 final String failReason = extractFailReason(message);
                 resetCurrentLibraryImportWithFail();
-                final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName,
-                        new ArrayList<String>());
+                final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libraryName);
                 int libIndex = importedLibraries.indexOf(dryRunLibraryImport);
                 if (libIndex < 0) {
                     dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, failReason);
@@ -84,8 +82,7 @@ public class RobotDryRunLibraryImportCollector {
             final int endIndex = message.lastIndexOf("' does not exist");
             if (nameStartIndex > 0 && endIndex > nameStartIndex) {
                 final String libName = message.substring(nameStartIndex + nameStartTxt.length(), endIndex);
-                final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libName,
-                        new ArrayList<String>());
+                final RobotDryRunLibraryImport dryRunLibraryImport = new RobotDryRunLibraryImport(libName);
                 final String errorStartTxt = "Error in file '";
                 final int errorStartIndex = message.indexOf(errorStartTxt);
                 String importer = "";
