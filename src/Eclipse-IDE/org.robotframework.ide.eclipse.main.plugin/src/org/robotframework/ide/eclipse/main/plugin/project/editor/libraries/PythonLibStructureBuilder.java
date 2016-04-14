@@ -15,9 +15,11 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 
@@ -31,14 +33,18 @@ public class PythonLibStructureBuilder {
     
     private final RobotRuntimeEnvironment environment;
 
-    public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment) {
+    private final EnvironmentSearchPaths additionalSearchPaths;
+
+    public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config) {
         this.environment = environment;
+        this.additionalSearchPaths = config.createEnvironmentSearchPaths();
     }
 
     public Collection<PythonClass> provideEntriesFromFile(final String path, final Optional<String> moduleName)
             throws RobotEnvironmentException {
     
-        final List<String> classes = environment.getClassesDefinedInModule(new File(path), moduleName);
+        final List<String> classes = environment.getClassesDefinedInModule(new File(path), moduleName,
+                additionalSearchPaths);
         return newLinkedHashSet(transform(classes, new Function<String, PythonClass>() {
             @Override
             public PythonClass apply(final String name) {
