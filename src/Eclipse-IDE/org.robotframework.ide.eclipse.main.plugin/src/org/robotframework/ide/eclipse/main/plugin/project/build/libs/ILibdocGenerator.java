@@ -5,14 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
 interface ILibdocGenerator {
 
-    void generateLibdoc(RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException;
+    void generateLibdoc(RobotRuntimeEnvironment runtimeEnvironment, EnvironmentSearchPaths additionalPaths)
+            throws RobotEnvironmentException;
 
-    void generateLibdocForcibly(RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException;
+    void generateLibdocForcibly(RobotRuntimeEnvironment runtimeEnvironment, EnvironmentSearchPaths additionalPaths)
+            throws RobotEnvironmentException;
 
     String getMessage();
 

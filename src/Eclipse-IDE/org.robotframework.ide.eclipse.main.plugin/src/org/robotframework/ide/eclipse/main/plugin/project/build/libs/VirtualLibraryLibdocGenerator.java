@@ -9,6 +9,7 @@ import java.io.IOException;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
@@ -29,7 +30,8 @@ public class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
-    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException {
+    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
+            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         try {
             Files.copy(path.toFile(), targetSpecFile.getLocation().toFile());
         } catch (final IOException e) {
@@ -38,9 +40,10 @@ public class VirtualLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
-    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment) {
+    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment,
+            final EnvironmentSearchPaths additionalPaths) {
         try {
-            generateLibdoc(runtimeEnvironment);
+            generateLibdoc(runtimeEnvironment, additionalPaths);
         } catch (final RobotEnvironmentException e) {
             // nothing to do
         }

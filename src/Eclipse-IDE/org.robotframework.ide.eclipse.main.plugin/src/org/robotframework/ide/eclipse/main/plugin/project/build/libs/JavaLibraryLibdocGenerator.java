@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.libs;
 
 import org.eclipse.core.resources.IFile;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 
@@ -22,14 +23,20 @@ public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
     }
 
     @Override
-    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment) throws RobotEnvironmentException {
-        runtimeEnvironment.createLibdocForJavaLibrary(libName, jarPath, targetSpecFile.getLocation().toFile());
+    public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
+            final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
+        additionalPaths.addClassPath(jarPath);
+        runtimeEnvironment.createLibdocForJavaLibrary(libName, jarPath, additionalPaths,
+                targetSpecFile.getLocation().toFile());
     }
 
     @Override
-    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment)
+    public void generateLibdocForcibly(final RobotRuntimeEnvironment runtimeEnvironment,
+            final EnvironmentSearchPaths additionalPaths)
             throws RobotEnvironmentException {
-        runtimeEnvironment.createLibdocForJavaLibraryForcibly(libName, jarPath, targetSpecFile.getLocation().toFile());
+        additionalPaths.addClassPath(jarPath);
+        runtimeEnvironment.createLibdocForJavaLibraryForcibly(libName, jarPath, additionalPaths,
+                targetSpecFile.getLocation().toFile());
     }
 
     @Override
