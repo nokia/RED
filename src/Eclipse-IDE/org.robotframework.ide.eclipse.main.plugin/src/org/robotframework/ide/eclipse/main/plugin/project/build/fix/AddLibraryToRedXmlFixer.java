@@ -12,14 +12,16 @@ import java.util.Collection;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
-import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -27,7 +29,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
@@ -67,8 +68,6 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         private final RobotSuiteFile suiteFile;
 
-        private String libName;
-
         private final Collection<ReferencedLibrary> addedLibraries = new ArrayList<>();
 
         public AddLibraryProposal(final IMarker marker, final RobotSuiteFile suiteFile, final IFile externalFile,
@@ -80,7 +79,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
         @Override
         public boolean apply(final IFile externalFile, final RobotProjectConfig config)
                 throws ProposalApplyingException {
-            return isPath ? importLibraryByPath(config) : importLibraryByName(externalFile, config);
+            return isPath ? importLibraryByPath(config, pathOrName) : importLibraryByName(externalFile, config);
         }
 
         private boolean importLibraryByName(final IFile externalFile, final RobotProjectConfig config) {
@@ -89,42 +88,45 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             
             Optional<File> modulePath = Optional.absent();
             try {
-                modulePath = env.getModulePath(pathOrName);
-            } catch (final RobotEnvironmentException e) {
-                // that's fine
-            }
+                final EnvironmentSearchPaths searchPaths = config.createEnvironmentSearchPaths();
+                searchPaths.addClassPath(suiteFile.getFile().getParent().getLocation().toOSString());
+                modulePath = env.getModulePath(pathOrName, searchPaths);
+                if (!modulePath.isPresent()) {
+                    throw new RobotEnvironmentException("No path found");
+                }
+                if (modulePath.get().getAbsolutePath().endsWith(".jar")) {
+                    final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile,
+                            modulePath.get().getAbsolutePath());
+                    final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+                    addedLibraries.addAll(importer.importJavaLib(Display.getCurrent().getActiveShell(),
+                            suiteFile.getProject().getRuntimeEnvironment(), config, resolvedAbsPath.toString()));
 
-            if (modulePath.isPresent()) {
-                libName = pathOrName;
-            } else {
-                final String location = env.getInterpreter() == SuiteExecutor.Jython ? "PYTHONPATH/CLASSPATH"
-                        : "PYTHONPATH";
-                MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
-                        "Unable to locate '" + pathOrName + "' module. It seems that it is not contained"
-                                + " in " + location + " of " + env.getFile() + " python installation.");
+                    if (addedLibraries.isEmpty()) {
+                        throw new ProposalApplyingException("Unable to apply proposal");
+                    } else {
+                        for (final ReferencedLibrary addedLibrary : addedLibraries) {
+                            config.addReferencedLibrary(addedLibrary);
+                        }
+                        return true;
+                    }
+                } else {
+                    return importLibraryByPath(config, modulePath.get().getAbsolutePath());
+                }
+            } catch (final RobotEnvironmentException e) {
+                StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                        "Unable to import " + pathOrName + " library", e),
+                        StatusManager.SHOW);
                 return false;
             }
-            final Path path = new Path(modulePath.get().getPath());
-
-            final ReferencedLibrary newLibrary = new ReferencedLibrary();
-            final String fileExt = path.getFileExtension();
-            newLibrary.setType(fileExt != null && fileExt.equals("jar") ? LibraryType.JAVA.toString()
-                    : LibraryType.PYTHON.toString());
-            newLibrary.setName(libName);
-            newLibrary.setPath(path.toPortableString());
-            config.addReferencedLibrary(newLibrary);
-
-            addedLibraries.add(newLibrary);
-
-            return true;
         }
 
-        private boolean importLibraryByPath(final RobotProjectConfig config) {
-            if (pathOrName.endsWith("/") || pathOrName.endsWith(".py")) {
-                final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile, pathOrName);
+        private boolean importLibraryByPath(final RobotProjectConfig config, final String path) {
+            if (path.endsWith("/") || path.endsWith(".py")) {
+                final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile, path);
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+                final RobotProject project = suiteFile.getProject();
                 addedLibraries.addAll(importer.importPythonLib(Display.getCurrent().getActiveShell(),
-                        suiteFile.getProject().getRuntimeEnvironment(), resolvedAbsPath.toString()));
+                        project.getRuntimeEnvironment(), config, resolvedAbsPath.toString()));
 
                 if (addedLibraries.isEmpty()) {
                     throw new ProposalApplyingException("Unable to apply proposal");
@@ -136,7 +138,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                 }
             } else {
                 MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
-                        "The path '" + pathOrName + "' should point to either .py file or python module directory.");
+                        "The path '" + path + "' should point to either .py file or python module directory.");
                 return false;
             }
         }

@@ -281,7 +281,7 @@ public class LibrariesAutoDiscoverer {
     private void addPythonLibraryToProjectConfiguration(final RobotProjectConfig config,
             final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
-                robotProject.getRuntimeEnvironment());
+                robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig());
         Collection<PythonClass> pythonClasses = newArrayList();
         try {
             pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath(),
@@ -317,7 +317,8 @@ public class LibrariesAutoDiscoverer {
             final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
         Optional<File> modulePath = Optional.absent();
         try {
-            modulePath = robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName());
+            modulePath = robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(),
+                    config.createEnvironmentSearchPaths());
         } catch (final RobotEnvironmentException e1) {
             // that's fine
         }
@@ -337,7 +338,8 @@ public class LibrariesAutoDiscoverer {
 
     private void addJavaLibraryToProjectConfiguration(final RobotProjectConfig config,
             final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
-        final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(robotProject.getRuntimeEnvironment());
+        final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
+                robotProject.getRobotProjectConfig());
         List<JarClass> classesFromJar = newArrayList();
         try {
             classesFromJar = jarStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath());

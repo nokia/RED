@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 
 import java.io.File;
@@ -30,7 +31,10 @@ import javax.xml.bind.annotation.XmlValue;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+
+import com.google.common.base.Function;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "variableMappings", "libraries", "pythonPaths", "classPaths",
@@ -377,6 +381,11 @@ public class RobotProjectConfig {
         referencedVariableFiles.removeAll(selectedFiles);
     }
 
+    public EnvironmentSearchPaths createEnvironmentSearchPaths() {
+        return new EnvironmentSearchPaths(transform(getClassPath(), SearchPath.asString()),
+                transform(getPythonPath(), SearchPath.asString()));
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(version, executionEnvironment == null ? null : executionEnvironment.path);
@@ -718,6 +727,15 @@ public class RobotProjectConfig {
             searchPath.setPath(path);
             searchPath.setSystem(isSystem);
             return searchPath;
+        }
+
+        private static Function<SearchPath, String> asString() {
+            return new Function<SearchPath, String>() {
+                @Override
+                public String apply(final SearchPath path) {
+                    return path.getPath();
+                }
+            };
         }
 
         @XmlValue
