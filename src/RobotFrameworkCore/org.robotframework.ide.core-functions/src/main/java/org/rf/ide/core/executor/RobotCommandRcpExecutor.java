@@ -53,22 +53,30 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     private static final int CONNECTION_TIMEOUT = 30;
 
     private final String interpreterPath;
+    private final SuiteExecutor interpreterType;
 
     private final File scriptFile;
 
     private Process serverProcess;
+    private boolean isExternal = false;
 
     private XmlRpcClient client;
 
-    RobotCommandRcpExecutor(final String interpreterPath, final File scriptFile) {
+
+    RobotCommandRcpExecutor(final String interpreterPath, final SuiteExecutor interpreterType, final File scriptFile) {
         this.interpreterPath = interpreterPath;
+        this.interpreterType = interpreterType;
         this.scriptFile = scriptFile;
     }
 
     void waitForEstablishedConnection() {
         if (new File(interpreterPath).exists() && scriptFile.exists()) {
-            final int port = findFreePort();
-            serverProcess = createPythonServerProcess(interpreterPath, scriptFile, port);
+            isExternal = RedSystemProperties.shouldConnectToRunningServer();
+            final int port = isExternal ? RedSystemProperties.getPortOfRunningServer() : findFreePort();
+
+            if (!isExternal) {
+                serverProcess = createPythonServerProcess(interpreterPath, scriptFile, port);
+            }
             client = createClient(port);
             waitForConnectionToServer(CONNECTION_TIMEOUT);
         } else {
@@ -204,6 +212,10 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
         return serverProcess != null;
     }
 
+    boolean isExternal() {
+        return isExternal;
+    }
+
     void kill() {
         if (serverProcess != null) {
             serverProcess.destroy();
@@ -282,22 +294,31 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
 
     @Override
     public void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath) {
-        createLibdoc(resultFilePath, libName, libPath);
+        createLibdoc(resultFilePath, libName, libPath, new EnvironmentSearchPaths());
     }
 
     @Override
-    public void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath) {
-        createLibdoc(resultFilePath, libName, libPath);
+    public void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath,
+            final EnvironmentSearchPaths additionalPaths) {
+        createLibdoc(resultFilePath, libName, libPath, additionalPaths);
     }
 
     @Override
-    public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath) {
-        createLibdoc(resultFilePath, libName, libPath);
+    public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath,
+            final EnvironmentSearchPaths additionalPaths) {
+        createLibdoc(resultFilePath, libName, libPath, additionalPaths);
     }
 
-    private void createLibdoc(final String resultFilePath, final String libName, final String libPath) {
+    private void createLibdoc(final String resultFilePath, final String libName, final String libPath,
+            final EnvironmentSearchPaths paths) {
         try {
-            callRpcFunction("createLibdoc", resultFilePath, libName, libPath);
+            final List<String> pythonPaths = newArrayList(paths.getPythonPaths());
+            if (interpreterType == SuiteExecutor.Jython) {
+                pythonPaths.addAll(RedSystemProperties.getPythonPaths());
+            }
+            final List<String> classPaths = newArrayList(paths.getClassPaths());
+
+            callRpcFunction("createLibdoc", resultFilePath, libName, pythonPaths, classPaths);
         } catch (final XmlRpcException e) {
             final String additional = libPath.isEmpty() ? ""
                     : ". Library path '" + libPath + "', result file '" + resultFilePath + "'";
@@ -323,12 +344,13 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Optional<File> getModulePath(final String moduleName) {
+    public Optional<File> getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
         try {
-            final String path = (String) callRpcFunction("getModulePath", moduleName);
+            final String path = (String) callRpcFunction("getModulePath", moduleName,
+                    newArrayList(additionalPaths.getPythonPaths()), newArrayList(additionalPaths.getClassPaths()));
             return Optional.of(new File(path));
         } catch (final XmlRpcException e) {
-            throw new RobotEnvironmentException("Unable to path of '" + moduleName + "' module", e);
+            throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
         }
     }
 

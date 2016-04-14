@@ -5,6 +5,7 @@
 #
 # Author: Mateusz Marzec
 #
+from sys import __excepthook__
 
     
 class Logger(object):
@@ -76,9 +77,13 @@ def get_modules_search_paths():
 @logresult
 @encode_result_or_exception
 @logargs
-def get_module_path(modulename):
+def get_module_path(module_name, python_paths, class_paths):
     import red_modules
-    return red_modules.get_module_path(modulename)
+    import platform
+    
+    pythonpath_decorator = red_modules.call_with_temporary_pythonpaths(red_modules.get_module_path, python_paths)
+    __extend_classpath(class_paths)
+    return pythonpath_decorator(module_name)
 
 
 @logresult
@@ -139,22 +144,25 @@ def get_run_module_path():
 @logresult
 @encode_result_or_exception
 @logargs
-def create_libdoc(result_filepath, libname, libpath):
+def create_libdoc(result_filepath, libname, python_paths, class_paths):
     import robot
-    from robot import pythonpathsetter
-    from robot import libdoc
+    from red_modules import call_with_temporary_pythonpaths
+    from robot.libdoc import libdoc
+    import platform
 
-    if libpath.endswith('.jar'):
-        from classpath_updater import ClassPathUpdater
-        cp_updater = ClassPathUpdater()
-        cp_updater.add_file(libpath) 
+    __extend_classpath(class_paths)
+        
+    pythonpath_decorator = call_with_temporary_pythonpaths(libdoc, python_paths + class_paths)
+    pythonpath_decorator(libname, result_filepath, format='XML')
 
-    if libpath != '':
-        pythonpathsetter.add_path(libpath)
-    robot.libdoc.libdoc(libname, result_filepath, format='XML')
-    if libpath != '':
-        pythonpathsetter.remove_path(libpath)
+def __extend_classpath(class_paths):
+    import platform
 
+    if platform.python_implementation() == 'Jython':
+        for class_path in class_paths:
+            from classpath_updater import ClassPathUpdater
+            cp_updater = ClassPathUpdater()
+            cp_updater.add_file(class_path) 
 
 def __shutdown_server_when_parent_process_becomes_unavailable(server):
     import sys
