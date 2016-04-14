@@ -89,6 +89,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             Optional<File> modulePath = Optional.absent();
             try {
                 final EnvironmentSearchPaths searchPaths = config.createEnvironmentSearchPaths();
+                searchPaths.addPythonPath(suiteFile.getFile().getParent().getLocation().toOSString());
                 searchPaths.addClassPath(suiteFile.getFile().getParent().getLocation().toOSString());
                 modulePath = env.getModulePath(pathOrName, searchPaths);
                 if (!modulePath.isPresent()) {
