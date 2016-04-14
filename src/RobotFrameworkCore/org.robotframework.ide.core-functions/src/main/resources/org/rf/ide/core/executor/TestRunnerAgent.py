@@ -342,7 +342,7 @@ class TestRunnerAgent:
     def library_import(self, name, attributes):
         # equals org.python.core.ClasspathPyImporter.PYCLASSPATH_PREFIX
         import platform
-        if 'Jython' in platform.python_implementation() and '__pyclasspath__' in attributes['source']:
+        if ('Jython' in platform.python_implementation()) and (attributes['source'] and '__pyclasspath__' in attributes['source']):
             import org.python.core.imp as jimp
             res = attributes['source'].split('__pyclasspath__')[1].replace(os.sep, '')
             attributes['source'] = jimp.getSyspathJavaLoader().getResources(res).nextElement()
