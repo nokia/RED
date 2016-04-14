@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/13/16 7:54 PM
+Save-Time: 4/14/16 11:45 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -86,8 +86,10 @@ get-tab-folder -index 1 | get-tab-item "lib_with_variable.robot" | click
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 
     | click
 replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
-	get-view Console | get-text-viewer | get-property text 
-	    | equals [format "Command:.* -P a:/!@#\$%%path/new.file.txt:b:not existing:%s/RobotProject/libs:\"escpaed\\\\\\\\text\":correct\ttab\t/folder:C:\\\\folder\\\\folder2.*\n"  
+
+}
+get-view Console | get-text-viewer | get-property text 
+	    | equals "Command:.* -m .* -P .* --listener.*\n"  
 	    + "Suite Executor: Robot Framework .*\n"
 	    + "==============================================================================\n"
 	    + "RobotProject                                                                  \n"
@@ -106,9 +108,9 @@ replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -
 	    + "==============================================================================\n"
 	    + "Output:  .*output.xml\n"
 	    + "Log:     .*log.html\n"
-	    + "Report:  .*report.html" $new_ws_path]| verify-true
+	    + "Report:  .*report.html"| verify-true
 	    
-}
+
 //add more items to path    
 get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
 get-editor "RobotProject/red.xml" | get-section Paths | get-table | get-item "...add new search path" | double-click
