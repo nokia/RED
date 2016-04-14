@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +21,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
@@ -39,8 +39,11 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
     private final String interpreterPath;
 
-    RobotCommandDirectExecutor(final String interpreterPath) {
+    private final SuiteExecutor interpreterType;
+
+    RobotCommandDirectExecutor(final String interpreterPath, final SuiteExecutor interpreterType) {
         this.interpreterPath = interpreterPath;
+        this.interpreterType = interpreterType;
     }
 
     @Override
@@ -49,7 +52,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             final String normalizedPath = filePath.replace('\\', '/');
 
             final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_variables.py");
-            final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-variables",
+            final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-variables",
                     normalizedPath);
             cmdLine.addAll(fileArguments);
 
@@ -77,7 +80,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_variables.py");
             if (scriptFile != null) {
-                final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-global");
+                final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-global");
                 final StringBuilder jsonEncodedOutput = new StringBuilder();
                 final ILineHandler linesHandler = new ILineHandler() {
 
@@ -103,7 +106,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     public List<String> getStandardLibrariesNames() {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_libraries.py");
-            final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-names");
+            final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-names");
             final List<String> stdLibs = new ArrayList<>();
             final ILineHandler linesHandler = new ILineHandler() {
                 @Override
@@ -122,7 +125,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     public String getStandardLibraryPath(final String libraryName) {
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_libraries.py");
-            final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-path",
+            final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-path",
                     libraryName);
             final StringBuilder path = new StringBuilder();
             final ILineHandler linesHandler = new ILineHandler() {
@@ -149,7 +152,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             }
         };
         try {
-            RobotRuntimeEnvironment.runExternalProcess(Arrays.asList(interpreterPath, "-m", "robot.run", "--version"),
+            RobotRuntimeEnvironment.runExternalProcess(newArrayList(interpreterPath, "-m", "robot.run", "--version"),
                     linesHandler);
             final String version = versionOutput.toString();
             return version.startsWith("Robot Framework") ? version.trim() : null;
@@ -160,32 +163,35 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
 
     @Override
     public void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath) {
-        final List<String> cmdLine = Arrays.asList(interpreterPath, "-m", "robot.libdoc", "-f", "XML", libName,
+        final List<String> cmdLine = newArrayList(interpreterPath, "-m", "robot.libdoc", "-f", "XML", libName,
                 resultFilePath);
         runLibdoc(libName, cmdLine);
     }
 
     @Override
-    public void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath) {
-        final List<String> cmdLine = Arrays.asList(interpreterPath, "-m", "robot.libdoc", "-f", "XML", "-P", libPath,
-                libName, resultFilePath);
-        runLibdoc(libName, cmdLine);
+    public void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath,
+            final EnvironmentSearchPaths additionalPaths) {
+        createLibdocForThirdPartyLib(resultFilePath, libName, libPath, additionalPaths);
     }
 
     @Override
-    public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath) {
-        final String cpSeparator = RobotRuntimeEnvironment.isWindows() ? ";" : ":";
+    public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath,
+            final EnvironmentSearchPaths additionalPaths) {
+        createLibdocForThirdPartyLib(resultFilePath, libName, libPath, additionalPaths);
+    }
 
-        final List<String> wholeClasspath = newArrayList(".", libPath);
-        final String sysPath = System.getenv("CLASSPATH");
-        if (sysPath != null && !sysPath.isEmpty()) {
-            wholeClasspath.add(sysPath);
+    private void createLibdocForThirdPartyLib(final String resultFilePath, final String libName, final String libPath,
+            final EnvironmentSearchPaths additionalPaths) {
+        final List<String> additions = newArrayList(libPath);
+        additions.addAll(additionalPaths.getPythonPaths());
+        additions.addAll(additionalPaths.getClassPaths());
+        if (interpreterType == SuiteExecutor.Jython) {
+            additions.addAll(RedSystemProperties.getPythonPaths());
         }
 
-        final String classPath = "\"" + Joiner.on(cpSeparator).join(wholeClasspath) + "\"";
-
-        final List<String> cmdLine = Arrays.asList(interpreterPath, "-J-cp", classPath, "-m", "robot.libdoc", "-f",
-                "XML", libName, resultFilePath);
+        final String paths = RobotRuntimeEnvironment.wrapArgumentIfNeeded(Joiner.on(':').join(additions));
+        final List<String> cmdLine = newArrayList(interpreterPath, "-m", "robot.libdoc", "-f", "XML", "-P", paths,
+                libName, resultFilePath);
         runLibdoc(libName, cmdLine);
     }
 
@@ -222,7 +228,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             };
 
             final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_modules.py");
-            final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-pythonpath");
+            final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath(), "-pythonpath");
             final int returnCode = RobotRuntimeEnvironment.runExternalProcess(cmdLine, handler);
             if (returnCode != 0) {
                 throw new RobotEnvironmentException("Unable to obtain modules search paths");
@@ -247,22 +253,38 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public Optional<File> getModulePath(final String moduleName) {
-        final StringBuilder pathOutput = new StringBuilder();
+    public Optional<File> getModulePath(final String moduleName, final EnvironmentSearchPaths additionalPaths) {
+        final List<String> lines = new ArrayList<>();
         final ILineHandler linesHandler = new ILineHandler() {
-
             @Override
             public void processLine(final String line) {
-                pathOutput.append(line);
+                lines.add(line);
             }
         };
         try {
             final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_modules.py");
-            final List<String> cmdLine = Arrays.asList(interpreterPath, scriptFile.getAbsolutePath(), "-modulepath",
-                    moduleName);
+            
+            final List<String> cmdLine = newArrayList(interpreterPath);
+            if (interpreterType == SuiteExecutor.Jython) {
+                cmdLine.add("-J-cp");
+                cmdLine.add(Joiner.on(RedSystemProperties.getPathsSeparator()).join(additionalPaths.getClassPaths()));
+            }
+            cmdLine.add(scriptFile.getAbsolutePath());
+            cmdLine.add("-modulename");
+            cmdLine.add(moduleName);
+            cmdLine.add(RobotRuntimeEnvironment.wrapArgumentIfNeeded(Joiner.on(";").join(additionalPaths.getPythonPaths())));
 
             RobotRuntimeEnvironment.runExternalProcess(cmdLine, linesHandler);
-            return Optional.of(new File(pathOutput.toString()));
+            if (lines.size() == 1) {
+                // there should be a single line with path only
+                return Optional.of(new File(lines.get(0).toString()));
+            } else {
+                final String indent = Strings.repeat(" ", 12);
+                final String exception = indent + Joiner.on("\n" + indent).join(lines);
+                throw new RobotEnvironmentException(
+                        "RED python session problem. Following exception has been thrown by python service:\n"
+                                + exception);
+            }
         } catch (final IOException e) {
             throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
         }

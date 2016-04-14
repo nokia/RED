@@ -71,33 +71,38 @@ class PythonInterpretersCommandExecutors {
     }
 
     synchronized RobotCommandExecutor getRobotCommandExecutor(final PythonInstallationDirectory interpreterPath) {
+        final SuiteExecutor interpreter = interpreterPath.getInterpreter();
         final String pathAsName = interpreterPath.toPath()
-                .resolve(interpreterPath.getInterpreter().executableName())
+                .resolve(interpreter.executableName())
                 .toAbsolutePath()
                 .toString();
         
+        if (RedSystemProperties.shouldUseDirectExecutor()) {
+            return new RobotCommandDirectExecutor(pathAsName, interpreter);
+        }
+
         if (xmlRpcServerScriptFile == null) {
-            return new RobotCommandDirectExecutor(pathAsName);
+            return new RobotCommandDirectExecutor(pathAsName, interpreter);
         }
 
         RobotCommandRcpExecutor executor = executors.get(pathAsName);
-        if (executor != null && executor.isAlive()) {
+        if (executor != null && (executor.isAlive() || executor.isExternal())) {
             return executor;
         } else if (executor != null) {
             //executor.kill();
             executors.remove(pathAsName);
         }
         try {
-            executor = new RobotCommandRcpExecutor(pathAsName, xmlRpcServerScriptFile);
+            executor = new RobotCommandRcpExecutor(pathAsName, interpreter, xmlRpcServerScriptFile);
             executor.waitForEstablishedConnection();
-            if (executor.isAlive()) {
+            if (executor.isAlive() || executor.isExternal()) {
                 executors.put(pathAsName, executor);
                 return executor;
             } else {
-                return new RobotCommandDirectExecutor(pathAsName);
+                return new RobotCommandDirectExecutor(pathAsName, interpreter);
             }
         } catch (final RobotCommandExecutorException e) {
-            return new RobotCommandDirectExecutor(pathAsName);
+            return new RobotCommandDirectExecutor(pathAsName, interpreter);
         }
     }
 
@@ -106,6 +111,6 @@ class PythonInterpretersCommandExecutors {
                 .resolve(interpreterPath.getInterpreter().executableName())
                 .toAbsolutePath()
                 .toString();
-        return new RobotCommandDirectExecutor(pathAsName);
+        return new RobotCommandDirectExecutor(pathAsName, interpreterPath.getInterpreter());
     }
 }

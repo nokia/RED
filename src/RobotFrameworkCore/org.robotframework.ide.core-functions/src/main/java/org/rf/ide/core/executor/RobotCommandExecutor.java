@@ -19,7 +19,7 @@ interface RobotCommandExecutor {
 
     List<File> getModulesSearchPaths();
 
-    Optional<File> getModulePath(String moduleName);
+    Optional<File> getModulePath(String moduleName, EnvironmentSearchPaths additionalPaths);
 
     Map<String, Object> getVariables(final String filePath, final List<String> fileArguments);
 
@@ -33,7 +33,9 @@ interface RobotCommandExecutor {
 
     void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath);
 
-    void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath);
+    void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath,
+            EnvironmentSearchPaths additionalPaths);
 
-    void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath);
+    void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath,
+            EnvironmentSearchPaths additionalPaths);
 }
