@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/7/16 4:23 PM
+Save-Time: 4/15/16 4:29 PM
 Testcase-Type: ecl
 Verifications: _ase_IGBvEeW-9bGOK0urnw
 
@@ -323,6 +323,7 @@ get-editor "red.xml" | get-text-viewer | get-property text
     | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
     + "<projectConfiguration>\n"
     + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
     + "    <pythonpath/>\n"
     + "    <classpath/>\n"
     + "    <excludedForValidation/>\n"
