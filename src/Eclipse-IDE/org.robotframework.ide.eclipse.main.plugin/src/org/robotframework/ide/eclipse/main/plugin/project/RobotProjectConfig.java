@@ -37,10 +37,10 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import com.google.common.base.Function;
 
 @XmlRootElement(name = "projectConfiguration")
-@XmlType(propOrder = { "version", "executionEnvironment", "variableMappings", "libraries", "pythonPaths", "classPaths",
-        "remoteLocations", "referencedVariableFiles", "excludedPath", "isValidatedFileSizeCheckingEnabled",
-        "validatedFileMaxSize", "isReferencedLibrariesAutoReloadEnabled", "isReferencedLibrariesAutoDiscoveringEnabled",
-        "isLibrariesAutoDiscoveringSummaryWindowEnabled" })
+@XmlType(propOrder = { "version", "executionEnvironment", "pathsRelativityPoint", "variableMappings", "libraries",
+        "pythonPaths", "classPaths", "remoteLocations", "referencedVariableFiles", "excludedPath",
+        "isValidatedFileSizeCheckingEnabled", "validatedFileMaxSize", "isReferencedLibrariesAutoReloadEnabled",
+        "isReferencedLibrariesAutoDiscoveringEnabled", "isLibrariesAutoDiscoveringSummaryWindowEnabled" })
 @XmlAccessorType(XmlAccessType.FIELD)
 public class RobotProjectConfig {
 
@@ -55,6 +55,9 @@ public class RobotProjectConfig {
 
     @XmlElement(name = "robotExecEnvironment", required = false)
     private ExecutionEnvironment executionEnvironment;
+
+    @XmlElement(name = "relativeTo", required = true)
+    private RelativityPoint pathsRelativityPoint = new RelativityPoint();
 
     @XmlElement(name = "referencedLibrary", required = false)
     private List<ReferencedLibrary> libraries = new ArrayList<>();
@@ -121,6 +124,14 @@ public class RobotProjectConfig {
 
     public ExecutionEnvironment getExecutionEnvironment() {
         return executionEnvironment;
+    }
+
+    public void setRelativityPoint(final RelativityPoint relativityPoint) {
+        this.pathsRelativityPoint = relativityPoint;
+    }
+
+    public RelativityPoint getRelativityPoint() {
+        return pathsRelativityPoint;
     }
 
     public void setLibraries(final List<ReferencedLibrary> libraries) {
@@ -774,5 +785,34 @@ public class RobotProjectConfig {
         public int hashCode() {
             return Objects.hash(path);
         }
+    }
+
+    @XmlRootElement(name = "relativeTo")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class RelativityPoint {
+
+        @XmlValue
+        private RelativeTo relativeTo;
+
+        public RelativityPoint() {
+            this(RelativeTo.WORKSPACE);
+        }
+
+        public RelativityPoint(final RelativeTo relativeTo) {
+            this.relativeTo = relativeTo;
+        }
+
+        public RelativeTo getRelativeTo() {
+            return relativeTo;
+        }
+
+        public void setRelativeTo(final RelativeTo relativeTo) {
+            this.relativeTo = relativeTo;
+        }
+    }
+
+    public enum RelativeTo {
+        WORKSPACE,
+        PROJECT
     }
 }
