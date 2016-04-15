@@ -169,18 +169,8 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath,
-            final EnvironmentSearchPaths additionalPaths) {
-        createLibdocForThirdPartyLib(resultFilePath, libName, libPath, additionalPaths);
-    }
-
-    @Override
-    public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath,
-            final EnvironmentSearchPaths additionalPaths) {
-        createLibdocForThirdPartyLib(resultFilePath, libName, libPath, additionalPaths);
-    }
-
-    private void createLibdocForThirdPartyLib(final String resultFilePath, final String libName, final String libPath,
+    public void createLibdocForThirdPartyLibrary(final String resultFilePath, final String libName,
+            final String libPath,
             final EnvironmentSearchPaths additionalPaths) {
         final List<String> additions = newArrayList(libPath);
         additions.addAll(additionalPaths.getPythonPaths());
@@ -188,7 +178,7 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
         if (interpreterType == SuiteExecutor.Jython) {
             additions.addAll(RedSystemProperties.getPythonPaths());
         }
-
+        
         final String paths = RobotRuntimeEnvironment.wrapArgumentIfNeeded(Joiner.on(':').join(additions));
         final List<String> cmdLine = newArrayList(interpreterPath, "-m", "robot.libdoc", "-f", "XML", "-P", paths,
                 libName, resultFilePath);

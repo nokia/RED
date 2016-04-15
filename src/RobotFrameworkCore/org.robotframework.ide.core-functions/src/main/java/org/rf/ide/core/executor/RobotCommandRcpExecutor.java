@@ -298,13 +298,8 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     }
 
     @Override
-    public void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath,
-            final EnvironmentSearchPaths additionalPaths) {
-        createLibdoc(resultFilePath, libName, libPath, additionalPaths);
-    }
-
-    @Override
-    public void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath,
+    public void createLibdocForThirdPartyLibrary(final String resultFilePath, final String libName,
+            final String libPath,
             final EnvironmentSearchPaths additionalPaths) {
         createLibdoc(resultFilePath, libName, libPath, additionalPaths);
     }
