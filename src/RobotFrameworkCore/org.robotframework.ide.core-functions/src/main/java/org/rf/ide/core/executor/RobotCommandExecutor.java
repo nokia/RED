@@ -33,9 +33,6 @@ interface RobotCommandExecutor {
 
     void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath);
 
-    void createLibdocForPythonLibrary(final String resultFilePath, final String libName, final String libPath,
-            EnvironmentSearchPaths additionalPaths);
-
-    void createLibdocForJavaLibrary(final String resultFilePath, final String libName, final String libPath,
+    void createLibdocForThirdPartyLibrary(final String resultFilePath, final String libName, final String libPath,
             EnvironmentSearchPaths additionalPaths);
 }
