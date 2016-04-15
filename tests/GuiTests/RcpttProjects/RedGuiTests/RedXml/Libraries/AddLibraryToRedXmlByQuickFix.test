@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/24/16 2:41 PM
+Save-Time: 4/15/16 1:51 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -103,15 +103,7 @@ get-view "Project Explorer" | get-tree
     | get-item "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)" 
     | get-property "getItems().TreeItem[0].getText()" | equals News | verify-true
 
-////open libspec
-//get-view "Project Explorer" | get-tree 
-//    | select "RobotProject/Robot Referenced libraries/only_function RobotProject \\(1\\)/News" | double-click
-//get-window -class KeywordDocumentationPopup | get-canvas -after [get-label News] -index 1 | get-property text 
-//    | equals "Arguments\r\n"
-//    + "This is only simple function\r\n" | verify-true    
-
-
-
+//use QF on file name (now path where suite is is added to PYTHONPATH)
 get-tab-folder -index 1 | get-tab-item "Script.robot" | click
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 5 28
@@ -126,16 +118,38 @@ with [get-editor "Script.robot" | get-text-viewer] {
     get-menu "Quick Fix" | click
     wait 500
 }
+
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'here_is_class' and add to configuration" | click -default
-with [get-window "Library import problem"] {
-    get-property title | equals "Library import problem" | verify-true
-    get-label "Unable to locate .*" 
-        | get-property caption 
-        | equals "Unable to locate 'here_is_class' module. It seems that it is not contained in PYTHONPATH of .* python installation." 
-        | verify-true
+get-window "Select library class" | get-table | select "here_is_class"
+with [get-window "Select library class" | get-table] {
+    get-property itemCount | equals 3 | verify-true
+    get-property "getItems().TableItem[0].getText()" | equals "here_is_class" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "here_is_class.Cat" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "here_is_class.Dog" | verify-true
 }
-get-window "Library import problem" | get-button OK | click
+
+//select second option
+get-window "Select library class" | get-table | select "here_is_class.Dog" | click -default
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "Script.robot" | verify-true
+    get-property "pages[1]" | equals "*RobotProject/red.xml" | verify-true
+    get-property activePage | equals "*RobotProject/red.xml" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+
+//remove "here_is_class.Cat from red.xml
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "here_is_class.Dog - RobotProject" | key-type Del
+    key-type "M1+s"
+}
+
+//clean
+get-tab-folder -index 1 | get-tab-item "Script.robot" | click
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+//add extension to file
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 6 25
     type-text ".py"
@@ -145,6 +159,8 @@ with [get-editor "Script.robot" | get-text-viewer] {
     get-menu "Quick Fix" | click
     wait 500
 }
+
+//add Cat to red.xml
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'here_is_class.py' and add to configuration" | click -default
 get-window "Select library class" | get-table | select "here_is_class.Cat"
@@ -160,6 +176,7 @@ with [get-window "Select library class"] {
     get-button OK | click
 }
 
+//save 
 get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" 
     | key-type "M1+s"
 
@@ -167,6 +184,8 @@ try -times 8 -delay 1000 -command{
 	get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | get-property childCount 
 	    | equals 3 | verify-true
 }
+
+//check libspeck
 get-view "Project Explorer" | get-tree 
     | get-item "RobotProject/Robot Referenced libraries/here_is_class.Cat RobotProject \\(1\\)" 
     | get-property "getItems().length" | equals 1 | verify-true
@@ -189,6 +208,8 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries" | get-property "getText()" | equals "Robot Referenced libraries" 
         | verify-true
 }
+
+//add here_is_class.Dog
 get-tab-folder -index 1 | get-tab-item "Script.robot" | click
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 6 28
@@ -205,10 +226,17 @@ with [get-editor "Script.robot" | get-text-viewer] {
     get-menu "Quick Fix" | click
     wait 300
 }
+//check error
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Discover 'here_is_class.Dog' and add to configuration" | click -default
-get-window "Library import problem" | get-button OK | click
+    | select "Discover 'here_is_class.Dog' and add to configuration"
+exec-with-options {
+    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | click -default
+    get-window "Problem Occurred" | get-label "Unable to import here_is_class.Dog library" | get-property caption 
+        | equals "Unable to import here_is_class.Dog library" | verify-true
+    get-window "Problem Occurred" | get-button OK | click
+} -allowStatusDialog    
 
+//add python extension
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 7 29
     key-type BackSpace -times 3
@@ -217,15 +245,16 @@ with [get-editor "Script.robot" | get-text-viewer] {
     wait 1000
     set-caret-pos 7 21
     get-menu "Quick Fix" | click
+    wait 300
 }
-wait 300
+//add DOg
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'here_is_class.py' and add to configuration" | click -default
 with [get-window "Select library class"] {
     get-table | select "here_is_class.Dog"
     get-button OK | click
 }
-
+//check red.xml
 try -times 8 -delay 1000 -command{
 	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
 	    get-property "getItems().TableItem[0].getText()" | equals "empty - RobotProject/empty_file" | verify-true
@@ -236,6 +265,8 @@ try -times 8 -delay 1000 -command{
 	}
 
 }
+
+//add Dog
 get-button "Save \((Ctrl|M1)\+S\)" | click
 get-tab-folder -index 1 | get-tab-item "Script.robot" | click
 with [get-editor "Script.robot" | get-text-viewer] {
