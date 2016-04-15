@@ -28,7 +28,9 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -142,8 +144,7 @@ class PathsFormFragment implements ISectionFormFragment {
 
     private void createColumns(final TableViewer viewer, final ViewerConfiguration config) {
         ViewerColumnsFactory.newColumn("")
-                .withWidth(400)
-                .withMinWidth(100)
+                .withWidth(300)
                 .labelsProvidedBy(new PathsLabelProvider(config.getVariableName()))
                 .editingEnabledOnlyWhen(editorInput.isEditable())
                 .editingSupportedBy(new PathsEditingSupport(viewer, elementsCreator(config.getPathAddingStrategy()),
@@ -203,6 +204,28 @@ class PathsFormFragment implements ISectionFormFragment {
     private void setInput() {
         pythonPathViewer.setInput(editorInput.getProjectConfiguration().getPythonPath());
         classPathViewer.setInput(editorInput.getProjectConfiguration().getClassPath());
+
+        adjustColumnWidth(pythonPathViewer.getTable());
+        adjustColumnWidth(classPathViewer.getTable());
+    }
+
+    private void adjustColumnWidth(final Table table) {
+        final int totalTableWidth = table.getSize().x;
+
+        final TableColumn column = table.getColumn(0);
+        column.pack();
+        final int columnWidth = column.getWidth();
+        column.setWidth(columnWidth + 10);
+
+        final int scrollbarWidth = getScrollBarWidth(table);
+        final int borderWidth = table.getBorderWidth();
+        final int widthToOccupy = totalTableWidth - (scrollbarWidth + 2 * borderWidth);
+        column.setWidth(Math.max(columnWidth + 10, widthToOccupy));
+    }
+
+    private int getScrollBarWidth(final Table table) {
+        final ScrollBar verticalBar = table.getVerticalBar();
+        return verticalBar == null || !verticalBar.isVisible() ? 0 : verticalBar.getSize().x;
     }
 
     @Inject
@@ -247,6 +270,7 @@ class PathsFormFragment implements ISectionFormFragment {
         if (editorInput.getProjectConfiguration().getPythonPath().contains(newPath)) {
             setDirty(true);
             pythonPathViewer.refresh();
+            adjustColumnWidth(pythonPathViewer.getTable());
         }
     }
 
@@ -257,6 +281,7 @@ class PathsFormFragment implements ISectionFormFragment {
         if (editorInput.getProjectConfiguration().getPythonPath() == affectedPaths) {
             setDirty(true);
             pythonPathViewer.refresh();
+            adjustColumnWidth(pythonPathViewer.getTable());
         }
     }
 
@@ -267,6 +292,7 @@ class PathsFormFragment implements ISectionFormFragment {
         if (editorInput.getProjectConfiguration().getClassPath().contains(newPath)) {
             setDirty(true);
             classPathViewer.refresh();
+            adjustColumnWidth(classPathViewer.getTable());
         }
     }
 
@@ -277,6 +303,7 @@ class PathsFormFragment implements ISectionFormFragment {
         if (editorInput.getProjectConfiguration().getClassPath() == affectedPaths) {
             setDirty(true);
             classPathViewer.refresh();
+            adjustColumnWidth(classPathViewer.getTable());
         }
     }
 
