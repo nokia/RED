@@ -113,4 +113,4 @@ if original_path.endswith('.py'):
     to_print = extend_pythonpath.get_module_combinations(to_print, extend_pythonpath.get_module_name_by_path(original_path))
 
 if len(to_print) > 0:
-    print '\n'.join(to_print)
+    print('\n'.join(to_print))
