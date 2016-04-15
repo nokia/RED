@@ -42,28 +42,6 @@ def get_run_module_path():
     import robot
     return robot.__file__
 
-def __add_to_pythonpath(paths):
-    added_paths = []
-    for path in paths:
-        if not path in sys.path:
-            added_paths.append(path)
-            sys.path.append(path)
-    return added_paths
-
-def __remove_from_pythonpath(paths):
-    for path in paths:
-        if path in sys.path:
-            sys.path.remove(path)
-            
-def call_with_temporary_pythonpaths(func, additional_paths):
-    def inner(*args, **kwargs):
-        added = []
-        try:
-            added = __add_to_pythonpath(additional_paths)
-            return func(*args, **kwargs)
-        finally: 
-            __remove_from_pythonpath(added)
-    return inner
 
 import sys
 if __name__ == '__main__':

@@ -80,10 +80,16 @@ def get_modules_search_paths():
 def get_module_path(module_name, python_paths, class_paths):
     import red_modules
     import platform
-    
-    pythonpath_decorator = red_modules.call_with_temporary_pythonpaths(red_modules.get_module_path, python_paths)
+    from robot import pythonpathsetter
+
     __extend_classpath(class_paths)
-    return pythonpath_decorator(module_name)
+    
+    for path in python_paths + class_paths:
+        pythonpathsetter.add_path(path)    
+    module_path = red_modules.get_module_path(module_name)
+    for path in python_paths + class_paths:
+        pythonpathsetter.remove_path(path)    
+    return module_path
 
 
 @logresult
@@ -146,14 +152,16 @@ def get_run_module_path():
 @logargs
 def create_libdoc(result_filepath, libname, python_paths, class_paths):
     import robot
-    from red_modules import call_with_temporary_pythonpaths
+    from robot import pythonpathsetter
     from robot.libdoc import libdoc
-    import platform
 
     __extend_classpath(class_paths)
         
-    pythonpath_decorator = call_with_temporary_pythonpaths(libdoc, python_paths + class_paths)
-    pythonpath_decorator(libname, result_filepath, format='XML')
+    for path in python_paths + class_paths:
+        pythonpathsetter.add_path(path)    
+    libdoc(libname, result_filepath, format='XML')
+    for path in python_paths + class_paths:
+        pythonpathsetter.remove_path(path)    
 
 def __extend_classpath(class_paths):
     import platform
