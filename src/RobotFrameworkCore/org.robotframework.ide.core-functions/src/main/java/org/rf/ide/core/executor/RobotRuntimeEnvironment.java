@@ -391,39 +391,21 @@ public class RobotRuntimeEnvironment {
         }
     }
 
-    public void createLibdocForPythonLibrary(final String libName, final String libPath,
+    public void createLibdocForThirdPartyLibrary(final String libName, final String libPath,
             final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForPythonLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
+            executor.createLibdocForThirdPartyLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
         }
     }
 
-    public void createLibdocForPythonLibraryForcibly(final String libName, final String libPath,
+    public void createLibdocForThirdPartyLibraryForcibly(final String libName, final String libPath,
             final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
         if (hasRobotInstalled()) {
             final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
                     .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForPythonLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
-        }
-    }
-
-    public void createLibdocForJavaLibrary(final String libName, final String jarPath,
-            final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
-        if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForJavaLibrary(outputFile.getAbsolutePath(), libName, jarPath, additionalPaths);
-        }
-    }
-
-    public void createLibdocForJavaLibraryForcibly(final String libName, final String jarPath,
-            final EnvironmentSearchPaths additionalPaths, final File outputFile) throws RobotEnvironmentException {
-        if (hasRobotInstalled() && ((PythonInstallationDirectory) location).interpreter == SuiteExecutor.Jython) {
-            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
-                    .getDirectRobotCommandExecutor((PythonInstallationDirectory) location);
-            executor.createLibdocForJavaLibrary(outputFile.getAbsolutePath(), libName, jarPath, additionalPaths);
+            executor.createLibdocForThirdPartyLibrary(outputFile.getAbsolutePath(), libName, libPath, additionalPaths);
         }
     }
 
