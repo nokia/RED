@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.SubMonitor;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
@@ -122,7 +123,9 @@ public class LibrariesBuilder {
         libdocGenerators.addAll(getStandardLibrariesToRecreate(runtimeEnvironment, libspecsFolder));
         libdocGenerators.addAll(getReferencedVirtualLibrariesToRecreate(configuration, libspecsFolder));
         libdocGenerators.addAll(getReferencedPythonLibrariesToRecreate(configuration, libspecsFolder));
-        libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
+        if (runtimeEnvironment.getInterpreter() == SuiteExecutor.Jython) {
+            libdocGenerators.addAll(getReferencedJavaLibrariesToRecreate(configuration, libspecsFolder));
+        }
         libdocGenerators.addAll(getRemoteLibrariesToRecreate(configuration, libspecsFolder));
 
         monitor.setWorkRemaining(libdocGenerators.size());
