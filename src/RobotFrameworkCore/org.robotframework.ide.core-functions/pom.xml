@@ -11,6 +11,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<endorsed.dir>${project.build.directory}/endorsed</endorsed.dir>
 		<jdk.version>1.7</jdk.version>
+		<pmd.file>../../PMD/pegasus-pmd.xml</pmd.file>
 	</properties>
 
 	<reporting>
@@ -63,7 +64,7 @@
 						<excludeRoot>target/generated-sources/stubs</excludeRoot>
 					</excludeRoots>
 					<rulesets>
-						<ruleset>../../PMD/pegasus-pmd.xml</ruleset>
+						<ruleset>${pmd.file}</ruleset>
 					</rulesets>
 				</configuration>
 			</plugin>
@@ -74,6 +75,11 @@
 				<configuration>
 					<!-- excludes>**/model/**/*</excludes -->
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.5.201505241946</version>
 			</plugin>
 		</plugins>
 	</reporting>
@@ -190,6 +196,38 @@
 					<skipTests>${skip.unit.tests}</skipTests>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>0.7.5.201505241946</version>
+				<configuration>
+					<destFile>${basedir}/target/coverage-reports/jacoco-unit.exec</destFile>
+					<dataFile>${basedir}/target/coverage-reports/jacoco-unit.exec</dataFile>
+				</configuration>
+				<executions>
+					<execution>
+						<id>jacoco-initialize</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>jacoco-site</id>
+						<phase>package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -293,6 +331,6 @@
 			<artifactId>annotations</artifactId>
 			<version>2.0.1</version>
 			<scope>provided</scope>
-		</dependency>		
+		</dependency>
 	</dependencies>
 </project>
