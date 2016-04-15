@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.general;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
@@ -27,9 +29,12 @@ import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
@@ -48,6 +53,8 @@ import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnv
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPreferencesPage;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RelativeTo;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RelativityPoint;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
@@ -77,6 +84,8 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
     private Button sourceButton;
 
+    private Combo relativityCombo;
+
     TableViewer getViewer() {
         return viewer;
     }
@@ -93,13 +102,14 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
 
         final Composite sectionInternal = toolkit.createComposite(section);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(sectionInternal);
-        GridLayoutFactory.fillDefaults().applyTo(sectionInternal);
+        GridLayoutFactory.fillDefaults().extendedMargins(0, 0, 0, 10).applyTo(sectionInternal);
         section.setClient(sectionInternal);
 
         createCurrentFrameworkInfo(sectionInternal);
         createSeparator(sectionInternal);
         createSourceButton(sectionInternal);
         createViewer(sectionInternal);
+        createRelativityCombo(sectionInternal);
     }
 
     private void createCurrentFrameworkInfo(final Composite parent) {
@@ -219,6 +229,32 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         };
     }
 
+    private void createRelativityCombo(final Composite sectionInternal) {
+        final Label label = toolkit.createLabel(sectionInternal,
+                "Relative paths used in red.xml configuration are relative to:", SWT.WRAP);
+        GridDataFactory.fillDefaults().grab(true, false).indent(0, 10).applyTo(label);
+        relativityCombo = new Combo(sectionInternal, SWT.DROP_DOWN | SWT.READ_ONLY);
+        relativityCombo.setItems(new String[] { RelativeTo.WORKSPACE.toString(), RelativeTo.PROJECT.toString() });
+        GridDataFactory.fillDefaults().applyTo(relativityCombo);
+
+        relativityCombo.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(final ModifyEvent e) {
+                final RobotProjectConfig config = editorInput.getProjectConfiguration();
+
+                final RelativeTo oldRelativeTo = config.getRelativityPoint().getRelativeTo();
+                final RelativeTo newRelativeTo = RelativeTo
+                        .valueOf(relativityCombo.getItem(relativityCombo.getSelectionIndex()));
+
+                if (oldRelativeTo != newRelativeTo) {
+                    setDirty(true);
+                    config.setRelativityPoint(new RelativityPoint(newRelativeTo));
+                }
+            }
+        });
+    }
+
     @Override
     public void setFocus() {
         viewer.getTable().getParent().setFocus();
@@ -240,6 +276,13 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         currentFramework.setText("", false, false);
         sourceButton.setEnabled(false);
         viewer.getTable().setEnabled(false);
+        relativityCombo.setEnabled(false);
+
+        final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
+        final int indexToSelect = newArrayList(relativityCombo.getItems())
+                .indexOf(configuration.getRelativityPoint().getRelativeTo().toString());
+        relativityCombo.select(indexToSelect);
+        sourceButton.setSelection(!configuration.usesPreferences());
     }
 
     @Inject
@@ -255,10 +298,9 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         if (viewer.getTable() == null || viewer.getTable().isDisposed()) {
             return;
         }
-        final boolean isUsingPrefs = configuration.usesPreferences();
 
+        final boolean isUsingPrefs = configuration.usesPreferences();
         sourceButton.setEnabled(isEditable);
-        sourceButton.setSelection(!isUsingPrefs);
 
         viewer.setInput(allEnvironments);
         if (env != null) {
@@ -266,6 +308,8 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
         }
         viewer.getTable().setEnabled(isEditable && !isUsingPrefs);
         viewer.refresh();
+
+        relativityCombo.setEnabled(isEditable);
 
         if (env == null) {
             currentFramework.setText(createCurrentFrameworkText("unknown"), true, true);
