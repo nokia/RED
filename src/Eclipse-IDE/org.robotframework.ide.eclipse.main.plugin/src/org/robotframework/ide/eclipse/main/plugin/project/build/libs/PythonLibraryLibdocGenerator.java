@@ -31,7 +31,7 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         final File libFile = new File(libPath);
         final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         additionalPaths.addPythonPath(additionalLocation);
-        runtimeEnvironment.createLibdocForPythonLibrary(libName, additionalLocation, additionalPaths,
+        runtimeEnvironment.createLibdocForThirdPartyLibrary(libName, additionalLocation, additionalPaths,
                 targetSpecFile.getLocation().toFile());
     }
 
@@ -42,7 +42,7 @@ public class PythonLibraryLibdocGenerator implements ILibdocGenerator {
         final File libFile = new File(libPath);
         final String additionalLocation = libFile.isFile() ? libFile.getParent() : extractLibParent();
         additionalPaths.addPythonPath(additionalLocation);
-        runtimeEnvironment.createLibdocForPythonLibraryForcibly(libName, additionalLocation, additionalPaths,
+        runtimeEnvironment.createLibdocForThirdPartyLibraryForcibly(libName, additionalLocation, additionalPaths,
                 targetSpecFile.getLocation().toFile());
     }
 

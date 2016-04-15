@@ -26,7 +26,7 @@ public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
     public void generateLibdoc(final RobotRuntimeEnvironment runtimeEnvironment,
             final EnvironmentSearchPaths additionalPaths) throws RobotEnvironmentException {
         additionalPaths.addClassPath(jarPath);
-        runtimeEnvironment.createLibdocForJavaLibrary(libName, jarPath, additionalPaths,
+        runtimeEnvironment.createLibdocForThirdPartyLibrary(libName, jarPath, additionalPaths,
                 targetSpecFile.getLocation().toFile());
     }
 
@@ -35,7 +35,7 @@ public class JavaLibraryLibdocGenerator implements ILibdocGenerator {
             final EnvironmentSearchPaths additionalPaths)
             throws RobotEnvironmentException {
         additionalPaths.addClassPath(jarPath);
-        runtimeEnvironment.createLibdocForJavaLibraryForcibly(libName, jarPath, additionalPaths,
+        runtimeEnvironment.createLibdocForThirdPartyLibraryForcibly(libName, jarPath, additionalPaths,
                 targetSpecFile.getLocation().toFile());
     }
 
