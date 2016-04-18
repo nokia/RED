@@ -6,6 +6,7 @@
 package org.rf.ide.core.dryrun;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +34,9 @@ public class RobotDryRunOutputParser implements ILineHandler {
     
     private IDryRunStartSuiteHandler startSuiteHandler;
 
-    public RobotDryRunOutputParser(final Set<String> standardLibrariesNames) {
+    public RobotDryRunOutputParser() {
         this.mapper = new ObjectMapper();
         this.parsedLine = new HashMap<String, Object>();
-        dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(standardLibrariesNames);
     }
 
     @SuppressWarnings("unchecked")
@@ -55,20 +55,24 @@ public class RobotDryRunOutputParser implements ILineHandler {
             final String source = (String) details.get("source");
             final List<String> args = (List<String>) details.get("args");
 
-            dryRunLibraryImportCollector.collectFromLibraryImportEvent(libraryName, importer, source, args);
+            if (dryRunLibraryImportCollector != null) {
+                dryRunLibraryImportCollector.collectFromLibraryImportEvent(libraryName, importer, source, args);
+            }
             
         } else if (parsedLine.containsKey(MESSAGE_EVENT_NAME)) {
             final List<Object> messageList = (List<Object>) parsedLine.get(MESSAGE_EVENT_NAME);
             final Map<String, String> details = (Map<String, String>) messageList.get(0);
             final String messageLevel = details.get("level");
 
-            if (messageLevel != null && messageLevel.equalsIgnoreCase("FAIL")) {
-                String failMessage = details.get("message");
-                dryRunLibraryImportCollector.collectFromFailMessageEvent(failMessage);
+            if (dryRunLibraryImportCollector != null && messageLevel != null) {
+                if (messageLevel.equalsIgnoreCase("FAIL")) {
+                    String failMessage = details.get("message");
+                    dryRunLibraryImportCollector.collectFromFailMessageEvent(failMessage);
 
-            } else if (messageLevel != null && messageLevel.equalsIgnoreCase("ERROR")) {
-                String errorMessage = details.get("message");
-                dryRunLibraryImportCollector.collectFromErrorMessageEvent(errorMessage);
+                } else if (messageLevel.equalsIgnoreCase("ERROR")) {
+                    String errorMessage = details.get("message");
+                    dryRunLibraryImportCollector.collectFromErrorMessageEvent(errorMessage);
+                }
             }
             
         } else if (parsedLine.containsKey(START_SUITE_EVENT_NAME)) {
@@ -81,11 +85,15 @@ public class RobotDryRunOutputParser implements ILineHandler {
     }
 
     public List<RobotDryRunLibraryImport> getImportedLibraries() {
-        return dryRunLibraryImportCollector.getImportedLibraries();
+        return dryRunLibraryImportCollector != null ? dryRunLibraryImportCollector.getImportedLibraries()
+                : new ArrayList<RobotDryRunLibraryImport>();
     }
 
     public void setStartSuiteHandler(final IDryRunStartSuiteHandler startSuiteHandler) {
         this.startSuiteHandler = startSuiteHandler;
     }
 
+    public void setupRobotDryRunLibraryImportCollector(final Set<String> standardLibrariesNames) {
+        dryRunLibraryImportCollector = new RobotDryRunLibraryImportCollector(standardLibrariesNames);
+    }
 }

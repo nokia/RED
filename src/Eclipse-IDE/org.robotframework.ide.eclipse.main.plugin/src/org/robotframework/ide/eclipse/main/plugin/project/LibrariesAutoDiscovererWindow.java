@@ -132,8 +132,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             public void selectionChanged(final SelectionChangedEvent event) {
                 final Object selection = ((TreeSelection) event.getSelection()).getFirstElement();
                 if (selection != null) {
-                    if (selection instanceof String) {
-                        detailsText.setText((String) selection);
+                    if (selection instanceof DryRunLibraryImportChildElement) {
+                        detailsText.setText(selection.toString());
                     } else if (selection instanceof RobotDryRunLibraryImport) {
                         detailsText.setText(convertDryRunLibraryImportToText(selection));
                     } else {
@@ -158,15 +158,15 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         detailsText.setAlwaysShowScrollBars(false);
     }
 
-    @SuppressWarnings("unchecked")
     private String convertDryRunLibraryImportToText(final Object selection) {
         final StringBuilder libraryImportTxtBuilder = new StringBuilder("");
         for (final Object child : extractDryRunLibraryImportChildren((RobotDryRunLibraryImport) selection)) {
-            if (child instanceof String) {
+            if (child instanceof DryRunLibraryImportChildElement) {
                 libraryImportTxtBuilder.append(child + "\n");
-            } else if (child instanceof List<?>) {
-                libraryImportTxtBuilder.append(IMPORTERS_ELEMENT_NAME + ":\n");
-                for (final String listChild : (List<String>) child) {
+            } else if (child instanceof DryRunLibraryImportListChildElement) {
+                libraryImportTxtBuilder.append(((DryRunLibraryImportListChildElement) child).getName() + "\n");
+                for (final DryRunLibraryImportChildElement listChild : ((DryRunLibraryImportListChildElement) child)
+                        .getList()) {
                     libraryImportTxtBuilder.append(listChild + "\n");
                 }
             }
@@ -177,22 +177,23 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     private List<Object> extractDryRunLibraryImportChildren(final RobotDryRunLibraryImport libraryImport) {
         final List<Object> children = new ArrayList<>();
         if (libraryImport.getStatus() != null) {
-            children.add(STATUS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getStatus().getMessage());
+            children.add(
+                    new DryRunLibraryImportChildElement(STATUS_ELEMENT_NAME, libraryImport.getStatus().getMessage()));
         }
         if (libraryImport.getSourcePath() != null && !libraryImport.getSourcePath().isEmpty()) {
-            children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + libraryImport.getSourcePath());
+            children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, libraryImport.getSourcePath()));
         } else {
-            children.add(SOURCE_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + "Unknown");
+            children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, "Unknown"));
         }
         final List<String> importersPaths = libraryImport.getImportersPaths();
         if (importersPaths.size() == 1) {
-            children.add(IMPORTERS_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + importersPaths.get(0));
+            children.add(new DryRunLibraryImportChildElement(IMPORTERS_ELEMENT_NAME, importersPaths.get(0)));
         } else {
-            children.add(importersPaths);
+            children.add(new DryRunLibraryImportListChildElement(IMPORTERS_ELEMENT_NAME, importersPaths));
         }
         final String additionalInfo = libraryImport.getAdditionalInfo();
         if (additionalInfo != null && !additionalInfo.isEmpty()) {
-            children.add(ADDITIONAL_INFO_ELEMENT_NAME + ELEMENT_SEPARATOR + " " + additionalInfo);
+            children.add(new DryRunLibraryImportChildElement(ADDITIONAL_INFO_ELEMENT_NAME, additionalInfo));
         }
         return children;
     }
@@ -210,10 +211,10 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 final List<Object> children = extractDryRunLibraryImportChildren(
                         (RobotDryRunLibraryImport) parentElement);
                 return children.toArray(new Object[children.size()]);
-            } else if (parentElement instanceof List<?>) {
-                @SuppressWarnings("unchecked")
-                final List<String> list = (List<String>) parentElement;
-                return list.toArray(new String[list.size()]);
+            } else if (parentElement instanceof DryRunLibraryImportListChildElement) {
+                final List<DryRunLibraryImportChildElement> childElementList = ((DryRunLibraryImportListChildElement) parentElement)
+                        .getList();
+                return childElementList.toArray(new DryRunLibraryImportChildElement[childElementList.size()]);
             }
             return null;
         }
@@ -225,7 +226,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         @Override
         public boolean hasChildren(final Object element) {
-            if (element instanceof String) {
+            if (element instanceof DryRunLibraryImportChildElement) {
                 return false;
             }
             return true;
@@ -252,33 +253,25 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             if (element instanceof RobotDryRunLibraryImport) {
                 final String name = ((RobotDryRunLibraryImport) element).getName().replaceAll("\\n", "/n");
                 label = new StyledString(name);
-            } else if (element instanceof String) {
-                String text = (String) element;
-                String[] textSplit = text.split(ELEMENT_SEPARATOR);
-                if (textSplit[0].length() == 1) {
-                    label.append(text);
-                } else {
-                    StyledString firstElement = new StyledString(textSplit[0], new Styler() {
+            } else if (element instanceof DryRunLibraryImportChildElement) {
+                final DryRunLibraryImportChildElement libraryImportChildElement = (DryRunLibraryImportChildElement) element;
+                final String childElementName = libraryImportChildElement.getName();
+                if (childElementName != null && !childElementName.isEmpty()) {
+                    label.append(new StyledString(childElementName, new Styler() {
 
                         @Override
                         public void applyStyles(final TextStyle textStyle) {
                             textStyle.font = getFont(textStyle.font, SWT.BOLD);
                         }
-                    });
-                    label.append(firstElement);
-                    if (textSplit.length > 1) {
-                        StringBuilder secElement = new StringBuilder("");
-                        for (int i = 1; i < textSplit.length; i++) {
-                            secElement.append(textSplit[i]);
-                            if (i < textSplit.length - 1) {
-                                secElement.append(ELEMENT_SEPARATOR);
-                            }
-                        }
-                        label.append(" " + ELEMENT_SEPARATOR + secElement.toString());
-                    }
+                    }));
+                    label.append(" ");
                 }
-            } else if (element instanceof List<?>) {
-                label = new StyledString(IMPORTERS_ELEMENT_NAME + ELEMENT_SEPARATOR, new Styler() {
+                final String childElementValue = libraryImportChildElement.getValue();
+                if (childElementValue != null && !childElementValue.isEmpty()) {
+                    label.append(childElementValue);
+                }
+            } else if (element instanceof DryRunLibraryImportListChildElement) {
+                label = new StyledString(((DryRunLibraryImportListChildElement) element).getName(), new Styler() {
 
                     @Override
                     public void applyStyles(final TextStyle textStyle) {
@@ -307,7 +300,8 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 } else if (libraryImport.getStatus() == DryRunLibraryImportStatus.ALREADY_EXISTING) {
                     return ImagesManager.getImage(RedImages.getBigWarningImage());
                 }
-            } else if (element instanceof String || element instanceof List<?>) {
+            } else if (element instanceof DryRunLibraryImportChildElement
+                    || element instanceof DryRunLibraryImportListChildElement) {
                 return ImagesManager.getImage(RedImages.getElementImage());
             }
             return null;
@@ -338,5 +332,69 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
             return 0;
         }
+    }
+
+    private static class DryRunLibraryImportChildElement {
+
+        private String name;
+
+        private String value;
+
+        public DryRunLibraryImportChildElement(final String name, final String value) {
+            if (name != null) {
+                this.name = name + ELEMENT_SEPARATOR;
+            }
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            if (value == null && name != null) {
+                return name;
+            }
+            if (value != null && name == null) {
+                return value;
+            }
+            if (value == null && name == null) {
+                return "";
+            }
+            return name + " " + value;
+        }
+
+    }
+
+    private static class DryRunLibraryImportListChildElement {
+
+        private String name;
+
+        private List<DryRunLibraryImportChildElement> list = new ArrayList<>();
+
+        public DryRunLibraryImportListChildElement(final String name, final List<String> list) {
+            if (name != null) {
+                this.name = name + ELEMENT_SEPARATOR;
+            }
+            if (list != null) {
+                for (final String listElement : list) {
+                    this.list.add(new DryRunLibraryImportChildElement(null, listElement));
+                }
+            }
+        }
+
+        public List<DryRunLibraryImportChildElement> getList() {
+            return list;
+        }
+
+        public String getName() {
+            return name;
+        }
+
     }
 }
