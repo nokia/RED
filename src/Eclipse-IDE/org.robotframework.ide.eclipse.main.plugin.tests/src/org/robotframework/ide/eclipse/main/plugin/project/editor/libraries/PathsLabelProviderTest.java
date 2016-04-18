@@ -6,17 +6,37 @@
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
 
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
+import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.viewers.ElementAddingToken;
 
+@RunWith(MockitoJUnitRunner.class)
 public class PathsLabelProviderTest {
 
-    private final PathsLabelProvider provider = new PathsLabelProvider("VAR");
+    @Mock
+    private RedProjectEditorInput editorInput;
+
+    private PathsLabelProvider provider;
+
+    @Before
+    public void before() {
+        provider = new PathsLabelProvider("VAR", editorInput);
+    }
 
     @Test
     public void whenSearchPathIsGiven_nullIsReturnedAsItsImage() {
@@ -32,9 +52,12 @@ public class PathsLabelProviderTest {
 
     @Test
     public void whenCustomSearchPathIsGiven_onlyNonDecoratedPathIsReturnedAsLabel() {
-        final StyledString styledLabel = provider.getStyledText(SearchPath.create("path"));
+        final SearchPath searchPath = SearchPath.create("path");
+        when(editorInput.getProblemsFor(searchPath)).thenReturn(new ArrayList<RedXmlProblem>());
+
+        final StyledString styledLabel = provider.getStyledText(searchPath);
         assertThat(styledLabel.getString()).isEqualTo("path");
-        assertThat(styledLabel.getStyleRanges()).isEmpty();
+        assertThat(styledLabel.getStyleRanges()).containsExactly(new StyleRange(0, 4, null, null, SWT.NORMAL));
     }
 
     @Test
