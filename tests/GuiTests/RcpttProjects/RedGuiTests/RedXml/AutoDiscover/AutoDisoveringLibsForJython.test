@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dOy-EAJFEea9vai2oGByIg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/15/16 7:37 PM
+Save-Time: 4/18/16 11:15 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -62,7 +62,7 @@ with [get-window "Discovering libraries summary" | get-tree] {
     get-item MathOperator | get-property "getItems().TreeItem[0].getText()" 
         | equals "Status : Added to project configuration" | verify-true
     get-item MathOperator | get-property "getItems().TreeItem[1].getText()" 
-        | equals [format "Source : %s/jython_simple_project/RED_TEST_JavaLib.jar" [ replace -input $RED_workspace_path -old "\\" -new "/"]]| verify-true
+        | equals [format "Source : %s\jython_simple_project\RED_TEST_JavaLib.jar" $RED_workspace_path]| verify-true
     get-item MathOperator | get-property "getItems().TreeItem[2].getText()" 
         | equals [os-specific [format "Importers : %s\\jython_simple_project\\test.robot" $RED_workspace_path]  [format "Importers : %s/jython_simple_project/test.robot" $RED_workspace_path]] 
         | verify-true
@@ -83,9 +83,9 @@ get-window "Discovering libraries summary" | get-editbox -after [get-label "Disc
     | get-property text | equals [os-specific [format "Importers: %s\\jython_simple_project\\test.robot" $RED_workspace_path]  [format "Importers: %s/jython_simple_project/test.robot" $RED_workspace_path]]| verify-true
     
 get-window "Discovering libraries summary" | get-tree 
-    | select "MathOperator/Source : .*jython_simple_project\\/RED_TEST_JavaLib.jar"
+    | select "MathOperator/Source : .*RED_TEST_JavaLib.jar"
 get-window "Discovering libraries summary" | get-editbox -after [get-label "Discovered libraries (1):"] 
-    | get-property text | equals [format "Source: %s/jython_simple_project/RED_TEST_JavaLib.jar" [ replace -input $RED_workspace_path -old "\\" -new "/"]]| verify-true
+    | get-property text | equals [format "Source: %s%sjython_simple_project%sRED_TEST_JavaLib.jar" $RED_workspace_path $sys_sep $sys_sep]| verify-true
     
 get-window "Discovering libraries summary" | get-tree | select MathOperator
 get-window "Discovering libraries summary" | get-tree | get-item MathOperator | get-property childCount | equals 3 
@@ -173,7 +173,7 @@ with [get-window "Discovering libraries summary"] {
         get-item MathOperator | get-property "getItems().TreeItem[1].getText()" | equals "Source : Unknown" 
             | verify-true
         get-item MathOperator | get-property "getItems().TreeItem[2].getText()" 
-            | equals [format "Importers : %s\\jython_simple_project\\test.robot" $RED_workspace_path]  | verify-true
+            | equals [format "Importers : %s%sjython_simple_project%stest.robot" $RED_workspace_path $sys_sep $sys_sep] | verify-true
 //        get-item MathOperator | get-property "getItems().TreeItem[3].getText()" 
 //            | equals "Additional info : (u\"Importing test library 'MathOperator' failed: ImportError: No module named MathOperator\n"
 //            + "Traceback (most recent call last):\n"
