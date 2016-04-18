@@ -17,16 +17,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveLibrar
 public enum ConfigFileProblem implements IProblemCause {
     UNREACHABLE_HOST {
         @Override
-        public boolean hasResolution() {
-            return false;
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList();
-        }
-
-        @Override
         public String getProblemDescription() {
             return "Unreachable remote server %s";
         }
@@ -35,6 +25,11 @@ public enum ConfigFileProblem implements IProblemCause {
         @Override
         public Severity getSeverity() {
             return Severity.WARNING;
+        }
+
+        @Override
+        public boolean hasResolution() {
+            return true;
         }
 
         @Override
@@ -49,6 +44,11 @@ public enum ConfigFileProblem implements IProblemCause {
     },
     MISSING_LIBRARY_FILE {
         @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
@@ -59,6 +59,11 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     MISSING_VARIABLE_FILE {
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
@@ -71,11 +76,6 @@ public enum ConfigFileProblem implements IProblemCause {
     },
     MISSING_EXCLUDED_FOLDER {
         @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return new ArrayList<>();
-        }
-
-        @Override
         public Severity getSeverity() {
             return Severity.WARNING;
         }
@@ -86,6 +86,11 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     JAVA_LIB_NOT_A_JAR_FILE {
+        @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
@@ -98,6 +103,11 @@ public enum ConfigFileProblem implements IProblemCause {
     },
     JAVA_LIB_MISSING_CLASS {
         @Override
+        public boolean hasResolution() {
+            return true;
+        }
+
+        @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             return newArrayList(new RemoveLibraryFromConfigurationFileFixer());
         }
@@ -108,28 +118,12 @@ public enum ConfigFileProblem implements IProblemCause {
         }
     },
     JAVA_LIB_IN_NON_JAVA_ENV {
-
-        @Override
-        public boolean hasResolution() {
-            return false;
-        }
-
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return newArrayList();
-        }
-
         @Override
         public String getProblemDescription() {
             return "Java library '%s' requires Jython, but %s environment is in use by this project";
         }
     },
     USELESS_FOLDER_EXCLUSION {
-        @Override
-        public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
-            return new ArrayList<>();
-        }
-
         @Override
         public Severity getSeverity() {
             return Severity.WARNING;
@@ -138,6 +132,18 @@ public enum ConfigFileProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "The path '%s' is already excluded by '%s'";
+        }
+    },
+    MISSING_SEARCH_PATH {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "The path '%s' points to non-existing location";
         }
     };
 
@@ -150,7 +156,12 @@ public enum ConfigFileProblem implements IProblemCause {
 
     @Override
     public boolean hasResolution() {
-        return true;
+        return false;
+    }
+
+    @Override
+    public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
+        return new ArrayList<>();
     }
 
     @Override

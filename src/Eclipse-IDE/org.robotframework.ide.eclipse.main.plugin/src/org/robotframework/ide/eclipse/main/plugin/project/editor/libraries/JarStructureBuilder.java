@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
@@ -30,10 +31,15 @@ public class JarStructureBuilder {
     private final RobotRuntimeEnvironment environment;
 
     private final RobotProjectConfig config;
+
+    private final IProject project;
     
-    public JarStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config) {
+    public JarStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config,
+            final IProject project) {
         this.environment = environment;
         this.config = config;
+        this.project = project;
+
     }
 
     public List<JarClass> provideEntriesFromFile(final String path) {
@@ -68,7 +74,8 @@ public class JarStructureBuilder {
     }
     
     private List<JarClass> providePythonEntriesFromJarFile(final File file) {
-        final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config);
+        final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
+                project);
         final Collection<PythonClass> entriesFromFile = pythonLibStructureBuilder
                 .provideEntriesFromFile(file.getPath(), Optional. <String>absent());
 

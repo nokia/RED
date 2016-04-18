@@ -24,7 +24,6 @@ import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 
 class VariableFilesLabelProvider extends RedCommonLabelProvider {
@@ -92,12 +91,7 @@ class VariableFilesLabelProvider extends RedCommonLabelProvider {
             final ReferencedVariableFile varFile = (ReferencedVariableFile) element;
 
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(varFile);
-            final String descriptions = Joiner.on('\n').join(transform(problems, new Function<RedXmlProblem, String>() {
-                @Override
-                public String apply(final RedXmlProblem problem) {
-                    return problem.getDescription();
-                }
-            }));
+            final String descriptions = Joiner.on('\n').join(transform(problems, RedXmlProblem.toDescriptions()));
             return descriptions.isEmpty() ? null : descriptions;
         }
         return null;

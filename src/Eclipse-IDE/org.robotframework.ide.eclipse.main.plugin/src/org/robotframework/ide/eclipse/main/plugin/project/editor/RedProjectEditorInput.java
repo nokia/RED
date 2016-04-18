@@ -21,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause.Severity;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
 public class RedProjectEditorInput {
@@ -95,6 +96,15 @@ public class RedProjectEditorInput {
 
         public static boolean hasErrors(final Collection<RedXmlProblem> problems) {
             return hasProblemsOfSeverity(problems, Severity.ERROR);
+        }
+
+        public static Function<RedXmlProblem, String> toDescriptions() {
+            return new Function<RedProjectEditorInput.RedXmlProblem, String>() {
+                @Override
+                public String apply(final RedXmlProblem problem) {
+                    return problem.description;
+                }
+            };
         }
 
         private static boolean hasProblemsOfSeverity(final Collection<RedXmlProblem> problems,
