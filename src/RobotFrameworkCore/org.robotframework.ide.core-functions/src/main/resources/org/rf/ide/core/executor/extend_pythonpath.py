@@ -45,7 +45,10 @@ def get_module_name_by_path(start_path):
     module_name = start_path
     path_to_module = find_module_path(start_path)
     if (path_to_module != start_path):
-        path_to_module = start_path.replace(path_to_module + os.sep, '', 1)
+        path_to_replace = path_to_module + os.sep
+        if path_to_module.endswith(os.sep):
+            path_to_replace = path_to_module
+        path_to_module = start_path.replace(path_to_replace, '', 1)
         module_name = path_to_module.replace(os.sep, '.')
         if (os.path.isfile(start_path)):
             module_name = module_name[:-3]
