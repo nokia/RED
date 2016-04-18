@@ -64,13 +64,13 @@ public class LibrariesAutoDiscoverer {
 
     private IEventBroker eventBroker;
 
-    private RobotProject robotProject;
+    private final RobotProject robotProject;
 
-    private List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
+    private final List<IResource> suiteFiles = Collections.synchronizedList(new ArrayList<IResource>());
 
-    private RobotDryRunOutputParser dryRunOutputParser;
+    private final RobotDryRunOutputParser dryRunOutputParser;
 
-    private RobotDryRunHandler dryRunHandler;
+    private final RobotDryRunHandler dryRunHandler;
 
     private boolean isSummaryWindowEnabled;
 
@@ -136,7 +136,7 @@ public class LibrariesAutoDiscoverer {
 
     private void startDiscovering(final IProgressMonitor monitor) throws InvocationTargetException {
 
-        SubMonitor subMonitor = SubMonitor.convert(monitor);
+        final SubMonitor subMonitor = SubMonitor.convert(monitor);
         subMonitor.subTask("Preparing Robot dry run execution...");
         subMonitor.setWorkRemaining(3);
 
@@ -165,7 +165,7 @@ public class LibrariesAutoDiscoverer {
 
     private RunCommandLine createDryRunCommandLine(final LibrariesSourcesCollector librariesSourcesCollector)
             throws InvocationTargetException {
-        DryRunTargetsCollector dryRunTargetsCollector = new DryRunTargetsCollector();
+        final DryRunTargetsCollector dryRunTargetsCollector = new DryRunTargetsCollector();
         dryRunTargetsCollector.collectSuiteNamesAndAdditionalProjectsLocations();
 
         RunCommandLine runCommandLine = null;
@@ -175,7 +175,7 @@ public class LibrariesAutoDiscoverer {
                     librariesSourcesCollector.getPythonpathLocations(),
                     librariesSourcesCollector.getClasspathLocations(),
                     dryRunTargetsCollector.getAdditionalProjectsLocations());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new InvocationTargetException(e);
         }
         return runCommandLine;
@@ -211,7 +211,7 @@ public class LibrariesAutoDiscoverer {
             final List<RobotDryRunLibraryImport> dryRunLibrariesToAdd = filterExistingReferencedLibraries(
                     importedLibraries, config);
 
-            SubMonitor subMonitor = SubMonitor.convert(monitor);
+            final SubMonitor subMonitor = SubMonitor.convert(monitor);
             subMonitor.setWorkRemaining(dryRunLibrariesToAdd.size() + 1);
             final List<ReferencedLibrary> addedLibs = new ArrayList<>();
             for (final RobotDryRunLibraryImport libraryImport : dryRunLibrariesToAdd) {
@@ -240,7 +240,7 @@ public class LibrariesAutoDiscoverer {
         final RedProjectConfigEventData<List<ReferencedLibrary>> eventData = new RedProjectConfigEventData<>(
                 robotProject.getConfigurationFile(), addedLibs);
         if (eventBroker == null) {
-            eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+            eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         }
         if (eventBroker != null) {
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
@@ -258,7 +258,7 @@ public class LibrariesAutoDiscoverer {
     }
 
     private List<RobotDryRunLibraryImport> filterExistingReferencedLibraries(
-            final List<RobotDryRunLibraryImport> importedLibraries, RobotProjectConfig config) {
+            final List<RobotDryRunLibraryImport> importedLibraries, final RobotProjectConfig config) {
         final List<RobotDryRunLibraryImport> dryRunLibrariesToAdd = newArrayList();
         if (config != null) {
             final List<String> currentLibrariesNames = newArrayList();
@@ -281,12 +281,12 @@ public class LibrariesAutoDiscoverer {
     private void addPythonLibraryToProjectConfiguration(final RobotProjectConfig config,
             final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(
-                robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig());
+                robotProject.getRuntimeEnvironment(), robotProject.getRobotProjectConfig(), robotProject.getProject());
         Collection<PythonClass> pythonClasses = newArrayList();
         try {
             pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath(),
                     Optional.of(libraryImport.getName()));
-        } catch (RobotEnvironmentException e) {
+        } catch (final RobotEnvironmentException e) {
             if(!isPythonLibraryRecognizedByName(config, libraryImport, addedLibs)) {
                 libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
             }
@@ -298,7 +298,7 @@ public class LibrariesAutoDiscoverer {
             libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
                     "RED was unable to find classes inside '" + libraryImport.getSourcePath() + "' module.");
         } else {
-            for (PythonClass pythonClass : pythonClasses) {
+            for (final PythonClass pythonClass : pythonClasses) {
                 if (pythonClass.getQualifiedName().equalsIgnoreCase(libraryImport.getName())) {
                     librariesToAdd.add(pythonClass.toReferencedLibrary(libraryImport.getSourcePath()));
                 }
@@ -318,7 +318,7 @@ public class LibrariesAutoDiscoverer {
         Optional<File> modulePath = Optional.absent();
         try {
             modulePath = robotProject.getRuntimeEnvironment().getModulePath(libraryImport.getName(),
-                    config.createEnvironmentSearchPaths());
+                    config.createEnvironmentSearchPaths(robotProject.getProject()));
         } catch (final RobotEnvironmentException e1) {
             // that's fine
         }
@@ -339,11 +339,11 @@ public class LibrariesAutoDiscoverer {
     private void addJavaLibraryToProjectConfiguration(final RobotProjectConfig config,
             final RobotDryRunLibraryImport libraryImport, final List<ReferencedLibrary> addedLibs) {
         final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
-                robotProject.getRobotProjectConfig());
+                robotProject.getRobotProjectConfig(), robotProject.getProject());
         List<JarClass> classesFromJar = newArrayList();
         try {
             classesFromJar = jarStructureBuilder.provideEntriesFromFile(libraryImport.getSourcePath());
-        } catch (RobotEnvironmentException e) {
+        } catch (final RobotEnvironmentException e) {
             libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
             return;
         }
@@ -352,7 +352,7 @@ public class LibrariesAutoDiscoverer {
             libraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED,
                     "RED was unable to find classes inside '" + libraryImport.getSourcePath() + "' module.");
         } else {
-            for (JarClass jarClass : classesFromJar) {
+            for (final JarClass jarClass : classesFromJar) {
                 if (jarClass.getQualifiedName().equalsIgnoreCase(libraryImport.getName())) {
                     librariesToAdd.add(jarClass.toReferencedLibrary(libraryImport.getSourcePath()));
                 }
@@ -407,9 +407,9 @@ public class LibrariesAutoDiscoverer {
     
     private class DryRunTargetsCollector {
 
-        private List<String> suiteNames = newArrayList();
+        private final List<String> suiteNames = newArrayList();
 
-        private List<String> additionalProjectsLocations = newArrayList();
+        private final List<String> additionalProjectsLocations = newArrayList();
 
         public void collectSuiteNamesAndAdditionalProjectsLocations() {
             final List<String> resourcesPaths = newArrayList();

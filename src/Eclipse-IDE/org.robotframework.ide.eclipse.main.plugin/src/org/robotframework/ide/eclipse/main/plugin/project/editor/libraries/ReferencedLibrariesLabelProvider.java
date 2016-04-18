@@ -21,7 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEdito
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 
 class ReferencedLibrariesLabelProvider extends RedCommonLabelProvider {
@@ -89,14 +88,9 @@ class ReferencedLibrariesLabelProvider extends RedCommonLabelProvider {
     @Override
     public String getToolTipText(final Object element) {
         final List<RedXmlProblem> problems = editorInput.getProblemsFor(element);
-        final String description = Joiner.on('\n').join(transform(problems, new Function<RedXmlProblem, String>() {
 
-            @Override
-            public String apply(final RedXmlProblem problem) {
-                return problem.getDescription();
-            }
-        }));
-        return description.isEmpty() ? null : description;
+        final String descriptions = Joiner.on('\n').join(transform(problems, RedXmlProblem.toDescriptions()));
+        return descriptions.isEmpty() ? null : descriptions;
     }
 
     @Override

@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
@@ -31,7 +32,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.Exc
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RelativityPoint;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
@@ -76,7 +79,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             if (monitor.isCanceled()) {
                 return;
             }
-            validateRemoteLocation(location, linesMapping, reporter);
+            validateRemoteLocation(location, linesMapping);
         }
 
         int index = 0;
@@ -84,27 +87,34 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             if (monitor.isCanceled()) {
                 return;
             }
-            validateReferencedLibrary(library, index, linesMapping, reporter);
+            validateReferencedLibrary(library, index, linesMapping);
             index++;
+        }
+
+        for (final SearchPath path : model.getPythonPath()) {
+            validateSearchPath(path, model.getRelativityPoint(), linesMapping);
+        }
+        for (final SearchPath path : model.getClassPath()) {
+            validateSearchPath(path, model.getRelativityPoint(), linesMapping);
         }
 
         for (final ReferencedVariableFile variableFile : model.getReferencedVariableFiles()) {
             if (monitor.isCanceled()) {
                 return;
             }
-            validateReferencedVariableFile(variableFile, linesMapping, reporter);
+            validateReferencedVariableFile(variableFile, linesMapping);
         }
 
         for (final ExcludedFolderPath excludedPath : model.getExcludedPath()) {
             if (monitor.isCanceled()) {
                 return;
             }
-            validateExcludedPath(excludedPath, model.getExcludedPath(), linesMapping, reporter);
+            validateExcludedPath(excludedPath, model.getExcludedPath(), linesMapping);
         }
     }
 
-    private void validateRemoteLocation(final RemoteLocation location, final Map<Object, ProblemPosition> linesMapping,
-            final ProblemsReportingStrategy reporter) throws CoreException {
+    private void validateRemoteLocation(final RemoteLocation location, final Map<Object, ProblemPosition> linesMapping)
+            throws CoreException {
         final URI uriAddress = location.getUriAddress();
         @SuppressWarnings("resource")
         final Socket s = new Socket();
@@ -125,7 +135,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     }
 
     private void validateReferencedLibrary(final ReferencedLibrary library, final int index,
-            final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter) {
+            final Map<Object, ProblemPosition> linesMapping) {
         final LibraryType libType = library.provideType();
         final IPath libraryPath = Path.fromPortableString(library.getPath());
         final ProblemPosition position = linesMapping.get(library);
@@ -164,8 +174,10 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final IPath absolutePath = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
         final RobotProject robotProject = context.getModel().createRobotProject(configFile.getProject());
         boolean containsClass = false;
-        for (final JarClass jarClass : new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
-                robotProject.getRobotProjectConfig()).provideEntriesFromFile(absolutePath.toFile())) {
+        List<JarClass> classes = new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
+                robotProject.getRobotProjectConfig(), robotProject.getProject())
+                        .provideEntriesFromFile(absolutePath.toFile());
+        for (final JarClass jarClass : classes) {
             if (jarClass.getQualifiedName().equals(libName)) {
                 containsClass = true;
                 break;
@@ -211,8 +223,18 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         return problems;
     }
 
+    private void validateSearchPath(final SearchPath searchPath, final RelativityPoint relativityPoint,
+            final Map<Object, ProblemPosition> linesMapping) {
+        final File location = searchPath.toAbsolutePath(configFile.getProject(), relativityPoint);
+        if (!location.exists()) {
+            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
+                    .formatMessageWith(location.toString());
+            reporter.handleProblem(problem, configFile, linesMapping.get(searchPath));
+        }
+    }
+
     private void validateReferencedVariableFile(final ReferencedVariableFile variableFile,
-            final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter) {
+            final Map<Object, ProblemPosition> linesMapping) {
 
         final IPath libraryPath = Path.fromPortableString(variableFile.getPath());
         final List<RobotProblem> pathProblems = validateLibraryPath(libraryPath,
@@ -223,7 +245,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     }
 
     private void validateExcludedPath(final ExcludedFolderPath excludedPath, final List<ExcludedFolderPath> allExcluded,
-            final Map<Object, ProblemPosition> linesMapping, final ProblemsReportingStrategy reporter) {
+            final Map<Object, ProblemPosition> linesMapping) {
         final IProject project = configFile.getProject();
         final IPath asExcludedPath = excludedPath.asPath();
         final Path projectPath = new Path(project.getName());
@@ -243,6 +265,5 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
                 }
             }
         }
-
     }
 }
