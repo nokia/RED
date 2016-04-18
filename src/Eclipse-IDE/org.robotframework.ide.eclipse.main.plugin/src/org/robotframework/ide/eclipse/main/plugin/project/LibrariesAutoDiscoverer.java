@@ -39,6 +39,7 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.rf.ide.core.dryrun.RobotDryRunOutputParser;
 import org.rf.ide.core.executor.ILineHandler;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
@@ -87,7 +88,8 @@ public class LibrariesAutoDiscoverer {
         this.robotProject = robotProject;
         this.suiteFiles.addAll(suiteFiles);
         this.isSummaryWindowEnabled = isSummaryWindowEnabled;
-        dryRunOutputParser = new RobotDryRunOutputParser(robotProject.getStandardLibraries().keySet());
+        dryRunOutputParser = new RobotDryRunOutputParser();
+        dryRunOutputParser.setupRobotDryRunLibraryImportCollector(robotProject.getStandardLibraries().keySet());
         dryRunHandler = new RobotDryRunHandler();
     }
 
@@ -170,7 +172,11 @@ public class LibrariesAutoDiscoverer {
 
         RunCommandLine runCommandLine = null;
         try {
-            runCommandLine = dryRunHandler.buildDryRunCommand(robotProject.getRuntimeEnvironment(),
+            final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+            if(runtimeEnvironment == null) {
+                return null;
+            }
+            runCommandLine = dryRunHandler.buildDryRunCommand(runtimeEnvironment,
                     getProjectLocationFile(), dryRunTargetsCollector.getSuiteNames(),
                     librariesSourcesCollector.getPythonpathLocations(),
                     librariesSourcesCollector.getClasspathLocations(),
