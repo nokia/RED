@@ -214,7 +214,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     final List<ReferencedLibrary> libs = new ArrayList<>();
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
-                        final IPath path = new Path(dialog.getFilterPath()).append(file);
+                        final IPath path = new Path(dialog.getFilterPath()).addTrailingSeparator().append(file);    //add separator when filterPath is e.g. 'D:'
                         final Collection<ReferencedLibrary> importedLibs = importer
                                 .importPythonLib(viewer.getTable().getShell(), environment,
                                         editorInput.getProjectConfiguration(), path.toString());
@@ -241,7 +241,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     final List<ReferencedLibrary> libs = new ArrayList<>();
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
-                        final IPath path = new Path(dialog.getFilterPath()).append(file);
+                        final IPath path = new Path(dialog.getFilterPath()).addTrailingSeparator().append(file);
                         final Collection<ReferencedLibrary> importedLibs = importer
                                 .importJavaLib(viewer.getTable().getShell(), environment,
                                         editorInput.getProjectConfiguration(), path.toString());
@@ -267,7 +267,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                     final List<ReferencedLibrary> libs = new ArrayList<>();
                     final String[] chosenFiles = dialog.getFileNames();
                     for (final String file : chosenFiles) {
-                        final IPath path = new Path(dialog.getFilterPath()).append(file);
+                        final IPath path = new Path(dialog.getFilterPath()).addTrailingSeparator().append(file);
                         final ReferencedLibrary lib = importer.importLibFromSpecFile(path.toString());
                         if (lib != null) {
                             libs.add(lib);
