@@ -28,13 +28,15 @@ import javax.xml.bind.annotation.XmlTransient;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 
-import com.google.common.base.Function;
+import com.google.common.base.Functions;
 
 @XmlRootElement(name = "projectConfiguration")
 @XmlType(propOrder = { "version", "executionEnvironment", "pathsRelativityPoint", "variableMappings", "libraries",
@@ -190,6 +192,23 @@ public class RobotProjectConfig {
 
     public List<SearchPath> getClassPath() {
         return classPaths;
+    }
+
+    public List<File> getResolvedPythonPaths(final IProject containingProject) {
+        return getResolvedPaths(containingProject, pythonPaths, getRelativityPoint());
+    }
+
+    public List<File> getResolvedClassPaths(final IProject containingProject) {
+        return getResolvedPaths(containingProject, classPaths, getRelativityPoint());
+    }
+
+    private static List<File> getResolvedPaths(final IProject containingProject, final List<SearchPath> paths,
+            final RelativityPoint relativityPoint) {
+        final List<File> files = new ArrayList<>();
+        for (final SearchPath path : paths) {
+            files.add(path.toAbsolutePath(containingProject, relativityPoint));
+        }
+        return files;
     }
 
     public void setRemoteLocations(final List<RemoteLocation> remoteLocations) {
@@ -392,9 +411,9 @@ public class RobotProjectConfig {
         referencedVariableFiles.removeAll(selectedFiles);
     }
 
-    public EnvironmentSearchPaths createEnvironmentSearchPaths() {
-        return new EnvironmentSearchPaths(transform(getClassPath(), SearchPath.asString()),
-                transform(getPythonPath(), SearchPath.asString()));
+    public EnvironmentSearchPaths createEnvironmentSearchPaths(final IProject project) {
+        return new EnvironmentSearchPaths(transform(getResolvedClassPaths(project), Functions.toStringFunction()),
+                transform(getResolvedPythonPaths(project), Functions.toStringFunction()));
     }
 
     @Override
@@ -725,7 +744,7 @@ public class RobotProjectConfig {
         }
     }
 
-    @XmlRootElement(name = "searchPath")
+    @XmlRootElement(name = "path")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class SearchPath {
 
@@ -735,32 +754,23 @@ public class RobotProjectConfig {
 
         public static SearchPath create(final String path, final boolean isSystem) {
             final SearchPath searchPath = new SearchPath();
-            searchPath.setPath(path);
+            searchPath.setLocation(path);
             searchPath.setSystem(isSystem);
             return searchPath;
         }
 
-        private static Function<SearchPath, String> asString() {
-            return new Function<SearchPath, String>() {
-                @Override
-                public String apply(final SearchPath path) {
-                    return path.getPath();
-                }
-            };
-        }
-
-        @XmlValue
-        private String path;
+        @XmlAttribute(required = true)
+        private String location;
 
         @XmlTransient
         private boolean isSystem = false;
 
-        public void setPath(final String path) {
-            this.path = path;
+        public void setLocation(final String path) {
+            this.location = path;
         }
 
-        public String getPath() {
-            return path;
+        public String getLocation() {
+            return location;
         }
 
         @XmlTransient
@@ -772,18 +782,33 @@ public class RobotProjectConfig {
             return isSystem;
         }
 
+        public File toAbsolutePath(final IProject containingProject, final RelativityPoint relativityPoint) {
+            final IPath asPath = new Path(location);
+            if (asPath.isAbsolute()) {
+                return asPath.toFile();
+            }
+            return PathsResolver
+                    .resolveToAbsolutePath(getRelativityLocation(relativityPoint, containingProject), asPath).toFile();
+        }
+
+        private static IPath getRelativityLocation(final RelativityPoint relativityPoint,
+                final IProject containingProject) {
+            return relativityPoint.getRelativeTo() == RelativeTo.WORKSPACE
+                    ? containingProject.getWorkspace().getRoot().getLocation() : containingProject.getLocation();
+        }
+
         @Override
         public boolean equals(final Object obj) {
             if (obj instanceof SearchPath) {
                 final SearchPath that = (SearchPath) obj;
-                return Objects.equals(this.path, that.path);
+                return Objects.equals(this.location, that.location);
             }
             return false;
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(path);
+            return Objects.hash(location);
         }
     }
 
@@ -808,6 +833,20 @@ public class RobotProjectConfig {
 
         public void setRelativeTo(final RelativeTo relativeTo) {
             this.relativeTo = relativeTo;
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof RelativityPoint) {
+                final RelativityPoint that = (RelativityPoint) obj;
+                return Objects.equals(this.relativeTo, that.relativeTo);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(relativeTo);
         }
     }
 

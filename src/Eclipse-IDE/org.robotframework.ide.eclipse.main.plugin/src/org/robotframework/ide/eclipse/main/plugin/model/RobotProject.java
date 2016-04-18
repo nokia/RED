@@ -33,7 +33,6 @@ import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesWatchHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
@@ -327,9 +326,9 @@ public class RobotProject extends RobotContainer {
                 }
             }
             for (final SearchPath searchPath : configuration.getPythonPath()) {
-                pp.add(searchPath.getPath());
-                // TODO : use relative paths if required
-                // pp.add(toPathEntry(searchPath));
+                final String path = searchPath
+                        .toAbsolutePath(getProject(), getRobotProjectConfig().getRelativityPoint()).getPath();
+                pp.add(path);
             }
             return newArrayList(pp);
         }
@@ -348,25 +347,15 @@ public class RobotProject extends RobotContainer {
                 }
             }
             for (final SearchPath searchPath : configuration.getClassPath()) {
-                cp.add(searchPath.getPath());
-                // TODO : use relative paths if required
-                // cp.add(toPathEntry(searchPath));
+                final String path = searchPath.toAbsolutePath(getProject(),
+                        getRobotProjectConfig().getRelativityPoint()).getPath();
+                cp.add(path);
             }
             return newArrayList(cp);
         }
         return newArrayList(".");
     }
     
-    private String toPathEntry(final SearchPath searchPath) {
-        IPath asPath = new Path(searchPath.getPath());
-        if (!asPath.isAbsolute()) {
-            // TODO : decide how it should be treated relative to project or to workspace, or something else..?
-            asPath = PathsResolver.resolveToAbsolutePath(getProject().getLocation(), asPath);
-            asPath = PathsResolver.resolveToAbsolutePath(getProject().getWorkspace().getRoot().getLocation(), asPath);
-        }
-        return asPath.toOSString();
-    }
-
     public synchronized boolean isStandardLibrary(final LibrarySpecification spec) {
         final Map<String, LibrarySpecification> stdLibs = getStandardLibraries();
         return isLibraryFrom(spec, stdLibs == null ? null : stdLibs.values());

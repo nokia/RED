@@ -54,7 +54,7 @@ class PathsContentProvider extends StructuredContentProvider {
             @Override
             public SearchPath apply(final String path) {
                 final SearchPath searchPath = new SearchPath();
-                searchPath.setPath(path);
+                searchPath.setLocation(path);
                 searchPath.setSystem(true);
                 return searchPath;
             }

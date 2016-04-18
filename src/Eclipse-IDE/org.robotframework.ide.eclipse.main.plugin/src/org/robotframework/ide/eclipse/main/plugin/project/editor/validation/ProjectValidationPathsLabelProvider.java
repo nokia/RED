@@ -21,7 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEdito
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 
 class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
@@ -77,13 +76,8 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
         final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
                 .getExcludedPath(projectTreeElement.getPath());
         final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
-        final String descriptions = Joiner.on('\n').join(transform(problems, new Function<RedXmlProblem, String>() {
 
-            @Override
-            public String apply(final RedXmlProblem problem) {
-                return problem.getDescription();
-            }
-        }));
+        final String descriptions = Joiner.on('\n').join(transform(problems, RedXmlProblem.toDescriptions()));
         return descriptions.isEmpty() ? null : descriptions;
     }
 

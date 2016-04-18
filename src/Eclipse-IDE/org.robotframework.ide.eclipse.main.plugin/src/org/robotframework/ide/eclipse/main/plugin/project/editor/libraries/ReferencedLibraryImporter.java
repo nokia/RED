@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -45,8 +46,10 @@ import com.google.common.base.Optional;
 public class ReferencedLibraryImporter {
 
     public Collection<ReferencedLibrary> importPythonLib(final Shell shellForDialogs,
-            final RobotRuntimeEnvironment environment, final RobotProjectConfig config, final String fullLibraryPath) {
-        final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config);
+            final RobotRuntimeEnvironment environment, final IProject project, final RobotProjectConfig config,
+            final String fullLibraryPath) {
+        final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
+                project);
         final List<PythonClass> pythonClasses = newArrayList();
 
         try {
@@ -96,8 +99,8 @@ public class ReferencedLibraryImporter {
     }
 
     public Collection<ReferencedLibrary> importJavaLib(final Shell shell, final RobotRuntimeEnvironment environment,
-            final RobotProjectConfig config, final String fullLibraryPath) {
-        final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(environment, config);
+            final IProject project, final RobotProjectConfig config, final String fullLibraryPath) {
+        final JarStructureBuilder jarStructureBuilder = new JarStructureBuilder(environment, config, project);
         final List<JarClass> classesFromJar = newArrayList();
         try {
             PlatformUI.getWorkbench().getProgressService().busyCursorWhile(new IRunnableWithProgress() {

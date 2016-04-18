@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.Collection;
 import java.util.List;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
@@ -35,9 +36,10 @@ public class PythonLibStructureBuilder {
 
     private final EnvironmentSearchPaths additionalSearchPaths;
 
-    public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config) {
+    public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config,
+            final IProject project) {
         this.environment = environment;
-        this.additionalSearchPaths = config.createEnvironmentSearchPaths();
+        this.additionalSearchPaths = config.createEnvironmentSearchPaths(project);
     }
 
     public Collection<PythonClass> provideEntriesFromFile(final String path, final Optional<String> moduleName)
