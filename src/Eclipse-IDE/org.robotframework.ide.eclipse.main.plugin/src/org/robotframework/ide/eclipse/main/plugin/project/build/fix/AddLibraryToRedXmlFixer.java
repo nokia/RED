@@ -89,7 +89,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             Optional<File> modulePath = Optional.absent();
             try {
                 final String currentFileDirectoryPath = suiteFile.getFile().getParent().getLocation().toOSString();
-                final EnvironmentSearchPaths searchPaths = config.createEnvironmentSearchPaths();
+                final EnvironmentSearchPaths searchPaths = config.createEnvironmentSearchPaths(project.getProject());
                 searchPaths.addPythonPath(currentFileDirectoryPath);
                 searchPaths.addClassPath(currentFileDirectoryPath);
 
@@ -101,8 +101,10 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                     final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile,
                             modulePath.get().getAbsolutePath());
                     final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
+                    final RobotProject robotProject = suiteFile.getProject();
                     addedLibraries.addAll(importer.importJavaLib(Display.getCurrent().getActiveShell(),
-                            suiteFile.getProject().getRuntimeEnvironment(), config, resolvedAbsPath.toString()));
+                            robotProject.getRuntimeEnvironment(), robotProject.getProject(), config,
+                            resolvedAbsPath.toString()));
 
                     if (addedLibraries.isEmpty()) {
                         throw new ProposalApplyingException("Unable to apply proposal");
@@ -127,9 +129,10 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             if (path.endsWith("/") || path.endsWith(".py")) {
                 final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile, path);
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
-                final RobotProject project = suiteFile.getProject();
+                final RobotProject robotProject = suiteFile.getProject();
                 addedLibraries.addAll(importer.importPythonLib(Display.getCurrent().getActiveShell(),
-                        project.getRuntimeEnvironment(), config, resolvedAbsPath.toString()));
+                        robotProject.getRuntimeEnvironment(), robotProject.getProject(), config,
+                        resolvedAbsPath.toString()));
 
                 if (addedLibraries.isEmpty()) {
                     throw new ProposalApplyingException("Unable to apply proposal");

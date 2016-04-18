@@ -53,7 +53,7 @@ class PathsEditingSupport extends ElementsAddingEditingSupport {
     @Override
     protected Object getValue(final Object element) {
         if (element instanceof SearchPath) {
-            return ((SearchPath) element).getPath();
+            return ((SearchPath) element).getLocation();
         } else {
             return null;
         }
@@ -62,7 +62,7 @@ class PathsEditingSupport extends ElementsAddingEditingSupport {
     @Override
     protected void setValue(final Object element, final Object value) {
         if (element instanceof SearchPath) {
-            ((SearchPath) element).setPath((String) value);
+            ((SearchPath) element).setLocation((String) value);
 
             eventBroker.send(topic, element);
         } else {

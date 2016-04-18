@@ -48,7 +48,7 @@ public class RobotProjectConfigWriter {
         try {
             final JAXBContext jaxbContext = JAXBContext.newInstance(RobotProjectConfig.class);
             final Marshaller marshaller = jaxbContext.createMarshaller();
-            marshaller.setProperty("jaxb.formatted.output", Boolean.TRUE);
+            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
             marshaller.marshal(configuration, writer);
         } catch (final JAXBException e) {
             throw new CannotWriteProjectConfigurationException("Unable to write project configuration file");
