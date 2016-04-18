@@ -28,7 +28,8 @@ public class RobotDryRunOutputParserTest {
 
     @Before
     public void setUp() {
-        dryRunOutputParser = new RobotDryRunOutputParser(new HashSet<String>());
+        dryRunOutputParser = new RobotDryRunOutputParser();
+        dryRunOutputParser.setupRobotDryRunLibraryImportCollector(new HashSet<String>());
     }
 
     @Test
@@ -136,7 +137,8 @@ public class RobotDryRunOutputParserTest {
         String libName = "String";
         Set<String> standardLibs = new HashSet<String>();
         standardLibs.add(libName);
-        dryRunOutputParser = new RobotDryRunOutputParser(standardLibs);
+        dryRunOutputParser = new RobotDryRunOutputParser();
+        dryRunOutputParser.setupRobotDryRunLibraryImportCollector(standardLibs);
         List<String> args = newArrayList();
         List<String> importers = newArrayList("testProject/testSuite.robot");
         String source = "python/String.py";
@@ -217,6 +219,19 @@ public class RobotDryRunOutputParserTest {
         dryRunOutputParser.processLine(createLibraryImportJSON(libName, args, importers.get(0), source));
         verifyLibraryImport(dryRunOutputParser, 1, 2, DryRunLibraryType.UNKNOWN, libName, args, importers, "");
     }
+    
+    @Test
+    public void testProcessLine_withStartSuiteEvent() {
+        final String suiteName = "testSuite1";
+        dryRunOutputParser.setStartSuiteHandler(new IDryRunStartSuiteHandler() {
+
+            @Override
+            public void processStartSuiteEvent(String name) {
+                assertEquals(suiteName, name);
+            }
+        });
+        dryRunOutputParser.processLine(createStartSuiteJSON(suiteName));
+    }
 
     private void verifyLibraryImport(RobotDryRunOutputParser dryRunOutputParser, int importedLibraryIndex,
             int expectedImportedLibrariesSize, DryRunLibraryType expectedType, String expectedLibName,
@@ -274,5 +289,9 @@ public class RobotDryRunOutputParserTest {
         return "{\"message\":[{\"html\":\"no\",\"level\":\"FAIL\",\"message\":\"{LIB_ERROR: " + libName
                 + ", value: VALUE_START((Importing test library " + libName
                 + " failed))VALUE_END, lib_file_import:None}\",\"timestamp\":\"12345\"}]}";
+    }
+    
+    private String createStartSuiteJSON(String suiteName) {
+        return "{\"start_suite\":[\"" + suiteName + "\",{\"longname\":\"" + suiteName + "\"}]}";
     }
 }
