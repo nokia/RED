@@ -100,7 +100,7 @@ public class PathsEditingSupportTest {
         final PathsEditingSupport support = new PathsEditingSupport(viewer, creator, eventBroker, "topic");
         support.setValue(searchPath, "new_path");
 
-        assertThat(searchPath.getPath()).isEqualTo("new_path");
+        assertThat(searchPath.getLocation()).isEqualTo("new_path");
         verify(eventBroker, times(1)).send("topic", searchPath);
     }
     
