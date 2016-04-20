@@ -540,6 +540,12 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class RemoteLocation {
 
+        public static RemoteLocation create(final String path) {
+            final RemoteLocation location = new RemoteLocation();
+            location.setUri(path);
+            return location;
+        }
+
         @XmlAttribute(required = true)
         private URI uri;
 
@@ -589,6 +595,13 @@ public class RobotProjectConfig {
     @XmlRootElement(name = "referencedVariableFile")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class ReferencedVariableFile {
+
+        public static ReferencedVariableFile create(final String path, final String... arguments) {
+            final ReferencedVariableFile file = new ReferencedVariableFile();
+            file.setPath(path);
+            file.setArguments(newArrayList(arguments));
+            return file;
+        }
 
         @XmlAttribute
         private String path;
