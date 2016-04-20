@@ -130,7 +130,7 @@ public class PathsResolver {
                 final Escaper escaper = PathsConverter.getUriSpecialCharsEscaper();
 
                 final String portablePath = absolute.toPortableString();
-                final URI filePath = new URI(escaper.escape(portablePath) + "/");
+                final URI filePath = new URI(escaper.escape(portablePath));
                 final URI pathUri = filePath.resolve(escaper.escape(relative.toString()));
 
                 return new Path(PathsConverter.reverseUriSpecialCharsEscapes(pathUri.toString()));
