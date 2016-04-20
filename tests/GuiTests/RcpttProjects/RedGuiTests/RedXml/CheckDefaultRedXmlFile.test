@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mHeMEKQYEeW4l-rLhvMqpg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/15/16 4:48 PM
+Save-Time: 4/20/16 2:09 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -41,7 +41,7 @@ with [get-editor "RobotProject/red.xml" | get-section "Robot framework"] {
     get-property "getChildren().Control[1].getText()" 
         | equals "Specify which Robot Framework should be used by this project. Currently following framework is in use:" 
         | verify-true
-    get-property "getChildren().Control[2].getChildren().length" | equals 6 | verify-true
+    get-property "getChildren().Control[2].getChildren().length" | equals 4 | verify-true
 }
 
 //check python path and version
@@ -62,19 +62,6 @@ with [get-editor "RobotProject/red.xml" | get-section "Robot framework"] {
         | equals [format " %s %s (from Preferences)\n" $python_exe_path $robot_version] | verify-true
 }
 
-//check relative path
-with [get-editor "RobotProject/red.xml"] {
-    with [get-section "Robot framework"] {
-        get-label "Relative paths used in red.xml configuration are relative to:" | get-property caption 
-            | equals "Relative paths used in red.xml configuration are relative to:" | verify-true
-        with [get-combo -after [get-label "Relative paths used in red.xml configuration are relative to:"]] {
-            get-property enablement | equals true | verify-true
-            get-property selection | equals WORKSPACE | verify-true
-            get-property "values[0]" | equals WORKSPACE | verify-true
-            get-property "values[1]" | equals PROJECT | verify-true
-        }
-    }
-}
 //-------------------- varaible mapping ------------------
 
 with [get-editor "RobotProject/red.xml"] {
@@ -101,60 +88,97 @@ with [get-editor "RobotProject/red.xml"] {
 //tab Referenced libreries  -------------------------------------------------------------------------------------------------------------------------------------------
 get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 
+//check amount of elements
+with [get-tab-folder -index 1] {
+    double-click
+    get-tab-item "RobotProject/red.xml" | click
+}
+with [get-editor "RobotProject/red.xml"] {
+    with [get-section "Referenced libraries"] {
+        get-property "getDescription()" 
+            | equals "Specify third party libraries and/or locations for Remote standard library to be used by the project" 
+            | verify-true
+        get-property "getText()" | equals "Referenced libraries" | verify-true
+        get-property "getChildren().length" | equals 3 | verify-true
+    }
+    with [get-section Paths] {
+        get-property "getDescription()" 
+            | equals "Specify additional paths which will be added to respective environment variables when communicating with Robot Framework" 
+            | verify-true
+        get-property "getText()" | equals Paths | verify-true
+    }
+}
+
 
 //check Referenced libreries
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
-get-property "getDescription()" 
-    | equals "Specify third party libraries and/or locations for Remote standard library to be used by the project" 
-    | verify-true
-get-property "getChildren().Control[0].getText()" | equals "Referenced libraries" | verify-true
-get-property "getChildren().Control[1].getText()" 
-    | equals "Specify third party libraries and/or locations for Remote standard library to be used by the project" 
-    | verify-true
-    }
-
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
-    get-property "getChildren().Control[2].getChildren().Control[0].getChildren().Control[1].getText()" 
-        | equals "Add Python library" | verify-true
-    get-property "getChildren().Control[2].getChildren().Control[0].getChildren().Control[2].getText()" 
-        | equals "Add Java library" | verify-true
-    get-property "getChildren().Control[2].getChildren().Control[0].getChildren().Control[3].getText()" 
-        | equals "Add libspec file" | verify-true
-    get-property "getChildren().Control[2].getChildren().Control[0].getChildren().Control[4].getText()" 
-        | equals "Add Remote location" | verify-true
-    get-property "getChildren().Control[2].getChildren().Control[0].getChildren().Control[5].getText()" 
-        | equals "Auto discover libraries after test suite save action" | verify-true
-    get-property "getChildren().Control[2].getChildren().Control[0].getChildren().Control[6].getText()" 
-        | equals "Show discovering summary after test suite save action" | verify-true
-    get-property "getChildren().Control[2].getChildren().Control[0].getChildren().Control[7].getText()" 
-        | equals "Automatically reload changed libraries" | verify-true
+    get-property "getChildren().length" | equals 3 | verify-true
+    get-property "getDescription()" 
+        | equals "Specify third party libraries and/or locations for Remote standard library to be used by the project" 
+        | verify-true
+    get-property "getText()" | equals "Referenced libraries" | verify-true
+    get-property "getChildren().length" | equals 3 | verify-true
+    get-property "getChildren().Control[0].getText()" | equals "Referenced libraries" | verify-true
+    get-property "getChildren().Control[1].getText()" 
+        | equals "Specify third party libraries and/or locations for Remote standard library to be used by the project" 
+        | verify-true
+    get-property "getChildren().Control[2].getChildren().length" | equals 1 | verify-true
+    get-property "getChildren().Control[2].getChildren().Control[0].getChildren().length" | equals 8 | verify-true
 }
+//check table for libs
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
+    get-table | get-property itemCount | equals 0 | verify-true
+    with [get-button "Add Python library"] {
+        get-property enablement | equals true | verify-true
+        get-property caption | equals "Add Python library" | verify-true
+    }
+    //check buttons
+    get-button "Add Java library" | get-property enablement | equals false | verify-true
+    get-button "Add libspec file" | get-property enablement | equals true | verify-true
+    get-button "Add Remote location" | get-property enablement | equals true | verify-true
 
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table | get-property itemCount | equals 0 
-    | verify-true
-
-
+	//check autodiscover 
+    with [get-button "Auto discover libraries after test suite save action"] {
+	    get-property enablement | equals true | verify-true
+	    get-property selected | equals true | verify-true
+	    }
+    with [get-button "Show discovering summary after test suite save action"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button "Automatically reload changed libraries"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals true | verify-true
+    }
+   
+}
 // Paths
 with [get-editor "RobotProject/red.xml" | get-section Paths] {
-    get-property "getChildren().Control[0].getText()" | equals Paths | verify-true
-    get-property "getChildren().Control[1].getText()" 
-        | equals "Specify additional paths which will be added to respective environment variables when communicating with Robot Framework" 
-        | verify-true
-        
-    //pythonpath    
+	//check item count
+    get-property "getChildren().length" | equals 3 | verify-true
+
+	//check workspace combobox
+    with [get-combo -after [get-label "Relative paths defined below are relative to:"]] {
+        get-property enablement | equals true | verify-true
+        get-property selection | equals WORKSPACE | verify-true
+        get-property "values[0]" | equals WORKSPACE | verify-true
+        get-property "values[1]" | equals PROJECT | verify-true
+    }
+    //check PYTHON table
     get-canvas | get-property text | equals "PYTHONPATH\r\n" | verify-true
-    get-table | get-property enablement | equals true | verify-true
-    get-table | get-item "...add new search path" 
-       | get-property caption | equals "...add new search path" | verify-true
-    
-    //classpath
-    get-canvas -index 1 | get-property text | equals "CLASSPATH\r\n" | verify-true
-    with [get-table -index 1] {
-        get-property enablement | equals false | verify-true
+    with [get-table] {
+        get-property "getItems().TableItem[0].getText()" 
+            | equals ".*LibsFromPythonPath \[already defined in PYTHONPATH variable\]" 
+            | verify-true
+        get-property "getItems().TableItem[1].getText()" | equals "...add new search path" | verify-true
+    }
+    //check CLASSPATH
+    get-canvas -after [get-label "Relative paths defined below are relative to:"] -index 1 | get-property text 
+        | equals "CLASSPATH\r\n" | verify-true
+    with [get-table -after [get-label "Relative paths defined below are relative to:"] -index 1] {
         get-property "getItems().length" | equals 1 | verify-true
         get-property "getItems().TableItem[0].getText()" | equals "...add new search path" | verify-true
     }
-    
 }
 
 
