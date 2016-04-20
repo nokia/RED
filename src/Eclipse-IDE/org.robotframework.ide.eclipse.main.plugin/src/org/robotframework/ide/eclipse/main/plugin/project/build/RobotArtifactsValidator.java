@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
@@ -62,7 +63,8 @@ public class RobotArtifactsValidator {
                 || !RobotProjectNature.hasRobotNature(file.getProject())) {
             return;
         }
-        if (suiteModel.getProject().getRuntimeEnvironment().getVersion() == null) {
+        final RobotRuntimeEnvironment runtimeEnvironment = suiteModel.getProject().getRuntimeEnvironment();
+        if (runtimeEnvironment == null || runtimeEnvironment.getVersion() == null) {
             return;
         }
 
