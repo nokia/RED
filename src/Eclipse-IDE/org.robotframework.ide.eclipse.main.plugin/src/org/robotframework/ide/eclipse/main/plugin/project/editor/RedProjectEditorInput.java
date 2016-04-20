@@ -90,6 +90,10 @@ public class RedProjectEditorInput {
 
     public static class RedXmlProblem {
 
+        public static boolean hasProblems(final Collection<RedXmlProblem> problems) {
+            return !problems.isEmpty();
+        }
+
         public static boolean hasWarnings(final Collection<RedXmlProblem> problems) {
             return hasProblemsOfSeverity(problems, Severity.WARNING);
         }

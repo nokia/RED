@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
@@ -174,7 +175,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         final IPath absolutePath = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
         final RobotProject robotProject = context.getModel().createRobotProject(configFile.getProject());
         boolean containsClass = false;
-        List<JarClass> classes = new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
+        final List<JarClass> classes = new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
                 robotProject.getRobotProjectConfig(), robotProject.getProject())
                         .provideEntriesFromFile(absolutePath.toFile());
         for (final JarClass jarClass : classes) {
@@ -225,10 +226,16 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
     private void validateSearchPath(final SearchPath searchPath, final RelativityPoint relativityPoint,
             final Map<Object, ProblemPosition> linesMapping) {
-        final File location = searchPath.toAbsolutePath(configFile.getProject(), relativityPoint);
-        if (!location.exists()) {
-            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
-                    .formatMessageWith(location.toString());
+        try {
+            final File location = searchPath.toAbsolutePath(configFile.getProject(), relativityPoint);
+            if (!location.exists()) {
+                final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
+                        .formatMessageWith(location.toString());
+                reporter.handleProblem(problem, configFile, linesMapping.get(searchPath));
+            }
+        } catch (final PathResolvingException e) {
+            final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.INVALID_SEARCH_PATH)
+                    .formatMessageWith(searchPath.getLocation());
             reporter.handleProblem(problem, configFile, linesMapping.get(searchPath));
         }
     }
