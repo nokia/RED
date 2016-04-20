@@ -336,6 +336,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
                             editorInput.getProjectConfiguration()
                                     .setLibrariesAutoDiscoveringSummaryWindowEnabled(selection);
                         }
+                        showAutoLibDiscoverDialogButton.setEnabled(selection);
                         setDirty(true);
                     }
                 });
@@ -428,7 +429,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         addLibspecButton.setEnabled(isEditable);
         addRemoteButton.setEnabled(isEditable);
         autoLibDiscoverButton.setEnabled(isEditable);
-        showAutoLibDiscoverDialogButton.setEnabled(isEditable);
+        showAutoLibDiscoverDialogButton.setEnabled(autoLibDiscoverButton.getSelection() && isEditable);
         autoLibReloadButton.setEnabled(isEditable);
         viewer.getTable().setEnabled(isEditable);
 
