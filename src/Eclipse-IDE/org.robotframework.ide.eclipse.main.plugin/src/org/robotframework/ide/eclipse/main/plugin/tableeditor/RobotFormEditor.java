@@ -322,6 +322,7 @@ public class RobotFormEditor extends FormEditor {
         }
         if (getEditorInput() instanceof FileEditorInput) {
             suiteModel = RedPlugin.getModelManager().createSuiteFile(((FileEditorInput) getEditorInput()).getFile());
+            checkRuntimeEnvironment(suiteModel);
         } else {
             final IStorage storage = (IStorage) getEditorInput().getAdapter(IStorage.class);
             try {
@@ -330,9 +331,7 @@ public class RobotFormEditor extends FormEditor {
                 throw new IllegalRobotEditorInputException("Unable to provide model for given input", e);
             }
         }
-        
-        checkRuntimeEnvironment(suiteModel);
-        
+
         return suiteModel;
     }
 
