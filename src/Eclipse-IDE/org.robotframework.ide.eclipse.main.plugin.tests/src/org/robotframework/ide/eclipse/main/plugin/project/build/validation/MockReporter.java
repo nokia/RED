@@ -118,7 +118,7 @@ public class MockReporter extends ProblemsReportingStrategy {
 
         @Override
         public String toString() {
-            return "Problem: " + cause.toString() + "@" + position.toString();
+            return "Problem: " + cause + "@" + position;
         }
     }
 }
