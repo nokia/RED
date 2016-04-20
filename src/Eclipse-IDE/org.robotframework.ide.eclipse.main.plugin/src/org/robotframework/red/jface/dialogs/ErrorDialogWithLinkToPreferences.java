@@ -39,6 +39,7 @@ public class ErrorDialogWithLinkToPreferences extends MessageDialog {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 PreferencesUtil.createPreferenceDialogOn(getShell(), e.text, null, null).open();
+                close();
             }
         });
         return link;
