@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tAQV0PpcEeWSorJ4SRUI3Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/15/16 3:17 PM
+Save-Time: 4/20/16 12:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -82,7 +82,7 @@ with [get-editor "test.robot" | get-text-viewer] {
     set-caret-pos 2 22
     get-menu "Quick Fix" | click
 }
-
+wait 1000
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
     | select "Discover 'LibFromPythonPath' and add to configuration" | click -default
 get-editor "ImportLibFromPythonPath/red.xml" | get-section "Referenced libraries" | mouse-release 266 11 button1 524288
