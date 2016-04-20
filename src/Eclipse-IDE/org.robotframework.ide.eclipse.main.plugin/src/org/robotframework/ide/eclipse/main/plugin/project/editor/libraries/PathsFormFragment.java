@@ -40,6 +40,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RelativeTo;
@@ -287,8 +288,11 @@ class PathsFormFragment implements ISectionFormFragment {
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
         final boolean isEditable = editorInput.isEditable();
-        final boolean projectIsInterpretedByJython = envs.getActiveEnvironment()
-                .getInterpreter() == SuiteExecutor.Jython;
+        final RobotRuntimeEnvironment activeEnvironment = envs.getActiveEnvironment();
+        if(activeEnvironment == null) {
+            return;
+        }
+        final boolean projectIsInterpretedByJython = envs.getActiveEnvironment().getInterpreter() == SuiteExecutor.Jython;
 
         relativityCombo.setEnabled(isEditable);
         pythonPathViewer.getTable().setEnabled(isEditable);
