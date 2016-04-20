@@ -115,7 +115,8 @@ public class ValidationContext {
         return logger;
     }
 
-    RobotModel getModel() {
+    @VisibleForTesting
+    public RobotModel getModel() {
         return model;
     }
 
@@ -143,7 +144,7 @@ public class ValidationContext {
         return isValidatingChangedFiles;
     }
 
-    public void setIsValidatingChangedFiles(boolean isValidatingChangedFiles) {
+    public void setIsValidatingChangedFiles(final boolean isValidatingChangedFiles) {
         this.isValidatingChangedFiles = isValidatingChangedFiles;
     }
 
