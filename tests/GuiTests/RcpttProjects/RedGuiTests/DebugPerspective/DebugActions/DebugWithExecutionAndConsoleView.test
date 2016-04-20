@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OVxNoN8BEeWvV6AMcH1t9Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/25/16 2:36 PM
+Save-Time: 4/20/16 2:59 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -70,8 +70,12 @@ try -times 7 -delay 1000 -command{
 	get-view Console | get-button Terminate | get-property "getEnabled()" | equals false | verify-true
 }
 
+with [get-tab-folder -index 5] {
+    double-click
+    get-tab-item Console | click
+}
 get-view Console | get-text-viewer | get-property text 
-    | matches "Command: .*\n"
+    | equals "Command: .*\n"
     + "Suite Executor: Robot Framework .*\n"
     + "==============================================================================\n"
     + "RobotProject                                                                  \n"
@@ -95,6 +99,11 @@ get-view Console | get-text-viewer | get-property text
     + "Output: .*output.xml\n"
     + "Log:     .*log.html\n"
     + "Report:  .*report.html" | verify-true
+
+with [get-tab-folder] {
+    double-click
+    get-tab-item Console | click
+}
 
 wait 2000
 //checking Execution view only on windows because on Linux this test fails.
