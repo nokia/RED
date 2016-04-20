@@ -145,6 +145,13 @@ public enum ConfigFileProblem implements IProblemCause {
         public String getProblemDescription() {
             return "The path '%s' points to non-existing location";
         }
+    },
+    INVALID_SEARCH_PATH {
+
+        @Override
+        public String getProblemDescription() {
+            return "The path '%s' is invalid";
+        }
     };
 
     public static final String LIBRARY_INDEX = "marker.libraryIndex";
