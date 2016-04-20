@@ -421,7 +421,7 @@ class ReferencedLibrariesFormFragment implements ISectionFormFragment {
         this.environment = envs.getActiveEnvironment();
 
         final boolean isEditable = editorInput.isEditable();
-        final boolean projectIsInterpretedByJython = environment.getInterpreter() == SuiteExecutor.Jython;
+        final boolean projectIsInterpretedByJython = environment != null && environment.getInterpreter() == SuiteExecutor.Jython;
 
         addPythonLibButton.setEnabled(isEditable);
         addJavaLibButton.setEnabled(isEditable && projectIsInterpretedByJython);

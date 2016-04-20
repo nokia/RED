@@ -96,8 +96,10 @@ public class RobotLaunchConfiguration {
         final RobotLaunchConfiguration robotConfig = new RobotLaunchConfiguration(launchConfig);
         final IProject project = getFirst(suitesMapping.keySet(), null).getProject();
         final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
-        final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
-        robotConfig.setExecutor(interpreter);
+        if (robotProject.getRuntimeEnvironment() != null) {
+            final SuiteExecutor interpreter = robotProject.getRuntimeEnvironment().getInterpreter();
+            robotConfig.setExecutor(interpreter);
+        }
         robotConfig.setExecutorArguments("");
         robotConfig.setProjectName(project.getName());
         
