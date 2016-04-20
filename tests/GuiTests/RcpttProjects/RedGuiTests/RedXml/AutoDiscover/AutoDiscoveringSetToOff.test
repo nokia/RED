@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-gXO8P_gEeWRL4nRKA71zA
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/12/16 4:57 PM
+Save-Time: 4/20/16 1:11 PM
 Testcase-Type: ecl
 Verifications: _gGHWMP_kEeWRL4nRKA71zA
 
@@ -31,6 +31,8 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
 get-editor "RobotProject/red.xml" | get-section "Referenced libraries" 
     | get-button "Auto discover libraries after test suite save action" | uncheck
 
+get-button "Save \((Ctrl|M1)\+S\)" | click
+
 //check result - both options are not selected
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
     get-button "Auto discover libraries after test suite save action" | get-property selected | equals false 
@@ -39,16 +41,13 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
         | verify-true
 }
 
-//select second option
-get-editor "RobotProject/red.xml" | get-section "Referenced libraries" 
-    | get-button "Show discovering summary after test suite save action" | check
+//second option is disbaled
 with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"] {
-    get-button "Auto discover libraries after test suite save action" | get-property selected | equals false 
+    get-button "Auto discover libraries after test suite save action" | get-property enablement | equals true 
         | verify-true
-    get-button "Show discovering summary after test suite save action" | get-property selected | equals true 
+    get-button "Show discovering summary after test suite save action" | get-property enablement | equals false 
         | verify-true
 }
-get-button "Save \((Ctrl|M1)\+S\)" | click
 
 
 //add text to Suite
@@ -118,4 +117,49 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
     get-property "getItems().TableItem[0].getText()" | equals "multiply - RobotProject" | verify-true
 }
 
+
+//create new project and check default behaviour
+get-menu "File/New/Robot Project" | click
+with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Project name:"] | set-text new
+    get-button Finish | click
+}
+//openn red.xml
+get-view "Project Explorer" | get-tree | select "new/red.xml" | double-click
+get-editor "new/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+with [get-editor "new/red.xml" | get-section "Referenced libraries"] {
+    //check if firs option is selected and enabled
+    with [get-button "Auto discover libraries after test suite save action"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals true | verify-true
+    }
+    //second is deselected
+    with [get-button "Show discovering summary after test suite save action"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button "Automatically reload changed libraries"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals true | verify-true
+    }
+}
+
+//unselect Auto discover
+get-editor "new/red.xml" | get-section "Referenced libraries" 
+    | get-button "Auto discover libraries after test suite save action" | uncheck
+with [get-editor "new/red.xml" | get-section "Referenced libraries"] {
+    with [get-button "Auto discover libraries after test suite save action"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals false | verify-true
+    }
+    // summary is disabled now
+    with [get-button "Show discovering summary after test suite save action"] {
+        get-property enablement | equals false | verify-true
+        get-property selected | equals false | verify-true
+    }
+    with [get-button "Automatically reload changed libraries"] {
+        get-property enablement | equals true | verify-true
+        get-property selected | equals true | verify-true
+    }
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
