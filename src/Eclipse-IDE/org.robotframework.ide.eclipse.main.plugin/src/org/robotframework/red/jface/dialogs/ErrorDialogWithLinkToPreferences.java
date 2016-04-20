@@ -5,6 +5,7 @@
  */
 package org.robotframework.red.jface.dialogs;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
@@ -24,7 +25,8 @@ public class ErrorDialogWithLinkToPreferences extends MessageDialog {
 
     public ErrorDialogWithLinkToPreferences(final Shell parentShell, final String dialogTitle,
             final String dialogMessage, final String preferenceId, final String preferenceName) {
-        super(parentShell, dialogTitle, null, dialogMessage, MessageDialog.ERROR, new String[] {}, 0);
+        super(parentShell, dialogTitle, null, dialogMessage, MessageDialog.ERROR,
+                new String[] { IDialogConstants.OK_LABEL }, 0);
         this.preferenceId = preferenceId;
         this.preferenceName = preferenceName;
     }
