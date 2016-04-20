@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -54,6 +55,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteStreamFile;
+import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsPreferencesPage;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescriber;
@@ -63,6 +65,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsE
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
+import org.robotframework.red.jface.dialogs.ErrorDialogWithLinkToPreferences;
 
 public class RobotFormEditor extends FormEditor {
 
@@ -416,8 +419,12 @@ public class RobotFormEditor extends FormEditor {
                 final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
                 if (runtimeEnvironment == null || !runtimeEnvironment.isValidPythonInstallation()
                         || !runtimeEnvironment.hasRobotInstalled()) {
-                    MessageDialog.openError(getSite().getShell(), "Runtime Environment Error",
-                            "Unable to provide valid RED runtime environment. Check python/robot installation and set it in Preferences.");
+                    final Shell shell = getSite().getShell();
+                    if (shell != null && shell.isVisible()) {
+                        new ErrorDialogWithLinkToPreferences(shell, "Runtime Environment Error",
+                                "Unable to provide valid RED runtime environment. Check python/robot installation and set it in Preferences.",
+                                InstalledRobotsPreferencesPage.ID, "Installed Robot Frameworks").open();
+                    }
                 }
             }
         }
