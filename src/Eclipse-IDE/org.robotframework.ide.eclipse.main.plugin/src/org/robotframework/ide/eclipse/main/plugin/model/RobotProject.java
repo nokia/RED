@@ -33,6 +33,7 @@ import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesWatchHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
@@ -326,9 +327,13 @@ public class RobotProject extends RobotContainer {
                 }
             }
             for (final SearchPath searchPath : configuration.getPythonPath()) {
-                final String path = searchPath
-                        .toAbsolutePath(getProject(), getRobotProjectConfig().getRelativityPoint()).getPath();
-                pp.add(path);
+                try {
+                    final String path = searchPath
+                            .toAbsolutePath(getProject(), getRobotProjectConfig().getRelativityPoint()).getPath();
+                    pp.add(path);
+                } catch (final PathResolvingException e) {
+                    // we don't want to add syntax-problematic paths
+                }
             }
             return newArrayList(pp);
         }
@@ -347,9 +352,13 @@ public class RobotProject extends RobotContainer {
                 }
             }
             for (final SearchPath searchPath : configuration.getClassPath()) {
-                final String path = searchPath.toAbsolutePath(getProject(),
-                        getRobotProjectConfig().getRelativityPoint()).getPath();
-                cp.add(path);
+                try {
+                    final String path = searchPath
+                            .toAbsolutePath(getProject(), getRobotProjectConfig().getRelativityPoint()).getPath();
+                    cp.add(path);
+                } catch (final PathResolvingException e) {
+                    // we don't want to add syntax-problematic paths
+                }
             }
             return newArrayList(cp);
         }
@@ -397,7 +406,7 @@ public class RobotProject extends RobotContainer {
             final List<String> list = newArrayList();
             for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
                 final String path = PathsConverter
-                        .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(variableFile.getPath())).toPortableString();
+                        .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(variableFile.getPath())).toOSString();
                 final List<String> args = variableFile.getArguments();
                 final String arguments = args == null || args.isEmpty() ? "" : ":" + Joiner.on(":").join(args);
                 list.add(path + arguments);

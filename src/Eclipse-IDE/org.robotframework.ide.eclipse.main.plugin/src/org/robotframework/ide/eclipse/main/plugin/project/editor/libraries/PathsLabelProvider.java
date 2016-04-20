@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
 import static com.google.common.collect.Iterables.transform;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.viewers.StyledString;
@@ -49,9 +50,15 @@ class PathsLabelProvider extends RedCommonLabelProvider {
                         Stylers.Common.ECLIPSE_DECORATION_STYLER);
                 return label;
             } else {
-                final Styler styler = editorInput.getProblemsFor(searchPath).isEmpty() ? Stylers.Common.EMPTY_STYLER
-                        : Stylers.Common.WARNING_STYLER;
-
+                Styler styler;
+                final Collection<RedXmlProblem> problems = editorInput.getProblemsFor(searchPath);
+                if (RedXmlProblem.hasErrors(problems)) {
+                    styler = Stylers.Common.ERROR_STYLER;
+                } else if (RedXmlProblem.hasProblems(problems)) {
+                    styler = Stylers.Common.WARNING_STYLER;
+                } else {
+                    styler = Stylers.Common.EMPTY_STYLER;
+                }
                 return new StyledString(searchPath.getLocation(), styler);
             }
         } else {
@@ -91,7 +98,7 @@ class PathsLabelProvider extends RedCommonLabelProvider {
 
         if (RedXmlProblem.hasErrors(problems)) {
             return ImagesManager.getImage(RedImages.getErrorImage());
-        } else if (!problems.isEmpty()) {
+        } else if (RedXmlProblem.hasProblems(problems)) {
             return ImagesManager.getImage(RedImages.getWarningImage());
         }
         return null;
