@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.editor.libraries;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import javax.inject.Inject;
@@ -26,7 +28,11 @@ import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Table;
@@ -36,6 +42,8 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RelativeTo;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RelativityPoint;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
@@ -73,6 +81,8 @@ class PathsFormFragment implements ISectionFormFragment {
     @Inject
     private RedProjectEditorInput editorInput;
 
+    private Combo relativityCombo;
+
     private RowExposingTableViewer pythonPathViewer;
 
     private RowExposingTableViewer classPathViewer;
@@ -95,6 +105,8 @@ class PathsFormFragment implements ISectionFormFragment {
         section.setClient(internalComposite);
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
         GridLayoutFactory.fillDefaults().margins(0, 5).applyTo(internalComposite);
+
+        createRelativityCombo(internalComposite);
 
         final ViewerConfiguration pythonConfig = new PythonPathViewerConfiguration();
         toolkit.createFormText(internalComposite, false)
@@ -120,6 +132,32 @@ class PathsFormFragment implements ISectionFormFragment {
                         + "environment variables when communicating with Robot Framework");
         GridDataFactory.fillDefaults().grab(true, true).applyTo(section);
         return section;
+    }
+
+    private void createRelativityCombo(final Composite sectionInternal) {
+        final Label label = toolkit.createLabel(sectionInternal,
+                "Relative paths defined below are relative to:", SWT.WRAP);
+        GridDataFactory.fillDefaults().grab(true, false).indent(0, 0).applyTo(label);
+        relativityCombo = new Combo(sectionInternal, SWT.DROP_DOWN | SWT.READ_ONLY);
+        relativityCombo.setItems(new String[] { RelativeTo.WORKSPACE.toString(), RelativeTo.PROJECT.toString() });
+        GridDataFactory.fillDefaults().indent(10, 0).applyTo(relativityCombo);
+
+        relativityCombo.addModifyListener(new ModifyListener() {
+
+            @Override
+            public void modifyText(final ModifyEvent e) {
+                final RobotProjectConfig config = editorInput.getProjectConfiguration();
+
+                final RelativeTo oldRelativeTo = config.getRelativityPoint().getRelativeTo();
+                final RelativeTo newRelativeTo = RelativeTo
+                        .valueOf(relativityCombo.getItem(relativityCombo.getSelectionIndex()));
+
+                if (oldRelativeTo != newRelativeTo) {
+                    setDirty(true);
+                    config.setRelativityPoint(new RelativityPoint(newRelativeTo));
+                }
+            }
+        });
     }
 
     private RowExposingTableViewer createViewer(final Composite parent, final ViewerConfiguration config) {
@@ -202,8 +240,13 @@ class PathsFormFragment implements ISectionFormFragment {
     }
 
     private void setInput() {
-        pythonPathViewer.setInput(editorInput.getProjectConfiguration().getPythonPath());
-        classPathViewer.setInput(editorInput.getProjectConfiguration().getClassPath());
+        final RobotProjectConfig configuration = editorInput.getProjectConfiguration();
+        pythonPathViewer.setInput(configuration.getPythonPath());
+        classPathViewer.setInput(configuration.getClassPath());
+
+        final int indexToSelect = newArrayList(relativityCombo.getItems())
+                .indexOf(configuration.getRelativityPoint().getRelativeTo().toString());
+        relativityCombo.select(indexToSelect);
 
         adjustColumnWidth(pythonPathViewer.getTable());
         adjustColumnWidth(classPathViewer.getTable());
@@ -234,6 +277,7 @@ class PathsFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADING_STARTED) final RobotProjectConfig config) {
         setInput();
 
+        relativityCombo.setEnabled(false);
         pythonPathViewer.getTable().setEnabled(false);
         classPathViewer.getTable().setEnabled(false);
     }
@@ -246,6 +290,7 @@ class PathsFormFragment implements ISectionFormFragment {
         final boolean projectIsInterpretedByJython = envs.getActiveEnvironment()
                 .getInterpreter() == SuiteExecutor.Jython;
 
+        relativityCombo.setEnabled(isEditable);
         pythonPathViewer.getTable().setEnabled(isEditable);
         classPathViewer.getTable().setEnabled(isEditable && projectIsInterpretedByJython);
 
