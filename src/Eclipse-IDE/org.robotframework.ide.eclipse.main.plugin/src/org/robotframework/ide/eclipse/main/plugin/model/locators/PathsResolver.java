@@ -112,7 +112,7 @@ public class PathsResolver {
      * @param absolute
      * @param relative
      * @return
-     * @throws PathResolvingException is hrown when:
+     * @throws PathResolvingException is thrown when:
      *  - path is RF-parameterized (using ${var}) 
      *  - when given absolute path is null
      *  - in case of paths syntax problems 

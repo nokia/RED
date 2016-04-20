@@ -793,8 +793,9 @@ public class RobotProjectConfig {
 
         private static IPath getRelativityLocation(final RelativityPoint relativityPoint,
                 final IProject containingProject) {
-            return relativityPoint.getRelativeTo() == RelativeTo.WORKSPACE
-                    ? containingProject.getWorkspace().getRoot().getLocation() : containingProject.getLocation();
+            final IPath result = relativityPoint.getRelativeTo() == RelativeTo.WORKSPACE
+                            ? containingProject.getWorkspace().getRoot().getLocation() : containingProject.getLocation();
+            return result.getFileExtension() == null ? result.addTrailingSeparator() : result;
         }
 
         @Override
