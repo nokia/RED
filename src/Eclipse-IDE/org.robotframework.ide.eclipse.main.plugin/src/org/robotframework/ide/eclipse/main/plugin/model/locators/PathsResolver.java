@@ -109,29 +109,30 @@ public class PathsResolver {
      * the path given in {@code absolute} parameter. The {@code relative} path is returned
      * if it is absolute.
      * 
-     * @param absolute
-     * @param relative
+     * @param base
+     * @param child
      * @return
-     * @throws PathResolvingException is thrown when:
-     *  - path is RF-parameterized (using ${var}) 
-     *  - when given absolute path is null
-     *  - in case of paths syntax problems 
+     * @throws PathResolvingException
+     *             is thrown when:
+     *             - path is RF-parameterized (using ${var})
+     *             - when given absolute path is null
+     *             - in case of paths syntax problems
      */
-    public static IPath resolveToAbsolutePath(final IPath absolute, final IPath relative)
+    public static IPath resolveToAbsolutePath(final IPath base, final IPath child)
             throws PathResolvingException {
-        if (isParameterized(relative)) {
+        if (isParameterized(child)) {
             throw new PathResolvingException("Given path is parameterized");
-        } else if (relative.isAbsolute()) {
-            return relative;
-        } else if (absolute == null) {
+        } else if (child.isAbsolute()) {
+            return child;
+        } else if (base == null) {
             throw new PathResolvingException("Given path is not located physically in the file system");
         } else {
             try {
                 final Escaper escaper = PathsConverter.getUriSpecialCharsEscaper();
 
-                final String portablePath = absolute.toPortableString();
+                final String portablePath = base.toPortableString();
                 final URI filePath = new URI(escaper.escape(portablePath));
-                final URI pathUri = filePath.resolve(escaper.escape(relative.toString()));
+                final URI pathUri = filePath.resolve(escaper.escape(child.toString()));
 
                 return new Path(PathsConverter.reverseUriSpecialCharsEscapes(pathUri.toString()));
             } catch (final URISyntaxException | IllegalArgumentException e) {
