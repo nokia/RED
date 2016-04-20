@@ -27,7 +27,7 @@ public class PathsConverter {
         return Escapers.builder()
                 .addEscape(' ', "%20")
                 .addEscape('!', "%21")
-                .addEscape('@', "%40")
+                .addEscape('"', "%22")
                 .addEscape('#', "%23")
                 .addEscape('$', "%24")
                 .addEscape('%', "%25")
@@ -35,8 +35,24 @@ public class PathsConverter {
                 .addEscape('(', "%28")
                 .addEscape(')', "%29")
                 .addEscape(';', "%3b")
+                .addEscape('@', "%40")
                 .addEscape('^', "%5e")
                 .build();
+    }
+
+    public static String reverseUriSpecialCharsEscapes(final String uriWithEscapedChars) {
+        return uriWithEscapedChars.replaceAll("%20", " ")
+                .replaceAll("%21", "!")
+                .replaceAll("%22", "\"")
+                .replaceAll("%23", "#")
+                .replaceAll("%24", "\\$")
+                .replaceAll("%25", "%")
+                .replaceAll("%26", "&")
+                .replaceAll("%28", "\\(")
+                .replaceAll("%29", "\\)")
+                .replaceAll("%3b", ";")
+                .replaceAll("%40", "@")
+                .replaceAll("%5e", "\\^");
     }
 
     public static IPath fromResourceRelativeToWorkspaceRelative(final IResource resource, final IPath path) {
@@ -69,9 +85,12 @@ public class PathsConverter {
     }
 
     public static IPath toWorkspaceRelativeIfPossible(final IPath fullPath) {
-        final IPath wsPath = ResourcesPlugin.getWorkspace().getRoot().getLocation();
-        if (wsPath.isPrefixOf(fullPath)) {
-            return fullPath.makeRelativeTo(wsPath);
+        return toRelativeIfPossible(ResourcesPlugin.getWorkspace().getRoot().getLocation(), fullPath);
+    }
+
+    public static IPath toRelativeIfPossible(final IPath relativityPoint, final IPath fullPath) {
+        if (relativityPoint.isPrefixOf(fullPath)) {
+            return fullPath.makeRelativeTo(relativityPoint);
         } else {
             return fullPath;
         }
