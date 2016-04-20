@@ -91,6 +91,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
                 final String[] chosenFiles = dialog.getFileNames();
                 for (final String file : chosenFiles) {
                     final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(dialog.getFilterPath()))
+                            .addTrailingSeparator() //add separator when filterPath is e.g. 'D:'
                             .append(file);
 
                     final ReferencedVariableFile variableFile = new ReferencedVariableFile();
