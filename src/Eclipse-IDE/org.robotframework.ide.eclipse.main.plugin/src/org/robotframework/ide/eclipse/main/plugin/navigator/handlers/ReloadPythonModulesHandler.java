@@ -45,8 +45,10 @@ public class ReloadPythonModulesHandler extends DIParameterizedHandler<E4ReloadP
             final Set<RobotRuntimeEnvironment> envsToReset = new HashSet<>();
             for (final IProject project : projects) {
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
-                envsToReset.add(robotProject.getRuntimeEnvironment());
-
+                if (robotProject.getRuntimeEnvironment() != null) {
+                    envsToReset.add(robotProject.getRuntimeEnvironment());
+                }
+                
                 robotProject.clearCachedData();
             }
             for (final RobotRuntimeEnvironment environment : envsToReset) {

@@ -42,6 +42,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -326,6 +327,9 @@ public class RobotFormEditor extends FormEditor {
                 throw new IllegalRobotEditorInputException("Unable to provide model for given input", e);
             }
         }
+        
+        checkRuntimeEnvironment(suiteModel);
+        
         return suiteModel;
     }
 
@@ -403,6 +407,20 @@ public class RobotFormEditor extends FormEditor {
             return (ISectionEditorPart) pages.get(index);
         }
         return null;
+    }
+    
+    private void checkRuntimeEnvironment(final RobotSuiteFile suiteFile) {
+        if (suiteFile != null) {
+            final RobotProject robotProject = suiteFile.getProject();
+            if (robotProject != null) {
+                final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
+                if (runtimeEnvironment == null || !runtimeEnvironment.isValidPythonInstallation()
+                        || !runtimeEnvironment.hasRobotInstalled()) {
+                    MessageDialog.openError(getSite().getShell(), "Runtime Environment Error",
+                            "Unable to provide valid RED runtime environment. Check python/robot installation and set it in Preferences.");
+                }
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
