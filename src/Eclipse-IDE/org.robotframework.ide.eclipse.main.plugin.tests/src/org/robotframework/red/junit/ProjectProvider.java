@@ -28,15 +28,14 @@ import com.google.common.base.Joiner;
  */
 public class ProjectProvider implements TestRule {
 
+    private final String projectName;
+
     private IProject project;
 
-    public IProject create(final String name) throws CoreException {
-        project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
-        project.create(null);
-        project.open(null);
-        return project;
+    public ProjectProvider(final String projectName) {
+        this.projectName = projectName;
     }
-    
+
     public IProject getProject() {
         return project;
     }
@@ -47,6 +46,11 @@ public class ProjectProvider implements TestRule {
             @Override
             public void evaluate() throws Throwable {
                 try {
+                    if (project == null) {
+                        project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+                        project.create(null);
+                        project.open(null);
+                    }
                     base.evaluate();
                 } finally {
                     if (project != null && project.exists()) {
@@ -59,7 +63,7 @@ public class ProjectProvider implements TestRule {
 
     public IFolder createDir(final IPath dirPath) throws CoreException {
         final IFolder directory = project.getFolder(dirPath);
-        directory.create(true, false, null);
+        directory.create(true, true, null);
         return directory;
     }
 

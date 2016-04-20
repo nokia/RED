@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -29,16 +28,24 @@ import com.google.common.collect.Lists;
 
 public class RobotLaunchConfigurationDelegateTest {
 
+    private static final String PROJECT_NAME = RobotLaunchConfigurationDelegateTest.class.getSimpleName();
+
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider();
+    public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
     @BeforeClass
     public static void before() throws Exception {
-        createProject();
+        projectProvider.createDir(Path.fromPortableString("001__suites_a"));
+        projectProvider.createFile(Path.fromPortableString("001__suites_a/s1.robot"), 
+                "*** Test Cases ***",
+                "001__case1", 
+                "  Log  10", 
+                "001__case2", 
+                "  Log  20");
     }
 
     @Test
-    public void commandLineTranslatesSuitesNames_whenNamesContainsDoubleUnderscores() throws Exception, IOException {
+    public void commandLineTranslatesSuitesNames_whenNamesContainsDoubleUnderscores() throws Exception {
         final RobotLaunchConfigurationDelegate delegate = new RobotLaunchConfigurationDelegate();
 
         final RobotProject robotProject = mock(RobotProject.class);
@@ -51,17 +58,17 @@ public class RobotLaunchConfigurationDelegateTest {
 
         final Collection<IResource> suiteResources = Lists
                 .<IResource> newArrayList(projectProvider.getDir(Path.fromPortableString("001__suites_a")));
-        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock("Project");
+        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
         robotConfig.addSuite("001__suites_a", new ArrayList<String>());
 
         final RunCommandLine commandLine = delegate.createStandardModeCmd(robotConfig, robotProject, suiteResources,
                 false);
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-s", "Project.Suites_a");
+        assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
     }
 
     @Test
     public void commandLineDoesNotTranslateTestNames_whenNamesContainsDoubleUnderscores()
-            throws Exception, IOException {
+            throws Exception {
         final RobotLaunchConfigurationDelegate delegate = new RobotLaunchConfigurationDelegate();
 
         final RobotProject robotProject = mock(RobotProject.class);
@@ -74,37 +81,11 @@ public class RobotLaunchConfigurationDelegateTest {
 
         final Collection<IResource> suiteResources = Lists
                 .<IResource> newArrayList(projectProvider.getDir(Path.fromPortableString("001__suites_a")));
-        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock("Project");
+        final RobotLaunchConfigurationMock robotConfig = new RobotLaunchConfigurationMock(PROJECT_NAME);
         robotConfig.addSuite("001__suites_a", newArrayList("001__case1"));
 
         final RunCommandLine commandLine = delegate.createStandardModeCmd(robotConfig, robotProject, suiteResources, false);
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-s", "Project.Suites_a");
-        assertThat(commandLine.getCommandLine()).containsSubsequence("-t", "Project.Suites_a.001__case1");
-    }
-
-    private static void createProject() throws Exception {
-        projectProvider.create("Project");
-        projectProvider.createDir(Path.fromPortableString("001__suites_a"));
-        projectProvider.createFile(Path.fromPortableString("001__suites_a/s1.robot"), 
-                "*** Test Cases ***", 
-                "001__case1",
-                "  Log  10",
-                "001__case2",
-                "  Log  20");
-        // projectProvider.createFile(Path.fromPortableString("suites/s2.robot"),
-        // "*** Test Cases ***",
-        // "case2",
-        // " [Tags] tag4",
-        // " Log 10");
-        // projectProvider.createFile(Path.fromPortableString("s3.robot"),
-        // "*** Test Cases ***",
-        // "case3",
-        // " [Tags] tag5",
-        // " Log 10",
-        // "case4",
-        // " [Tags] tag4",
-        // " Log 10",
-        // "case5",
-        // " Log 10");
+        assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
+        assertThat(commandLine.getCommandLine()).containsSubsequence("-t", PROJECT_NAME + ".Suites_a.001__case1");
     }
 }
