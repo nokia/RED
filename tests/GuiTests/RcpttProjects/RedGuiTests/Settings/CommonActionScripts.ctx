@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/21/16 2:29 PM
+Save-Time: 4/21/16 5:31 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -17,9 +17,7 @@ Entry-Name: .ecl.context
 get-eclipse-window | maximize 
 
 proc "run-process-and-trim"  [val process ""] [val arg1 ""] [val arg2 ""] [val ignoreStderr false ] [val ignoreExitCode false] {
-
 	exec-process  $process $arg1 $arg2  -ignoreStderr $ignoreStderr -ignoreExitCode $ignoreExitCode|  get stdout  |invoke trim 
-
 }
 
 //select path depends to operating system
@@ -35,8 +33,12 @@ global [val python_exe_path [run-process-and-trim  "python" "-c"  "import sys,os
 //get robot version:  "Robot Framework 3.0 (Python 2.7.8 on win32)" 
 global [val robot_version [run-process-and-trim -process  [os-specific "pybot.bat"  "pybot" ] -arg1 "--version"  -ignoreStderr true -ignoreExitCode true ]]
 
-//get jython path
-global [val jython_path [run-process-and-trim  "python" "-c" "import os, sys; [sys.stdout.write(i.rstrip('\\/')) for i in os.environ['PATH'].split(os.pathsep) if i.find('jython')!=-1]"]]
+//get jython path: "d:\jyton\jython2.7.0\bin\"
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+	global [val jython_path [run-process-and-trim  "python" "-c" "import os, sys; [sys.stdout.write(i.rstrip('\\/')) for i in os.environ['PATH'].split(os.pathsep) if i.find('jython')!=-1]"]]
+}-else{
+	global [val jython_path "/usr/local/bin"]
+}
 
 //jybot version: "Robot Framework 3.0 (Python 2.7.8 on win32)"
 global [val jybot_version [run-process-and-trim -process  [os-specific "jybot.bat"  "jybot" ] -arg1 "--version"  -ignoreStderr true -ignoreExitCode true ]]
