@@ -36,6 +36,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -46,20 +47,20 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsNamesLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotsEnvironmentsLabelProvider.InstalledRobotsPathsLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.fix.InstallRobotUsingPipFixer;
+import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
@@ -70,15 +71,18 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
 
     public static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.installed";
 
-    private ProgressBar progressBar;
-    private CheckboxTableViewer viewer;
     private List<RobotRuntimeEnvironment> installations;
+
+    private Composite parent;
+    private CheckboxTableViewer viewer;
+    private ProgressBar progressBar;
+
+    private Button addButton;
     private Button removeButton;
-    private Button installButton;
+    private Button discoverButton;
 
     private boolean dirty = false;
 
-    private Button addButton;
 
     public InstalledRobotsPreferencesPage() {
         super("Installed Robot Frameworks");
@@ -96,21 +100,27 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
 
     @Override
     protected Control createContents(final Composite parent) {
+        this.parent = parent;
         noDefaultAndApplyButton();
-        GridLayoutFactory.fillDefaults().applyTo(parent);
+        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(parent);
 
         createDescription(parent);
 
-        final Composite tableParent = createParentForTable(parent);
-        createViewer(tableParent);
+        createViewer(parent);
 
-        addButton = createButton(tableParent, "Add...", createAddListener());
+        addButton = createButton(parent, "Add...", createAddListener());
         addButton.setEnabled(false);
-        removeButton = createButton(tableParent, "Remove", createRemoveListener());
+        addButton.setToolTipText("Choose interpreter executable directory");
+
+        removeButton = createButton(parent, "Remove", createRemoveListener());
         removeButton.setEnabled(false);
-        installButton = createButton(tableParent, "Install Robot", createInstallListener());
-        installButton.setEnabled(false);
-        createSpacer(tableParent);
+        removeButton.setToolTipText("Remove selected environments");
+
+        discoverButton = createButton(parent, "Discover", createDiscoverListener());
+        discoverButton.setEnabled(false);
+        discoverButton.setToolTipText("Search again for Python interpreters");
+
+        createSpacer(parent);
 
         progressBar = createProgress(parent);
 
@@ -118,11 +128,56 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         return parent;
     }
 
-    private ProgressBar createProgress(final Composite tableParent) {
-        final ProgressBar pb = new ProgressBar(tableParent, SWT.SMOOTH | SWT.INDETERMINATE);
+    private SelectionListener createDiscoverListener() {
+        return new SelectionAdapter() {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                disableControls();
+                progressBar = createProgress(parent);
+                
+                final QualifiedName key = new QualifiedName(RedPlugin.PLUGIN_ID, "result");
+                final Job job = new Job("Looking for python installations") {
+                    @Override
+                    protected IStatus run(final IProgressMonitor monitor) {
+                        final List<PythonInstallationDirectory> interpreters = RobotRuntimeEnvironment
+                                .whereArePythonInterpreters();
+
+                        for (final PythonInstallationDirectory directory : interpreters) {
+                            boolean contains = false;
+                            for (final RobotRuntimeEnvironment environment : installations) {
+                                if (environment.getFile().equals(directory)) {
+                                    contains = true;
+                                    break;
+                                }
+                            }
+                            if (!contains) {
+                                installations.add(RobotRuntimeEnvironment.create(directory));
+                                dirty = true;
+                            }
+                        }
+                        setProperty(key, null);
+                        return Status.OK_STATUS;
+                    }
+                };
+                job.addJobChangeListener(new EnvironmentFoundJobListener(key));
+                job.schedule();
+            }
+
+        };
+    }
+
+    private ProgressBar createProgress(final Composite parent) {
+        final ProgressBar pb = new ProgressBar(parent, SWT.SMOOTH | SWT.INDETERMINATE);
         pb.setToolTipText("Looking for Python interpreters");
         GridDataFactory.fillDefaults().span(2, 1).applyTo(pb);
+        parent.layout();
         return pb;
+    }
+
+    private void destroyProgress(final ProgressBar pb) {
+        final Composite parent = pb.getParent();
+        pb.dispose();
+        parent.layout();
     }
 
     private void createDescription(final Composite parent) {
@@ -131,20 +186,14 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                 + "installed, currently " + Joiner.on(", ").join(SuiteExecutor.allExecutorNames())
                 + " are supported). The selected environment will be used by project unless it is explicitly "
                 + "overridden in project configuration.");
-        GridDataFactory.fillDefaults().grab(true, false).hint(500, SWT.DEFAULT).applyTo(lbl);
-    }
-
-    private Composite createParentForTable(final Composite parent) {
-        final Composite tableParent = new Composite(parent, SWT.NONE);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(tableParent);
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(tableParent);
-        return tableParent;
+        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).hint(600, SWT.DEFAULT).applyTo(lbl);
     }
 
     private void createViewer(final Composite tableParent) {
         final Table table = new Table(tableParent, SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION | SWT.H_SCROLL
                 | SWT.V_SCROLL);
         viewer = new CheckboxTableViewer(table);
+        ViewersConfigurator.enableDeselectionPossibility(viewer);
         GridDataFactory.fillDefaults().grab(true, true).span(1, 5).applyTo(viewer.getTable());
         viewer.getTable().setLinesVisible(true);
         viewer.getTable().setHeaderVisible(true);
@@ -153,14 +202,6 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
             public void selectionChanged(final SelectionChangedEvent event) {
                 final RobotRuntimeEnvironment selectedInstalation = getSelectedInstalation();
                 removeButton.setEnabled(selectedInstalation != null);
-                installButton
-                        .setEnabled(selectedInstalation != null && selectedInstalation.isValidPythonInstallation());
-
-                if (selectedInstalation != null && selectedInstalation.hasRobotInstalled()) {
-                    installButton.setText("Update Robot");
-                } else {
-                    installButton.setText("Install Robot");
-                }
             }
         };
         final ICheckStateListener checkListener = new ICheckStateListener() {
@@ -185,11 +226,15 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         ColumnViewerToolTipSupport.enableFor(viewer);
 
         viewer.setContentProvider(new InstalledRobotsContentProvider());
-        ViewerColumnsFactory.newColumn("Name").withWidth(300)
-            .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
-            .createFor(viewer);
-        ViewerColumnsFactory.newColumn("Path").withWidth(200)
-                .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer)).createFor(viewer);
+        ViewerColumnsFactory.newColumn("Name")
+                .withWidth(300)
+                .labelsProvidedBy(new InstalledRobotsNamesLabelProvider(viewer))
+                .createFor(viewer);
+        ViewerColumnsFactory.newColumn("Path")
+                .withWidth(200)
+                .shouldGrabAllTheSpaceLeft(true)
+                .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer))
+                .createFor(viewer);
     }
 
     private Button createButton(final Composite tableParent, final String buttonLabel,
@@ -205,6 +250,20 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         new Label(tableParent, SWT.NONE);
     }
 
+    private void disableControls() {
+        viewer.getTable().setEnabled(false);
+        addButton.setEnabled(false);
+        removeButton.setEnabled(false);
+        discoverButton.setEnabled(false);
+    }
+
+    private void enableControls() {
+        viewer.getTable().setEnabled(true);
+        addButton.setEnabled(true);
+        removeButton.setEnabled(true);
+        discoverButton.setEnabled(true);
+    }
+
     private void initializeValues() {
         final QualifiedName key = new QualifiedName(RedPlugin.PLUGIN_ID, "result");
         final Job job = new Job("Looking for python installations") {
@@ -218,32 +277,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                 return Status.OK_STATUS;
             }
         };
-        job.addJobChangeListener(new JobChangeAdapter() {
-            @Override
-            public void done(final IJobChangeEvent event) {
-                Display.getDefault().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        final RobotRuntimeEnvironment active = (RobotRuntimeEnvironment) event.getJob()
-                                .getProperty(key);
-                        final Control control = InstalledRobotsPreferencesPage.this.getControl();
-                        if (control == null || control.isDisposed()) {
-                            return;
-                        }
-                        viewer.setInput(installations);
-                        if (active != null) {
-                            viewer.setChecked(active, true);
-                            viewer.refresh();
-                        }
-                        addButton.setEnabled(true);
-                        final Composite parent = progressBar.getParent();
-                        progressBar.dispose();
-                        progressBar = null;
-                        parent.layout();
-                    }
-                });
-            }
-        });
+        job.addJobChangeListener(new EnvironmentFoundJobListener(key));
         job.schedule();
     }
 
@@ -281,21 +315,6 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                 installations.remove(env);
 
                 dirty = true;
-                viewer.setSelection(StructuredSelection.EMPTY);
-                viewer.refresh();
-            }
-        };
-    }
-
-    private SelectionListener createInstallListener() {
-        return new SelectionAdapter() {
-            @Override
-            public void widgetSelected(final SelectionEvent event) {
-                final RobotRuntimeEnvironment selectedInstalation = getSelectedInstalation();
-
-                InstallRobotUsingPipFixer.updateRobotFramework(getShell(), selectedInstalation);
-                dirty = true;
-
                 viewer.setSelection(StructuredSelection.EMPTY);
                 viewer.refresh();
             }
@@ -352,6 +371,39 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
         } catch (InvocationTargetException | InterruptedException e) {
             MessageDialog.openError(getShell(), "Workspace rebuild",
                     "Problems occured during workspace build " + e.getMessage());
+        }
+    }
+
+    private final class EnvironmentFoundJobListener extends JobChangeAdapter {
+
+        private final QualifiedName key;
+
+        private EnvironmentFoundJobListener(final QualifiedName key) {
+            this.key = key;
+        }
+
+        @Override
+        public void done(final IJobChangeEvent event) {
+            SwtThread.asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    final RobotRuntimeEnvironment active = (RobotRuntimeEnvironment) event.getJob().getProperty(key);
+                    final Control control = InstalledRobotsPreferencesPage.this.getControl();
+                    if (control == null || control.isDisposed()) {
+                        return;
+                    }
+                    enableControls();
+                    viewer.setInput(installations);
+                    if (active != null) {
+                        viewer.setChecked(active, true);
+                        viewer.refresh();
+                    }
+                    viewer.setSelection(StructuredSelection.EMPTY);
+
+                    destroyProgress(progressBar);
+                    progressBar = null;
+                }
+            });
         }
     }
 }
