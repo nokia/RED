@@ -23,6 +23,8 @@
     </topic>
 	<topic href="doc/user_guide/variable_files.html" label="Variable Files - dealing with missing variables ">
     </topic>
+	<topic href="doc/user_guide/custom_paths_relatve.html" label="Custom python/class paths and path relativeness">
+    </topic>
     <topic href="doc/user_guide/remote.html" label="Remote debug">
     </topic>
     <topic href="doc/user_guide/importing.html" label="Importing files and projects to workspace.">
@@ -41,5 +43,6 @@
     </topic>
 	<topic href="doc/user_guide/headless.html" label="Headless - running validation in command line">
     </topic>
+
  </topic>
 </toc>
