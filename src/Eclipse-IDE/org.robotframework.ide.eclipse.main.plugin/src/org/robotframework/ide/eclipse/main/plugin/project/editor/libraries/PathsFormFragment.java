@@ -288,11 +288,8 @@ class PathsFormFragment implements ISectionFormFragment {
     private void whenEnvironmentsWereLoaded(
             @UIEventTopic(RobotProjectConfigEvents.ROBOT_CONFIG_ENV_LOADED) final Environments envs) {
         final boolean isEditable = editorInput.isEditable();
-        final RobotRuntimeEnvironment activeEnvironment = envs.getActiveEnvironment();
-        if(activeEnvironment == null) {
-            return;
-        }
-        final boolean projectIsInterpretedByJython = envs.getActiveEnvironment().getInterpreter() == SuiteExecutor.Jython;
+        final boolean projectIsInterpretedByJython = envs.getActiveEnvironment() != null
+                && envs.getActiveEnvironment().getInterpreter() == SuiteExecutor.Jython;
 
         relativityCombo.setEnabled(isEditable);
         pythonPathViewer.getTable().setEnabled(isEditable);
