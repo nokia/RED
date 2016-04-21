@@ -1,0 +1,123 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: DiscoverInterpreters
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _-qvG8Ae3EearkLC-7wHL-g
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/21/16 2:52 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//restart RED
+get-menu "File/Restart" | click
+wait-until-eclipse-is-ready
+get-view Welcome | close
+
+
+//open preference
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+
+
+//check if 2 interperetrs are visible (first is selected and has bold font)
+with [get-window Preferences | get-table] {
+    get-item "Robot Framework .*\\(Python .*\\)" | get-property "styles[0].fontStyle" | equals bold 
+        | verify-true
+    get-item "Robot Framework .*\\(Python .*\)" | get-property "styles[1].fontStyle" | equals bold 
+        | verify-true
+    get-item "Robot Framework .*\\(Python .*\\)" | get-property "values['Name']" 
+        | equals $robot_version | verify-true
+    get-item "Robot Framework .*\\(Python .*\\)" | get-property "values['Path']" | equals $python_exe_path
+        | verify-true
+        
+        
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[0].fontStyle" 
+        | equals normal | verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[1].fontStyle" 
+        | equals normal | verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "values['Name']" 
+        | equals $jybot_version | verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "values['Path']" 
+        | equals $jython_path | verify-true
+}
+
+//remove all interpreters
+with [get-window Preferences] {
+    get-table | select"Robot Framework .*\\(Python .*\\)"
+    get-button Remove | click
+    get-table | select "Robot Framework .*\\(Jython .*\\)"
+    get-button Remove | click
+}
+get-window Preferences | get-table | get-property itemCount | equals 0 | verify-true
+
+//select Discover button
+get-window Preferences | get-button Discover | click
+
+//check
+with [get-window Preferences | get-table] {
+    get-item"Robot Framework .*\\(Python .*\\)" | get-property selected | equals false | verify-true
+    get-item"Robot Framework .*\\(Python .*\\)" | get-property checked | equals false | verify-true
+    get-item"Robot Framework .*\\(Python .*\\)" | get-property "values['Name']" 
+        | equals $robot_version  | verify-true
+    get-item"Robot Framework .*\\(Python .*\\)" | get-property "values['Path']" | equals $python_exe_path
+        | verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property selection | equals false 
+        | verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property enablement | equals false 
+        | verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "values['Name']" 
+        | equals $jybot_version| verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "values['Path']" 
+        | equals $jython_path | verify-true
+}
+get-window Preferences | get-table | get-item"Robot Framework .*\\(Python .*\\)" | check
+with [get-window Preferences | get-table] {
+    get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[0].fontStyle" | equals bold 
+        | verify-true
+    get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[1].fontStyle" | equals bold 
+        | verify-true
+}
+with [get-window Preferences | get-table] {
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[0].fontStyle" 
+        | equals normal | verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[1].fontStyle" 
+        | equals normal | verify-true
+}
+get-window Preferences | get-table | get-item "Robot Framework .*\\(Jython .*\\)" | check
+with [get-window Preferences | get-table] {
+    get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[0].fontStyle" | equals normal 
+        | verify-true
+    get-item"Robot Framework .*\\(Python .*\\)" | get-property "styles[1].fontStyle" | equals normal 
+        | verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[0].fontStyle" 
+        | equals bold | verify-true
+    get-item "Robot Framework .*\\(Jython .*\\)" | get-property "styles[1].fontStyle" 
+        | equals bold | verify-true
+}
+with [get-window Preferences] {
+    get-table | get-item"Robot Framework .*\\(Python .*\\)" | check
+    get-button OK | click
+    get-window "Rebuild required" | get-button OK | click
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text test
+    key-type Enter
+    type-text "log  66"
+    key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Run As/1 Robot Test" | click
+get-tab-folder -index 5 | get-tab-item "Message Log" | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.TestFile.test\n"
+    + ".* : INFO : 66\n"
+    + "Ending test: RobotProject.TestFile.test" | verify-true
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
