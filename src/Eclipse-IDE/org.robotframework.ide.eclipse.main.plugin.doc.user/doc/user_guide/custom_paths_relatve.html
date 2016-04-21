@@ -1,0 +1,21 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>Custom python/class paths and path relativeness</h2>
+Settings available in red.xml -> Referenced Libraries
+<h3>Custom python/class paths</h3>
+Certain RED usage scenarios such as library development, requires custom path for python/jython interpreter to fulfill dependencies. <br>
+Either this can be done on OS level by updating environment variables or can be included in red.xml.<br>
+Path entries can be absolute or relative, they will be taken into use anytime when interpreter executes (testcase and debug run or libdoc generation). <br>
+ <br><br><img src="custom_paths_relatve/custom_path.png"> <br><br>
+<h3>Path relativeness</h3>
+By default, relative paths are resolved around Project scope although in some scenarios like storing Robot testsuites in one project and libraries in other, there is a need to change relativeness regards to Workspace.<br>
+This can be changed in red.xml under Referenced Libraries -> Path part.
+<br><b>Note that relativeness setting is used together with class/python path and libraries only.</b>
+
+</body>
+</html>
