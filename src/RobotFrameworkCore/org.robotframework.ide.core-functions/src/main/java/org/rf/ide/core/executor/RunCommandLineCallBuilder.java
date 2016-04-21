@@ -17,6 +17,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import org.rf.ide.core.executor.RobotRuntimeEnvironment.PythonInstallationDirectory;
+
 import com.google.common.base.Joiner;
 
 /**
@@ -216,12 +218,9 @@ public class RunCommandLineCallBuilder {
 
             cmdLine.add(executablePath);
             if (executor == SuiteExecutor.Jython) {
-                final Path jythonPath = Paths.get(executablePath);
-                final Path jythonParentPath = jythonPath.getParent();
-                if (jythonParentPath.getFileName().toString().equalsIgnoreCase("bin")) {
-                    Path mainDir = jythonParentPath.getParent();
-                    Path sitePackagesDir = Paths.get(mainDir.toString(), "Lib", "site-packages");
-                    cmdLine.add("-J-Dpython.path=" + sitePackagesDir.toString()); // in case of 'robot' folder existing in project
+                final String additionalPythonPathLocationForJython = extractAdditionalPythonPathLocationForJython();
+                if (!additionalPythonPathLocationForJython.isEmpty()) {
+                    cmdLine.add(additionalPythonPathLocationForJython);
                 }
                 cmdLine.add("-J-cp");
                 cmdLine.add(classPath());
@@ -287,6 +286,29 @@ public class RunCommandLineCallBuilder {
 
         private String pythonPath() {
             return Joiner.on(":").join(pythonPath);
+        }
+        
+        private String extractAdditionalPythonPathLocationForJython() {
+            String additionalPythonPathLocation = "";
+            final Path jythonPath = Paths.get(executablePath);
+            Path jythonParentPath = jythonPath.getParent();
+            if (jythonParentPath == null) {
+                final List<PythonInstallationDirectory> pythonInterpreters = RobotRuntimeEnvironment
+                        .whereArePythonInterpreters();
+                for (final PythonInstallationDirectory pythonInstallationDirectory : pythonInterpreters) {
+                    if (pythonInstallationDirectory.getInterpreter() == SuiteExecutor.Jython) {
+                        jythonParentPath = pythonInstallationDirectory.toPath();
+                        break;
+                    }
+                }
+            }
+            if (jythonParentPath != null && jythonParentPath.getFileName() != null
+                    && jythonParentPath.getFileName().toString().equalsIgnoreCase("bin")) {
+                final Path mainDir = jythonParentPath.getParent();
+                final Path sitePackagesDir = Paths.get(mainDir.toString(), "Lib", "site-packages");
+                additionalPythonPathLocation = "-J-Dpython.path=" + sitePackagesDir.toString(); // in case of 'robot' folder existing in project
+            }
+            return additionalPythonPathLocation;
         }
     }
 
