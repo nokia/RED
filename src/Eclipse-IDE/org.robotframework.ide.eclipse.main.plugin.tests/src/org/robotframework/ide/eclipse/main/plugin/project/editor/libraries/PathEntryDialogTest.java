@@ -42,7 +42,7 @@ public class PathEntryDialogTest {
                 SwtThread.asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        dialog.get().getSearchPathsText().setText("path1\n\n  \t  \npath2\n");
+                        dialog.get().getSearchPathsText().setText("path1\n\n  \t  \npath\t2\n");
                         dialog.get().getOkButton().notifyListeners(SWT.Selection, new Event());
                     }
                 });
@@ -58,6 +58,6 @@ public class PathEntryDialogTest {
         }
 
         assertThat(dialog.get().getSearchPath()).containsExactly(SearchPath.create("path1"),
-                SearchPath.create("path2"));
+                SearchPath.create("path 2"));
     }
 }
