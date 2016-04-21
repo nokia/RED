@@ -15,9 +15,13 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -38,6 +42,28 @@ public class ProjectProvider implements TestRule {
 
     public IProject getProject() {
         return project;
+    }
+
+    public void addRobotNature() throws CoreException {
+        RobotProjectNature.addRobotNature(project, null);
+    }
+
+    public void removeRobotNature() throws CoreException {
+        RobotProjectNature.removeRobotNature(project, null);
+    }
+
+    public void configure() throws IOException, CoreException {
+        configure(new RobotProjectConfig());
+    }
+
+    public void configure(final RobotProjectConfig config) throws IOException, CoreException {
+        createFile(Path.fromPortableString("red.xml"), "");
+        final RobotProjectConfigWriter configWriter = new RobotProjectConfigWriter();
+        configWriter.writeConfiguration(config, project);
+    }
+
+    public void deconfigure() throws CoreException {
+        project.findMember("red.xml").delete(true, null);
     }
 
     @Override
@@ -70,7 +96,11 @@ public class ProjectProvider implements TestRule {
     public IFile createFile(final IPath filePath, final String... lines) throws IOException, CoreException {
         final IFile file = project.getFile(filePath);
         try (InputStream source = new ByteArrayInputStream(Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
-            file.create(source, true, null);
+            if (file.exists()) {
+                file.setContents(source, true, false, null);
+            } else {
+                file.create(source, true, null);
+            }
         }
         return file;
     }
