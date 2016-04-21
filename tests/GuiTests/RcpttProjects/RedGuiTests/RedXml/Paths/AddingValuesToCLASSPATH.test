@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Fh1mIAFsEeaQD_aaetnnqw
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/21/16 1:17 PM
+Save-Time: 4/21/16 1:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -68,7 +68,7 @@ with [get-tab-folder -index 4] {
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{  
 		get-view Console | get-text-viewer | get-object |invoke getLine  0 
-		| matches [format "Command: .*jython.exe -J-cp \.;%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar -m .* --listener.*" $new_ws_path]
+		| matches [format "Command: .*jython.exe -J-cp ((\.;%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar)|(%s\\\\jython_simple_project\\\\RED_TEST_JavaLib.jar;\.)) -m .* --listener .*" $new_ws_path $new_ws_path]
 		| verify-true
 	}
 }-else{
