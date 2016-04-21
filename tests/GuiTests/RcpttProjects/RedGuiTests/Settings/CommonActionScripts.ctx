@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/11/16 12:25 PM
+Save-Time: 4/21/16 2:29 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -29,16 +29,17 @@ proc "os-specific" [val windowsValue] [val linuxValue]
 }
 
 
-//get python path
+//get python path: "C:\Pyhon27"
 global [val python_exe_path [run-process-and-trim  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)" ]]
 
-
-//get robot version
+//get robot version:  "Robot Framework 3.0 (Python 2.7.8 on win32)" 
 global [val robot_version [run-process-and-trim -process  [os-specific "pybot.bat"  "pybot" ] -arg1 "--version"  -ignoreStderr true -ignoreExitCode true ]]
-
 
 //get jython path
 global [val jython_path [run-process-and-trim  "python" "-c" "import os, sys; [sys.stdout.write(i.rstrip('\\/')) for i in os.environ['PATH'].split(os.pathsep) if i.find('jython')!=-1]"]]
+
+//jybot version: "Robot Framework 3.0 (Python 2.7.8 on win32)"
+global [val jybot_version [run-process-and-trim -process  [os-specific "jybot.bat"  "jybot" ] -arg1 "--version"  -ignoreStderr true -ignoreExitCode true ]]
 
 
 let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
