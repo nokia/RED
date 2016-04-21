@@ -9,7 +9,7 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
-import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.io.File;
 import java.util.Collection;
@@ -318,7 +318,7 @@ public class RobotProject extends RobotContainer {
     public synchronized List<String> getPythonpath() {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
-            final Set<String> pp = newHashSet();
+            final Set<String> pp = newLinkedHashSet();
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
                 if (lib.provideType() == LibraryType.PYTHON) {
                     final String path = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
@@ -343,7 +343,8 @@ public class RobotProject extends RobotContainer {
     public synchronized List<String> getClasspath() {
         readProjectConfigurationIfNeeded();
         if (configuration != null) {
-            final Set<String> cp = newHashSet(".");
+            final Set<String> cp = newLinkedHashSet();
+            cp.add(".");
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
                 if (lib.provideType() == LibraryType.JAVA) {
                     final IPath absPath = PathsConverter
