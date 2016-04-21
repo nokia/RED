@@ -43,7 +43,7 @@ public class RobotRuntimeEnvironment {
 
     private final File location;
 
-    private String version;
+    private final String version;
 
     public static void addProcessListener(final PythonProcessListener listener) {
         PythonInterpretersCommandExecutors.getInstance().addProcessListener(listener);
@@ -340,31 +340,6 @@ public class RobotRuntimeEnvironment {
 
     public File getFile() {
         return location;
-    }
-
-    public void installRobotUsingPip(final ILineHandler linesHandler,
-            final boolean useStableVersion) throws RobotEnvironmentException {
-        if (isValidPythonInstallation()) {
-            final String cmd = getPythonExecutablePath();
-            final List<String> cmdLine = new ArrayList<>();
-            cmdLine.addAll(Arrays.asList(cmd, "-m", "pip", "install",
-                    "--upgrade"));
-            if (!useStableVersion) {
-                cmdLine.add("--pre");
-            }
-            cmdLine.add("robotframework");
-            try {
-                final int returnCode = runExternalProcess(cmdLine, linesHandler);
-                if (returnCode != 0) {
-                    throw new RobotEnvironmentException(
-                            "Unable to upgrade Robot installation");
-                }
-                version = getRobotFrameworkVersion((PythonInstallationDirectory) location);
-            } catch (final IOException e) {
-                throw new RobotEnvironmentException(
-                        "Unable to upgrade Robot installation", e);
-            }
-        }
     }
 
     public void resetCommandExecutors() {
