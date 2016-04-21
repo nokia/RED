@@ -73,7 +73,7 @@ class PathEntryDialog extends Dialog {
                     @Override
                     public SearchPath apply(final String singlePath) {
                         final SearchPath path = new SearchPath();
-                        path.setLocation(singlePath.trim());
+                        path.setLocation(singlePath.trim().replaceAll("\t", " "));
                         return path.getLocation().isEmpty() ? null : path;
                     }
                 }), Predicates.notNull()));
