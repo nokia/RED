@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4M2r0AB_EeWittqS49qH2Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/21/16 1:57 PM
+Save-Time: 4/21/16 3:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,6 +15,7 @@ Entry-Name: .content
 
 //open and close prefernce
 get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
 
 //Check Label
 get-window Preferences 
