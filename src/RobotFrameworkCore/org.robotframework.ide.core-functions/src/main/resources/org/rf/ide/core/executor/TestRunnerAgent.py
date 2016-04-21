@@ -347,19 +347,24 @@ class TestRunnerAgent:
             if attributes['source']:
                 if '__pyclasspath__' in attributes['source']:
                     res = attributes['source'].split('__pyclasspath__')[1].replace(os.sep, '')
-                    attributes['source'] = jimp.getSyspathJavaLoader().getResources(res).nextElement()
+                    attributes['source'] = str(jimp.getSyspathJavaLoader().getResources(res).nextElement())
             else:
-                source_uri = jimp.getSyspathJavaLoader().getResources(name + '.class').nextElement()
-                source_uri_txt = str(source_uri)
-                if source_uri_txt and 'file:/' in source_uri_txt:
-                    import re
-                    from java.io import File as File
-                    from java.net import URL as URL
-                    filePath = re.split('.*(?=file[:])', source_uri_txt)
-                    if len(filePath) > 1:
-                        path = re.split('[!][/]', filePath[1])[0]
-                        f = File(URL(path).getFile())
-                        source_uri_txt = f.getAbsolutePath()
+                try:
+                    source_uri = jimp.getSyspathJavaLoader().getResources(name + '.class').nextElement()
+                    attributes['source'] = str(source_uri)
+                except:
+                    pass
+
+            source_uri_txt = attributes['source']
+            if source_uri_txt and 'file:/' in source_uri_txt:
+                import re
+                from java.io import File as File
+                from java.net import URL as URL
+                filePath = re.split('.*(?=file[:])', source_uri_txt)
+                if len(filePath) > 1:
+                    path = re.split('[!][/]', filePath[1])[0]
+                    f = File(URL(path).getFile())
+                    source_uri_txt = f.getAbsolutePath()
                 attributes['source'] = source_uri_txt
         self._send_socket("library_import", name, attributes)
 

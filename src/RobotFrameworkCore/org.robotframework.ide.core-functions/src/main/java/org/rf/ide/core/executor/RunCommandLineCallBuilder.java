@@ -10,6 +10,8 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -214,6 +216,13 @@ public class RunCommandLineCallBuilder {
 
             cmdLine.add(executablePath);
             if (executor == SuiteExecutor.Jython) {
+                final Path jythonPath = Paths.get(executablePath);
+                final Path jythonParentPath = jythonPath.getParent();
+                if (jythonParentPath.getFileName().toString().equalsIgnoreCase("bin")) {
+                    Path mainDir = jythonParentPath.getParent();
+                    Path sitePackagesDir = Paths.get(mainDir.toString(), "Lib", "site-packages");
+                    cmdLine.add("-J-Dpython.path=" + sitePackagesDir.toString()); // in case of 'robot' folder existing in project
+                }
                 cmdLine.add("-J-cp");
                 cmdLine.add(classPath());
             }
