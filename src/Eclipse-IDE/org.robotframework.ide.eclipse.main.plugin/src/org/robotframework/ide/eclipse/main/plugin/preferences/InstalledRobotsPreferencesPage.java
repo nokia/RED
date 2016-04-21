@@ -218,7 +218,6 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                 return Status.OK_STATUS;
             }
         };
-        job.schedule();
         job.addJobChangeListener(new JobChangeAdapter() {
             @Override
             public void done(final IJobChangeEvent event) {
@@ -245,6 +244,7 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                 });
             }
         });
+        job.schedule();
     }
 
     private RobotRuntimeEnvironment getSelectedInstalation() {
