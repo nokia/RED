@@ -147,11 +147,8 @@ public class ReferencedLibraryImporter {
 
     public ReferencedLibrary importLibFromSpecFile(final String fullLibraryPath) {
         final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath));
-        final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-        referencedLibrary.setType(LibraryType.VIRTUAL.toString());
-        referencedLibrary.setName(path.lastSegment());
-        referencedLibrary.setPath(path.toPortableString());
-        return referencedLibrary;
+        return ReferencedLibrary.create(LibraryType.VIRTUAL,
+                path.lastSegment(), path.toPortableString());
     }
 
     static ElementListSelectionDialog createSelectionDialog(final Shell shell, final String path,

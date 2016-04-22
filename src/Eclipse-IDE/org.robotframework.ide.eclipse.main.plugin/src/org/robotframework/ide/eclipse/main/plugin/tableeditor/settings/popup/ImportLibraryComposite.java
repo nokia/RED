@@ -63,6 +63,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSe
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -105,7 +106,7 @@ public class ImportLibraryComposite {
         this.fileModel = fileModel;
         this.shell = shell;
         robotProject = fileModel.getProject();
-        eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     public Composite createImportResourcesComposite(final Composite parent) {
@@ -292,7 +293,9 @@ public class ImportLibraryComposite {
 
     private void addNewLibraryToProjectConfiguration(final IPath path, final String nameWithoutExtension) {
         final RobotProjectConfig config = robotProject.getRobotProjectConfig();
-        config.addReferencedLibraryInPython(nameWithoutExtension, path);
+        final ReferencedLibrary referencedLibrary = ReferencedLibrary.create(LibraryType.PYTHON, nameWithoutExtension,
+                path.toPortableString());
+        config.addReferencedLibrary(referencedLibrary);
         robotProject.clearConfiguration();
         new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");

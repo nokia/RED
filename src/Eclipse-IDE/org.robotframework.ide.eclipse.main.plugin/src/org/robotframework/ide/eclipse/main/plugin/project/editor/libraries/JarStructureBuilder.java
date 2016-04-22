@@ -113,12 +113,8 @@ public class JarStructureBuilder {
         }
 
         public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
-            final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-            referencedLibrary.setType(LibraryType.JAVA.toString());
-            referencedLibrary.setName(qualifiedName);
-            referencedLibrary.setPath(
+            return ReferencedLibrary.create(LibraryType.JAVA, qualifiedName,
                     PathsConverter.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath)).toPortableString());
-            return referencedLibrary;
         }
     }
 }
