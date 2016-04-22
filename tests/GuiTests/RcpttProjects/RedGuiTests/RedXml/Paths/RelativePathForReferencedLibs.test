@@ -1,0 +1,166 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _eXb6MPp7EeW7_PzjO98BIw
+Element-Name: RelativePathForReferencedLibs
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _8mYawAiBEearkLC-7wHL-g
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/22/16 2:50 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open red.xml and add new path to PYTHONPAT
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+with [get-editor "RobotProject/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    with [get-section "Referenced libraries" | get-button "Auto discover libraries after test suite save action"] {
+        uncheck
+        key-type "M1+s"
+    }
+    get-section Paths | get-table | get-item "...add new search path" | double-click
+}
+with [get-window "Add new search path"] {
+    with [get-editbox 
+        -after [get-label "Provide search paths to be added. Each path should be specified in separate line."]] {
+        set-text "libs\n"
+            + "D:\\folder\\folder2\n"
+            + "/linux_path/tests\n"
+            + "\\win_path/addons"
+    }
+    get-button OK | click
+}
+
+get-editor "RobotProject/red.xml" | get-section Paths | get-table | key-type "M1+s"
+
+//check color of items in table
+with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+    get-item libs | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+    get-item "D:\\folder\\folder2" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+    get-item "\\/linux_path\\/tests" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+    get-item "\\win_path\\/addons" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+}
+
+//check warnings
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+	with [get-view Problems | get-tree] {
+	    get-item "Warnings \\(4 items\\)" | get-property childCount | equals 4 | verify-true
+	    get-item "Warnings \\(4 items\\)/The path '\\linux_path\\tests' points to non-existing location" 
+	        | get-property caption | equals "The path '\\linux_path\\tests' points to non-existing location" | verify-true
+	    get-item "Warnings \\(4 items\\)/The path '\\win_path\\addons' points to non-existing location" 
+	        | get-property caption | equals "The path '\\win_path\\addons' points to non-existing location" | verify-true
+	    get-item "Warnings \\(4 items\\)/The path '.*libs' points to non-existing location" 
+	        | get-property caption | equals [format "The path '%s\\libs' points to non-existing location" $RED_workspace_path]
+	        | verify-true
+	    get-item "Warnings \\(4 items\\)/The path 'D:\\folder\\folder2' points to non-existing location" 
+	        | get-property caption | equals "The path 'D:\\folder\\folder2' points to non-existing location" | verify-true
+	 }
+
+}-else{
+	with [get-view Problems | get-tree] {
+	    get-item "Warnings \\(4 items\\)" | get-property childCount | equals 4 | verify-true
+	    get-item "Warnings \\(4 items\\)/The path '\\linux_path\\tests' points to non-existing location" 
+	        | get-property caption | equals "The path '\\linux_path\\tests' points to non-existing location" | verify-true
+	    get-item "Warnings \\(4 items\\)/The path '\\win_path\\addons' points to non-existing location" 
+	        | get-property caption | equals "The path '\\win_path\\addons' points to non-existing location" | verify-true
+	    get-item "Warnings \\(4 items\\)/The path 'D:\\aut-red-product\\libs' points to non-existing location" 
+	        | get-property caption | equals "The path 'D:\\aut-red-product\\libs' points to non-existing location" 
+	        | verify-true
+	    get-item "Warnings \\(4 items\\)/The path 'D:\\folder\\folder2' points to non-existing location" 
+	        | get-property caption | equals "The path 'D:\\folder\\folder2' points to non-existing location" | verify-true
+	}
+}
+//add lib to test
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | double-click
+get-editor "lib_with_variable.robot" | get-text-viewer |set-text "*** Settings ***\n"
+    + "Library    add\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  67"
+    
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    key-type "M1+s"
+}    
+//run test    
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 
+    | click
+
+//check console
+get-view Console | get-text-viewer | get-property text 
+    | contains "lib_with_variable.robot': Importing test library 'add' failed: ImportError: No module named add\n"
+    | verify-true
+    
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
+		let [val rp 
+		   [format "(%s\\\\libs|D:\\\\folder\\\\folder2|\\\\linux_path\\\\tests|\\\\win_path\\\\addons)" $new_ws_path]]
+		   {
+				get-view Console | get-text-viewer | get-object |invoke getLine  0
+				| matches [format "Command: .* -m .* -P %s:%s:%s:%s.* --listener .*" $rp $rp $rp $rp] 
+				| verify-true
+		   }
+    }
+}-else{
+   let [val rp 
+   [format "(%s/RobotProject/libs|D:/folder/folder2|/linux_path/tests|/win_path/addons)" $new_ws_path]]
+   {
+		get-view Console | get-text-viewer | get-object |invoke getLine  0
+		| matches [format "Command: .* -m .* -P %s:%s:%s:%s.* --listener .*" $rp $rp $rp $rp] 
+		| verify-true
+   }
+}      
+
+
+//change path to Project
+get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
+with [get-editor "RobotProject/red.xml" | get-section Paths] {
+    get-combo -after [get-label "Relative paths defined below are relative to:"] | select PROJECT
+    get-table | select "\\win_path\\/addons" | key-type "M1+s"
+}
+
+get-tab-folder -index 4 | get-tab-item Problems | click
+with [get-view Problems | get-tree] {
+    get-item "Warnings \\(3 items\\)" | get-property childCount | equals 3 | verify-true
+    get-item "Warnings \\(3 items\\)/The path '\\linux_path\\tests' points to non-existing location" 
+        | get-property caption | equals "The path '\\linux_path\\tests' points to non-existing location" | verify-true
+    get-item "Warnings \\(3 items\\)/The path '\\win_path\\addons' points to non-existing location" 
+        | get-property caption | equals "The path '\\win_path\\addons' points to non-existing location" | verify-true
+    get-item "Warnings \\(3 items\\)/The path 'D:\\folder\\folder2' points to non-existing location" 
+        | get-property caption | equals "The path 'D:\\folder\\folder2' points to non-existing location" | verify-true
+}
+
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 
+    | click
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.Lib With Variable.test\n"
+    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : 67\n"
+    + "Ending test: RobotProject.Lib With Variable.test" | verify-true
+
+
+
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
+		let [val rp 
+		   [format "(%s\\\\RobotProject\\\\libs|D:\\\\folder\\\\folder2|\\\\linux_path\\\\tests|\\\\win_path\\\\addons)" $new_ws_path]]
+		   {
+				get-view Console | get-text-viewer | get-object |invoke getLine  0
+				| matches [format "Command: .* -m .* -P %s:%s:%s:%s.* --listener .*" $rp $rp $rp $rp] 
+				| verify-true
+		   }
+    }
+}-else{
+   let [val rp 
+   [format "(%s/RobotProject/libs|D:/folder/folder2|/linux_path/tests|/win_path/addons)" $new_ws_path]]
+   {
+		get-view Console | get-text-viewer | get-object |invoke getLine  0
+		| matches [format "Command: .* -m .* -P %s:%s:%s:%s.* --listener .*" $rp $rp $rp $rp] 
+		| verify-true
+   }
+}      
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
