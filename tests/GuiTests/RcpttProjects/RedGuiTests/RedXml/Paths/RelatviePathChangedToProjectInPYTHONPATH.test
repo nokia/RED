@@ -1,0 +1,257 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _eXb6MPp7EeW7_PzjO98BIw
+Element-Name: RelatviePathChangedToProjectInPYTHONPATH
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _a_1L4AfGEearkLC-7wHL-g
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/22/16 12:43 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open red.xml and remove autodiscover
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" 
+    | get-button "Auto discover libraries after test suite save action"] {
+    uncheck
+    key-type "M1+s"
+}
+
+//add res1.py to reference lib
+set-dialog-result File "platform:/resource/RobotProject/libs/for_resource/res1.py"
+with [get-editor "RobotProject/red.xml"] {
+    with [get-section "Referenced libraries" | get-button "Add Python library"] {
+        click
+        key-type "M1+s"
+    }
+    get-section Paths | get-table | get-item "...add new search path" | double-click
+}
+
+//add new paths: libs, not_existing/path
+with [get-window "Add new search path"] {
+    with [get-editbox 
+        -after [get-label "Provide search paths to be added. Each path should be specified in separate line."]] {
+        set-text libs
+        key-type Enter
+        set-text "libs\n"
+        key-type Enter
+        set-text "libs\n"
+            + "not_existing/path"
+    }
+    get-button OK | click
+}
+get-editor "RobotProject/red.xml" | get-section Paths | get-table | key-type "M1+s"
+
+//check that WORKSPACE is set
+get-editor "RobotProject/red.xml" | get-section Paths | get-combo 
+    -after [get-label "Relative paths defined below are relative to:"] | get-property selection | equals WORKSPACE 
+    | verify-true
+    
+//check colours of warnings    
+with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+    get-item libs | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+    get-item "not_existing\\/path" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+}
+
+//check warnings in Problems
+get-tab-folder -index 4 | get-tab-item Problems | click
+with [get-view Problems | get-tree] {
+    get-item "Warnings \\(2 items\\)" | get-property childCount | equals 2 | verify-true
+    get-item "Warnings \\(2 items\\)/The path '.*libs' points to non-existing location" 
+        | get-property caption | equals [format "The path '%s%slibs' points to non-existing location" $RED_workspace_path $sys_sep]
+        | verify-true
+    get-item "Warnings \\(2 items\\)/The path '.*path' points to non-existing location" | get-property caption 
+        | equals [format "The path '%s%snot_existing%spath' points to non-existing location" $RED_workspace_path $sys_sep $sys_sep]| verify-true
+}
+
+
+//open test and add content
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | double-click
+
+get-editor "lib_with_variable.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Library   add\n"
+    + "Library    res1  \n"
+    + "Library    multiply\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    \n"
+    + "    ${a}=  res1\n"
+    + "    ${b}=  add\n"
+    + "    ${c}=  multiply\n"
+    + "    \n"
+    + "    log  ${a}\n"
+    + "    log  ${b}\n"
+    + "    log  ${c}" 
+
+
+with [get-editor "lib_with_variable.robot" | get-text-viewer] {
+    key-type "M1+s"
+}
+
+//run test
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 
+    | click
+    
+//check console with error    
+get-view Console | get-text-viewer | get-property text 
+    | contains  "lib_with_variable.robot': Importing test library 'add' failed: ImportError: No module named add\n"
+    | verify-true
+    
+//check interpreters arg
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+	 replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
+		let [val rp 
+		   [format "(%s\\\\RobotProject\\\\libs\\\\for_resource|%s\\\\libs|%s\\\\not_existing\\\\path)" $new_ws_path $new_ws_path $new_ws_path]]
+		   {
+				get-view Console | get-text-viewer | get-object |invoke getLine  0
+				| matches [format "Command: .* -m .* -P %s:%s:%s.* --listener .*" $rp $rp $rp ] 
+				| verify-true
+		   }
+    }
+}-else{
+
+	let [val rp 
+		   [format "(%s/RobotProject/libs/for_resource|%s/libs|%s/not_existing/path)" $RED_workspace_path $RED_workspace_path $RED_workspace_path]]
+		   {
+				get-view Console | get-text-viewer | get-object |invoke getLine  0
+				| matches [format "Command: .* -m .* -P %s:%s:%s.* --listener .*" $rp $rp $rp ] 
+				| verify-true
+		}
+}    
+// check messege log
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.Lib With Variable.test\n"
+    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{a\} = text\n"
+    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : FAIL : No keyword with name 'add' found.\n"
+    + "Ending test: RobotProject.Lib With Variable.test" | verify-true
+    
+//change relative path to project    
+get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
+get-editor "RobotProject/red.xml" | get-section Paths | get-combo 
+    -after [get-label "Relative paths defined below are relative to:"] | select PROJECT
+    
+//save file (workaround - cannot save when dropdown was used ??)
+with [get-editor "RobotProject/red.xml"] {
+    get-section "Referenced libraries" | get-table | select "res1 - RobotProject\\/libs\\/for_resource" 
+        | key-type "M1+s"
+}    
+wait 2000
+//check if it was changed    
+get-editor "RobotProject/red.xml" | get-section Paths | get-combo 
+    -after [get-label "Relative paths defined below are relative to:"] | get-property selection | equals PROJECT 
+    | verify-true
+    
+//check warning
+with [get-view Problems | get-tree] {
+    get-item "Warnings \\(2 items\\)" | get-property childCount | equals 2 | verify-true
+    get-item "Warnings \\(2 items\\)/Given keyword name 'res1' is not consistent with keyword definition 'Res 1'" 
+        | get-property caption | equals "Given keyword name 'res1' is not consistent with keyword definition 'Res 1'" 
+        | verify-true
+    get-item "Warnings \\(2 items\\)/The path '.*path' points to non-existing location" | get-property caption 
+        | equals [format "The path '%s%sRobotProject%snot_existing%spath' points to non-existing location" $RED_workspace_path $sys_sep $sys_sep $sys_sep]| verify-true
+}
+
+    
+//run test again    
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" 
+    | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" | click
+    
+//check message log    
+get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.Lib With Variable.test\n"
+    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{a\} = text\n"
+    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{b\} = 56\n"
+    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{c\} = 8\n"
+    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : text\n"
+    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : 56\n"
+    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : 8\n"
+    + "Ending test: RobotProject.Lib With Variable.test" | verify-true
+    
+//check console    
+get-view Console | get-text-viewer | get-property text 
+    | equals "Command: .* -m .* -P .* --listener .* -s .*\n"
+    + "Suite Executor: Robot Framework .* \(Python .*\)\n"
+    + "==============================================================================\n"
+    + "RobotProject                                                                  \n"
+    + "==============================================================================\n"
+    + "RobotProject.Lib With Variable                                                \n"
+    + "==============================================================================\n"
+    + "test                                                                  \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "RobotProject.Lib With Variable                                        \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "RobotProject                                                          \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*output.xml\n"
+    + "Log:     .*log.html\n"
+    + "Report:  .*report.html" | verify-true
+
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+	replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
+		let [val rp 
+		   [format "(%s\\\\RobotProject\\\\libs\\\\for_resource|%s\\\\RobotProject\\\\libs|%s\\\\RobotProject\\\\not_existing\\\\path)" $new_ws_path $new_ws_path $new_ws_path]]
+		   {
+				get-view Console | get-text-viewer | get-object |invoke getLine  0
+				| matches [format "Command: .* -m .* -P %s:%s:%s.* --listener .*" $rp $rp $rp ] 
+				| verify-true
+		   }
+    }
+}-else{
+
+	let [val rp 
+		   [format "(%s/RobotProject/libs/for_resource|%s/RobotProject/libs|%s/RobotProject/not_existing/path)" $RED_workspace_path $RED_workspace_path $RED_workspace_path]]
+		   {
+				get-view Console | get-text-viewer | get-object |invoke getLine  0
+				| matches [format "Command: .* -m .* -P %s:%s:%s.* --listener .*" $rp $rp $rp ] 
+				| verify-true
+		}
+}       
+
+
+//switch again to WORKSPACE
+get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
+with [get-editor "RobotProject/red.xml"] {
+    get-section Paths | get-combo -after [get-label "Relative paths defined below are relative to:"] | select WORKSPACE
+    get-section "Referenced libraries" | get-table | select "res1 - RobotProject\\/libs\\/for_resource" 
+        | key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" 
+    | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" | click
+
+//check console with error    
+get-view Console | get-text-viewer | get-property text 
+    | contains  "lib_with_variable.robot': Importing test library 'add' failed: ImportError: No module named add\n"
+    | verify-true
+    
+    
+//check interpreters arg
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+	 replace -input $RED_workspace_path -old "\\" -new "\\\\" | let[val new_ws_path -input]{    
+		let [val rp 
+		   [format "(%s\\\\RobotProject\\\\libs\\\\for_resource|%s\\\\libs|%s\\\\not_existing\\\\path)" $new_ws_path $new_ws_path $new_ws_path]]
+		   {
+				get-view Console | get-text-viewer | get-object |invoke getLine  0
+				| matches [format "Command: .* -m .* -P %s:%s:%s.* --listener .*" $rp $rp $rp ] 
+				| verify-true
+		   }
+    }
+}-else{
+
+	let [val rp 
+		   [format "(%s/RobotProject/libs/for_resource|%s/libs|%s/not_existing/path)" $RED_workspace_path $RED_workspace_path $RED_workspace_path]]
+		   {
+				get-view Console | get-text-viewer | get-object |invoke getLine  0
+				| matches [format "Command: .* -m .* -P %s:%s:%s.* --listener .*" $rp $rp $rp ] 
+				| verify-true
+		}
+}        
+     
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
