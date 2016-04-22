@@ -64,7 +64,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
     }
 
     private static IEventBroker getEventBroker() {
-        return (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        return PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     static class VariableFileCreator extends NewElementsCreator<ReferencedVariableFile> {
@@ -94,10 +94,7 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
                             .addTrailingSeparator() //add separator when filterPath is e.g. 'D:'
                             .append(file);
 
-                    final ReferencedVariableFile variableFile = new ReferencedVariableFile();
-                    variableFile.setArguments(new ArrayList<String>());
-                    variableFile.setPath(path.toPortableString());
-                    variableFiles.add(variableFile);
+                    variableFiles.add(ReferencedVariableFile.create(path.toPortableString()));
                 }
                 for (final ReferencedVariableFile variableFile : variableFiles) {
                     if (firstFile == null) {

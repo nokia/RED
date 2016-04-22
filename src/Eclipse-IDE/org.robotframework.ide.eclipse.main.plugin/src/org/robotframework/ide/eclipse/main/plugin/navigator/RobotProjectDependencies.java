@@ -37,8 +37,8 @@ class RobotProjectDependencies {
             } else {
                 final LibrarySpecification specification = new ErroneousLibrarySpecification(entry.getKey());
                 if (entry.getKey().startsWith("Remote")) {
-                    final RemoteLocation remoteLocation = new RemoteLocation();
-                    remoteLocation.setUri(entry.getKey().substring("Remote".length()).trim());
+                    final RemoteLocation remoteLocation = RemoteLocation
+                            .create(entry.getKey().substring("Remote".length()).trim());
 
                     specification.setRemoteLocation(remoteLocation);
                     specification.setSourceFile(libspecsFolder.getSpecFile(remoteLocation.createLibspecFileName()));

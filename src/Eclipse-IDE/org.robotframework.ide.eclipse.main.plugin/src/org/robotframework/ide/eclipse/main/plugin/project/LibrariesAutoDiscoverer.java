@@ -329,10 +329,8 @@ public class LibrariesAutoDiscoverer {
         }
         if (modulePath.isPresent()) {
             final Path path = new Path(modulePath.get().getPath());
-            final ReferencedLibrary newLibrary = new ReferencedLibrary();
-            newLibrary.setType(LibraryType.PYTHON.toString());
-            newLibrary.setName(dryRunLibraryImport.getName());
-            newLibrary.setPath(path.toPortableString());
+            final ReferencedLibrary newLibrary = ReferencedLibrary.create(LibraryType.PYTHON,
+                    dryRunLibraryImport.getName(), path.toPortableString());
             final Collection<ReferencedLibrary> librariesToAdd = new ArrayList<>();
             librariesToAdd.add(newLibrary);
             addReferencedLibrariesToProjectConfiguration(config, dryRunLibraryImport, addedLibs, librariesToAdd);

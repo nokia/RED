@@ -378,9 +378,7 @@ public class VariableMappingsFormFragment implements ISectionFormFragment {
 
         @Override
         protected void okPressed() {
-            mapping = new VariableMapping();
-            mapping.setName(nameText.getText());
-            mapping.setValue(valueText.getText());
+            mapping = VariableMapping.create(nameText.getText(), valueText.getText());
 
             super.okPressed();
         }
