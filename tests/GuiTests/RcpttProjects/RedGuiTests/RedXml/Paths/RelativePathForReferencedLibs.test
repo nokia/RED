@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8mYawAiBEearkLC-7wHL-g
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/22/16 2:50 PM
+Save-Time: 4/22/16 4:54 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -37,16 +37,19 @@ with [get-window "Add new search path"] {
 
 get-editor "RobotProject/red.xml" | get-section Paths | get-table | key-type "M1+s"
 
-//check color of items in table
-with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
-    get-item libs | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
-    get-item "D:\\folder\\folder2" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
-    get-item "\\/linux_path\\/tests" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
-    get-item "\\win_path\\/addons" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
-}
 
-//check warnings
+
+
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+	
+	//check color of items in table
+	with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+	    get-item libs | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+	    get-item "D:\\folder\\folder2" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+	    get-item "\\/linux_path\\/tests" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+	    get-item "\\win_path\\/addons" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+	}
+	//check warnings
 	with [get-view Problems | get-tree] {
 	    get-item "Warnings \\(4 items\\)" | get-property childCount | equals 4 | verify-true
 	    get-item "Warnings \\(4 items\\)/The path '\\linux_path\\tests' points to non-existing location" 
@@ -61,17 +64,26 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	 }
 
 }-else{
+	//check color of items in table
+	with [get-editor "RobotProject/red.xml" | get-section Paths | get-table] {
+	    get-item libs | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+	    get-item "D:\\folder\\folder2" | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
+	    get-item "\\/linux_path\\/tests" | get-property "styles[0].foregroundColor" | equals "#FFA500" | verify-true
+	    get-item "\\win_path\\/addons" | get-property "styles[0].foregroundColor" | equals "#FF0000" | verify-true
+	}
+	//check warnings and errors
 	with [get-view Problems | get-tree] {
-	    get-item "Warnings \\(4 items\\)" | get-property childCount | equals 4 | verify-true
-	    get-item "Warnings \\(4 items\\)/The path '\\linux_path\\tests' points to non-existing location" 
-	        | get-property caption | equals "The path '\\linux_path\\tests' points to non-existing location" | verify-true
-	    get-item "Warnings \\(4 items\\)/The path '\\win_path\\addons' points to non-existing location" 
-	        | get-property caption | equals "The path '\\win_path\\addons' points to non-existing location" | verify-true
-	    get-item "Warnings \\(4 items\\)/The path 'D:\\aut-red-product\\libs' points to non-existing location" 
-	        | get-property caption | equals "The path 'D:\\aut-red-product\\libs' points to non-existing location" 
+	    get-item "Warnings \\(2 items\\)/The path '\\/linux_path\\/tests' points to non-existing location" 
+	        | get-property caption | equals "The path '/linux_path/tests' points to non-existing location" | verify-true
+	    get-item "Warnings \\(2 items\\)/The path '\\/root\\/asia\\/aut-red_product\\/libs' points to non-existing location" 
+	        | get-property caption | equals [format "The path '%s/libs' points to non-existing location"  $RED_workspace_path]
 	        | verify-true
-	    get-item "Warnings \\(4 items\\)/The path 'D:\\folder\\folder2' points to non-existing location" 
-	        | get-property caption | equals "The path 'D:\\folder\\folder2' points to non-existing location" | verify-true
+	}
+	with [get-view Problems | get-tree] {
+	    get-item "Errors \\(.* items\\)/The path '\\win_path\\/addons' is invalid" | get-property caption 
+	        | equals "The path '\\win_path/addons' is invalid" | verify-true
+	    get-item "Errors \\(.* items\\)/The path 'D:\\folder\\folder2' is invalid" | get-property caption 
+	        | equals "The path 'D:\\folder\\folder2' is invalid" | verify-true
 	}
 }
 //add lib to test
@@ -105,14 +117,14 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 		   }
     }
 }-else{
-   let [val rp 
-   [format "(%s/RobotProject/libs|D:/folder/folder2|/linux_path/tests|/win_path/addons)" $new_ws_path]]
+    let [val rp 
+   [format "(%s/libs|/linux_path/tests)" $RED_workspace_path]]
    {
 		get-view Console | get-text-viewer | get-object |invoke getLine  0
-		| matches [format "Command: .* -m .* -P %s:%s:%s:%s.* --listener .*" $rp $rp $rp $rp] 
+		| matches [format "Command: .* -m .* -P %s:%s.* --listener .*" $rp $rp $rp] 
 		| verify-true
    }
-}      
+}
 
 
 //change path to Project
@@ -123,14 +135,26 @@ with [get-editor "RobotProject/red.xml" | get-section Paths] {
 }
 
 get-tab-folder -index 4 | get-tab-item Problems | click
-with [get-view Problems | get-tree] {
-    get-item "Warnings \\(3 items\\)" | get-property childCount | equals 3 | verify-true
-    get-item "Warnings \\(3 items\\)/The path '\\linux_path\\tests' points to non-existing location" 
-        | get-property caption | equals "The path '\\linux_path\\tests' points to non-existing location" | verify-true
-    get-item "Warnings \\(3 items\\)/The path '\\win_path\\addons' points to non-existing location" 
-        | get-property caption | equals "The path '\\win_path\\addons' points to non-existing location" | verify-true
-    get-item "Warnings \\(3 items\\)/The path 'D:\\folder\\folder2' points to non-existing location" 
-        | get-property caption | equals "The path 'D:\\folder\\folder2' points to non-existing location" | verify-true
+
+if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
+	with [get-view Problems | get-tree] {
+	    get-item "Warnings \\(3 items\\)" | get-property childCount | equals 3 | verify-true
+	    get-item "Warnings \\(3 items\\)/The path '\\linux_path\\tests' points to non-existing location" 
+	        | get-property caption | equals "The path '\\linux_path\\tests' points to non-existing location" | verify-true
+	    get-item "Warnings \\(3 items\\)/The path '\\win_path\\addons' points to non-existing location" 
+	        | get-property caption | equals "The path '\\win_path\\addons' points to non-existing location" | verify-true
+	    get-item "Warnings \\(3 items\\)/The path 'D:\\folder\\folder2' points to non-existing location" 
+	        | get-property caption | equals "The path 'D:\\folder\\folder2' points to non-existing location" | verify-true
+	}
+}-else{
+	with [get-view Problems | get-tree] {
+	    get-item "Warnings \\(1 item\\)/The path '\\/linux_path\\/tests' points to non-existing location" 
+	        | get-property caption | equals "The path '/linux_path/tests' points to non-existing location" | verify-true
+	    get-item "Errors \\(18 items\\)/The path '\\win_path\\/addons' is invalid" | get-property caption 
+	        | equals "The path '\\win_path/addons' is invalid" | verify-true
+	    get-item "Errors \\(18 items\\)/The path 'D:\\folder\\folder2' is invalid" | get-property caption 
+	        | equals "The path 'D:\\folder\\folder2' is invalid" | verify-true
+	}
 }
 
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 
@@ -153,14 +177,13 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
     }
 }-else{
    let [val rp 
-   [format "(%s/RobotProject/libs|D:/folder/folder2|/linux_path/tests|/win_path/addons)" $new_ws_path]]
+   [format "(%s/RobotProject/libs|/linux_path/tests)" $RED_workspace_path]]
    {
 		get-view Console | get-text-viewer | get-object |invoke getLine  0
-		| matches [format "Command: .* -m .* -P %s:%s:%s:%s.* --listener .*" $rp $rp $rp $rp] 
+		| matches [format "Command: .* -m .* -P %s:%s.* --listener .*" $rp $rp] 
 		| verify-true
    }
 }      
-
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
