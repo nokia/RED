@@ -283,8 +283,7 @@ public class RobotProjectConfig {
         if (excludedPath == null) {
             excludedPath = new ArrayList<>();
         }
-        final ExcludedFolderPath excludedFolderPath = new ExcludedFolderPath();
-        excludedFolderPath.path = path.toPortableString();
+        final ExcludedFolderPath excludedFolderPath = ExcludedFolderPath.create(path.toPortableString());
         if (!excludedPath.contains(excludedFolderPath)) {
             excludedPath.add(excludedFolderPath);
         }
@@ -319,14 +318,6 @@ public class RobotProjectConfig {
             }
         }
         return null;
-    }
-
-    public void addReferencedLibraryInPython(final String name, final IPath path) {
-        final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-        referencedLibrary.setType(LibraryType.PYTHON.toString());
-        referencedLibrary.setName(name);
-        referencedLibrary.setPath(path.toPortableString());
-        addReferencedLibrary(referencedLibrary);
     }
 
     public boolean addReferencedLibrary(final ReferencedLibrary referencedLibrary) {
@@ -381,9 +372,11 @@ public class RobotProjectConfig {
             return;
         }
         if (executionEnvironment == null) {
-            executionEnvironment = new ExecutionEnvironment();
+            executionEnvironment = ExecutionEnvironment.create(location.getAbsolutePath());
         }
-        executionEnvironment.path = location.getAbsolutePath();
+        if (!executionEnvironment.getPath().equals(location.getAbsolutePath())) {
+            executionEnvironment.setPath(location.getAbsolutePath());
+        }
     }
 
     public boolean hasReferencedLibraries() {
@@ -441,6 +434,12 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class ExecutionEnvironment {
 
+        public static ExecutionEnvironment create(final String path) {
+            final ExecutionEnvironment environment = new ExecutionEnvironment();
+            environment.setPath(path);
+            return environment;
+        }
+
         @XmlAttribute
         private String path;
 
@@ -456,6 +455,14 @@ public class RobotProjectConfig {
     @XmlRootElement(name = "referencedLibrary")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class ReferencedLibrary {
+
+        public static ReferencedLibrary create(final LibraryType type, final String name, final String path) {
+            final ReferencedLibrary library = new ReferencedLibrary();
+            library.setType(type.toString());
+            library.setName(name);
+            library.setPath(path);
+            return library;
+        }
 
         @XmlAttribute
         private String type;
@@ -543,6 +550,12 @@ public class RobotProjectConfig {
         public static RemoteLocation create(final String path) {
             final RemoteLocation location = new RemoteLocation();
             location.setUri(path);
+            return location;
+        }
+
+        public static RemoteLocation create(final URI path) {
+            final RemoteLocation location = new RemoteLocation();
+            location.setUriAddress(path);
             return location;
         }
 
@@ -686,6 +699,13 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class VariableMapping {
 
+        public static VariableMapping create(final String name, final String value) {
+            final VariableMapping mapping = new VariableMapping();
+            mapping.setName(name);
+            mapping.setValue(value);
+            return mapping;
+        }
+
         @XmlAttribute(required = true)
         private String name;
 
@@ -726,6 +746,12 @@ public class RobotProjectConfig {
     @XmlRootElement(name = "excludedPath")
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class ExcludedFolderPath {
+
+        public static ExcludedFolderPath create(final String path) {
+            final ExcludedFolderPath excludedPath = new ExcludedFolderPath();
+            excludedPath.setPath(path);
+            return excludedPath;
+        }
 
         @XmlAttribute(required = true)
         private String path;
@@ -830,15 +856,17 @@ public class RobotProjectConfig {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class RelativityPoint {
 
+        public static RelativityPoint create(final RelativeTo relativeTo) {
+            final RelativityPoint point = new RelativityPoint();
+            point.setRelativeTo(relativeTo);
+            return point;
+        }
+
         @XmlValue
         private RelativeTo relativeTo;
 
         public RelativityPoint() {
-            this(RelativeTo.WORKSPACE);
-        }
-
-        public RelativityPoint(final RelativeTo relativeTo) {
-            this.relativeTo = relativeTo;
+            this.relativeTo = RelativeTo.WORKSPACE;
         }
 
         public RelativeTo getRelativeTo() {

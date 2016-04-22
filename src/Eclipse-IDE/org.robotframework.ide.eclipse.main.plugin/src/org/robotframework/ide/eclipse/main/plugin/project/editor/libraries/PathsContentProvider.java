@@ -53,10 +53,7 @@ class PathsContentProvider extends StructuredContentProvider {
         elements.addAll(transform(paths, new Function<String, SearchPath>() {
             @Override
             public SearchPath apply(final String path) {
-                final SearchPath searchPath = new SearchPath();
-                searchPath.setLocation(path);
-                searchPath.setSystem(true);
-                return searchPath;
+                return SearchPath.create(path, true);
             }
         }));
         elements.addAll((List<?>) inputElement);

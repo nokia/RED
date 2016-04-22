@@ -97,9 +97,8 @@ class RemoteLocationDialog extends Dialog {
 
     @Override
     protected void okPressed() {
-        location = new RemoteLocation();
         try {
-            location.setUriAddress(createUriWithDefaultsIfMissing(new URI(uriText.getText()), 8270, "/RPC2"));
+            location = RemoteLocation.create(createUriWithDefaultsIfMissing(new URI(uriText.getText()), 8270, "/RPC2"));
         } catch (final URISyntaxException e) {
             throw new IllegalStateException("Can't happen. It is not possible to click ok with invalid URI", e);
         }

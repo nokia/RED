@@ -89,12 +89,8 @@ public class PythonLibStructureBuilder {
             final IPath pathWithoutModuleName = fullLibraryPath.endsWith("__init__.py") ? path.removeLastSegments(2)
                     : path.removeLastSegments(1);
 
-            final ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-            referencedLibrary.setType(LibraryType.PYTHON.toString());
-            referencedLibrary.setName(qualifiedName);
-            referencedLibrary
-                    .setPath(PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
-            return referencedLibrary;
+            return ReferencedLibrary.create(LibraryType.PYTHON, qualifiedName,
+                    PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
         }
 
         @Override

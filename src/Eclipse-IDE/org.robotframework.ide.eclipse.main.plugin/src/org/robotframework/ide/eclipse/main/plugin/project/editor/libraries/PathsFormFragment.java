@@ -154,7 +154,7 @@ class PathsFormFragment implements ISectionFormFragment {
 
                 if (oldRelativeTo != newRelativeTo) {
                     setDirty(true);
-                    config.setRelativityPoint(new RelativityPoint(newRelativeTo));
+                    config.setRelativityPoint(RelativityPoint.create(newRelativeTo));
                 }
             }
         });
