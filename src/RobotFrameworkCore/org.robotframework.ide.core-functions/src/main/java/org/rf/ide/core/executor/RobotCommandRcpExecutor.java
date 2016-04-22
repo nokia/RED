@@ -37,6 +37,8 @@ import org.apache.xmlrpc.serializer.NullSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializer;
 import org.apache.xmlrpc.serializer.TypeSerializerImpl;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.jvmutils.process.OSProcessHelper;
+import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
@@ -53,15 +55,16 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
     private static final int CONNECTION_TIMEOUT = 30;
 
     private final String interpreterPath;
+
     private final SuiteExecutor interpreterType;
 
     private final File scriptFile;
 
     private Process serverProcess;
+
     private boolean isExternal = false;
 
     private XmlRpcClient client;
-
 
     RobotCommandRcpExecutor(final String interpreterPath, final SuiteExecutor interpreterType, final File scriptFile) {
         this.interpreterPath = interpreterPath;
@@ -218,6 +221,14 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
 
     void kill() {
         if (serverProcess != null) {
+            try {
+                new OSProcessHelper().destroyProcessTree(serverProcess);
+            } catch (final ProcessHelperException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (serverProcess != null) {
             serverProcess.destroy();
         }
         try {
@@ -299,8 +310,7 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
 
     @Override
     public void createLibdocForThirdPartyLibrary(final String resultFilePath, final String libName,
-            final String libPath,
-            final EnvironmentSearchPaths additionalPaths) {
+            final String libPath, final EnvironmentSearchPaths additionalPaths) {
         createLibdoc(resultFilePath, libName, libPath, additionalPaths);
     }
 

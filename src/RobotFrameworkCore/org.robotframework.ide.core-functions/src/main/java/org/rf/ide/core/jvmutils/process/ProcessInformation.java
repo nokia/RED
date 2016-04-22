@@ -40,6 +40,14 @@ public class ProcessInformation {
         return foundHandler;
     }
 
+    public void setHandler(final IProcessTreeHandler handler) {
+        if (handler == null) {
+            this.handler = Optional.absent();
+        } else {
+            this.handler = Optional.of(handler);
+        }
+    }
+
     public Optional<ProcessInformation> parent() {
         return parent;
     }

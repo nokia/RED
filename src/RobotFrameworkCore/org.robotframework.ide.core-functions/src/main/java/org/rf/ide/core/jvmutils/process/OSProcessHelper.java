@@ -111,6 +111,7 @@ public class OSProcessHelper {
     @VisibleForTesting
     protected ProcessInformation fillProcessTree(final IProcessTreeHandler provider, final long pid) {
         final ProcessInformation process = new ProcessInformation(pid);
+        process.setHandler(provider);
 
         final List<Long> childPids = provider.getChildPids(pid);
         for (final Long childPid : childPids) {
@@ -124,7 +125,7 @@ public class OSProcessHelper {
     protected Optional<IProcessTreeHandler> findProcessTreeProviderFor(final Process process) {
         Optional<IProcessTreeHandler> provider = Optional.absent();
 
-        for (IProcessTreeHandler prov : osPidCheckers) {
+        for (final IProcessTreeHandler prov : osPidCheckers) {
             if (prov.isSupported(process)) {
                 provider = Optional.of(prov);
                 break;

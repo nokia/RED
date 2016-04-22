@@ -7,12 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.console;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.rf.ide.core.jvmutils.process.OSProcessHelper;
+import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-
 
 /**
  * @author Michal Anglart
- *
  */
 class TerminateRedSessionAction extends Action {
 
@@ -29,6 +29,11 @@ class TerminateRedSessionAction extends Action {
     public void run() {
         final Process process = console.getProcess();
         if (process != null) {
+            try {
+                new OSProcessHelper().destroyProcessTree(process);
+            } catch (final ProcessHelperException e1) {
+                e1.printStackTrace();
+            }
             process.destroyForcibly();
             try {
                 process.waitFor();
