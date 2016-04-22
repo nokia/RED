@@ -232,7 +232,6 @@ public class InstalledRobotsPreferencesPage extends PreferencePage implements IW
                 .createFor(viewer);
         ViewerColumnsFactory.newColumn("Path")
                 .withWidth(200)
-                .shouldGrabAllTheSpaceLeft(true)
                 .labelsProvidedBy(new InstalledRobotsPathsLabelProvider(viewer))
                 .createFor(viewer);
     }
