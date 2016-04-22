@@ -34,10 +34,6 @@ while i < len(sys.argv):
     else:
         i += 1    
 
-if len(sys.argv) > 2:
-    module_name_from_import = sys.argv[2]
-else:
-    module_name_from_import = ''
 if original_path.startswith('"') and original_path.endswith('"'):
     original_path = original_path[1:-1]
 
