@@ -61,8 +61,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(
                 mock(ColumnViewer.class), null, null);
 
-        final RemoteLocation location = new RemoteLocation();
-        location.setUri("http://some.uri.com");
+        final RemoteLocation location = RemoteLocation.create("http://some.uri.com");
         assertThat(support.getValue(location)).isEqualTo("http://some.uri.com");
 
     }
@@ -82,8 +81,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(
                 mock(ColumnViewer.class), null, eventBroker);
 
-        final RemoteLocation location = new RemoteLocation();
-        location.setUri("http://some.uri.com");
+        final RemoteLocation location = RemoteLocation.create("http://some.uri.com");
 
         support.setValue(location, "invalid uri");
 
@@ -100,8 +98,7 @@ public class ReferencedLibrariesEditingSupportTest {
         final ReferencedLibrariesEditingSupport support = new ReferencedLibrariesEditingSupport(
                 mock(ColumnViewer.class), input, eventBroker);
 
-        final RemoteLocation location = new RemoteLocation();
-        location.setUri("http://some.uri.com");
+        final RemoteLocation location = RemoteLocation.create("http://some.uri.com");
 
         support.setValue(location, "http://some.other.uri.com");
 
