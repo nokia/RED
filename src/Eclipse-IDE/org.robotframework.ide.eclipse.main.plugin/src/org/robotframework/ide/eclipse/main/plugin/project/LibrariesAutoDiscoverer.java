@@ -94,9 +94,7 @@ public class LibrariesAutoDiscoverer {
     }
 
     public void start() {
-        if (!isWorkspaceJobRunning.get()) {
-            isWorkspaceJobRunning.set(true);
-
+        if (isWorkspaceJobRunning.compareAndSet(false, true)) {
             final WorkspaceJob wsJob = new WorkspaceJob("Discovering libraries") {
 
                 @Override
