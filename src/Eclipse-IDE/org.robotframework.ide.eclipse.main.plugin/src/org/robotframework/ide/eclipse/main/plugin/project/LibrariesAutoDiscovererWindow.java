@@ -234,7 +234,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
     }
 
-    class DiscoveredLibrariesViewerLabelProvider extends StyledCellLabelProvider {
+    private class DiscoveredLibrariesViewerLabelProvider extends StyledCellLabelProvider {
 
         @Override
         public void update(final ViewerCell cell) {
