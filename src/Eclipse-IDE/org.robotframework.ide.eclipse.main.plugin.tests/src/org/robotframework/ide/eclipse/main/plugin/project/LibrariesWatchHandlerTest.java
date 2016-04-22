@@ -82,14 +82,14 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenLibraryPathIsNotDirectory() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
+        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
         assertFalse(registeredPaths.isEmpty());
         assertEquals(pythonLibraryFile.getParentFile().getPath(), registeredPaths.get(PYTHON_LIBRARY_FILE_NAME));
         assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
@@ -100,14 +100,14 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenLibraryPathIsDirectory() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
+        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
         assertFalse(registeredPaths.isEmpty());
         assertEquals(pythonLibraryFile.getParentFile().getPath(), registeredPaths.get(PYTHON_LIBRARY_FILE_NAME));
         assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
@@ -118,22 +118,22 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenMultipleClassesFromLibraryAreUsed() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
-        ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
+        final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
+        final ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
-        ReferencedLibrary referencedLibrary3 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
+        final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
+        final ReferencedLibrary referencedLibrary3 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec3 = createNewLibSpec(referencedLibrary3);
+        final LibrarySpecification libSpec3 = createNewLibSpec(referencedLibrary3);
 
         librariesWatchHandler.registerLibrary(referencedLibrary1, libSpec1);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
         librariesWatchHandler.registerLibrary(referencedLibrary3, libSpec3);
 
-        Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
+        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
         assertFalse(registeredPaths.isEmpty());
         assertEquals(pythonLibraryFile.getParentFile().getPath(), registeredPaths.get(PYTHON_LIBRARY_FILE_NAME));
         assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
@@ -152,20 +152,20 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenLibraryIsModule() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
+        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
         assertTrue(registeredPaths.size() == 2);
         assertEquals(pythonModuleLibraryFolder.getPath(), registeredPaths.get(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME));
         assertEquals(pythonModuleLibraryFolder.getPath(), registeredPaths.get(PYTHON_MODULE_LIBRARY_FILE_NAME));
         assertEquals(new Path(pythonModuleLibraryInitFile.getPath()).toPortableString(),
                 librariesWatchHandler.getRegisteredRefLibraries().get(referencedLibrary));
-        List<String> moduleFilesNames = librariesWatchHandler.getLibrarySpecifications().get(libSpec);
+        final List<String> moduleFilesNames = librariesWatchHandler.getLibrarySpecifications().get(libSpec);
         assertTrue(moduleFilesNames.size() == 2);
         assertTrue(moduleFilesNames.contains(pythonModuleLibraryFile.getName()));
         assertTrue(moduleFilesNames.contains(pythonModuleLibraryInitFile.getName()));
@@ -173,14 +173,14 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterJavaLibrary() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary(JAVA_LIBRARY_NAME,
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(JAVA_LIBRARY_NAME,
                 javaLibraryFile.getParentFile().getPath(), LibraryType.JAVA);
-        LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
+        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
         assertFalse(registeredPaths.isEmpty());
         assertEquals(javaLibraryFile.getParentFile().getPath(), registeredPaths.get(JAVA_LIBRARY_FILE_NAME));
         assertEquals(new Path(javaLibraryFile.getPath()).toPortableString(),
@@ -191,8 +191,8 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterVirtualLibrary() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary("virtualLibTest", "", LibraryType.VIRTUAL);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary("virtualLibTest", "", LibraryType.VIRTUAL);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, new LibrarySpecification());
 
@@ -203,8 +203,8 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterNonExistenceLibrary() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary("libTest",
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary("libTest",
                 pythonModuleLibraryFolder.getPath() + "/libTest.py", LibraryType.PYTHON);
 
         librariesWatchHandler.registerLibrary(referencedLibrary, new LibrarySpecification());
@@ -216,7 +216,7 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRegisterPythonLibrary_whenTheSameLibSpecWithDifferentKeywordsIsRegistered() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
         ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
         LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
@@ -226,19 +226,19 @@ public class LibrariesWatchHandlerTest {
         referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME, pythonLibraryFile.getParentFile().getPath(),
                 LibraryType.PYTHON);
         libSpec = createNewLibSpec(referencedLibrary);
-        KeywordSpecification kwSpec = createNewKeywordSpec("someNewKeyword", newArrayList("arg"));
+        final KeywordSpecification kwSpec = createNewKeywordSpec("someNewKeyword", newArrayList("arg"));
         libSpec.setKeywords(newArrayList(kwSpec));
 
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
-        Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
+        final Map<String, String> registeredPaths = librariesWatchHandler.getRegisteredPaths();
         assertFalse(registeredPaths.isEmpty());
         assertEquals(pythonLibraryFile.getParentFile().getPath(), registeredPaths.get(PYTHON_LIBRARY_FILE_NAME));
-        Map<ReferencedLibrary, String> registeredRefLibraries = librariesWatchHandler.getRegisteredRefLibraries();
+        final Map<ReferencedLibrary, String> registeredRefLibraries = librariesWatchHandler.getRegisteredRefLibraries();
         assertTrue(registeredRefLibraries.size() == 1);
         assertEquals(new Path(pythonLibraryFile.getPath()).toPortableString(),
                 registeredRefLibraries.get(referencedLibrary));
-        ListMultimap<LibrarySpecification, String> librarySpecifications = librariesWatchHandler
+        final ListMultimap<LibrarySpecification, String> librarySpecifications = librariesWatchHandler
                 .getLibrarySpecifications();
         assertTrue(librarySpecifications.size() == 1);
         assertEquals(newArrayList(pythonLibraryFile.getName()), librarySpecifications.get(libSpec));
@@ -247,19 +247,19 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testUnregisterLibraries() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
+        final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
         librariesWatchHandler.registerLibrary(referencedLibrary1, libSpec1);
-        ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
+        final ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
+        final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
 
         librariesWatchHandler.unregisterLibraries(newArrayList(referencedLibrary1, referencedLibrary2));
 
-        List<String> unregisteredFiles = librariesWatchHandler.getUnregisteredFiles();
+        final List<String> unregisteredFiles = librariesWatchHandler.getUnregisteredFiles();
         assertTrue(unregisteredFiles.size() == 2);
         assertEquals(pythonLibraryFile.getName(), unregisteredFiles.get(0));
         assertEquals(pythonLibraryFile.getName(), unregisteredFiles.get(1));
@@ -269,15 +269,15 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testUnregisterModuleLibrary() {
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(null);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
         librariesWatchHandler.unregisterLibraries(newArrayList(referencedLibrary));
 
-        List<String> unregisteredFiles = librariesWatchHandler.getUnregisteredFiles();
+        final List<String> unregisteredFiles = librariesWatchHandler.getUnregisteredFiles();
         assertTrue(unregisteredFiles.size() == 2);
         assertTrue(unregisteredFiles.contains(pythonModuleLibraryFile.getName()));
         assertTrue(unregisteredFiles.contains(pythonModuleLibraryInitFile.getName()));
@@ -287,16 +287,16 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsEnabled() {
-        IProject project = createNewProjectMock(true);
-        RobotProject robotProject = createNewRobotProjectMock(project, true);
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
-        ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProjectMock(project, true);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
+        final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
+        final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
         librariesWatchHandler.registerLibrary(referencedLibrary1, libSpec1);
-        ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
+        final ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
+        final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
 
         librariesWatchHandler.setRebuildTasksQueueSizeBeforeBuilderInvoke(1);
@@ -311,12 +311,12 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsEnabledAndLibraryIsModule() {
-        IProject project = createNewProjectMock(true);
-        RobotProject robotProject = createNewRobotProjectMock(project, true);
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProjectMock(project, true);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
         librariesWatchHandler.setRebuildTasksQueueSizeBeforeBuilderInvoke(1);
 
@@ -341,16 +341,16 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsEnabledAndDuplicatedTasksAreRemoved() {
-        IProject project = createNewProjectMock(true);
-        RobotProject robotProject = createNewRobotProjectMock(project, true);
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
-        ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProjectMock(project, true);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
+        final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
+        final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
         librariesWatchHandler.registerLibrary(referencedLibrary1, libSpec1);
-        ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
+        final ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
+        final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
 
         librariesWatchHandler.setRebuildTasksQueueSizeBeforeBuilderInvoke(8);
@@ -369,18 +369,18 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsDisabled() {
-        ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
+        final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
-        ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
+        final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
+        final ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
-        Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
+        final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
+        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(referencedLibrary1, libSpec1);
         refLibs.put(referencedLibrary2, libSpec2);
-        IProject project = createNewProjectMock(true);
-        RobotProject robotProject = createNewRobotProjectMock(project, false, refLibs);
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProjectMock(project, false, refLibs);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         librariesWatchHandler.registerLibrary(referencedLibrary1, libSpec1);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
 
@@ -395,18 +395,18 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsDisabledAndDuplicatedEventsAreHandled() {
-        ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
+        final ReferencedLibrary referencedLibrary1 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass1",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
-        ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
+        final LibrarySpecification libSpec1 = createNewLibSpec(referencedLibrary1);
+        final ReferencedLibrary referencedLibrary2 = createNewReferencedLibrary(PYTHON_LIBRARY_NAME + ".PythonClass2",
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
-        Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
+        final LibrarySpecification libSpec2 = createNewLibSpec(referencedLibrary2);
+        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(referencedLibrary1, libSpec1);
         refLibs.put(referencedLibrary2, libSpec2);
-        IProject project = createNewProjectMock(true);
-        RobotProject robotProject = createNewRobotProjectMock(project, false, refLibs);
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProjectMock(project, false, refLibs);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         librariesWatchHandler.registerLibrary(referencedLibrary1, libSpec1);
         librariesWatchHandler.registerLibrary(referencedLibrary2, libSpec2);
 
@@ -424,14 +424,14 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenAutoReloadIsDisabledAndLibraryIsModule() {
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
-        Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
+        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(referencedLibrary, libSpec);
-        IProject project = createNewProjectMock(true);
-        RobotProject robotProject = createNewRobotProjectMock(project, false, refLibs);
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProjectMock(project, false, refLibs);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
@@ -445,14 +445,14 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testRemoveDirtySpecs() {
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_MODULE_LIBRARY_NAME,
                 pythonModuleLibraryFolder.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
-        Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
+        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(referencedLibrary, libSpec);
-        IProject project = createNewProjectMock(true);
-        RobotProject robotProject = createNewRobotProjectMock(project, false, refLibs);
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
+        final IProject project = createNewProjectMock(true);
+        final RobotProject robotProject = createNewRobotProjectMock(project, false, refLibs);
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
         librariesWatchHandler.handleModifyEvent(PYTHON_MODULE_LIBRARY_INIT_FILE_NAME);
         librariesWatchHandler.execAllAwaitingMessages();
@@ -467,13 +467,13 @@ public class LibrariesWatchHandlerTest {
 
     @Test
     public void testHandleModifyEvent_whenProjectNotExists() {
-        IProject project = createNewProjectMock(false);
-        RobotProject robotProject = createNewRobotProjectMock(project, true);
+        final IProject project = createNewProjectMock(false);
+        final RobotProject robotProject = createNewRobotProjectMock(project, true);
 
-        DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
-        ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
+        final DummyLibrariesWatchHandler librariesWatchHandler = new DummyLibrariesWatchHandler(robotProject);
+        final ReferencedLibrary referencedLibrary = createNewReferencedLibrary(PYTHON_LIBRARY_NAME,
                 pythonLibraryFile.getParentFile().getPath(), LibraryType.PYTHON);
-        LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
+        final LibrarySpecification libSpec = createNewLibSpec(referencedLibrary);
         librariesWatchHandler.registerLibrary(referencedLibrary, libSpec);
 
         librariesWatchHandler.handleModifyEvent(PYTHON_LIBRARY_FILE_NAME);
@@ -484,33 +484,29 @@ public class LibrariesWatchHandlerTest {
     }
 
     private IProject createNewProjectMock(final boolean projectExists) {
-        IProject project = mock(IProject.class);
+        final IProject project = mock(IProject.class);
         when(project.exists()).thenReturn(projectExists);
         return project;
     }
 
     private RobotProject createNewRobotProjectMock(final IProject project, final boolean isAutoReloadEnabled,
             final Map<ReferencedLibrary, LibrarySpecification> referencedLibraries) {
-        RobotProject robotProject = createNewRobotProjectMock(project, isAutoReloadEnabled);
+        final RobotProject robotProject = createNewRobotProjectMock(project, isAutoReloadEnabled);
         when(robotProject.getReferencedLibraries()).thenReturn(referencedLibraries);
         return robotProject;
     }
 
     private RobotProject createNewRobotProjectMock(final IProject project, final boolean isAutoReloadEnabled) {
-        RobotProject robotProject = mock(RobotProject.class);
+        final RobotProject robotProject = mock(RobotProject.class);
         when(robotProject.getProject()).thenReturn(project);
-        RobotProjectConfig projectConfig = mock(RobotProjectConfig.class);
+        final RobotProjectConfig projectConfig = mock(RobotProjectConfig.class);
         when(projectConfig.isReferencedLibrariesAutoReloadEnabled()).thenReturn(isAutoReloadEnabled);
         when(robotProject.getRobotProjectConfig()).thenReturn(projectConfig);
         return robotProject;
     }
 
     private ReferencedLibrary createNewReferencedLibrary(final String name, final String path, final LibraryType type) {
-        ReferencedLibrary referencedLibrary = new ReferencedLibrary();
-        referencedLibrary.setName(name);
-        referencedLibrary.setPath(path);
-        referencedLibrary.setType(type.name());
-        return referencedLibrary;
+        return ReferencedLibrary.create(type, name, path);
     }
 
     private LibrarySpecification createNewLibSpec(final ReferencedLibrary referencedLibrary) {
@@ -538,33 +534,33 @@ public class LibrariesWatchHandlerTest {
 
     static class DummyLibrariesWatchHandler extends LibrariesWatchHandler {
 
-        private Map<String, String> registeredPaths = new HashMap<>();
+        private final Map<String, String> registeredPaths = new HashMap<>();
 
-        private List<String> unregisteredFiles = newArrayList();
+        private final List<String> unregisteredFiles = newArrayList();
 
-        private Multimap<IProject, LibrarySpecification> specificationsToRebuild = LinkedHashMultimap.create();
+        private final Multimap<IProject, LibrarySpecification> specificationsToRebuild = LinkedHashMultimap.create();
 
-        private List<Integer> rebuildTasksQueueSizeAfterEachBuilderInvoke = newArrayList();
+        private final List<Integer> rebuildTasksQueueSizeAfterEachBuilderInvoke = newArrayList();
 
         private int rebuildTasksQueueSizeBeforeBuilderInvoke = 0;
 
-        public DummyLibrariesWatchHandler(RobotProject robotProject) {
+        public DummyLibrariesWatchHandler(final RobotProject robotProject) {
             super(robotProject);
         }
 
         @Override
-        public void registerPath(java.nio.file.Path dir, String fileName, IWatchEventHandler handler) {
+        public void registerPath(final java.nio.file.Path dir, final String fileName, final IWatchEventHandler handler) {
             registeredPaths.put(fileName, dir.toString());
         }
 
         @Override
-        public void unregisterFile(String fileName, IWatchEventHandler handler) {
+        public void unregisterFile(final String fileName, final IWatchEventHandler handler) {
             unregisteredFiles.add(fileName);
         }
 
         @Override
-        protected void invokeLibrariesBuilder(IProgressMonitor monitor,
-                Multimap<IProject, LibrarySpecification> groupedSpecifications) {
+        protected void invokeLibrariesBuilder(final IProgressMonitor monitor,
+                final Multimap<IProject, LibrarySpecification> groupedSpecifications) {
             int sleepCounter = 0;
             while (sleepCounter < 20 && getRebuildTasksQueueSize() < rebuildTasksQueueSizeBeforeBuilderInvoke
                     && specificationsToRebuild.isEmpty()) {
@@ -601,7 +597,7 @@ public class LibrariesWatchHandlerTest {
             }
         }
 
-        public void setRebuildTasksQueueSizeBeforeBuilderInvoke(int rebuildTasksQueueSizeBeforeBuilderInvoke) {
+        public void setRebuildTasksQueueSizeBeforeBuilderInvoke(final int rebuildTasksQueueSizeBeforeBuilderInvoke) {
             this.rebuildTasksQueueSizeBeforeBuilderInvoke = rebuildTasksQueueSizeBeforeBuilderInvoke;
         }
 

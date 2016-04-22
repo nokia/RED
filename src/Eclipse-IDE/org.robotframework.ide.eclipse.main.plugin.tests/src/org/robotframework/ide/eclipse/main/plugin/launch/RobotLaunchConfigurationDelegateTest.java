@@ -96,7 +96,7 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addPythonPath(searchPath1);
         config.addPythonPath(searchPath2);
-        config.setRelativityPoint(new RelativityPoint(RelativeTo.PROJECT));
+        config.setRelativityPoint(RelativityPoint.create(RelativeTo.PROJECT));
         projectProvider.addRobotNature();
         projectProvider.configure(config);
 
@@ -124,7 +124,7 @@ public class RobotLaunchConfigurationDelegateTest {
         final RobotProjectConfig config = new RobotProjectConfig();
         config.addPythonPath(searchPath1);
         config.addPythonPath(searchPath2);
-        config.setRelativityPoint(new RelativityPoint(RelativeTo.WORKSPACE));
+        config.setRelativityPoint(RelativityPoint.create(RelativeTo.WORKSPACE));
         projectProvider.addRobotNature();
         projectProvider.configure(config);
 
