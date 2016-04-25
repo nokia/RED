@@ -1,29 +1,35 @@
-RED 0.6.2 - 2016/03/15
+RED 0.6.3 - 2016/04/25
 
-Bugs
+Bug
 
-    Keyword not recognized if dot is in the name
-    No possible to add library by filename, when inside file classes exists
-    Jython - proper generating libdoc and running tests
-    Problem with Java Libraries run and libdoc generation in RED
-    jython - fix running tests with external libs under python
-    
+      Problem with killing RobotCommand server after library remove
+      No automatic reload for library when second project is deleted
+      Adding lib by quickfix in RED under jython cause NPE in .log
+      Correct path with double underscores while running tests
+      Installed Framework hangs while discovering interpreters
+      Missing OS directory separator in Variables files tab
+      RED without Python&RF should not display error while opening test file.
 
-Enhancements
+Enhancement
 
-    Arguments validation - arguments and keyword call
-    Extend current RobotFileValidation to show an information get from parser
-    provide validation for items in [sections] like teardown
-    Make report files links clickable in robot console
-    When adding lib, suppress class selection window when only one class is found
-    Discover python libs inside jar when adding java libs in red.xml
+      Extend current RobotFileValidation to show an information get from parser
+      Discover python libs inside jar when adding java libs in red.xml
+      Run configuration  use default interpreter than previously used
+      Add Marketplace to RED product
+      Text box to include users lib dependency paths to PythonPath / ClassPath
+      Merge Remote Libs to Referenced Libs in Red.xml
+      Option  relative paths to Workspace/Project in libs and vars in red.xml
+      Custom PythonPathClassPath  handling relative paths
+      Disabling option "Show discovering summary after test .." after unselecting "auto discover"
+      Disable autodiscovering of libraries for not RF files i.e. JPG
+      Autodiscovering  show in Progress dialog information, which suite (resource) is currently check
 
-Features
+Feature
 
-    Adding linked mode for creating variables in Variable section
-    Reload library when lib file is changed
-
-
-    
+      Reload library when lib file is changed
+      Automatic import lib to red.xml
+      POC  Nebula NAT table
+      UpdateSite on SourceForge  setup&tests
+      Changing button "Update Robot" to searching interpreters in PATH in Preference
 
 
