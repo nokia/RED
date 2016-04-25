@@ -20,6 +20,13 @@ RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow q
 ## Binaries distribution:
 RED is distributed as independent binary (Eclipse product) and Eclipse feature to be installed on existing Eclipse binary. 
 
+###Install form Marketplace/Update Site
+
+Marketpalce: Click Help -> Eclipse Marketplace -> and type into Find field "RED"
+
+Update Site: Click Help -> Install New Software -> Add and set address in Location to:
+http://master.dl.sourceforge.net/project/red-robot-editor/repository
+
 ### Update existing RED installation
 We recommend to not to do direct update of newer version, instead perform unistall old RED and install new RED after Eclipse restart.
 Open Help -> Installation Details, select old RED feature and perform unistall, restart Eclipse
