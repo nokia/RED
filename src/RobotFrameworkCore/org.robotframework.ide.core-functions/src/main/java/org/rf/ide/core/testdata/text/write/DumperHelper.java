@@ -659,4 +659,71 @@ public class DumperHelper {
     public String getEmpty() {
         return EMPTY;
     }
+
+    public void dumpEmptyLines(final RobotFile model, final List<RobotLine> lines,
+            final AModelElement<ARobotSectionTable> setting) {
+        final FilePosition fPosEnd = setting.getEndPosition();
+        if (!fPosEnd.isNotSet()) {
+            if (!lines.isEmpty()) {
+                RobotLine lastLine = lines.get(lines.size() - 1);
+                IRobotLineElement endOfLine = lastLine.getEndOfLine();
+                if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
+                        || endOfLine.getTypes().contains(EndOfLineTypes.NON)
+                        || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
+                        && !lastLine.getLineElements().isEmpty()) {
+                    updateLine(model, lines, getLineSeparator(model, fPosEnd));
+                }
+            }
+
+            Optional<Integer> currentLine = model.getRobotLineIndexBy(fPosEnd.getOffset());
+            int currentLineNumber;
+            if (currentLine.isPresent()) {
+                currentLineNumber = currentLine.get();
+            } else {
+                currentLineNumber = fPosEnd.getLine();
+            }
+
+            final List<RobotLine> fileContent = model.getFileContent();
+            while (fileContent.size() > currentLineNumber + 1) {
+                final RobotLine nextLine = fileContent.get(currentLineNumber + 1);
+                if (isEmptyLine(nextLine)) {
+                    dumpLineDirectly(model, lines, nextLine);
+                    currentLineNumber++;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    private boolean isEmptyLine(final RobotLine line) {
+        boolean isEmpty = true;
+
+        for (final IRobotLineElement elem : line.getLineElements()) {
+            if (elem instanceof RobotToken) {
+                RobotToken tok = (RobotToken) elem;
+                if (!containsType(tok, RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                    isEmpty = false;
+                    break;
+                }
+            }
+        }
+
+        return isEmpty;
+    }
+
+    private boolean containsType(final RobotToken token, final IRobotTokenType... types) {
+        boolean contains = false;
+        final List<IRobotTokenType> accepted = Arrays.asList(types);
+        for (final IRobotTokenType type : token.getTypes()) {
+            if (accepted.contains(type)) {
+                contains = true;
+            } else {
+                contains = false;
+                break;
+            }
+        }
+
+        return contains;
+    }
 }
