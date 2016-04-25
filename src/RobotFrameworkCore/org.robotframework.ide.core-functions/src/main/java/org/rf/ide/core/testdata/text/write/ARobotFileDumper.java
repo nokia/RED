@@ -25,6 +25,8 @@ import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.TableHeaderComparator;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -100,7 +102,9 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         final List<AModelElement<VariableTable>> sortedVariables = sortVariables(variableTable);
 
         final TestCaseTable testCaseTable = model.getTestCaseTable();
+        final List<AModelElement<TestCaseTable>> sortedTestCases = getTestCases(testCaseTable);
         final KeywordTable keywordTable = model.getKeywordTable();
+        final List<AModelElement<KeywordTable>> sortedKeywords = getKeywords(keywordTable);
 
         final List<TableHeader<? extends ARobotSectionTable>> headers = new ArrayList<>(0);
         headers.addAll(settingTable.getHeaders());
@@ -126,9 +130,9 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
             } else if (th.getModelType() == ModelType.VARIABLES_TABLE_HEADER) {
                 sorted = copyVariables(sortedVariables);
             } else if (th.getModelType() == ModelType.KEYWORDS_TABLE_HEADER) {
-                sorted = null;
+                sorted = copyKeywords(sortedKeywords);
             } else if (th.getModelType() == ModelType.TEST_CASE_TABLE_HEADER) {
-                sorted = null;
+                sorted = copyTestCases(sortedTestCases);
             }
 
             dumperToUse.dump(model, sections, sectionWithHeader, th, sorted, lines);
@@ -140,9 +144,11 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                 sortedVariables.clear();
                 sortedVariables.addAll(copyUpVariables(sorted));
             } else if (th.getModelType() == ModelType.KEYWORDS_TABLE_HEADER) {
-                sorted = null;
+                sortedKeywords.clear();
+                sortedKeywords.addAll(copyUpKeywords(sorted));
             } else if (th.getModelType() == ModelType.TEST_CASE_TABLE_HEADER) {
-                sorted = null;
+                sortedTestCases.clear();
+                sortedTestCases.addAll(copyUpTestCases(sorted));
             }
 
             if (sectionWithHeader > -1) {
@@ -179,6 +185,26 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @SuppressWarnings("unchecked")
+    private List<AModelElement<ARobotSectionTable>> copyTestCases(final List<AModelElement<TestCaseTable>> elems) {
+        final List<AModelElement<ARobotSectionTable>> copied = new ArrayList<>();
+        for (final AModelElement<?> stE : elems) {
+            copied.add(((AModelElement<ARobotSectionTable>) stE));
+        }
+
+        return copied;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<AModelElement<ARobotSectionTable>> copyKeywords(final List<AModelElement<KeywordTable>> elems) {
+        final List<AModelElement<ARobotSectionTable>> copied = new ArrayList<>();
+        for (final AModelElement<?> stE : elems) {
+            copied.add(((AModelElement<ARobotSectionTable>) stE));
+        }
+
+        return copied;
+    }
+
+    @SuppressWarnings("unchecked")
     private List<AModelElement<SettingTable>> copyUpSettings(List<AModelElement<ARobotSectionTable>> elems) {
         final List<AModelElement<SettingTable>> copied = new ArrayList<>();
         for (final AModelElement<?> stE : elems) {
@@ -196,6 +222,46 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         }
 
         return copied;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<AModelElement<TestCaseTable>> copyUpTestCases(List<AModelElement<ARobotSectionTable>> elems) {
+        final List<AModelElement<TestCaseTable>> copied = new ArrayList<>();
+        for (final AModelElement<?> stE : elems) {
+            copied.add(((AModelElement<TestCaseTable>) stE));
+        }
+
+        return copied;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<AModelElement<KeywordTable>> copyUpKeywords(List<AModelElement<ARobotSectionTable>> elems) {
+        final List<AModelElement<KeywordTable>> copied = new ArrayList<>();
+        for (final AModelElement<?> stE : elems) {
+            copied.add(((AModelElement<KeywordTable>) stE));
+        }
+
+        return copied;
+    }
+
+    private List<AModelElement<KeywordTable>> getKeywords(final KeywordTable keywordTable) {
+        List<AModelElement<KeywordTable>> list = new ArrayList<>();
+
+        for (final UserKeyword uk : keywordTable.getKeywords()) {
+            list.add(uk);
+        }
+
+        return list;
+    }
+
+    private List<AModelElement<TestCaseTable>> getTestCases(final TestCaseTable testCaseTable) {
+        List<AModelElement<TestCaseTable>> list = new ArrayList<>();
+
+        for (final TestCase tc : testCaseTable.getTestCases()) {
+            list.add(tc);
+        }
+
+        return list;
     }
 
     private List<AModelElement<SettingTable>> sortSettings(final SettingTable settingTable) {
