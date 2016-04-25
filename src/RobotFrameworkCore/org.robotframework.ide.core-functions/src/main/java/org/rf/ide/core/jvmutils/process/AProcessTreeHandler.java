@@ -36,7 +36,7 @@ public abstract class AProcessTreeHandler implements IProcessTreeHandler {
 
             if (returnCode == OSProcessHelper.SUCCESS) {
                 for (String line : collectedOutput) {
-                    if (line != null && !line.isEmpty()) {
+                    if (!line.isEmpty()) {
                         String[] columns = columnSeparator.split(line);
                         if (columns.length > 1) {
                             try {
