@@ -10,6 +10,7 @@ import org.eclipse.jface.action.IAction;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper;
 import org.rf.ide.core.jvmutils.process.OSProcessHelper.ProcessHelperException;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 /**
  * @author Michal Anglart
@@ -32,7 +33,7 @@ class TerminateRedSessionAction extends Action {
             try {
                 new OSProcessHelper().destroyProcessTree(process);
             } catch (final ProcessHelperException e1) {
-                e1.printStackTrace();
+                RedPlugin.logError("Problem during RED server shutdown.", e1);
             }
             process.destroyForcibly();
             try {
