@@ -35,9 +35,13 @@ class TerminateRedSessionAction extends Action {
             } catch (final ProcessHelperException e1) {
                 RedPlugin.logError("Problem during RED server shutdown.", e1);
             }
-            process.destroyForcibly();
+            if (process != null) {
+                process.destroyForcibly();
+            }
             try {
-                process.waitFor();
+                if (process != null) {
+                    process.waitFor();
+                }
             } catch (final InterruptedException e) {
                 // nothing to do
             }
