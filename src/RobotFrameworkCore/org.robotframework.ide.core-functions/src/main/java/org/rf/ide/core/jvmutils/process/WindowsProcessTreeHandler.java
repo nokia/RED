@@ -8,12 +8,9 @@ package org.rf.ide.core.jvmutils.process;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.rf.ide.core.executor.RedSystemProperties;
 
-import com.google.common.base.Joiner;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
@@ -62,32 +59,9 @@ public class WindowsProcessTreeHandler extends AProcessTreeHandler {
 
     @Override
     public List<String> getKillProcessTreeCommand(final ProcessInformation procInformation) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void killProcessTree(final ProcessInformation procInformation) throws ProcessKillException {
-        try {
-            final List<String> command = Arrays.asList("cmd.exe", "/c", "wmic", "process", "where",
-                    "\"ProcessID=" + procInformation.pid() + " or ParentProcessID=" + procInformation.pid() + "\"",
-                    "delete");
-            final Queue<String> collectedOutput = new ConcurrentLinkedQueue<>();
-            final int returnCode = getHelper().execCommandAndCollectOutput(command, collectedOutput);
-
-            if (returnCode == OSProcessHelper.SUCCESS) {
-                final List<ProcessInformation> childs = procInformation.childs();
-                for (final ProcessInformation pi : childs) {
-                    killProcessTree(pi);
-                }
-            } else {
-                throw new ProcessKillException("Couldn't stop process tree for PID=" + procInformation.pid()
-                        + ", exitCode=" + returnCode + ", output=" + Joiner.on('\n').join(collectedOutput));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ProcessKillException(e);
-        }
+        return Arrays.asList("cmd.exe", "/c", "wmic", "process", "where",
+                "\"ProcessID=" + procInformation.pid() + " or ParentProcessID=" + procInformation.pid() + "\"",
+                "delete");
     }
 
     @Override

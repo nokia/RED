@@ -41,11 +41,7 @@ public class ProcessInformation {
     }
 
     public void setHandler(final IProcessTreeHandler handler) {
-        if (handler == null) {
-            this.handler = Optional.absent();
-        } else {
-            this.handler = Optional.of(handler);
-        }
+        this.handler = Optional.fromNullable(handler);
     }
 
     public Optional<ProcessInformation> parent() {
