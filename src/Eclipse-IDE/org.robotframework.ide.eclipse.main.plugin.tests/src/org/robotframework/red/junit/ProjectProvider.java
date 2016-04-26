@@ -8,6 +8,7 @@ package org.robotframework.red.junit;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -25,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.io.CharStreams;
 
 /**
  * @author Michal Anglart
@@ -36,6 +38,10 @@ public class ProjectProvider implements TestRule {
 
     private IProject project;
 
+    public ProjectProvider(final Class<?> testClass) {
+        this(testClass.getSimpleName());
+    }
+
     public ProjectProvider(final String projectName) {
         this.projectName = projectName;
     }
@@ -44,6 +50,12 @@ public class ProjectProvider implements TestRule {
         return project;
     }
 
+    /**
+     * Configures the project to have robot nature. Use wisely since this adds builder
+     * to the project, so in some situations project building/validation can start.
+     * 
+     * @throws CoreException
+     */
     public void addRobotNature() throws CoreException {
         RobotProjectNature.addRobotNature(project, null);
     }
@@ -109,8 +121,26 @@ public class ProjectProvider implements TestRule {
         return project.getFile(filePath);
     }
 
+    public IFile getFile(final String filePath) {
+        return getFile(new Path(filePath));
+    }
+
+    public String getFileContent(final IPath filePath) throws IOException, CoreException {
+        try (final InputStream stream = getFile(filePath).getContents()) {
+            return CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
+        }
+    }
+
+    public String getFileContent(final String filePath) throws IOException, CoreException {
+        return getFileContent(new Path(filePath));
+    }
+
     public IFolder getDir(final IPath dirPath) {
         return project.getFolder(dirPath);
+    }
+
+    public IFolder getDir(final String dirPath) {
+        return getDir(new Path(dirPath));
     }
 
 }
