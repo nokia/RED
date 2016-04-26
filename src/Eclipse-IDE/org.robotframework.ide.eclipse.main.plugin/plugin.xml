@@ -4513,6 +4513,83 @@
             </instanceof></enablement>
       </consolePageParticipant>
    </extension>
+      <extension
+         point="org.eclipse.ltk.core.refactoring.renameParticipants">
+      <renameParticipant
+            class="org.robotframework.ide.eclipse.main.plugin.refactoring.ResourceRenameParticipant"
+            id="org.robotframework.red.refactoring.resourceRenameParticipant"
+            name="Rename participant">
+         <enablement>
+            <with
+                  variable="element">
+               <instanceof
+                     value="org.eclipse.core.resources.IResource">
+               </instanceof>
+            </with>
+            <with
+                  variable="affectedNatures">
+               <iterate
+                     ifEmpty="false"
+                     operator="or">
+                  <equals
+                        value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                  </equals>
+               </iterate>
+            </with>
+          </enablement>
+      </renameParticipant>
+   </extension>
+      <extension
+            point="org.eclipse.ltk.core.refactoring.moveParticipants">
+         <moveParticipant
+               class="org.robotframework.ide.eclipse.main.plugin.refactoring.ResourceMoveParticipant"
+               id="org.robotframework.red.refactoring.resourceMoveParticipant"
+               name="Move participant">
+            <enablement>
+               <with
+                     variable="element">
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+               </with>
+               <with
+                     variable="affectedNatures">
+                  <iterate
+                         ifEmpty="false"
+                         operator="or">
+                      <equals
+                            value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                      </equals>
+                  </iterate>
+               </with></enablement>
+         </moveParticipant>
+      </extension>
+      <extension
+            point="org.eclipse.ltk.core.refactoring.deleteParticipants">
+         <deleteParticipant
+               class="org.robotframework.ide.eclipse.main.plugin.refactoring.ResourceDeleteParticipant"
+               id="org.robotframework.red.refactoring.resourceDeleteParticipant"
+               name="Delete participant">
+            <enablement>
+               <with
+                     variable="element">
+                  <instanceof
+                        value="org.eclipse.core.resources.IResource">
+                  </instanceof>
+               </with>
+               <with
+                     variable="affectedNatures">
+                  <iterate
+                        ifEmpty="false"
+                        operator="or">
+                     <equals
+                           value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                     </equals>
+                  </iterate>
+               </with>
+            </enablement>
+         </deleteParticipant>
+      </extension>
    <!--<extension
          point="org.eclipse.search.searchPages">
       <page
