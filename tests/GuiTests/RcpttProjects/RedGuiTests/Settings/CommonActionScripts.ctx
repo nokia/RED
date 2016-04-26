@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/26/16 10:10 AM
+Save-Time: 4/26/16 11:29 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -23,6 +23,7 @@ proc "restore-interpreters"{
 	    get-tree | select "Robot Framework/Installed frameworks"
 	    get-button Discover | click
 	    get-button OK | click
+	    get-window "Rebuild required" | get-button OK | click
 	}
 }
 
