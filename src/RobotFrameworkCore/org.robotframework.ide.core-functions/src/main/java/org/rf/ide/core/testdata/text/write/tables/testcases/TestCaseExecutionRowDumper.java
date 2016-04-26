@@ -29,19 +29,19 @@ public class TestCaseExecutionRowDumper extends AExecutableTableElementDumper {
     @Override
     public RobotElementsComparatorWithPositionChangedPresave getSorter(
             final AModelElement<? extends IExecutableStepsHolder<?>> currentElement) {
-        RobotExecutableRow<TestCase> userKeyword = (RobotExecutableRow<TestCase>) currentElement;
+        RobotExecutableRow<TestCase> testCaseRowExec = (RobotExecutableRow<TestCase>) currentElement;
         RobotElementsComparatorWithPositionChangedPresave sorter = new RobotElementsComparatorWithPositionChangedPresave();
 
         final List<RobotToken> keys = new ArrayList<>();
-        if (userKeyword.getAction() != null) {
-            keys.add(userKeyword.getAction());
+        if (testCaseRowExec.getAction() != null) {
+            keys.add(testCaseRowExec.getAction());
         }
         sorter.addPresaveSequenceForType(RobotTokenType.TEST_CASE_ACTION_NAME, 1, keys);
-        sorter.addPresaveSequenceForType(RobotTokenType.TEST_CASE_ACTION_ARGUMENT, 2, userKeyword.getArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
-                getElementHelper().filter(userKeyword.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
-                getElementHelper().filter(userKeyword.getComment(), RobotTokenType.COMMENT_CONTINUE));
+        sorter.addPresaveSequenceForType(RobotTokenType.TEST_CASE_ACTION_ARGUMENT, 2, testCaseRowExec.getArguments());
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
+                getElementHelper().filter(testCaseRowExec.getComment(), RobotTokenType.START_HASH_COMMENT));
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
+                getElementHelper().filter(testCaseRowExec.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
     }
