@@ -44,7 +44,7 @@ public class TestCaseTimeoutMessageMapper implements IParsingMapper {
         final TestCase testCase = testCases.get(testCases.size() - 1);
         final List<TestCaseTimeout> timeouts = testCase.getTimeouts();
         if (timeouts.size() == 1) {
-            timeouts.get(0).setTimeout(rt);
+            timeouts.get(0).addMessagePart(rt);
         } else {
             for (final TestCaseTimeout timeout : timeouts) {
                 if (timeout.getTimeout() != null && !timeout.getTimeout().getFilePosition().isNotSet()) {
