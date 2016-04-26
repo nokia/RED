@@ -111,6 +111,10 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                     getDumperHelper().updateLine(model, lines, elemDeclaration);
                 }
 
+                if (currentLine != null) {
+                    getDumperHelper().dumpSeparatorsAfterToken(model, currentLine, elemDeclaration, lines);
+                }
+
                 final List<AModelElement<? extends IExecutableStepsHolder<?>>> sortedUnits = getSortedUnits(execHolder);
                 for (AModelElement<? extends IExecutableStepsHolder<?>> execElement : sortedUnits) {
 
