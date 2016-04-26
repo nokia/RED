@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/26/16 4:34 PM
+Save-Time: 4/26/16 5:23 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -19,15 +19,18 @@ get-eclipse-window | maximize
 
 proc "restore-interpreters"{
 	get-preferences-menu | click
-	with [get-window Preferences] {
-	    get-tree | select "Robot Framework/Installed frameworks"
-	    get-button Discover | click
-	    get-table | get-item "Robot Framework .*\\(Python .*\)" | check
-	    get-button OK | click
-	    get-window "Rebuild required" | get-button OK | click
+	if [get-window Preferences | get-table | get-property itemCount -raw | equals 0 ]{
+		with [get-window Preferences] {
+		    get-tree | select "Robot Framework/Installed frameworks"
+		    get-button Discover | click
+		    get-table | get-item "Robot Framework .*\\(Python .*\)" | check
+		    get-button OK | click
+		    get-window "Rebuild required" | get-button OK | click
+		}
+	}-else{
+		get-window Preferences | get-button OK | click
 	}
 }
-
 restore-interpreters
 
 proc "run-process-and-trim"  [val process ""] [val arg1 ""] [val arg2 ""] [val ignoreStderr false ] [val ignoreExitCode false] {
@@ -44,8 +47,6 @@ proc "os-specific" [val windowsValue] [val linuxValue]
 //get python path: "C:\Pyhon27"
 global [val python_exe_path [run-process-and-trim  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)" ]]
 
-//get robot version:  "Robot Framework 3.0 (Python 2.7.8 on win32)" 
-global [val robot_version [run-process-and-trim -process  [os-specific "pybot.bat"  "pybot" ] -arg1 "--version"  -ignoreStderr true -ignoreExitCode true ]]
 
 //get jython path: "d:\jyton\jython2.7.0\bin\"
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
@@ -54,9 +55,15 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 	global [val jython_path "/usr/local/bin"]
 	//global [val jython_path [exec-process "which" "jython" |  get stdout  |invoke trim | invoke replace "jython" ""]]
 }
-//jybot version: "Robot Framework 3.0 (Python 2.7.8 on win32)"
-global [val jybot_version [run-process-and-trim -process  [os-specific "jybot.bat"  "jybot" ] -arg1 "--version"  -ignoreStderr true -ignoreExitCode true ]]
 
+
+//get robot version:  "Robot Framework 3.0 (Python 2.7.8 on win32)" 
+global [val robot_version [run-process-and-trim -process  [os-specific "pybot.bat"  "pybot" ] -arg1 "--version"  -ignoreStderr true -ignoreExitCode true ]]
+
+//get jybot version: "Robot Framework 3.0 (Jython 2.7.0 on java1.8.0_25)" This is in procedure because i takes too much time
+proc "check-jython-version"{
+	global [val jybot_version [run-process-and-trim -process  [os-specific "jybot.bat"  "jybot" ] -arg1 "--version"  -ignoreStderr true -ignoreExitCode true ]]
+}
 
 let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
 	if [$temp | equals ""] {
@@ -82,6 +89,63 @@ global [val RED_workspace_path [get-workspace-location]]
 global [val user_folder [get-java-property "user.home"]]
 
 global [val sys_sep [os-specific "\\" "/"]]
+
+//--------------------------------------------------------------------------------------------
+
+//concatenate strings in list with regex to check MEssage Log view (for short log)
+proc concat_str_with_regex [val log_list]
+{
+	concat [$log_list |each [val single ] 
+	{
+		concat $msg_log_regex_INFO $single
+	}] 
+
+}
+
+
+proc "check-debug-marker-on-ruler" [val line] [val script_name]{
+	get-tab-folder -index 2 | get-property activePage | equals $script_name | verify-true
+ 	loop [val index 0]{
+	 	try -times 1 -command{
+			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].text" $line $index] -raw
+			| let [val marker -input]{
+				if [ $marker | not-eq "Debug Current Instruction Pointer" ] {  
+					recur [$index | plus 1]
+				}
+	
+			}
+ 		}-catch{
+ 			str "a" | equals "b" |assert-true -message [format "There was no debug marker in line %s!! " $line]
+ 		}
+	}
+
+}
+
+proc replace [val input] [val old] [val new]{
+	$input |str| invoke replace $old $new
+
+}
+
+
+proc "compare-message-log2" [val ref_content]{
+	get-view "Message Log" | get-editbox | get-property text -raw| let [val original_content -input]
+	{
+		if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
+			exec-process [format "\"python.exe\"  \"%s/Settings/PythonScripts/compare_msg_log_as_strings.py\"  \"%s\" \"%s\""   $user_RCPTT_project_path $original_content $ref_content ]
+			| let [val result [ get stdout] ]{
+			 $result | equals "OK!\r\n" | assert-true -message [format "Message was: %s" $result]
+			 }
+	
+		}-else{
+			exec-process [format "python"  "%s/Settings/PythonScripts/compare_msg_log_as_strings.py"  "%s" "%s"   $user_RCPTT_project_path $original_content $ref_content ]
+			| let [val result [ get stdout] ]{
+			 $result | equals "OK!\n" | assert-true -message [format "Message was: %s" $result]
+			 }
+		}	
+	}
+
+}
+
 
 //----------------------------procedures -----------------------------------------------------
 
@@ -295,62 +359,6 @@ proc Create2MetadataInTableEditor [val EditorTitle]{
     	}
     	apply-cell-edit -deactivate
 	}
-}
-
-
-
-//concatenate strings in list with regex to check MEssage Log view (for short log)
-proc concat_str_with_regex [val log_list]
-{
-	concat [$log_list |each [val single ] 
-	{
-		concat $msg_log_regex_INFO $single
-	}] 
-
-}
-
-
-proc "check-debug-marker-on-ruler" [val line] [val script_name]{
-	get-tab-folder -index 2 | get-property activePage | equals $script_name | verify-true
- 	loop [val index 0]{
-	 	try -times 1 -command{
-			get-editor $script_name | get-text-viewer | get-property [format "markers['%s'][%s].text" $line $index] -raw
-			| let [val marker -input]{
-				if [ $marker | not-eq "Debug Current Instruction Pointer" ] {  
-					recur [$index | plus 1]
-				}
-	
-			}
- 		}-catch{
- 			str "a" | equals "b" |assert-true -message [format "There was no debug marker in line %s!! " $line]
- 		}
-	}
-
-}
-
-proc replace [val input] [val old] [val new]{
-	$input |str| invoke replace $old $new
-
-}
-
-
-proc "compare-message-log2" [val ref_content]{
-	get-view "Message Log" | get-editbox | get-property text -raw| let [val original_content -input]
-	{
-		if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
-			exec-process [format "\"python.exe\"  \"%s/Settings/PythonScripts/compare_msg_log_as_strings.py\"  \"%s\" \"%s\""   $user_RCPTT_project_path $original_content $ref_content ]
-			| let [val result [ get stdout] ]{
-			 $result | equals "OK!\r\n" | assert-true -message [format "Message was: %s" $result]
-			 }
-	
-		}-else{
-			exec-process [format "python"  "%s/Settings/PythonScripts/compare_msg_log_as_strings.py"  "%s" "%s"   $user_RCPTT_project_path $original_content $ref_content ]
-			| let [val result [ get stdout] ]{
-			 $result | equals "OK!\n" | assert-true -message [format "Message was: %s" $result]
-			 }
-		}	
-	}
-
 }
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
