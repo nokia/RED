@@ -19,14 +19,14 @@ import org.rf.ide.core.testdata.model.table.UserKeywordTableElementsComparator;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
-import org.rf.ide.core.testdata.text.write.keywords.KeywordArgumentsDumper;
-import org.rf.ide.core.testdata.text.write.keywords.KeywordDocumentationDumper;
-import org.rf.ide.core.testdata.text.write.keywords.KeywordExecutionRowDumper;
-import org.rf.ide.core.testdata.text.write.keywords.KeywordReturnDumper;
-import org.rf.ide.core.testdata.text.write.keywords.KeywordTagsDumper;
-import org.rf.ide.core.testdata.text.write.keywords.KeywordTeardownDumper;
-import org.rf.ide.core.testdata.text.write.keywords.KeywordTimeoutDumper;
-import org.rf.ide.core.testdata.text.write.keywords.KeywordUnknownSettingDumper;
+import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordArgumentsDumper;
+import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordDocumentationDumper;
+import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordExecutionRowDumper;
+import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordReturnDumper;
+import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordTagsDumper;
+import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordTeardownDumper;
+import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordTimeoutDumper;
+import org.rf.ide.core.testdata.text.write.tables.keywords.KeywordUnknownSettingDumper;
 
 public class KeywordsSectionTableDumper extends AExecutableTableDumper {
 
