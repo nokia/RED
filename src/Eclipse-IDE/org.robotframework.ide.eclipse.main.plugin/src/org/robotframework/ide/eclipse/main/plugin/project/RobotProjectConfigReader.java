@@ -53,7 +53,7 @@ public class RobotProjectConfigReader {
         }
     }
 
-    private RobotProjectConfig readConfiguration(final InputStream contents) {
+    public RobotProjectConfig readConfiguration(final InputStream contents) {
         return readConfiguration(new InputStreamReader(contents));
     }
 
