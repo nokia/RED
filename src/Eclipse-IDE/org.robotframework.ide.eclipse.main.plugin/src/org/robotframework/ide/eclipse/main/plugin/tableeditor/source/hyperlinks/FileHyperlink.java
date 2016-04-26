@@ -13,6 +13,7 @@ import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
@@ -58,7 +59,7 @@ public class FileHyperlink implements IHyperlink {
             if (!desc.isInternal()) {
                 // we don't want to open files with external editors (e.g. running script files etc)
                 final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                desc = editorRegistry.findEditor("org.eclipse.ui.DefaultTextEditor");
+                desc = editorRegistry.findEditor(EditorsUI.DEFAULT_TEXT_EDITOR_ID);
             }
             if (desc != null) {
                 page.openEditor(new FileEditorInput(destinationFile), desc.getId());

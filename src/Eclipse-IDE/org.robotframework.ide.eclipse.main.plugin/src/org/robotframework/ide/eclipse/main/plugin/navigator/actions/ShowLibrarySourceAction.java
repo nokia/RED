@@ -23,6 +23,7 @@ import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
@@ -77,7 +78,7 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
                 // we don't want to open .py file with interpreter, so if there
                 // is no internal editor, then we will use default text editor
                 final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
-                desc = editorRegistry.findEditor("org.eclipse.ui.DefaultTextEditor");
+                desc = editorRegistry.findEditor(EditorsUI.DEFAULT_TEXT_EDITOR_ID);
                 if (desc == null) {
                     throw new SourceOpeningException(
                             "Unable to open editor for library: " + spec.getName()
