@@ -29,6 +29,8 @@ public class RobotDebugExecutionContext {
     public static final String MAIN_KEYWORD_TYPE = "Keyword";
 
     public static final String LOOP_KEYWORD_TYPE = "Test For";
+    
+    public static final String SUITE_LOOP_KEYWORD_TYPE = "Suite For";
 
     public static final String LOOP_KEYWORD_NEW_TYPE = "For"; // since Robot 3.0 a2
 
@@ -205,7 +207,8 @@ public class RobotDebugExecutionContext {
     }
 
     private boolean isForLoopKeyword(final String keywordType) {
-        return keywordType.equalsIgnoreCase(LOOP_KEYWORD_TYPE) || keywordType.equalsIgnoreCase(LOOP_KEYWORD_NEW_TYPE);
+        return keywordType.equalsIgnoreCase(LOOP_KEYWORD_TYPE) || keywordType.equalsIgnoreCase(LOOP_KEYWORD_NEW_TYPE)
+                || keywordType.equalsIgnoreCase(SUITE_LOOP_KEYWORD_TYPE);
     }
 
     private boolean isSetupTeardownStart(final String keywordType) {
