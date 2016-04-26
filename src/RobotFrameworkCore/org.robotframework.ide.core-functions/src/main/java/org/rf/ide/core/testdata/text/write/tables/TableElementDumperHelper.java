@@ -157,12 +157,18 @@ public class TableElementDumperHelper {
         if (offset == -1) {
             offset = tokens.get(0).getFilePosition().getOffset();
         }
+
+        if (isLastElementTheSameAsFirstInTokensToDump(lastToken, tokens)) {
+            // before this method
+            meatTokens++;
+        }
+
         while (meatTokens < tokSize) {
             lastLine = model.getFileContent().get(model.getRobotLineIndexBy(offset).get());
             List<IRobotLineElement> lastToks = lastLine.getLineElements();
             final int lastToksSize = lastToks.size();
 
-            final int elementPositionInLine;
+            int elementPositionInLine;
             if (offset != startOffset) {
                 elementPositionInLine = lastLine.getElementPositionInLine(offset, PositionCheck.STARTS).get();
             } else {
@@ -246,6 +252,11 @@ public class TableElementDumperHelper {
         for (final IRobotLineElement rle : dumps) {
             dumpHelper.updateLine(model, lines, rle);
         }
+    }
+
+    private boolean isLastElementTheSameAsFirstInTokensToDump(final IRobotLineElement startToken,
+            final List<RobotToken> tokens) {
+        return (!tokens.isEmpty() && tokens.get(0) == startToken);
     }
 
     private boolean isContinue(final DumperHelper dumpHelper, final List<IRobotLineElement> dumps,

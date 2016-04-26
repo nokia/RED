@@ -466,7 +466,7 @@ public class DumperHelper {
             final IRobotLineElement currentToken, final List<RobotLine> lines) {
         int dumpEndIndex = -1;
         List<IRobotLineElement> lineElements = currentLine.getLineElements();
-
+        currentLine.getEndOfLine();
         Optional<Integer> forCurrentLine = getDumpEndIndex(lineElements, currentToken);
         if (forCurrentLine.isPresent()) {
             dumpEndIndex = forCurrentLine.get();
