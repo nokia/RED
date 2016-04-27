@@ -28,12 +28,6 @@ public class RobotDebugExecutionContext {
 
     public static final String MAIN_KEYWORD_TYPE = "Keyword";
 
-    public static final String LOOP_KEYWORD_TYPE = "Test For";
-    
-    public static final String SUITE_LOOP_KEYWORD_TYPE = "Suite For";
-
-    public static final String LOOP_KEYWORD_NEW_TYPE = "For"; // since Robot 3.0 a2
-
     private RobotFile currentModel;
 
     private RobotParser robotParser;
@@ -188,7 +182,7 @@ public class RobotDebugExecutionContext {
             forLoopsCounter++;
         } else if (forLoopsCounter > 0) {
             isForLoopStarted = true;
-        } else if (isSetupTeardownStart(type)) {
+        } else if (isSetupTeardownStartKeyword(type)) {
             isSetupTeardownKeywordStarted = true;
         }
     }
@@ -207,11 +201,10 @@ public class RobotDebugExecutionContext {
     }
 
     private boolean isForLoopKeyword(final String keywordType) {
-        return keywordType.equalsIgnoreCase(LOOP_KEYWORD_TYPE) || keywordType.equalsIgnoreCase(LOOP_KEYWORD_NEW_TYPE)
-                || keywordType.equalsIgnoreCase(SUITE_LOOP_KEYWORD_TYPE);
+        return ForLoopKeywordTypes.isForLoopKeywordType(keywordType);
     }
 
-    private boolean isSetupTeardownStart(final String keywordType) {
+    private boolean isSetupTeardownStartKeyword(final String keywordType) {
         return !keywordType.equalsIgnoreCase(MAIN_KEYWORD_TYPE) && !isForLoopKeyword(keywordType);
     }
 
@@ -322,5 +315,32 @@ public class RobotDebugExecutionContext {
         public int getCounter() {
             return counter;
         }
+    }
+    
+    enum ForLoopKeywordTypes {
+        NEW_FOR("For"), // since Robot 3.0 a2
+        TEST_FOR("Test For"),
+        SUITE_FOR("Suite For");
+        
+        private String typeName;
+        
+        private ForLoopKeywordTypes(final String typeName) {
+            this.typeName = typeName;
+        }
+        
+        private String getTypeName() {
+            return typeName;
+        }
+        
+        public static boolean isForLoopKeywordType(final String keywordType) {
+            final ForLoopKeywordTypes[] values = ForLoopKeywordTypes.values();
+            for (int i = 0; i < values.length; i++) {
+                if(values[i].getTypeName().equalsIgnoreCase(keywordType)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
     }
 }
