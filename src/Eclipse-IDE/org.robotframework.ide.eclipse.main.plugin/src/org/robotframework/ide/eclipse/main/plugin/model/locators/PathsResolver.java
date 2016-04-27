@@ -88,8 +88,10 @@ public class PathsResolver {
         final List<IPath> paths = newArrayList(resolveToAbsolutePath(file, path));
         final Escaper escaper = PathsConverter.getUriSpecialCharsEscaper();
         for (final File f : file.getProject().getModuleSearchPaths()) {
-            final URI resolvedPath = f.toURI().resolve(escaper.escape(path.toString()));
-            paths.add(new Path(resolvedPath.getPath()));
+            final String resolvedPath = f.toURI().resolve(escaper.escape(path.toString())).getPath();
+            if(resolvedPath != null) {
+                paths.add(new Path(resolvedPath));
+            }
         }
         return paths;
     }
@@ -101,7 +103,7 @@ public class PathsResolver {
 
     private static IPath resolveToAbsolutePath(final RobotSuiteFile file, final IPath path)
             throws PathResolvingException {
-        return resolveToAbsolutePath(file.getFile().getLocation(), path);
+        return resolveToAbsolutePath(file.getFile() != null ? file.getFile().getLocation() : null, path);
     }
 
     /**
@@ -143,6 +145,10 @@ public class PathsResolver {
 
     private static boolean isParameterized(final IPath path) {
         return Pattern.compile("[@$&%]\\{[^\\}]+\\}").matcher(path.toPortableString()).find();
+    }
+    
+    public static boolean hasNotEscapedWindowsPathSeparator(final String path) {
+        return Pattern.compile("^.*[^\\\\][\\\\]{1}[^\\\\].*$").matcher(path).find(); // e.g. c:\lib.py
     }
 
     public static class PathResolvingException extends RuntimeException {

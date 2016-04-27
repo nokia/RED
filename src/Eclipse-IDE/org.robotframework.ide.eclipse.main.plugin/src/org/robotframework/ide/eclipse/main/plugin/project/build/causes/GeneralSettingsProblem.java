@@ -550,6 +550,13 @@ public enum GeneralSettingsProblem implements IProblemCause {
         public String getProblemDescription() {
             return "Variable '%s' is given as keyword name.";
         }
+    },
+    NOT_ESCAPED_WINDOWS_PATH {
+
+        @Override
+        public String getProblemDescription() {
+            return "Windows paths are not supported. Use escaped '\\\\' or Linux-like '/' path separators.";
+        }
     };
 
     @Override
