@@ -159,7 +159,7 @@ public class TableElementDumperHelper {
         }
 
         if (isLastElementTheSameAsFirstInTokensToDump(lastToken, tokens)) {
-            // before this method
+            // dump token before this method
             meatTokens++;
         }
 

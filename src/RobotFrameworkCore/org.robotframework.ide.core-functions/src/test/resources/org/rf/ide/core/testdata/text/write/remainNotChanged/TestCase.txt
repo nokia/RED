@@ -1,0 +1,37 @@
+*** Test Cases ***
+Test1
+	[Unknown]	data
+	[Document]	doc doc doc
+	[Tags]		t1		t2
+	[Setup]		setup
+	[Teardown]	tyr1
+	[Template]	template
+	[Timeout]	10 hours	ok		#done
+	Log		p2	mal
+| | new
+
+
+Test2	[Unknown]	data2
+	[Document]	doc doc doc2
+	[Tags]		t1		t2
+	[Setup]		setup2
+	[Teardown]	tyr2
+	[Template]	template2
+	[Timeout]	10 hours	ok		#done
+	Log2		p2	mal2
+| | new2
+
+*** Test Cases ***
+
+
+
+
+Test3	[Setup]		setup3
+	[Unknown]	data3
+	[Document]	doc doc doc3
+	[Tags]		t1		t3
+	[Teardown]	tyr3
+	[Template]	template3
+	[Timeout]	10 hours	ok		#done
+	Log3		p3	mal3
+| | new3
