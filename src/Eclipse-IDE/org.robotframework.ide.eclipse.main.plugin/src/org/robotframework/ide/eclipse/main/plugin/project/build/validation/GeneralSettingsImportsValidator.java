@@ -197,14 +197,20 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         @Override
         protected void validatePathImport(final AImported imported, final String path, final RobotToken pathToken,
                 final boolean isParametrized, final IProgressMonitor monitor) throws CoreException {
+            if (PathsResolver.hasNotEscapedWindowsPathSeparator(path)) {
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NOT_ESCAPED_WINDOWS_PATH);
+                reporter.handleProblem(problem, validationContext.getFile(), pathToken);
+                return;
+            }
             LibrarySpecification specification = null;
+            final List<IPath> resolvedPossiblePaths = PathsResolver.resolveToAbsolutePossiblePaths(suiteFile, path);
             for (final Entry<ReferencedLibrary, LibrarySpecification> entry : validationContext
                     .getReferencedLibrarySpecifications().entrySet()) {
                 final IPath entryPath = entry.getKey().getFilepath();
                 final IPath libPath1 = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
                 final IPath libPath2 = PathsConverter
                         .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
-                for (final IPath candidate : PathsResolver.resolveToAbsolutePossiblePaths(suiteFile, path)) {
+                for (final IPath candidate : resolvedPossiblePaths) {
                     if (candidate.equals(libPath1) || candidate.equals(libPath2)) {
                         specification = entry.getValue();
                     }
