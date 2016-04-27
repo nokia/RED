@@ -134,7 +134,7 @@ public class PathsResolver {
 
                 final String portablePath = base.toPortableString();
                 final URI filePath = new URI(escaper.escape(portablePath));
-                final URI pathUri = filePath.resolve(escaper.escape(child.toString()));
+                final URI pathUri = filePath.resolve(escaper.escape(child.toPortableString()));
 
                 return new Path(PathsConverter.reverseUriSpecialCharsEscapes(pathUri.toString()));
             } catch (final URISyntaxException | IllegalArgumentException e) {
