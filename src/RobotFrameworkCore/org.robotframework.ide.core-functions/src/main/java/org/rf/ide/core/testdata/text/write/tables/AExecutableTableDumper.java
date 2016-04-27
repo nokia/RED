@@ -111,10 +111,6 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                     getDumperHelper().updateLine(model, lines, elemDeclaration);
                 }
 
-                if (currentLine != null) {
-                    getDumperHelper().dumpSeparatorsAfterToken(model, currentLine, elemDeclaration, lines);
-                }
-
                 final List<AModelElement<? extends IExecutableStepsHolder<?>>> sortedUnits = getSortedUnits(execHolder);
                 for (AModelElement<? extends IExecutableStepsHolder<?>> execElement : sortedUnits) {
                     if (!lines.isEmpty()) {
@@ -124,8 +120,12 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                                 || endOfLine.getTypes().contains(EndOfLineTypes.NON)
                                 || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
                                 && !lastLine.getLineElements().isEmpty()) {
-                            final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                            getDumperHelper().updateLine(model, lines, lineSeparator);
+                            boolean shouldSeparateLine = shouldSeparateLine(execHolder, execElement);
+
+                            if (shouldSeparateLine) {
+                                final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
+                                getDumperHelper().updateLine(model, lines, lineSeparator);
+                            }
                         }
                     }
 
@@ -151,6 +151,30 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                 }
             }
         }
+    }
+
+    private boolean shouldSeparateLine(
+            final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> execUnit,
+            final AModelElement<? extends IExecutableStepsHolder<?>> execElement) {
+        boolean shouldSeparateLine = true;
+
+        final IRobotLineElement execUnitDec = execUnit.getHolder().getDeclaration();
+        if (execUnitDec.getStartOffset() >= 0) {
+            final RobotFile model = execUnit.getHolder().getParent().getParent();
+            Optional<Integer> robotLineIndexBy = model.getRobotLineIndexBy(execUnitDec.getStartOffset());
+            if (robotLineIndexBy.isPresent()) {
+                final RobotLine lastLine = model.getFileContent().get(robotLineIndexBy.get());
+                final Optional<Integer> execUnitPos = lastLine.getElementPositionInLine(execUnitDec);
+
+                final IRobotLineElement execElemDec = execElement.getDeclaration();
+                final Optional<Integer> execElemPos = lastLine.getElementPositionInLine(execElemDec);
+                if (execUnitPos.isPresent() && execElemPos.isPresent()) {
+                    shouldSeparateLine = false;
+                }
+            }
+        }
+
+        return shouldSeparateLine;
     }
 
     public abstract List<AModelElement<? extends IExecutableStepsHolder<?>>> getSortedUnits(

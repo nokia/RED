@@ -114,8 +114,6 @@ public class DumperHelper {
                 }
             }
 
-            // if (elem.getTypes().contains(RobotTokenType.VARIABLES_VARIABLE_VALUE) ||
-            // elem.getTypes().contains(RobotTokenType.)) {
             if (elem instanceof RobotToken) {
                 if (artToken.isDirty()) {
                     if (artToken.getRaw().isEmpty()) {
@@ -134,7 +132,6 @@ public class DumperHelper {
                     }
                 }
             }
-            // }
 
             line.addLineElement(cloneWithPositionRecalculate(artToken, line, outLines));
         }
