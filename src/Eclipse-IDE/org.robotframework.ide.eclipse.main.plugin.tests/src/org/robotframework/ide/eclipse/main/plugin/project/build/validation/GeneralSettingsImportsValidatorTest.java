@@ -21,6 +21,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.testdata.model.RobotVersion;
@@ -100,6 +101,7 @@ public class GeneralSettingsImportsValidatorTest {
                 GeneralSettingsProblem.NOT_ESCAPED_WINDOWS_PATH, new ProblemPosition(2, Range.closed(26, 49))));
     }
 
+    @Ignore
     @Test
     public void testValidateLibraryImport_withEscapedWindowsPathSeparators() throws CoreException {
         final String libName = "ExampleLibrary";
@@ -123,6 +125,7 @@ public class GeneralSettingsImportsValidatorTest {
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
     }
 
+    @Ignore
     @Test
     public void testValidateLibraryImport_withLinuxPathSeparatorsAndNoFileExtension() throws CoreException {
         final String libName = "ExampleLibrary";
