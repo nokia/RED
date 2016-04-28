@@ -148,6 +148,13 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return fixers;
         }
     },
+    INVALID_LIBRARY_PATH {
+
+        @Override
+        public String getProblemDescription() {
+            return "Invalid library path: %s";
+        }
+    },
     SETTING_ARGUMENTS_NOT_APPLICABLE {
 
         @Override
