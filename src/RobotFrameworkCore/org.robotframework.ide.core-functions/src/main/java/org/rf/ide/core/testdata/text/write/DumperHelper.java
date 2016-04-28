@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.text.write;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -211,8 +212,9 @@ public class DumperHelper {
         updateLine(model, lines, decToken);
         IRobotLineElement lastToken = decToken;
 
+        List<IRobotLineElement> lineElements = new ArrayList<>(0);
         if (currentLine != null) {
-            final List<IRobotLineElement> lineElements = currentLine.getLineElements();
+            lineElements = currentLine.getLineElements();
             if (!decToken.isDirty()) {
                 final int tokenPosIndex = lineElements.indexOf(decToken);
                 if (lineElements.size() - 1 > tokenPosIndex + 1) {
@@ -223,52 +225,67 @@ public class DumperHelper {
                     }
                 }
             }
+        }
 
-            for (final RobotToken columnToken : th.getColumnNames()) {
+        for (final RobotToken columnToken : th.getColumnNames()) {
+            if (currentLine != null) {
                 dumpSeparatorsBeforeToken(model, currentLine, columnToken, lines);
-                updateLine(model, lines, columnToken);
-                lastToken = columnToken;
-                if (!columnToken.isDirty()) {
-                    int thisTokenPosIndex = lineElements.indexOf(decToken);
-                    if (thisTokenPosIndex >= 0) {
-                        if (lineElements.size() - 1 > thisTokenPosIndex + 1) {
-                            final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);
-                            if (nextElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
-                                updateLine(model, lines, nextElem);
-                                lastToken = nextElem;
-                            }
-                        }
-                    }
-                }
+            } else {
+                updateLine(model, lines, getSeparator(model, lines, lastToken, columnToken));
             }
 
-            for (final RobotToken commentPart : th.getComment()) {
-                dumpSeparatorsBeforeToken(model, currentLine, commentPart, lines);
-                updateLine(model, lines, commentPart);
-                lastToken = commentPart;
-                if (!commentPart.isDirty()) {
-                    int thisTokenPosIndex = lineElements.indexOf(decToken);
-                    if (thisTokenPosIndex >= 0) {
-                        if (lineElements.size() - 1 > thisTokenPosIndex + 1) {
-                            final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);
-                            if (nextElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
-                                updateLine(model, lines, nextElem);
-                                lastToken = nextElem;
-                            }
+            updateLine(model, lines, columnToken);
+            lastToken = columnToken;
+            if (!columnToken.isDirty()) {
+                int thisTokenPosIndex = lineElements.indexOf(decToken);
+                if (thisTokenPosIndex >= 0) {
+                    if (lineElements.size() - 1 > thisTokenPosIndex + 1) {
+                        final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);
+                        if (nextElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                            updateLine(model, lines, nextElem);
+                            lastToken = nextElem;
                         }
                     }
-                }
-            }
-
-            dumpSeparatorsAfterToken(model, currentLine, lastToken, lines);
-            final IRobotLineElement endOfLine = currentLine.getEndOfLine();
-            if (endOfLine != null) {
-                final List<IRobotTokenType> types = endOfLine.getTypes();
-                if (!types.contains(EndOfLineTypes.EOF) && !types.contains(EndOfLineTypes.NON)) {
-                    updateLine(model, lines, endOfLine);
                 }
             }
         }
+
+        for (final RobotToken commentPart : th.getComment()) {
+            if (currentLine != null) {
+                dumpSeparatorsBeforeToken(model, currentLine, commentPart, lines);
+            } else {
+                updateLine(model, lines, getSeparator(model, lines, lastToken, commentPart));
+            }
+
+            updateLine(model, lines, commentPart);
+            lastToken = commentPart;
+            if (!commentPart.isDirty()) {
+                int thisTokenPosIndex = lineElements.indexOf(decToken);
+                if (thisTokenPosIndex >= 0) {
+                    if (lineElements.size() - 1 > thisTokenPosIndex + 1) {
+                        final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);
+                        if (nextElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                            updateLine(model, lines, nextElem);
+                            lastToken = nextElem;
+                        }
+                    }
+                }
+            }
+        }
+
+        IRobotLineElement endOfLine = null;
+        if (currentLine != null) {
+            dumpSeparatorsAfterToken(model, currentLine, lastToken, lines);
+            endOfLine = currentLine.getEndOfLine();
+        }
+
+        if (endOfLine != null) {
+            final List<IRobotTokenType> types = endOfLine.getTypes();
+            if (!types.contains(EndOfLineTypes.EOF) && !types.contains(EndOfLineTypes.NON)) {
+                updateLine(model, lines, endOfLine);
+            }
+        }
+
     }
 
     private FilePosition getPosition(final RobotLine line, final List<RobotLine> outLines) {
