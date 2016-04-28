@@ -4,6 +4,7 @@ Library		MyLib2
 ...			param1
 ...			WITH NAME
 ...			ok2
+ |	Library	|	ok
 
 
 | *** Variables *** |

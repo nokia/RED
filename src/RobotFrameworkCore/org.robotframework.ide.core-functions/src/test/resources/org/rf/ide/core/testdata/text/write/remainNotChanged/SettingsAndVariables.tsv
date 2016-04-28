@@ -5,7 +5,6 @@ Library	MyLib2
 ...	WITH NAME
 ...	ok2
 
-
 *** Variables ***
 ${x}	\		z	c
 ...	nowy
