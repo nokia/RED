@@ -11,7 +11,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class TokenSeparatorBuilder {
 
-    private static final Pattern PIPE_SEPARATOR_BEGIN = Pattern.compile("(^[|]\\s+)|(^[|]$)");
+    private static final Pattern PIPE_SEPARATOR_BEGIN = Pattern.compile("(^[|]\\s+)|(^[|]$)|(^[ ][|]\\s+)");
 
     private final FileFormat format;
 
@@ -35,7 +35,7 @@ public class TokenSeparatorBuilder {
     }
 
     @VisibleForTesting
-    protected boolean isPipeSeparated(final String line) {
+    public boolean isPipeSeparated(final String line) {
         boolean result = false;
         if (format == FileFormat.TXT_OR_ROBOT) {
             result = PIPE_SEPARATOR_BEGIN.matcher(line).find();
