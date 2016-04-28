@@ -20,18 +20,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
  */
 public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFinder {
 
-    public static final String TESTCASE_SETUP_KEYWORD_TYPE = "Test Setup";
-
-    public static final String TESTCASE_TEARDOWN_KEYWORD_TYPE = "Test Teardown";
-
-    public static final String SUITE_SETUP_KEYWORD_TYPE = "Suite Setup";
-
-    public static final String SUITE_TEARDOWN_KEYWORD_TYPE = "Suite Teardown";
-
-    public static final String SETUP_KEYWORD_TYPE = "Setup"; // since Robot 3.0 a2
-
-    public static final String TEARDOWN_KEYWORD_TYPE = "Teardown"; // since Robot 3.0 a2
-
     private TestCase currentTestCase;
 
     private RobotFile currentModel;
@@ -88,24 +76,33 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
         return row;
     }
 
+    
     private boolean isSuiteSetup(final KeywordContext currentKeywordContext) {
-        return currentKeywordContext.getType().equalsIgnoreCase(SUITE_SETUP_KEYWORD_TYPE)
-                || (currentTestCase == null && currentKeywordContext.getType().equalsIgnoreCase(SETUP_KEYWORD_TYPE));
+        final String currentKeywordType = currentKeywordContext.getType();
+        return SetupTeardownKeywordTypes.isTypeOf(currentKeywordType, SetupTeardownKeywordTypes.SUITE_SETUP)
+                || (currentTestCase == null
+                        && SetupTeardownKeywordTypes.isTypeOf(currentKeywordType, SetupTeardownKeywordTypes.NEW_SETUP)); 
     }
 
     private boolean isSuiteTeardown(final KeywordContext currentKeywordContext) {
-        return currentKeywordContext.getType().equalsIgnoreCase(SUITE_TEARDOWN_KEYWORD_TYPE)
-                || (currentTestCase == null && currentKeywordContext.getType().equalsIgnoreCase(TEARDOWN_KEYWORD_TYPE));
+        final String currentKeywordType = currentKeywordContext.getType();
+        return SetupTeardownKeywordTypes.isTypeOf(currentKeywordType, SetupTeardownKeywordTypes.SUITE_TEARDOWN)
+                || (currentTestCase == null && SetupTeardownKeywordTypes.isTypeOf(currentKeywordType,
+                        SetupTeardownKeywordTypes.NEW_TEARDOWN));
     }
 
     private boolean isTestCaseSetup(final KeywordContext currentKeywordContext) {
-        return currentKeywordContext.getType().equalsIgnoreCase(TESTCASE_SETUP_KEYWORD_TYPE)
-                || (currentTestCase != null && currentKeywordContext.getType().equalsIgnoreCase(SETUP_KEYWORD_TYPE));
+        final String currentKeywordType = currentKeywordContext.getType();
+        return SetupTeardownKeywordTypes.isTypeOf(currentKeywordType, SetupTeardownKeywordTypes.TESTCASE_SETUP)
+                || (currentTestCase != null
+                        && SetupTeardownKeywordTypes.isTypeOf(currentKeywordType, SetupTeardownKeywordTypes.NEW_SETUP));
     }
 
     private boolean isTestCaseTeardown(final KeywordContext currentKeywordContext) {
-        return currentKeywordContext.getType().equalsIgnoreCase(TESTCASE_TEARDOWN_KEYWORD_TYPE)
-                || (currentTestCase != null && currentKeywordContext.getType().equalsIgnoreCase(TEARDOWN_KEYWORD_TYPE));
+        final String currentKeywordType = currentKeywordContext.getType();
+        return SetupTeardownKeywordTypes.isTypeOf(currentKeywordType, SetupTeardownKeywordTypes.TESTCASE_TEARDOWN)
+                || (currentTestCase != null && SetupTeardownKeywordTypes.isTypeOf(currentKeywordType,
+                        SetupTeardownKeywordTypes.NEW_TEARDOWN));
     }
 
     public void setCurrentTestCase(final TestCase currentTestCase) {
@@ -116,4 +113,35 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
         this.currentModel = currentModel;
     }
 
+    enum SetupTeardownKeywordTypes {
+        TESTCASE_SETUP("Test Setup"),
+        TESTCASE_TEARDOWN("Test Teardown"),
+        SUITE_SETUP("Suite Setup"),
+        SUITE_TEARDOWN("Suite Teardown"),
+        NEW_SETUP("Setup"), // since Robot 3.0 a2
+        NEW_TEARDOWN("Teardown"); // since Robot 3.0 a2 
+        //new keyword types are common for test cases and suites setups/teardowns, so additionally TestCase object should be checked
+
+        private String typeName;
+
+        private SetupTeardownKeywordTypes(final String typeName) {
+            this.typeName = typeName;
+        }
+
+        private String getTypeName() {
+            return typeName;
+        }
+        
+        public static boolean isTypeOf(final String givenTypeName, SetupTeardownKeywordTypes expectedType) {
+            return expectedType.getTypeName().equalsIgnoreCase(givenTypeName);
+        }
+        
+        public static boolean isSuiteSetupTeardownType(final String typeName) {
+            return SUITE_SETUP.getTypeName().equalsIgnoreCase(typeName) || SUITE_TEARDOWN.getTypeName().equalsIgnoreCase(typeName);
+        }
+        
+        public static boolean isNewSetupTeardownType(final String typeName) {
+            return NEW_SETUP.getTypeName().equalsIgnoreCase(typeName) || NEW_TEARDOWN.getTypeName().equalsIgnoreCase(typeName);
+        }
+    }
 }

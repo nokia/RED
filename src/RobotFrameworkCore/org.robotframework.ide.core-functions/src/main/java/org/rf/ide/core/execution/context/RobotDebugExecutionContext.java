@@ -213,17 +213,18 @@ public class RobotDebugExecutionContext {
     }
 
     public boolean isSuiteSetupTeardownKeyword(final String keywordType) {
-        return keywordType.equalsIgnoreCase(SetupTeardownExecutableRowFinder.SUITE_SETUP_KEYWORD_TYPE)
-                || keywordType.equalsIgnoreCase(SetupTeardownExecutableRowFinder.SUITE_TEARDOWN_KEYWORD_TYPE)
-                || (!executableRowFindersManager.hasCurrentTestCase() && (keywordType
-                        .equalsIgnoreCase(SetupTeardownExecutableRowFinder.SETUP_KEYWORD_TYPE)
-                        || keywordType.equalsIgnoreCase(SetupTeardownExecutableRowFinder.TEARDOWN_KEYWORD_TYPE)));
+        return SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.isSuiteSetupTeardownType(keywordType)
+                || (!executableRowFindersManager.hasCurrentTestCase()
+                        && SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes
+                                .isNewSetupTeardownType(keywordType));
     }
 
     public boolean isTestCaseTeardownKeyword(final String keywordType) {
-        return keywordType.equalsIgnoreCase(SetupTeardownExecutableRowFinder.TESTCASE_TEARDOWN_KEYWORD_TYPE)
+        return SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.isTypeOf(keywordType,
+                SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.TESTCASE_TEARDOWN)
                 || (executableRowFindersManager.hasCurrentTestCase()
-                        && keywordType.equalsIgnoreCase(SetupTeardownExecutableRowFinder.TEARDOWN_KEYWORD_TYPE));
+                        && SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.isTypeOf(keywordType,
+                                SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.NEW_TEARDOWN));
     }
 
     protected static class KeywordContext {
@@ -317,7 +318,7 @@ public class RobotDebugExecutionContext {
         }
     }
     
-    enum ForLoopKeywordTypes {
+    protected enum ForLoopKeywordTypes {
         NEW_FOR("For"), // since Robot 3.0 a2
         TEST_FOR("Test For"),
         SUITE_FOR("Suite For");
