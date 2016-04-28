@@ -28,6 +28,11 @@ import com.google.common.escape.Escaper;
  */
 public class PathsResolver {
 
+    private static final Pattern parametrizedPathPattern = Pattern.compile("[@$&%]\\{[^\\}]+\\}");
+
+    private static final Pattern notEscapedWindowsPathSeparatorPattern = Pattern
+            .compile("^.*[^\\\\][\\\\]{1}[^\\\\].*$");
+
     static List<IPath> getWorkspaceRelativeResourceFilesPaths(final RobotSuiteFile file) {
         return getWorkspaceRelativePaths(file.getResourcesPaths(), file);
     }
@@ -144,11 +149,11 @@ public class PathsResolver {
     }
 
     private static boolean isParameterized(final IPath path) {
-        return Pattern.compile("[@$&%]\\{[^\\}]+\\}").matcher(path.toPortableString()).find();
+        return parametrizedPathPattern.matcher(path.toPortableString()).find();
     }
     
     public static boolean hasNotEscapedWindowsPathSeparator(final String path) {
-        return Pattern.compile("^.*[^\\\\][\\\\]{1}[^\\\\].*$").matcher(path).find(); // e.g. c:\lib.py
+        return notEscapedWindowsPathSeparatorPattern.matcher(path).find(); // e.g. c:\lib.py
     }
 
     public static class PathResolvingException extends RuntimeException {
