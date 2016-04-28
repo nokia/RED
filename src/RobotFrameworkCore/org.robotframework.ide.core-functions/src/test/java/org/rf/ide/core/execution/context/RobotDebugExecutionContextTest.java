@@ -5,6 +5,9 @@
  */
 package org.rf.ide.core.execution.context;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -703,6 +706,38 @@ public class RobotDebugExecutionContextTest {
             checkKeywordLine11();
             debugExecutionContext.endKeyword("Keyword");
         debugExecutionContext.endTest();
+    }
+    
+    @Test
+    public void test_isSuiteSetupTeardownKeyword() throws URISyntaxException {
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_11.robot", parser);
+        debugExecutionContext.startSuite(modelFile.getParent(), parser);
+        
+        assertFalse(debugExecutionContext.isSuiteSetupTeardownKeyword("Test Setup"));
+        assertFalse(debugExecutionContext.isSuiteSetupTeardownKeyword("Test Teardown"));
+        assertTrue(debugExecutionContext.isSuiteSetupTeardownKeyword("Suite Setup"));
+        assertTrue(debugExecutionContext.isSuiteSetupTeardownKeyword("Setup"));
+        assertTrue(debugExecutionContext.isSuiteSetupTeardownKeyword("Suite Teardown"));
+        assertTrue(debugExecutionContext.isSuiteSetupTeardownKeyword("Teardown"));
+        
+        debugExecutionContext.startTest("test11");
+        
+        assertFalse(debugExecutionContext.isSuiteSetupTeardownKeyword("Setup"));
+        assertFalse(debugExecutionContext.isSuiteSetupTeardownKeyword("Teardown"));
+    }
+    
+    @Test
+    public void test_isTestCaseTeardownKeyword() throws URISyntaxException {
+        RobotFile modelFile = RobotModelTestProvider.getModelFile("test_ExeContext_11.robot", parser);
+        debugExecutionContext.startSuite(modelFile.getParent(), parser);
+        
+        assertFalse(debugExecutionContext.isTestCaseTeardownKeyword("Suite Teardown"));
+        assertFalse(debugExecutionContext.isTestCaseTeardownKeyword("Teardown"));
+        
+        debugExecutionContext.startTest("test11");
+        
+        assertTrue(debugExecutionContext.isTestCaseTeardownKeyword("Test Teardown"));
+        assertTrue(debugExecutionContext.isTestCaseTeardownKeyword("Teardown"));
     }
 
 
