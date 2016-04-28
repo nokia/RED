@@ -200,7 +200,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         protected void validatePathImport(final AImported imported, final String path, final RobotToken pathToken,
                 final boolean isParametrized, final IProgressMonitor monitor) throws CoreException {
             if (PathsResolver.hasNotEscapedWindowsPathSeparator(path)) {
-                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NOT_ESCAPED_WINDOWS_PATH);
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.INVALID_WINDOWS_LIBRARY_PATH);
                 reporter.handleProblem(problem, validationContext.getFile(), pathToken);
                 return;
             }
