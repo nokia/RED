@@ -32,16 +32,19 @@ import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
@@ -321,6 +324,14 @@ public class RedProjectEditor extends MultiPageEditorPart {
             ResourcesPlugin.getWorkspace().removeResourceChangeListener(resourceListener);
         }
         super.dispose();
+
+        SwtThread.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
+                manager.update(RobotValidationExcludedDecorator.ID);
+            }
+        });
     }
 
     private static class IllegalProjectConfigurationEditorInputException extends RuntimeException {
