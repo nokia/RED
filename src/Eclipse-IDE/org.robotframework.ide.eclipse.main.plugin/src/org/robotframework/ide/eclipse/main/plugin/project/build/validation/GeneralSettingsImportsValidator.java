@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,6 +26,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
+import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -203,7 +205,15 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 return;
             }
             LibrarySpecification specification = null;
-            final List<IPath> resolvedPossiblePaths = PathsResolver.resolveToAbsolutePossiblePaths(suiteFile, path);
+            List<IPath> resolvedPossiblePaths = new ArrayList<>();
+            try {
+                resolvedPossiblePaths = PathsResolver.resolveToAbsolutePossiblePaths(suiteFile, path);
+            } catch (final PathResolvingException e) {
+                final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.INVALID_LIBRARY_PATH)
+                        .formatMessageWith(path + ". " + e.getMessage()
+                                + (e.getCause() != null ? ", " + e.getCause().getMessage() : "."));
+                reporter.handleProblem(problem, validationContext.getFile(), pathToken);
+            }
             for (final Entry<ReferencedLibrary, LibrarySpecification> entry : validationContext
                     .getReferencedLibrarySpecifications().entrySet()) {
                 final IPath entryPath = entry.getKey().getFilepath();

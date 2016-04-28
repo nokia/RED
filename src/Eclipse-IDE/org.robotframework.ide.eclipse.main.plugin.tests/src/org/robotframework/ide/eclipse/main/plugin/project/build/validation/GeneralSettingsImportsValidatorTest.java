@@ -21,7 +21,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.testdata.model.RobotVersion;
@@ -99,54 +98,6 @@ public class GeneralSettingsImportsValidatorTest {
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
                 GeneralSettingsProblem.NOT_ESCAPED_WINDOWS_PATH, new ProblemPosition(2, Range.closed(26, 49))));
-    }
-
-    @Ignore
-    @Test
-    public void testValidateLibraryImport_withEscapedWindowsPathSeparators() throws CoreException {
-        final String libName = "ExampleLibrary";
-
-        final List<LibraryImport> imports = new ArrayList<>();
-        imports.add(createNewLibraryImport("C:\\\\test\\\\ExampleLibrary.py"));
-
-        final LibrarySpecification spec = createNewLibrarySpecification(libName);
-        final ReferencedLibrary refLib = createNewPythonReferencedLibrary(libName, "C:\\test");
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(refLib, spec);
-        final Map<String, LibrarySpecification> specs = new HashMap<>();
-        specs.put(libName, spec);
-
-        final FileValidationContext context = prepareContext(refLibs, specs);
-        final GeneralSettingsImportsValidator validator = new GeneralSettingsImportsValidator.LibraryImportValidator(
-                context, createSuiteFile(), imports, reporter, Optional.<LibrariesAutoDiscoverer> absent());
-
-        validator.validate(null);
-
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
-    }
-
-    @Ignore
-    @Test
-    public void testValidateLibraryImport_withLinuxPathSeparatorsAndNoFileExtension() throws CoreException {
-        final String libName = "ExampleLibrary";
-
-        final List<LibraryImport> imports = new ArrayList<>();
-        imports.add(createNewLibraryImport("C:/test/ExampleLibrary/"));
-
-        final LibrarySpecification spec = createNewLibrarySpecification(libName);
-        final ReferencedLibrary refLib = createNewPythonReferencedLibrary(libName, "C:\\test");
-        final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
-        refLibs.put(refLib, spec);
-        final Map<String, LibrarySpecification> specs = new HashMap<>();
-        specs.put(libName, spec);
-
-        final FileValidationContext context = prepareContext(refLibs, specs);
-        final GeneralSettingsImportsValidator validator = new GeneralSettingsImportsValidator.LibraryImportValidator(
-                context, createSuiteFile(), imports, reporter, Optional.<LibrariesAutoDiscoverer> absent());
-
-        validator.validate(null);
-
-        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
     }
 
     @Test
