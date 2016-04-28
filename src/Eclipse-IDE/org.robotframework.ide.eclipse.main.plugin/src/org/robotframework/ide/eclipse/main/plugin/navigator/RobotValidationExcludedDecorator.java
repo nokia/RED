@@ -14,8 +14,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.red.graphics.ColorsManager;
 
-
 public class RobotValidationExcludedDecorator implements ILightweightLabelDecorator {
+
+    public static final String ID = "org.robotframework.red.decorator.resource.validationExcluded";
 
     @Override
     public void addListener(final ILabelProviderListener listener) {
@@ -44,7 +45,10 @@ public class RobotValidationExcludedDecorator implements ILightweightLabelDecora
             final RobotProject robotProject = RedPlugin.getModelManager()
                     .getModel()
                     .createRobotProject(folder.getProject());
-            final RobotProjectConfig config = robotProject.getRobotProjectConfig();
+            RobotProjectConfig config = robotProject.getOpenedProjectConfig();
+            if (config == null) {
+                config = robotProject.getRobotProjectConfig();
+            }
 
             if (config != null && config.isExcludedFromValidation(folder.getProjectRelativePath())) {
                 decoration.addSuffix(" [excluded]");
