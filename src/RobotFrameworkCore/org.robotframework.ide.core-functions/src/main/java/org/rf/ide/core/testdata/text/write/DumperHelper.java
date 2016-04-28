@@ -511,8 +511,13 @@ public class DumperHelper {
         final List<IRobotLineElement> lineElements = currentLine.getLineElements();
         final int tokenPosIndex = lineElements.indexOf(currentToken);
         for (int index = tokenPosIndex - 1; index >= 0; index--) {
-            if (lineElements.get(index) instanceof RobotToken) {
-                break;
+            IRobotLineElement lineElem = lineElements.get(index);
+            if (lineElem instanceof RobotToken) {
+                if (!lineElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                    break;
+                } else {
+                    dumpStartIndex = index;
+                }
             } else {
                 dumpStartIndex = index;
             }

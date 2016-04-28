@@ -1,0 +1,51 @@
+*** Keywords ***
+Key1
+	[Arguments]	${x}	${y}
+	[Documentation]		doc
+	[Timeout]		20 hour		ok		#job done
+	[Tags]	no way		play
+	Log	ok						ok
+ |	|	|	Log		ok
+	[Teardown]	done	really	#ok
+	[Unknow]		done1					done
+	[Return]	None
+	
+
+	
+
+	
+	
+	
+	
+	
+Key2
+	[Arguments]		${x}	${y}
+	[Documentation]		doc
+	[Timeout]		20 hour		ok		#job done
+	[Tags]		no way		play
+	Log		ok						ok
+	Log	ok
+	[Teardown]	done	really	#ok
+	[Unknow]		done1					done
+	[Return]	None
+	
+
+*** Keywords ***
+
+
+
+
+	
+	
+
+Key2	[Arguments]	${x}	${y}
+	[Documentation]
+	[Timeout]	20 hour		ok		#job done
+	[Tags]		no way		play
+	Log		ok						ok
+	Log		\	ok
+	[Teardown]	done	really	#ok
+	[Unknow]		done1					done
+	[Return]	None
+	
+
