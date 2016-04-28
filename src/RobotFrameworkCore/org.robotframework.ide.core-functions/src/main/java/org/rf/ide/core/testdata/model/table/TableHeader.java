@@ -50,7 +50,8 @@ public class TableHeader<T> extends AModelElement<T> {
     }
 
     public void addComment(final RobotToken commentWord) {
-        this.comment.add(commentWord);
+        fixComment(comment, commentWord);
+        comment.add(commentWord);
     }
 
     @Override
