@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/27/16 3:59 PM
+Save-Time: 4/28/16 1:23 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -22,7 +22,7 @@ proc "restore-interpreters"{
 	get-window Preferences| get-tree | select "Robot Framework/Installed frameworks"
 		if [get-window Preferences | get-table | get-property itemCount -raw | equals 0 ]{
 			with [get-window Preferences] {
-				try -times 10 -delay 1000 -command{
+				try -times 10 -delay 1500 -command{
 				    get-button Discover | click
 				}
 				    get-table | get-item "Robot Framework .*\\(Python .*\)" | check
