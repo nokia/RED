@@ -155,6 +155,13 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Invalid library path: %s";
         }
     },
+    INVALID_WINDOWS_LIBRARY_PATH {
+
+        @Override
+        public String getProblemDescription() {
+            return "Windows paths are not supported. Use global variable '${/}' or Linux-like '/' path separators.";
+        }
+    },
     SETTING_ARGUMENTS_NOT_APPLICABLE {
 
         @Override
@@ -556,13 +563,6 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public String getProblemDescription() {
             return "Variable '%s' is given as keyword name.";
-        }
-    },
-    NOT_ESCAPED_WINDOWS_PATH {
-
-        @Override
-        public String getProblemDescription() {
-            return "Windows paths are not supported. Use escaped '\\\\' or Linux-like '/' path separators.";
         }
     };
 
