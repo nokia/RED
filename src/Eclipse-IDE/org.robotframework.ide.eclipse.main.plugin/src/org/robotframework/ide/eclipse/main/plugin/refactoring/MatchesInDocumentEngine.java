@@ -10,6 +10,7 @@ import org.eclipse.jface.text.FindReplaceDocumentAdapter;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Position;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class MatchesInDocumentEngine implements MatchingEngine {
 
@@ -24,7 +25,7 @@ public class MatchesInDocumentEngine implements MatchingEngine {
         try {
             searchFor(toMatch, matchAccess);
         } catch (final BadLocationException e) {
-            // no matches found in such case... but this should not happen
+            RedPlugin.logError("Unable to locate matches in red.xml document", e);
         }
     }
 
