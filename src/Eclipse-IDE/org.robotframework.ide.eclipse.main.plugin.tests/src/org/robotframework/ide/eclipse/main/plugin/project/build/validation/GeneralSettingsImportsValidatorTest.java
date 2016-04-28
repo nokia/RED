@@ -65,7 +65,7 @@ public class GeneralSettingsImportsValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                GeneralSettingsProblem.NOT_ESCAPED_WINDOWS_PATH, new ProblemPosition(2, Range.closed(26, 51))));
+                GeneralSettingsProblem.INVALID_WINDOWS_LIBRARY_PATH, new ProblemPosition(2, Range.closed(26, 51))));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class GeneralSettingsImportsValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                GeneralSettingsProblem.NOT_ESCAPED_WINDOWS_PATH, new ProblemPosition(2, Range.closed(26, 49))));
+                GeneralSettingsProblem.INVALID_WINDOWS_LIBRARY_PATH, new ProblemPosition(2, Range.closed(26, 49))));
     }
 
     @Test
@@ -97,7 +97,7 @@ public class GeneralSettingsImportsValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(new Problem(
-                GeneralSettingsProblem.NOT_ESCAPED_WINDOWS_PATH, new ProblemPosition(2, Range.closed(26, 49))));
+                GeneralSettingsProblem.INVALID_WINDOWS_LIBRARY_PATH, new ProblemPosition(2, Range.closed(26, 49))));
     }
 
     @Test
