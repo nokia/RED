@@ -15,13 +15,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IDecoratorManager;
+import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
+import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.collect.LinkedListMultimap;
@@ -45,6 +49,13 @@ abstract class ChangeExclusionHandler {
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
 
         }
+        SwtThread.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                final IDecoratorManager manager = PlatformUI.getWorkbench().getDecoratorManager();
+                manager.update(RobotValidationExcludedDecorator.ID);
+            }
+        });
         return null;
     }
 
