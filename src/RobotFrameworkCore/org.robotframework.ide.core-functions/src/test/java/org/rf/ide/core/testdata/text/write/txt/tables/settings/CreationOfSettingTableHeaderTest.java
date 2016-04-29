@@ -22,10 +22,13 @@ import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
 
 public class CreationOfSettingTableHeaderTest {
 
+    private static final String PRETTY_NEW_DIR_LOCATION = "settings//header//new//";
+
     @Test
     public void test_emptyFile_and_thanCreateSettingHeaderOnly() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE().getFile("settings//SettingsHeaderOnly.txt");
+        final Path inputFile = DumperTestHelper.getINSTANCE()
+                .getFile(PRETTY_NEW_DIR_LOCATION + "SettingsHeaderOnly.txt");
         final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
         final RobotFileDumper dumper = new RobotFileDumper();
         final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
@@ -46,7 +49,8 @@ public class CreationOfSettingTableHeaderTest {
     @Test
     public void test_emptyFile_and_thanCreateSettingHeader_withTwoNamedColumns() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE().getFile("settings//SettingsHeaderWithColumns.txt");
+        final Path inputFile = DumperTestHelper.getINSTANCE()
+                .getFile(PRETTY_NEW_DIR_LOCATION + "SettingsHeaderWithColumns.txt");
         final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
         final RobotFileDumper dumper = new RobotFileDumper();
         final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
@@ -74,7 +78,8 @@ public class CreationOfSettingTableHeaderTest {
     @Test
     public void test_emptyFile_and_thanCreateSettingHeader_withTwoCommentTokens() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE().getFile("settings//SettingsHeaderWithComments.txt");
+        final Path inputFile = DumperTestHelper.getINSTANCE()
+                .getFile(PRETTY_NEW_DIR_LOCATION + "SettingsHeaderWithComments.txt");
         final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
         final RobotFileDumper dumper = new RobotFileDumper();
         final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
@@ -104,7 +109,7 @@ public class CreationOfSettingTableHeaderTest {
             throws Exception {
         // prepare
         final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile("settings//SettingsHeaderWithColumnsAndComments.txt");
+                .getFile(PRETTY_NEW_DIR_LOCATION + "SettingsHeaderWithColumnsAndComments.txt");
         final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
         final RobotFileDumper dumper = new RobotFileDumper();
         final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
