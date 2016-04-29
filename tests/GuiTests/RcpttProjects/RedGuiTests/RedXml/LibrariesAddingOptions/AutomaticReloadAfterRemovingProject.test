@@ -7,12 +7,23 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fGM4sOxZEeWqTNBmS5Gi4w
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/23/16 5:49 PM
+Save-Time: 4/29/16 9:56 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+proc "wait-for-disapearing_progressbar"{
+//	try -times 5 -delay 1000 -command{
+//		get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" 
+//	       | get-property "getExpanded()" | equals false | verify-true
+//	}
+	
+	try -times 5 -delay 1000 -command{
+	verify-error {get-window "Progress Information"}
+}
+}
 
 //open python file and change function name
 get-view "Project Explorer" | get-tree | select "RobotProject/file1.py" | select "RobotProject/file1.py" 
@@ -23,7 +34,9 @@ with [get-editor "file1.py" | get-text-viewer] {
     key-type "M1+s"
 }
 
-//se if new value is in PE
+wait-for-disapearing_progressbar
+
+//see if new value is in PE
 get-view "Project Explorer" | get-tree 
     | get-item "RobotProject/Robot Referenced libraries/file1 RobotProject \\(1\\)/Sum 2" | get-property index 
     | equals 0 | verify-true
@@ -36,6 +49,9 @@ with [get-editor "file2.py" | get-text-viewer] {
     type-text 2
     key-type "M1+s"
 }
+
+wait-for-disapearing_progressbar
+
 //check PE
 get-view "Project Explorer" | get-tree 
     | get-item "SecondProject/Robot Referenced libraries/file2 SecondProject \\(1\\)" | get-property index | equals 0 
@@ -63,6 +79,8 @@ with [get-editor "file2.py" | get-text-viewer] {
     type-text 3
     key-type "M1+s"
 }
+wait-for-disapearing_progressbar
+
 //check if new lib was generated
 get-view "Project Explorer" | get-tree 
     | get-item "SecondProject/Robot Referenced libraries/file2 SecondProject \\(1\\)/Multiply 3" | get-property index 
