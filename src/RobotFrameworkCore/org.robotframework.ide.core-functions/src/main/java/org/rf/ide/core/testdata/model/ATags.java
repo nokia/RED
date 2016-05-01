@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public abstract class ATags<T> extends AModelElement<T> {
@@ -38,6 +39,15 @@ public abstract class ATags<T> extends AModelElement<T> {
     }
 
     public void addTag(final RobotToken tag) {
+        final List<IRobotTokenType> tagTypes = tag.getTypes();
+        if (!tagTypes.contains(getTagType())) {
+            if (tagTypes.isEmpty()) {
+                tagTypes.add(getTagType());
+            } else {
+                tagTypes.add(0, getTagType());
+            }
+        }
+
         tags.add(tag);
     }
 
@@ -46,6 +56,7 @@ public abstract class ATags<T> extends AModelElement<T> {
     }
 
     public void addCommentPart(final RobotToken rt) {
+        this.fixComment(comment, rt);
         this.comment.add(rt);
     }
 
@@ -65,4 +76,6 @@ public abstract class ATags<T> extends AModelElement<T> {
 
         return tokens;
     }
+
+    public abstract IRobotTokenType getTagType();
 }
