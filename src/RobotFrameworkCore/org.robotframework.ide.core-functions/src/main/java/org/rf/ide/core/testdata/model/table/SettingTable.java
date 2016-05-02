@@ -24,6 +24,8 @@ import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.setting.UnknownSetting;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class SettingTable extends ARobotSectionTable {
 
@@ -154,6 +156,17 @@ public class SettingTable extends ARobotSectionTable {
 
     public List<DefaultTags> getDefaultTags() {
         return Collections.unmodifiableList(defaultTags);
+    }
+
+    public DefaultTags newDefaultTag() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        DefaultTags tags = new DefaultTags(dec);
+        addDefaultTags(tags);
+
+        return tags;
     }
 
     public void addDefaultTags(final DefaultTags tags) {

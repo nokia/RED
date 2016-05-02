@@ -93,7 +93,7 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
                 Integer typeO2hierarchy = typesToHierarchy.get(o2TypeOP.get());
 
                 result = Integer.compare(typeO1hierarchy, typeO2hierarchy);
-                if (result != posComperatorResult) {
+                if (posComperatorResult != ECompareResult.EQUAL_TO.getValue()) {
                     result = posComperatorResult;
                 }
             }
