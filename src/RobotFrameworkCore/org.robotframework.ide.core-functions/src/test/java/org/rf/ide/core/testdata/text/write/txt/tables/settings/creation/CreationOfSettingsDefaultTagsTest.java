@@ -29,7 +29,9 @@ public class CreationOfSettingsDefaultTagsTest {
         // prepare
         final Path inputFile = DumperTestHelper.getINSTANCE()
                 .getFile(PRETTY_NEW_DIR_LOCATION + "EmptyDefaultTagsDeclarationOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
+        final String fileContent = DumperTestHelper.getINSTANCE()
+                .readWithLineSeparatorPresave(inputFile)
+                .replaceAll("\r\n", System.lineSeparator());
         final RobotFileDumper dumper = new RobotFileDumper();
         final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
 
