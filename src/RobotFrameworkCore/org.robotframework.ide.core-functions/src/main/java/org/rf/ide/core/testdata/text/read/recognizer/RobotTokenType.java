@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.text.read.recognizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo.VersionAvailabilityInfoBuilder;
@@ -609,5 +610,40 @@ public enum RobotTokenType implements IRobotTokenType {
             }
         }
         return vaiResult;
+    }
+
+    public VersionAvailabilityInfo getTheMostCorrectOneRepresentation(final RobotVersion robotVersionInstalled) {
+        VersionAvailabilityInfo vaiInCaseNoMatches = null;
+        for (final VersionAvailabilityInfo vai : getVersionAvailabilityInfos()) {
+            if (vai.getRepresentation() == null) {
+                continue;
+            }
+            if ((vai.getAvailableFrom() == null || robotVersionInstalled.isNewerOrEqualTo(vai.getAvailableFrom()))
+                    && vai.getDepracatedFrom() == null && vai.getRemovedFrom() == null) {
+                vaiInCaseNoMatches = vai;
+                break;
+            } else {
+                if (vaiInCaseNoMatches == null) {
+                    vaiInCaseNoMatches = vai;
+                    continue;
+                }
+
+                if (vai.getAvailableFrom() == null || robotVersionInstalled.isNewerOrEqualTo(vai.getAvailableFrom())) {
+                    if (vai.getRemovedFrom() == null) {
+                        if (vaiInCaseNoMatches.getDepracatedFrom() != null
+                                && vai.getDepracatedFrom().isNewerThan(vaiInCaseNoMatches.getDepracatedFrom())) {
+                            vaiInCaseNoMatches = vai;
+                        }
+                    } else {
+                        if (vaiInCaseNoMatches.getRemovedFrom() != null
+                                && vai.getRemovedFrom().isNewerThan(vaiInCaseNoMatches.getRemovedFrom())) {
+                            vaiInCaseNoMatches = vai;
+                        }
+                    }
+                }
+            }
+        }
+
+        return vaiInCaseNoMatches;
     }
 }
