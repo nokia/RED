@@ -445,11 +445,13 @@ public class SectionBuilder {
         public static List<Section> filterByType(final List<Section> sections, final int sectionWithHeaderPos,
                 final SectionType type) {
             List<Section> matched = new ArrayList<>();
-            int sectionsSize = sections.size();
-            for (int sectionId = sectionWithHeaderPos; sectionId < sectionsSize; sectionId++) {
-                final Section section = sections.get(sectionId);
-                if (section.getType() == type) {
-                    matched.add(section);
+            if (sectionWithHeaderPos >= 0) {
+                int sectionsSize = sections.size();
+                for (int sectionId = sectionWithHeaderPos; sectionId < sectionsSize; sectionId++) {
+                    final Section section = sections.get(sectionId);
+                    if (section.getType() == type) {
+                        matched.add(section);
+                    }
                 }
             }
 
