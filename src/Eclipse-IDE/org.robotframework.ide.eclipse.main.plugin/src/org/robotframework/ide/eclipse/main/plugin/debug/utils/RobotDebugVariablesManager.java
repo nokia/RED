@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -42,6 +43,7 @@ public class RobotDebugVariablesManager {
     public RobotDebugVariablesManager(final RobotDebugTarget target) {
         this.target = target;
         this.previousVariables = new LinkedList<>();
+        this.globalVariables = new HashMap<>();
         this.nestedGlobalVars = new LinkedHashMap<>();
         this.sortedVariablesNames = new LinkedList<String>();
     }
@@ -218,12 +220,15 @@ public class RobotDebugVariablesManager {
     }
 
     public void setGlobalVariables(final Map<String, String> globalVariables) {
-        this.globalVariables = globalVariables;
-        final Set<String> set = globalVariables.keySet();
-        for (final String key : set) {
-            final RobotDebugVariable globalVar = new RobotDebugVariable(target, key, globalVariables.get(key), null);
-            globalVar.setValueModificationEnabled(false);
-            nestedGlobalVars.put(key, globalVar);
+        if (globalVariables != null) {
+            this.globalVariables = globalVariables;
+            final Set<String> set = globalVariables.keySet();
+            for (final String key : set) {
+                final RobotDebugVariable globalVar = new RobotDebugVariable(target, key, globalVariables.get(key),
+                        null);
+                globalVar.setValueModificationEnabled(false);
+                nestedGlobalVars.put(key, globalVar);
+            }
         }
     }
     

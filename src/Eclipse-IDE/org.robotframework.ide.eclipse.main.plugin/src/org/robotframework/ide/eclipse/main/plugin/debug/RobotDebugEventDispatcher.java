@@ -209,6 +209,7 @@ public class RobotDebugEventDispatcher extends Job {
         robotEventBroker.sendExecutionEventToExecutionView(ExecutionElementsParser.createStartTestExecutionElement(testCaseName));
     }
     
+    @SuppressWarnings({ "unchecked" })
     private void handleStartKeywordEvent(final Map<String, ?> eventMap) {
         final List<?> startList = (List<?>) eventMap.get("start_keyword");
         final String currentKeywordName = (String) startList.get(0);
@@ -216,8 +217,13 @@ public class RobotDebugEventDispatcher extends Job {
         final String keywordType = (String) startElements.get("type");
         if (keywordExecutionManager.getCurrentSuiteFile() == null
                 && !executionContext.isSuiteSetupTeardownKeyword(keywordType)) {
-            showError("Robot Event Dispatcher Error", "Missing suite file for execution");
-            throw new MissingFileToExecuteException("Missing suite file for execution");
+            String message = "Missing suite file for execution";
+            if (keywordExecutionManager.getCurrentSuiteName() != null) {
+                message += ", current suite name: '" + keywordExecutionManager.getCurrentSuiteName() + "'";
+            }
+            message += ", current keyword: '" + currentKeywordName + "' type='" + keywordType + "' args=" + ((List<String>) startElements.get("args"));
+            showError("Robot Event Dispatcher Error", message);
+            throw new MissingFileToExecuteException(message);
         }
         if (executionContext.isTestCaseTeardownKeyword(keywordType)) {
             target.clearStackFrames();
