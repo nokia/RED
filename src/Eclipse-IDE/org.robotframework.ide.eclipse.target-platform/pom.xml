@@ -64,7 +64,7 @@
                                 <artifact>
                                     <file>${target-file-name}</file>
                                     <type>target</type>
-                                    <classifier>${eclipe.version}</classifier>
+                                    <classifier>${eclipse.version}</classifier>
                                 </artifact>
                             </artifacts>
                         </configuration>
