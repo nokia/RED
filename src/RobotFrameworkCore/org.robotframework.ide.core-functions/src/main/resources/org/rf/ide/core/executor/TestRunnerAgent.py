@@ -164,8 +164,8 @@ class TestRunnerAgent:
     def _send_pid(self):
         self._send_socket("start agent", "")
         self._send_socket("pid", os.getpid())
+        variables = {}
         try:
-            variables = {}
             try:
                 from robot.variables import GLOBAL_VARIABLES
                 variables = GLOBAL_VARIABLES
@@ -182,7 +182,8 @@ class TestRunnerAgent:
                     key = k
                 data[key] = str(variables[k])
             self._send_socket('global_vars','global_vars',data)
-        except Exception:
+        except Exception as e:
+            self.print_error_message('Global variables sending error: ' + str(e) + ' Global variables: ' + str(variables))
             pass
 
     def _send_server_port(self, port):
@@ -223,13 +224,14 @@ class TestRunnerAgent:
         data = ''
         while data != 'resume' and data != 'interrupt':
             data = self.sock.recv(4096).decode('utf-8')
-            if self._is_debug_enabled:
+            if self._is_debug_enabled and data != 'resume' and data != 'interrupt':
                 self._check_changed_variable(data)
         if data == 'interrupt':
             sys.exit()
         self._debugger.resume()
 
     def _send_vars(self):
+        vars = {}
         try:
             from robot.libraries.BuiltIn import BuiltIn
             vars = BuiltIn().get_variables()
@@ -245,8 +247,8 @@ class TestRunnerAgent:
                     except:
                         data[k] = 'None'
             self._send_socket('vars','vars',data)
-        except AttributeError:
-            self._send_socket('error')
+        except Exception as e:
+            self.print_error_message('Variables sending error: ' + str(e) + ' Current variables: ' + str(vars))
 
     def fix_unicode(self,data):
        if sys.version_info < (3,0,0) and isinstance(data, unicode):
@@ -329,7 +331,8 @@ class TestRunnerAgent:
                                 Collections().set_list_value(nestedList,newValueIndex,newValue)
                         else:
                             BuiltIn().set_test_variable(key, js[key][0])
-            except:
+            except Exception as e:
+                self.print_error_message('Setting variables error: ' + str(e) + ' Received data:' + str(data))
                 pass
 
     def end_keyword(self, name, attrs):
@@ -396,6 +399,9 @@ class TestRunnerAgent:
         if self.sock:
             self.filehandler.close()
             self.sock.close()
+
+    def print_error_message(self, message):
+        print('\n[Error] ' + message)
 
     def _connect(self):
         '''Establish a connection for sending data'''
