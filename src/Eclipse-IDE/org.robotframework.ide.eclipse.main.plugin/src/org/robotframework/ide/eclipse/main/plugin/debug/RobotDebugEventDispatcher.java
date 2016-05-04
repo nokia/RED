@@ -216,6 +216,7 @@ public class RobotDebugEventDispatcher extends Job {
         final String keywordType = (String) startElements.get("type");
         if (keywordExecutionManager.getCurrentSuiteFile() == null
                 && !executionContext.isSuiteSetupTeardownKeyword(keywordType)) {
+            showError("Robot Event Dispatcher Error", "Missing suite file for execution");
             throw new MissingFileToExecuteException("Missing suite file for execution");
         }
         if (executionContext.isTestCaseTeardownKeyword(keywordType)) {
@@ -290,14 +291,7 @@ public class RobotDebugEventDispatcher extends Job {
     private void handleConditionErrorEvent(final Map<String, ?> eventMap) {
         isBreakpointConditionFulfilled = true;
         final List<?> errorList = (List<?>) eventMap.get("condition_error");
-        final Display display = PlatformUI.getWorkbench().getDisplay();
-        display.syncExec(new Runnable() {
-            @Override
-            public void run() {
-                MessageDialog.openError(display.getActiveShell(), "Conditional Breakpoint Error", "Reason:\n"
-                        + errorList.get(0));
-            }
-        });
+        showError("Conditional Breakpoint Error", "Reason:\n" + errorList.get(0));
     }
 
     private void handleConditionCheckedEvent() {
@@ -404,6 +398,17 @@ public class RobotDebugEventDispatcher extends Job {
                 e.printStackTrace();
             }
         }
+    }
+    
+    private void showError(final String title, final String message) {
+        final Display display = PlatformUI.getWorkbench().getDisplay();
+        display.syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                MessageDialog.openError(display.getActiveShell(), title, message);
+            }
+        });
     }
     
     private static class MissingFileToExecuteException extends RuntimeException {

@@ -216,7 +216,8 @@ public class RobotDebugExecutionContext {
         return SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes.isSuiteSetupTeardownType(keywordType)
                 || (!executableRowFindersManager.hasCurrentTestCase()
                         && SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes
-                                .isNewSetupTeardownType(keywordType));
+                                .isNewSetupTeardownType(keywordType))
+                || (isSetupTeardownKeywordStarted && keywordType.equalsIgnoreCase(MAIN_KEYWORD_TYPE));
     }
 
     public boolean isTestCaseTeardownKeyword(final String keywordType) {
