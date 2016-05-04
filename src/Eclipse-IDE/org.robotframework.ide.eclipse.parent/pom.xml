@@ -16,7 +16,8 @@
             <property>
                 <name>eclipse.version</name>
                 <value>luna</value>
-            </property>        </activation>
+            </property>            
+        </activation>
 	    <repositories>
 	        <repository>
 	            <id>eclipse-luna</id>
