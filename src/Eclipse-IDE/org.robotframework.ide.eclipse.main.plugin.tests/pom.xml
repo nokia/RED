@@ -43,7 +43,7 @@
 				<executions>
 					<execution>
 						<id>copy-dependencies</id>
-						<phase>compile</phase>
+						<phase>validate</phase>
 						<goals>
 							<goal>copy-dependencies</goal>
 						</goals>
