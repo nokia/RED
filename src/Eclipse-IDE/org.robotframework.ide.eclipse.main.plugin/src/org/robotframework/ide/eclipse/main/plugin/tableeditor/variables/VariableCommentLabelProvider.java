@@ -16,13 +16,15 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ImagesManager;
 
+import com.google.common.base.Supplier;
+
 class VariableCommentLabelProvider extends MatchesHighlightingLabelProvider {
 
-    VariableCommentLabelProvider(final MatchesProvider matchesProvider) {
+    VariableCommentLabelProvider(final Supplier<HeaderFilterMatchesCollection> matchesProvider) {
         super(matchesProvider);
     }
 

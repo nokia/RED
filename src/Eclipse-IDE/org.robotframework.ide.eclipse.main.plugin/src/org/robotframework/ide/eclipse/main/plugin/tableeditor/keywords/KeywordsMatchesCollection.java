@@ -10,9 +10,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
-public class KeywordsMatchesCollection extends MatchesCollection {
+public class KeywordsMatchesCollection extends HeaderFilterMatchesCollection {
 
     @Override
     public void collect(final RobotElement element, final String filter) {

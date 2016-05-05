@@ -10,13 +10,13 @@ import java.util.List;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
 class MetadataMatchesFilter extends ViewerFilter {
 
-    private final MatchesCollection matches;
+    private final HeaderFilterMatchesCollection matches;
 
-    MetadataMatchesFilter(final MatchesCollection matches) {
+    MetadataMatchesFilter(final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
     }
 

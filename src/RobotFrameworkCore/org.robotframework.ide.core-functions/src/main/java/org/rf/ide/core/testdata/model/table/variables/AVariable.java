@@ -26,7 +26,7 @@ public abstract class AVariable extends AModelElement<VariableTable> implements 
 
     private final RobotToken declaration;
 
-    private final String name;
+    private String name;
 
     private final List<RobotToken> comment = new ArrayList<>();
 
@@ -58,6 +58,10 @@ public abstract class AVariable extends AModelElement<VariableTable> implements 
     @Override
     public String getName() {
         return name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
     }
 
     @Override

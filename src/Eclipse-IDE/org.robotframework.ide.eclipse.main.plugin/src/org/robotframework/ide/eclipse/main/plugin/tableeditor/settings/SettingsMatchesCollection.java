@@ -7,9 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
-public class SettingsMatchesCollection extends MatchesCollection {
+public class SettingsMatchesCollection extends HeaderFilterMatchesCollection {
 
     @Override
     public void collect(final RobotElement element, final String filter) {

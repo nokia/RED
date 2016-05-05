@@ -7,14 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.List;
-
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class SetVariableNameCommand extends EditorCommand {
@@ -53,33 +51,21 @@ public class SetVariableNameCommand extends EditorCommand {
             typeWasChanged = setTypeIfNeeded(VariableType.INVALID);
             setName(newName);
         }
-
-        final List<RobotVariable> children = variable.getSuiteFile()
-                .findSection(RobotVariablesSection.class)
-                .get()
-                .getChildren();
-        RobotVariable newVariable = null;
-        for (final RobotVariable var : children) {
-            if (var.getName().equals(getNewNameWithoutMarks(newName))) {
-                newVariable = var;
-                break;
-            }
-        }
         if (typeWasChanged) {
-            eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, newVariable);
+            eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
         }
-        eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, newVariable);
+        eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
     }
 
     private void setName(final String rawName) {
         final IVariableHolder linkedVariable = variable.getLinkedElement();
-        
-        final RobotToken declaration = linkedVariable.getDeclaration();
-        final int offset = declaration.getStartOffset();
-        final int length = declaration.getText().length();
 
-        // DocumentUpdater.replace(document, offset, length, rawName);
-        // variable.getSuiteFile().reparseEverything(document.get());
+        final RobotToken declaration = linkedVariable.getDeclaration();
+        declaration.setText(rawName);
+
+        final String extractedName = linkedVariable.getType() == VariableType.INVALID ? rawName
+                : getNewNameWithoutMarks(rawName);
+        ((AVariable) linkedVariable).setName(extractedName);
     }
 
     private boolean setTypeIfNeeded(final VariableType... type) {

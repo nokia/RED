@@ -13,13 +13,13 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
 public class SettingsMatchesFilter extends ViewerFilter {
 
-    private final MatchesCollection matches;
+    private final HeaderFilterMatchesCollection matches;
 
-    public SettingsMatchesFilter(final MatchesCollection matches) {
+    public SettingsMatchesFilter(final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
     }
 
