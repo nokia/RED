@@ -4590,25 +4590,22 @@
             </enablement>
          </deleteParticipant>
       </extension>
-   <!--<extension
-         point="org.eclipse.search.searchPages">
+      <extension point="org.eclipse.search.searchPages">
       <page
             canSearchEnclosingProjects="true"
-            class="org.robotframework.ide.eclipse.main.plugin.search.RobotSearchPage"
+            class="org.robotframework.ide.eclipse.main.plugin.search.RedSearchPage"
             enabled="true"
-            icon="resources/robot.png"
+            icon="resources/red_search.png"
             id="org.robotframework.red.search.page"
-            label="Robot Search"
+            label="RED Search"
             showScopeSection="true">
-      </page>
-   </extension>
-   <extension
-         point="org.eclipse.search.searchResultViewPages">
-      <viewPage
-            class="org.robotframework.ide.eclipse.main.plugin.search.RobotSearchResultPage"
+          </page>
+      </extension>
+      <extension point="org.eclipse.search.searchResultViewPages">
+          <viewPage
+            class="org.robotframework.ide.eclipse.main.plugin.search.SearchResultPage"
             id="org.robotframework.red.search.page.result"
-            searchResultClass="org.robotframework.ide.eclipse.main.plugin.search.RobotSearchResult">
-      </viewPage>
-   </extension>-->
-
+            searchResultClass="org.robotframework.ide.eclipse.main.plugin.search.SearchResult">
+          </viewPage>
+      </extension>
 </plugin>
