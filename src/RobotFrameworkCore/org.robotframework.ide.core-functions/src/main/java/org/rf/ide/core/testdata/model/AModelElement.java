@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.model;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -63,6 +64,17 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
                 rt.setType(RobotTokenType.START_HASH_COMMENT);
             } else {
                 rt.setType(RobotTokenType.COMMENT_CONTINUE);
+            }
+        }
+    }
+
+    protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType) {
+        final List<IRobotTokenType> tagTypes = token.getTypes();
+        if (!tagTypes.contains(expectedMainType)) {
+            if (tagTypes.isEmpty()) {
+                tagTypes.add(expectedMainType);
+            } else {
+                tagTypes.add(0, expectedMainType);
             }
         }
     }

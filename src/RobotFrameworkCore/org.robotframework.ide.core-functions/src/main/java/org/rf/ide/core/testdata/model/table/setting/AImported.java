@@ -13,7 +13,9 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public abstract class AImported extends AModelElement<SettingTable> {
 
@@ -35,6 +37,7 @@ public abstract class AImported extends AModelElement<SettingTable> {
     }
 
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
 
@@ -48,13 +51,34 @@ public abstract class AImported extends AModelElement<SettingTable> {
     }
 
     public void setPathOrName(final RobotToken pathOrName) {
+        fixForTheType(pathOrName, type.getPathOrFileNameType());
         this.pathOrName = pathOrName;
     }
 
     public static enum Type {
-        LIBRARY,
-        RESOURCE,
-        VARIABLES;
+        LIBRARY {
+
+            @Override
+            public IRobotTokenType getPathOrFileNameType() {
+                return RobotTokenType.SETTING_LIBRARY_NAME;
+            }
+        },
+        RESOURCE {
+
+            @Override
+            public IRobotTokenType getPathOrFileNameType() {
+                return RobotTokenType.SETTING_RESOURCE_FILE_NAME;
+            }
+        },
+        VARIABLES {
+
+            @Override
+            public IRobotTokenType getPathOrFileNameType() {
+                return RobotTokenType.SETTING_VARIABLES_FILE_NAME;
+            }
+        };
+
+        public abstract IRobotTokenType getPathOrFileNameType();
     }
 
     public Type getType() {
