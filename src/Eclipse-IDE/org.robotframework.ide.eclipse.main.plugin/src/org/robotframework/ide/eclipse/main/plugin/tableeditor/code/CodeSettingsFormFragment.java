@@ -58,6 +58,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgume
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -68,6 +69,7 @@ import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.Selections;
 
+import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 
 public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
@@ -94,7 +96,7 @@ public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
 
     private RowExposingTableViewer viewer;
 
-    protected MatchesCollection matches;
+    protected HeaderFilterMatchesCollection matches;
 
     private final String expandableSectionName;
 
@@ -239,7 +241,7 @@ public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
             final RobotCodeHoldingElement codeElement, final String newDocumentation);
 
     private void createColumns() {
-        final MatchesProvider matcherProvider = getMatchesProvider();
+        final Supplier<HeaderFilterMatchesCollection> matcherProvider = getMatchesProvider();
         createNameColumn(matcherProvider);
 
         for (int i = 0; i < calculateLongestArgumentsLength(); i++) {
@@ -248,10 +250,10 @@ public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
         createCommentColumn(matcherProvider);
     }
 
-    private MatchesProvider getMatchesProvider() {
-        return new MatchesProvider() {
+    private Supplier<HeaderFilterMatchesCollection> getMatchesProvider() {
+        return new Supplier<HeaderFilterMatchesCollection>() {
             @Override
-            public MatchesCollection getMatches() {
+            public HeaderFilterMatchesCollection get() {
                 return matches;
             }
         };
@@ -261,7 +263,7 @@ public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
         return RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
     }
 
-    private void createNameColumn(final MatchesProvider matcherProvider) {
+    private void createNameColumn(final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
         ViewerColumnsFactory.newColumn("Setting")
                 .withMinWidth(50)
                 .withWidth(150)
@@ -271,14 +273,14 @@ public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
 
     protected abstract Map<String, String> prepareTooltips();
 
-    private void createArgumentColumn(final int index, final MatchesProvider matcherProvider) {
+    private void createArgumentColumn(final int index, final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
         ViewerColumnsFactory.newColumn("")
                 .withWidth(120)
                 .labelsProvidedBy(new CodeSettingsArgumentsLabelProvider(matcherProvider, index))
                 .createFor(viewer);
     }
 
-    private void createCommentColumn(final MatchesProvider matcherProvider) {
+    private void createCommentColumn(final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
         ViewerColumnsFactory.newColumn("Comment")
                 .withMinWidth(50).withWidth(200)
                 .shouldGrabAllTheSpaceLeft(true)
@@ -332,21 +334,17 @@ public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
-        if (filter.isEmpty()) {
-            return null;
-        } else {
-            final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
-            final List<RobotElement> settings = getElementsForMatchesCollection();
+    public HeaderFilterMatchesCollection collectMatches(final String filter) {
+        final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
+        final List<RobotElement> settings = getElementsForMatchesCollection();
 
-            settingsMatches.collect(settings, filter);
-            return settingsMatches;
-        }
+        settingsMatches.collect(settings, filter);
+        return settingsMatches;
     }
 
     protected abstract List<RobotElement> getElementsForMatchesCollection();
 
-    protected final void handleFilteringRequest(final MatchesCollection matches) {
+    protected final void handleFilteringRequest(final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
 
         try {
@@ -363,7 +361,7 @@ public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
         }
     }
 
-    private void setDocumentationMatches(final MatchesCollection settingsMatches) {
+    private void setDocumentationMatches(final HeaderFilterMatchesCollection settingsMatches) {
         clearDocumentationMatches();
 
         final Collection<Range<Integer>> ranges = settingsMatches.getRanges(documentation.getText());

@@ -17,10 +17,12 @@ import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
+
+import com.google.common.base.Supplier;
 
 class GeneralSettingsNamesLabelProvider extends MatchesHighlightingLabelProvider {
 
@@ -41,7 +43,7 @@ class GeneralSettingsNamesLabelProvider extends MatchesHighlightingLabelProvider
         tooltips.put("Default Tags", "Sets tags to all tests cases in this suite, unless test case specifies own tags");
     }
 
-    GeneralSettingsNamesLabelProvider(final MatchesProvider matcherProvider) {
+    GeneralSettingsNamesLabelProvider(final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
         super(matcherProvider);
     }
 

@@ -48,6 +48,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSe
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -58,6 +59,7 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCr
 import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 
 public class MetadataSettingsFormFragment implements ISectionFormFragment {
@@ -82,7 +84,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
 
     private Section section;
 
-    private MatchesCollection matches;
+    private HeaderFilterMatchesCollection matches;
 
     TableViewer getViewer() {
         return viewer;
@@ -127,9 +129,9 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final MatchesProvider matchesProvider = new MatchesProvider() {
+        final Supplier<HeaderFilterMatchesCollection> matchesProvider = new Supplier<HeaderFilterMatchesCollection>() {
             @Override
-            public MatchesCollection getMatches() {
+            public HeaderFilterMatchesCollection get() {
                 return matches;
             }
         };
@@ -201,20 +203,16 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
-        if (filter.isEmpty()) {
-            return null;
-        } else {
-            final MetadataSettingsMatchesCollection settingsMatches = new MetadataSettingsMatchesCollection();
-            settingsMatches.collect(getDisplayedSettings(), filter);
-            return settingsMatches;
-        }
+    public HeaderFilterMatchesCollection collectMatches(final String filter) {
+        final MetadataSettingsMatchesCollection settingsMatches = new MetadataSettingsMatchesCollection();
+        settingsMatches.collect(getDisplayedSettings(), filter);
+        return settingsMatches;
     }
 
     @Inject
     @Optional
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotSettingsSection.SECTION_NAME) final MatchesCollection matches) {
+            + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
 
         try {

@@ -13,12 +13,6 @@ import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -29,21 +23,11 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.window.DefaultToolTip;
-import org.eclipse.jface.window.ToolTip;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -52,18 +36,13 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.Form;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.services.IServiceLocator;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshSectionCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
 import org.robotframework.red.forms.RedFormToolkit;
-import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
 
@@ -92,7 +71,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
 
     private IEclipseContext context;
 
-    private Text filter;
+    private HeaderFilterSupport filterSupport;
 
     protected final IEclipseContext getContext() {
         return context;
@@ -104,7 +83,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         toolkit = createToolkit(parent);
 
         final IEditorSite site = editorPart.getEditorSite();
-        context = ((IEclipseContext) site.getService(IEclipseContext.class)).getActiveLeaf();
+        context = site.getService(IEclipseContext.class).getActiveLeaf();
         context.set(RobotEditorCommandsStack.class, commandsStack);
         context.set(RedFormToolkit.class, toolkit);
         context.set(IEditorSite.class, site);
@@ -147,94 +126,35 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         form.setText(getTitle());
         toolkit.decorateFormHeading(form);
 
-        createFilter();
+        addFilteringSupport();
 
         GridLayoutFactory.fillDefaults().applyTo(form.getBody());
+        form.getBody().setBackground(parent.getBackground());
+        form.getBody().setForeground(parent.getForeground());
         return form;
     }
 
-    private void createFilter() {
-        filter = toolkit.createText(form.getHead(), "");
-        filter.setData(FormToolkit.KEY_DRAW_BORDER, Boolean.FALSE);
-        form.setHeadClient(filter);
+    private void addFilteringSupport() {
+        final boolean isFilteringEnabled = new RobotSuiteEditorDialogSettings().isHeaderFilteringEnabled();
 
-        final Image filterImage = ImagesManager.getImage(RedImages.getFilterImage());
-        final Color filterSuccessFg = ColorsManager.getColor(0, 200, 0);
-        final Color filterFailureFg = ColorsManager.getColor(255, 0, 0);
+        filterSupport = new HeaderFilterSupport(form, toolkit, eventBroker,
+                RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/" + getSectionName().replaceAll(" ", "_"),
+                formFragments);
 
-        filter.addPaintListener(new PaintListener() {
+        final HeaderFilterSwitchAction filterSwitchAction = new HeaderFilterSwitchAction(filterSupport, isFilteringEnabled, eventBroker);
+        ContextInjectionFactory.inject(filterSwitchAction, context);
+        form.addDisposeListener(new DisposeListener() {
             @Override
-            public void paintControl(final PaintEvent e) {
-                if (filter.getText().isEmpty() && !filter.isFocusControl()) {
-                    final Color current = e.gc.getForeground();
-                    e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_GRAY));
-                    e.gc.drawText("filter elements", 3, 1);
-                    e.gc.setForeground(current);
-                }
+            public void widgetDisposed(final DisposeEvent e) {
+                ContextInjectionFactory.uninject(filterSwitchAction, context);
             }
         });
-        filter.addModifyListener(new ModifyListener() {
-            private Job notifyingJob = null;
 
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                if (notifyingJob != null && notifyingJob.getState() == Job.SLEEPING) {
-                    notifyingJob.cancel();
-                }
-                form.setBusy(true);
-                notifyingJob = new Job("filtering section") {
-                    @Override
-                    protected IStatus run(final IProgressMonitor monitor) {
-                        filter.getDisplay().syncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                MatchesCollection matches = null;
-                                for (final ISectionFormFragment fragment : formFragments) {
-                                    final MatchesCollection currentMatches = fragment.collectMatches(filter.getText());
-                                    if (matches == null) {
-                                        matches = currentMatches;
-                                    } else {
-                                        matches.addAll(currentMatches);
-                                    }
-                                }
-                                final DefaultToolTip filterTip = new DefaultToolTip(filter, ToolTip.RECREATE, true);
-                                if (matches != null) {
-                                    final int allMatches = matches.getNumberOfAllMatches();
-                                    final int rowsMatching = matches.getNumberOfMatchingElement();
-                                    final String elementForm = rowsMatching == 1 ? "element" : "elements";
-                                    filterTip.setText("Filtering on: found " + allMatches + " match in " + rowsMatching
-                                            + " " + elementForm);
+        form.getMenuManager().add(filterSwitchAction);
 
-                                    filter.setForeground(allMatches == 0 ? filterFailureFg : filterSuccessFg);
-                                    if (form.getMessage() == null) {
-                                        form.setMessage("Filtering is enabled", IMessageProvider.INFORMATION);
-                                    }
-                                } else {
-                                    if (form.getMessage() != null && form.getMessage().startsWith("Filtering")) {
-                                        form.setMessage(null);
-                                    }
-                                    filterTip.setText("Filtering off");
-                                }
-                                filterTip.setHideDelay(3000);
-                                filterTip.setImage(filterImage);
-                                filterTip.show(new Point(0, filter.getSize().y));
-                                eventBroker.send(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-                                        + getSectionName().replaceAll(" ", "_"), matches);
-                            }
-                        });
-                        monitor.done();
-                        return Status.OK_STATUS;
-                    }
-                };
-                notifyingJob.addJobChangeListener(new JobChangeAdapter() {
-                    @Override
-                    public void done(final IJobChangeEvent event) {
-                        form.setBusy(false);
-                    }
-                });
-                notifyingJob.schedule(350);
-            }
-        });
+        if (isFilteringEnabled) {
+            filterSupport.enableFilter();
+        }
     }
 
     private void injectToFormParts(final IEclipseContext context, final List<? extends ISectionFormFragment> sectionForms) {
@@ -252,7 +172,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     protected abstract ISelectionProvider getSelectionProvider();
 
     private void prepareCommandsContext(final IWorkbenchPartSite site) {
-        final IContextService service = (IContextService) site.getService(IContextService.class);
+        final IContextService service = site.getService(IContextService.class);
         service.activateContext(SECTION_EDITOR_PART_CONTEXT_ID);
         service.activateContext(getContextId());
     }
@@ -284,10 +204,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
             form.addMessageHyperlinkListener(createSectionLinkListener);
             form.setMessage("Section is not yet defined, do you want to create it?", IMessageProvider.ERROR);
         }
-        
-        if (!filter.getText().isEmpty() && form.getMessage() == null) {
-            form.setMessage("Filtering is enabled", IMessageProvider.INFORMATION);
-        }
+        filterSupport.addFormMessageIfNeeded();
     }
 
     private HyperlinkAdapter createHyperlinkListener() {

@@ -74,6 +74,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEdito
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Viewers;
@@ -387,7 +388,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
+    public HeaderFilterMatchesCollection collectMatches(final String filter) {
         return null;
     }
 
