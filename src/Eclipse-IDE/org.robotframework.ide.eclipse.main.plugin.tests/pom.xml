@@ -128,7 +128,6 @@
                     <destFile>${basedir}/target/coverage-reports/jacoco-it.exec</destFile>
                     <dataFile>${basedir}/target/coverage-reports/jacoco-it.exec</dataFile>
                     <includes>
-                    	<include>**/*rf/**/*</include>
                     	<include>**/*robotframework/**/*</include>
                     </includes>
                     <excludes>                    	
