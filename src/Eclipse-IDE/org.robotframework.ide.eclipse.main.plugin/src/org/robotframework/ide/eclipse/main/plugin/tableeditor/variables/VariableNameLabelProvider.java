@@ -13,14 +13,16 @@ import org.eclipse.swt.graphics.Image;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
 
+import com.google.common.base.Supplier;
+
 class VariableNameLabelProvider extends MatchesHighlightingLabelProvider {
 
-    public VariableNameLabelProvider(final MatchesProvider matchesProvider) {
+    public VariableNameLabelProvider(final Supplier<HeaderFilterMatchesCollection> matchesProvider) {
         super(matchesProvider);
     }
 

@@ -60,7 +60,7 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
 
         @Override
         public boolean isPartFor(final RobotSuiteFileSection section) {
-            return section instanceof RobotVariablesSection;
+            return false;
         }
 
         @Override

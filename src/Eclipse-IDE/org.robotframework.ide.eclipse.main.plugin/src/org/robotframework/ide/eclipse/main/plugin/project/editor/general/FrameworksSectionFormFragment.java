@@ -52,6 +52,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEven
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -229,7 +230,7 @@ class FrameworksSectionFormFragment implements ISectionFormFragment {
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
+    public HeaderFilterMatchesCollection collectMatches(final String filter) {
         return null;
     }
 

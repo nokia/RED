@@ -17,16 +17,17 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
 
 import com.google.common.base.Joiner;
+import com.google.common.base.Supplier;
 
 class CodeNamesLabelProvider extends MatchesHighlightingLabelProvider {
 
-    public CodeNamesLabelProvider(final MatchesProvider matchesProvider) {
+    public CodeNamesLabelProvider(final Supplier<HeaderFilterMatchesCollection> matchesProvider) {
         super(matchesProvider);
     }
 

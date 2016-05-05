@@ -50,11 +50,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor.ViewerColumnsManagingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
+
+import com.google.common.base.Supplier;
 
 public abstract class CodeEditorFormFragment implements ISectionFormFragment {
 
@@ -268,7 +271,7 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
             .createFor(viewer);
     }
 
-    protected abstract MatchesProvider getMatchesProvider();
+    protected abstract Supplier<HeaderFilterMatchesCollection> getMatchesProvider();
 
     protected abstract boolean sectionIsDefined();
 

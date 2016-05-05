@@ -28,6 +28,11 @@
 <repository location="http://download.eclipse.org/e4/updates/0.16/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+<unit id="org.eclipse.nebula.widgets.nattable.core.feature.feature.group" version="1.3.0.201503261201"/>
+<unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.feature.feature.group" version="1.3.0.201503261201"/>
+<repository location="http://download.eclipse.org/nattable/releases/1.3.0/repository/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
 <unit id="org.eclipse.epp.mpc.feature.group" version="1.3.1.v20140908-1651"/>
 <repository location="http://download.eclipse.org/mpc/luna/"/>
 </location>

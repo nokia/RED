@@ -20,14 +20,17 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeMatchesFilter;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 
+import com.google.common.base.Supplier;
+
 class CasesEditorFormFragment extends CodeEditorFormFragment {
 
-    private MatchesCollection matches;
+    private HeaderFilterMatchesCollection matches;
 
     public CasesEditorFormFragment() {
         super(RobotCasesSection.SECTION_NAME.replaceAll(" ", "_"));
@@ -94,21 +97,17 @@ class CasesEditorFormFragment extends CodeEditorFormFragment {
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
-        if (filter.isEmpty()) {
-            return null;
-        } else {
-            final CasesMatchesCollection casesMatches = new CasesMatchesCollection();
-            casesMatches.collect((RobotElement) viewer.getInput(), filter);
-            return casesMatches;
-        }
+    public HeaderFilterMatchesCollection collectMatches(final String filter) {
+        final CasesMatchesCollection casesMatches = new CasesMatchesCollection();
+        casesMatches.collect((RobotElement) viewer.getInput(), filter);
+        return casesMatches;
     }
 
     @Override
-    protected MatchesProvider getMatchesProvider() {
-        return new MatchesProvider() {
+    protected Supplier<HeaderFilterMatchesCollection> getMatchesProvider() {
+        return new Supplier<HeaderFilterMatchesCollection>() {
             @Override
-            public MatchesCollection getMatches() {
+            public HeaderFilterMatchesCollection get() {
                 return matches;
             }
         };
@@ -117,7 +116,7 @@ class CasesEditorFormFragment extends CodeEditorFormFragment {
     @Inject
     @Optional
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC
-            + "/Test_Cases") final MatchesCollection matches) {
+            + "/Test_Cases") final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
 
         try {

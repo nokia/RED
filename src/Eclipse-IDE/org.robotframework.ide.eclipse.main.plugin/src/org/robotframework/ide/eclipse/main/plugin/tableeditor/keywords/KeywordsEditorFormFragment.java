@@ -20,14 +20,17 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDefinitionCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeMatchesFilter;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 
+import com.google.common.base.Supplier;
+
 public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
 
-    private MatchesCollection matches;
+    private HeaderFilterMatchesCollection matches;
 
     public KeywordsEditorFormFragment() {
         super(RobotKeywordsSection.SECTION_NAME);
@@ -99,30 +102,26 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
     }
 
     @Override
-    protected MatchesProvider getMatchesProvider() {
-        return new MatchesProvider() {
+    protected Supplier<HeaderFilterMatchesCollection> getMatchesProvider() {
+        return new Supplier<HeaderFilterMatchesCollection>() {
             @Override
-            public MatchesCollection getMatches() {
+            public HeaderFilterMatchesCollection get() {
                 return matches;
             }
         };
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
-        if (filter.isEmpty()) {
-            return null;
-        } else {
-            final KeywordsMatchesCollection keywordMatches = new KeywordsMatchesCollection();
-            keywordMatches.collect((RobotElement) viewer.getInput(), filter);
-            return keywordMatches;
-        }
+    public HeaderFilterMatchesCollection collectMatches(final String filter) {
+        final KeywordsMatchesCollection keywordMatches = new KeywordsMatchesCollection();
+        keywordMatches.collect((RobotElement) viewer.getInput(), filter);
+        return keywordMatches;
     }
 
     @Inject
     @Optional
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotKeywordsSection.SECTION_NAME) final MatchesCollection matches) {
+            + RobotKeywordsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
         try {
             viewer.getTree().setRedraw(false);

@@ -8,13 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
 public class VariablesMatchesFilter extends ViewerFilter {
 
-    private final MatchesCollection matches;
+    private final HeaderFilterMatchesCollection matches;
 
-    public VariablesMatchesFilter(final MatchesCollection matches) {
+    public VariablesMatchesFilter(final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
     }
 

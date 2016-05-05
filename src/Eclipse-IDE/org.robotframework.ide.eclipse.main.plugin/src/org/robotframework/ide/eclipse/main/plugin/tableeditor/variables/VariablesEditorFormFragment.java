@@ -45,6 +45,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -54,6 +55,8 @@ import org.robotframework.red.forms.Sections;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.ViewersCombiningSelectionProvider;
+
+import com.google.common.base.Supplier;
 
 public class VariablesEditorFormFragment implements ISectionFormFragment {
     
@@ -84,7 +87,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private VariableValueEditForm valueEditForm;
     
     private Section editSection;
-    private MatchesCollection matches;
+    private HeaderFilterMatchesCollection matches;
 
     TableViewer getViewer() {
         return viewer;
@@ -129,9 +132,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     private void createColumns() {
         final NewElementsCreator<RobotElement> creator = newElementsCreator();
-        final MatchesProvider matchesProvider = new MatchesProvider() {
+        final Supplier<HeaderFilterMatchesCollection> matchesProvider = new Supplier<HeaderFilterMatchesCollection>() {
             @Override
-            public MatchesCollection getMatches() {
+            public HeaderFilterMatchesCollection get() {
                 return matches;
             }
         };
@@ -256,20 +259,16 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
-        if (filter.isEmpty()) {
-            return null;
-        } else {
-            final VariablesMatchesCollection variablesMatches = new VariablesMatchesCollection();
-            variablesMatches.collect((RobotElement) viewer.getInput(), filter);
-            return variablesMatches;
-        }
+    public HeaderFilterMatchesCollection collectMatches(final String filter) {
+        final VariablesMatchesCollection variablesMatches = new VariablesMatchesCollection();
+        variablesMatches.collect((RobotElement) viewer.getInput(), filter);
+        return variablesMatches;
     }
 
     @Inject
     @Optional
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotVariablesSection.SECTION_NAME) final MatchesCollection matches) {
+            + RobotVariablesSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
 
         try {

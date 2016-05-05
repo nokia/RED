@@ -72,6 +72,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor.ViewerColumnsManagingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -81,6 +82,7 @@ import org.robotframework.red.forms.Sections;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.viewers.Viewers;
 
+import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 
 public class GeneralSettingsFormFragment implements ISectionFormFragment {
@@ -109,7 +111,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
     private Section section;
 
-    private MatchesCollection matches;
+    private HeaderFilterMatchesCollection matches;
 
     TableViewer getViewer() {
         return viewer.orNull();
@@ -240,7 +242,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createColumns() {
-        final MatchesProvider matcherProvider = getMatchesProvider();
+        final Supplier<HeaderFilterMatchesCollection> matcherProvider = getMatchesProvider();
         createNameColumn(matcherProvider);
 
         for (int i = 0; i < calculateLongestArgumentsLength(); i++) {
@@ -249,22 +251,22 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         createCommentColumn(matcherProvider);
     }
 
-    private MatchesProvider getMatchesProvider() {
-        return new MatchesProvider() {
+    private Supplier<HeaderFilterMatchesCollection> getMatchesProvider() {
+        return new Supplier<HeaderFilterMatchesCollection>() {
             @Override
-            public MatchesCollection getMatches() {
+            public HeaderFilterMatchesCollection get() {
                 return matches;
             }
         };
     }
 
-    private void createNameColumn(final MatchesProvider matcherProvider) {
+    private void createNameColumn(final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
         ViewerColumnsFactory.newColumn("Setting").withWidth(100)
                 .labelsProvidedBy(new GeneralSettingsNamesLabelProvider(matcherProvider))
                 .createFor(viewer.get());
     }
 
-    private void createArgumentColumn(final int index, final MatchesProvider matcherProvider) {
+    private void createArgumentColumn(final int index, final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
         ViewerColumnsFactory.newColumn("").withWidth(120)
             .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(matcherProvider, index))
             .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer.get(), index, commandsStack))
@@ -272,7 +274,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
             .createFor(viewer.get());
     }
 
-    private void createCommentColumn(final MatchesProvider matcherProvider) {
+    private void createCommentColumn(final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
         ViewerColumnsFactory.newColumn("Comment").withWidth(200)
             .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
             .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider(matcherProvider))
@@ -407,30 +409,26 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
-        if (filter.isEmpty()) {
-            return null;
-        } else {
-            final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
-            final List<RobotElement> generalSettings = GeneralSettingsModel.findGeneralSettingsList(
-                    viewer.isPresent() ? (RobotSettingsSection) viewer.get().getInput() : null);
-            final RobotSettingsSection settingsSection = getSection();
-            if (settingsSection != null) {
-                final RobotSetting setting = settingsSection.getSetting("Documentation");
-                if (setting != null) {
-                    generalSettings.add(setting);
-                }
+    public HeaderFilterMatchesCollection collectMatches(final String filter) {
+        final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
+        final List<RobotElement> generalSettings = GeneralSettingsModel
+                .findGeneralSettingsList(viewer.isPresent() ? (RobotSettingsSection) viewer.get().getInput() : null);
+        final RobotSettingsSection settingsSection = getSection();
+        if (settingsSection != null) {
+            final RobotSetting setting = settingsSection.getSetting("Documentation");
+            if (setting != null) {
+                generalSettings.add(setting);
             }
-
-            settingsMatches.collect(generalSettings, filter);
-            return settingsMatches;
         }
+
+        settingsMatches.collect(generalSettings, filter);
+        return settingsMatches;
     }
 
     @Inject
     @Optional
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotSettingsSection.SECTION_NAME) final MatchesCollection matches) {
+            + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
 
         if (matches == null) {
@@ -454,7 +452,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
     }
 
-    private void setDocumentationMatches(final MatchesCollection settingsMatches) {
+    private void setDocumentationMatches(final HeaderFilterMatchesCollection settingsMatches) {
         clearDocumentationMatches();
 
         final Collection<Range<Integer>> ranges = settingsMatches.getRanges(documentation.getText());
