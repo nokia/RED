@@ -13,6 +13,7 @@ import java.io.InputStreamReader;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -88,10 +89,12 @@ public class ProjectProvider implements TestRule {
                         project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
                         project.create(null);
                         project.open(null);
+                        project.refreshLocal(IResource.DEPTH_INFINITE, null);
                     }
                     base.evaluate();
                 } finally {
                     if (project != null && project.exists()) {
+                        project.refreshLocal(IResource.DEPTH_INFINITE, null);
                         project.delete(true, null);
                     }
                 }
