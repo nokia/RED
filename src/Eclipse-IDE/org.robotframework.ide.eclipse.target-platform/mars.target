@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?pde version="3.8"?><target name="Target Definition for Eclipse Mars (4.5)" sequenceNumber="171">
+<?pde version="3.8"?><target name="Target Definition for Eclipse Mars (4.5)" sequenceNumber="173">
 <locations>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
 <unit id="org.eclipse.sdk.ide" version="0.0.0"/>
@@ -30,12 +30,15 @@
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
 <unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.feature.feature.group" version="1.3.0.201503261201"/>
-<unit id="org.eclipse.nebula.widgets.nattable.extension.poi.source.feature.feature.group" version="1.3.0.201503261201"/>
 <unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.source.feature.feature.group" version="1.3.0.201503261201"/>
 <unit id="org.eclipse.nebula.widgets.nattable.core.feature.feature.group" version="1.3.0.201503261201"/>
 <unit id="org.eclipse.nebula.widgets.nattable.core.source.feature.feature.group" version="1.3.0.201503261201"/>
-<unit id="org.eclipse.nebula.widgets.nattable.extension.poi.feature.feature.group" version="1.3.0.201503261201"/>
 <repository location="http://download.eclipse.org/nattable/releases/1.3.0/repository/"/>
+</location>
+<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
+<unit id="ca.odell.glazedlists" version="1.9.0.v201303080712"/>
+<unit id="ca.odell.glazedlists.source" version="1.9.0.v201303080712"/>
+<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/R20160221192158/repository"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
