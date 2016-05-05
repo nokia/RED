@@ -27,7 +27,7 @@ import com.google.common.base.Optional;
 
 public class RedXmlChangesCollectorTest {
 
-    private static final String PROJECT_NAME = RedXmlInProjectEditorChangesCollectorTest.class.getSimpleName();
+    private static final String PROJECT_NAME = RedXmlChangesCollectorTest.class.getSimpleName();
 
     @Rule
     public ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
