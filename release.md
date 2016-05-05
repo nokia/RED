@@ -1,4 +1,4 @@
-# RED - Robot Editor v0.6.3
+# RED - Robot Editor v0.6.4
 ## Introduction
 RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
 Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
@@ -37,11 +37,8 @@ Uninstall:
 Open Help -> Installation Details, select old RED feature and perform uninstall
 
 ## Updates
-- Automatic discovery of libraries (settings in red.xml) - see help for details
-- Custom PYTHONPATH, CLASSPATH for generating libdocs and running tests (set in referenced libraries in red.xml)
-- Merged Remote Libs to Referenced Libs in Red.xml
-- Added Marketplace to RED product
-- Run configuration - use default interpreter than previously used
+- Corrected bug for Debug when Suite Setup was inside __init__ file for RobotFramework version greater than 3.0
+- Updated RED to support :For in Suite Setup in Debug for RobotFramework 2.9 
 - Check **[changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)** for details
 
 ## What's in the package
