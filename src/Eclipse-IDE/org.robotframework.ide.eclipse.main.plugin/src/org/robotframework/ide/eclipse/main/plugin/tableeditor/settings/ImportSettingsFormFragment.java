@@ -49,6 +49,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStr
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor.ViewerColumnsManagingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -60,6 +61,7 @@ import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCr
 import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Lists;
 
 public class ImportSettingsFormFragment implements ISectionFormFragment {
@@ -84,7 +86,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
 
     private Section section;
 
-    private MatchesCollection matches;
+    private HeaderFilterMatchesCollection matches;
 
     TableViewer getViewer() {
         return viewer;
@@ -125,7 +127,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
 
     private void createColumns() {
         final NewElementsCreator<RobotElement> creator = newElementsCreator();
-        final MatchesProvider matchesProvider = getMatchesProvider();
+        final Supplier<HeaderFilterMatchesCollection> matchesProvider = getMatchesProvider();
         ViewerColumnsFactory.newColumn("Import").withWidth(140)
             .labelsProvidedBy(new KeywordCallNameLabelProvider(matchesProvider))
             .editingSupportedBy(new ImportSettingsEditingSupport(viewer, commandsStack, creator))
@@ -144,10 +146,10 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
             .createFor(viewer);
     }
 
-    private MatchesProvider getMatchesProvider() {
-        return new MatchesProvider() {
+    private Supplier<HeaderFilterMatchesCollection> getMatchesProvider() {
+        return new Supplier<HeaderFilterMatchesCollection>() {
             @Override
-            public MatchesCollection getMatches() {
+            public HeaderFilterMatchesCollection get() {
                 return matches;
             }
         };
@@ -177,7 +179,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         return max;
     }
 
-    private void createArgumentColumn(final String name, final int index, final MatchesProvider matchesProvider,
+    private void createArgumentColumn(final String name, final int index,
+            final Supplier<HeaderFilterMatchesCollection> matchesProvider,
             final NewElementsCreator<RobotElement> creator) {
         ViewerColumnsFactory.newColumn(name).withWidth(120)
                 .labelsProvidedBy(new SettingsArgsLabelProvider(matchesProvider, index))
@@ -256,20 +259,16 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     }
 
     @Override
-    public MatchesCollection collectMatches(final String filter) {
-        if (filter.isEmpty()) {
-            return null;
-        } else {
-            final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
-            settingsMatches.collect(getDisplayedSettings(), filter);
-            return settingsMatches;
-        }
+    public HeaderFilterMatchesCollection collectMatches(final String filter) {
+        final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
+        settingsMatches.collect(getDisplayedSettings(), filter);
+        return settingsMatches;
     }
 
     @Inject
     @Optional
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotSettingsSection.SECTION_NAME) final MatchesCollection matches) {
+            + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
 
         try {

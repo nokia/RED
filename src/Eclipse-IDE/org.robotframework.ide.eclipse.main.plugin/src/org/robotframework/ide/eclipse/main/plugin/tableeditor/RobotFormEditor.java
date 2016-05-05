@@ -45,6 +45,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -64,7 +65,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorP
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.VariablesEditorPart;
+import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.ErrorDialogWithLinkToPreferences;
 
 public class RobotFormEditor extends FormEditor {
@@ -98,7 +100,7 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void prepareEclipseContext() {
-        final IEclipseContext eclipseContext = ((IEclipseContext) getSite().getService(IEclipseContext.class))
+        final IEclipseContext eclipseContext = getSite().getService(IEclipseContext.class)
                 .getActiveLeaf();
         eclipseContext.set(RobotEditorSources.SUITE_FILE_MODEL, new ContextFunction() {
 
@@ -117,7 +119,7 @@ public class RobotFormEditor extends FormEditor {
             isEditable = !((FileEditorInput) input).getFile().isReadOnly();
             setPartName(input.getName());
         } else {
-            final IStorage storage = (IStorage) input.getAdapter(IStorage.class);
+            final IStorage storage = input.getAdapter(IStorage.class);
             if (storage != null) {
                 isEditable = !storage.isReadOnly();
                 setPartName(storage.getName() + " [" + storage.getFullPath() + "]");
@@ -143,8 +145,9 @@ public class RobotFormEditor extends FormEditor {
             }
             addEditorPart(new KeywordsEditorPart(), "Keywords");
             addEditorPart(new SettingsEditorPart(), "Settings");
+            // addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new VariablesEditorPart(), "Variables");
-            addEditorPart(new SuiteSourceEditor(), "Source", null);
+            addEditorPart(new SuiteSourceEditor(), "Source", ImagesManager.getImage(RedImages.getSourceImage()));
 
             setActivePart(getPageToActivate());
         } catch (final Exception e) {
@@ -187,18 +190,17 @@ public class RobotFormEditor extends FormEditor {
     private void addEditorPart(final IEditorPart editorPart, final String partName, final Image image)
             throws PartInitException {
         parts.add(editorPart);
-        final IEclipseContext eclipseContext = ((IEclipseContext) getSite().getService(IEclipseContext.class))
+        final IEclipseContext eclipseContext = getSite().getService(IEclipseContext.class)
                 .getActiveLeaf();
         ContextInjectionFactory.inject(editorPart, eclipseContext);
 
         final int newVariablesPart = addPage(editorPart, getEditorInput());
         setPageImage(newVariablesPart, image);
         setPageText(newVariablesPart, partName);
-
     }
 
     private void prepareCommandsContext() {
-        final IContextService commandsContext = (IContextService) getSite().getService(IContextService.class);
+        final IContextService commandsContext = getSite().getService(IContextService.class);
         commandsContext.activateContext(EDITOR_CONTEXT_ID);
     }
 
@@ -291,7 +293,7 @@ public class RobotFormEditor extends FormEditor {
 
     @Override
     public void dispose() {
-        final IEclipseContext context = ((IEclipseContext) getSite().getService(IEclipseContext.class)).getActiveLeaf();
+        final IEclipseContext context = getSite().getService(IEclipseContext.class).getActiveLeaf();
         ContextInjectionFactory.uninject(this, context);
         for (final IEditorPart part : parts) {
             ContextInjectionFactory.uninject(part, context);
@@ -302,7 +304,7 @@ public class RobotFormEditor extends FormEditor {
         clipboard.dispose();
         suiteModel.dispose();
 
-        final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         eventBroker.post(RobotModelEvents.SUITE_MODEL_DISPOSED,
                 RobotElementChange.createChangedElement(suiteModel));
         RobotArtifactsValidator.revalidate(suiteModel);
@@ -324,7 +326,7 @@ public class RobotFormEditor extends FormEditor {
             suiteModel = RedPlugin.getModelManager().createSuiteFile(((FileEditorInput) getEditorInput()).getFile());
             checkRuntimeEnvironment(suiteModel);
         } else {
-            final IStorage storage = (IStorage) getEditorInput().getAdapter(IStorage.class);
+            final IStorage storage = getEditorInput().getAdapter(IStorage.class);
             try {
                 suiteModel = new RobotSuiteStreamFile(storage.getName(), storage.getContents(), storage.isReadOnly());
             } catch (final CoreException e) {

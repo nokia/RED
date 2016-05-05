@@ -11,21 +11,23 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment.MatchesProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MatchesHighlightingLabelProvider;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.ElementAddingToken;
+
+import com.google.common.base.Supplier;
 
 class SettingsArgsLabelProvider extends MatchesHighlightingLabelProvider {
 
     private final int index;
     private final boolean shouldProvideLabelForAddingToken;
 
-    SettingsArgsLabelProvider(final MatchesProvider matchesProvider, final int index) {
+    SettingsArgsLabelProvider(final Supplier<HeaderFilterMatchesCollection> matchesProvider, final int index) {
         this(matchesProvider, index, false);
     }
 
-    SettingsArgsLabelProvider(final MatchesProvider matchesProvider, final int index,
+    SettingsArgsLabelProvider(final Supplier<HeaderFilterMatchesCollection> matchesProvider, final int index,
             final boolean shouldProvideLabelForAddingToken) {
         super(matchesProvider);
         this.index = index;

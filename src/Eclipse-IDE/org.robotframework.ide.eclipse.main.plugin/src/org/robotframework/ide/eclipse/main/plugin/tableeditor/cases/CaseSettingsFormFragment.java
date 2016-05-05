@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCaseSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeSettingsFormFragment;
@@ -85,7 +86,7 @@ public class CaseSettingsFormFragment extends CodeSettingsFormFragment {
     @Inject
     @Optional
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC
-            + "/Test_Cases") final MatchesCollection matches) {
+            + "/Test_Cases") final HeaderFilterMatchesCollection matches) {
         handleFilteringRequest(matches);
     }
 
