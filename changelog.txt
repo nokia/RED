@@ -1,14 +1,9 @@
-RED 0.6.3 - 2016/04/25
+RED 0.6.4 - 2016/05/05
 
 Bug
 
-      Problem with killing RobotCommand server after library remove
-      No automatic reload for library when second project is deleted
-      Adding lib by quickfix in RED under jython cause NPE in .log
-      Correct path with double underscores while running tests
-      Installed Framework hangs while discovering interpreters
-      Missing OS directory separator in Variables files tab
-      RED without Python&RF should not display error while opening test file.
+      Support for listener API made in RF 2.9
+      Cannot debug Suite Setup inside __init__ file on RF ver > 3.0
 
 Enhancement
 
