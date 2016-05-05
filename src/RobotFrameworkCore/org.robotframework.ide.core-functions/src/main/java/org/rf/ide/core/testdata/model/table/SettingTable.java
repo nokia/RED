@@ -145,6 +145,17 @@ public class SettingTable extends ARobotSectionTable {
         suiteTeardowns.add(suiteTeardown);
     }
 
+    public ForceTags newForceTag() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_FORCE_TAGS_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        ForceTags tags = new ForceTags(dec);
+        addForceTags(tags);
+
+        return tags;
+    }
+
     public List<ForceTags> getForceTags() {
         return Collections.unmodifiableList(forceTags);
     }
