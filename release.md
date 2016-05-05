@@ -13,7 +13,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 Product zip is ready to use RED installation bundled with Eclipse Mars. There is no need to install RED feature into it. Choose proper OS version from **Downloads** section.
 
 ### Feature
-Download RED eclipse feature zip: https://github.com/nokia/RED/releases/download/0.6.3/RED_0.6.3.201604250825.zip
+Download RED eclipse feature zip: https://github.com/nokia/RED/releases/download/0.6.4/RED_0.6.4.201605051229.zip
 Please refer to First Steps doc under https://github.com/nokia/RED/blob/master/First_steps.md
 
 #### Install form Marketplace/Update Site
@@ -60,8 +60,8 @@ Open Help -> Installation Details, select old RED feature and perform uninstall
 - Due to difficult to comprehend and countless exceptions in RF syntax, validation can show false positive errors. In such case please provide us sample test case for us to have a look at.
 
 ## Short term plans
-- Table Editor
-- Library auto-discovery
+- Table Editor persistency
+
 
 
 ## Notes
