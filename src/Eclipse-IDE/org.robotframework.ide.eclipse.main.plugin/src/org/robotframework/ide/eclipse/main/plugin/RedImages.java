@@ -158,6 +158,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/tooltip_prohibited.png");
     }
 
+    public static ImageDescriptor getSearchMarkerImage() {
+        return RedPlugin.getImageDescriptor("resources/red_search_marker.png");
+    }
+
     public static ImageDescriptor getLibraryImage() {
         return RedPlugin.getImageDescriptor("resources/library.png");
     }
