@@ -94,15 +94,17 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
 
                 result = Integer.compare(typeO1hierarchy, typeO2hierarchy);
                 if (posComperatorResult != ECompareResult.EQUAL_TO.getValue()) {
-                    result = posComperatorResult;
+                    if (!o1.getFilePosition().isNotSet() && !o2.getFilePosition().isNotSet()) {
+                        result = posComperatorResult;
+                    }
                 }
             }
+        } else if (!o1TypeOP.isPresent() && !o2TypeOP.isPresent()) {
+            result = posComperatorResult;
         } else if (!o1TypeOP.isPresent()) {
             result = ECompareResult.LESS_THAN.getValue();
         } else if (!o2TypeOP.isPresent()) {
             result = ECompareResult.GREATER_THAN.getValue();
-        } else {
-            result = posComperatorResult;
         }
 
         return result;
