@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
@@ -261,7 +262,12 @@ public class RobotProject extends RobotContainer {
         return SwtThread.syncEval(new Evaluation<RedProjectEditorInput>() {
             @Override
             public RedProjectEditorInput runCalculation() {
-                final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+                final IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+                if (window == null) {
+                    // in the meantime window could be destroyed actually..
+                    return null;
+                }
+                final IWorkbenchPage page = window.getActivePage();
                 final FileEditorInput input = new FileEditorInput(getConfigurationFile());
                 final IEditorPart editor = page.findEditor(input);
                 return editor instanceof RedProjectEditor ? ((RedProjectEditor) editor).getRedProjectEditorInput()

@@ -37,6 +37,13 @@ public class Stylers {
             }
         };
 
+        public static final Styler ECLIPSE_SEARCH_MATCH_STYLER = new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.background = RedTheme.getEclipseSearchMatchColor();
+            };
+        };
+
         public static final Styler STRIKEOUT_STYLER = new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
