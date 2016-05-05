@@ -39,14 +39,7 @@ public abstract class ATags<T> extends AModelElement<T> {
     }
 
     public void addTag(final RobotToken tag) {
-        final List<IRobotTokenType> tagTypes = tag.getTypes();
-        if (!tagTypes.contains(getTagType())) {
-            if (tagTypes.isEmpty()) {
-                tagTypes.add(getTagType());
-            } else {
-                tagTypes.add(0, getTagType());
-            }
-        }
+        fixForTheType(tag, getTagType());
 
         tags.add(tag);
     }

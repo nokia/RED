@@ -28,7 +28,7 @@ public class ForceTagsDumper extends ANotExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_FORCE_TAG, 1, forceTags.getTags());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
                 getElementHelper().filter(forceTags.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
                 getElementHelper().filter(forceTags.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
