@@ -12,6 +12,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class LibraryAlias extends AModelElement<LibraryImport> {
 
@@ -20,6 +21,9 @@ public class LibraryAlias extends AModelElement<LibraryImport> {
     private RobotToken libraryAlias;
 
     public LibraryAlias(final RobotToken aliasDeclaration) {
+        if (aliasDeclaration != null) {
+            fixForTheType(aliasDeclaration, RobotTokenType.SETTING_LIBRARY_ALIAS);
+        }
         this.libraryAliasDeclaration = aliasDeclaration;
     }
 
@@ -28,6 +32,9 @@ public class LibraryAlias extends AModelElement<LibraryImport> {
     }
 
     public void setLibraryAlias(final RobotToken libraryAlias) {
+        if (libraryAlias != null) {
+            fixForTheType(libraryAlias, RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
+        }
         this.libraryAlias = libraryAlias;
     }
 

@@ -25,7 +25,7 @@ public class CreationOfSettingsForceTagsTest {
     private static final String PRETTY_NEW_DIR_LOCATION = "settings//forceTags//new//";
 
     @Test
-    public void test_emptyFile_and_thanCreateDefaultTags() throws Exception {
+    public void test_emptyFile_and_thanCreateForceTags() throws Exception {
         // prepare
         final Path inputFile = DumperTestHelper.getINSTANCE()
                 .getFile(PRETTY_NEW_DIR_LOCATION + "EmptyForceTagsDeclarationOnly.txt");
@@ -51,7 +51,7 @@ public class CreationOfSettingsForceTagsTest {
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateDefaultTagsWithThreeTags() throws Exception {
+    public void test_emptyFile_and_thanCreateForceTagsWithThreeTags() throws Exception {
         // prepare
         final Path inputFile = DumperTestHelper.getINSTANCE()
                 .getFile(PRETTY_NEW_DIR_LOCATION + "ForceTagsWithThreeTagsOnly.txt");
@@ -86,7 +86,7 @@ public class CreationOfSettingsForceTagsTest {
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateDefaultTagsWithThreeComments() throws Exception {
+    public void test_emptyFile_and_thanCreateForceTagsWithThreeComments() throws Exception {
         // prepare
         final Path inputFile = DumperTestHelper.getINSTANCE()
                 .getFile(PRETTY_NEW_DIR_LOCATION + "ForceTagsWithThreeCommentOnly.txt");
@@ -122,7 +122,7 @@ public class CreationOfSettingsForceTagsTest {
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateDefaultTagsWithThreeCommentsAndTags() throws Exception {
+    public void test_emptyFile_and_thanCreateForceTagsWithThreeCommentsAndTags() throws Exception {
         // prepare
         final Path inputFile = DumperTestHelper.getINSTANCE()
                 .getFile(PRETTY_NEW_DIR_LOCATION + "ForceTagsWithThreeTagsAndCommentsOnly.txt");

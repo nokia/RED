@@ -15,6 +15,7 @@ import org.rf.ide.core.testdata.model.presenter.DataDrivenKeywordName;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
+import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
@@ -68,6 +69,17 @@ public class SettingTable extends ARobotSectionTable {
 
     public List<AImported> getImports() {
         return Collections.unmodifiableList(imports);
+    }
+
+    public LibraryImport newLibraryImport() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_LIBRARY_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        LibraryImport libImp = new LibraryImport(dec);
+        addImported(libImp);
+
+        return libImp;
     }
 
     public void addImported(final AImported imported) {

@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class LibraryImport extends AImported {
 
@@ -35,6 +36,7 @@ public class LibraryImport extends AImported {
     }
 
     public void addArgument(final RobotToken argument) {
+        fixForTheType(argument, RobotTokenType.SETTING_LIBRARY_ARGUMENT);
         this.arguments.add(argument);
     }
 
