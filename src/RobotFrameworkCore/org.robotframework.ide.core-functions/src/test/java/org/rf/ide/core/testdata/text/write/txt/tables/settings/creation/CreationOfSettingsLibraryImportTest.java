@@ -5,21 +5,13 @@
  */
 package org.rf.ide.core.testdata.text.write.txt.tables.settings.creation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.nio.file.Path;
-
 import org.junit.Test;
-import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.write.DumperTestHelper;
-import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
+import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfSettingsLibraryImportTest {
 
@@ -28,42 +20,25 @@ public class CreationOfSettingsLibraryImportTest {
     @Test
     public void test_emptyFile_and_thanCreateLibraryImport() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile(PRETTY_NEW_DIR_LOCATION + "EmptyLibraryDeclarationOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyLibraryDeclarationOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         settingTable.newLibraryImport();
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateLibraryImport_withName() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile(PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithLibraryNameOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithLibraryNameOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
@@ -71,28 +46,17 @@ public class CreationOfSettingsLibraryImportTest {
         libName.setText("newLib.py");
         lib.setPathOrName(libName);
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateLibraryImport_withNameAnd_ThreeCommentTokens() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile(PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithLibraryNameAndThreeCommentOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithLibraryNameAndThreeCommentOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
@@ -110,28 +74,17 @@ public class CreationOfSettingsLibraryImportTest {
         lib.addCommentPart(cm2);
         lib.addCommentPart(cm3);
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateLibraryImport_with_ThreeCommentTokens() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile(PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithThreeCommentOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithThreeCommentOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
@@ -146,28 +99,17 @@ public class CreationOfSettingsLibraryImportTest {
         lib.addCommentPart(cm2);
         lib.addCommentPart(cm3);
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateLibraryImport_withNameAnd_ThreeArguments() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile(PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithLibraryNameAndThreeArgsOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithLibraryNameAndThreeArgsOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
@@ -185,29 +127,19 @@ public class CreationOfSettingsLibraryImportTest {
         lib.addArgument(arg2);
         lib.addArgument(arg3);
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateLibraryImport_withNameAnd_ThreeArgumentsAnd_ThreeComments()
             throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(
-                PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithLibraryNameAndThreeArgsThreeCommentsOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION
+                + "LibraryDeclarationWithLibraryNameAndThreeArgsThreeCommentsOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
@@ -235,29 +167,20 @@ public class CreationOfSettingsLibraryImportTest {
         lib.addArgument(arg2);
         lib.addArgument(arg3);
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateLibraryImport_withNameAnd_ThreeArgumentsAnd_ThreeCommentsAndAlias()
             throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(
-                PRETTY_NEW_DIR_LOCATION + "LibraryDeclarationWithLibraryNameAndThreeArgsThreeCommentsAliasOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION
+                + "LibraryDeclarationWithLibraryNameAndThreeArgsThreeCommentsAliasOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        ;
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final LibraryImport lib = settingTable.newLibraryImport();
@@ -290,12 +213,7 @@ public class CreationOfSettingsLibraryImportTest {
         lib.addArgument(arg2);
         lib.addArgument(arg3);
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 }
