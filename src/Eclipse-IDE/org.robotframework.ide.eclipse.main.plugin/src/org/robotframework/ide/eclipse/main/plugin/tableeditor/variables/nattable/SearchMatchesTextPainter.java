@@ -62,7 +62,6 @@ public class SearchMatchesTextPainter extends TextPainter {
             final int fontHeight = gc.getFontMetrics().getHeight();
             String text = convertDataType(cell, configRegistry);
 
-            // Draw Text
             text = getTextToDisplay(cell, gc, rectangle.width, text);
 
             // no wrapping so always 1
@@ -98,32 +97,20 @@ public class SearchMatchesTextPainter extends TextPainter {
             if (underline || strikethrough) {
                 final int length = gc.textExtent(text).x;
                 if (length > 0) {
-                    // start x of line = start x of text
-                    final int x = rectangle.x
+                    final int xTextStart = rectangle.x
                             + CellStyleUtil.getHorizontalAlignmentPadding(cellStyle, rectangle, contentWidth)
                             + this.spacing;
-                    // y = start y of text
-                    final int y = rectangle.y
+                    final int yTextStart = rectangle.y
                             + CellStyleUtil.getVerticalAlignmentPadding(cellStyle, rectangle, contentHeight)
                             + this.spacing;
 
-                    // check and draw underline and strikethrough separately
-                    // so it is possible to combine both
                     if (underline) {
-                        // y = start y of text + font height
-                        // - half of the font descent so the underline is
-                        // between the baseline and the bottom
-                        final int underlineY = y + fontHeight - (gc.getFontMetrics().getDescent() / 2);
-                        gc.drawLine(x, underlineY, x + length, underlineY);
+                        final int underlineY = yTextStart + fontHeight - (gc.getFontMetrics().getDescent() / 2);
+                        gc.drawLine(xTextStart, underlineY, xTextStart + length, underlineY);
                     }
-
                     if (strikethrough) {
-                        // y = start y of text + half of font height +
-                        // ascent
-                        // this way lower case characters are also
-                        // strikethrough
-                        final int strikeY = y + (fontHeight / 2) + (gc.getFontMetrics().getLeading() / 2);
-                        gc.drawLine(x, strikeY, x + length, strikeY);
+                        final int strikeY = yTextStart + (fontHeight / 2) + (gc.getFontMetrics().getLeading() / 2);
+                        gc.drawLine(xTextStart, strikeY, xTextStart + length, strikeY);
                     }
                 }
             }
