@@ -120,6 +120,17 @@ public class SettingTable extends ARobotSectionTable {
         return Collections.unmodifiableList(documentations);
     }
 
+    public SuiteDocumentation newSuiteDocumentation() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_DOCUMENTATION_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        SuiteDocumentation suiteDoc = new SuiteDocumentation(dec);
+        addDocumentation(suiteDoc);
+
+        return suiteDoc;
+    }
+
     public void addDocumentation(final SuiteDocumentation doc) {
         doc.setParent(this);
         documentations.add(doc);
@@ -164,6 +175,17 @@ public class SettingTable extends ARobotSectionTable {
 
     public List<SuiteSetup> getSuiteSetups() {
         return Collections.unmodifiableList(suiteSetups);
+    }
+
+    public SuiteSetup newSuiteSetup() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        SuiteSetup suiteSetup = new SuiteSetup(dec);
+        addSuiteSetup(suiteSetup);
+
+        return suiteSetup;
     }
 
     public void addSuiteSetup(final SuiteSetup suiteSetup) {
