@@ -10,7 +10,9 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordTeardown extends AKeywordBaseSetting<UserKeyword> {
 
@@ -29,5 +31,15 @@ public class KeywordTeardown extends AKeywordBaseSetting<UserKeyword> {
         settings.addAll(getParent().getTeardowns());
 
         return settings;
+    }
+
+    @Override
+    public IRobotTokenType getKeywordNameType() {
+        return RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_NAME;
+    }
+
+    @Override
+    public IRobotTokenType getArgumentType() {
+        return RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT;
     }
 }

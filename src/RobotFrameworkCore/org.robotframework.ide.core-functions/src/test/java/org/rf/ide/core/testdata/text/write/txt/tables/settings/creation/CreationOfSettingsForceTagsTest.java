@@ -5,20 +5,12 @@
  */
 package org.rf.ide.core.testdata.text.write.txt.tables.settings.creation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.nio.file.Path;
-
 import org.junit.Test;
-import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.rf.ide.core.testdata.text.write.DumperTestHelper;
-import org.rf.ide.core.testdata.text.write.DumperTestHelper.TextCompareResult;
+import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class CreationOfSettingsForceTagsTest {
 
@@ -27,42 +19,25 @@ public class CreationOfSettingsForceTagsTest {
     @Test
     public void test_emptyFile_and_thanCreateForceTags() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile(PRETTY_NEW_DIR_LOCATION + "EmptyForceTagsDeclarationOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyForceTagsDeclarationOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         settingTable.newForceTag();
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateForceTagsWithThreeTags() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile(PRETTY_NEW_DIR_LOCATION + "ForceTagsWithThreeTagsOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "ForceTagsWithThreeTagsOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final ForceTags newForceTag = settingTable.newForceTag();
@@ -76,29 +51,17 @@ public class CreationOfSettingsForceTagsTest {
         newForceTag.addTag(tagTwo);
         newForceTag.addTag(tagThree);
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateForceTagsWithThreeComments() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile(PRETTY_NEW_DIR_LOCATION + "ForceTagsWithThreeCommentOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        fileContent.replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "ForceTagsWithThreeCommentOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final ForceTags newForceTag = settingTable.newForceTag();
@@ -112,28 +75,17 @@ public class CreationOfSettingsForceTagsTest {
         newForceTag.addCommentPart(commentTwo);
         newForceTag.addCommentPart(commentThree);
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateForceTagsWithThreeCommentsAndTags() throws Exception {
         // prepare
-        final Path inputFile = DumperTestHelper.getINSTANCE()
-                .getFile(PRETTY_NEW_DIR_LOCATION + "ForceTagsWithThreeTagsAndCommentsOnly.txt");
-        final String fileContent = DumperTestHelper.getINSTANCE()
-                .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
-        final RobotFileDumper dumper = new RobotFileDumper();
-        final RobotFileOutput created = new RobotFileOutput(RobotVersion.from("2.9"));
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "ForceTagsWithThreeTagsAndCommentsOnly.txt";
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
-        final RobotFile modelFile = created.getFileModel();
         modelFile.includeSettingTableSection();
         final SettingTable settingTable = modelFile.getSettingTable();
         final ForceTags newForceTag = settingTable.newForceTag();
@@ -157,12 +109,7 @@ public class CreationOfSettingsForceTagsTest {
         newForceTag.addCommentPart(commentTwo);
         newForceTag.addCommentPart(commentThree);
 
-        // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
-
         // verify
-        final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
-
-        assertThat(cmpResult.report()).isNull();
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 }
