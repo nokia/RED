@@ -28,7 +28,7 @@ public class KeywordTagsDumper extends AExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME, 1, keywordTags.getTags());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
                 getElementHelper().filter(keywordTags.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
                 getElementHelper().filter(keywordTags.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
