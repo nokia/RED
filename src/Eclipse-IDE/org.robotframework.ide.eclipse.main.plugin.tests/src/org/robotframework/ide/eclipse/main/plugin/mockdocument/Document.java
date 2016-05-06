@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.mockdocument;
 
+import java.util.List;
+
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.BadPositionCategoryException;
 import org.eclipse.jface.text.IDocument;
@@ -17,7 +19,6 @@ import org.eclipse.jface.text.ITypedRegion;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.Region;
 
-
 /**
  * @author Michal Anglart
  *
@@ -26,8 +27,20 @@ public class Document implements IDocument {
 
     private StringBuilder documentText;
 
+    public Document(final IDocument document) {
+        this(document.get());
+    }
+
     public Document(final String content) {
         this.documentText = new StringBuilder(content);
+    }
+
+    public Document(final List<String> content) {
+        this.documentText = new StringBuilder();
+        for (final String line : content) {
+            this.documentText.append(line);
+            this.documentText.append("\n");
+        }
     }
 
     public Document(final String firstLine, final String... lines) {
@@ -65,7 +78,7 @@ public class Document implements IDocument {
     @Override
     public String get(final int offset, final int length) throws BadLocationException {
         assertOffsetWithinLimits(offset);
-        assertOffsetWithinLimits(offset + length);
+        assertOffsetWithinLimits(Math.max(0, offset + length - 1));
 
         return documentText.substring(offset, offset + length);
     }
@@ -78,7 +91,7 @@ public class Document implements IDocument {
     @Override
     public void replace(final int offset, final int length, final String text) throws BadLocationException {
         assertOffsetWithinLimits(offset);
-        assertOffsetWithinLimits(offset + length);
+        assertOffsetWithinLimits(Math.max(0, offset + length - 1));
 
         documentText.replace(offset, offset + length, text);
     }
@@ -231,7 +244,7 @@ public class Document implements IDocument {
         assertOffsetWithinLimits(offset);
 
         int noOfLines = 0;
-        for (int i = 0; i <= offset; i++) {
+        for (int i = 0; i < offset; i++) {
             if (documentText.charAt(i) == '\n') {
                 noOfLines++;
             }
@@ -278,7 +291,7 @@ public class Document implements IDocument {
     @Override
     public int getNumberOfLines(final int offset, final int length) throws BadLocationException {
         assertOffsetWithinLimits(offset);
-        assertOffsetWithinLimits(offset + length);
+        assertOffsetWithinLimits(Math.max(0, offset + length - 1));
 
         int noOfLines = 0;
         for (int i = offset; i < offset + length; i++) {
@@ -302,12 +315,12 @@ public class Document implements IDocument {
 
     @Override
     public String[] getLegalLineDelimiters() {
-        return new String[] { "\\n" };
+        return new String[] { "\n" };
     }
 
     @Override
     public String getLineDelimiter(final int line) throws BadLocationException {
-        return "\\n";
+        return "\n";
     }
 
     @Override
@@ -316,4 +329,22 @@ public class Document implements IDocument {
         return 0;
     }
 
+    @Override
+    public String toString() {
+        return documentText.toString();
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof Document) {
+            final Document that = (Document) obj;
+            return this.get().equals(that.get());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return documentText.hashCode();
+    }
 }
