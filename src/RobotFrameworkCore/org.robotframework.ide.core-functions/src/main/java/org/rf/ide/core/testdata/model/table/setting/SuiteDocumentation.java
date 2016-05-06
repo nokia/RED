@@ -14,62 +14,56 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class SuiteDocumentation extends AModelElement<SettingTable> {
 
     private final RobotToken declaration;
-    private final List<RobotToken> text = new ArrayList<>();
-    private final List<RobotToken> comment = new ArrayList<>();
 
+    private final List<RobotToken> text = new ArrayList<>();
+
+    private final List<RobotToken> comment = new ArrayList<>();
 
     public SuiteDocumentation(final RobotToken declaration) {
         this.declaration = declaration;
     }
 
-
     public void addDocumentationText(final RobotToken token) {
+        fixForTheType(token, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
         text.add(token);
     }
-
 
     public List<RobotToken> getDocumentationText() {
         return Collections.unmodifiableList(text);
     }
 
-
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
-
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
-
 
     public RobotToken getDeclaration() {
         return declaration;
     }
-
 
     @Override
     public boolean isPresent() {
         return (getDeclaration() != null);
     }
 
-
     @Override
     public ModelType getModelType() {
         return ModelType.SUITE_DOCUMENTATION;
     }
 
-
     @Override
     public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {

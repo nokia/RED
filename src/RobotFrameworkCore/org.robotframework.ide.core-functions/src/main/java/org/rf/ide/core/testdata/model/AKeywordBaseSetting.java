@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
@@ -41,6 +42,9 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
     }
 
     public void setKeywordName(final RobotToken keywordName) {
+        if (keywordName != null) {
+            fixForTheType(keywordName, getKeywordNameType());
+        }
         this.keywordName = keywordName;
     }
 
@@ -49,6 +53,9 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
     }
 
     public void addArgument(final RobotToken argument) {
+        if (argument != null) {
+            fixForTheType(argument, getArgumentType());
+        }
         arguments.add(argument);
     }
 
@@ -57,6 +64,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
     }
 
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
 
@@ -107,4 +115,8 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
 
         return execRow;
     }
+
+    public abstract IRobotTokenType getKeywordNameType();
+
+    public abstract IRobotTokenType getArgumentType();
 }
