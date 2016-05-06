@@ -17,6 +17,7 @@ import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
+import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
@@ -82,6 +83,17 @@ public class SettingTable extends ARobotSectionTable {
         return libImp;
     }
 
+    public ResourceImport newResourceImport() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_RESOURCE_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        ResourceImport resImp = new ResourceImport(dec);
+        addImported(resImp);
+
+        return resImp;
+    }
+
     public void addImported(final AImported imported) {
         imported.setParent(this);
         imports.add(imported);
@@ -115,6 +127,17 @@ public class SettingTable extends ARobotSectionTable {
 
     public List<Metadata> getMetadatas() {
         return Collections.unmodifiableList(metadatas);
+    }
+
+    public Metadata newMetadata() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_METADATA_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        Metadata metadata = new Metadata(dec);
+        addMetadata(metadata);
+
+        return metadata;
     }
 
     public void addMetadata(final Metadata metadata) {
