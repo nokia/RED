@@ -40,7 +40,7 @@ public class ResourceImportDumper extends ANotExecutableTableElementDumper {
                 resource.getUnexpectedTrashArguments());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
                 getElementHelper().filter(resource.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
                 getElementHelper().filter(resource.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;

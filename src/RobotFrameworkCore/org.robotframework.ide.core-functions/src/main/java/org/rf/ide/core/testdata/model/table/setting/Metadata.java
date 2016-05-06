@@ -14,73 +14,71 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class Metadata extends AModelElement<SettingTable> {
 
     private final RobotToken declaration;
-    private RobotToken key;
-    private final List<RobotToken> values = new ArrayList<>();
-    private final List<RobotToken> comment = new ArrayList<>();
 
+    private RobotToken key;
+
+    private final List<RobotToken> values = new ArrayList<>();
+
+    private final List<RobotToken> comment = new ArrayList<>();
 
     public Metadata(final RobotToken declaration) {
         this.declaration = declaration;
     }
 
-
     public void setKey(final RobotToken key) {
+        if (key != null) {
+            fixForTheType(key, RobotTokenType.SETTING_METADATA_KEY);
+        }
         this.key = key;
     }
-
 
     public RobotToken getKey() {
         return key;
     }
 
-
     public void addValue(final RobotToken value) {
+        if (value != null) {
+            fixForTheType(value, RobotTokenType.SETTING_METADATA_VALUE);
+        }
         this.values.add(value);
     }
-
 
     public List<RobotToken> getValues() {
         return Collections.unmodifiableList(values);
     }
 
-
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
-
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
-
 
     public RobotToken getDeclaration() {
         return declaration;
     }
-
 
     @Override
     public boolean isPresent() {
         return (getDeclaration() != null);
     }
 
-
     @Override
     public ModelType getModelType() {
         return ModelType.METADATA_SETTING;
     }
 
-
     @Override
     public FilePosition getBeginPosition() {
         return getDeclaration().getFilePosition();
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {

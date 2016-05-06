@@ -31,6 +31,18 @@ public class LibraryImport extends AImported {
         this.alias = alias;
     }
 
+    public LibraryAlias newAlias() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_LIBRARY_ALIAS
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
+                .getRepresentation());
+
+        LibraryAlias libAlias = new LibraryAlias(dec);
+        setAlias(libAlias);
+
+        return libAlias;
+    }
+
     public List<RobotToken> getArguments() {
         return Collections.unmodifiableList(arguments);
     }
@@ -46,7 +58,7 @@ public class LibraryImport extends AImported {
 
     @Override
     public boolean isPresent() {
-        return true; // TODO: check if correct imported
+        return true;
     }
 
     @Override

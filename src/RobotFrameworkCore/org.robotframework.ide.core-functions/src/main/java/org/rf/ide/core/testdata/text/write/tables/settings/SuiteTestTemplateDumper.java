@@ -39,7 +39,7 @@ public class SuiteTestTemplateDumper extends ANotExecutableTableElementDumper {
                 testTemplate.getUnexpectedTrashArguments());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
                 getElementHelper().filter(testTemplate.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
                 getElementHelper().filter(testTemplate.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
