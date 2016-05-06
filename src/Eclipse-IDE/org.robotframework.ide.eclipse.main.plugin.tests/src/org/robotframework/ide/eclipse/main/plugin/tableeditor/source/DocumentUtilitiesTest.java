@@ -175,7 +175,7 @@ public class DocumentUtilitiesTest {
     public void snippetContainsLinesAroundGivenOne_4() throws BadLocationException {
         final IDocument document = new Document("line1", "line2", "line3", "line4", "line5");
 
-        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 17, 2);
+        final Optional<IRegion> snippet = DocumentUtilities.getSnippet(document, 18, 2);
 
         assertThat(snippet.isPresent()).isTrue();
         assertThat(document.get(snippet.get().getOffset(), snippet.get().getLength()))

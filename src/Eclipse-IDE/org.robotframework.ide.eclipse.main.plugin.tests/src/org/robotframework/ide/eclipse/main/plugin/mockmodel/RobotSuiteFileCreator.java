@@ -27,6 +27,11 @@ public class RobotSuiteFileCreator {
         return this;
     }
 
+    public RobotSuiteFileCreator appendLines(final List<String> lines) {
+        this.lines.addAll(lines);
+        return this;
+    }
+
     public RobotSuiteFile build() {
         final String content = Joiner.on('\n').join(lines);
         final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
