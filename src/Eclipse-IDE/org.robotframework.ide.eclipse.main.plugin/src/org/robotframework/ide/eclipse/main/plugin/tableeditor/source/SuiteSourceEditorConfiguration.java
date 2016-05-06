@@ -75,7 +75,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Sect
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SettingsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToFilesDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToKeywordsDetector;
@@ -208,7 +208,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
-        final VariablesDefinitionsProcessor variableDefsAssistProcessor = new VariablesDefinitionsProcessor(assistContext);
+        final VariablesDefinitionsAssistProcessor variableDefsAssistProcessor = new VariablesDefinitionsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(variableDefsAssistProcessor,
@@ -283,7 +283,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final GeneralSettingsAssistProcessor generalSettingNamesProcessor = new GeneralSettingsAssistProcessor(
                 assistContext);
-        final VariablesDefinitionsProcessor variableDefsAssistProcessor = new VariablesDefinitionsProcessor(
+        final VariablesDefinitionsAssistProcessor variableDefsAssistProcessor = new VariablesDefinitionsAssistProcessor(
                 assistContext);
         final LibrariesImportAssistProcessor libraryImportsProcessor = new LibrariesImportAssistProcessor(
                 assistContext);
