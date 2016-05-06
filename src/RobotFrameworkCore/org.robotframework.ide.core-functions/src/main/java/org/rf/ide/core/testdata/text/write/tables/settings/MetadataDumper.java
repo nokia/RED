@@ -38,7 +38,7 @@ public class MetadataDumper extends ANotExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(RobotTokenType.SETTING_METADATA_VALUE, 2, metadata.getValues());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
                 getElementHelper().filter(metadata.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
                 getElementHelper().filter(metadata.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
