@@ -35,13 +35,13 @@ import com.google.common.base.Splitter;
  * @author Michal Anglart
  *
  */
-public class VariablesDefinitionsProcessor extends RedContentAssistProcessor {
+public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcessor {
 
     private static final Collection<VarDef> VARIABLE_DEFS = EnumSet.allOf(VarDef.class);
 
     private final SuiteSourceAssistantContext assist;
 
-    public VariablesDefinitionsProcessor(final SuiteSourceAssistantContext assist) {
+    public VariablesDefinitionsAssistProcessor(final SuiteSourceAssistantContext assist) {
         this.assist = assist;
     }
 
