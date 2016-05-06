@@ -26,6 +26,7 @@ import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.setting.UnknownSetting;
+import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -92,6 +93,17 @@ public class SettingTable extends ARobotSectionTable {
         addImported(resImp);
 
         return resImp;
+    }
+
+    public VariablesImport newVariablesImport() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_VARIABLES_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        VariablesImport varImp = new VariablesImport(dec);
+        addImported(varImp);
+
+        return varImp;
     }
 
     public void addImported(final AImported imported) {
@@ -197,6 +209,17 @@ public class SettingTable extends ARobotSectionTable {
         return Collections.unmodifiableList(suiteTeardowns);
     }
 
+    public SuiteTeardown newSuiteTeardown() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        SuiteTeardown suiteTeardown = new SuiteTeardown(dec);
+        addSuiteTeardown(suiteTeardown);
+
+        return suiteTeardown;
+    }
+
     public void addSuiteTeardown(final SuiteTeardown suiteTeardown) {
         suiteTeardown.setParent(this);
         suiteTeardowns.add(suiteTeardown);
@@ -246,6 +269,17 @@ public class SettingTable extends ARobotSectionTable {
         return Collections.unmodifiableList(testSetups);
     }
 
+    public TestSetup newTestSetup() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_TEST_SETUP_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        TestSetup testSetup = new TestSetup(dec);
+        addTestSetup(testSetup);
+
+        return testSetup;
+    }
+
     public void addTestSetup(final TestSetup testSetup) {
         testSetup.setParent(this);
         testSetups.add(testSetup);
@@ -253,6 +287,17 @@ public class SettingTable extends ARobotSectionTable {
 
     public List<TestTeardown> getTestTeardowns() {
         return Collections.unmodifiableList(testTeardowns);
+    }
+
+    public TestTeardown newTestTeardown() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        TestTeardown testTeardown = new TestTeardown(dec);
+        addTestTeardown(testTeardown);
+
+        return testTeardown;
     }
 
     public void addTestTeardown(final TestTeardown testTeardown) {
@@ -285,6 +330,17 @@ public class SettingTable extends ARobotSectionTable {
         return testTemplates.size() != 1;
     }
 
+    public TestTemplate newTestTemplate() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        TestTemplate testTemplate = new TestTemplate(dec);
+        addTestTemplate(testTemplate);
+
+        return testTemplate;
+    }
+
     public void addTestTemplate(final TestTemplate testTemplate) {
         testTemplate.setParent(this);
         testTemplates.add(testTemplate);
@@ -292,6 +348,17 @@ public class SettingTable extends ARobotSectionTable {
 
     public List<TestTimeout> getTestTimeouts() {
         return Collections.unmodifiableList(testTimeouts);
+    }
+
+    public TestTimeout newTestTimeout() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
+
+        TestTimeout testTimeout = new TestTimeout(dec);
+        addTestTimeout(testTimeout);
+
+        return testTimeout;
     }
 
     public void addTestTimeout(final TestTimeout testTimeout) {
