@@ -39,7 +39,7 @@ public class SectionsAssistProcessorTest {
     }
 
     @Test
-    public void varDefsProcessorHasTitleDefined() {
+    public void sectionsProcessorProcessorHasTitleDefined() {
         final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant());
         assertThat(processor.getProposalsTitle()).isNotNull().isNotEmpty();
     }
