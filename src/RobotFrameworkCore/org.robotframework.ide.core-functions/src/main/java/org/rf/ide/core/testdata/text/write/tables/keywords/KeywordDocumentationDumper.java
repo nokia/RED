@@ -29,7 +29,7 @@ public class KeywordDocumentationDumper extends AExecutableTableElementDumper {
                 keywordDoc.getDocumentationText());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
                 getElementHelper().filter(keywordDoc.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
                 getElementHelper().filter(keywordDoc.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;

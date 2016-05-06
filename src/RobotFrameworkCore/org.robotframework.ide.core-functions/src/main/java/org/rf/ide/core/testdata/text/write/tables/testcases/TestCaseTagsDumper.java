@@ -28,7 +28,7 @@ public class TestCaseTagsDumper extends AExecutableTableElementDumper {
         sorter.addPresaveSequenceForType(RobotTokenType.TEST_CASE_SETTING_TAGS, 1, testTags.getTags());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
                 getElementHelper().filter(testTags.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
                 getElementHelper().filter(testTags.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
