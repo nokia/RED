@@ -29,7 +29,7 @@ public class TestCaseDocumentationDumper extends AExecutableTableElementDumper {
                 testDoc.getDocumentationText());
         sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
                 getElementHelper().filter(testDoc.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 2,
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
                 getElementHelper().filter(testDoc.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
