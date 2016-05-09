@@ -50,7 +50,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected List<String> getValidContentTypes() {
+    protected List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION);
     }
@@ -219,7 +219,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
     protected boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
-        return isInProperContentType(document, offset)
+        return isInApplicableContentType(document, offset)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) > 0;
     }
 }

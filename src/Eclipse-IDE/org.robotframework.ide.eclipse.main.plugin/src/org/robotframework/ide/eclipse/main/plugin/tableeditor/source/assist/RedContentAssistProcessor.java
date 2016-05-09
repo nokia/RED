@@ -20,7 +20,7 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
 
     protected abstract String getProposalsTitle();
 
-    protected abstract List<String> getValidContentTypes();
+    protected abstract List<String> getApplicableContentTypes();
 
     @Override
     public final ICompletionProposal[] computeCompletionProposals(final ITextViewer viewer, final int offset) {
@@ -30,14 +30,14 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
 
     protected abstract List<? extends ICompletionProposal> computeProposals(ITextViewer viewer, int offset);
 
-    protected final boolean isInProperContentType(final IDocument document, final int offset)
+    protected final boolean isInApplicableContentType(final IDocument document, final int offset)
             throws BadLocationException {
         // it is valid to show those proposals when we are in variables content type or in default
         // section at the end of document when previous content type is a variable table
         final String contentType = document.getContentType(offset);
-        return getValidContentTypes().contains(contentType)
+        return getApplicableContentTypes().contains(contentType)
                 || (contentType == IDocument.DEFAULT_CONTENT_TYPE && offset > 0 && offset == document.getLength()
-                        && getValidContentTypes().contains(document.getContentType(offset - 1)));
+                        && getApplicableContentTypes().contains(document.getContentType(offset - 1)));
     }
 
     protected final String getVirtualContentType(final IDocument document, final int offset)

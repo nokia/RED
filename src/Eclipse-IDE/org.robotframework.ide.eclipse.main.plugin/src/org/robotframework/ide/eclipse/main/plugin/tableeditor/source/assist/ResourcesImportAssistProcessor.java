@@ -39,7 +39,7 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected List<String> getValidContentTypes() {
+    protected List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
@@ -97,7 +97,7 @@ public class ResourcesImportAssistProcessor extends RedContentAssistProcessor {
 
     private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
-        return isInProperContentType(document, offset) && lineContent.toLowerCase().startsWith("resource")
+        return isInApplicableContentType(document, offset) && lineContent.toLowerCase().startsWith("resource")
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1;
     }
 
