@@ -183,10 +183,12 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     @Override
     public Position getPosition() {
-        final FilePosition begin = testCase.getBeginPosition();
-        final FilePosition end = testCase.getEndPosition();
-
-        return new Position(begin.getOffset(), end.getOffset() - begin.getOffset());
+        if (testCase != null) {
+            final FilePosition begin = testCase.getBeginPosition();
+            final FilePosition end = testCase.getEndPosition();
+            return new Position(begin.getOffset(), end.getOffset() - begin.getOffset());
+        }
+        return new Position(0);
     }
 
     @Override
