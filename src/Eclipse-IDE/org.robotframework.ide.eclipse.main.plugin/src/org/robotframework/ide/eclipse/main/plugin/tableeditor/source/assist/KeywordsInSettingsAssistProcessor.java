@@ -26,14 +26,14 @@ public class KeywordsInSettingsAssistProcessor extends KeywordCallsAssistProcess
     }
 
     @Override
-    protected List<String> getValidContentTypes() {
+    protected List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
     @Override
     protected boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
-        return isInProperContentType(document, offset)
+        return isInApplicableContentType(document, offset)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1
                 && (lineContent.toLowerCase().startsWith("suite setup")
                 || lineContent.toLowerCase().startsWith("suite teardown")
