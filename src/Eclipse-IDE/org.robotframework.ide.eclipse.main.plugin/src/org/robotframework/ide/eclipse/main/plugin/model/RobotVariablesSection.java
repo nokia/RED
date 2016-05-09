@@ -18,7 +18,7 @@ import com.google.common.collect.Lists;
 public class RobotVariablesSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Variables";
-    
+
     RobotVariablesSection(final RobotSuiteFile parent) {
         super(parent, SECTION_NAME);
     }
@@ -32,21 +32,21 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
     }
 
     public RobotVariable createVariable(final int index, final VariableType variableType, final String name) {
-        if(variableType == VariableType.SCALAR) {
-            getTable().createScalarVariable(index, name, Lists.<String> newArrayList(), "");
-        } else if(variableType == VariableType.LIST) {
-            getTable().createListVariable(index, name, Lists.<String> newArrayList(), "");
+        if (variableType == VariableType.SCALAR) {
+            getTable().createScalarVariable(index, name, Lists.<String> newArrayList());
+        } else if (variableType == VariableType.LIST) {
+            getTable().createListVariable(index, name, Lists.<String> newArrayList());
         } else if (variableType == VariableType.DICTIONARY) {
-            getTable().createDictionaryVariable(index, name, new HashMap<String, String>(), "");
+            getTable().createDictionaryVariable(index, name, new HashMap<String, String>());
         }
 
         final IVariableHolder newVariableHolder = getTable().getVariables().get(index);
         final RobotVariable robotVariable = new RobotVariable(this, newVariableHolder);
         elements.add(index, robotVariable);
-        
+
         return robotVariable;
     }
-    
+
     @Override
     public void link(final ARobotSectionTable table) {
         super.link(table);
