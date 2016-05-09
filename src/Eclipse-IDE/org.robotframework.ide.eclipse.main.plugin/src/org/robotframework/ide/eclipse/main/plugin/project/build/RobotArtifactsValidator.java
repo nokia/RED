@@ -239,7 +239,8 @@ public class RobotArtifactsValidator {
 
     private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource,
             final boolean isRevalidating) {
-        if (resource.getType() == IResource.FILE && !isInsideEclipseHiddenDirectory(resource)
+        if (robotProjectConfig != null && resource.getType() == IResource.FILE
+                && !isInsideEclipseHiddenDirectory(resource)
                 && hasRequiredFileSize(robotProjectConfig, resource, isRevalidating)) {
             final List<ExcludedFolderPath> excludedPaths = robotProjectConfig.getExcludedPath();
             for (final ExcludedFolderPath excludedPath : excludedPaths) {
