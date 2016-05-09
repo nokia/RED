@@ -440,7 +440,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
             final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription,
             final VariableDeclaration variableDeclaration) {
         return isInvalidVariableDeclaration(definedVariables, variableDeclaration)
-                && !isVariableInSetterOrCommentKeyword(lineDescription, validationContext, definedVariables);
+                && !isVariableInSetterOrGetterOrCommentKeyword(validationContext, definedVariables, lineDescription, variableDeclaration);
     }
 
     private static boolean isSpecificVariableDeclaration(final Set<String> definedVariables,
@@ -449,13 +449,19 @@ class TestCaseTableValidator implements ModelUnitValidator {
                 || VariableNamesSupport.isDefinedVariableInsideComputation(variableDeclaration, definedVariables);
     }
 
-    private static boolean isVariableInSetterOrCommentKeyword(final IExecutableRowDescriptor<?> lineDescription,
-            final FileValidationContext validationContext, final Set<String> definedVariables) {
+    private static boolean isVariableInSetterOrGetterOrCommentKeyword(final FileValidationContext validationContext,
+            final Set<String> definedVariables, final IExecutableRowDescriptor<?> lineDescription,
+            final VariableDeclaration variableDeclaration) {
         final String keywordName = QualifiedKeywordName.fromOccurrence(getKeyword(lineDescription)).getKeywordName();
         if (keywordName.equals("settestvariable") && isKeywordFromBuiltin(validationContext, keywordName)) {
             final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
             if (!usedVariables.isEmpty()) {
                 definedVariables.add(VariableNamesSupport.extractUnifiedVariableName(usedVariables.get(0).asToken().getText()));
+                return true;
+            }
+        } else if(keywordName.equals("getvariablevalue") && isKeywordFromBuiltin(validationContext, keywordName)) {
+            final List<VariableDeclaration> usedVariables = lineDescription.getUsedVariables();
+            if (!usedVariables.isEmpty() && usedVariables.get(0).equals(variableDeclaration)) {
                 return true;
             }
         } else if (keywordName.equals("comment") && isKeywordFromBuiltin(validationContext, keywordName)) {
