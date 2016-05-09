@@ -27,7 +27,7 @@ public class CombinedAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected List<String> getValidContentTypes() {
+    protected List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);

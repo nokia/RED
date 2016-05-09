@@ -40,7 +40,7 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected List<String> getValidContentTypes() {
+    protected List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
@@ -100,7 +100,7 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
 
     private boolean shouldShowProposals(final int offset, final IDocument document, final IRegion lineInformation)
             throws BadLocationException {
-        if (isInProperContentType(document, offset)) {
+        if (isInApplicableContentType(document, offset)) {
             if (offset != lineInformation.getOffset()) {
                 final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
                 return cellRegion.isPresent() && lineInformation.getOffset() == cellRegion.get().getOffset();

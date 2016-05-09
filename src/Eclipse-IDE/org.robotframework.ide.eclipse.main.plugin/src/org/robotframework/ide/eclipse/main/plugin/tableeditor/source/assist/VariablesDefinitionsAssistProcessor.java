@@ -46,7 +46,7 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
     }
 
     @Override
-    protected List<String> getValidContentTypes() {
+    protected List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
@@ -107,7 +107,7 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
 
     private boolean shouldShowProposals(final int offset, final IDocument document, final IRegion lineInformation)
             throws BadLocationException {
-        if (isInProperContentType(document, offset)) {
+        if (isInApplicableContentType(document, offset)) {
             // we only want to show those proposals in first cell of the line
             if (offset != lineInformation.getOffset()) {
                 final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
