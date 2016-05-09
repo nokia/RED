@@ -27,6 +27,10 @@ public class Document implements IDocument {
 
     private StringBuilder documentText;
 
+    public Document() {
+        this.documentText = new StringBuilder();
+    }
+
     public Document(final IDocument document) {
         this(document.get());
     }

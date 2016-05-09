@@ -33,7 +33,7 @@ public class SectionsAssistProcessorTest {
     @Test
     public void sectionsProcessorIsValidOnlyForVariablesSection() {
         final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant());
-        assertThat(processor.getValidContentTypes()).containsOnly(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
+        assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
