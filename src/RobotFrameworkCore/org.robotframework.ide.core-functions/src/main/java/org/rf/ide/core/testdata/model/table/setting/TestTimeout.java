@@ -44,9 +44,7 @@ public class TestTimeout extends AModelElement<SettingTable> {
     }
 
     public void setTimeout(final RobotToken timeout) {
-        if (timeout != null) {
-            fixForTheType(timeout, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
-        }
+        fixForTheType(timeout, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE, true);
         this.timeout = timeout;
     }
 
@@ -55,9 +53,7 @@ public class TestTimeout extends AModelElement<SettingTable> {
     }
 
     public void addMessageArgument(final RobotToken messageArgument) {
-        if (messageArgument != null) {
-            fixForTheType(messageArgument, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE);
-        }
+        fixForTheType(messageArgument, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE, true);
         this.message.add(messageArgument);
     }
 

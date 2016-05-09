@@ -110,6 +110,10 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
                 }
             }
         } else {
+            if (!wasSeparatorBefore(lines)) {
+                getDumperHelper().updateLine(model, lines,
+                        getDumperHelper().getSeparator(model, lines, lastToken, lastToken));
+            }
             getDumperHelper().updateLine(model, lines, elemDeclaration);
             lastToken = elemDeclaration;
         }
@@ -239,5 +243,20 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
                 }
             }
         }
+    }
+
+    private boolean wasSeparatorBefore(final List<RobotLine> lines) {
+        boolean result = false;
+        final int size = lines.size();
+        if (size > 0) {
+            final RobotLine line = lines.get(size - 1);
+            final List<IRobotLineElement> lineElements = line.getLineElements();
+            final int elemsInLine = lineElements.size();
+            if (elemsInLine > 0) {
+                final IRobotLineElement lastElement = lineElements.get(elemsInLine - 1);
+                result = (lastElement instanceof Separator);
+            }
+        }
+        return result;
     }
 }

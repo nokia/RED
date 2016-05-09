@@ -47,9 +47,7 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
     }
 
     public void setKeywordName(final RobotToken keywordName) {
-        if (keywordName != null) {
-            fixForTheType(keywordName, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
-        }
+        fixForTheType(keywordName, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME, true);
         this.keywordName = keywordName;
     }
 
@@ -59,9 +57,7 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
     }
 
     public void addUnexpectedTrashArgument(final RobotToken trashArgument) {
-        if (trashArgument != null) {
-            fixForTheType(trashArgument, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
-        }
+        fixForTheType(trashArgument, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, true);
         this.unexpectedTrashArguments.add(trashArgument);
     }
 

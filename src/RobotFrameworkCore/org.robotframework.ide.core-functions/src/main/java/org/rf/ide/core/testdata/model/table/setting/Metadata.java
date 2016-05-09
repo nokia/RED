@@ -31,9 +31,7 @@ public class Metadata extends AModelElement<SettingTable> {
     }
 
     public void setKey(final RobotToken key) {
-        if (key != null) {
-            fixForTheType(key, RobotTokenType.SETTING_METADATA_KEY);
-        }
+        fixForTheType(key, RobotTokenType.SETTING_METADATA_KEY, true);
         this.key = key;
     }
 
@@ -42,9 +40,7 @@ public class Metadata extends AModelElement<SettingTable> {
     }
 
     public void addValue(final RobotToken value) {
-        if (value != null) {
-            fixForTheType(value, RobotTokenType.SETTING_METADATA_VALUE);
-        }
+        fixForTheType(value, RobotTokenType.SETTING_METADATA_VALUE, true);
         this.values.add(value);
     }
 
