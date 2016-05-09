@@ -21,9 +21,7 @@ public class LibraryAlias extends AModelElement<LibraryImport> {
     private RobotToken libraryAlias;
 
     public LibraryAlias(final RobotToken aliasDeclaration) {
-        if (aliasDeclaration != null) {
-            fixForTheType(aliasDeclaration, RobotTokenType.SETTING_LIBRARY_ALIAS);
-        }
+        fixForTheType(aliasDeclaration, RobotTokenType.SETTING_LIBRARY_ALIAS, true);
         this.libraryAliasDeclaration = aliasDeclaration;
     }
 
@@ -32,9 +30,7 @@ public class LibraryAlias extends AModelElement<LibraryImport> {
     }
 
     public void setLibraryAlias(final RobotToken libraryAlias) {
-        if (libraryAlias != null) {
-            fixForTheType(libraryAlias, RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE);
-        }
+        fixForTheType(libraryAlias, RobotTokenType.SETTING_LIBRARY_ALIAS_VALUE, true);
         this.libraryAlias = libraryAlias;
     }
 

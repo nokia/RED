@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class KeywordTable extends ARobotSectionTable {
 
@@ -23,6 +24,16 @@ public class KeywordTable extends ARobotSectionTable {
     public void addKeyword(final UserKeyword keyword) {
         keyword.setParent(this);
         userKeywords.add(keyword);
+    }
+
+    public UserKeyword createUserKeyword(final String keywordName) {
+        RobotToken keyName = new RobotToken();
+        keyName.setText(keywordName);
+
+        UserKeyword uk = new UserKeyword(keyName);
+        addKeyword(uk);
+
+        return uk;
     }
 
     public void addKeyword(final UserKeyword keyword, final int position) {

@@ -64,7 +64,7 @@ public class RobotProjectHolder {
 
     @VisibleForTesting
     protected void initGlobalVariables() {
-        final Map<String, Object> variables = robotRuntime == null ? new HashMap<String, Object>()
+        final Map<String, Object> variables = robotRuntime == null ? new LinkedHashMap<String, Object>()
                 : robotRuntime.getGlobalVariables();
         globalVariables.addAll(map(variables));
     }
