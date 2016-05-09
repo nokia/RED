@@ -35,7 +35,7 @@ public class CombinedAssistProcessorTest {
         }
 
         @Override
-        protected List<String> getValidContentTypes() {
+        protected List<String> getApplicableContentTypes() {
             return newArrayList();
         }
 
