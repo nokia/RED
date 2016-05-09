@@ -72,8 +72,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         final VariableTable variableTable = modelFile.getVariableTable();
         Map<String, String> data = new HashMap<>();
 
-        variableTable.createDictionaryVariable(0, "&{dict}", data);
-        AVariable aVariable = variableTable.getVariables().get(variableTable.getVariables().size() - 1);
+        AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
         RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
         RobotToken cmTok2 = new RobotToken();
@@ -103,8 +102,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         data.put("key2", "value2");
         data.put("key3", "value3");
 
-        variableTable.createDictionaryVariable(0, "&{dict}", data);
-        AVariable aVariable = variableTable.getVariables().get(variableTable.getVariables().size() - 1);
+        AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
         RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
         RobotToken cmTok2 = new RobotToken();
