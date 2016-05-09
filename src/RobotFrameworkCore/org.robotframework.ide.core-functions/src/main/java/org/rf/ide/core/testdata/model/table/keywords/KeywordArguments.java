@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordArguments extends AModelElement<UserKeyword> {
 
@@ -23,6 +24,7 @@ public class KeywordArguments extends AModelElement<UserKeyword> {
     private final List<RobotToken> comment = new ArrayList<>();
 
     public KeywordArguments(final RobotToken declaration) {
+        fixForTheType(declaration, RobotTokenType.KEYWORD_SETTING_ARGUMENTS, true);
         this.declaration = declaration;
     }
 
@@ -41,6 +43,7 @@ public class KeywordArguments extends AModelElement<UserKeyword> {
     }
 
     public void addArgument(final RobotToken argument) {
+        fixForTheType(argument, RobotTokenType.KEYWORD_SETTING_ARGUMENT);
         arguments.add(argument);
     }
 
@@ -49,6 +52,7 @@ public class KeywordArguments extends AModelElement<UserKeyword> {
     }
 
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
 
