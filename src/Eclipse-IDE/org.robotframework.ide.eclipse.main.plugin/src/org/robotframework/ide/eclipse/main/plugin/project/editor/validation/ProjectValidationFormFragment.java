@@ -272,7 +272,9 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         } catch (final CoreException e) {
             throw new IllegalStateException("Unable to read project structure", e);
         } finally {
-            viewer.getTree().setRedraw(true);
+            if (viewer.getTree() != null && !viewer.getTree().isDisposed()) {
+                viewer.getTree().setRedraw(true);
+            }
         }
     }
 
