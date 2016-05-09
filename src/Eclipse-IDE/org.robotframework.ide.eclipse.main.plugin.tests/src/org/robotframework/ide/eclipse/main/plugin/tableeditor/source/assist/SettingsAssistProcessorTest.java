@@ -42,7 +42,7 @@ public class SettingsAssistProcessorTest {
     @Test
     public void settingsProcessorIsValidOnlyForVariablesSection() {
         final SettingsAssistProcessor processor = new SettingsAssistProcessor(createAssitant());
-        assertThat(processor.getValidContentTypes()).containsOnly(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
+        assertThat(processor.getApplicableContentTypes()).containsOnly(SuiteSourcePartitionScanner.TEST_CASES_SECTION,
                 SuiteSourcePartitionScanner.KEYWORDS_SECTION);
     }
 
