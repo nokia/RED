@@ -178,12 +178,14 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
             @Override
             public void verifyText(final VerifyEvent e) {
                 final String string = e.text;
-                final char[] chars = new char[string.length()];
-                string.getChars(0, chars.length, chars, 0);
-                for (int i = 0; i < chars.length; i++) {
-                    if (!('0' <= chars[i] && chars[i] <= '9')) {
-                        e.doit = false;
-                        return;
+                if (string != null) {
+                    final char[] chars = new char[string.length()];
+                    string.getChars(0, chars.length, chars, 0);
+                    for (int i = 0; i < chars.length; i++) {
+                        if (!('0' <= chars[i] && chars[i] <= '9')) {
+                            e.doit = false;
+                            return;
+                        }
                     }
                 }
             }
