@@ -94,7 +94,7 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
 
                 result = Integer.compare(typeO1hierarchy, typeO2hierarchy);
                 if (posComperatorResult != ECompareResult.EQUAL_TO.getValue()) {
-                    if (!o1.getFilePosition().isNotSet() && !o2.getFilePosition().isNotSet()) {
+                    if (isBothWithPositionSet(o1, o2)) {
                         result = posComperatorResult;
                     }
                 }
@@ -108,6 +108,10 @@ public class RobotElementsComparatorWithPositionChangedPresave implements Compar
         }
 
         return result;
+    }
+
+    private boolean isBothWithPositionSet(final IRobotLineElement o1, final IRobotLineElement o2) {
+        return !o1.getFilePosition().isNotSet() && !o2.getFilePosition().isNotSet();
     }
 
     public List<RobotToken> getTokensInElement() {
