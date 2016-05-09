@@ -77,11 +77,13 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
 
     public List<Position> getPositions() {
         final List<Position> positions = newArrayList();
-        for (final TableHeader<? extends ARobotSectionTable> header : sectionTable.getHeaders()) {
-            final FilePosition begin = header.getBeginPosition();
-            final FilePosition end = header.getEndPosition();
+        if (sectionTable != null) {
+            for (final TableHeader<? extends ARobotSectionTable> header : sectionTable.getHeaders()) {
+                final FilePosition begin = header.getBeginPosition();
+                final FilePosition end = header.getEndPosition();
 
-            positions.add(new Position(begin.getOffset(), end.getOffset() - begin.getOffset()));
+                positions.add(new Position(begin.getOffset(), end.getOffset() - begin.getOffset()));
+            }
         }
         return positions;
     }
