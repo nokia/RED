@@ -113,6 +113,12 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
         this.currentModel = currentModel;
     }
 
+    /**
+     * New keyword types are common for test case's and suite's setups/teardowns, so additionally
+     * presence of TestCase object should be checked.
+     * Since Robot 3.0 a2, keywords inside setup/teardown keyword, are carrying main keyword type -
+     * 'Keyword'.
+     */
     enum SetupTeardownKeywordTypes {
         TESTCASE_SETUP("Test Setup"),
         TESTCASE_TEARDOWN("Test Teardown"),
@@ -120,7 +126,6 @@ public class SetupTeardownExecutableRowFinder implements IRobotExecutableRowFind
         SUITE_TEARDOWN("Suite Teardown"),
         NEW_SETUP("Setup"), // since Robot 3.0 a2
         NEW_TEARDOWN("Teardown"); // since Robot 3.0 a2 
-        //new keyword types are common for test cases and suites setups/teardowns, so additionally TestCase object should be checked
 
         private String typeName;
 

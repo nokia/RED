@@ -213,23 +213,13 @@ public class RobotDebugEventDispatcher extends Job {
     private void handleStartKeywordEvent(final Map<String, ?> eventMap) {
         final List<?> startList = (List<?>) eventMap.get("start_keyword");
         final String currentKeywordName = (String) startList.get(0);
-        final Map<?, ?> startElements = (Map<?, ?>) startList.get(1);
-        final String keywordType = (String) startElements.get("type");
-        if (keywordExecutionManager.getCurrentSuiteFile() == null
-                && !executionContext.isSuiteSetupTeardownKeyword(keywordType)) {
-            String message = "Missing suite file for execution";
-            if (keywordExecutionManager.getCurrentSuiteName() != null) {
-                message += ", current suite name: '" + keywordExecutionManager.getCurrentSuiteName() + "'";
-            }
-            message += ", current keyword: '" + currentKeywordName + "' type='" + keywordType + "' args=" + ((List<String>) startElements.get("args"));
-            showError("Robot Event Dispatcher Error", message);
-            throw new MissingFileToExecuteException(message);
-        }
-        if (executionContext.isTestCaseTeardownKeyword(keywordType)) {
-            target.clearStackFrames();
-        }
+        final Map<?, ?> keywordDetails = (Map<?, ?>) startList.get(1);
+        final String keywordType = (String) keywordDetails.get("type");
+        final List<String> keywordArgs = (List<String>) keywordDetails.get("args");
+        
+        checkKeywordBeforeStart(currentKeywordName, keywordType, keywordArgs);
 
-        executionContext.startKeyword(currentKeywordName, keywordType, (List<String>) startElements.get("args"));
+        executionContext.startKeyword(currentKeywordName, keywordType, keywordArgs);
 
         String executedFileName = keywordExecutionManager.getCurrentSuiteName();
 
@@ -403,6 +393,23 @@ public class RobotDebugEventDispatcher extends Job {
             } catch (final IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+    
+    private void checkKeywordBeforeStart(final String currentKeywordName, final String keywordType,
+            final List<String> keywordArgs) {
+        if (keywordExecutionManager.getCurrentSuiteFile() == null
+                && !executionContext.isSuiteSetupTeardownKeyword(keywordType)) {
+            String message = "Missing suite file for execution";
+            if (keywordExecutionManager.getCurrentSuiteName() != null) {
+                message += ", current suite name: '" + keywordExecutionManager.getCurrentSuiteName() + "'";
+            }
+            message += ", current keyword: '" + currentKeywordName + "' type='" + keywordType + "' args=" + keywordArgs;
+            showError("Robot Event Dispatcher Error", message);
+            throw new MissingFileToExecuteException(message);
+        }
+        if (executionContext.isTestCaseTeardownKeyword(keywordType)) {
+            target.clearStackFrames();
         }
     }
     
