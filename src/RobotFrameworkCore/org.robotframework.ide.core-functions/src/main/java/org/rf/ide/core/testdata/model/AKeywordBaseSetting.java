@@ -42,9 +42,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
     }
 
     public void setKeywordName(final RobotToken keywordName) {
-        if (keywordName != null) {
-            fixForTheType(keywordName, getKeywordNameType());
-        }
+        fixForTheType(keywordName, getKeywordNameType(), true);
         this.keywordName = keywordName;
     }
 
@@ -53,9 +51,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
     }
 
     public void addArgument(final RobotToken argument) {
-        if (argument != null) {
-            fixForTheType(argument, getArgumentType());
-        }
+        fixForTheType(argument, getArgumentType(), true);
         arguments.add(argument);
     }
 

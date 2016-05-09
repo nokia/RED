@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class UserKeyword extends AModelElement<KeywordTable> implements IExecutableStepsHolder<UserKeyword> {
 
@@ -51,6 +52,7 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
     }
 
     public void setKeywordName(final RobotToken keywordName) {
+        fixForTheType(keywordName, RobotTokenType.KEYWORD_NAME, true);
         this.keywordName = keywordName;
     }
 
@@ -101,6 +103,20 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
         return getKeywordExecutionRows();
     }
 
+    public KeywordDocumentation newDocumentation() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
+                .getRepresentation());
+
+        fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
+
+        KeywordDocumentation keyDoc = new KeywordDocumentation(dec);
+        addDocumentation(keyDoc);
+
+        return keyDoc;
+    }
+
     public void addDocumentation(final KeywordDocumentation doc) {
         doc.setParent(this);
         this.documentation.add(doc);
@@ -108,6 +124,20 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
 
     public List<KeywordDocumentation> getDocumentation() {
         return Collections.unmodifiableList(documentation);
+    }
+
+    public KeywordTags newTags() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.KEYWORD_SETTING_TAGS
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
+                .getRepresentation());
+
+        fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_TAGS);
+
+        KeywordTags keyTags = new KeywordTags(dec);
+        addTag(keyTags);
+
+        return keyTags;
     }
 
     public void addTag(final KeywordTags tag) {
@@ -119,6 +149,20 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
         return Collections.unmodifiableList(tags);
     }
 
+    public KeywordArguments newArguments() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.KEYWORD_SETTING_ARGUMENTS
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
+                .getRepresentation());
+
+        fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_ARGUMENTS);
+
+        KeywordArguments keyArgs = new KeywordArguments(dec);
+        addArguments(keyArgs);
+
+        return keyArgs;
+    }
+
     public void addArguments(final KeywordArguments arguments) {
         arguments.setParent(this);
         keywordArguments.add(arguments);
@@ -126,6 +170,20 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
 
     public List<KeywordArguments> getArguments() {
         return Collections.unmodifiableList(keywordArguments);
+    }
+
+    public KeywordReturn newReturn() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.KEYWORD_SETTING_RETURN
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
+                .getRepresentation());
+
+        fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_RETURN);
+
+        KeywordReturn keyReturn = new KeywordReturn(dec);
+        addReturn(keyReturn);
+
+        return keyReturn;
     }
 
     public void addReturn(final KeywordReturn keywordReturn) {
@@ -137,6 +195,20 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
         return Collections.unmodifiableList(keywordReturns);
     }
 
+    public KeywordTeardown newTeardown() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.KEYWORD_SETTING_TEARDOWN
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
+                .getRepresentation());
+
+        fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_TEARDOWN);
+
+        KeywordTeardown keyTeardown = new KeywordTeardown(dec);
+        addTeardown(keyTeardown);
+
+        return keyTeardown;
+    }
+
     public void addTeardown(final KeywordTeardown teardown) {
         teardown.setParent(this);
         teardowns.add(teardown);
@@ -144,6 +216,20 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
 
     public List<KeywordTeardown> getTeardowns() {
         return Collections.unmodifiableList(teardowns);
+    }
+
+    public KeywordTimeout newTimeout() {
+        RobotToken dec = new RobotToken();
+        dec.setText(RobotTokenType.KEYWORD_SETTING_TIMEOUT
+                .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
+                .getRepresentation());
+
+        fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_TIMEOUT);
+
+        KeywordTimeout keyTimeout = new KeywordTimeout(dec);
+        addTimeout(keyTimeout);
+
+        return keyTimeout;
     }
 
     public void addTimeout(final KeywordTimeout timeout) {

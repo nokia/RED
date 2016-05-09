@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +23,7 @@ import com.google.common.collect.Multimap;
 
 public class RobotElementsComparatorWithPositionChangedPresave implements Comparator<IRobotLineElement> {
 
-    private final Map<IRobotTokenType, Integer> typesToHierarchy = new HashMap<IRobotTokenType, Integer>();
+    private final Map<IRobotTokenType, Integer> typesToHierarchy = new LinkedHashMap<IRobotTokenType, Integer>();
 
     private final Multimap<IRobotTokenType, IRobotLineElement> typeToTokens = ArrayListMultimap.create();
 

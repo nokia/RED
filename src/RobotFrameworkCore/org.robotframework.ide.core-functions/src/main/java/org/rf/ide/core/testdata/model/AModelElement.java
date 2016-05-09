@@ -78,4 +78,13 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
             }
         }
     }
+
+    protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType,
+            boolean shouldNullCheck) {
+        if (shouldNullCheck && token == null) {
+            return;
+        }
+
+        fixForTheType(token, expectedMainType);
+    }
 }
