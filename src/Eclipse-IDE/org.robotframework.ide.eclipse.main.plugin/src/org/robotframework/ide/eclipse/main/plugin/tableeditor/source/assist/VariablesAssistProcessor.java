@@ -39,7 +39,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected List<String> getValidContentTypes() {
+    protected List<String> getApplicableContentTypes() {
         return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
                 SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
                 SuiteSourcePartitionScanner.VARIABLES_SECTION);
@@ -97,7 +97,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
 
     private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
             throws BadLocationException {
-        return isInProperContentType(document, offset)
+        return isInApplicableContentType(document, offset)
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) >= 1;
     }
 

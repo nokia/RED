@@ -82,7 +82,7 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
     private boolean processorFromIndexIsApplicable(final int index, final IDocument document, final int offset) {
         final RedContentAssistProcessor processor = processors.get(index);
         try {
-            return processor.isInProperContentType(document, offset);
+            return processor.isInApplicableContentType(document, offset);
         } catch (final BadLocationException e) {
             throw new IllegalStateException("Offset should be always valid!", e);
         }
