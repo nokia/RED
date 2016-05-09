@@ -40,8 +40,7 @@ public class VariableTable extends ARobotSectionTable {
         variables.add(variable);
     }
 
-    public void createScalarVariable(final int index, final String name, final List<String> values,
-            final String comment) {
+    public void createScalarVariable(final int index, final String name, final List<String> values) {
         RobotToken dec = new RobotToken();
         dec.setRaw(name);
         dec.setText(name);
@@ -54,13 +53,11 @@ public class VariableTable extends ARobotSectionTable {
             t.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
             scalar.addValue(t);
         }
-
         scalar.setParent(this);
         variables.add(index, scalar);
     }
 
-    public void createListVariable(final int index, final String name, final List<String> values,
-            final String comment) {
+    public void createListVariable(final int index, final String name, final List<String> values) {
         RobotToken dec = new RobotToken();
         dec.setRaw(name);
         dec.setText(name);
@@ -77,8 +74,7 @@ public class VariableTable extends ARobotSectionTable {
         variables.add(index, list);
     }
 
-    public void createDictionaryVariable(final int index, final String name, final Map<String, String> items,
-            final String comment) {
+    public void createDictionaryVariable(final int index, final String name, final Map<String, String> items) {
         RobotToken dec = new RobotToken();
         dec.setRaw(name);
         dec.setText(name);
