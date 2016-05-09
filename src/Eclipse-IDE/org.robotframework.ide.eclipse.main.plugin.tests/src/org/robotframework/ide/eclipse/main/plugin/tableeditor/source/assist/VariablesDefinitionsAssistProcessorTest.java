@@ -26,7 +26,7 @@ public class VariablesDefinitionsAssistProcessorTest {
     @Test
     public void varDefsProcessorIsValidOnlyForVariablesSection() {
         final VariablesDefinitionsAssistProcessor processor = new VariablesDefinitionsAssistProcessor(createAssitant());
-        assertThat(processor.getValidContentTypes()).containsExactly(SuiteSourcePartitionScanner.VARIABLES_SECTION);
+        assertThat(processor.getApplicableContentTypes()).containsExactly(SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
     @Test
