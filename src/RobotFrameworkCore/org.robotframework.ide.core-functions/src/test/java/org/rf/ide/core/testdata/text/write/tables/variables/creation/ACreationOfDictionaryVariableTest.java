@@ -1,6 +1,7 @@
 package org.rf.ide.core.testdata.text.write.tables.variables.creation;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.junit.Test;
@@ -49,7 +50,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        Map<String, String> data = new HashMap<>();
+        Map<String, String> data = new LinkedHashMap<>();
         data.put("key1", "value1");
         data.put("key2", "value2");
         data.put("key3", "value3");
@@ -70,7 +71,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        Map<String, String> data = new HashMap<>();
+        Map<String, String> data = new LinkedHashMap<>();
 
         AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
         RobotToken cmTok1 = new RobotToken();
@@ -97,7 +98,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        Map<String, String> data = new HashMap<>();
+        Map<String, String> data = new LinkedHashMap<>();
         data.put("key1", "value1");
         data.put("key2", "value2");
         data.put("key3", "value3");
