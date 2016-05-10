@@ -61,21 +61,22 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteModelEditableRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
-import org.robotframework.red.nattable.configs.AddingElementConfiguration;
 import org.robotframework.red.nattable.configs.AlternatingRowsConfiguration;
 import org.robotframework.red.nattable.configs.ColumnHeaderConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderConfiguration;
-import org.robotframework.red.nattable.layer.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 
 import com.google.common.base.Supplier;
@@ -160,7 +161,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         addCustomStyling(theme);
 
         gridLayer.addConfiguration(new DefaultEditBindings());
-        gridLayer.addConfiguration(new VariablesEditConfiguration());
+        gridLayer
+                .addConfiguration(new VariablesEditConfiguration(SuiteModelEditableRule.createEditableRule(fileModel)));
 
         // Add popup menu - build your own popup menu using the PopupMenuBuilder
         table.addConfiguration(new HeaderMenuConfiguration(table));
@@ -240,7 +242,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new RowHeaderConfiguration(theme));
         table.addConfiguration(new AlternatingRowsConfiguration(theme));
         table.addConfiguration(selectionStyle);
-        table.addConfiguration(new AddingElementConfiguration(theme));
+        table.addConfiguration(new AddingElementConfiguration(theme, fileModel.isEditable()));
     }
 
     private void createContextMenu() {

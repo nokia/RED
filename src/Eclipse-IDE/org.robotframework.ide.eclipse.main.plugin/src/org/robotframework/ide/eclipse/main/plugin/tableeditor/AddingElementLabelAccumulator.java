@@ -3,12 +3,11 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.red.nattable.layer;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
-import org.robotframework.red.nattable.configs.AddingElementConfiguration;
 
 /**
  * @author Michal Anglart
