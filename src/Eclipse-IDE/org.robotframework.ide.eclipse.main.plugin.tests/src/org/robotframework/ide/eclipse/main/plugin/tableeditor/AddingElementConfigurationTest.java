@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.red.nattable.configs;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -31,7 +31,7 @@ public class AddingElementConfigurationTest {
 
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
-        final AddingElementConfiguration configuration = new AddingElementConfiguration(theme);
+        final AddingElementConfiguration configuration = new AddingElementConfiguration(theme, true);
         configuration.configureRegistry(configRegistry);
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
