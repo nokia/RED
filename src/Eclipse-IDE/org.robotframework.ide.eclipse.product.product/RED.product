@@ -9,6 +9,9 @@
    <launcherArgs>
       <programArgs>--launcher.appendVmargs
       </programArgs>
+      <programArgsLin>--launcher.GTK_version
+2
+      </programArgsLin>
       <vmArgs>-Xms512m
          <argsX86>-Xmx1g</argsX86>
          <argsX86_64>-Xmx2g</argsX86_64>
