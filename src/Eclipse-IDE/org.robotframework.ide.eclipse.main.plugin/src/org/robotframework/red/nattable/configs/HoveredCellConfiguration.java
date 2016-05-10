@@ -11,7 +11,6 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.ConfigAttribute;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
-import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.TableThemes.TableTheme;
 
@@ -29,20 +28,22 @@ public class HoveredCellConfiguration extends AbstractRegistryConfiguration {
 
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
-        final ConfigAttribute<IStyle> attribute = CellConfigAttributes.CELL_STYLE;
-        configRegistry.registerConfigAttribute(attribute, createHoverStyle(), DisplayMode.HOVER);
-        configRegistry.registerConfigAttribute(attribute, createSelectedHoverStyle(), DisplayMode.SELECT_HOVER);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, createHoverStyle(), DisplayMode.HOVER);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, createSelectedHoverStyle(),
+                DisplayMode.SELECT_HOVER);
     }
 
     private Style createSelectedHoverStyle() {
-        final Style style = new Style();
-        style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, theme.getBodyHoveredSelectedCellBackground());
-        return style;
+        return createStyle(CellStyleAttributes.BACKGROUND_COLOR, theme.getBodyHoveredSelectedCellBackground());
     }
 
     private Style createHoverStyle() {
+        return createStyle(CellStyleAttributes.BACKGROUND_COLOR, theme.getBodyHoveredCellBackground());
+    }
+
+    private <T> Style createStyle(final ConfigAttribute<T> attribute, final T value) {
         final Style style = new Style();
-        style.setAttributeValue(CellStyleAttributes.BACKGROUND_COLOR, theme.getBodyHoveredCellBackground());
+        style.setAttributeValue(attribute, value);
         return style;
     }
 }
