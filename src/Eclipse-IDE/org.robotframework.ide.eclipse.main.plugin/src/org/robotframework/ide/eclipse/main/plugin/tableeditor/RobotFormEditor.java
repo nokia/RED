@@ -145,7 +145,8 @@ public class RobotFormEditor extends FormEditor {
             }
             addEditorPart(new KeywordsEditorPart(), "Keywords");
             addEditorPart(new SettingsEditorPart(), "Settings");
-            // addEditorPart(new VariablesEditorPart(), "Variables");
+            addEditorPart(new org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart(),
+                    "Old Variables");
             addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new SuiteSourceEditor(), "Source", ImagesManager.getImage(RedImages.getSourceImage()));
 

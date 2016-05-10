@@ -300,18 +300,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
             + RobotVariablesSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
-        table.redraw();
-
-        // try {
-        // viewer.getTable().setRedraw(false);
-        // if (matches == null) {
-        // viewer.setFilters(new ViewerFilter[0]);
-        // } else {
-        // viewer.setFilters(new ViewerFilter[] { new VariablesMatchesFilter(matches) });
-        // }
-        // } finally {
-        // viewer.getTable().setRedraw(true);
-        // }
+        dataProvider.setMatches(matches);
+        table.refresh();
     }
 
     @Inject

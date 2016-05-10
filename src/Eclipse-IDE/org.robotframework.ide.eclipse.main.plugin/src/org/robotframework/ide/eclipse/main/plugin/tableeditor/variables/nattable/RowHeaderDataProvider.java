@@ -12,9 +12,9 @@ import org.eclipse.nebula.widgets.nattable.grid.data.DefaultRowHeaderDataProvide
  * @author Michal Anglart
  *
  */
-public class RowHeaderDataProvider extends DefaultRowHeaderDataProvider {
+class RowHeaderDataProvider extends DefaultRowHeaderDataProvider {
 
-    public RowHeaderDataProvider(final IDataProvider bodyDataProvider) {
+    RowHeaderDataProvider(final IDataProvider bodyDataProvider) {
         super(bodyDataProvider);
     }
 
