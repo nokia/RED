@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.red.nattable.configs;
+package org.robotframework.red.nattable.painter;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
@@ -16,7 +16,12 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.robotframework.red.graphics.ColorsManager;
 
-class UnderlinedCellBackgroundPainter extends BackgroundPainter {
+/**
+ * Cell painter which paints line in cell background on given side of cell
+ * 
+ * @author Michal Anglart
+ */
+public class UnderlinedCellBackgroundPainter extends BackgroundPainter {
 
     private static final int LINE_WIDTH = 2;
 
@@ -24,7 +29,7 @@ class UnderlinedCellBackgroundPainter extends BackgroundPainter {
 
     private final RGB color;
 
-    UnderlinedCellBackgroundPainter(final ICellPainter cellPainter, final Side side, final RGB underlineColor) {
+    public UnderlinedCellBackgroundPainter(final ICellPainter cellPainter, final Side side, final RGB underlineColor) {
         super(cellPainter);
         this.side = side;
         this.color = underlineColor;
@@ -48,7 +53,7 @@ class UnderlinedCellBackgroundPainter extends BackgroundPainter {
         gc.setLineWidth(originalLineWidth);
     }
 
-    enum Side {
+    public enum Side {
         LEFT {
             @Override
             Point getStartPoint(final Rectangle bounds, final int lineWidth) {
