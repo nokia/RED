@@ -19,6 +19,7 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -83,6 +84,7 @@ import org.robotframework.red.nattable.configs.GeneralTableConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderConfiguration;
 import org.robotframework.red.nattable.layer.AddingElementLabelAccumulator;
+import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
@@ -234,7 +236,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                     public HeaderFilterMatchesCollection get() {
                         return matches;
                     }
-                }));
+                }, Stylers.Common.MATCH_STYLER));
 
         final DefaultSelectionStyleConfiguration selectionStyle = new DefaultSelectionStyleConfiguration();
         selectionStyle.selectionFont = FontsManager.getFont(FontDescriptor.createFrom(table.getFont()));

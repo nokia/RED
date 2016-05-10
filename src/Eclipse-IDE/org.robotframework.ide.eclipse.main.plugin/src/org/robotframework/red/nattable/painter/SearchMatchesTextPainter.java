@@ -3,12 +3,12 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable;
+package org.robotframework.red.nattable.painter;
 
 import java.util.Collection;
 
 import org.eclipse.jface.viewers.StyledString;
-import org.eclipse.jface.viewers.Stylers;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
@@ -27,8 +27,9 @@ import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 
 /**
+ * Cell painter which paints text with matches styled by given styler.
+ * 
  * @author Michal Anglart
- *
  */
 public class SearchMatchesTextPainter extends TextPainter {
 
@@ -37,8 +38,12 @@ public class SearchMatchesTextPainter extends TextPainter {
 
     private final Supplier<HeaderFilterMatchesCollection> matchesSupplier;
 
-    public SearchMatchesTextPainter(final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
+    private final Styler matchStyler;
+
+    public SearchMatchesTextPainter(final Supplier<HeaderFilterMatchesCollection> matchesSupplier,
+            final Styler matchStyler) {
         this.matchesSupplier = matchesSupplier;
+        this.matchStyler = matchStyler;
     }
 
     @Override
@@ -136,8 +141,7 @@ public class SearchMatchesTextPainter extends TextPainter {
             return label;
         }
         for (final Range<Integer> range : ranges) {
-            label.setStyle(range.lowerEndpoint() + shift, range.upperEndpoint() - range.lowerEndpoint(),
-                    Stylers.Common.MATCH_STYLER);
+            label.setStyle(range.lowerEndpoint() + shift, range.upperEndpoint() - range.lowerEndpoint(), matchStyler);
         }
         return label;
     }
