@@ -160,13 +160,15 @@ public class RobotProjectHolder {
         @Override
         public boolean matchCriteria(final RobotFileOutput robotFile) {
             boolean matchResult = false;
-            final List<VariablesFileImportReference> varImports = robotFile.getVariablesImportReferences();
-            for (final VariablesFileImportReference variablesFileImportReference : varImports) {
-                if (variablesFileImportReference.getVariablesFile()
-                        .getAbsolutePath()
-                        .equals(toFound.getAbsolutePath())) {
-                    matchResult = true;
-                    break;
+            if (robotFile != null) {
+                final List<VariablesFileImportReference> varImports = robotFile.getVariablesImportReferences();
+                for (final VariablesFileImportReference variablesFileImportReference : varImports) {
+                    if (variablesFileImportReference.getVariablesFile()
+                            .getAbsolutePath()
+                            .equals(toFound.getAbsolutePath())) {
+                        matchResult = true;
+                        break;
+                    }
                 }
             }
 

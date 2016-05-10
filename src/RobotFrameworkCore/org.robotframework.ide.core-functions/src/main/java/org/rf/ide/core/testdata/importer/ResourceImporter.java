@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.importer;
 
 import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -16,8 +17,8 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
-import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.model.table.setting.AImported.Type;
+import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 
 public class ResourceImporter {
 
@@ -34,8 +35,15 @@ public class ResourceImporter {
 
                     final File currentFile = robotFile.getProcessedFile().getAbsoluteFile();
                     if (currentFile.exists()) {
-                        final Path joinPath = Paths.get(currentFile.getAbsolutePath()).resolveSibling(path);
-                        path = joinPath.toAbsolutePath().toFile().getAbsolutePath();
+                        try {
+                            final Path joinPath = Paths.get(currentFile.getAbsolutePath()).resolveSibling(path);
+                            path = joinPath.toAbsolutePath().toFile().getAbsolutePath();
+                        } catch (final InvalidPathException ipe) {
+                            robotFile.addBuildMessage(BuildMessage.createErrorMessage(
+                                    "Problem with importing resource file " + currentFile + " with error stack: " + ipe,
+                                    "" + robotFile.getProcessedFile()));
+                            continue;
+                        }
                     }
 
                     final File toImport = new File(path);
@@ -58,8 +66,8 @@ public class ResourceImporter {
         final File toImport = new File(path);
         final List<RobotFileOutput> parsedFiles = parser.parse(toImport);
         if (parsedFiles.isEmpty()) {
-            robotFile.addBuildMessage(BuildMessage.createErrorMessage("Couldn't import resource file.",
-                    toImport.getAbsolutePath()));
+            robotFile.addBuildMessage(
+                    BuildMessage.createErrorMessage("Couldn't import resource file.", toImport.getAbsolutePath()));
         } else {
             ResourceImportReference resourceReference = new ResourceImportReference(null, parsedFiles.get(0));
             int position = robotFile.findResourceReferencePositionToReplace(resourceReference);
