@@ -38,9 +38,9 @@ public class KeywordExecutionRowDumper extends AExecutableTableElementDumper {
         }
         sorter.addPresaveSequenceForType(RobotTokenType.KEYWORD_ACTION_NAME, 1, keys);
         sorter.addPresaveSequenceForType(RobotTokenType.KEYWORD_ACTION_ARGUMENT, 2, userKeyword.getArguments());
-        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 2,
+        sorter.addPresaveSequenceForType(RobotTokenType.START_HASH_COMMENT, 3,
                 getElementHelper().filter(userKeyword.getComment(), RobotTokenType.START_HASH_COMMENT));
-        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 3,
+        sorter.addPresaveSequenceForType(RobotTokenType.COMMENT_CONTINUE, 4,
                 getElementHelper().filter(userKeyword.getComment(), RobotTokenType.COMMENT_CONTINUE));
 
         return sorter;
