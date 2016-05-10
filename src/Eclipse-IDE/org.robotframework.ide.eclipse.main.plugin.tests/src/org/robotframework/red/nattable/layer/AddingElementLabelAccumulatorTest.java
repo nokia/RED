@@ -22,14 +22,19 @@ public class AddingElementLabelAccumulatorTest {
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                final boolean isInLeftBottomCorner = i == rows - 1 && j == 0;
+                final boolean isInBottomRow = i == rows - 1;
+                final boolean isInLeftBottomCorner = isInBottomRow && j == 0;
 
                 final LabelStack configLabels = new LabelStack();
                 accumulator.accumulateConfigLabels(configLabels, j, i);
 
                 if (isInLeftBottomCorner) {
                     assertThat(configLabels.getLabels())
-                            .containsOnly(AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL);
+                            .containsOnly(AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL,
+                                    AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                } else if (isInBottomRow) {
+                    assertThat(configLabels.getLabels())
+                            .containsOnly(AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else {
                     assertThat(configLabels.getLabels()).isEmpty();
                 }
