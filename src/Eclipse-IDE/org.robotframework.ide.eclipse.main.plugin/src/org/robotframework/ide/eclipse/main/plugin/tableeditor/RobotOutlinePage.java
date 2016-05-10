@@ -28,6 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.red.viewers.Selections;
@@ -127,8 +128,20 @@ class RobotOutlinePage extends ContentOutlinePage {
                     final DefinitionPosition position = robotElement.getDefinitionPosition();
                     selectionProvider.setSelection(new TextSelection(position.getOffset(), position.getLength()));
                 } else {
-                    robotElement.getOpenRobotEditorStrategy(getSite().getPage()).run();
+                    final ISectionEditorPart activatedPage = editor.activatePage(getSection(element.get()));
+                    if (activatedPage != null) {
+                        activatedPage.setFocus();
+                        activatedPage.revealElement(element.get());
+                    }
                 }
+            }
+
+            private RobotSuiteFileSection getSection(final RobotFileInternalElement element) {
+                RobotElement current = element;
+                while (current != null && !(current instanceof RobotSuiteFileSection)) {
+                    current = current.getParent();
+                }
+                return (RobotSuiteFileSection) current;
             }
         };
     }
