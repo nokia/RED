@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.importer;
 
 import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -15,8 +16,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
@@ -47,7 +50,7 @@ public class VariablesImporter {
                     if (!isCorrectPath(path)) {
                         continue;
                     }
-                    
+
                     final Map<String, String> variableMappings = robotProject.getVariableMappings();
 
                     path = replaceRobotSpecificArguments(path, variableMappings);
@@ -56,13 +59,35 @@ public class VariablesImporter {
 
                     final File currentRobotFile = robotFile.getProcessedFile().getAbsoluteFile();
                     if (currentRobotFile.exists()) {
-                        final Path joinPath = Paths.get(currentRobotFile.getAbsolutePath()).resolveSibling(path);
-                        path = joinPath.toAbsolutePath().toFile().getAbsolutePath();
+                        try {
+                            final Path joinPath = Paths.get(currentRobotFile.getAbsolutePath()).resolveSibling(path);
+                            path = joinPath.toAbsolutePath().toFile().getAbsolutePath();
+                        } catch (final InvalidPathException ipe) {
+                            final BuildMessage errorMsg = BuildMessage.createErrorMessage(
+                                    "Problem with importing variable file " + path + " with error stack: " + ipe,
+                                    "" + currentRobotFile);
+                            errorMsg.setFileRegion(
+                                    new FileRegion(varImport.getBeginPosition(), varImport.getEndPosition()));
+                            robotFile.addBuildMessage(errorMsg);
+
+                            continue;
+                        }
                     }
 
                     final File varFile = new File(path);
-                    VariablesFileImportReference varImportRef = findInProjectVariablesImport(robotProject, varImport,
-                            varFile.toPath().normalize().toFile());
+                    VariablesFileImportReference varImportRef;
+                    try {
+                        varImportRef = findInProjectVariablesImport(robotProject, varImport,
+                                varFile.toPath().normalize().toFile());
+                    } catch (final InvalidPathException ipe) {
+                        final BuildMessage errorMsg = BuildMessage.createErrorMessage(
+                                "Problem with importing variable file " + path + " with error stack: " + ipe,
+                                "" + currentRobotFile);
+                        errorMsg.setFileRegion(
+                                new FileRegion(varImport.getBeginPosition(), varImport.getEndPosition()));
+                        robotFile.addBuildMessage(errorMsg);
+                        continue;
+                    }
 
                     if (varImportRef == null) {
                         final Map<?, ?> variablesFromFile = robotRunEnv.getVariablesFromFile(path, varFileArguments);
@@ -95,7 +120,7 @@ public class VariablesImporter {
 
     private String replaceRobotSpecificArguments(final String path, final Map<String, String> variableMappings) {
         String resultPath = path;
-        if(RobotExpressions.isParameterized(path)) {
+        if (RobotExpressions.isParameterized(path)) {
             resultPath = RobotExpressions.resolve(variableMappings, path);
         }
         return resultPath.replaceAll(" [\\\\] ", "  ");
@@ -172,11 +197,12 @@ public class VariablesImporter {
     }
 
     @VisibleForTesting
-    protected List<String> convertTokensToArguments(final VariablesImport varImport, final Map<String, String> variableMappings) {
+    protected List<String> convertTokensToArguments(final VariablesImport varImport,
+            final Map<String, String> variableMappings) {
         final List<String> arguments = new ArrayList<>();
         for (final RobotToken rtArgument : varImport.getArguments()) {
             String arg = rtArgument.getRaw().toString();
-            if(RobotExpressions.isParameterized(arg)) {
+            if (RobotExpressions.isParameterized(arg)) {
                 arg = RobotExpressions.resolve(variableMappings, arg);
             }
             arguments.add(arg);
