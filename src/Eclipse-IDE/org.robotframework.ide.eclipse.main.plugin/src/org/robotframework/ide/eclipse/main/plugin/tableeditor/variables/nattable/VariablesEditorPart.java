@@ -65,7 +65,9 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
 
         @Override
         public void revealElement(final RobotElement robotElement) {
-            variablesFragment.revealVariable((RobotVariable) robotElement);
+            if (robotElement instanceof RobotVariable) {
+                variablesFragment.revealVariable((RobotVariable) robotElement);
+            }
         }
 
         @Override
