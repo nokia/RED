@@ -8,26 +8,26 @@ package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
-public abstract class ACreationOfKeywordArgumentsTest {
+public abstract class ACreationOfKeywordDocumentationTest {
 
-    public static final String PRETTY_NEW_DIR_LOCATION = "keywords//setting//arguments//new//";
+    public static final String PRETTY_NEW_DIR_LOCATION = "keywords//setting//documentation//new//";
 
     private final String extension;
 
-    public ACreationOfKeywordArgumentsTest(final String extension) {
+    public ACreationOfKeywordDocumentationTest(final String extension) {
         this.extension = extension;
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDecOnly()
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationDecOnly()
             throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyKeywordArgumentsNoKeywordName." + getExtension();
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyKeywordDocumentationNoKeywordName." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -38,16 +38,17 @@ public abstract class ACreationOfKeywordArgumentsTest {
         keyName.setText("");
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        uk.newArguments();
+        uk.newDocumentation();
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDecOnly() throws Exception {
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationDecOnly()
+            throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyKeywordArguments." + getExtension();
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyKeywordDocumentation." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -58,17 +59,17 @@ public abstract class ACreationOfKeywordArgumentsTest {
         keyName.setText("User Keyword");
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        uk.newArguments();
+        uk.newDocumentation();
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDec_andCommentsOnly()
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationAndCommentOnly()
             throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordArgumentsWithCommentAndNoKeywordName."
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordDocumentationNoKeywordNameAndComment."
                 + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
@@ -80,7 +81,7 @@ public abstract class ACreationOfKeywordArgumentsTest {
         keyName.setText("");
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordArguments newArguments = uk.newArguments();
+        KeywordDocumentation keyDoc = uk.newDocumentation();
 
         RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
@@ -89,19 +90,19 @@ public abstract class ACreationOfKeywordArgumentsTest {
         RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
-        newArguments.addCommentPart(cmTok1);
-        newArguments.addCommentPart(cmTok2);
-        newArguments.addCommentPart(cmTok3);
+        keyDoc.addCommentPart(cmTok1);
+        keyDoc.addCommentPart(cmTok2);
+        keyDoc.addCommentPart(cmTok3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDec_andCommentsOnly()
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationAndCommentOnly()
             throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordArgumentsWithCommentOnly." + getExtension();
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordDocumentationAndComment." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -112,7 +113,7 @@ public abstract class ACreationOfKeywordArgumentsTest {
         keyName.setText("User Keyword");
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordArguments newArguments = uk.newArguments();
+        KeywordDocumentation keyDoc = uk.newDocumentation();
 
         RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
@@ -121,83 +122,19 @@ public abstract class ACreationOfKeywordArgumentsTest {
         RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
-        newArguments.addCommentPart(cmTok1);
-        newArguments.addCommentPart(cmTok2);
-        newArguments.addCommentPart(cmTok3);
+        keyDoc.addCommentPart(cmTok1);
+        keyDoc.addCommentPart(cmTok2);
+        keyDoc.addCommentPart(cmTok3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDec_and3ArgsOnly()
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationAnd3Words()
             throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordArgumentsWith3ArgsAndNoKeywordName." + getExtension();
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
-
-        // test data prepare
-        modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
-
-        RobotToken keyName = new RobotToken();
-        keyName.setText("");
-        UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        KeywordArguments newArguments = uk.newArguments();
-
-        RobotToken argTok1 = new RobotToken();
-        argTok1.setText("${arg1}");
-        RobotToken argTok2 = new RobotToken();
-        argTok2.setText("${arg2}");
-        RobotToken argTok3 = new RobotToken();
-        argTok3.setText("${arg3}");
-
-        newArguments.addArgument(argTok1);
-        newArguments.addArgument(argTok2);
-        newArguments.addArgument(argTok3);
-
-        // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDec_and3ArgsOnly()
-            throws Exception {
-        // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordArgumentsWith3ArgsOnly." + getExtension();
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
-
-        // test data prepare
-        modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
-
-        RobotToken keyName = new RobotToken();
-        keyName.setText("User Keyword");
-        UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        KeywordArguments newArguments = uk.newArguments();
-
-        RobotToken argTok1 = new RobotToken();
-        argTok1.setText("${arg1}");
-        RobotToken argTok2 = new RobotToken();
-        argTok2.setText("${arg2}");
-        RobotToken argTok3 = new RobotToken();
-        argTok3.setText("${arg3}");
-
-        newArguments.addArgument(argTok1);
-        newArguments.addArgument(argTok2);
-        newArguments.addArgument(argTok3);
-
-        // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
-    }
-
-    @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withoutKeywordName_andArgumentsDec_and3Args_andCommentOnly()
-            throws Exception {
-        // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordArgumentsWith3ArgsCommentAndNoKeywordName."
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordDocumentationNoKeywordNameAnd3WordsInText."
                 + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
@@ -209,39 +146,27 @@ public abstract class ACreationOfKeywordArgumentsTest {
         keyName.setText("");
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordArguments newArguments = uk.newArguments();
+        KeywordDocumentation keyDoc = uk.newDocumentation();
+        RobotToken wr1 = new RobotToken();
+        wr1.setText("w1");
+        RobotToken wr2 = new RobotToken();
+        wr2.setText("w2");
+        RobotToken wr3 = new RobotToken();
+        wr3.setText("w3");
 
-        RobotToken argTok1 = new RobotToken();
-        argTok1.setText("${arg1}");
-        RobotToken argTok2 = new RobotToken();
-        argTok2.setText("${arg2}");
-        RobotToken argTok3 = new RobotToken();
-        argTok3.setText("${arg3}");
-
-        newArguments.addArgument(argTok1);
-        newArguments.addArgument(argTok2);
-        newArguments.addArgument(argTok3);
-
-        RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        newArguments.addCommentPart(cmTok1);
-        newArguments.addCommentPart(cmTok2);
-        newArguments.addCommentPart(cmTok3);
+        keyDoc.addDocumentationText(wr1);
+        keyDoc.addDocumentationText(wr2);
+        keyDoc.addDocumentationText(wr3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateKeywordArguments_withKeywordName_andArgumentsDec_and3Args_andCommentOnly()
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationAnd3Words()
             throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordArgumentsWith3ArgsCommentOnly." + getExtension();
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordDocumentationAnd3WordsInText." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -252,18 +177,48 @@ public abstract class ACreationOfKeywordArgumentsTest {
         keyName.setText("User Keyword");
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
-        KeywordArguments newArguments = uk.newArguments();
+        KeywordDocumentation keyDoc = uk.newDocumentation();
+        RobotToken wr1 = new RobotToken();
+        wr1.setText("w1");
+        RobotToken wr2 = new RobotToken();
+        wr2.setText("w2");
+        RobotToken wr3 = new RobotToken();
+        wr3.setText("w3");
 
-        RobotToken argTok1 = new RobotToken();
-        argTok1.setText("${arg1}");
-        RobotToken argTok2 = new RobotToken();
-        argTok2.setText("${arg2}");
-        RobotToken argTok3 = new RobotToken();
-        argTok3.setText("${arg3}");
+        keyDoc.addDocumentationText(wr1);
+        keyDoc.addDocumentationText(wr2);
+        keyDoc.addDocumentationText(wr3);
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+    }
 
-        newArguments.addArgument(argTok1);
-        newArguments.addArgument(argTok2);
-        newArguments.addArgument(argTok3);
+    @Test
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withoutKeywordName_andDocumentationAnd3WordsAndComment()
+            throws Exception {
+        // prepare
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordDocumentationNoKeywordNameAnd3WordsInTextAndComment."
+                + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeKeywordTableSection();
+        KeywordTable keywordTable = modelFile.getKeywordTable();
+
+        RobotToken keyName = new RobotToken();
+        keyName.setText("");
+        UserKeyword uk = new UserKeyword(keyName);
+        keywordTable.addKeyword(uk);
+        KeywordDocumentation keyDoc = uk.newDocumentation();
+        RobotToken wr1 = new RobotToken();
+        wr1.setText("w1");
+        RobotToken wr2 = new RobotToken();
+        wr2.setText("w2");
+        RobotToken wr3 = new RobotToken();
+        wr3.setText("w3");
+
+        keyDoc.addDocumentationText(wr1);
+        keyDoc.addDocumentationText(wr2);
+        keyDoc.addDocumentationText(wr3);
 
         RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
@@ -272,9 +227,52 @@ public abstract class ACreationOfKeywordArgumentsTest {
         RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
-        newArguments.addCommentPart(cmTok1);
-        newArguments.addCommentPart(cmTok2);
-        newArguments.addCommentPart(cmTok3);
+        keyDoc.addCommentPart(cmTok1);
+        keyDoc.addCommentPart(cmTok2);
+        keyDoc.addCommentPart(cmTok3);
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+    }
+
+    @Test
+    public void test_emptyFile_and_thanCreateKeywordDocumentation_withKeywordName_andDocumentationAnd3WordsAndComment()
+            throws Exception {
+        // prepare
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordDocumentationAnd3WordsInTextAndComment."
+                + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeKeywordTableSection();
+        KeywordTable keywordTable = modelFile.getKeywordTable();
+
+        RobotToken keyName = new RobotToken();
+        keyName.setText("User Keyword");
+        UserKeyword uk = new UserKeyword(keyName);
+        keywordTable.addKeyword(uk);
+        KeywordDocumentation keyDoc = uk.newDocumentation();
+        RobotToken wr1 = new RobotToken();
+        wr1.setText("w1");
+        RobotToken wr2 = new RobotToken();
+        wr2.setText("w2");
+        RobotToken wr3 = new RobotToken();
+        wr3.setText("w3");
+
+        keyDoc.addDocumentationText(wr1);
+        keyDoc.addDocumentationText(wr2);
+        keyDoc.addDocumentationText(wr3);
+
+        RobotToken cmTok1 = new RobotToken();
+        cmTok1.setText("cm1");
+        RobotToken cmTok2 = new RobotToken();
+        cmTok2.setText("cm2");
+        RobotToken cmTok3 = new RobotToken();
+        cmTok3.setText("cm3");
+
+        keyDoc.addCommentPart(cmTok1);
+        keyDoc.addCommentPart(cmTok2);
+        keyDoc.addCommentPart(cmTok3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
