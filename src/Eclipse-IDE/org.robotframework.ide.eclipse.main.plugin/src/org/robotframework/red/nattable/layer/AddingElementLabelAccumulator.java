@@ -27,5 +27,8 @@ public class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
         if (columnPosition == 0 && dataProvider.getRowCount() - 1 == rowPosition) {
             configLabels.addLabel(AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL);
         }
+        if (dataProvider.getRowCount() - 1 == rowPosition) {
+            configLabels.addLabel(AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+        }
     }
 }
