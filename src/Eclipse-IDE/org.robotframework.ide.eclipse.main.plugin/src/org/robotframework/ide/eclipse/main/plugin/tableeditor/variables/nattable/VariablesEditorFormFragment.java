@@ -21,15 +21,8 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
-import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
-import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
-import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditConfiguration;
-import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
-import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
@@ -54,7 +47,6 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.config.DefaultSelectionStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.style.BorderStyle;
 import org.eclipse.nebula.widgets.nattable.style.BorderStyle.LineStyleEnum;
-import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.ui.menu.DebugMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -168,20 +160,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         addCustomStyling(theme);
 
         gridLayer.addConfiguration(new DefaultEditBindings());
-        gridLayer.addConfiguration(new DefaultEditConfiguration());
-        gridLayer.addConfiguration(new AbstractRegistryConfiguration() {
-            @Override
-            public void configureRegistry(final IConfigRegistry configRegistry) {
-                configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE,
-                        IEditableRule.ALWAYS_EDITABLE);
-                configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new TextCellEditor(true, true),
-                        DisplayMode.NORMAL, GridRegion.BODY);
-                configRegistry.registerConfigAttribute(EditConfigAttributes.OPEN_ADJACENT_EDITOR, Boolean.TRUE,
-                        DisplayMode.EDIT, GridRegion.BODY);
-                configRegistry.registerConfigAttribute(EditConfigAttributes.ACTIVATE_EDITOR_ON_TRAVERSAL, Boolean.TRUE,
-                        DisplayMode.EDIT, GridRegion.BODY);
-            }
-        });
+        gridLayer.addConfiguration(new VariablesEditConfiguration());
+
         // Add popup menu - build your own popup menu using the PopupMenuBuilder
         table.addConfiguration(new HeaderMenuConfiguration(table));
         table.addConfiguration(new DebugMenuConfiguration(table));
