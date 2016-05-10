@@ -45,7 +45,7 @@ public class VariablesImporterTest {
         RobotFile fileModel = robotFile.getFileModel();
         fileModel.includeSettingTableSection();
         SettingTable settingTable = fileModel.getSettingTable();
-        final String varImport = "VariableFiles/UnicodeInVariables.py*** Test Cases ***";
+        final String varImport = "\\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases ***";
         addNewVariableImport(settingTable, varImport);
         RobotProjectHolder robotProject = mock(RobotProjectHolder.class);
         RobotRuntimeEnvironment robotRunEnv = mock(RobotRuntimeEnvironment.class);
@@ -62,13 +62,12 @@ public class VariablesImporterTest {
         assertThat(buildMessage.getFileName()).isEqualTo("robot.robot");
         assertThat(buildMessage.getType()).isEqualTo(LogLevel.ERROR);
         assertThat(buildMessage.getMessage()).contains(
-                "Problem with importing variable file VariableFiles/UnicodeInVariables.py*** Test Cases *** with error stack: ");
+                "Problem with importing variable file \\VariableFiles\u0000/UnicodeInVariables.py*** Test Cases *** with error stack: ");
         FileRegion fileRegion = buildMessage.getFileRegion();
         assertThat(fileRegion).isNotNull();
         assertThat(fileRegion.getStart().isSamePlace(new FilePosition(1, 0, 0))).isTrue();
         final int importTextLength = "Variables".length() + varImport.length();
-        assertThat(fileRegion.getEnd().isSamePlace(new FilePosition(1, importTextLength,
-                importTextLength))).isTrue();
+        assertThat(fileRegion.getEnd().isSamePlace(new FilePosition(1, importTextLength, importTextLength))).isTrue();
     }
 
     @Test
