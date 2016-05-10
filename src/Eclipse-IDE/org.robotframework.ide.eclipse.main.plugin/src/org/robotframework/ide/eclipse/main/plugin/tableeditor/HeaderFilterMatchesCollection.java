@@ -59,7 +59,7 @@ public class HeaderFilterMatchesCollection {
         int index = label.indexOf(filter);
         final boolean result = index >= 0;
         while (index >= 0) {
-            matches.put(label, Range.closed(index, index + filter.length()));
+            matches.put(label, Range.closedOpen(index, index + filter.length()));
             allMatches++;
             index = label.indexOf(filter, index + 1);
         }
