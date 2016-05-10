@@ -28,11 +28,38 @@ class VariablesMatchesCollection extends HeaderFilterMatchesCollection {
     private void collectMatches(final RobotVariable variable, final String filter) {
         // or has to be greedy, since we want to find all matches
         final boolean isMatching = 
-                collectMatches(filter, variable.getPrefix() + variable.getName() + variable.getSuffix())
-                | collectMatches(filter, variable.getValue()) 
-                | collectMatches(filter, variable.getComment());
+                collectMatches(filter, constructNameToSearch(variable))
+                | collectMatches(filter, constructValueToSearch(variable)) 
+                | collectMatches(filter, constructCommentToSearch(variable));
         if (isMatching) {
             rowsMatching++;
+        }
+    }
+
+    private static String constructNameToSearch(final RobotVariable variable) {
+        return variable.getPrefix() + variable.getName() + variable.getSuffix();
+    }
+
+    private static String constructValueToSearch(final RobotVariable variable) {
+        return variable.getValue();
+    }
+
+    private static String constructCommentToSearch(final RobotVariable variable) {
+        return variable.getComment();
+    }
+
+    static class VariableFilter {
+
+        private final HeaderFilterMatchesCollection matches;
+
+        public VariableFilter(final HeaderFilterMatchesCollection matches) {
+            this.matches = matches;
+        }
+
+        boolean isMatching(final RobotVariable variable) {
+            return matches.contains(constructNameToSearch(variable))
+                    || matches.contains(constructValueToSearch(variable))
+                    || matches.contains(constructCommentToSearch(variable));
         }
     }
 }
