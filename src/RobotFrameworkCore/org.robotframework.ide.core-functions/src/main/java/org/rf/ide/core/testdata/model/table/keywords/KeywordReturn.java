@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordReturn extends AModelElement<UserKeyword> {
 
@@ -42,6 +43,7 @@ public class KeywordReturn extends AModelElement<UserKeyword> {
     }
 
     public void addReturnValue(final RobotToken returnValue) {
+        fixForTheType(returnValue, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE, true);
         values.add(returnValue);
     }
 
@@ -50,6 +52,7 @@ public class KeywordReturn extends AModelElement<UserKeyword> {
     }
 
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
 
