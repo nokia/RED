@@ -33,6 +33,7 @@ import org.robotframework.red.graphics.ImagesManager;
 public class AddingElementConfiguration extends AbstractRegistryConfiguration {
 
     public static final String ELEMENT_ADDER_CONFIG_LABEL = "ELEMENT_ADDER";
+    public static final String ELEMENT_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW";
 
     private final Font font;
 
