@@ -15,9 +15,9 @@ import org.robotframework.red.nattable.painter.UnderlinedCellBackgroundPainter.S
  * @author Michal Anglart
  *
  */
-public class ColumnHeaderConfiguration extends DefaultColumnHeaderStyleConfiguration {
+public class ColumnHeaderStyleConfiguration extends DefaultColumnHeaderStyleConfiguration {
 
-    public ColumnHeaderConfiguration(final TableTheme theme) {
+    public ColumnHeaderStyleConfiguration(final TableTheme theme) {
         this.font = theme.getFont();
         this.bgColor = theme.getHeadersBackground();
         this.fgColor = theme.getHeadersForeground();
