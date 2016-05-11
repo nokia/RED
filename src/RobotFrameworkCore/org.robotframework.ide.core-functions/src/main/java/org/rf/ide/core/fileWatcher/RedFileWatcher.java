@@ -8,6 +8,7 @@ package org.rf.ide.core.fileWatcher;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.IOException;
+import java.nio.file.ClosedWatchServiceException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.StandardWatchEventKinds;
@@ -50,15 +51,13 @@ public class RedFileWatcher {
 
     private AtomicBoolean isEventConsumerThreadStarted = new AtomicBoolean(false);
 
-    private RedFileWatcher() {
-        createAndStartWatchService();
-    }
+    private RedFileWatcher() {}
 
     public synchronized void registerPath(final Path fileDir, final String fileName,
             final IWatchEventHandler watchEventHandler) {
 
         if (watcher == null) {
-            restartWatcher();
+            setupWatcher();
         }
 
         if (watcher != null && fileDir != null && fileName != null) {
@@ -94,8 +93,20 @@ public class RedFileWatcher {
             }
         }
     }
+    
+    public synchronized void closeWatchService() {
+        try {
+            if (watcher != null) {
+                watcher.close();
+            }
+        } catch (IOException e) {
+            // nothing to do
+        } finally {
+            watcher = null;
+        }
+    }
 
-    private void restartWatcher() {
+    private void setupWatcher() {
         registeredDirs.clear();
         modifiedFilesQueue.clear();
         createAndStartWatchService();
@@ -129,7 +140,7 @@ public class RedFileWatcher {
                         WatchKey key;
                         try {
                             key = watcher.take();
-                        } catch (InterruptedException e) {
+                        } catch (InterruptedException | ClosedWatchServiceException e) {
                             break;
                         }
                         for (WatchEvent<?> event : key.pollEvents()) {
@@ -160,7 +171,7 @@ public class RedFileWatcher {
                         }
                     }
                     isEventProducerThreadStarted.set(false);
-                    tryToCloseWatchService();
+                    closeWatchService();
                     sendWatchServiceInterruptedEvent();
                 }
             }).start();
@@ -188,7 +199,7 @@ public class RedFileWatcher {
                         }
                     }
                     isEventConsumerThreadStarted.set(false);
-                    tryToCloseWatchService();
+                    closeWatchService();
                     sendWatchServiceInterruptedEvent();
                 }
             }).start();
@@ -213,18 +224,6 @@ public class RedFileWatcher {
             if (nextFileName != null && nextFileName.equals(fileName)) {
                 modifiedFilesQueue.remove();
             }
-        }
-    }
-
-    private void tryToCloseWatchService() {
-        try {
-            if (watcher != null) {
-                watcher.close();
-            }
-        } catch (IOException e) {
-            // nothing to do
-        } finally {
-            watcher = null;
         }
     }
 
