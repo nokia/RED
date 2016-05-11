@@ -32,7 +32,7 @@ public class RowHeaderConfigurationTest {
         when(theme.getHeadersForeground()).thenReturn(fgColorInUse);
         when(theme.getHeadersUnderlineColor()).thenReturn(ColorsManager.getColor(200, 0, 0));
 
-        final RowHeaderConfiguration configuration = new RowHeaderConfiguration(theme);
+        final RowHeaderStyleConfiguration configuration = new RowHeaderStyleConfiguration(theme);
 
         assertThat(configuration).has(font(fontInUse));
         assertThat(configuration).has(background(bgColorInUse));
@@ -40,31 +40,31 @@ public class RowHeaderConfigurationTest {
         assertThat(configuration.cellPainter).isInstanceOf(UnderlinedCellBackgroundPainter.class);
     }
 
-    private Condition<RowHeaderConfiguration> background(final Color bgColorInUse) {
-        return new Condition<RowHeaderConfiguration>() {
+    private Condition<RowHeaderStyleConfiguration> background(final Color bgColorInUse) {
+        return new Condition<RowHeaderStyleConfiguration>() {
 
             @Override
-            public boolean matches(final RowHeaderConfiguration config) {
+            public boolean matches(final RowHeaderStyleConfiguration config) {
                 return config.bgColor.equals(bgColorInUse);
             }
         };
     }
 
-    private Condition<RowHeaderConfiguration> foreground(final Color fgColorInUse) {
-        return new Condition<RowHeaderConfiguration>() {
+    private Condition<RowHeaderStyleConfiguration> foreground(final Color fgColorInUse) {
+        return new Condition<RowHeaderStyleConfiguration>() {
 
             @Override
-            public boolean matches(final RowHeaderConfiguration config) {
+            public boolean matches(final RowHeaderStyleConfiguration config) {
                 return config.fgColor.equals(fgColorInUse);
             }
         };
     }
 
-    private static Condition<RowHeaderConfiguration> font(final Font font) {
-        return new Condition<RowHeaderConfiguration>() {
+    private static Condition<RowHeaderStyleConfiguration> font(final Font font) {
+        return new Condition<RowHeaderStyleConfiguration>() {
 
             @Override
-            public boolean matches(final RowHeaderConfiguration config) {
+            public boolean matches(final RowHeaderStyleConfiguration config) {
                 return config.font.equals(font);
             }
         };

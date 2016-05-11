@@ -30,7 +30,7 @@ public class GeneralTableConfigurationTest {
         when(theme.getBodyBackgroundOddRowBackground()).thenReturn(bgColorInUse);
         when(theme.getBodyForeground()).thenReturn(fgColorInUse);
 
-        final GeneralTableConfiguration configuration = new GeneralTableConfiguration(theme, mock(TextPainter.class));
+        final GeneralTableStyleConfiguration configuration = new GeneralTableStyleConfiguration(theme, mock(TextPainter.class));
 
         assertThat(configuration).has(background(bgColorInUse));
         assertThat(configuration).has(foreground(fgColorInUse));
@@ -39,21 +39,21 @@ public class GeneralTableConfigurationTest {
         assertThat(configuration.cellPainter).isInstanceOf(PaddingDecorator.class);
     }
 
-    private Condition<GeneralTableConfiguration> background(final Color bgColorInUse) {
-        return new Condition<GeneralTableConfiguration>() {
+    private Condition<GeneralTableStyleConfiguration> background(final Color bgColorInUse) {
+        return new Condition<GeneralTableStyleConfiguration>() {
 
             @Override
-            public boolean matches(final GeneralTableConfiguration config) {
+            public boolean matches(final GeneralTableStyleConfiguration config) {
                 return config.bgColor.equals(bgColorInUse);
             }
         };
     }
 
-    private Condition<GeneralTableConfiguration> foreground(final Color fgColorInUse) {
-        return new Condition<GeneralTableConfiguration>() {
+    private Condition<GeneralTableStyleConfiguration> foreground(final Color fgColorInUse) {
+        return new Condition<GeneralTableStyleConfiguration>() {
 
             @Override
-            public boolean matches(final GeneralTableConfiguration config) {
+            public boolean matches(final GeneralTableStyleConfiguration config) {
                 return config.fgColor.equals(fgColorInUse);
             }
         };

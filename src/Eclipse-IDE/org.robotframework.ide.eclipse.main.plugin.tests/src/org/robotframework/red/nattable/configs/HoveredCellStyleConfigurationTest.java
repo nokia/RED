@@ -21,7 +21,7 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
 
-public class HoveredCellConfigurationTest {
+public class HoveredCellStyleConfigurationTest {
 
     @SuppressWarnings("unchecked")
     @Test
@@ -35,7 +35,7 @@ public class HoveredCellConfigurationTest {
 
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
-        final HoveredCellConfiguration configuration = new HoveredCellConfiguration(theme);
+        final HoveredCellStyleConfiguration configuration = new HoveredCellStyleConfiguration(theme);
         configuration.configureRegistry(configRegistry);
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
