@@ -61,8 +61,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementLabelAccumulator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementStyleConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -78,6 +79,7 @@ import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.edit.AlwaysDeactivatingCellEditor.NewElementsCreator;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 
 import com.google.common.base.Supplier;
@@ -135,9 +137,12 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         final SelectionLayer selectionLayer = new SelectionLayer(hoverLayer);
         selectionLayer.addConfiguration(new AbstractUiBindingConfiguration() {
+
             @Override
             public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-                uiBindingRegistry.registerKeyBinding(new KeyEventMatcher(SWT.CR),
+                uiBindingRegistry.registerFirstKeyBinding(new KeyEventMatcher(SWT.SHIFT, SWT.CR),
+                        new MoveSelectionAction(MoveDirectionEnum.LEFT, false, false));
+                uiBindingRegistry.registerFirstKeyBinding(new KeyEventMatcher(SWT.NONE, SWT.CR),
                         new MoveSelectionAction(MoveDirectionEnum.RIGHT));
             }
         });
@@ -170,7 +175,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         gridLayer.addConfiguration(new TableEditBindings());
         gridLayer
-                .addConfiguration(new VariablesEditConfiguration(SuiteModelEditableRule.createEditableRule(fileModel)));
+                .addConfiguration(new VariablesEditConfiguration(
+                        SuiteModelEditableRule.createEditableRule(fileModel), newElementsCreator()));
 
         // Add popup menu - build your own popup menu using the PopupMenuBuilder
         table.addConfiguration(new HeaderMenuConfiguration(table));
@@ -234,7 +240,19 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new RowHeaderStyleConfiguration(theme));
         table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
-        table.addConfiguration(new AddingElementConfiguration(theme, fileModel.isEditable()));
+        table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
+    }
+
+    private NewElementsCreator<RobotVariable> newElementsCreator() {
+        return new NewElementsCreator<RobotVariable>() {
+            @Override
+            public RobotVariable createNew() {
+                final RobotVariablesSection section = dataProvider.getInput();
+                commandsStack.execute(new CreateFreshVariableCommand(section));
+
+                return section.getChildren().get(section.getChildren().size() - 1);
+            }
+        };
     }
 
     private void createContextMenu() {
