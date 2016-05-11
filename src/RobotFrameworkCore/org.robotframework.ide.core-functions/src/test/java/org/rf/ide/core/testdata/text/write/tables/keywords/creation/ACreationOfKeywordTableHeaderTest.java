@@ -12,13 +12,13 @@ import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
-public abstract class ACreationOfKeywordsTableHeaderTest {
+public abstract class ACreationOfKeywordTableHeaderTest {
 
     public static final String PRETTY_NEW_DIR_LOCATION = "keywords//header//new//";
 
     private final String extension;
 
-    public ACreationOfKeywordsTableHeaderTest(final String extension) {
+    public ACreationOfKeywordTableHeaderTest(final String extension) {
         this.extension = extension;
     }
 

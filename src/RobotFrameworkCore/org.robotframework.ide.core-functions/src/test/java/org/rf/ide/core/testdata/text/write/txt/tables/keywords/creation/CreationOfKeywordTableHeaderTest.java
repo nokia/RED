@@ -5,9 +5,9 @@
  */
 package org.rf.ide.core.testdata.text.write.txt.tables.keywords.creation;
 
-import org.rf.ide.core.testdata.text.write.tables.keywords.creation.ACreationOfKeywordsTableHeaderTest;
+import org.rf.ide.core.testdata.text.write.tables.keywords.creation.ACreationOfKeywordTableHeaderTest;
 
-public class CreationOfKeywordTableHeaderTest extends ACreationOfKeywordsTableHeaderTest {
+public class CreationOfKeywordTableHeaderTest extends ACreationOfKeywordTableHeaderTest {
 
     public CreationOfKeywordTableHeaderTest() {
         super("txt");
