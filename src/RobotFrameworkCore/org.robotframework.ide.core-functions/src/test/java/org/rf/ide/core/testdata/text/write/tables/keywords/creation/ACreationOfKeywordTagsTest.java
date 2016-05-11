@@ -25,28 +25,17 @@ public abstract class ACreationOfKeywordTagsTest {
 
     @Test
     public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTagsDecOnly() throws Exception {
-        // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyKeywordTagsNoKeywordName." + getExtension();
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
-
-        // test data prepare
-        modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
-
-        RobotToken keyName = new RobotToken();
-        keyName.setText("");
-        UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        uk.newTags();
-
-        // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+        test_tagsDecOnly("EmptyKeywordTagsNoKeywordName", "");
     }
 
     @Test
     public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTagsDecOnly() throws Exception {
+        test_tagsDecOnly("EmptyKeywordTags", "User Keyword");
+    }
+
+    private void test_tagsDecOnly(final String fileNameWithoutExt, final String userKeywordName) throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyKeywordTags." + getExtension();
+        final String filePath = PRETTY_NEW_DIR_LOCATION + fileNameWithoutExt + "." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -54,50 +43,29 @@ public abstract class ACreationOfKeywordTagsTest {
         KeywordTable keywordTable = modelFile.getKeywordTable();
 
         RobotToken keyName = new RobotToken();
-        keyName.setText("User Keyword");
+        keyName.setText(userKeywordName);
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
         uk.newTags();
 
         // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTags_andComment() throws Exception {
-        // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyKeywordTagsCommentNoKeywordName." + getExtension();
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
-
-        // test data prepare
-        modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
-
-        RobotToken keyName = new RobotToken();
-        keyName.setText("");
-        UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        KeywordTags keyTags = uk.newTags();
-
-        RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTags.addCommentPart(cmTok1);
-        keyTags.addCommentPart(cmTok2);
-        keyTags.addCommentPart(cmTok3);
-
-        // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+        test_tagsDec_andComment("EmptyKeywordTagsCommentNoKeywordName", "");
     }
 
     @Test
     public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTags_andComment() throws Exception {
+        test_tagsDec_andComment("EmptyKeywordTagsComment", "User Keyword");
+    }
+
+    private void test_tagsDec_andComment(final String fileNameWithoutExt, final String userKeywordName)
+            throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyKeywordTagsComment." + getExtension();
+        final String filePath = PRETTY_NEW_DIR_LOCATION + fileNameWithoutExt + "." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -105,7 +73,7 @@ public abstract class ACreationOfKeywordTagsTest {
         KeywordTable keywordTable = modelFile.getKeywordTable();
 
         RobotToken keyName = new RobotToken();
-        keyName.setText("User Keyword");
+        keyName.setText(userKeywordName);
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
         KeywordTags keyTags = uk.newTags();
@@ -122,43 +90,23 @@ public abstract class ACreationOfKeywordTagsTest {
         keyTags.addCommentPart(cmTok3);
 
         // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTags_and3Tags() throws Exception {
-        // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordTagsAnd3TagsNoKeywordName." + getExtension();
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
-
-        // test data prepare
-        modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
-
-        RobotToken keyName = new RobotToken();
-        keyName.setText("");
-        UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        KeywordTags keyTags = uk.newTags();
-
-        RobotToken tagOne = new RobotToken();
-        tagOne.setText("tag1");
-        RobotToken tagTwo = new RobotToken();
-        tagTwo.setText("tag2");
-        RobotToken tagThree = new RobotToken();
-        tagThree.setText("tag3");
-        keyTags.addTag(tagOne);
-        keyTags.addTag(tagTwo);
-        keyTags.addTag(tagThree);
-
-        // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+        test_tags_withTagsAnd3Tags("KeywordTagsAnd3TagsNoKeywordName", "");
     }
 
     @Test
     public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTags_and3Tags() throws Exception {
+        test_tags_withTagsAnd3Tags("KeywordTagsAnd3Tags", "User Keyword");
+    }
+
+    private void test_tags_withTagsAnd3Tags(final String fileNameWithoutExt, final String userKeywordName)
+            throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordTagsAnd3Tags." + getExtension();
+        final String filePath = PRETTY_NEW_DIR_LOCATION + fileNameWithoutExt + "." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -166,7 +114,7 @@ public abstract class ACreationOfKeywordTagsTest {
         KeywordTable keywordTable = modelFile.getKeywordTable();
 
         RobotToken keyName = new RobotToken();
-        keyName.setText("User Keyword");
+        keyName.setText(userKeywordName);
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
         KeywordTags keyTags = uk.newTags();
@@ -182,56 +130,25 @@ public abstract class ACreationOfKeywordTagsTest {
         keyTags.addTag(tagThree);
 
         // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test
     public void test_emptyFile_and_thanCreateKeywordTags_withoutKeywordName_andTags_and3Tags_andComment()
             throws Exception {
-        // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordTagsAnd3TagsCommentNoKeywordName." + getExtension();
-        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
-
-        // test data prepare
-        modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
-
-        RobotToken keyName = new RobotToken();
-        keyName.setText("");
-        UserKeyword uk = new UserKeyword(keyName);
-        keywordTable.addKeyword(uk);
-        KeywordTags keyTags = uk.newTags();
-
-        RobotToken tagOne = new RobotToken();
-        tagOne.setText("tag1");
-        RobotToken tagTwo = new RobotToken();
-        tagTwo.setText("tag2");
-        RobotToken tagThree = new RobotToken();
-        tagThree.setText("tag3");
-        keyTags.addTag(tagOne);
-        keyTags.addTag(tagTwo);
-        keyTags.addTag(tagThree);
-
-        RobotToken cmTok1 = new RobotToken();
-        cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
-        cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
-        cmTok3.setText("cm3");
-
-        keyTags.addCommentPart(cmTok1);
-        keyTags.addCommentPart(cmTok2);
-        keyTags.addCommentPart(cmTok3);
-
-        // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+        test_tags_with3Tags_andComment("KeywordTagsAnd3TagsCommentNoKeywordName", "");
     }
 
     @Test
     public void test_emptyFile_and_thanCreateKeywordTags_withKeywordName_andTags_and3Tags_andComment()
             throws Exception {
+        test_tags_with3Tags_andComment("KeywordTagsAnd3TagsComment", "User Keyword");
+    }
+
+    private void test_tags_with3Tags_andComment(final String fileNameWithoutExt, final String userKeywordName)
+            throws Exception {
         // prepare
-        final String fileName = PRETTY_NEW_DIR_LOCATION + "KeywordTagsAnd3TagsComment." + getExtension();
+        final String filePath = PRETTY_NEW_DIR_LOCATION + fileNameWithoutExt + "." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
 
         // test data prepare
@@ -239,7 +156,7 @@ public abstract class ACreationOfKeywordTagsTest {
         KeywordTable keywordTable = modelFile.getKeywordTable();
 
         RobotToken keyName = new RobotToken();
-        keyName.setText("User Keyword");
+        keyName.setText(userKeywordName);
         UserKeyword uk = new UserKeyword(keyName);
         keywordTable.addKeyword(uk);
         KeywordTags keyTags = uk.newTags();
@@ -266,7 +183,7 @@ public abstract class ACreationOfKeywordTagsTest {
         keyTags.addCommentPart(cmTok3);
 
         // verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     public String getExtension() {
