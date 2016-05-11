@@ -6,7 +6,7 @@
 package org.robotframework.red.nattable.configs;
 
 import org.eclipse.nebula.widgets.nattable.grid.layer.config.DefaultRowStyleConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 
 
 /**

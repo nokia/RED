@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -20,7 +20,7 @@ public class TableThemes {
 
     private static final int LIMIT = 130;
 
-    static TableTheme getTheme(final RGB backgroundInUse) {
+    public static TableTheme getTheme(final RGB backgroundInUse) {
         return isDarkColor(backgroundInUse) ? new DarkTheme() : new BrightTheme();
     }
 
