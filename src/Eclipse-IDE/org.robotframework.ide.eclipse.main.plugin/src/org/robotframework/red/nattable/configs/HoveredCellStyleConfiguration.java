@@ -18,11 +18,11 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
  * @author Michal Anglart
  *
  */
-public class HoveredCellConfiguration extends AbstractRegistryConfiguration {
+public class HoveredCellStyleConfiguration extends AbstractRegistryConfiguration {
 
     private final TableTheme theme;
 
-    public HoveredCellConfiguration(final TableTheme theme) {
+    public HoveredCellStyleConfiguration(final TableTheme theme) {
         this.theme = theme;
     }
 
