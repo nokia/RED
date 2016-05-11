@@ -29,6 +29,7 @@ public class VariablesEditConfiguration extends DefaultEditConfiguration {
 
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
+        super.configureRegistry(configRegistry);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, editableRule);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new TextCellEditor(true, true),
                 DisplayMode.NORMAL, GridRegion.BODY);

@@ -10,7 +10,7 @@ import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.PaddingDecorator;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
 import org.eclipse.nebula.widgets.nattable.style.VerticalAlignmentEnum;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 
 
 /**
