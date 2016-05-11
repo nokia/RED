@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
@@ -41,7 +42,11 @@ import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
 import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayerPainter;
+import org.eclipse.nebula.widgets.nattable.selection.action.MoveSelectionAction;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.menu.DebugMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -129,6 +134,13 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         hoverLayer.addConfiguration(new SimpleHoverStylingBindings(hoverLayer));
 
         final SelectionLayer selectionLayer = new SelectionLayer(hoverLayer);
+        selectionLayer.addConfiguration(new AbstractUiBindingConfiguration() {
+            @Override
+            public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+                uiBindingRegistry.registerKeyBinding(new KeyEventMatcher(SWT.CR),
+                        new MoveSelectionAction(MoveDirectionEnum.RIGHT));
+            }
+        });
         selectionLayer.setLayerPainter(new SelectionLayerPainter(theme.getGridBorderColor()));
         final ViewportLayer viewportLayer = new ViewportLayer(selectionLayer);
 
