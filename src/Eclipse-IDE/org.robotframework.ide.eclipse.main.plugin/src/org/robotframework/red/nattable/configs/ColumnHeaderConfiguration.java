@@ -7,7 +7,7 @@ package org.robotframework.red.nattable.configs;
 
 import org.eclipse.nebula.widgets.nattable.layer.config.DefaultColumnHeaderStyleConfiguration;
 import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.nattable.painter.UnderlinedCellBackgroundPainter;
 import org.robotframework.red.nattable.painter.UnderlinedCellBackgroundPainter.Side;
 
