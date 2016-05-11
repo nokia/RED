@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementStyleConfiguration;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementLabelAccumulator;
 
 public class AddingElementLabelAccumulatorTest {
@@ -31,11 +31,11 @@ public class AddingElementLabelAccumulatorTest {
 
                 if (isInLeftBottomCorner) {
                     assertThat(configLabels.getLabels())
-                            .containsOnly(AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL,
-                                    AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                            .containsOnly(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL,
+                                    AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else if (isInBottomRow) {
                     assertThat(configLabels.getLabels())
-                            .containsOnly(AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                            .containsOnly(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else {
                     assertThat(configLabels.getLabels()).isEmpty();
                 }
