@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class TestCaseTable extends ARobotSectionTable {
 
@@ -18,6 +19,16 @@ public class TestCaseTable extends ARobotSectionTable {
 
     public TestCaseTable(final RobotFile parent) {
         super(parent);
+    }
+
+    public TestCase createTestCase(final String testName) {
+        RobotToken testCaseName = new RobotToken();
+        testCaseName.setText(testName);
+
+        TestCase test = new TestCase(testCaseName);
+        addTest(test);
+
+        return test;
     }
 
     public void addTest(final TestCase testCase) {
