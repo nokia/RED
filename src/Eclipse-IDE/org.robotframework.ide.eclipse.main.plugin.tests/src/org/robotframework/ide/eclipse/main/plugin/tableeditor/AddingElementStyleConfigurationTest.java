@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Display;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 
-public class AddingElementConfigurationTest {
+public class AddingElementStyleConfigurationTest {
 
     @SuppressWarnings("unchecked")
     @Test
@@ -31,14 +31,14 @@ public class AddingElementConfigurationTest {
 
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
-        final AddingElementConfiguration configuration = new AddingElementConfiguration(theme, true);
+        final AddingElementStyleConfiguration configuration = new AddingElementStyleConfiguration(theme, true);
         configuration.configureRegistry(configRegistry);
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
-                eq(DisplayMode.NORMAL), eq(AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                eq(DisplayMode.NORMAL), eq(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
-                eq(DisplayMode.SELECT), eq(AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                eq(DisplayMode.SELECT), eq(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(ICellPainter.class),
-                eq(DisplayMode.NORMAL), eq(AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                eq(DisplayMode.NORMAL), eq(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
     }
 }

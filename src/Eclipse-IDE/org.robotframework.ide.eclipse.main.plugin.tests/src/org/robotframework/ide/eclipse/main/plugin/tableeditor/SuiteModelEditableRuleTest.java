@@ -38,10 +38,10 @@ public class SuiteModelEditableRuleTest {
 
         when(cell1.getConfigLabels()).thenReturn(new LabelStack("BODY"));
         when(cell2.getConfigLabels())
-                .thenReturn(new LabelStack("BODY", AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL));
+                .thenReturn(new LabelStack("BODY", AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL));
         when(cell3.getConfigLabels())
-                .thenReturn(new LabelStack("BODY", AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL,
-                        AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                .thenReturn(new LabelStack("BODY", AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL,
+                        AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
 
         final IEditableRule rule = SuiteModelEditableRule.createEditableRule(model);
 
@@ -55,31 +55,21 @@ public class SuiteModelEditableRuleTest {
         final RobotSuiteFile model = spy(new RobotSuiteFileCreator().build());
         when(model.isEditable()).thenReturn(true);
 
-        final ILayerCell cell = mock(ILayerCell.class);
-        when(cell.getConfigLabels()).thenReturn(new LabelStack("BODY"));
-
-        final IEditableRule rule = SuiteModelEditableRule.createEditableRule(model);
-
-        assertThat(rule.isEditable(cell, mock(IConfigRegistry.class))).isTrue();
-    }
-
-    @Test
-    public void addingCellIsNotEditable_evenWhenModelIsEditable() {
-        final RobotSuiteFile model = spy(new RobotSuiteFileCreator().build());
-        when(model.isEditable()).thenReturn(true);
-
         final ILayerCell cell1 = mock(ILayerCell.class);
         final ILayerCell cell2 = mock(ILayerCell.class);
+        final ILayerCell cell3 = mock(ILayerCell.class);
 
-        when(cell1.getConfigLabels())
-                .thenReturn(new LabelStack("BODY", AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL));
+        when(cell1.getConfigLabels()).thenReturn(new LabelStack("BODY"));
         when(cell2.getConfigLabels())
-                .thenReturn(new LabelStack("BODY", AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL,
-                        AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                .thenReturn(new LabelStack("BODY", AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL));
+        when(cell3.getConfigLabels())
+                .thenReturn(new LabelStack("BODY", AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL,
+                        AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
 
         final IEditableRule rule = SuiteModelEditableRule.createEditableRule(model);
 
-        assertThat(rule.isEditable(cell1, mock(IConfigRegistry.class))).isFalse();
-        assertThat(rule.isEditable(cell2, mock(IConfigRegistry.class))).isFalse();
+        assertThat(rule.isEditable(cell1, mock(IConfigRegistry.class))).isTrue();
+        assertThat(rule.isEditable(cell2, mock(IConfigRegistry.class))).isTrue();
+        assertThat(rule.isEditable(cell2, mock(IConfigRegistry.class))).isTrue();
     }
 }
