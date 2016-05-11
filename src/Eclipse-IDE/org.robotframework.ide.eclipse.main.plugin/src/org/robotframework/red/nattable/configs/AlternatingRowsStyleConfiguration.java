@@ -13,9 +13,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
  * @author Michal Anglart
  *
  */
-public class AlternatingRowsConfiguration extends DefaultRowStyleConfiguration {
+public class AlternatingRowsStyleConfiguration extends DefaultRowStyleConfiguration {
 
-    public AlternatingRowsConfiguration(final TableTheme theme) {
+    public AlternatingRowsStyleConfiguration(final TableTheme theme) {
         this.oddRowBgColor = theme.getBodyBackgroundOddRowBackground();
         this.evenRowBgColor = theme.getBodyBackgroundEvenRowBackground();
     }
