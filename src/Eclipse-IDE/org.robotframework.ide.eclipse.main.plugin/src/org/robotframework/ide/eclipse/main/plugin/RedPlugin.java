@@ -16,6 +16,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.fileWatcher.RedFileWatcher;
 import org.robotframework.ide.eclipse.main.plugin.console.RedSessionProcessListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.preferences.InstalledRobotEnvironments;
@@ -66,6 +67,7 @@ public class RedPlugin extends AbstractUIPlugin {
         FontsManager.disposeFonts();
         ImagesManager.disposeImages();
         RobotModelManager.getInstance().dispose();
+        RedFileWatcher.getInstance().closeWatchService();
     }
 
     public RedPreferences getPreferences() {
