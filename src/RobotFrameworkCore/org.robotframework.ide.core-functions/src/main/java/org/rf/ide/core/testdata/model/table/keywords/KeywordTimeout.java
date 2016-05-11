@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordTimeout extends AModelElement<UserKeyword> {
 
@@ -43,6 +44,7 @@ public class KeywordTimeout extends AModelElement<UserKeyword> {
     }
 
     public void setTimeout(final RobotToken timeout) {
+        fixForTheType(timeout, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE, true);
         this.timeout = timeout;
     }
 
@@ -51,6 +53,7 @@ public class KeywordTimeout extends AModelElement<UserKeyword> {
     }
 
     public void addMessagePart(final RobotToken messagePart) {
+        fixForTheType(messagePart, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE, true);
         this.message.add(messagePart);
     }
 
@@ -59,6 +62,7 @@ public class KeywordTimeout extends AModelElement<UserKeyword> {
     }
 
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
 
