@@ -21,7 +21,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
+import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
@@ -81,6 +83,7 @@ import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.edit.AlwaysDeactivatingCellEditor.NewElementsCreator;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.ImmutableMap;
@@ -174,9 +177,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         addCustomStyling(theme);
 
         gridLayer.addConfiguration(new TableEditBindings());
-        gridLayer
-                .addConfiguration(new VariablesEditConfiguration(
-                        SuiteModelEditableRule.createEditableRule(fileModel), newElementsCreator()));
+        gridLayer.addConfiguration(new VariablesEditConfiguration(SuiteModelEditableRule.createEditableRule(fileModel),
+                newElementsCreator(selectionLayer)));
 
         // Add popup menu - build your own popup menu using the PopupMenuBuilder
         table.addConfiguration(new HeaderMenuConfiguration(table));
@@ -243,13 +245,23 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
     }
 
-    private NewElementsCreator<RobotVariable> newElementsCreator() {
+    private NewElementsCreator<RobotVariable> newElementsCreator(final SelectionLayer selectionLayer) {
         return new NewElementsCreator<RobotVariable>() {
             @Override
             public RobotVariable createNew() {
+                final PositionCoordinate selectedCellPosition = selectionLayer.getLastSelectedCellPosition();
+                final int selectedCellColumn = selectedCellPosition.columnPosition;
+                final int selectedCellRow = selectedCellPosition.rowPosition;
+
                 final RobotVariablesSection section = dataProvider.getInput();
                 commandsStack.execute(new CreateFreshVariableCommand(section));
-
+                SwtThread.asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        selectionLayer.selectCell(selectedCellColumn, selectedCellRow, false, false);
+                        table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
+                    }
+                });
                 return section.getChildren().get(section.getChildren().size() - 1);
             }
         };
