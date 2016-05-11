@@ -26,27 +26,27 @@ public class AlternatingRowsConfigurationTest {
         when(theme.getBodyBackgroundOddRowBackground()).thenReturn(oddBgColorInUse);
         when(theme.getBodyBackgroundEvenRowBackground()).thenReturn(evenBgColorInUse);
 
-        final AlternatingRowsConfiguration configuration = new AlternatingRowsConfiguration(theme);
+        final AlternatingRowsStyleConfiguration configuration = new AlternatingRowsStyleConfiguration(theme);
 
         assertThat(configuration).has(oddBackground(oddBgColorInUse));
         assertThat(configuration).has(evenBackground(evenBgColorInUse));
     }
 
-    private Condition<AlternatingRowsConfiguration> oddBackground(final Color bgColorInUse) {
-        return new Condition<AlternatingRowsConfiguration>() {
+    private Condition<AlternatingRowsStyleConfiguration> oddBackground(final Color bgColorInUse) {
+        return new Condition<AlternatingRowsStyleConfiguration>() {
 
             @Override
-            public boolean matches(final AlternatingRowsConfiguration config) {
+            public boolean matches(final AlternatingRowsStyleConfiguration config) {
                 return config.oddRowBgColor.equals(bgColorInUse);
             }
         };
     }
 
-    private Condition<AlternatingRowsConfiguration> evenBackground(final Color fgColorInUse) {
-        return new Condition<AlternatingRowsConfiguration>() {
+    private Condition<AlternatingRowsStyleConfiguration> evenBackground(final Color fgColorInUse) {
+        return new Condition<AlternatingRowsStyleConfiguration>() {
 
             @Override
-            public boolean matches(final AlternatingRowsConfiguration config) {
+            public boolean matches(final AlternatingRowsStyleConfiguration config) {
                 return config.evenRowBgColor.equals(fgColorInUse);
             }
         };

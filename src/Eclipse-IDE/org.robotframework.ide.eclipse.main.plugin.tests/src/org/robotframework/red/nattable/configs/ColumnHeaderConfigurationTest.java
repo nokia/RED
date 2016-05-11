@@ -32,7 +32,7 @@ public class ColumnHeaderConfigurationTest {
         when(theme.getHeadersForeground()).thenReturn(fgColorInUse);
         when(theme.getHeadersUnderlineColor()).thenReturn(ColorsManager.getColor(200, 0, 0));
 
-        final ColumnHeaderConfiguration configuration = new ColumnHeaderConfiguration(theme);
+        final ColumnHeaderStyleConfiguration configuration = new ColumnHeaderStyleConfiguration(theme);
 
         assertThat(configuration).has(font(fontInUse));
         assertThat(configuration).has(background(bgColorInUse));
@@ -40,31 +40,31 @@ public class ColumnHeaderConfigurationTest {
         assertThat(configuration.cellPainter).isInstanceOf(UnderlinedCellBackgroundPainter.class);
     }
 
-    private Condition<ColumnHeaderConfiguration> background(final Color bgColorInUse) {
-        return new Condition<ColumnHeaderConfiguration>() {
+    private Condition<ColumnHeaderStyleConfiguration> background(final Color bgColorInUse) {
+        return new Condition<ColumnHeaderStyleConfiguration>() {
 
             @Override
-            public boolean matches(final ColumnHeaderConfiguration config) {
+            public boolean matches(final ColumnHeaderStyleConfiguration config) {
                 return config.bgColor.equals(bgColorInUse);
             }
         };
     }
 
-    private Condition<ColumnHeaderConfiguration> foreground(final Color fgColorInUse) {
-        return new Condition<ColumnHeaderConfiguration>() {
+    private Condition<ColumnHeaderStyleConfiguration> foreground(final Color fgColorInUse) {
+        return new Condition<ColumnHeaderStyleConfiguration>() {
 
             @Override
-            public boolean matches(final ColumnHeaderConfiguration config) {
+            public boolean matches(final ColumnHeaderStyleConfiguration config) {
                 return config.fgColor.equals(fgColorInUse);
             }
         };
     }
 
-    private static Condition<ColumnHeaderConfiguration> font(final Font font) {
-        return new Condition<ColumnHeaderConfiguration>() {
+    private static Condition<ColumnHeaderStyleConfiguration> font(final Font font) {
+        return new Condition<ColumnHeaderStyleConfiguration>() {
 
             @Override
-            public boolean matches(final ColumnHeaderConfiguration config) {
+            public boolean matches(final ColumnHeaderStyleConfiguration config) {
                 return config.font.equals(font);
             }
         };
