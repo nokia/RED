@@ -67,11 +67,11 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteModelEditable
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.nattable.configs.AlternatingRowsConfiguration;
-import org.robotframework.red.nattable.configs.ColumnHeaderConfiguration;
-import org.robotframework.red.nattable.configs.GeneralTableConfiguration;
-import org.robotframework.red.nattable.configs.HoveredCellConfiguration;
-import org.robotframework.red.nattable.configs.RowHeaderConfiguration;
+import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
+import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
+import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
+import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
+import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 
@@ -208,7 +208,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     private void addCustomStyling(final TableTheme theme) {
-        final GeneralTableConfiguration tableStyle = new GeneralTableConfiguration(theme,
+        final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
                 new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
                     @Override
                     public HeaderFilterMatchesCollection get() {
@@ -217,10 +217,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 }, Stylers.Common.MATCH_STYLER));
 
         table.addConfiguration(tableStyle);
-        table.addConfiguration(new HoveredCellConfiguration(theme));
-        table.addConfiguration(new ColumnHeaderConfiguration(theme));
-        table.addConfiguration(new RowHeaderConfiguration(theme));
-        table.addConfiguration(new AlternatingRowsConfiguration(theme));
+        table.addConfiguration(new HoveredCellStyleConfiguration(theme));
+        table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
+        table.addConfiguration(new RowHeaderStyleConfiguration(theme));
+        table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementConfiguration(theme, fileModel.isEditable()));
     }
