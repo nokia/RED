@@ -18,7 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.nattable.painter.UnderlinedCellBackgroundPainter;
 
-public class RowHeaderConfigurationTest {
+public class ColumnHeaderStyleConfigurationTest {
 
     @Test
     public void configurationCheck() {
@@ -32,7 +32,7 @@ public class RowHeaderConfigurationTest {
         when(theme.getHeadersForeground()).thenReturn(fgColorInUse);
         when(theme.getHeadersUnderlineColor()).thenReturn(ColorsManager.getColor(200, 0, 0));
 
-        final RowHeaderStyleConfiguration configuration = new RowHeaderStyleConfiguration(theme);
+        final ColumnHeaderStyleConfiguration configuration = new ColumnHeaderStyleConfiguration(theme);
 
         assertThat(configuration).has(font(fontInUse));
         assertThat(configuration).has(background(bgColorInUse));
@@ -40,31 +40,31 @@ public class RowHeaderConfigurationTest {
         assertThat(configuration.cellPainter).isInstanceOf(UnderlinedCellBackgroundPainter.class);
     }
 
-    private Condition<RowHeaderStyleConfiguration> background(final Color bgColorInUse) {
-        return new Condition<RowHeaderStyleConfiguration>() {
+    private Condition<ColumnHeaderStyleConfiguration> background(final Color bgColorInUse) {
+        return new Condition<ColumnHeaderStyleConfiguration>() {
 
             @Override
-            public boolean matches(final RowHeaderStyleConfiguration config) {
+            public boolean matches(final ColumnHeaderStyleConfiguration config) {
                 return config.bgColor.equals(bgColorInUse);
             }
         };
     }
 
-    private Condition<RowHeaderStyleConfiguration> foreground(final Color fgColorInUse) {
-        return new Condition<RowHeaderStyleConfiguration>() {
+    private Condition<ColumnHeaderStyleConfiguration> foreground(final Color fgColorInUse) {
+        return new Condition<ColumnHeaderStyleConfiguration>() {
 
             @Override
-            public boolean matches(final RowHeaderStyleConfiguration config) {
+            public boolean matches(final ColumnHeaderStyleConfiguration config) {
                 return config.fgColor.equals(fgColorInUse);
             }
         };
     }
 
-    private static Condition<RowHeaderStyleConfiguration> font(final Font font) {
-        return new Condition<RowHeaderStyleConfiguration>() {
+    private static Condition<ColumnHeaderStyleConfiguration> font(final Font font) {
+        return new Condition<ColumnHeaderStyleConfiguration>() {
 
             @Override
-            public boolean matches(final RowHeaderStyleConfiguration config) {
+            public boolean matches(final ColumnHeaderStyleConfiguration config) {
                 return config.font.equals(font);
             }
         };
