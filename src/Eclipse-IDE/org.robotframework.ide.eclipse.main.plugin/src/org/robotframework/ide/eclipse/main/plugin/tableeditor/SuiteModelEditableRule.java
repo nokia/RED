@@ -24,8 +24,7 @@ public class SuiteModelEditableRule implements IEditableRule {
 
     @Override
     public boolean isEditable(final ILayerCell cell, final IConfigRegistry configRegistry) {
-        return isEditable
-                && !cell.getConfigLabels().hasLabel(AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+        return isEditable;
     }
 
     @Override

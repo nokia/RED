@@ -32,7 +32,7 @@ import org.robotframework.red.graphics.ImagesManager;
 /**
  * @author Michal Anglart
  */
-public class AddingElementConfiguration extends AbstractRegistryConfiguration {
+public class AddingElementStyleConfiguration extends AbstractRegistryConfiguration {
 
     public static final String ELEMENT_ADDER_CONFIG_LABEL = "ELEMENT_ADDER";
 
@@ -42,7 +42,7 @@ public class AddingElementConfiguration extends AbstractRegistryConfiguration {
 
     private final boolean isEditable;
 
-    public AddingElementConfiguration(final TableTheme theme, final boolean isEditable) {
+    public AddingElementStyleConfiguration(final TableTheme theme, final boolean isEditable) {
         this.font = theme.getFont();
         this.isEditable = isEditable;
     }
