@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
 
-public class AlternatingRowsConfigurationTest {
+public class AlternatingRowsStyleConfigurationTest {
 
     @Test
     public void configurationCheck() {
