@@ -24,10 +24,10 @@ public class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
     @Override
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
         if (columnPosition == 0 && dataProvider.getRowCount() - 1 == rowPosition) {
-            configLabels.addLabel(AddingElementConfiguration.ELEMENT_ADDER_CONFIG_LABEL);
+            configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL);
         }
         if (dataProvider.getRowCount() - 1 == rowPosition) {
-            configLabels.addLabel(AddingElementConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+            configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
         }
     }
 }

@@ -101,6 +101,9 @@ class VariablesDataProvider implements IDataProvider, IRowDataProvider<RobotVari
 
     @Override
     public void setDataValue(final int column, final int row, final Object value) {
+        if (value instanceof RobotVariable) {
+            return;
+        }
         final RobotVariable var = getRowObject(row);
         if (column == 0) {
             commandsStack.execute(new SetVariableNameCommand(var, (String) value));
