@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestDocumentation extends AModelElement<TestCase> {
 
@@ -27,6 +28,7 @@ public class TestDocumentation extends AModelElement<TestCase> {
     }
 
     public void addDocumentationText(final RobotToken token) {
+        fixForTheType(token, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT, true);
         text.add(token);
     }
 
@@ -39,6 +41,7 @@ public class TestDocumentation extends AModelElement<TestCase> {
     }
 
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
 

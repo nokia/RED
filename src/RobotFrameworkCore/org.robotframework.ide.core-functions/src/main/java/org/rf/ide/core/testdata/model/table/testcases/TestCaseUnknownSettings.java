@@ -50,6 +50,7 @@ public class TestCaseUnknownSettings extends AModelElement<TestCase> {
     }
 
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
 
