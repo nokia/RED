@@ -16,13 +16,11 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditBindings;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultColumnHeaderDataProvider;
 import org.eclipse.nebula.widgets.nattable.grid.data.DefaultCornerDataProvider;
@@ -44,9 +42,6 @@ import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHan
 import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayerPainter;
-import org.eclipse.nebula.widgets.nattable.selection.config.DefaultSelectionStyleConfiguration;
-import org.eclipse.nebula.widgets.nattable.style.BorderStyle;
-import org.eclipse.nebula.widgets.nattable.style.BorderStyle.LineStyleEnum;
 import org.eclipse.nebula.widgets.nattable.ui.menu.DebugMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -69,14 +64,15 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteModelEditableRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.nattable.configs.AlternatingRowsConfiguration;
 import org.robotframework.red.nattable.configs.ColumnHeaderConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderConfiguration;
+import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 
 import com.google.common.base.Supplier;
@@ -160,7 +156,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         addCustomStyling(theme);
 
-        gridLayer.addConfiguration(new DefaultEditBindings());
+        gridLayer.addConfiguration(new TableEditBindings());
         gridLayer
                 .addConfiguration(new VariablesEditConfiguration(SuiteModelEditableRule.createEditableRule(fileModel)));
 
@@ -220,28 +216,12 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                     }
                 }, Stylers.Common.MATCH_STYLER));
 
-        final DefaultSelectionStyleConfiguration selectionStyle = new DefaultSelectionStyleConfiguration();
-        selectionStyle.selectionFont = FontsManager.getFont(FontDescriptor.createFrom(table.getFont()));
-        selectionStyle.selectionBgColor = theme.getBodySelectedCellBackground();
-        selectionStyle.selectionFgColor = theme.getBodyForeground();
-        selectionStyle.selectedHeaderFont = FontsManager.getFont(FontDescriptor.createFrom(table.getFont()));
-        selectionStyle.selectedHeaderBorderStyle = new BorderStyle(0, ColorsManager.getColor(SWT.COLOR_DARK_GRAY),
-                LineStyleEnum.SOLID);
-        selectionStyle.selectedHeaderBgColor = theme.getHighlightedHeadersBackground();
-        selectionStyle.selectedHeaderFgColor = theme.getBodyForeground();
-        selectionStyle.anchorBgColor = theme.getBodyAnchoredCellBackground();
-        selectionStyle.anchorFgColor = theme.getBodyForeground();
-        selectionStyle.anchorBorderStyle = new BorderStyle(0, ColorsManager.getColor(SWT.COLOR_DARK_GRAY),
-                LineStyleEnum.SOLID);
-        selectionStyle.anchorGridBorderStyle = new BorderStyle(0, ColorsManager.getColor(SWT.COLOR_DARK_GRAY),
-                LineStyleEnum.SOLID);
-
         table.addConfiguration(tableStyle);
         table.addConfiguration(new HoveredCellConfiguration(theme));
         table.addConfiguration(new ColumnHeaderConfiguration(theme));
         table.addConfiguration(new RowHeaderConfiguration(theme));
         table.addConfiguration(new AlternatingRowsConfiguration(theme));
-        table.addConfiguration(selectionStyle);
+        table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementConfiguration(theme, fileModel.isEditable()));
     }
 
@@ -328,8 +308,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenVariableIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
-            // viewer.refresh();
-
+            dataProvider.setInput(getSection());
+            table.refresh();
             setDirty();
         }
     }
