@@ -10,6 +10,7 @@ import org.eclipse.nebula.widgets.nattable.edit.editor.IEditErrorHandler;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.robotframework.red.nattable.NewElementsCreator;
 
 /**
  * @author Michal Anglart
@@ -52,10 +53,5 @@ public class AlwaysDeactivatingCellEditor extends AbstractCellEditor {
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
         commit(MoveDirectionEnum.UP);
         return null;
-    }
-
-    public static interface NewElementsCreator<T> {
-
-        T createNew();
     }
 }
