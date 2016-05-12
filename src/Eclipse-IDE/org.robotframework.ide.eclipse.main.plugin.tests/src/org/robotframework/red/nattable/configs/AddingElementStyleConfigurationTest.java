@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor;
+package org.robotframework.red.nattable.configs;
 
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -19,7 +19,9 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.swt.widgets.Display;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 
 public class AddingElementStyleConfigurationTest {
 

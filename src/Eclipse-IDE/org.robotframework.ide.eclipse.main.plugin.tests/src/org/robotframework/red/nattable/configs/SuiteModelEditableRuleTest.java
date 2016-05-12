@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor;
+package org.robotframework.red.nattable.configs;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -17,6 +17,8 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
+import org.robotframework.red.nattable.configs.SuiteModelEditableRule;
 
 public class SuiteModelEditableRuleTest {
 
