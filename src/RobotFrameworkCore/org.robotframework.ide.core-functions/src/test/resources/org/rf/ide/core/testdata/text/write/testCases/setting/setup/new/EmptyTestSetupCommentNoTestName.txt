@@ -1,0 +1,3 @@
+*** Test Case ***
+
+	[Setup]	#cm1	cm2	cm3
