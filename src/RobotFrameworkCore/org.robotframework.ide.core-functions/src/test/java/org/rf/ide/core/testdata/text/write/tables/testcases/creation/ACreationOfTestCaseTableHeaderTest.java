@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public abstract class ACreationOfTestCaseTableHeaderTest {
 
-    public static final String PRETTY_NEW_DIR_LOCATION = "testcases//header//new//";
+    public static final String PRETTY_NEW_DIR_LOCATION = "testCases//header//new//";
 
     private final String extension;
 
