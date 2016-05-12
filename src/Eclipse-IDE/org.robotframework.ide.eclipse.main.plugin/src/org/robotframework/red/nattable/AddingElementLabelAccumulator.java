@@ -3,21 +3,22 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor;
+package org.robotframework.red.nattable;
 
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
+import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 
 /**
  * @author Michal Anglart
  *
  */
-public class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
+class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
 
     private final IDataProvider dataProvider;
 
-    public AddingElementLabelAccumulator(final IDataProvider dataProvider) {
+    AddingElementLabelAccumulator(final IDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
 
