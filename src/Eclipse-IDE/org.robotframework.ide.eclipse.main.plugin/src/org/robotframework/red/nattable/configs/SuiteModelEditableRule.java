@@ -3,18 +3,18 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor;
+package org.robotframework.red.nattable.configs;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
-public class SuiteModelEditableRule implements IEditableRule {
+class SuiteModelEditableRule implements IEditableRule {
 
     private final boolean isEditable;
 
-    public static IEditableRule createEditableRule(final RobotSuiteFile fileModel) {
+    static IEditableRule createEditableRule(final RobotSuiteFile fileModel) {
         return new SuiteModelEditableRule(fileModel.isEditable());
     }
 
