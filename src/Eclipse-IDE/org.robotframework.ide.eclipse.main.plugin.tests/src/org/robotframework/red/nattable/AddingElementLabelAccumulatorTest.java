@@ -3,15 +3,15 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor;
+package org.robotframework.red.nattable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementStyleConfiguration;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingElementLabelAccumulator;
+import org.robotframework.red.nattable.AddingElementLabelAccumulator;
+import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 
 public class AddingElementLabelAccumulatorTest {
 
