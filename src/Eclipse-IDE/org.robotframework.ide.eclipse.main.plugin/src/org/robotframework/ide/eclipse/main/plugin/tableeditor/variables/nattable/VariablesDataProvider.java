@@ -7,15 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattabl
 
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
-import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.VariablesMatchesCollection.VariableFilter;
 
-import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
 
@@ -25,23 +22,27 @@ import ca.odell.glazedlists.SortedList;
  */
 class VariablesDataProvider implements IDataProvider, IRowDataProvider<RobotVariable> {
 
-    private final RobotEditorCommandsStack commandsStack;
-
     private RobotVariablesSection section;
     private SortedList<RobotVariable> variables;
 
     private VariableFilter filter;
 
+    private final VariableColumnsPropertyAccessor propertyAccessor;
+
     VariablesDataProvider(final RobotEditorCommandsStack commandsStack, final RobotVariablesSection section) {
-        this.commandsStack = commandsStack;
         this.section = section;
         this.variables = createFrom(section);
+        this.propertyAccessor = new VariableColumnsPropertyAccessor(commandsStack);
     }
 
     private SortedList<RobotVariable> createFrom(final RobotVariablesSection section) {
         if (section != null) {
-            final EventList<RobotVariable> vars = GlazedLists.eventList(section.getChildren());
-            return new SortedList<>(vars, null);
+            if (variables == null) {
+                variables = new SortedList<>(GlazedLists.<RobotVariable>eventListOf(), null);
+            }
+            variables.clear();
+            variables.addAll(section.getChildren());
+            return variables;
         }
         return null;
     }
@@ -51,13 +52,21 @@ class VariablesDataProvider implements IDataProvider, IRowDataProvider<RobotVari
         this.variables = createFrom(section);
     }
 
+    SortedList<RobotVariable> getSortedList() {
+        return variables;
+    }
+
     public RobotVariablesSection getInput() {
         return section;
     }
 
+    VariableColumnsPropertyAccessor getPropertyAccessor() {
+        return propertyAccessor;
+    }
+
     @Override
     public int getColumnCount() {
-        return 3;
+        return propertyAccessor.getColumnCount();
     }
 
     @Override
@@ -66,17 +75,8 @@ class VariablesDataProvider implements IDataProvider, IRowDataProvider<RobotVari
             if (row == variables.size() - countInvisible()) {
                 return column == 0 ? "...add new scalar" : "";
             }
-
             final RobotVariable variable = getRowObject(row);
-            if (column == 0) {
-                return variable.getType() == VariableType.INVALID ? variable.getName()
-                        : variable.getPrefix() + variable.getName() + variable.getSuffix();
-            } else if (column == 1) {
-                return variable.getValue();
-            } else if (column == 2) {
-                return variable.getComment();
-            }
-            throw new IllegalStateException("Unknown column with " + column + " index");
+            return propertyAccessor.getDataValue(variable, column);
         }
         return "";
     }
@@ -104,10 +104,8 @@ class VariablesDataProvider implements IDataProvider, IRowDataProvider<RobotVari
         if (value instanceof RobotVariable) {
             return;
         }
-        final RobotVariable var = getRowObject(row);
-        if (column == 0) {
-            commandsStack.execute(new SetVariableNameCommand(var, (String) value));
-        }
+        final RobotVariable variable = getRowObject(row);
+        propertyAccessor.setDataValue(variable, column, value);
     }
 
     @Override

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable;
+package org.robotframework.red.nattable.configs;
 
 import java.util.ArrayList;
 import java.util.Collection;
