@@ -15,6 +15,8 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ExecutableRowDescriptorBuilder;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -39,6 +41,14 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     }
 
     public void setAction(final RobotToken action) {
+        if (getParent() != null) {
+            Class<? extends Object> parentClass = getParent().getClass();
+            if (parentClass == TestCase.class) {
+                fixForTheType(action, RobotTokenType.TEST_CASE_ACTION_NAME, true);
+            } else if (parentClass == UserKeyword.class) {
+                fixForTheType(action, RobotTokenType.KEYWORD_ACTION_NAME, true);
+            }
+        }
         this.action = action;
     }
 
@@ -47,6 +57,14 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     }
 
     public void addArgument(final RobotToken argument) {
+        if (getParent() != null) {
+            Class<? extends Object> parentClass = getParent().getClass();
+            if (parentClass == TestCase.class) {
+                fixForTheType(action, RobotTokenType.TEST_CASE_ACTION_ARGUMENT, true);
+            } else if (parentClass == UserKeyword.class) {
+                fixForTheType(action, RobotTokenType.KEYWORD_ACTION_ARGUMENT, true);
+            }
+        }
         arguments.add(argument);
     }
 
@@ -55,6 +73,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     }
 
     public void addComment(final RobotToken commentWord) {
+        fixComment(getComment(), commentWord);
         this.comments.add(commentWord);
     }
 
@@ -77,6 +96,18 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
             type = ModelType.TEST_CASE_EXECUTABLE_ROW;
         } else if (types.contains(RobotTokenType.KEYWORD_ACTION_NAME)) {
             type = ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+        }
+
+        if (types.contains(RobotTokenType.UNKNOWN) && type == ModelType.UNKNOWN) {
+            T parent = getParent();
+            if (parent != null) {
+                AModelElement<?> parentModel = (AModelElement<?>) parent;
+                if (parentModel.getModelType() == ModelType.TEST_CASE) {
+                    type = ModelType.TEST_CASE_EXECUTABLE_ROW;
+                } else if (parentModel.getModelType() == ModelType.USER_KEYWORD) {
+                    type = ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+                }
+            }
         }
 
         return type;
