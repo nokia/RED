@@ -91,6 +91,13 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             getDumperHelper().dumpSeparatorsBeforeToken(model, currentLine, elemDeclaration, lines);
         }
 
+        final RobotElementsComparatorWithPositionChangedPresave sorter = getSorter(currentElement);
+        final List<RobotToken> tokens = sorter.getTokensInElement();
+
+        Collections.sort(tokens, sorter);
+
+        int nrOfTokens = getElementDumperHelper().getLastIndexNotEmptyIndex(tokens) + 1;
+
         IRobotLineElement lastToken = elemDeclaration;
         if (!elemDeclaration.isDirty() && currentLine != null) {
             getDumperHelper().updateLine(model, lines, elemDeclaration);
@@ -110,18 +117,29 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
                 }
             }
         } else {
-            if (!wasSeparatorBefore(lines)) {
-                getDumperHelper().updateLine(model, lines,
-                        getDumperHelper().getSeparator(model, lines, lastToken, lastToken));
+            boolean shouldDumpDeclaration = true;
+            if (!elemDeclaration.isNotEmpty()) {
+                if (tokens.size() > 1) {
+                    final RobotToken theNextToken = tokens.get(1);
+                    final List<IRobotTokenType> types = theNextToken.getTypes();
+                    if (types.contains(RobotTokenType.COMMENT_CONTINUE)
+                            || types.contains(RobotTokenType.START_HASH_COMMENT)) {
+                        shouldDumpDeclaration = false;
+                    }
+                }
             }
-            getDumperHelper().updateLine(model, lines, elemDeclaration);
+
+            if (shouldDumpDeclaration) {
+                if (!wasSeparatorBefore(lines)) {
+                    getDumperHelper().updateLine(model, lines,
+                            getDumperHelper().getSeparator(model, lines, lastToken, lastToken));
+                }
+
+                getDumperHelper().updateLine(model, lines, elemDeclaration);
+            }
             lastToken = elemDeclaration;
         }
 
-        final RobotElementsComparatorWithPositionChangedPresave sorter = getSorter(currentElement);
-        final List<RobotToken> tokens = sorter.getTokensInElement();
-
-        Collections.sort(tokens, sorter);
         // dump as it is
         if (!lastToken.getFilePosition().isNotSet()
                 && !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent()
@@ -129,8 +147,6 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
             return;
         }
-
-        int nrOfTokens = tokens.size();
 
         final List<Integer> lineEndPos = new ArrayList<>(getElementDumperHelper().getLineEndPos(model, tokens));
         if (nrOfTokens > 0) {
@@ -168,6 +184,9 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
         for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
             final IRobotLineElement tokElem = tokens.get(tokenId);
+            if (tokenId == 0 && tokElem == lastToken) {
+                continue;
+            }
             Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokElem);
             getDumperHelper().updateLine(model, lines, sep);
             lastToken = sep;
