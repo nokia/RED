@@ -37,7 +37,6 @@ import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
-import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.DebugMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -67,6 +66,7 @@ import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
 import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
+import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
 import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
@@ -175,7 +175,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         addCustomStyling(table, theme);
 
-        table.addConfiguration(new SingleClickSortConfiguration());
+        table.addConfiguration(new HeaderSortConfiguration());
 
         // Add popup menu - build your own popup menu using the PopupMenuBuilder
         table.addConfiguration(new HeaderMenuConfiguration(table));

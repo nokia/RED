@@ -29,8 +29,16 @@ public class UnderlinedCellBackgroundPainter extends BackgroundPainter {
 
     private final RGB color;
 
+    private final int lineWidth;
+
     public UnderlinedCellBackgroundPainter(final ICellPainter cellPainter, final Side side, final RGB underlineColor) {
+        this(cellPainter, side, LINE_WIDTH, underlineColor);
+    }
+
+    public UnderlinedCellBackgroundPainter(final ICellPainter cellPainter, final Side side, final int lineWidth,
+            final RGB underlineColor) {
         super(cellPainter);
+        this.lineWidth = lineWidth;
         this.side = side;
         this.color = underlineColor;
     }
@@ -43,10 +51,10 @@ public class UnderlinedCellBackgroundPainter extends BackgroundPainter {
         final Color originalFg = gc.getForeground();
         final int originalLineWidth = gc.getLineWidth();
 
-        gc.setLineWidth(LINE_WIDTH);
+        gc.setLineWidth(lineWidth);
         gc.setForeground(ColorsManager.getColor(color));
-        final Point startPoint = side.getStartPoint(bounds, LINE_WIDTH);
-        final Point endPoint = side.getEndPoint(bounds, LINE_WIDTH);
+        final Point startPoint = side.getStartPoint(bounds, lineWidth);
+        final Point endPoint = side.getEndPoint(bounds, lineWidth);
         gc.drawLine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
 
         gc.setForeground(originalFg);
