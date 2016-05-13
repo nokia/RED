@@ -68,13 +68,21 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     public RobotSuiteFileSection createRobotSection(final String name) {
         final RobotSuiteFileSection section;
         if (name.equals(RobotVariablesSection.SECTION_NAME)) {
+            getLinkedElement().includeVariableTableSection();
             section = new RobotVariablesSection(this);
+            section.link(getLinkedElement().getVariableTable());
         } else if (name.equals(RobotSettingsSection.SECTION_NAME)) {
+            getLinkedElement().includeSettingTableSection();
             section = new RobotSettingsSection(this);
+            section.link(getLinkedElement().getSettingTable());
         } else if (name.equals(RobotCasesSection.SECTION_NAME)) {
+            getLinkedElement().includeTestCaseTableSection();
             section = new RobotCasesSection(this);
+            section.link(getLinkedElement().getTestCaseTable());
         } else if (name.equals(RobotKeywordsSection.SECTION_NAME)) {
+            getLinkedElement().includeKeywordTableSection();
             section = new RobotKeywordsSection(this);
+            section.link(getLinkedElement().getKeywordTable());
         } else {
             throw new IllegalStateException("Unrecognized section '" + name + "' cannot be created");
         }
