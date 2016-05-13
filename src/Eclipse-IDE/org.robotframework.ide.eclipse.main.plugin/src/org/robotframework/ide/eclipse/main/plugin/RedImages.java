@@ -318,6 +318,14 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/generic_element.png");
     }
     
+    public static ImageDescriptor getSortUpImage() {
+        return RedPlugin.getImageDescriptor("resources/sort_up.png");
+    }
+
+    public static ImageDescriptor getSortDownImage() {
+        return RedPlugin.getImageDescriptor("resources/sort_down.png");
+    }
+
     public static ImageDescriptor getImageForFileWithExtension(final String extension) {
         final String extWithoutDot = extension.startsWith(".") ? extension.substring(1) : extension;
         return PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor("file." + extWithoutDot);
