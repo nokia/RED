@@ -89,6 +89,11 @@ public class RobotToken implements IRobotLineElement {
         isDirty = false;
     }
 
+    public boolean isNotEmpty() {
+        return (this.getRaw() != null && !this.getRaw().isEmpty())
+                || (this.getText() != null && !this.getText().isEmpty());
+    }
+
     @Override
     public String getRaw() {
         return raw;
