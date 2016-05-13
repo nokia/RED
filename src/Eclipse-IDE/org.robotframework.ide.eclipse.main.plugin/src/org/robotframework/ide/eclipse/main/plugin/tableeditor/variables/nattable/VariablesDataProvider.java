@@ -36,15 +36,14 @@ class VariablesDataProvider implements IDataProvider, IRowDataProvider<RobotVari
     }
 
     private SortedList<RobotVariable> createFrom(final RobotVariablesSection section) {
+        if (variables == null) {
+            variables = new SortedList<>(GlazedLists.<RobotVariable> eventListOf(), null);
+        }
         if (section != null) {
-            if (variables == null) {
-                variables = new SortedList<>(GlazedLists.<RobotVariable>eventListOf(), null);
-            }
             variables.clear();
             variables.addAll(section.getChildren());
-            return variables;
         }
-        return null;
+        return variables;
     }
 
     public void setInput(final RobotVariablesSection section) {
