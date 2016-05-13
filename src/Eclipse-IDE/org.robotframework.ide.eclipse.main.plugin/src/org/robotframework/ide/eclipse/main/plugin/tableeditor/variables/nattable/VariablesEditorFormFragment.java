@@ -35,6 +35,7 @@ import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
 import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.sort.config.SingleClickSortConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.DebugMenuConfiguration;
@@ -101,6 +102,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     private RowSelectionProvider<RobotVariable> selectionProvider;
 
+    private ISortModel sortModel;
+
     ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
@@ -155,6 +158,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
+        sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider);
         // createContextMenu();
     }
@@ -296,7 +300,6 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenVariableDetailChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_DETAIL_CHANGE_ALL) final RobotVariable variable) {
         if (variable.getSuiteFile() == fileModel) {
-            // viewer.update(variable, null);
             table.update();
             setDirty();
         }
@@ -318,8 +321,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenVariableIsAdded(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_ADDED) final RobotSuiteFileSection variablesSection) {
         if (variablesSection.getSuiteFile() == fileModel) {
-            // viewer.getTable().setSortColumn(null);
-            // viewer.setComparator(null);
+            sortModel.clear();
         }
     }
 
