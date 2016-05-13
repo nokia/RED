@@ -26,6 +26,22 @@ import com.google.common.base.Optional;
 
 public class TableElementDumperHelper {
 
+    public int getLastIndexNotEmptyIndex(final List<RobotToken> elems) {
+        int index = -1;
+
+        if (elems != null) {
+            int size = elems.size();
+            for (int elementIndex = 0; elementIndex < size; elementIndex++) {
+                final RobotToken currentElement = elems.get(elementIndex);
+                if (currentElement.isNotEmpty()) {
+                    index = elementIndex;
+                }
+            }
+        }
+
+        return index;
+    }
+
     public Set<Integer> getLineEndPos(final RobotFile model, final List<? extends IRobotLineElement> elems) {
         final Set<Integer> lof = new TreeSet<>();
 
