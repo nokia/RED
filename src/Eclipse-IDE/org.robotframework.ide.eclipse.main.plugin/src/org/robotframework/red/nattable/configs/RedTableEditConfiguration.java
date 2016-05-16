@@ -31,7 +31,12 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
     private final NewElementsCreator<T> creator;
 
     public RedTableEditConfiguration(final RobotSuiteFile fileModel, final NewElementsCreator<T> creator) {
-        this.editableRule = SuiteModelEditableRule.createEditableRule(fileModel);
+        this(fileModel, creator, SuiteModelEditableRule.createEditableRule(fileModel));
+    }
+    
+    public RedTableEditConfiguration(final RobotSuiteFile fileModel, final NewElementsCreator<T> creator,
+            final IEditableRule editableRule) {
+        this.editableRule = editableRule;
         this.creator = creator;
     }
 
