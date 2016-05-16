@@ -45,15 +45,24 @@ public class RedNattableLayersFactory {
     public final static int ROW_HEIGHT = 22;
 
     public DataLayer createDataLayer(final IDataProvider dataProvider) {
+        return createCustomDataLayer(dataProvider, 270, 270);
+    }
+    
+    public DataLayer createDataLayer(final IDataProvider dataProvider, final int firstColumnWidth,
+            final int secondColumnWidth) {
+        return createCustomDataLayer(dataProvider, firstColumnWidth, secondColumnWidth,
+                new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider));
+    }
+
+    public DataLayer createCustomDataLayer(final IDataProvider dataProvider, final int firstColumnWidth,
+            final int secondColumnWidth, final IConfigLabelAccumulator... accumulators) {
         final DataLayer dataLayer = new DataLayer(dataProvider);
         dataLayer.setColumnPercentageSizing(2, true);
-        dataLayer.setColumnWidthByPosition(0, 270);
-        dataLayer.setColumnWidthByPosition(1, 270);
+        dataLayer.setColumnWidthByPosition(0, firstColumnWidth);
+        dataLayer.setColumnWidthByPosition(1, secondColumnWidth);
         dataLayer.setDefaultRowHeight(ROW_HEIGHT);
 
-        dataLayer.setConfigLabelAccumulator(aggregatedFrom(
-                new AlternatingRowConfigLabelAccumulator(),
-                new AddingElementLabelAccumulator(dataProvider)));
+        dataLayer.setConfigLabelAccumulator(aggregatedFrom(accumulators));
         return dataLayer;
     }
 
@@ -109,9 +118,13 @@ public class RedNattableLayersFactory {
     }
 
     public DataLayer createColumnHeaderDataLayer(final IDataProvider columnHeaderDataProvider) {
+        return createColumnHeaderDataLayer(columnHeaderDataProvider, new ColumnLabelAccumulator());
+    }
+    
+    public DataLayer createColumnHeaderDataLayer(final IDataProvider columnHeaderDataProvider, final IConfigLabelAccumulator configLabelAccumulator) {
         final DataLayer columnHeaderDataLayer = new DataLayer(columnHeaderDataProvider);
         columnHeaderDataLayer.setDefaultRowHeight(ROW_HEIGHT);
-        columnHeaderDataLayer.setConfigLabelAccumulator(new ColumnLabelAccumulator());
+        columnHeaderDataLayer.setConfigLabelAccumulator(configLabelAccumulator);
         return columnHeaderDataLayer;
     }
 

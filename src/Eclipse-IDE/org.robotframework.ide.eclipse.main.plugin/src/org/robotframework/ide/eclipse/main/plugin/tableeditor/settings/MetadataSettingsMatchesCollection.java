@@ -9,7 +9,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
-class MetadataSettingsMatchesCollection extends HeaderFilterMatchesCollection {
+public class MetadataSettingsMatchesCollection extends HeaderFilterMatchesCollection {
 
     @Override
     public void collect(final RobotElement element, final String filter) {
