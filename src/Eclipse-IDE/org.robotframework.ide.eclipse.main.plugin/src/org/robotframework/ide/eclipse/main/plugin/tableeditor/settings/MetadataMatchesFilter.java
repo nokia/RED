@@ -12,11 +12,11 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
-class MetadataMatchesFilter extends ViewerFilter {
+public class MetadataMatchesFilter extends ViewerFilter {
 
     private final HeaderFilterMatchesCollection matches;
 
-    MetadataMatchesFilter(final HeaderFilterMatchesCollection matches) {
+    public MetadataMatchesFilter(final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
     }
 
