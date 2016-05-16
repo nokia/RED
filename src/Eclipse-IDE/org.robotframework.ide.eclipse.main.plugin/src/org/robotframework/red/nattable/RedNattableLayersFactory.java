@@ -45,16 +45,16 @@ public class RedNattableLayersFactory {
     public final static int ROW_HEIGHT = 22;
 
     public DataLayer createDataLayer(final IDataProvider dataProvider) {
-        return createCustomDataLayer(dataProvider, 270, 270);
+        return createDataLayer(dataProvider, 270, 270);
     }
     
     public DataLayer createDataLayer(final IDataProvider dataProvider, final int firstColumnWidth,
             final int secondColumnWidth) {
-        return createCustomDataLayer(dataProvider, firstColumnWidth, secondColumnWidth,
+        return createDataLayer(dataProvider, firstColumnWidth, secondColumnWidth,
                 new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider));
     }
 
-    public DataLayer createCustomDataLayer(final IDataProvider dataProvider, final int firstColumnWidth,
+    public DataLayer createDataLayer(final IDataProvider dataProvider, final int firstColumnWidth,
             final int secondColumnWidth, final IConfigLabelAccumulator... accumulators) {
         final DataLayer dataLayer = new DataLayer(dataProvider);
         dataLayer.setColumnPercentageSizing(2, true);
