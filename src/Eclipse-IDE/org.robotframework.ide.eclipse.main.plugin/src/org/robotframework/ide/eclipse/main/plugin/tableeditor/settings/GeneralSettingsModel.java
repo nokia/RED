@@ -21,9 +21,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 
-class GeneralSettingsModel {
+public class GeneralSettingsModel {
     
-    static List<RobotElement> findGeneralSettingsList(final RobotSettingsSection section) {
+    public static List<RobotElement> findGeneralSettingsList(final RobotSettingsSection section) {
         if (section == null) {
             return newArrayList();
         }
@@ -32,7 +32,7 @@ class GeneralSettingsModel {
                 Predicates.notNull()));
     }
 
-    static Map<String, RobotElement> fillSettingsMapping(final RobotSettingsSection section) {
+    public static Map<String, RobotElement> fillSettingsMapping(final RobotSettingsSection section) {
         final Map<String, RobotElement> initialMapping = AccessibleSettings.forFile(section.getSuiteFile().getFile())
                 .createInitialMapping();
 
