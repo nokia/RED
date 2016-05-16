@@ -284,7 +284,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
-        final DataLayer bodyDataLayer = factory.createCustomDataLayer(dataProvider, 120, 150,
+        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 120, 150,
                 new AlternatingRowConfigLabelAccumulator(), new EmptyGeneralSettingLabelAcumulator(dataProvider));
         final GlazedListsEventLayer<Entry<String, RobotElement>> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
