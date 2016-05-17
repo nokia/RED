@@ -12,15 +12,15 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOfExecutionRowTest;
+import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOfThreeExecutionRowsTest;
 
-public abstract class ACreationOfTestCaseExecutableOneStepTest extends ACreationOfExecutionRowTest {
+public abstract class ACreationOfTestCaseExecutableThreeStepsTest extends ACreationOfThreeExecutionRowsTest {
 
-    public static final String PRETTY_NEW_DIR_LOCATION = "testCases//exec//new//oneTestCase//oneExec//";
+    public static final String PRETTY_NEW_DIR_LOCATION = "testCases//exec//new//oneTestCase//threeExecs//";
 
     private final String extension;
 
-    public ACreationOfTestCaseExecutableOneStepTest(final String extension) {
+    public ACreationOfTestCaseExecutableThreeStepsTest(final String extension) {
         this.extension = extension;
     }
 
@@ -47,6 +47,8 @@ public abstract class ACreationOfTestCaseExecutableOneStepTest extends ACreation
         RobotToken testName = new RobotToken();
         TestCase execUnit = new TestCase(testName);
         execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
+        execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
+        execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
         testCaseTable.addTest(execUnit);
 
         return execUnit;
@@ -56,14 +58,11 @@ public abstract class ACreationOfTestCaseExecutableOneStepTest extends ACreation
     public TestFilesCompareStore getCompareFilesStoreForExecutableWithName() {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
-        store.setActionOnlyCmpFile(convert("TestCaseExecutionActionOnly"));
-        store.setActionWithCommentCmpFile(convert("TestCaseExecutionActionWithComment"));
-        store.setActionWithOneArgCmpFile(convert("TestCaseExecutionActionWithOneArg"));
-        store.setActionWithOneArgAndCommentCmpFile(convert("TestCaseExecutionActionWithOneArgAndComment"));
-        store.setActionWithThreeArgCmpFile(convert("TestCaseExecutionActionWithThreeArg"));
-        store.setActionWithThreeArgAndCommentCmpFile(convert("TestCaseExecutionActionWithThreeArgAndComment"));
-        store.setCommentOnlyCmpFile(convert("TestCaseExecutionCommentOnly"));
-        store.setEmptyLineCmpFile(convert("TestCaseExecutionEmptyLine"));
+        store.setThreeLinesWithoutCommentedLineCmpFile(convert("TestExecutionActionWithAllCombinationsNoCommentLine"));
+        store.setThreeLinesWithCommentAndEmptyLineCmpFile(
+                convert("TestExecutionActionWithThreeArgsCommentAndOneCommentedLineAndOneEmpty"));
+        store.setThreeLinesWithCommentTheFirstEmptyLineInTheMiddleCmpFile(
+                convert("TestExecutionActionEmptyLineInTheMiddleCommentTheFirst"));
 
         return store;
     }
@@ -72,16 +71,12 @@ public abstract class ACreationOfTestCaseExecutableOneStepTest extends ACreation
     public TestFilesCompareStore getCompareFilesStoreForExecutableWithoutName() {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
-        store.setActionOnlyCmpFile(convert("TestCaseExecutionActionOnlyWithoutTestName"));
-        store.setActionWithCommentCmpFile(convert("TestCaseExecutionActionWithCommentWithoutTestName"));
-        store.setActionWithOneArgCmpFile(convert("TestCaseExecutionActionWithOneArgWithoutTestName"));
-        store.setActionWithOneArgAndCommentCmpFile(
-                convert("TestCaseExecutionActionWithOneArgAndCommentWithoutTestName"));
-        store.setActionWithThreeArgCmpFile(convert("TestCaseExecutionActionWithThreeArgWithoutTestName"));
-        store.setActionWithThreeArgAndCommentCmpFile(
-                convert("TestCaseExecutionActionWithThreeArgAndCommentWithoutTestName"));
-        store.setCommentOnlyCmpFile(convert("TestCaseExecutionCommentOnlyWithoutTestName"));
-        store.setEmptyLineCmpFile(convert("TestCaseExecutionEmptyLineWithoutTestName"));
+        store.setThreeLinesWithoutCommentedLineCmpFile(
+                convert("TestExecutionActionWithAllCombinationsNoCommentLineWithoutTestName"));
+        store.setThreeLinesWithCommentAndEmptyLineCmpFile(
+                convert("TestExecutionActionWithThreeArgsCommentAndOneCommentedLineAndOneEmptyWithoutTestName"));
+        store.setThreeLinesWithCommentTheFirstEmptyLineInTheMiddleCmpFile(
+                convert("TestExecutionActionEmptyLineInTheMiddleCommentTheFirstWithoutTestName"));
 
         return store;
     }

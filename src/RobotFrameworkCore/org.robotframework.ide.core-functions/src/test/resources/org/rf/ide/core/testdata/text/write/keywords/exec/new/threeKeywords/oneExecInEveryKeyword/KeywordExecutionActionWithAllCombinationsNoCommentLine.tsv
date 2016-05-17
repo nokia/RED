@@ -1,0 +1,9 @@
+*** Keyword ***
+UserKeyword
+	execAction1
+
+UserKeyword2
+	execAction2	arg1	arg2	arg3
+	
+UserKeyword3
+	execAction3	arg1a	#cm1	cm2	cm3
