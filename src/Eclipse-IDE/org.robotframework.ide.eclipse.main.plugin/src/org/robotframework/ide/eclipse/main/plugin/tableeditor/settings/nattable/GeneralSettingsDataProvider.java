@@ -87,7 +87,7 @@ public class GeneralSettingsDataProvider implements IDataProvider, IRowDataProvi
     @Override
     public int getRowCount() {
         if (section != null) {
-            return generalSettings.size() - countInvisible() + 1;
+            return generalSettings.size() - countInvisible(); //no need to add one more row count for element adder row
         }
         return 0;
     }
@@ -101,7 +101,7 @@ public class GeneralSettingsDataProvider implements IDataProvider, IRowDataProvi
             int realRowIndex = 0;
             while (count <= rowIndex) {
                 rowObject = generalSettings.get(realRowIndex);
-                RobotSetting setting = (RobotSetting) rowObject.getValue();
+                final RobotSetting setting = (RobotSetting) rowObject.getValue();
                 if (isPassingThroughFilter(setting)) {
                     count++;
                 }
@@ -141,7 +141,8 @@ public class GeneralSettingsDataProvider implements IDataProvider, IRowDataProvi
     private int countInvisible() {
         int numberOfInvisible = 0;
         for (final Entry<String, RobotElement> settingEntry : generalSettings) {
-            if (!isPassingThroughFilter((RobotSetting) settingEntry.getValue())) {
+            final RobotSetting setting = (RobotSetting) settingEntry.getValue();
+            if (!isPassingThroughFilter(setting)) {
                 numberOfInvisible++;
             }
         }
