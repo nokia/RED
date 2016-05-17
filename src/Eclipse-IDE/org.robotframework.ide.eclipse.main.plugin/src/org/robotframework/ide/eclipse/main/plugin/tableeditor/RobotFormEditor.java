@@ -44,6 +44,7 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -63,7 +64,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescr
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable.SettingsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.VariablesEditorPart;
 import org.robotframework.red.graphics.ImagesManager;
@@ -242,7 +243,7 @@ public class RobotFormEditor extends FormEditor {
         }
 
         if (!(getActiveEditor() instanceof SuiteSourceEditor)) {
-            updateSourceFromModel();
+            updateSourceFromModel(monitor);
         }
         for (final IEditorPart dirtyEditor : getDirtyEditors()) {
             dirtyEditor.doSave(monitor);
@@ -363,15 +364,21 @@ public class RobotFormEditor extends FormEditor {
             final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
             page.updateOnActivation();
         } else if (getActiveEditor() instanceof SuiteSourceEditor) {
-            updateSourceFromModel();
+            updateSourceFromModel(null);
         }
     }
 
-    private void updateSourceFromModel() {
+    private void updateSourceFromModel(final IProgressMonitor monitor) {
         final SuiteSourceEditor editor = getSourceEditor();
-        final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
-        final RobotFile model = provideSuiteModel().getLinkedElement();
-        // document.set(model.toString());
+
+        if (!getDirtyEditors().isEmpty()) {
+            final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
+            final RobotFile model = provideSuiteModel().getLinkedElement();
+            document.set(new RobotFileDumper().dump(model.getParent()));
+        }
+        if (monitor != null) {
+            editor.doSave(monitor);
+        }
     }
 
     private void saveActivePage(final String activePageClassName) {

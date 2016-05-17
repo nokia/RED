@@ -89,7 +89,7 @@ import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 
-public class MetadataSettingsFormFragment implements ISectionFormFragment {
+public class MetadataSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
     @Inject
     private IEditorSite site;
@@ -119,8 +119,14 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment {
 
     private RowSelectionProvider<RobotKeywordCall> selectionProvider;
 
-    ISelectionProvider getSelectionProvider() {
+    @Override
+    public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
+    }
+    
+    @Override
+    public NatTable getTable() {
+        return table;
     }
     
     @Override
