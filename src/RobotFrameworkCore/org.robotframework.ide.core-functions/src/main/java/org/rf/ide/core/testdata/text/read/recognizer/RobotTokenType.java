@@ -595,6 +595,23 @@ public enum RobotTokenType implements IRobotTokenType {
         return new ArrayList<>(TYPE_TO_TABLE.get(type));
     }
 
+    public static RobotTokenType findTypeOfDeclarationForSettingTable(final String textSettingDeclaration) {
+        RobotTokenType found = RobotTokenType.UNKNOWN;
+
+        for (final RobotTokenType type : getTypesForSettingsTable()) {
+            if (type.isSettingDeclaration()) {
+                for (final String representation : type.getRepresentation()) {
+                    if (representation.equalsIgnoreCase(textSettingDeclaration.trim())) {
+                        found = type;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return found;
+    }
+
     @Override
     public List<VersionAvailabilityInfo> getVersionAvailabilityInfos() {
         return representation;
