@@ -64,7 +64,7 @@ class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Ro
                 return columnIndex == 0 ? "...add new metadata" : "";
             }
             final RobotKeywordCall metadataSetting = getRowObject(rowIndex);
-            propertyAccessor.getDataValue(metadataSetting, columnIndex);
+            return propertyAccessor.getDataValue(metadataSetting, columnIndex);
         }
         return "";
     }

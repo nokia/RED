@@ -78,7 +78,7 @@ import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 
-public class ImportSettingsFormFragment implements ISectionFormFragment {
+public class ImportSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
     @Inject
     private IEditorSite site;
@@ -108,10 +108,16 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
 
     private RowSelectionProvider<RobotKeywordCall> selectionProvider;
 
-    ISelectionProvider getSelectionProvider() {
+    @Override
+    public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
-    
+
+    @Override
+    public NatTable getTable() {
+        return table;
+    }
+
     @Override
     public void initialize(final Composite parent) {
         importSettingsSection = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
