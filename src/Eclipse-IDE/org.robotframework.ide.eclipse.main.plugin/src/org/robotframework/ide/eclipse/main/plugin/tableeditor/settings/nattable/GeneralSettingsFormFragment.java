@@ -114,7 +114,7 @@ import com.google.common.collect.Range;
 
 import ca.odell.glazedlists.SortedList;
 
-public class GeneralSettingsFormFragment implements ISectionFormFragment {
+public class GeneralSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
     @Inject
     private IEditorSite site;
@@ -148,8 +148,14 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
 
     private RowSelectionProvider<Entry<String, RobotElement>> selectionProvider;
 
-    ISelectionProvider getSelectionProvider() {
+    @Override
+    public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
+    }
+    
+    @Override
+    public NatTable getTable() {
+        return table.orNull();
     }
 
     @Override

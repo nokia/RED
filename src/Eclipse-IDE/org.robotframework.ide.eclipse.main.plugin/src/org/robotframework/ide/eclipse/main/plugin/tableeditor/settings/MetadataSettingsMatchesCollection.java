@@ -6,7 +6,9 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
 public class MetadataSettingsMatchesCollection extends HeaderFilterMatchesCollection {
@@ -15,6 +17,10 @@ public class MetadataSettingsMatchesCollection extends HeaderFilterMatchesCollec
     public void collect(final RobotElement element, final String filter) {
         if (element instanceof RobotSetting) {
             collectMetadataMatches((RobotSetting) element, filter);
+        } else if (element instanceof RobotSettingsSection) {
+            for (final RobotKeywordCall setting : ((RobotSettingsSection) element).getMetadataSettings()) {
+                collectMetadataMatches((RobotSetting) setting, filter);
+            }
         }
     }
 
