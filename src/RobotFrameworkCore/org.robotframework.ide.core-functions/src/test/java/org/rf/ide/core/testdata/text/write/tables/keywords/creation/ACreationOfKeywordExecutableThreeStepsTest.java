@@ -12,15 +12,15 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
-import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOfExecutionRowTest;
+import org.rf.ide.core.testdata.text.write.tables.execution.creation.ACreationOfThreeExecutionRowsTest;
 
-public abstract class ACreationOfKeywordExecutableOneStepTest extends ACreationOfExecutionRowTest {
+public abstract class ACreationOfKeywordExecutableThreeStepsTest extends ACreationOfThreeExecutionRowsTest {
 
-    public static final String PRETTY_NEW_DIR_LOCATION = "keywords//exec//new//oneKeyword//oneExec//";
+    public static final String PRETTY_NEW_DIR_LOCATION = "keywords//exec//new//oneKeyword//threeExecs//";
 
     private final String extension;
 
-    public ACreationOfKeywordExecutableOneStepTest(final String extension) {
+    public ACreationOfKeywordExecutableThreeStepsTest(final String extension) {
         this.extension = extension;
     }
 
@@ -47,6 +47,8 @@ public abstract class ACreationOfKeywordExecutableOneStepTest extends ACreationO
         RobotToken keywordName = new RobotToken();
         UserKeyword execUnit = new UserKeyword(keywordName);
         execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
+        execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
+        execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
         keywordTable.addKeyword(execUnit);
 
         return execUnit;
@@ -56,14 +58,12 @@ public abstract class ACreationOfKeywordExecutableOneStepTest extends ACreationO
     public TestFilesCompareStore getCompareFilesStoreForExecutableWithName() {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
-        store.setActionOnlyCmpFile(convert("KeywordExecutionActionOnly"));
-        store.setActionWithCommentCmpFile(convert("KeywordExecutionActionWithComment"));
-        store.setActionWithOneArgCmpFile(convert("KeywordExecutionActionWithOneArg"));
-        store.setActionWithOneArgAndCommentCmpFile(convert("KeywordExecutionActionWithOneArgAndComment"));
-        store.setActionWithThreeArgCmpFile(convert("KeywordExecutionActionWithThreeArg"));
-        store.setActionWithThreeArgAndCommentCmpFile(convert("KeywordExecutionActionWithThreeArgAndComment"));
-        store.setCommentOnlyCmpFile(convert("KeywordExecutionCommentOnly"));
-        store.setEmptyLineCmpFile(convert("KeywordExecutionEmptyLine"));
+        store.setThreeLinesWithoutCommentedLineCmpFile(
+                convert("KeywordExecutionActionWithAllCombinationsNoCommentLine"));
+        store.setThreeLinesWithCommentAndEmptyLineCmpFile(
+                convert("KeywordExecutionActionWithThreeArgsCommentAndOneCommentedLineAndOneEmpty"));
+        store.setThreeLinesWithCommentTheFirstEmptyLineInTheMiddleCmpFile(
+                convert("KeywordExecutionActionEmptyLineInTheMiddleCommentTheFirst"));
 
         return store;
     }
@@ -72,16 +72,12 @@ public abstract class ACreationOfKeywordExecutableOneStepTest extends ACreationO
     public TestFilesCompareStore getCompareFilesStoreForExecutableWithoutName() {
         final TestFilesCompareStore store = new TestFilesCompareStore();
 
-        store.setActionOnlyCmpFile(convert("KeywordExecutionActionOnlyWithoutKeywordName"));
-        store.setActionWithCommentCmpFile(convert("KeywordExecutionActionWithCommentWithoutKeywordName"));
-        store.setActionWithOneArgCmpFile(convert("KeywordExecutionActionWithOneArgWithoutKeywordName"));
-        store.setActionWithOneArgAndCommentCmpFile(
-                convert("KeywordExecutionActionWithOneArgAndCommentWithoutKeywordName"));
-        store.setActionWithThreeArgCmpFile(convert("KeywordExecutionActionWithThreeArgWithoutKeywordName"));
-        store.setActionWithThreeArgAndCommentCmpFile(
-                convert("KeywordExecutionActionWithThreeArgAndCommentWithoutKeywordName"));
-        store.setCommentOnlyCmpFile(convert("KeywordExecutionCommentOnlyWithoutKeywordName"));
-        store.setEmptyLineCmpFile(convert("KeywordExecutionEmptyLineWithoutKeywordName"));
+        store.setThreeLinesWithoutCommentedLineCmpFile(
+                convert("KeywordExecutionActionWithAllCombinationsNoCommentLineWithoutKeywordName"));
+        store.setThreeLinesWithCommentAndEmptyLineCmpFile(
+                convert("KeywordExecutionActionWithThreeArgsCommentAndOneCommentedLineAndOneEmptyWithoutKeywordName"));
+        store.setThreeLinesWithCommentTheFirstEmptyLineInTheMiddleCmpFile(
+                convert("KeywordExecutionActionEmptyLineInTheMiddleCommentTheFirstWithoutKeywordName"));
 
         return store;
     }
