@@ -35,6 +35,11 @@ public abstract class AImported extends AModelElement<SettingTable> {
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
+    
+    public void setComment(final RobotToken rt) {
+        this.comment.clear();
+        addCommentPart(rt);
+    }
 
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
@@ -51,8 +56,11 @@ public abstract class AImported extends AModelElement<SettingTable> {
     }
 
     public void setPathOrName(final RobotToken pathOrName) {
-        fixForTheType(pathOrName, type.getPathOrFileNameType());
-        this.pathOrName = pathOrName;
+        this.pathOrName = updateOrCreate(this.pathOrName, pathOrName, type.getPathOrFileNameType());
+    }
+    
+    public void setPathOrName(final String pathOrName) {
+        this.pathOrName = updateOrCreate(this.pathOrName, pathOrName, type.getPathOrFileNameType());
     }
 
     public static enum Type {

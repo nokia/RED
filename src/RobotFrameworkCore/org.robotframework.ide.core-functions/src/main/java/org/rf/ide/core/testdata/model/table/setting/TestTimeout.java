@@ -44,8 +44,11 @@ public class TestTimeout extends AModelElement<SettingTable> {
     }
 
     public void setTimeout(final RobotToken timeout) {
-        fixForTheType(timeout, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE, true);
-        this.timeout = timeout;
+        this.timeout = updateOrCreate(this.timeout, timeout, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
+    }
+    
+    public void setTimeout(final String timeout) {
+        this.timeout = updateOrCreate(this.timeout, timeout, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
     }
 
     public List<RobotToken> getMessageArguments() {
@@ -56,6 +59,14 @@ public class TestTimeout extends AModelElement<SettingTable> {
         fixForTheType(messageArgument, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE, true);
         this.message.add(messageArgument);
     }
+    
+    public void setMessageArgument(final int index, final String argument) {
+        updateOrCreateTokenInside(message, index, argument, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE);
+    }
+
+    public void setMessageArgument(final int index, final RobotToken argument) {
+        updateOrCreateTokenInside(message, index, argument, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE);
+    }
 
     public List<RobotToken> getComment() {
         return comment;
@@ -65,6 +76,12 @@ public class TestTimeout extends AModelElement<SettingTable> {
         fixComment(getComment(), rt);
         this.comment.add(rt);
     }
+    
+    public void setComment(final RobotToken rt) {
+        this.comment.clear();
+        addCommentPart(rt);
+    }
+
 
     @Override
     public ModelType getModelType() {
