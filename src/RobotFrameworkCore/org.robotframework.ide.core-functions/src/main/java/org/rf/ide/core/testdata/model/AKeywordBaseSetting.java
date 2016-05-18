@@ -41,9 +41,12 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
         return keywordName;
     }
 
+    public void setKeywordName(final String keywordName) {
+        this.keywordName = updateOrCreate(this.keywordName, keywordName, getKeywordNameType());
+    }
+
     public void setKeywordName(final RobotToken keywordName) {
-        fixForTheType(keywordName, getKeywordNameType(), true);
-        this.keywordName = keywordName;
+        this.keywordName = updateOrCreate(this.keywordName, keywordName, getKeywordNameType());
     }
 
     public List<RobotToken> getArguments() {
@@ -55,13 +58,21 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
         arguments.add(argument);
     }
 
+    public void setArgument(final int index, final String argument) {
+        updateOrCreateTokenInside(arguments, index, argument, getArgumentType());
+    }
+
     public void setArgument(final int index, final RobotToken argument) {
-        fixForTheType(argument, getArgumentType());
-        // arguments.set(index, argument);
+        updateOrCreateTokenInside(arguments, index, argument, getArgumentType());
     }
 
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
+    }
+
+    public void setComment(final RobotToken rt) {
+        this.comment.clear();
+        addCommentPart(rt);
     }
 
     public void addCommentPart(final RobotToken rt) {
