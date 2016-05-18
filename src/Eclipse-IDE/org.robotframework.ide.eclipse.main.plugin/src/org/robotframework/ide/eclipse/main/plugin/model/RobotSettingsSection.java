@@ -11,7 +11,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
+import org.rf.ide.core.testdata.model.presenter.update.ModelElementFactory;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
@@ -32,28 +34,37 @@ import com.google.common.collect.Lists;
 public class RobotSettingsSection extends RobotSuiteFileSection implements IRobotCodeHoldingElement {
 
     public static final String SECTION_NAME = "Settings";
+    
+    private final ModelElementFactory modelElementFactory;
 
     RobotSettingsSection(final RobotSuiteFile parent) {
         super(parent, SECTION_NAME);
+        modelElementFactory = new ModelElementFactory();
     }
 
     public RobotSetting createSetting(final String name, final String comment, final String... args) {
+        final List<String> settingArgs = newArrayList(args);
         RobotSetting setting;
         if (name.equals(SettingsGroup.METADATA.getName())) {
-            setting = new RobotSetting(this, SettingsGroup.METADATA, name, newArrayList(args), comment);
+            setting = new RobotSetting(this, SettingsGroup.METADATA, name, settingArgs, comment);
         } else if (name.equals(SettingsGroup.LIBRARIES.getName())) {
-            setting = new RobotSetting(this, SettingsGroup.LIBRARIES, name, newArrayList(args), comment);
+            setting = new RobotSetting(this, SettingsGroup.LIBRARIES, name, settingArgs, comment);
         } else if (name.equals(SettingsGroup.RESOURCES.getName())) {
-            setting = new RobotSetting(this, SettingsGroup.RESOURCES, name, newArrayList(args), comment);
+            setting = new RobotSetting(this, SettingsGroup.RESOURCES, name, settingArgs, comment);
         } else if (name.equals(SettingsGroup.VARIABLES.getName())) {
-            setting = new RobotSetting(this, SettingsGroup.VARIABLES, name, newArrayList(args), comment);
+            setting = new RobotSetting(this, SettingsGroup.VARIABLES, name, settingArgs, comment);
         } else {
-            setting = new RobotSetting(this, SettingsGroup.NO_GROUP, name, newArrayList(args), comment);
+            setting = new RobotSetting(this, SettingsGroup.NO_GROUP, name, settingArgs, comment);
         }
+        
+        final AModelElement<?> newModelElement = modelElementFactory.createNewSettingsElement(getLinkedElement(), name, comment, settingArgs);
+        setting.link(newModelElement);
+        
         elements.add(setting);
+
         return setting;
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public List<RobotKeywordCall> getChildren() {

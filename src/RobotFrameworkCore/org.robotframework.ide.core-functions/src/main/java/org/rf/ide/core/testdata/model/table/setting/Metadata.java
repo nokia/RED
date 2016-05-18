@@ -31,8 +31,11 @@ public class Metadata extends AModelElement<SettingTable> {
     }
 
     public void setKey(final RobotToken key) {
-        fixForTheType(key, RobotTokenType.SETTING_METADATA_KEY, true);
-        this.key = key;
+        this.key = updateOrCreate(this.key, key, RobotTokenType.SETTING_METADATA_KEY);
+    }
+    
+    public void setKey(final String key) {
+        this.key = updateOrCreate(this.key, key, RobotTokenType.SETTING_METADATA_KEY);
     }
 
     public RobotToken getKey() {
@@ -47,6 +50,14 @@ public class Metadata extends AModelElement<SettingTable> {
     public List<RobotToken> getValues() {
         return Collections.unmodifiableList(values);
     }
+    
+    public void setValues(final int index, final String value) {
+        updateOrCreateTokenInside(values, index, value, RobotTokenType.SETTING_METADATA_VALUE);
+    }
+    
+    public void setValues(final int index, final RobotToken value) {
+        updateOrCreateTokenInside(values, index, value, RobotTokenType.SETTING_METADATA_VALUE);
+    }
 
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
@@ -55,6 +66,11 @@ public class Metadata extends AModelElement<SettingTable> {
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
+    }
+    
+    public void setComment(final RobotToken rt) {
+        this.comment.clear();
+        addCommentPart(rt);
     }
 
     public RobotToken getDeclaration() {

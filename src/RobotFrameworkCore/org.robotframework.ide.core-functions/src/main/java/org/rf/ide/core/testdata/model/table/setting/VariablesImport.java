@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class VariablesImport extends AImported {
@@ -26,6 +27,13 @@ public class VariablesImport extends AImported {
         return Collections.unmodifiableList(arguments);
     }
 
+    public void setArguments(final int index, final String argument) {
+        updateOrCreateTokenInside(arguments, index, argument, RobotTokenType.SETTING_VARIABLES_ARGUMENT);
+    }
+    
+    public void setArguments(final int index, final RobotToken argument) {
+        updateOrCreateTokenInside(arguments, index, argument, RobotTokenType.SETTING_VARIABLES_ARGUMENT);
+    }
 
     public void addArgument(final RobotToken argument) {
         this.arguments.add(argument);
