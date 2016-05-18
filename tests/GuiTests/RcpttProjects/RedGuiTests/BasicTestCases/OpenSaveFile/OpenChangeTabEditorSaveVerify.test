@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _iCNcoPo_EeSBeM10W7Y1ng
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/19/15 3:11 PM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 5/18/16 11:50 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -37,7 +37,10 @@ get-tab-folder -index 1 | get-property activePage | equals "*TestFile.robot" | v
 // change tab and do a save
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Settings | click
-    get-section General | get-table | key-type "M1+s"
+    with [get-editbox -after [get-label Settings]] {
+        click-text
+        key-type "M1+s"
+    }
 }
 
 //verify if file still dirty after save
