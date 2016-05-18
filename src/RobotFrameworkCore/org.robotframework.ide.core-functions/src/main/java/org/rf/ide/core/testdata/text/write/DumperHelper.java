@@ -141,6 +141,11 @@ public class DumperHelper {
                                 rt.setText(getEmpty());
                             }
                         }
+                    } else if (elem.isDirty()) {
+                        if (artToken instanceof RobotToken) {
+                            RobotToken rt = (RobotToken) artToken;
+                            rt.setRaw(artToken.getText());
+                        }
                     }
                 }
             }

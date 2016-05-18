@@ -1,0 +1,2 @@
+*** Setting ***
+Suite Setup	olo1
