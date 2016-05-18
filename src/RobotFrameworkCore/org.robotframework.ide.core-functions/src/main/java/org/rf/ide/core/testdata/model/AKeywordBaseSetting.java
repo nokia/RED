@@ -55,6 +55,11 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
         arguments.add(argument);
     }
 
+    public void setArgument(final int index, final RobotToken argument) {
+        fixForTheType(argument, getArgumentType());
+        // arguments.set(index, argument);
+    }
+
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
