@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
@@ -37,7 +37,7 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
         } else if (variableType == VariableType.LIST) {
             getTable().createListVariable(index, name, Lists.<String> newArrayList());
         } else if (variableType == VariableType.DICTIONARY) {
-            getTable().createDictionaryVariable(index, name, new HashMap<String, String>());
+            getTable().createDictionaryVariable(index, name, Lists.<Entry<String, String>> newArrayList());
         }
 
         final IVariableHolder newVariableHolder = getTable().getVariables().get(index);

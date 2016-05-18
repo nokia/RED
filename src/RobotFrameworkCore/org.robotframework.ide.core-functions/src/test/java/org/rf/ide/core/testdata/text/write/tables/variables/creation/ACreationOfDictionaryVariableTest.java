@@ -1,8 +1,8 @@
 package org.rf.ide.core.testdata.text.write.tables.variables.creation;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -34,7 +34,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        variableTable.createDictionaryVariable(0, "&{dict}", new HashMap<String, String>());
+        variableTable.createDictionaryVariable(0, "&{dict}", new ArrayList<Entry<String, String>>());
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -50,10 +50,10 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        Map<String, String> data = new LinkedHashMap<>();
-        data.put("key1", "value1");
-        data.put("key2", "value2");
-        data.put("key3", "value3");
+        List<Entry<String, String>> data = new ArrayList<>();
+        data.add(variableTable.createEntry("key1", "value1"));
+        data.add(variableTable.createEntry("key2", "value2"));
+        data.add(variableTable.createEntry("key3", "value3"));
 
         variableTable.createDictionaryVariable(0, "&{dict}", data);
 
@@ -71,7 +71,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        Map<String, String> data = new LinkedHashMap<>();
+        List<Entry<String, String>> data = new ArrayList<>();
 
         AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
         RobotToken cmTok1 = new RobotToken();
@@ -98,10 +98,10 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        Map<String, String> data = new LinkedHashMap<>();
-        data.put("key1", "value1");
-        data.put("key2", "value2");
-        data.put("key3", "value3");
+        List<Entry<String, String>> data = new ArrayList<>();
+        data.add(variableTable.createEntry("key1", "value1"));
+        data.add(variableTable.createEntry("key2", "value2"));
+        data.add(variableTable.createEntry("key3", "value3"));
 
         AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
         RobotToken cmTok1 = new RobotToken();
@@ -114,6 +114,48 @@ public abstract class ACreationOfDictionaryVariableTest {
         aVariable.addCommentPart(cmTok1);
         aVariable.addCommentPart(cmTok2);
         aVariable.addCommentPart(cmTok3);
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+    }
+
+    @Test
+    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePair_andLastOnlyHasValue() throws Exception {
+        // prepare
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "DictionaryVariableDeclarationWith2ValuesEmptyAndLastSet."
+                + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeVariableTableSection();
+        final VariableTable variableTable = modelFile.getVariableTable();
+        List<Entry<String, String>> data = new ArrayList<>();
+        data.add(variableTable.createEntry("", ""));
+        data.add(variableTable.createEntry("", ""));
+        data.add(variableTable.createEntry("key", "value"));
+
+        AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+    }
+
+    @Test
+    public void test_emptyFile_and_thanCreationDictionary_withThreeKeyValuePair_andMiddleHasValue() throws Exception {
+        // prepare
+        final String fileName = PRETTY_NEW_DIR_LOCATION
+                + "DictionaryVariableDeclarationWith1ValueEmptyNextSetAndLastEmpty." + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeVariableTableSection();
+        final VariableTable variableTable = modelFile.getVariableTable();
+        List<Entry<String, String>> data = new ArrayList<>();
+        data.add(variableTable.createEntry("", ""));
+        data.add(variableTable.createEntry("key", "value"));
+        data.add(variableTable.createEntry("", ""));
+
+        AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
+
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }

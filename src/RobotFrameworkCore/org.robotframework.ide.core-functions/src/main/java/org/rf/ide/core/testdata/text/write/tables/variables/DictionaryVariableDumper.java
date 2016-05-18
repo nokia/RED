@@ -41,7 +41,11 @@ public class DictionaryVariableDumper extends ANotExecutableTableElementDumper {
                 joinedKeyValue.setLineNumber(key.getLineNumber());
                 joinedKeyValue.setStartColumn(key.getStartColumn());
                 joinedKeyValue.setRaw(key.getText() + "=" + dv.getValue().getText());
+                if (joinedKeyValue.getRaw().equals("=")) {
+                    joinedKeyValue.setRaw("");
+                }
                 joinedKeyValue.setText(joinedKeyValue.getRaw());
+                joinedKeyValue.setType(RobotTokenType.VARIABLES_VARIABLE_VALUE);
 
                 itemsAsValue.add(joinedKeyValue);
             }

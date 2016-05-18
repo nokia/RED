@@ -131,11 +131,35 @@ public class DumperHelper {
                             rt.setText(text);
                         }
                     }
+                } else {
+                    if (artToken.getText().isEmpty() && artToken.getRaw().isEmpty()
+                            && (elem.isDirty() || elem.getFilePosition().isNotSet())) {
+                        if (artToken instanceof RobotToken) {
+                            if (isTokenToEmptyEscape((RobotToken) artToken)) {
+                                RobotToken rt = (RobotToken) artToken;
+                                rt.setRaw(getEmpty());
+                                rt.setText(getEmpty());
+                            }
+                        }
+                    }
                 }
             }
 
             line.addLineElement(cloneWithPositionRecalculate(artToken, line, outLines));
         }
+    }
+
+    private boolean isTokenToEmptyEscape(final RobotToken token) {
+        boolean result = false;
+        final List<IRobotTokenType> types = token.getTypes();
+        for (final IRobotTokenType tt : types) {
+            if (tt == RobotTokenType.VARIABLES_VARIABLE_VALUE) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
     }
 
     public void dumpHeader(final RobotFile model, final TableHeader<? extends ARobotSectionTable> th,
