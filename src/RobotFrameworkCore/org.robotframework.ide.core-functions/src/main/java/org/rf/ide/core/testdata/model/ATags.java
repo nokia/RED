@@ -44,10 +44,23 @@ public abstract class ATags<T> extends AModelElement<T> {
         tags.add(tag);
     }
 
+    public void setTag(final int index, final String tag) {
+        updateOrCreateTokenInside(tags, index, tag, getTagType());
+    }
+
+    public void setTag(final int index, final RobotToken tag) {
+        updateOrCreateTokenInside(tags, index, tag, getTagType());
+    }
+    
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
+    public void setComment(final RobotToken rt) {
+        this.comment.clear();
+        addCommentPart(rt);
+    }
+    
     public void addCommentPart(final RobotToken rt) {
         this.fixComment(comment, rt);
         this.comment.add(rt);

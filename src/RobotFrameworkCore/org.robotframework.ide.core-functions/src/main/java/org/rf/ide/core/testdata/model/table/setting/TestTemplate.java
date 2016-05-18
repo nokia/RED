@@ -47,8 +47,11 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
     }
 
     public void setKeywordName(final RobotToken keywordName) {
-        fixForTheType(keywordName, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME, true);
-        this.keywordName = keywordName;
+        this.keywordName = updateOrCreate(this.keywordName, keywordName, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
+    }
+    
+    public void setKeywordName(final String keywordName) {
+        this.keywordName = updateOrCreate(this.keywordName, keywordName, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
     }
 
     @Override
@@ -60,6 +63,14 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
         fixForTheType(trashArgument, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, true);
         this.unexpectedTrashArguments.add(trashArgument);
     }
+    
+    public void setUnexpectedTrashArgument(final int index, final String argument) {
+        updateOrCreateTokenInside(unexpectedTrashArguments, index, argument, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
+    }
+
+    public void setUnexpectedTrashArgument(final int index, final RobotToken argument) {
+        updateOrCreateTokenInside(unexpectedTrashArguments, index, argument, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
+    }
 
     @Override
     public List<RobotToken> getComment() {
@@ -69,6 +80,11 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
+    }
+    
+    public void setComment(final RobotToken rt) {
+        this.comment.clear();
+        addCommentPart(rt);
     }
 
     @Override

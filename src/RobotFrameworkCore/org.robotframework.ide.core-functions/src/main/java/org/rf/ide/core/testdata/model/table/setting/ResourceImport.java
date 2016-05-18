@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
 public class ResourceImport extends AImported {
@@ -26,6 +27,13 @@ public class ResourceImport extends AImported {
         return Collections.unmodifiableList(unexpectedTrashArguments);
     }
 
+    public void setUnexpectedTrashArguments(final int index, final String trashArgument) {
+        updateOrCreateTokenInside(unexpectedTrashArguments, index, trashArgument, RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
+    }
+    
+    public void setUnexpectedTrashArguments(final int index, final RobotToken trashArgument) {
+        updateOrCreateTokenInside(unexpectedTrashArguments, index, trashArgument, RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
+    }
 
     public void addUnexpectedTrashArgument(final RobotToken trashArgument) {
         this.unexpectedTrashArguments.add(trashArgument);
