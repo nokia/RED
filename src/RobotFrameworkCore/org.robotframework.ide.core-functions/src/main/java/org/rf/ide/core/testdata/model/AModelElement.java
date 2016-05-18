@@ -68,6 +68,77 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         }
     }
 
+    protected void updateOrCreateTokenInside(final List<RobotToken> toModify, final int index, final String value) {
+        updateOrCreateTokenInside(toModify, index, value, null);
+    }
+
+    protected void updateOrCreateTokenInside(final List<RobotToken> toModify, final int index, final String value,
+            final IRobotTokenType expectedType) {
+        RobotToken token = new RobotToken();
+        if (expectedType != null) {
+            fixForTheType(token, expectedType);
+        }
+        token.setText(value);
+        updateOrCreateTokenInside(toModify, index, token);
+    }
+
+    protected void updateOrCreateTokenInside(final List<RobotToken> toModify, final int index, final RobotToken token) {
+        updateOrCreateTokenInside(toModify, index, token, null);
+    }
+
+    protected void updateOrCreateTokenInside(final List<RobotToken> toModify, final int index, final RobotToken token,
+            final IRobotTokenType expectedType) {
+        int size = toModify.size();
+        if (size > index) {
+            toModify.get(index).setText(token.getText());
+        } else if (size == index) {
+            toModify.add(token);
+        } else {
+            int toCreate = index - size - 1;
+            for (int i = 0; i < toCreate; i++) {
+                RobotToken tempToken = new RobotToken();
+                tempToken.getTypes().clear();
+                if (expectedType == null) {
+                    tempToken.getTypes().addAll(token.getTypes());
+                } else {
+                    tempToken.setType(expectedType);
+                }
+                toModify.add(tempToken);
+            }
+
+            toModify.add(token);
+        }
+    }
+
+    protected RobotToken updateOrCreate(final RobotToken current, final RobotToken newValue,
+            final IRobotTokenType expectedType) {
+        if (newValue == null) {
+            return null;
+        } else if (current == null) {
+            return newValue;
+        } else {
+            return updateOrCreate(current, newValue.getText(), expectedType);
+        }
+    }
+
+    protected RobotToken updateOrCreate(final RobotToken current, final String newValue,
+            final IRobotTokenType expectedType) {
+        RobotToken toReturn = null;
+        if (current == null) {
+            toReturn = new RobotToken();
+        } else {
+            toReturn = current;
+        }
+
+        toReturn.setText(newValue);
+
+        if (expectedType != null) {
+            fixForTheType(toReturn, expectedType);
+        }
+
+        return toReturn;
+    }
+
     protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType) {
         final List<IRobotTokenType> tagTypes = token.getTypes();
         if (!tagTypes.contains(expectedMainType)) {
