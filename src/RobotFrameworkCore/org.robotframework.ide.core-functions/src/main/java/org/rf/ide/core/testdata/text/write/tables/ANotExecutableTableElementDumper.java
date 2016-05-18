@@ -125,7 +125,7 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
             return;
         }
 
-        int nrOfTokens = tokens.size();
+        int nrOfTokens = getElementDumperHelper().getLastIndexNotEmptyIndex(tokens) + 1;
 
         final List<Integer> lineEndPos = new ArrayList<>(getElementDumperHelper().getLineEndPos(model, tokens));
         if (nrOfTokens > 0) {

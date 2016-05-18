@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class DictionaryVariable extends AVariable {
 
@@ -20,11 +21,17 @@ public class DictionaryVariable extends AVariable {
     }
 
     public void put(final RobotToken raw, final RobotToken key, final RobotToken value) {
+        fixForTheType(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE);
+        fixForTheType(key, RobotTokenType.VARIABLES_DICTIONARY_KEY);
+        fixForTheType(value, RobotTokenType.VARIABLES_DICTIONARY_VALUE);
         items.add(new DictionaryKeyValuePair(raw, key, value));
     }
 
     public void addKeyValuePair(final RobotToken raw, final RobotToken key, final RobotToken value,
             final int position) {
+        fixForTheType(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE);
+        fixForTheType(key, RobotTokenType.VARIABLES_DICTIONARY_KEY);
+        fixForTheType(value, RobotTokenType.VARIABLES_DICTIONARY_VALUE);
         items.set(position, new DictionaryKeyValuePair(raw, key, value));
     }
 
