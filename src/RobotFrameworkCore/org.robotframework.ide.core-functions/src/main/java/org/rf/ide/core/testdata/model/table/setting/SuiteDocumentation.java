@@ -36,6 +36,14 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
     public List<RobotToken> getDocumentationText() {
         return Collections.unmodifiableList(text);
     }
+    
+    public void setDocumentationText(final int index, final String docText) {
+        updateOrCreateTokenInside(text, index, docText, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
+    }
+
+    public void setDocumentationText(final int index, final RobotToken docText) {
+        updateOrCreateTokenInside(text, index, docText, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
+    }
 
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
@@ -46,6 +54,11 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
         this.comment.add(rt);
     }
 
+    public void setComment(final RobotToken rt) {
+        this.comment.clear();
+        addCommentPart(rt);
+    }
+    
     public RobotToken getDeclaration() {
         return declaration;
     }
