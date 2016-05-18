@@ -162,4 +162,46 @@ public abstract class ACreationOfListVariableTest {
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
     }
+
+    @Test
+    public void test_emptyFile_and_thanCreationList_withThreeValues_andLastOnlyHasValue() throws Exception {
+        // prepare
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "ListVariableDeclarationWith2ValuesEmptyAndLastSet."
+                + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeVariableTableSection();
+        final VariableTable variableTable = modelFile.getVariableTable();
+        final List<String> values = new ArrayList<>();
+        values.add("");
+        values.add("");
+        values.add("value");
+
+        AVariable aVariable = variableTable.createListVariable(0, "@{list}", values);
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+    }
+
+    @Test
+    public void test_emptyFile_and_thanCreationList_withThreeValues_andMiddleHasValue() throws Exception {
+        // prepare
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "ListVariableDeclarationWith1ValueEmptyNextSetAndLastEmpty."
+                + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeVariableTableSection();
+        final VariableTable variableTable = modelFile.getVariableTable();
+        final List<String> values = new ArrayList<>();
+        values.add("");
+        values.add("value");
+        values.add("");
+
+        AVariable aVariable = variableTable.createListVariable(0, "@{list}", values);
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+    }
 }
