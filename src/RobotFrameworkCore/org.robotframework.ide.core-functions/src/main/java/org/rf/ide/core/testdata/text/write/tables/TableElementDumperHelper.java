@@ -26,6 +26,18 @@ import com.google.common.base.Optional;
 
 public class TableElementDumperHelper {
 
+    public boolean isDirtyAnyDirtyInside(final List<RobotToken> elems) {
+        boolean result = false;
+        for (final RobotToken rt : elems) {
+            if (rt.isDirty()) {
+                result = true;
+                break;
+            }
+        }
+
+        return result;
+    }
+
     public int getLastIndexNotEmptyIndex(final List<RobotToken> elems) {
         int index = -1;
 
