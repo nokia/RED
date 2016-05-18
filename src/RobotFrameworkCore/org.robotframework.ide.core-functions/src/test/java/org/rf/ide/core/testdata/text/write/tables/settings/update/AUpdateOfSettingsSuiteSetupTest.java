@@ -12,6 +12,7 @@ import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
@@ -37,6 +38,60 @@ public abstract class AUpdateOfSettingsSuiteSetupTest {
         final SettingTable settingTable = modelFile.getSettingTable();
         final SuiteSetup suiteSetup = settingTable.getSuiteSetups().get(0);
         suiteSetup.setKeywordName("key");
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    @Test
+    public void test_emptyFile_updateSuiteSetup_andCommentOnly() throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_CommentSetNoOtherElements." + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Output_CommentSetNoOtherElements." + getExtension();
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final SettingTable settingTable = modelFile.getSettingTable();
+        final SuiteSetup suiteSetup = settingTable.getSuiteSetups().get(0);
+
+        RobotToken cm1 = new RobotToken();
+        cm1.setText("cm1");
+        RobotToken cm2 = new RobotToken();
+        cm2.setText("cm2");
+        RobotToken cm3 = new RobotToken();
+        cm3.setText("cm3");
+        suiteSetup.addCommentPart(cm1);
+        suiteSetup.addCommentPart(cm2);
+        suiteSetup.addCommentPart(cm3);
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    @Test
+    public void test_emptyFile_updateSuiteSetup_withKeywordExists_andCommentOnly() throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_KeywordExistsAndCommentSetNoOtherElements."
+                + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Output_KeywordExistsAndCommentSetNoOtherElements."
+                + getExtension();
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final SettingTable settingTable = modelFile.getSettingTable();
+        final SuiteSetup suiteSetup = settingTable.getSuiteSetups().get(0);
+
+        RobotToken cm1 = new RobotToken();
+        cm1.setText("cm1");
+        RobotToken cm2 = new RobotToken();
+        cm2.setText("cm2");
+        RobotToken cm3 = new RobotToken();
+        cm3.setText("cm3");
+        suiteSetup.addCommentPart(cm1);
+        suiteSetup.addCommentPart(cm2);
+        suiteSetup.addCommentPart(cm3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
