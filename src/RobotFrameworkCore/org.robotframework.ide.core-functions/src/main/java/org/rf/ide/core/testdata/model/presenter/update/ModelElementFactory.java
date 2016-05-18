@@ -16,6 +16,7 @@ import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
+import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
@@ -46,6 +47,8 @@ public class ModelElementFactory {
                 return createNewForceTagsElement(settingsTable, args, comment);
             } else if (settingType == RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION) {
                 return createNewDefaultTagsElement(settingsTable, args, comment);
+            } else if (settingType == RobotTokenType.SETTING_DOCUMENTATION_DECLARATION) {
+                return createNewDocumentationElement(settingsTable, args, comment);
             } 
             
             else if (settingType == RobotTokenType.SETTING_LIBRARY_DECLARATION) {
@@ -136,6 +139,18 @@ public class ModelElementFactory {
             newDefaultTags.addCommentPart(createRobotToken(comment));
         }
         return newDefaultTags;
+    }
+    
+    private AModelElement<?> createNewDocumentationElement(final SettingTable settingsTable, final List<String> args,
+            final String comment) {
+        final SuiteDocumentation newSuiteDocumentation = settingsTable.newSuiteDocumentation();
+        for (int i = 0; i < args.size(); i++) {
+            newSuiteDocumentation.addDocumentationText(createRobotToken(args.get(i)));
+        }
+        if (comment != null && !comment.isEmpty()) {
+            newSuiteDocumentation.addCommentPart(createRobotToken(comment));
+        }
+        return newSuiteDocumentation;
     }
     
     private AModelElement<?> createNewMetadataElement(final SettingTable settingsTable, final List<String> args,
