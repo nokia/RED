@@ -8,8 +8,7 @@ package org.rf.ide.core.testdata.model.table;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
@@ -79,19 +78,18 @@ public class VariableTable extends ARobotSectionTable {
     }
 
     public DictionaryVariable createDictionaryVariable(final int index, final String name,
-            final Map<String, String> items) {
+            final List<Entry<String, String>> items) {
         RobotToken dec = new RobotToken();
         dec.setRaw(name);
         dec.setText(name);
         dec.setType(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
         final DictionaryVariable dict = new DictionaryVariable(name, dec, VariableScope.TEST_SUITE);
-        final Set<String> keySet = items.keySet();
-        for (final String key : keySet) {
+        for (final Entry<String, String> e : items) {
             final RobotToken keyT = new RobotToken();
-            keyT.setText(key);
+            keyT.setText(e.getKey());
             keyT.setType(RobotTokenType.VARIABLES_DICTIONARY_KEY);
 
-            final String value = items.get(key);
+            final String value = e.getValue();
             final RobotToken valueT = new RobotToken();
             valueT.setText(value);
             valueT.setType(RobotTokenType.VARIABLES_DICTIONARY_VALUE);
@@ -104,6 +102,38 @@ public class VariableTable extends ARobotSectionTable {
         variables.add(index, dict);
 
         return dict;
+    }
+
+    public Entry<String, String> createEntry(final String key, final String value) {
+        return new DictionaryEntry(key, value);
+    }
+
+    private static class DictionaryEntry implements Entry<String, String> {
+
+        private final String key;
+
+        private String value;
+
+        public DictionaryEntry(final String key, final String value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        @Override
+        public String getKey() {
+            return key;
+        }
+
+        @Override
+        public String getValue() {
+            return value;
+        }
+
+        @Override
+        public String setValue(final String value) {
+            this.value = value;
+            return value;
+        }
     }
 
     public void removeVariable(final AVariable variable) {
