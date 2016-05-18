@@ -25,7 +25,7 @@ public abstract class ACreationOfScalarVariableTest {
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable() throws Exception {
+    public void test_emptyFile_and_thanCreateScalarVariable() throws Exception {
         // prepare
         final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptyScalarVariableDeclarationOnly." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
@@ -40,7 +40,7 @@ public abstract class ACreationOfScalarVariableTest {
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andComment() throws Exception {
+    public void test_emptyFile_and_thanCreateScalarVariable_andComment() throws Exception {
         // prepare
         final String fileName = PRETTY_NEW_DIR_LOCATION + "ScalarVariableDeclarationWithCommentOnly." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
@@ -65,7 +65,7 @@ public abstract class ACreationOfScalarVariableTest {
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andOneValue() throws Exception {
+    public void test_emptyFile_and_thanCreateScalarVariable_andOneValue() throws Exception {
         // prepare
         final String fileName = PRETTY_NEW_DIR_LOCATION + "ScalarVariableDeclarationAndOneValueOnly." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
@@ -83,7 +83,7 @@ public abstract class ACreationOfScalarVariableTest {
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andOneValue_andComment() throws Exception {
+    public void test_emptyFile_and_thanCreateScalarVariable_andOneValue_andComment() throws Exception {
         // prepare
         final String fileName = PRETTY_NEW_DIR_LOCATION + "ScalarVariableDeclarationAndOneValueAndCommentOnly."
                 + getExtension();
@@ -112,7 +112,7 @@ public abstract class ACreationOfScalarVariableTest {
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andThreeValues() throws Exception {
+    public void test_emptyFile_and_thanCreateScalarVariable_andThreeValues() throws Exception {
         // prepare
         final String fileName = PRETTY_NEW_DIR_LOCATION + "ScalarVariableDeclarationAnd3ValueOnly." + getExtension();
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
@@ -132,7 +132,7 @@ public abstract class ACreationOfScalarVariableTest {
     }
 
     @Test
-    public void test_emptyFile_and_thanCreateDictionaryVariable_andThreeValues_andComment() throws Exception {
+    public void test_emptyFile_and_thanCreateScalarVariable_andThreeValues_andComment() throws Exception {
         // prepare
         final String fileName = PRETTY_NEW_DIR_LOCATION + "ScalarVariableDeclarationAnd3ValueAndCommentOnly."
                 + getExtension();
@@ -145,6 +145,35 @@ public abstract class ACreationOfScalarVariableTest {
         values.add("value1");
         values.add("value2");
         values.add("value3");
+
+        AVariable aVariable = variableTable.createScalarVariable(0, "${scalar}", values);
+        RobotToken cmTok1 = new RobotToken();
+        cmTok1.setText("cm1");
+        RobotToken cmTok2 = new RobotToken();
+        cmTok2.setText("cm2");
+        RobotToken cmTok3 = new RobotToken();
+        cmTok3.setText("cm3");
+
+        aVariable.addCommentPart(cmTok1);
+        aVariable.addCommentPart(cmTok2);
+        aVariable.addCommentPart(cmTok3);
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+    }
+
+    @Test
+    public void test_emptyFile_and_thanCreateDictionaryVariable_andEmptyValue_andComment() throws Exception {
+        // prepare
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "ScalarVariableDeclarationAndEmptyValueAndCommentOnly."
+                + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeVariableTableSection();
+        final VariableTable variableTable = modelFile.getVariableTable();
+        final List<String> values = new ArrayList<>();
+        values.add("");
 
         AVariable aVariable = variableTable.createScalarVariable(0, "${scalar}", values);
         RobotToken cmTok1 = new RobotToken();
