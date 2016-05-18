@@ -13,8 +13,12 @@ import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
+import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
+import org.rf.ide.core.testdata.model.table.setting.Metadata;
+import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
+import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -42,6 +46,16 @@ public class ModelElementFactory {
                 return createNewForceTagsElement(settingsTable, args, comment);
             } else if (settingType == RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION) {
                 return createNewDefaultTagsElement(settingsTable, args, comment);
+            } 
+            
+            else if (settingType == RobotTokenType.SETTING_LIBRARY_DECLARATION) {
+                return createNewLibraryElement(settingsTable, args, comment);
+            } else if (settingType == RobotTokenType.SETTING_RESOURCE_DECLARATION) {
+                return createNewResourceElement(settingsTable, args, comment);
+            } else if (settingType == RobotTokenType.SETTING_VARIABLES_DECLARATION) {
+                return createNewVariablesElement(settingsTable, args, comment);
+            } else if (settingType == RobotTokenType.SETTING_METADATA_DECLARATION) {
+                return createNewMetadataElement(settingsTable, args, comment);
             }
         }
 
@@ -122,6 +136,66 @@ public class ModelElementFactory {
             newDefaultTags.addCommentPart(createRobotToken(comment));
         }
         return newDefaultTags;
+    }
+    
+    private AModelElement<?> createNewMetadataElement(final SettingTable settingsTable, final List<String> args,
+            final String comment) {
+        final Metadata newMetadata = settingsTable.newMetadata();
+        if (!args.isEmpty()) {
+            newMetadata.setKey(createRobotToken(args.get(0)));
+        }
+        for (int i = 1; i < args.size(); i++) {
+            newMetadata.addValue(createRobotToken(args.get(i)));
+        }
+        if (comment != null && !comment.isEmpty()) {
+            newMetadata.addCommentPart(createRobotToken(comment));
+        }
+        return newMetadata;
+    }
+    
+    private AModelElement<?> createNewLibraryElement(final SettingTable settingsTable, final List<String> args,
+            final String comment) {
+        final LibraryImport newLibraryImport = settingsTable.newLibraryImport();
+        if (!args.isEmpty()) {
+            newLibraryImport.setPathOrName(createRobotToken(args.get(0)));
+        }
+        for (int i = 1; i < args.size(); i++) {
+            newLibraryImport.addArgument(createRobotToken(args.get(i)));
+        }
+        if (comment != null && !comment.isEmpty()) {
+            newLibraryImport.addCommentPart(createRobotToken(comment));
+        }
+        return newLibraryImport;
+    }
+    
+    private AModelElement<?> createNewResourceElement(final SettingTable settingsTable, final List<String> args,
+            final String comment) {
+        final ResourceImport newResourceImport = settingsTable.newResourceImport();
+        if (!args.isEmpty()) {
+            newResourceImport.setPathOrName(createRobotToken(args.get(0)));
+        }
+        for (int i = 1; i < args.size(); i++) {
+            newResourceImport.addUnexpectedTrashArgument(createRobotToken(args.get(i)));
+        }
+        if (comment != null && !comment.isEmpty()) {
+            newResourceImport.addCommentPart(createRobotToken(comment));
+        }
+        return newResourceImport;
+    }
+    
+    private AModelElement<?> createNewVariablesElement(final SettingTable settingsTable, final List<String> args,
+            final String comment) {
+        final VariablesImport newVariablesImport = settingsTable.newVariablesImport();
+        if (!args.isEmpty()) {
+            newVariablesImport.setPathOrName(createRobotToken(args.get(0)));
+        }
+        for (int i = 1; i < args.size(); i++) {
+            newVariablesImport.addArgument(createRobotToken(args.get(i)));
+        }
+        if (comment != null && !comment.isEmpty()) {
+            newVariablesImport.addCommentPart(createRobotToken(comment));
+        }
+        return newVariablesImport;
     }
 
     private AModelElement<?> setupNewKeywordBaseElement(final SettingTable settingsTable,
