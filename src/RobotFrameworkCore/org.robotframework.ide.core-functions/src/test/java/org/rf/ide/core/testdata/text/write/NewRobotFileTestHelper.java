@@ -31,7 +31,7 @@ public class NewRobotFileTestHelper {
         final RobotFileDumper dumper = new RobotFileDumper();
 
         // execute
-        final String dumpResult = dumper.dump(modelFile.getParent());
+        final String dumpResult = dumper.dump(modelFile.getParent()).replaceAll("\r\n", System.lineSeparator());
 
         // verify
         final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
