@@ -128,38 +128,6 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         int nrOfTokens = getElementDumperHelper().getLastIndexNotEmptyIndex(tokens) + 1;
 
         final List<Integer> lineEndPos = new ArrayList<>(getElementDumperHelper().getLineEndPos(model, tokens));
-        if (nrOfTokens > 0) {
-            boolean wasMyLine = false;
-            for (int i = 0; i < nrOfTokens; i++) {
-                final RobotToken robotToken = tokens.get(i);
-                final FilePosition fp = robotToken.getFilePosition();
-                if (!fp.isNotSet()) {
-                    if (filePosition.getLine() == fp.getLine()) {
-                        wasMyLine = true;
-                        break;
-                    }
-                }
-            }
-
-            if (!wasMyLine && currentLine != null) {
-                getDumperHelper().updateLine(model, lines, currentLine.getEndOfLine());
-                if (!tokens.isEmpty()) {
-                    Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokens.get(0));
-                    if (sep.getTypes().contains(SeparatorType.PIPE)) {
-                        getDumperHelper().updateLine(model, lines, sep);
-                    }
-
-                    RobotToken lineContinueToken = new RobotToken();
-                    lineContinueToken.setRaw("...");
-                    lineContinueToken.setText("...");
-                    lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
-
-                    getDumperHelper().updateLine(model, lines, lineContinueToken);
-
-                    getDumperHelper().updateLine(model, lines, sep);
-                }
-            }
-        }
 
         for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
             final IRobotLineElement tokElem = tokens.get(tokenId);
