@@ -147,6 +147,10 @@ public class SettingTable extends ARobotSectionTable {
         doc.setParent(this);
         documentations.add(doc);
     }
+    
+    public void removeDocumentation() {
+        documentations.clear();
+    }
 
     public List<Metadata> getMetadatas() {
         return Collections.unmodifiableList(metadatas);
@@ -204,6 +208,10 @@ public class SettingTable extends ARobotSectionTable {
         suiteSetup.setParent(this);
         suiteSetups.add(suiteSetup);
     }
+    
+    public void removeSuiteSetup() {
+        suiteSetups.clear();
+    }
 
     public List<SuiteTeardown> getSuiteTeardowns() {
         return Collections.unmodifiableList(suiteTeardowns);
@@ -223,6 +231,10 @@ public class SettingTable extends ARobotSectionTable {
     public void addSuiteTeardown(final SuiteTeardown suiteTeardown) {
         suiteTeardown.setParent(this);
         suiteTeardowns.add(suiteTeardown);
+    }
+    
+    public void removeSuiteTeardown() {
+        suiteTeardowns.clear();
     }
 
     public ForceTags newForceTag() {
@@ -244,6 +256,10 @@ public class SettingTable extends ARobotSectionTable {
         tags.setParent(this);
         forceTags.add(tags);
     }
+    
+    public void removeForceTags() {
+        forceTags.clear();
+    }
 
     public List<DefaultTags> getDefaultTags() {
         return Collections.unmodifiableList(defaultTags);
@@ -263,6 +279,10 @@ public class SettingTable extends ARobotSectionTable {
     public void addDefaultTags(final DefaultTags tags) {
         tags.setParent(this);
         defaultTags.add(tags);
+    }
+    
+    public void removeDefaultTags() {
+        defaultTags.clear();
     }
 
     public List<TestSetup> getTestSetups() {
@@ -284,6 +304,10 @@ public class SettingTable extends ARobotSectionTable {
         testSetup.setParent(this);
         testSetups.add(testSetup);
     }
+    
+    public void removeTestSetup() {
+        testSetups.clear();
+    }
 
     public List<TestTeardown> getTestTeardowns() {
         return Collections.unmodifiableList(testTeardowns);
@@ -303,6 +327,10 @@ public class SettingTable extends ARobotSectionTable {
     public void addTestTeardown(final TestTeardown testTeardown) {
         testTeardown.setParent(this);
         testTeardowns.add(testTeardown);
+    }
+    
+    public void removeTestTeardown() {
+        testTeardowns.clear();
     }
 
     public List<TestTemplate> getTestTemplates() {
@@ -345,6 +373,10 @@ public class SettingTable extends ARobotSectionTable {
         testTemplate.setParent(this);
         testTemplates.add(testTemplate);
     }
+    
+    public void removeTestTemplate() {
+        testTemplates.clear();
+    }
 
     public List<TestTimeout> getTestTimeouts() {
         return Collections.unmodifiableList(testTimeouts);
@@ -364,6 +396,10 @@ public class SettingTable extends ARobotSectionTable {
     public void addTestTimeout(final TestTimeout testTimeout) {
         testTimeout.setParent(this);
         testTimeouts.add(testTimeout);
+    }
+    
+    public void removeTestTimeout() {
+        testTimeouts.clear();
     }
 
     public List<UnknownSetting> getUnknownSettings() {
