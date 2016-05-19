@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.presenter.update.ModelElementUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -38,6 +39,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             changed = true;
         }
         if (changed) {
+            new ModelElementUpdater().updateModelElement(keywordCall.getLinkedElement(), index, value);
             // it has to be send, not posted
             // otherwise it is not possible to traverse between cells, because the cell
             // is traversed and then main thread has to handle incoming posted event which
