@@ -5,9 +5,14 @@
  */
 package org.rf.ide.core.testdata.model.presenter.update;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
@@ -63,6 +68,38 @@ public class ModelElementUpdater {
 
     public void updateModelElementComment(final AModelElement<?> modelElement, final String comment) {
         updateModelElement(modelElement, -1, comment);
+    }
+    
+    public void removeModelElements(final ARobotSectionTable sectionTable, final List<AModelElement<?>> modelElements) {
+        if (sectionTable != null && sectionTable instanceof SettingTable) {
+            final SettingTable settingsTable = (SettingTable) sectionTable;
+            for (AModelElement<?> modelElement : modelElements) {
+                ModelType modelType = modelElement.getModelType();
+                if (modelElement instanceof AImported) {
+                    settingsTable.removeImported((AImported) modelElement);
+                } else if (modelType == ModelType.SUITE_SETUP) {
+                    settingsTable.removeSuiteSetup();
+                } else if (modelType == ModelType.SUITE_TEARDOWN) {
+                    settingsTable.removeSuiteTeardown();
+                } else if (modelType == ModelType.SUITE_TEST_SETUP) {
+                    settingsTable.removeTestSetup();
+                } else if (modelType == ModelType.SUITE_TEST_TEARDOWN) {
+                    settingsTable.removeTestTeardown();
+                } else if (modelType == ModelType.SUITE_TEST_TEMPLATE) {
+                    settingsTable.removeTestTemplate();
+                } else if (modelType == ModelType.SUITE_TEST_TIMEOUT) {
+                    settingsTable.removeTestTimeout();
+                } else if (modelType == ModelType.FORCE_TAGS_SETTING) {
+                    settingsTable.removeForceTags();
+                } else if (modelType == ModelType.DEFAULT_TAGS_SETTING) {
+                    settingsTable.removeDefaultTags();
+                } else if (modelType == ModelType.SUITE_DOCUMENTATION) {
+                    settingsTable.removeDocumentation();
+                } else if (modelType == ModelType.METADATA_SETTING) {
+                    settingsTable.removeMetadata((Metadata) modelElement);
+                }
+            }
+        }
     }
 
     private void updateSuiteSetupElement(final AModelElement<?> modelElement, final int index, final String value) {
