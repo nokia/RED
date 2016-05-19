@@ -41,15 +41,25 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     }
 
     public void setAction(final RobotToken action) {
+        final IRobotTokenType actType = getActionType();
+        if (actType != null) {
+            fixForTheType(action, actType, true);
+        }
+        this.action = action;
+    }
+
+    private IRobotTokenType getActionType() {
+        IRobotTokenType actType = null;
         if (getParent() != null) {
             Class<? extends Object> parentClass = getParent().getClass();
             if (parentClass == TestCase.class) {
-                fixForTheType(action, RobotTokenType.TEST_CASE_ACTION_NAME, true);
+                actType = RobotTokenType.TEST_CASE_ACTION_NAME;
             } else if (parentClass == UserKeyword.class) {
-                fixForTheType(action, RobotTokenType.KEYWORD_ACTION_NAME, true);
+                actType = RobotTokenType.KEYWORD_ACTION_NAME;
             }
         }
-        this.action = action;
+
+        return actType;
     }
 
     public List<RobotToken> getArguments() {
@@ -57,15 +67,25 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
     }
 
     public void addArgument(final RobotToken argument) {
+        IRobotTokenType argType = getArgumentType();
+        if (argType != null) {
+            fixForTheType(argument, argType, true);
+        }
+        arguments.add(argument);
+    }
+
+    private IRobotTokenType getArgumentType() {
+        IRobotTokenType argType = null;
         if (getParent() != null) {
             Class<? extends Object> parentClass = getParent().getClass();
             if (parentClass == TestCase.class) {
-                fixForTheType(action, RobotTokenType.TEST_CASE_ACTION_ARGUMENT, true);
+                argType = RobotTokenType.TEST_CASE_ACTION_ARGUMENT;
             } else if (parentClass == UserKeyword.class) {
-                fixForTheType(action, RobotTokenType.KEYWORD_ACTION_ARGUMENT, true);
+                argType = RobotTokenType.KEYWORD_ACTION_ARGUMENT;
             }
         }
-        arguments.add(argument);
+
+        return argType;
     }
 
     public List<RobotToken> getComment() {
