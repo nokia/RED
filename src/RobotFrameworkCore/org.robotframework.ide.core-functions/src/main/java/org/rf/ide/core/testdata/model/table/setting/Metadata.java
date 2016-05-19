@@ -41,6 +41,13 @@ public class Metadata extends AModelElement<SettingTable> {
     public RobotToken getKey() {
         return key;
     }
+    
+    public void addValue(final String value) {
+        RobotToken rt = new RobotToken();
+        rt.setText(value);
+
+        addValue(rt);
+    }
 
     public void addValue(final RobotToken value) {
         fixForTheType(value, RobotTokenType.SETTING_METADATA_VALUE, true);
@@ -66,6 +73,13 @@ public class Metadata extends AModelElement<SettingTable> {
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
+    }
+    
+    public void setComment(final String comment) {
+        RobotToken token = new RobotToken();
+        token.setText(comment);
+
+        setComment(token);
     }
     
     public void setComment(final RobotToken rt) {

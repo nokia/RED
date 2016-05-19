@@ -27,6 +27,13 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
     public SuiteDocumentation(final RobotToken declaration) {
         this.declaration = declaration;
     }
+    
+    public void addDocumentationText(final String text) {
+        RobotToken rt = new RobotToken();
+        rt.setText(text);
+
+        addDocumentationText(rt);
+    }
 
     public void addDocumentationText(final RobotToken token) {
         fixForTheType(token, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
@@ -52,6 +59,13 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
+    }
+
+    public void setComment(final String comment) {
+        RobotToken token = new RobotToken();
+        token.setText(comment);
+
+        setComment(token);
     }
 
     public void setComment(final RobotToken rt) {
