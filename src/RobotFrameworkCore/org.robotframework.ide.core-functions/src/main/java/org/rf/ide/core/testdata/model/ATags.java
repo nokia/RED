@@ -37,6 +37,13 @@ public abstract class ATags<T> extends AModelElement<T> {
     public List<RobotToken> getTags() {
         return Collections.unmodifiableList(tags);
     }
+    
+    public void addTag(final String tag) {
+        RobotToken rt = new RobotToken();
+        rt.setText(tag);
+
+        addTag(rt);
+    }
 
     public void addTag(final RobotToken tag) {
         fixForTheType(tag, getTagType());
@@ -54,6 +61,13 @@ public abstract class ATags<T> extends AModelElement<T> {
     
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
+    }
+    
+    public void setComment(final String comment) {
+        RobotToken token = new RobotToken();
+        token.setText(comment);
+
+        setComment(token);
     }
 
     public void setComment(final RobotToken rt) {

@@ -54,6 +54,13 @@ public class TestTimeout extends AModelElement<SettingTable> {
     public List<RobotToken> getMessageArguments() {
         return Collections.unmodifiableList(message);
     }
+    
+    public void addMessageArgument(final String messageArgument) {
+        RobotToken rt = new RobotToken();
+        rt.setText(messageArgument);
+
+        addMessageArgument(rt);
+    }
 
     public void addMessageArgument(final RobotToken messageArgument) {
         fixForTheType(messageArgument, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE, true);
@@ -75,6 +82,13 @@ public class TestTimeout extends AModelElement<SettingTable> {
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
+    }
+    
+    public void setComment(final String comment) {
+        RobotToken token = new RobotToken();
+        token.setText(comment);
+
+        setComment(token);
     }
     
     public void setComment(final RobotToken rt) {
