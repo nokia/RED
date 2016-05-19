@@ -34,6 +34,13 @@ public class ResourceImport extends AImported {
     public void setUnexpectedTrashArguments(final int index, final RobotToken trashArgument) {
         updateOrCreateTokenInside(unexpectedTrashArguments, index, trashArgument, RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
     }
+    
+    public void addUnexpectedTrashArgument(final String trashArgument) {
+        RobotToken rt = new RobotToken();
+        rt.setText(trashArgument);
+
+        addUnexpectedTrashArgument(rt);
+    }
 
     public void addUnexpectedTrashArgument(final RobotToken trashArgument) {
         this.unexpectedTrashArguments.add(trashArgument);
