@@ -36,6 +36,13 @@ public abstract class AImported extends AModelElement<SettingTable> {
         return Collections.unmodifiableList(comment);
     }
     
+    public void setComment(final String comment) {
+        RobotToken token = new RobotToken();
+        token.setText(comment);
+
+        setComment(token);
+    }
+    
     public void setComment(final RobotToken rt) {
         this.comment.clear();
         addCommentPart(rt);

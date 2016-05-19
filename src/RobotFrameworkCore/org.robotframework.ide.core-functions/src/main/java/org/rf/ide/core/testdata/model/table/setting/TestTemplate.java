@@ -58,6 +58,13 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
     public List<RobotToken> getUnexpectedTrashArguments() {
         return Collections.unmodifiableList(unexpectedTrashArguments);
     }
+    
+    public void addUnexpectedTrashArgument(final String trashArgument) {
+        RobotToken rt = new RobotToken();
+        rt.setText(trashArgument);
+
+        addUnexpectedTrashArgument(rt);
+    }
 
     public void addUnexpectedTrashArgument(final RobotToken trashArgument) {
         fixForTheType(trashArgument, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, true);
@@ -80,6 +87,13 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
+    }
+    
+    public void setComment(final String comment) {
+        RobotToken token = new RobotToken();
+        token.setText(comment);
+
+        setComment(token);
     }
     
     public void setComment(final RobotToken rt) {

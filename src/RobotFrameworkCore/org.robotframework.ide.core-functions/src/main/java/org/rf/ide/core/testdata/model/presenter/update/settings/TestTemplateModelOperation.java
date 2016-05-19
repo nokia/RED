@@ -11,34 +11,51 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.ISettingTableElementOperation;
 import org.rf.ide.core.testdata.model.table.SettingTable;
-import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class SuiteSetupModelOperation extends KeywordBaseModelOperations implements ISettingTableElementOperation {
+public class TestTemplateModelOperation implements ISettingTableElementOperation {
 
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
-        return (elementType == RobotTokenType.SETTING_SUITE_SETUP_DECLARATION);
+        return (elementType == RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION);
     }
 
     @Override
     public boolean isApplicable(final ModelType elementType) {
-        return (elementType == ModelType.SUITE_SETUP);
+        return (elementType == ModelType.SUITE_TEST_TEMPLATE);
     }
 
     @Override
     public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
-        return super.create(settingsTable.newSuiteSetup(), args, comment);
+        final TestTemplate newTestTemplate = settingsTable.newTestTemplate();
+        if (!args.isEmpty()) {
+            newTestTemplate.setKeywordName(args.get(0));
+        }
+        for (int i = 1; i < args.size(); i++) {
+            newTestTemplate.addUnexpectedTrashArgument(args.get(i));
+        }
+        if (comment != null && !comment.isEmpty()) {
+            newTestTemplate.setComment(comment);
+        }
+        return newTestTemplate;
     }
 
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
-        super.update((SuiteSetup) modelElement, index, value);
+        final TestTemplate testTemplate = (TestTemplate) modelElement;
+        if (index == 0) {
+            testTemplate.setKeywordName(value);
+        } else if (index > 0) {
+            testTemplate.setUnexpectedTrashArgument(index - 1, value);
+        } else {
+            testTemplate.setComment(value);
+        }
     }
 
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElements) {
-        settingsTable.removeSuiteSetup();
+        settingsTable.removeTestTemplate();
     }
 }

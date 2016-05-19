@@ -54,6 +54,13 @@ public class LibraryImport extends AImported {
     public void setArguments(final int index, final RobotToken argument) {
         updateOrCreateTokenInside(arguments, index, argument, RobotTokenType.SETTING_LIBRARY_ARGUMENT);
     }
+    
+    public void addArgument(final String argument) {
+        RobotToken rt = new RobotToken();
+        rt.setText(argument);
+
+        addArgument(rt);
+    }
 
     public void addArgument(final RobotToken argument) {
         fixForTheType(argument, RobotTokenType.SETTING_LIBRARY_ARGUMENT);
