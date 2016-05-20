@@ -331,7 +331,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider);
-
     }
 
     public void addGeneralSettingsConfigAttributes(final ConfigRegistry configRegistry) {

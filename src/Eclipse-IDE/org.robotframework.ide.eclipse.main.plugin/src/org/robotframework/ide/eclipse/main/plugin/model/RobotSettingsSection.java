@@ -13,7 +13,7 @@ import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
-import org.rf.ide.core.testdata.model.presenter.update.ModelElementFactory;
+import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
@@ -35,11 +35,11 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     public static final String SECTION_NAME = "Settings";
     
-    private final ModelElementFactory modelElementFactory;
+    private final SettingTableModelUpdater settingTableModelUpdater;
 
     RobotSettingsSection(final RobotSuiteFile parent) {
         super(parent, SECTION_NAME);
-        modelElementFactory = new ModelElementFactory();
+        settingTableModelUpdater = new SettingTableModelUpdater();
     }
 
     public RobotSetting createSetting(final String name, final String comment, final String... args) {
@@ -57,7 +57,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             setting = new RobotSetting(this, SettingsGroup.NO_GROUP, name, settingArgs, comment);
         }
         
-        final AModelElement<?> newModelElement = modelElementFactory.createNewSettingsElement(getLinkedElement(), name, comment, settingArgs);
+        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), name, comment, settingArgs);
         setting.link(newModelElement);
         
         elements.add(setting);
