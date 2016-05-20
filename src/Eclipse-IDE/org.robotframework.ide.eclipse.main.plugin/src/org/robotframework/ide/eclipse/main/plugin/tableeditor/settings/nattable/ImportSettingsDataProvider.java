@@ -87,7 +87,9 @@ public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvid
         }
         final String newStringValue = newValue != null ? (String) newValue : "";
         final RobotKeywordCall importSetting = getRowObject(rowIndex);
-        propertyAccessor.setDataValue(importSetting, columnIndex, newStringValue);
+        if (importSetting != null) {
+            propertyAccessor.setDataValue(importSetting, columnIndex, newStringValue);
+        }
     }
 
     @Override
