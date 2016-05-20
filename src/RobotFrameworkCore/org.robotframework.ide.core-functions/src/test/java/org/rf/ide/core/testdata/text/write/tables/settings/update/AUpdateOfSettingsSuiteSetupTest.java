@@ -97,6 +97,29 @@ public abstract class AUpdateOfSettingsSuiteSetupTest {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
+    @Test
+    public void test_emptyFile_updateSuiteSetup_withKeywordExists_withArgToAdd_andCommentAlreadyInside()
+            throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_KeywordArgumentInDifferentLine." + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Ouput_KeywordArgumentInDifferentLine."
+                + getExtension();
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final SettingTable settingTable = modelFile.getSettingTable();
+        final SuiteSetup suiteSetup = settingTable.getSuiteSetups().get(0);
+
+        RobotToken arg2 = new RobotToken();
+        arg2.setText("arg2");
+
+        suiteSetup.addArgument(arg2);
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
     public String getExtension() {
         return extension;
     }

@@ -121,13 +121,34 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         if (!lastToken.getFilePosition().isNotSet()
                 && !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent() && !tokens.isEmpty()
                 && !getElementDumperHelper().isDirtyAnyDirtyInside(tokens)) {
-            getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
-            return;
+            boolean wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
+            if (wasDumped) {
+                return;
+            }
         }
 
         int nrOfTokens = getElementDumperHelper().getLastIndexNotEmptyIndex(tokens) + 1;
 
         final List<Integer> lineEndPos = new ArrayList<>(getElementDumperHelper().getLineEndPos(model, tokens));
+
+        // just dump now
+        if (tokens.size() > 1 && lineEndPos.contains(0)) {
+            if (currentLine != null) {
+                getDumperHelper().updateLine(model, lines, currentLine.getEndOfLine());
+            }
+
+            Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokens.get(0));
+            if (sep.getTypes().contains(SeparatorType.PIPE)) {
+                getDumperHelper().updateLine(model, lines, sep);
+            }
+
+            RobotToken lineContinueToken = new RobotToken();
+            lineContinueToken.setRaw("...");
+            lineContinueToken.setText("...");
+            lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+
+            getDumperHelper().updateLine(model, lines, lineContinueToken);
+        }
 
         for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
             final IRobotLineElement tokElem = tokens.get(tokenId);
@@ -183,7 +204,7 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
 
             // check if is not end of line
             if (lineEndPos.contains(tokenId)) {
-                if (currentLine != null) {
+                if (currentLine != null && (sortedSettings.size() > 1 || tokenId + 1 < nrOfTokens)) {
                     getDumperHelper().updateLine(model, lines, currentLine.getEndOfLine());
                 } else {
                     // new end of line

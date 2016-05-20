@@ -114,7 +114,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
             final IRobotTokenType expectedType) {
         if (newValue == null) {
             return null;
-        } else if (current == null) {
+        } else if (current == null || current.getFilePosition().isNotSet()) {
             return newValue;
         } else {
             return updateOrCreate(current, newValue.getText(), expectedType);
