@@ -1,0 +1,4 @@
+*** Setting ***
+Metadata	key1	value1
+Metadata	key2	value2
+Metadata	key3	value3
