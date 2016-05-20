@@ -39,7 +39,10 @@ public class SettingTableModelUpdater {
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
 
         if (modelElement != null) {
-            getOperationHandler(modelElement).update(modelElement, index, value);
+            final ISettingTableElementOperation operationHandler = getOperationHandler(modelElement);
+            if (operationHandler != null) {
+                operationHandler.update(modelElement, index, value);
+            }
         }
     }
     
@@ -51,8 +54,10 @@ public class SettingTableModelUpdater {
             final String comment, final List<String> args) {
 
         if (sectionTable != null && sectionTable instanceof SettingTable) {
-            final SettingTable settingsTable = (SettingTable) sectionTable;
-            return getOperationHandler(settingName).create(settingsTable, args, comment);
+            final ISettingTableElementOperation operationHandler = getOperationHandler(settingName);
+            if (operationHandler != null) {
+                return operationHandler.create((SettingTable) sectionTable, args, comment);
+            }
         }
         return null;
     }
@@ -60,8 +65,10 @@ public class SettingTableModelUpdater {
     public void remove(final ARobotSectionTable sectionTable, final AModelElement<?> modelElement) {
 
         if (sectionTable != null && sectionTable instanceof SettingTable) {
-            final SettingTable settingsTable = (SettingTable) sectionTable;
-            getOperationHandler(modelElement).remove(settingsTable, modelElement);
+            final ISettingTableElementOperation operationHandler = getOperationHandler(modelElement);
+            if (operationHandler != null) {
+                operationHandler.remove((SettingTable) sectionTable, modelElement);
+            }
         }
     }
 
