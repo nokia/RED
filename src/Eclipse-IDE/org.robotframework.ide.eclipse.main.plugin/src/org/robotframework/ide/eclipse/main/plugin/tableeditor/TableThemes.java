@@ -190,7 +190,7 @@ public class TableThemes {
 
         @Override
         public Color getBodyHoveredSelectedCellBackground() {
-            return ColorsManager.getColor(255, 240, 170);
+            return RedTheme.getHighlightedCellColor();
         }
 
         @Override
@@ -200,7 +200,7 @@ public class TableThemes {
 
         @Override
         public Color getBodyAnchoredCellBackground() {
-            return RedTheme.getHighlightedCellColor();
+            return RedTheme.getHiglihtedRowColor();
         }
     }
 }

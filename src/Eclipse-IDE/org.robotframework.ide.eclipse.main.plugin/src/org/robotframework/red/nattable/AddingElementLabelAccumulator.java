@@ -14,11 +14,11 @@ import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
  * @author Michal Anglart
  *
  */
-class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
+public class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
 
     private final IDataProvider dataProvider;
 
-    AddingElementLabelAccumulator(final IDataProvider dataProvider) {
+    public AddingElementLabelAccumulator(final IDataProvider dataProvider) {
         this.dataProvider = dataProvider;
     }
 
