@@ -30,6 +30,8 @@ import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
+import com.google.common.base.Optional;
+
 public class SettingTable extends ARobotSectionTable {
 
     private final List<AImported> imports = new ArrayList<>();
@@ -58,8 +60,14 @@ public class SettingTable extends ARobotSectionTable {
 
     private final DataDrivenKeywordName<TestTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
 
+    private final SettingTableMultipleDeclarationsJoiner joiner = new SettingTableMultipleDeclarationsJoiner();
+
     public SettingTable(final RobotFile parent) {
         super(parent);
+    }
+
+    protected SettingTableMultipleDeclarationsJoiner getSettingConsolidator() {
+        return joiner;
     }
 
     public boolean isEmpty() {
@@ -128,6 +136,10 @@ public class SettingTable extends ARobotSectionTable {
         return getMoveHelper().moveDown(imports, imported);
     }
 
+    public Optional<SuiteDocumentation> documentation() {
+        return getSettingConsolidator().joinSuiteDoc(getDocumentation());
+    }
+
     public List<SuiteDocumentation> getDocumentation() {
         return Collections.unmodifiableList(documentations);
     }
@@ -147,7 +159,7 @@ public class SettingTable extends ARobotSectionTable {
         doc.setParent(this);
         documentations.add(doc);
     }
-    
+
     public void removeDocumentation() {
         documentations.clear();
     }
@@ -189,6 +201,10 @@ public class SettingTable extends ARobotSectionTable {
         return getMoveHelper().moveDown(metadatas, metadata);
     }
 
+    public Optional<SuiteSetup> suiteSetup() {
+        return getSettingConsolidator().joinSuiteSetup(getSuiteSetups());
+    }
+
     public List<SuiteSetup> getSuiteSetups() {
         return Collections.unmodifiableList(suiteSetups);
     }
@@ -208,9 +224,13 @@ public class SettingTable extends ARobotSectionTable {
         suiteSetup.setParent(this);
         suiteSetups.add(suiteSetup);
     }
-    
+
     public void removeSuiteSetup() {
         suiteSetups.clear();
+    }
+
+    public Optional<SuiteTeardown> suiteTeardown() {
+        return getSettingConsolidator().joinSuiteTeardown(getSuiteTeardowns());
     }
 
     public List<SuiteTeardown> getSuiteTeardowns() {
@@ -232,9 +252,13 @@ public class SettingTable extends ARobotSectionTable {
         suiteTeardown.setParent(this);
         suiteTeardowns.add(suiteTeardown);
     }
-    
+
     public void removeSuiteTeardown() {
         suiteTeardowns.clear();
+    }
+
+    public Optional<ForceTags> forceTags() {
+        return getSettingConsolidator().joinForceTag(getForceTags());
     }
 
     public ForceTags newForceTag() {
@@ -256,9 +280,13 @@ public class SettingTable extends ARobotSectionTable {
         tags.setParent(this);
         forceTags.add(tags);
     }
-    
+
     public void removeForceTags() {
         forceTags.clear();
+    }
+
+    public Optional<DefaultTags> defaultTags() {
+        return getSettingConsolidator().joinDefaultTag(getDefaultTags());
     }
 
     public List<DefaultTags> getDefaultTags() {
@@ -280,9 +308,13 @@ public class SettingTable extends ARobotSectionTable {
         tags.setParent(this);
         defaultTags.add(tags);
     }
-    
+
     public void removeDefaultTags() {
         defaultTags.clear();
+    }
+
+    public Optional<TestSetup> testSetup() {
+        return getSettingConsolidator().joinTestSetup(getTestSetups());
     }
 
     public List<TestSetup> getTestSetups() {
@@ -304,9 +336,13 @@ public class SettingTable extends ARobotSectionTable {
         testSetup.setParent(this);
         testSetups.add(testSetup);
     }
-    
+
     public void removeTestSetup() {
         testSetups.clear();
+    }
+
+    public Optional<TestTeardown> testTeardown() {
+        return getSettingConsolidator().joinTestTeardown(getTestTeardowns());
     }
 
     public List<TestTeardown> getTestTeardowns() {
@@ -328,7 +364,7 @@ public class SettingTable extends ARobotSectionTable {
         testTeardown.setParent(this);
         testTeardowns.add(testTeardown);
     }
-    
+
     public void removeTestTeardown() {
         testTeardowns.clear();
     }
@@ -373,9 +409,13 @@ public class SettingTable extends ARobotSectionTable {
         testTemplate.setParent(this);
         testTemplates.add(testTemplate);
     }
-    
+
     public void removeTestTemplate() {
         testTemplates.clear();
+    }
+
+    public Optional<TestTimeout> testTimeout() {
+        return getSettingConsolidator().joinTestTimeout(getTestTimeouts());
     }
 
     public List<TestTimeout> getTestTimeouts() {
@@ -397,7 +437,7 @@ public class SettingTable extends ARobotSectionTable {
         testTimeout.setParent(this);
         testTimeouts.add(testTimeout);
     }
-    
+
     public void removeTestTimeout() {
         testTimeouts.clear();
     }
