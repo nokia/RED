@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
 
 import java.io.Serializable;
 import java.util.List;
@@ -15,8 +16,12 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
+import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -80,11 +85,29 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
         if (getType() == VariableType.SCALAR) {
             final ScalarVariable variable = (ScalarVariable) holder;
             final List<RobotToken> values = variable.getValues();
-            if (!values.isEmpty()) {
-                return values.get(0).getText();
-            }
+            return values.isEmpty() ? "" : values.get(0).getText();
+
+        } else if (getType() == VariableType.SCALAR_AS_LIST) {
+            final ScalarVariable variable = (ScalarVariable) holder;
+            final List<RobotToken> values = variable.getValues();
+            return "[" + Joiner.on(", ").join(transform(values, TokenFunctions.tokenToString())) + "]";
+
+        } else if (getType() == VariableType.LIST) {
+            final ListVariable variable = (ListVariable) holder;
+            final List<RobotToken> values = variable.getItems();
+            return "[" + Joiner.on(", ").join(transform(values, TokenFunctions.tokenToString())) + "]";
+
+        } else if (getType() == VariableType.DICTIONARY) {
+            final DictionaryVariable variable = (DictionaryVariable) holder;
+            final List<DictionaryKeyValuePair> values = variable.getItems();
+            return "{" + Joiner.on(", ").join(transform(values, TokenFunctions.pairToString(" -> "))) + "}";
+
+        } else if (getType() == VariableType.INVALID) {
+            final UnknownVariable variable = (UnknownVariable) holder;
+            final List<RobotToken> values = variable.getItems();
+            return "[" + Joiner.on(", ").join(transform(values, TokenFunctions.tokenToString())) + "]";
         }
-        return "value";
+        return "";
     }
 
     @Override

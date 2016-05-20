@@ -12,12 +12,12 @@ import com.google.common.base.Function;
 
 class TokenFunctions {
 
-    static Function<DictionaryKeyValuePair, String> pairToString() {
+    static Function<DictionaryKeyValuePair, String> pairToString(final String connector) {
         return new Function<DictionaryKeyValuePair, String>() {
 
             @Override
             public String apply(final DictionaryKeyValuePair pair) {
-                return pair.getKey().getText().toString() + "=" + pair.getValue().getText().toString();
+                return pair.getKey().getText() + connector + pair.getValue().getText();
             }
         };
     }
@@ -27,7 +27,7 @@ class TokenFunctions {
 
             @Override
             public String apply(final RobotToken token) {
-                return token.getText().toString();
+                return token.getText();
             }
         };
     }
