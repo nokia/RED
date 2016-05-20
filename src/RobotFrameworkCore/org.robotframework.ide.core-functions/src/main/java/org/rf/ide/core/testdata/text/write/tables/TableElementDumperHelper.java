@@ -168,7 +168,7 @@ public class TableElementDumperHelper {
         return o;
     }
 
-    public void dumpAsItIs(final DumperHelper dumpHelper, final RobotFile model, final IRobotLineElement startToken,
+    public boolean dumpAsItIs(final DumperHelper dumpHelper, final RobotFile model, final IRobotLineElement startToken,
             final List<RobotToken> tokens, final List<RobotLine> lines) {
         final List<IRobotLineElement> dumps = new ArrayList<>(0);
         final int tokSize = tokens.size();
@@ -224,7 +224,8 @@ public class TableElementDumperHelper {
                             continue;
                         } else {
                             removeUpdated = true;
-                            break;
+                            return false;
+                            // break;
                         }
                     }
                 }
@@ -280,6 +281,8 @@ public class TableElementDumperHelper {
         for (final IRobotLineElement rle : dumps) {
             dumpHelper.updateLine(model, lines, rle);
         }
+
+        return (dumps.size() > 0);
     }
 
     private boolean isLastElementTheSameAsFirstInTokensToDump(final IRobotLineElement startToken,
