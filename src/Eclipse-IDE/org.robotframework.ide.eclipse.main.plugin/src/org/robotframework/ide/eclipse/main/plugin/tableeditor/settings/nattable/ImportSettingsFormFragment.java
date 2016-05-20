@@ -266,6 +266,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                         new ImportSettingsPopup(site.getShell(), commandsStack, fileModel, null).open();
                     }
                 });
+                clearSettingsSelection();
                 return null;
             }
         };

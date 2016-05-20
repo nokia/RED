@@ -5,7 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import org.rf.ide.core.testdata.model.presenter.update.ModelElementUpdater;
+import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -26,7 +26,7 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
             return;
         }
         keywordCall.setComment(newComment);
-        new ModelElementUpdater().updateModelElementComment(keywordCall.getLinkedElement(), newComment);
+        new SettingTableModelUpdater().updateComment(keywordCall.getLinkedElement(), newComment);
 
         // it has to be send, not posted
         // otherwise it is not possible to traverse between cells, because the

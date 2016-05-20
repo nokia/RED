@@ -42,6 +42,10 @@ public class SettingTableModelUpdater {
             getOperationHandler(modelElement).update(modelElement, index, value);
         }
     }
+    
+    public void updateComment(final AModelElement<?> modelElement, final String value) {
+        update(modelElement, -1, value);
+    }
 
     public AModelElement<?> create(final ARobotSectionTable sectionTable, final String settingName,
             final String comment, final List<String> args) {
