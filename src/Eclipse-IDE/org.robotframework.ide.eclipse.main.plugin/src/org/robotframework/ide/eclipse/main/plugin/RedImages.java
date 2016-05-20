@@ -18,6 +18,10 @@ public class RedImages {
 
     private static final Map<ImageDescriptor, ImageDescriptor> GRAY_IMAGES = new HashMap<>(0);
 
+    public static ImageDescriptor getArrowImage() {
+        return RedPlugin.getImageDescriptor("resources/arrow.png");
+    }
+
     public static ImageDescriptor getFilterImage() {
         return RedPlugin.getImageDescriptor("resources/filter.png");
     }

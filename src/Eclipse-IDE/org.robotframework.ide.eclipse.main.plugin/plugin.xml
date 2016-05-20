@@ -885,17 +885,17 @@
           label="Highlighted cell color"
           value="255, 245, 210">
        <description>
-          This color is used in RED table editor in order to highlight currently focused cell
+          This color is used in RED table editor in order to highlight currently hovered cell
        </description>
     </colorDefinition>
     <colorDefinition
           categoryId="org.robotframework.ide.eclipse.table.theme"
           id="org.robotframework.ide.eclipse.row.selected"
           isEditable="true"
-          label="Selected row color"
+          label="Selected cell color"
           value="255, 250, 245">
        <description>
-          This color is used in RED table editor in order to highlight currently selected row
+          This color is used in RED table editor in order to highlight currently selected cells
        </description>
     </colorDefinition>
     <colorDefinition

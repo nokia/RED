@@ -9,6 +9,7 @@ import java.util.Collection;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
@@ -39,6 +40,10 @@ public class SearchMatchesTextPainter extends TextPainter {
     private final Supplier<HeaderFilterMatchesCollection> matchesSupplier;
 
     private final Styler matchStyler;
+
+    public SearchMatchesTextPainter(final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
+        this(matchesSupplier, Stylers.Common.MATCH_STYLER);
+    }
 
     public SearchMatchesTextPainter(final Supplier<HeaderFilterMatchesCollection> matchesSupplier,
             final Styler matchStyler) {

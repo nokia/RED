@@ -16,13 +16,13 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
+import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
@@ -59,6 +59,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
@@ -124,7 +125,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
-        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider);
+        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 270, 270,
+                new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider),
+                new VariableValuesTypeLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -151,6 +154,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
+        gridLayer.addConfiguration(new VariableValuesEditConfiguration(theme, dataProvider, eventBroker));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 
@@ -195,7 +199,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                     public HeaderFilterMatchesCollection get() {
                         return matches;
                     }
-                }, Stylers.Common.MATCH_STYLER));
+                }));
 
         table.addConfiguration(tableStyle);
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
