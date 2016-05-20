@@ -24,7 +24,6 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
-import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 
@@ -144,42 +143,29 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
         if (!lastToken.getFilePosition().isNotSet()
                 && !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent()
                 && !tokens.isEmpty()) {
-            getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
-            return;
+            boolean wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
+            if (wasDumped) {
+                return;
+            }
         }
 
         final List<Integer> lineEndPos = new ArrayList<>(getElementDumperHelper().getLineEndPos(model, tokens));
-        if (nrOfTokens > 0) {
-            boolean wasMyLine = false;
-            for (int i = 0; i < nrOfTokens; i++) {
-                final RobotToken robotToken = tokens.get(i);
-                final FilePosition fp = robotToken.getFilePosition();
-                if (!fp.isNotSet()) {
-                    if (filePosition.getLine() == fp.getLine()) {
-                        wasMyLine = true;
-                        break;
-                    }
-                }
-            }
 
-            if (!wasMyLine && currentLine != null) {
+        // just dump now
+        if (tokens.size() > 1 && lineEndPos.contains(0)) {
+            if (currentLine != null) {
                 getDumperHelper().updateLine(model, lines, currentLine.getEndOfLine());
-                if (!tokens.isEmpty()) {
-                    Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokens.get(0));
-                    if (sep.getTypes().contains(SeparatorType.PIPE)) {
-                        getDumperHelper().updateLine(model, lines, sep);
-                    }
-
-                    RobotToken lineContinueToken = new RobotToken();
-                    lineContinueToken.setRaw("...");
-                    lineContinueToken.setText("...");
-                    lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
-
-                    getDumperHelper().updateLine(model, lines, lineContinueToken);
-
-                    getDumperHelper().updateLine(model, lines, sep);
-                }
             }
+
+            Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokens.get(0));
+            getDumperHelper().updateLine(model, lines, sep);
+
+            RobotToken lineContinueToken = new RobotToken();
+            lineContinueToken.setRaw("...");
+            lineContinueToken.setText("...");
+            lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+
+            getDumperHelper().updateLine(model, lines, lineContinueToken);
         }
 
         for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
@@ -187,9 +173,12 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             if (tokenId == 0 && tokElem == lastToken) {
                 continue;
             }
-            Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokElem);
-            getDumperHelper().updateLine(model, lines, sep);
-            lastToken = sep;
+
+            if (!wasSeparatorBefore(lines)) {
+                Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokElem);
+                getDumperHelper().updateLine(model, lines, sep);
+                lastToken = sep;
+            }
 
             getDumperHelper().updateLine(model, lines, tokElem);
             lastToken = tokElem;
@@ -238,18 +227,16 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             }
 
             // check if is not end of line
-            if (lineEndPos.contains(tokenId)) {
+            if (lineEndPos.contains(tokenId) && tokenId + 1 < nrOfTokens) {
                 if (currentLine != null) {
                     getDumperHelper().updateLine(model, lines, currentLine.getEndOfLine());
                 } else {
                     // new end of line
                 }
 
-                if (!tokens.isEmpty() && tokenId + 1 < nrOfTokens) {
+                if (!tokens.isEmpty()) {
                     Separator sepNew = getDumperHelper().getSeparator(model, lines, lastToken, tokens.get(tokenId + 1));
-                    if (sepNew.getTypes().contains(SeparatorType.PIPE)) {
-                        getDumperHelper().updateLine(model, lines, sepNew);
-                    }
+                    getDumperHelper().updateLine(model, lines, sepNew);
 
                     RobotToken lineContinueToken = new RobotToken();
                     lineContinueToken.setRaw("...");

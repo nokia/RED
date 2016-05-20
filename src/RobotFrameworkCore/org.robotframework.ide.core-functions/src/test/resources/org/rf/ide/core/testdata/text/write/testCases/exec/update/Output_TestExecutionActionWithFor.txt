@@ -1,0 +1,6 @@
+*** Test Case ***
+TestCase
+	:FOR	${x}	IN	c	d
+	...	e	f	g #cm1	cm2	cm3
+	\	Log	${x}	#cm1a	cm1b
+	...	INFO

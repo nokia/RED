@@ -45,7 +45,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
         if (actType != null) {
             fixForTheType(action, actType, true);
         }
-        this.action = action;
+        this.action = updateOrCreate(this.action, action, actType);
     }
 
     private IRobotTokenType getActionType() {
@@ -66,12 +66,27 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
         return Collections.unmodifiableList(arguments);
     }
 
+    public void setArgument(final int index, final String argument) {
+        RobotToken token = new RobotToken();
+        token.setText(argument);
+
+        setArgument(index, token);
+    }
+
+    public void setArgument(final int index, final RobotToken argument) {
+        updateOrCreateTokenInside(arguments, index, argument, getArgumentType());
+    }
+
     public void addArgument(final RobotToken argument) {
         IRobotTokenType argType = getArgumentType();
         if (argType != null) {
             fixForTheType(argument, argType, true);
         }
         arguments.add(argument);
+    }
+
+    public void removeArgument(final int index) {
+        arguments.remove(index);
     }
 
     private IRobotTokenType getArgumentType() {
@@ -90,6 +105,14 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
 
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comments);
+    }
+
+    public void setComment(final String comment) {
+        this.comments.clear();
+        RobotToken token = new RobotToken();
+        token.setText(comment);
+
+        addComment(token);
     }
 
     public void addComment(final RobotToken commentWord) {
