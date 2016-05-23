@@ -17,6 +17,21 @@ public class DefaultTagsView extends DefaultTags {
     public DefaultTagsView(final List<DefaultTags> defaultTags) {
         super(defaultTags.get(0).getDeclaration());
         this.defaultTags = defaultTags;
+
+        // join tags for this view
+        final DefaultTags tags = new DefaultTags(getDeclaration());
+        OneSettingJoinerHelper.joinATag(tags, defaultTags);
+        copyWithoutJoinIfNeededExecution(tags);
+    }
+
+    private void copyWithoutJoinIfNeededExecution(final DefaultTags tags) {
+        for (final RobotToken token : tags.getTags()) {
+            super.addTag(token);
+        }
+
+        for (final RobotToken comment : tags.getComment()) {
+            super.addCommentPart(comment);
+        }
     }
 
     @Override

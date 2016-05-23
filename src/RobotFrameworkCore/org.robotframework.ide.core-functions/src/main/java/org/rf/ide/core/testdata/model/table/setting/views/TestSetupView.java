@@ -17,6 +17,21 @@ public class TestSetupView extends TestSetup {
     public TestSetupView(final List<TestSetup> setups) {
         super(setups.get(0).getDeclaration());
         this.setups = setups;
+        // join setup for this view
+        final TestSetup setup = new TestSetup(getDeclaration());
+        OneSettingJoinerHelper.joinKeywordBase(setup, setups);
+        copyWithoutJoinIfNeededExecution(setup);
+    }
+
+    private void copyWithoutJoinIfNeededExecution(final TestSetup setup) {
+        super.setKeywordName(setup.getKeywordName());
+        for (final RobotToken arg : setup.getArguments()) {
+            super.addArgument(arg);
+        }
+
+        for (final RobotToken commentText : setup.getComment()) {
+            super.addCommentPart(commentText);
+        }
     }
 
     @Override
