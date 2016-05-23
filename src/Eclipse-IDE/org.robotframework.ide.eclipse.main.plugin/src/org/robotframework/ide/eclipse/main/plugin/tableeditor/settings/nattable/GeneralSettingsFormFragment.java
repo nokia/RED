@@ -109,6 +109,7 @@ import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 
@@ -245,7 +246,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             return "";
         } else {
             final RobotSetting docSetting = section.getSetting("Documentation");
-            return docSetting != null && !docSetting.getArguments().isEmpty() ? docSetting.getArguments().get(0) : "";
+            return docSetting != null && !docSetting.getArguments().isEmpty() ? Joiner.on(" ").join(docSetting.getArguments()) : "";
         }
     }
 
@@ -497,7 +498,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         documentation.setEditable(fileModel.isEditable() && section != null);
         documentation.setText(getDocumentation(section));
-
+        
         if (table.isPresent()) {
             dataProvider.setInput(section);
         }

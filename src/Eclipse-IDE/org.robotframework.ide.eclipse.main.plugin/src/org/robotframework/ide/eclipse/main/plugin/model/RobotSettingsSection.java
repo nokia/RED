@@ -17,16 +17,23 @@ import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
+import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
+import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
+import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
+import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
+import org.rf.ide.core.testdata.model.table.setting.TestSetup;
+import org.rf.ide.core.testdata.model.table.setting.TestTeardown;
 import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -202,12 +209,14 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 elements.add(setting);
             }
         }
-        for (final SuiteDocumentation documentationSetting : settingsTable.getDocumentation()) {
-            final String name = documentationSetting.getDeclaration().getText().toString();
+        final Optional<SuiteDocumentation> documentationSetting = settingsTable.documentation();
+        if (documentationSetting.isPresent()) {
+            final SuiteDocumentation suiteDocumentation = documentationSetting.get();
+            final String name = suiteDocumentation.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
-                    Lists.transform(documentationSetting.getDocumentationText(), TokenFunctions.tokenToString()));
+                    Lists.transform(suiteDocumentation.getDocumentationText(), TokenFunctions.tokenToString()));
             final RobotSetting setting = new RobotSetting(this, name, args, "");
-            setting.link(documentationSetting);
+            setting.link(suiteDocumentation);
             elements.add(setting);
         }
         for (final AKeywordBaseSetting<?> keywordSetting : getKeywordBasedSettings(settingsTable)) {
@@ -241,33 +250,53 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             setting.link(templateSetting);
             elements.add(setting);
         }
-        for (final TestTimeout timeoutSetting : settingsTable.getTestTimeouts()) {
-            final String name = timeoutSetting.getDeclaration().getText().toString();
-            final RobotToken timeout = timeoutSetting.getTimeout();
+        Optional<TestTimeout> timeoutSetting = settingsTable.testTimeout();
+        if (timeoutSetting.isPresent()) {
+            final TestTimeout testTimeout = timeoutSetting.get();
+            final String name = testTimeout.getDeclaration().getText().toString();
+            final RobotToken timeout = testTimeout.getTimeout();
             final List<String> args = newArrayList();
             if (timeout != null) {
                 args.add(timeout.getText().toString());
             }
-            args.addAll(Lists.transform(timeoutSetting.getMessageArguments(), TokenFunctions.tokenToString()));
+            args.addAll(Lists.transform(testTimeout.getMessageArguments(), TokenFunctions.tokenToString()));
             final RobotSetting setting = new RobotSetting(this, name, args, "");
-            setting.link(timeoutSetting);
+            setting.link(testTimeout);
             elements.add(setting);
         }
     }
 
     private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {
         final List<AKeywordBaseSetting<?>> elements = newArrayList();
-        elements.addAll(settingTable.getSuiteSetups());
-        elements.addAll(settingTable.getSuiteTeardowns());
-        elements.addAll(settingTable.getTestSetups());
-        elements.addAll(settingTable.getTestTeardowns());
+        final Optional<SuiteSetup> suiteSetup = settingTable.suiteSetup();
+        if (suiteSetup.isPresent()) {
+            elements.add(suiteSetup.get());
+        }
+        final Optional<SuiteTeardown> suiteTeardown = settingTable.suiteTeardown();
+        if (suiteTeardown.isPresent()) {
+            elements.add(suiteTeardown.get());
+        }
+        final Optional<TestSetup> testSetup = settingTable.testSetup();
+        if (testSetup.isPresent()) {
+            elements.add(testSetup.get());
+        }
+        final Optional<TestTeardown> testTeardown = settingTable.testTeardown();
+        if (testTeardown.isPresent()) {
+            elements.add(testTeardown.get());
+        }
         return elements;
     }
 
     private static List<? extends ATags<?>> getTagsSettings(final SettingTable settingTable) {
         final List<ATags<?>> elements = newArrayList();
-        elements.addAll(settingTable.getForceTags());
-        elements.addAll(settingTable.getDefaultTags());
+        final Optional<ForceTags> forceTags = settingTable.forceTags();
+        if (forceTags.isPresent()) {
+            elements.add(forceTags.get());
+        }
+        final Optional<DefaultTags> defaultTags = settingTable.defaultTags();
+        if (defaultTags.isPresent()) {
+            elements.add(defaultTags.get());
+        }
         return elements;
     }
 }
