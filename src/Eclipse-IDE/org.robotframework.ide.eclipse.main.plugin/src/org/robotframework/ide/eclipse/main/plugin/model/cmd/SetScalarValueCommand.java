@@ -20,7 +20,7 @@ public class SetScalarValueCommand extends EditorCommand {
 
     public SetScalarValueCommand(final RobotVariable variable, final String newValue) {
         this.variable = variable;
-        this.newValue = newValue;
+        this.newValue = newValue == null ? "" : newValue;
     }
 
     @Override
@@ -33,7 +33,11 @@ public class SetScalarValueCommand extends EditorCommand {
         token.setText(newValue);
 
         final ScalarVariable scalar = (ScalarVariable) variable.getLinkedElement();
-        scalar.addValue(token, 0);
+        if (scalar.getValues().isEmpty()) {
+            scalar.addValue(token);
+        } else {
+            scalar.addValue(token, 0);
+        }
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
