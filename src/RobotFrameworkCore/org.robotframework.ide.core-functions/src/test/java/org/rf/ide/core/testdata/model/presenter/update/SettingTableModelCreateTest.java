@@ -1,3 +1,8 @@
+/*
+ * Copyright 2016 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
 package org.rf.ide.core.testdata.model.presenter.update;
 
 import static com.google.common.collect.Lists.newArrayList;
@@ -255,7 +260,7 @@ public class SettingTableModelCreateTest {
 
     @Test
     public void testCreateWhenNoTableExists() {
-        assertNull(modelUpdater.create(null, SettingName.METADATA.getName(), "", newArrayList()));
+        assertNull(modelUpdater.create(null, SettingName.METADATA.getName(), "", newArrayList("")));
     }
 
     @Test
@@ -263,12 +268,12 @@ public class SettingTableModelCreateTest {
         RobotFile file = NewRobotFileTestHelper.getModelFileToModify("3.0");
         file.includeSettingTableSection();
         VariableTable variableTable = file.getVariableTable();
-        assertNull(modelUpdater.create(variableTable, SettingName.METADATA.getName(), "", newArrayList()));
+        assertNull(modelUpdater.create(variableTable, SettingName.METADATA.getName(), "", newArrayList("")));
     }
 
     @Test
     public void testCreateWithUnknownSetting() {
-        assertNull(modelUpdater.create(settingTable, "Unknown", "", newArrayList()));
+        assertNull(modelUpdater.create(settingTable, "Unknown", "", newArrayList("")));
     }
 
     private void checkSetting(final RobotToken actualKeywordName, final String expectedKeywordName,
