@@ -17,6 +17,21 @@ public class SuiteSetupView extends SuiteSetup {
     public SuiteSetupView(final List<SuiteSetup> setups) {
         super(setups.get(0).getDeclaration());
         this.setups = setups;
+        // join setup for this view
+        final SuiteSetup setup = new SuiteSetup(getDeclaration());
+        OneSettingJoinerHelper.joinKeywordBase(setup, setups);
+        copyWithoutJoinIfNeededExecution(setup);
+    }
+
+    private void copyWithoutJoinIfNeededExecution(final SuiteSetup setup) {
+        super.setKeywordName(setup.getKeywordName());
+        for (final RobotToken arg : setup.getArguments()) {
+            super.addArgument(arg);
+        }
+
+        for (final RobotToken commentText : setup.getComment()) {
+            super.addCommentPart(commentText);
+        }
     }
 
     @Override

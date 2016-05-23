@@ -17,6 +17,20 @@ public class SuiteDocumentationView extends SuiteDocumentation {
     public SuiteDocumentationView(final List<SuiteDocumentation> suiteDocs) {
         super(suiteDocs.get(0).getDeclaration());
         this.suiteDocs = suiteDocs;
+        // join tags for this view
+        final SuiteDocumentation doc = new SuiteDocumentation(getDeclaration());
+        joinDoc(doc, suiteDocs);
+        copyWithoutJoinIfNeededExecution(doc);
+    }
+
+    private void copyWithoutJoinIfNeededExecution(final SuiteDocumentation doc) {
+        for (final RobotToken token : doc.getDocumentationText()) {
+            super.addDocumentationText(token);
+        }
+
+        for (final RobotToken comment : doc.getComment()) {
+            super.addCommentPart(comment);
+        }
     }
 
     @Override
@@ -73,11 +87,11 @@ public class SuiteDocumentationView extends SuiteDocumentation {
     private void joinDoc(final SuiteDocumentation target, final List<SuiteDocumentation> suiteDocs) {
         for (final SuiteDocumentation sd : suiteDocs) {
             for (final RobotToken text : sd.getDocumentationText()) {
-                sd.addDocumentationText(text);
+                target.addDocumentationText(text);
             }
 
             for (final RobotToken comment : sd.getComment()) {
-                sd.addCommentPart(comment);
+                target.addCommentPart(comment);
             }
         }
     }

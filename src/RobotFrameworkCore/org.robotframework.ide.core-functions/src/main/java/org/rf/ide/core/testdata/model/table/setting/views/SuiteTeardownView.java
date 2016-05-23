@@ -17,6 +17,21 @@ public class SuiteTeardownView extends SuiteTeardown {
     public SuiteTeardownView(final List<SuiteTeardown> teardowns) {
         super(teardowns.get(0).getDeclaration());
         this.teardowns = teardowns;
+        // join setup for this view
+        final SuiteTeardown teardown = new SuiteTeardown(getDeclaration());
+        OneSettingJoinerHelper.joinKeywordBase(teardown, teardowns);
+        copyWithoutJoinIfNeededExecution(teardown);
+    }
+
+    private void copyWithoutJoinIfNeededExecution(final SuiteTeardown teardown) {
+        super.setKeywordName(teardown.getKeywordName());
+        for (final RobotToken arg : teardown.getArguments()) {
+            super.addArgument(arg);
+        }
+
+        for (final RobotToken commentText : teardown.getComment()) {
+            super.addCommentPart(commentText);
+        }
     }
 
     @Override
