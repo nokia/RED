@@ -17,6 +17,21 @@ public class ForceTagsView extends ForceTags {
     public ForceTagsView(final List<ForceTags> forceTags) {
         super(forceTags.get(0).getDeclaration());
         this.forceTags = forceTags;
+
+        // join tags for this view
+        final ForceTags tags = new ForceTags(getDeclaration());
+        OneSettingJoinerHelper.joinATag(tags, forceTags);
+        copyWithoutJoinIfNeededExecution(tags);
+    }
+
+    private void copyWithoutJoinIfNeededExecution(final ForceTags tags) {
+        for (final RobotToken token : tags.getTags()) {
+            super.addTag(token);
+        }
+
+        for (final RobotToken comment : tags.getComment()) {
+            super.addCommentPart(comment);
+        }
     }
 
     @Override

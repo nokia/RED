@@ -17,6 +17,21 @@ public class TestTeardownView extends TestTeardown {
     public TestTeardownView(final List<TestTeardown> teardowns) {
         super(teardowns.get(0).getDeclaration());
         this.teardowns = teardowns;
+        // join setup for this view
+        final TestTeardown teardown = new TestTeardown(getDeclaration());
+        OneSettingJoinerHelper.joinKeywordBase(teardown, teardowns);
+        copyWithoutJoinIfNeededExecution(teardown);
+    }
+
+    private void copyWithoutJoinIfNeededExecution(final TestTeardown teardown) {
+        super.setKeywordName(teardown.getKeywordName());
+        for (final RobotToken arg : teardown.getArguments()) {
+            super.addArgument(arg);
+        }
+
+        for (final RobotToken commentText : teardown.getComment()) {
+            super.addCommentPart(commentText);
+        }
     }
 
     @Override
