@@ -17,6 +17,23 @@ public class TestTimeoutView extends TestTimeout {
     public TestTimeoutView(final List<TestTimeout> timeouts) {
         super(timeouts.get(0).getDeclaration());
         this.timeouts = timeouts;
+
+        // join timeout for this view
+        final TestTimeout timeout = new TestTimeout(getDeclaration());
+        joinTimeout(timeout, timeouts);
+        copyWithoutJoinIfNeededExecution(timeout);
+    }
+
+    private void copyWithoutJoinIfNeededExecution(final TestTimeout timeout) {
+        super.setTimeout(timeout.getTimeout());
+
+        for (final RobotToken token : timeout.getMessageArguments()) {
+            super.addMessageArgument(token);
+        }
+
+        for (final RobotToken comment : timeout.getComment()) {
+            super.addCommentPart(comment);
+        }
     }
 
     @Override
