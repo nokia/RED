@@ -60,13 +60,13 @@ public class SettingTable extends ARobotSectionTable {
 
     private final DataDrivenKeywordName<TestTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
 
-    private final SettingTableMultipleDeclarationsJoiner joiner = new SettingTableMultipleDeclarationsJoiner();
+    private final SettingTableMultipleElementsViewCreator joiner = new SettingTableMultipleElementsViewCreator();
 
     public SettingTable(final RobotFile parent) {
         super(parent);
     }
 
-    protected SettingTableMultipleDeclarationsJoiner getSettingConsolidator() {
+    protected SettingTableMultipleElementsViewCreator getSettingViewCreator() {
         return joiner;
     }
 
@@ -137,7 +137,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public Optional<SuiteDocumentation> documentation() {
-        return getSettingConsolidator().joinSuiteDoc(getDocumentation());
+        return getSettingViewCreator().createViewAboutSuiteDoc(documentations);
     }
 
     public List<SuiteDocumentation> getDocumentation() {
@@ -202,7 +202,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public Optional<SuiteSetup> suiteSetup() {
-        return getSettingConsolidator().joinSuiteSetup(getSuiteSetups());
+        return getSettingViewCreator().createViewAboutSuiteSetup(suiteSetups);
     }
 
     public List<SuiteSetup> getSuiteSetups() {
@@ -230,7 +230,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public Optional<SuiteTeardown> suiteTeardown() {
-        return getSettingConsolidator().joinSuiteTeardown(getSuiteTeardowns());
+        return getSettingViewCreator().createViewAboutSuiteTeardown(suiteTeardowns);
     }
 
     public List<SuiteTeardown> getSuiteTeardowns() {
@@ -258,7 +258,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public Optional<ForceTags> forceTags() {
-        return getSettingConsolidator().joinForceTag(getForceTags());
+        return getSettingViewCreator().createViewAboutForceTags(forceTags);
     }
 
     public ForceTags newForceTag() {
@@ -286,7 +286,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public Optional<DefaultTags> defaultTags() {
-        return getSettingConsolidator().joinDefaultTag(getDefaultTags());
+        return getSettingViewCreator().createViewAboutDefaultTags(defaultTags);
     }
 
     public List<DefaultTags> getDefaultTags() {
@@ -314,7 +314,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public Optional<TestSetup> testSetup() {
-        return getSettingConsolidator().joinTestSetup(getTestSetups());
+        return getSettingViewCreator().createViewAboutTestSetup(testSetups);
     }
 
     public List<TestSetup> getTestSetups() {
@@ -342,7 +342,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public Optional<TestTeardown> testTeardown() {
-        return getSettingConsolidator().joinTestTeardown(getTestTeardowns());
+        return getSettingViewCreator().createViewAboutTestTeardown(testTeardowns);
     }
 
     public List<TestTeardown> getTestTeardowns() {
@@ -415,7 +415,7 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public Optional<TestTimeout> testTimeout() {
-        return getSettingConsolidator().joinTestTimeout(getTestTimeouts());
+        return getSettingViewCreator().createViewAboutTestTimeout(testTimeouts);
     }
 
     public List<TestTimeout> getTestTimeouts() {
