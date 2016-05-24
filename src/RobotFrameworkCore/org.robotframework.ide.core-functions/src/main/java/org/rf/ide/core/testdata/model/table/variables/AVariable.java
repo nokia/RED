@@ -30,19 +30,12 @@ public abstract class AVariable extends AModelElement<VariableTable> implements 
 
     private final List<RobotToken> comment = new ArrayList<>();
 
-    private final MoveElementHelper moveHelper;
-
     protected AVariable(final VariableType type, final String name, final RobotToken declaration,
             final VariableScope scope) {
         this.type = type;
         this.name = name;
         this.declaration = declaration;
         this.scope = scope;
-        this.moveHelper = new MoveElementHelper();
-    }
-
-    protected MoveElementHelper getMoveHelper() {
-        return this.moveHelper;
     }
 
     @Override
@@ -85,11 +78,11 @@ public abstract class AVariable extends AModelElement<VariableTable> implements 
     }
 
     public boolean moveCommentPartLeft(final RobotToken rt) {
-        return getMoveHelper().moveLeft(comment, rt);
+        return MoveElementHelper.moveLeft(comment, rt);
     }
 
     public boolean moveCommentPartRight(final RobotToken rt) {
-        return getMoveHelper().moveRight(comment, rt);
+        return MoveElementHelper.moveRight(comment, rt);
     }
 
     @Override

@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
@@ -46,11 +47,11 @@ public class TestCaseTable extends ARobotSectionTable {
     }
 
     public boolean moveUpTest(final TestCase testCase) {
-        return getMoveHelper().moveUp(testCases, testCase);
+        return MoveElementHelper.moveUp(testCases, testCase);
     }
 
     public boolean moveDownTest(final TestCase testCase) {
-        return getMoveHelper().moveDown(testCases, testCase);
+        return MoveElementHelper.moveDown(testCases, testCase);
     }
 
     public List<TestCase> getTestCases() {

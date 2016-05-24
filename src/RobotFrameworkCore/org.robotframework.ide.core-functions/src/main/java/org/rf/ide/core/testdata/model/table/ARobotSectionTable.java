@@ -12,7 +12,6 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.IChildElement;
 import org.rf.ide.core.testdata.model.IOptional;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 
 public abstract class ARobotSectionTable implements IOptional, IChildElement<RobotFile> {
 
@@ -20,15 +19,8 @@ public abstract class ARobotSectionTable implements IOptional, IChildElement<Rob
 
     private final List<TableHeader<? extends ARobotSectionTable>> headers = new ArrayList<>();
 
-    private final MoveElementHelper moveHelper;
-
     public ARobotSectionTable(final RobotFile parent) {
         this.parent = parent;
-        this.moveHelper = new MoveElementHelper();
-    }
-
-    public MoveElementHelper getMoveHelper() {
-        return moveHelper;
     }
 
     @Override
