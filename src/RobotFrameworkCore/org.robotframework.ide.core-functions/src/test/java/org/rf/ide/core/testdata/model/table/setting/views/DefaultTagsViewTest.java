@@ -6,9 +6,7 @@
 package org.rf.ide.core.testdata.model.table.setting.views;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.rf.ide.core.testdata.model.table.setting.views.ModelTokenTestHelper.getText;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -113,13 +111,5 @@ public class DefaultTagsViewTest {
         assertThat(joined.getTags()).hasSize(4);
         assertThat(getText(joined.getTags())).containsExactly("tag1", "tag2", "mod", "tag2a");
         assertThat(settingTable.getDefaultTags()).hasSize(2);
-    }
-
-    private List<String> getText(List<RobotToken> tokens) {
-        List<String> text = new ArrayList<>();
-        for (final RobotToken tok : tokens) {
-            text.add(tok.getText());
-        }
-        return text;
     }
 }

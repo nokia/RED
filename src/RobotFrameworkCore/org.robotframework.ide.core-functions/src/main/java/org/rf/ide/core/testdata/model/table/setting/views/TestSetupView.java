@@ -14,13 +14,24 @@ public class TestSetupView extends TestSetup {
 
     private final List<TestSetup> setups;
 
+    private final boolean changeForceRebuild;
+
     public TestSetupView(final List<TestSetup> setups) {
+        this(setups, false);
+    }
+
+    public TestSetupView(final List<TestSetup> setups, final boolean changeForceRebuild) {
         super(setups.get(0).getDeclaration());
         this.setups = setups;
+        this.changeForceRebuild = changeForceRebuild;
         // join setup for this view
         final TestSetup setup = new TestSetup(getDeclaration());
         OneSettingJoinerHelper.joinKeywordBase(setup, setups);
         copyWithoutJoinIfNeededExecution(setup);
+    }
+
+    protected boolean isForceRebuild() {
+        return changeForceRebuild;
     }
 
     private void copyWithoutJoinIfNeededExecution(final TestSetup setup) {
@@ -36,13 +47,17 @@ public class TestSetupView extends TestSetup {
 
     @Override
     public void setKeywordName(final String keywordName) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setKeywordName(keywordName);
     }
 
     @Override
     public void setKeywordName(final RobotToken keywordName) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setKeywordName(keywordName);
     }
 
@@ -60,13 +75,17 @@ public class TestSetupView extends TestSetup {
 
     @Override
     public void setArgument(final int index, final String argument) {
-        joinIfNeeded();
+        if (super.getArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 
     @Override
     public void setArgument(final int index, final RobotToken argument) {
-        joinIfNeeded();
+        if (super.getArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 
