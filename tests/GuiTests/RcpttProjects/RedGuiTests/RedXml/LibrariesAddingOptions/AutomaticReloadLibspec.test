@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pTFvYOVGEeWkVpqnVhTYmg
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/28/16 3:07 PM
+Save-Time: 5/24/16 5:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -268,7 +268,19 @@ get-window "Regenerating library specification"
      
 get-window "Regenerating library specification" | get-button OK | click
 
+
+
+
+
 //------------------------
+
+get-view "Project Explorer" | get-tree | select "NewProject/red.xml" | double-click
+with [get-editor "NewProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "test - NewProject\\/imports" | key-type "M1+a"
+    select "only_function - NewProject" "here_is_class.Dog - NewProject" "test - NewProject\\/imports" "MainClass - NewProject\\/imports"
+    key-type Del
+    key-type "M1+s"
+}
 
 // remove entire project (for one file RCPPT cannot see window with error)
 exec-with-options {
