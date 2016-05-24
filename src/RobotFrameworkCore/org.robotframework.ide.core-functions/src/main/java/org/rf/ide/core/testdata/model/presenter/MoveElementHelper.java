@@ -5,51 +5,38 @@
  */
 package org.rf.ide.core.testdata.model.presenter;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 public class MoveElementHelper {
 
-    public boolean moveLeft(@SuppressWarnings("rawtypes") final Collection list, final Object toMoveLeft) {
+    public static <T> boolean moveLeft(final List<T> list, final T toMoveLeft) {
         return moveUp(list, toMoveLeft);
     }
 
-    @SuppressWarnings("unchecked")
-    public boolean moveUp(@SuppressWarnings("rawtypes") final Collection list, final Object toMoveUp) {
+    public static <T> boolean moveUp(final List<T> list, final T toMoveUp) {
         boolean result = false;
         if (list.size() >= 2) {
-            final List<?> listCopy = new ArrayList<>(list);
-            int elemIndex = listCopy.indexOf(toMoveUp);
+            int elemIndex = list.indexOf(toMoveUp);
             if (elemIndex > 0) {
-                Collections.swap(listCopy, elemIndex, elemIndex - 1);
-                synchronized (list) {
-                    list.clear();
-                    list.addAll(listCopy);
-                }
+                Collections.swap(list, elemIndex, elemIndex - 1);
                 result = true;
             }
         }
+
         return result;
     }
 
-    public boolean moveRight(@SuppressWarnings("rawtypes") final Collection list, final Object toMoveRight) {
+    public static <T> boolean moveRight(final List<T> list, final T toMoveRight) {
         return moveDown(list, toMoveRight);
     }
 
-    @SuppressWarnings("unchecked")
-    public boolean moveDown(@SuppressWarnings("rawtypes") final Collection list, final Object toMoveDown) {
+    public static <T> boolean moveDown(final List<T> list, final T toMoveDown) {
         boolean result = false;
         if (list.size() >= 2) {
-            final List<?> listCopy = new ArrayList<>(list);
-            int elemIndex = listCopy.indexOf(toMoveDown);
-            if (elemIndex >= 0 && elemIndex < listCopy.size() - 1) {
-                Collections.swap(listCopy, elemIndex, elemIndex + 1);
-                synchronized (list) {
-                    list.clear();
-                    list.addAll(listCopy);
-                }
+            int elemIndex = list.indexOf(toMoveDown);
+            if (elemIndex >= 0 && elemIndex < list.size() - 1) {
+                Collections.swap(list, elemIndex, elemIndex + 1);
                 result = true;
             }
         }

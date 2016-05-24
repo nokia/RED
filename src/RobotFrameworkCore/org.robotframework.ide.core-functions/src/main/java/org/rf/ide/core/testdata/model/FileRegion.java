@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.model;
 
+import com.google.common.collect.Range;
+
 public class FileRegion {
 
     private FilePosition start;
@@ -33,13 +35,7 @@ public class FileRegion {
     }
 
     public boolean isInside(final int offset) {
-        boolean result = false;
-
-        int startOffset = start.getOffset();
-        int endOffset = end.getOffset();
-        result = (offset >= startOffset && offset <= endOffset);
-
-        return result;
+        return Range.closed(start.getOffset(), end.getOffset()).contains(offset);
     }
 
     @Override

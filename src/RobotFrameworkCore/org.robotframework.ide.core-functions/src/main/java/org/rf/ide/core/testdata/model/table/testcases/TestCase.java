@@ -45,11 +45,8 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     private final DataDrivenKeywordName<TestCaseTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
 
-    private final MoveElementHelper moveHelper;
-
     public TestCase(final RobotToken testName) {
         this.testName = testName;
-        this.moveHelper = new MoveElementHelper();
     }
 
     public RobotToken getTestName() {
@@ -89,11 +86,11 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public boolean moveUpExecutableRow(final RobotExecutableRow<TestCase> executionRow) {
-        return moveHelper.moveUp(testContext, executionRow);
+        return MoveElementHelper.moveUp(testContext, executionRow);
     }
 
     public boolean moveDownExecutableRow(final RobotExecutableRow<TestCase> executionRow) {
-        return moveHelper.moveDown(testContext, executionRow);
+        return MoveElementHelper.moveDown(testContext, executionRow);
     }
 
     public void removeExecutableLineWithIndex(final int rowIndex) {

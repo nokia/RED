@@ -12,6 +12,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.presenter.DataDrivenKeywordName;
+import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
@@ -129,11 +130,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public boolean moveUpImported(final AImported imported) {
-        return getMoveHelper().moveUp(imports, imported);
+        return MoveElementHelper.moveUp(imports, imported);
     }
 
     public boolean moveDownImported(final AImported imported) {
-        return getMoveHelper().moveDown(imports, imported);
+        return MoveElementHelper.moveDown(imports, imported);
     }
 
     public Optional<SuiteDocumentation> documentation() {
@@ -194,11 +195,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public boolean moveUpMetadata(final Metadata metadata) {
-        return getMoveHelper().moveUp(metadatas, metadata);
+        return MoveElementHelper.moveUp(metadatas, metadata);
     }
 
     public boolean moveDownMetadata(final Metadata metadata) {
-        return getMoveHelper().moveDown(metadatas, metadata);
+        return MoveElementHelper.moveDown(metadatas, metadata);
     }
 
     public Optional<SuiteSetup> suiteSetup() {
