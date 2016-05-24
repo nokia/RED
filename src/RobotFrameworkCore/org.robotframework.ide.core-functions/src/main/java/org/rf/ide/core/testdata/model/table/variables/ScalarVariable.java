@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class ScalarVariable extends AVariable {
@@ -32,11 +33,11 @@ public class ScalarVariable extends AVariable {
     }
 
     public boolean moveLeftValue(final RobotToken value) {
-        return getMoveHelper().moveLeft(values, value);
+        return MoveElementHelper.moveLeft(values, value);
     }
 
     public boolean moveRightValue(final RobotToken value) {
-        return getMoveHelper().moveRight(values, value);
+        return MoveElementHelper.moveRight(values, value);
     }
 
     public List<RobotToken> getValues() {

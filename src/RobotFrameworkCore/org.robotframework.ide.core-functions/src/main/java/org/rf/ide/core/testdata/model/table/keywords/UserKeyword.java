@@ -40,11 +40,8 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
 
     private final List<RobotExecutableRow<UserKeyword>> keywordContext = new ArrayList<>();
 
-    private final MoveElementHelper moveHelper;
-
     public UserKeyword(final RobotToken keywordName) {
         this.keywordName = keywordName;
-        this.moveHelper = new MoveElementHelper();
     }
 
     public RobotToken getKeywordName() {
@@ -79,11 +76,11 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
     }
 
     public boolean moveUpExecutableRow(final RobotExecutableRow<UserKeyword> executionRow) {
-        return moveHelper.moveUp(keywordContext, executionRow);
+        return MoveElementHelper.moveUp(keywordContext, executionRow);
     }
 
     public boolean moveDownExecutableRow(final RobotExecutableRow<UserKeyword> executionRow) {
-        return moveHelper.moveDown(keywordContext, executionRow);
+        return MoveElementHelper.moveDown(keywordContext, executionRow);
     }
 
     public void removeExecutableLineWithIndex(final int rowIndex) {

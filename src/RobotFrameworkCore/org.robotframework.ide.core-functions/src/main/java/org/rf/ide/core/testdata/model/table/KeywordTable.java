@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
@@ -46,11 +47,11 @@ public class KeywordTable extends ARobotSectionTable {
     }
 
     public boolean moveUpKeyword(final UserKeyword keyword) {
-        return getMoveHelper().moveUp(userKeywords, keyword);
+        return MoveElementHelper.moveUp(userKeywords, keyword);
     }
 
     public boolean moveDownKeyword(final UserKeyword keyword) {
-        return getMoveHelper().moveDown(userKeywords, keyword);
+        return MoveElementHelper.moveDown(userKeywords, keyword);
     }
 
     public List<UserKeyword> getKeywords() {
