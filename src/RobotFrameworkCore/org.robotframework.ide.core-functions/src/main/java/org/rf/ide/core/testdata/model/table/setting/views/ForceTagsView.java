@@ -14,14 +14,24 @@ public class ForceTagsView extends ForceTags {
 
     private final List<ForceTags> forceTags;
 
+    private final boolean changeForceRebuild;
+
     public ForceTagsView(final List<ForceTags> forceTags) {
+        this(forceTags, false);
+    }
+
+    public ForceTagsView(final List<ForceTags> forceTags, final boolean changeForceRebuild) {
         super(forceTags.get(0).getDeclaration());
         this.forceTags = forceTags;
-
+        this.changeForceRebuild = changeForceRebuild;
         // join tags for this view
         final ForceTags tags = new ForceTags(getDeclaration());
         OneSettingJoinerHelper.joinATag(tags, forceTags);
         copyWithoutJoinIfNeededExecution(tags);
+    }
+
+    protected boolean isForceRebuild() {
+        return changeForceRebuild;
     }
 
     private void copyWithoutJoinIfNeededExecution(final ForceTags tags) {
@@ -48,13 +58,17 @@ public class ForceTagsView extends ForceTags {
 
     @Override
     public void setTag(final int index, final String tag) {
-        joinIfNeeded();
+        if (super.getTags().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setTag(index, tag);
     }
 
     @Override
     public void setTag(final int index, final RobotToken tag) {
-        joinIfNeeded();
+        if (super.getTags().size() > index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setTag(index, tag);
     }
 

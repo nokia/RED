@@ -14,9 +14,16 @@ public class TestTeardownView extends TestTeardown {
 
     private final List<TestTeardown> teardowns;
 
+    private final boolean changeForceRebuild;
+
     public TestTeardownView(final List<TestTeardown> teardowns) {
+        this(teardowns, false);
+    }
+
+    public TestTeardownView(final List<TestTeardown> teardowns, final boolean changeForceRebuild) {
         super(teardowns.get(0).getDeclaration());
         this.teardowns = teardowns;
+        this.changeForceRebuild = changeForceRebuild;
         // join setup for this view
         final TestTeardown teardown = new TestTeardown(getDeclaration());
         OneSettingJoinerHelper.joinKeywordBase(teardown, teardowns);
@@ -34,15 +41,23 @@ public class TestTeardownView extends TestTeardown {
         }
     }
 
+    protected boolean isForceRebuild() {
+        return changeForceRebuild;
+    }
+
     @Override
     public void setKeywordName(final String keywordName) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setKeywordName(keywordName);
     }
 
     @Override
     public void setKeywordName(final RobotToken keywordName) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setKeywordName(keywordName);
     }
 
@@ -60,13 +75,17 @@ public class TestTeardownView extends TestTeardown {
 
     @Override
     public void setArgument(final int index, final String argument) {
-        joinIfNeeded();
+        if (super.getArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 
     @Override
     public void setArgument(final int index, final RobotToken argument) {
-        joinIfNeeded();
+        if (super.getArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 

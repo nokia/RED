@@ -14,13 +14,24 @@ public class SuiteSetupView extends SuiteSetup {
 
     private final List<SuiteSetup> setups;
 
+    private final boolean changeForceRebuild;
+
     public SuiteSetupView(final List<SuiteSetup> setups) {
+        this(setups, false);
+    }
+
+    public SuiteSetupView(final List<SuiteSetup> setups, boolean changeForceRebuild) {
         super(setups.get(0).getDeclaration());
         this.setups = setups;
         // join setup for this view
         final SuiteSetup setup = new SuiteSetup(getDeclaration());
         OneSettingJoinerHelper.joinKeywordBase(setup, setups);
         copyWithoutJoinIfNeededExecution(setup);
+        this.changeForceRebuild = changeForceRebuild;
+    }
+
+    protected boolean isForceRebuild() {
+        return changeForceRebuild;
     }
 
     private void copyWithoutJoinIfNeededExecution(final SuiteSetup setup) {
@@ -36,13 +47,17 @@ public class SuiteSetupView extends SuiteSetup {
 
     @Override
     public void setKeywordName(final String keywordName) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setKeywordName(keywordName);
     }
 
     @Override
     public void setKeywordName(final RobotToken keywordName) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setKeywordName(keywordName);
     }
 
@@ -60,13 +75,17 @@ public class SuiteSetupView extends SuiteSetup {
 
     @Override
     public void setArgument(final int index, final String argument) {
-        joinIfNeeded();
+        if (super.getArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 
     @Override
     public void setArgument(final int index, final RobotToken argument) {
-        joinIfNeeded();
+        if (super.getArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 
