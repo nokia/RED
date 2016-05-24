@@ -14,13 +14,25 @@ public class SuiteDocumentationView extends SuiteDocumentation {
 
     private final List<SuiteDocumentation> suiteDocs;
 
+    private final boolean changeForceRebuild;
+
     public SuiteDocumentationView(final List<SuiteDocumentation> suiteDocs) {
+        this(suiteDocs, false);
+    }
+
+    public SuiteDocumentationView(final List<SuiteDocumentation> suiteDocs, final boolean changeForceRebuild) {
         super(suiteDocs.get(0).getDeclaration());
         this.suiteDocs = suiteDocs;
+        this.changeForceRebuild = changeForceRebuild;
+
         // join tags for this view
         final SuiteDocumentation doc = new SuiteDocumentation(getDeclaration());
         joinDoc(doc, suiteDocs);
         copyWithoutJoinIfNeededExecution(doc);
+    }
+
+    protected boolean isForceRebuild() {
+        return changeForceRebuild;
     }
 
     private void copyWithoutJoinIfNeededExecution(final SuiteDocumentation doc) {
@@ -47,13 +59,17 @@ public class SuiteDocumentationView extends SuiteDocumentation {
 
     @Override
     public void setDocumentationText(final int index, final String docText) {
-        joinIfNeeded();
+        if (super.getDocumentationText().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setDocumentationText(index, docText);
     }
 
     @Override
     public void setDocumentationText(final int index, final RobotToken docText) {
-        joinIfNeeded();
+        if (super.getDocumentationText().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setDocumentationText(index, docText);
     }
 
