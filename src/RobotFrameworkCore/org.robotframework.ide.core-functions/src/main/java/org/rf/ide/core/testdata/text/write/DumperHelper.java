@@ -144,6 +144,9 @@ public class DumperHelper {
                     } else if (elem.isDirty()) {
                         if (artToken instanceof RobotToken) {
                             RobotToken rt = (RobotToken) artToken;
+                            if (rt.getText().isEmpty() && isTokenToEmptyEscape(rt)) {
+                                ((RobotToken) artToken).setText(getEmpty());
+                            }
                             rt.setRaw(artToken.getText());
                         }
                     }
@@ -158,7 +161,9 @@ public class DumperHelper {
         boolean result = false;
         final List<IRobotTokenType> types = token.getTypes();
         for (final IRobotTokenType tt : types) {
-            if (tt == RobotTokenType.VARIABLES_VARIABLE_VALUE) {
+            if (tt == RobotTokenType.VARIABLES_VARIABLE_VALUE || RobotTokenType.getTypesForSettingsTable().contains(tt)
+                    || (RobotTokenType.getTypesForTestCasesTable().contains(tt) && tt != RobotTokenType.TEST_CASE_NAME)
+                    || (RobotTokenType.getTypesForKeywordsTable().contains(tt) && tt != RobotTokenType.KEYWORD_NAME)) {
                 result = true;
                 break;
             }
