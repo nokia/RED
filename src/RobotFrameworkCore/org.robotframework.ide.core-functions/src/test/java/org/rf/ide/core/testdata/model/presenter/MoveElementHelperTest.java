@@ -15,16 +15,14 @@ import org.junit.Test;
 
 public class MoveElementHelperTest {
 
-    private final MoveElementHelper tested = new MoveElementHelper();
-
     @Test
     public void zeroElements_tryToMoveUp_shouldReturn_False() {
-        assertThat(tested.moveUp(Arrays.asList(), "A")).isFalse();
+        assertThat(MoveElementHelper.moveUp(Arrays.asList(), "A")).isFalse();
     }
 
     @Test
     public void zeroElements_tryToMoveDown_shouldReturn_False() {
-        assertThat(tested.moveDown(Arrays.asList(), "A")).isFalse();
+        assertThat(MoveElementHelper.moveDown(Arrays.asList(), "A")).isFalse();
     }
 
     @Test
@@ -35,7 +33,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveUp(list, elemOne);
+        result = MoveElementHelper.moveUp(list, elemOne);
 
         // verify
         assertThat(result).isFalse();
@@ -50,7 +48,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveDown(list, elemOne);
+        result = MoveElementHelper.moveDown(list, elemOne);
 
         // verify
         assertThat(result).isFalse();
@@ -66,7 +64,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveUp(list, "C");
+        result = MoveElementHelper.moveUp(list, "C");
 
         // verify
         assertThat(result).isFalse();
@@ -82,7 +80,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveDown(list, "C");
+        result = MoveElementHelper.moveDown(list, "C");
 
         // verify
         assertThat(result).isFalse();
@@ -98,7 +96,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveUp(list, elemOne);
+        result = MoveElementHelper.moveUp(list, elemOne);
 
         // verify
         assertThat(result).isFalse();
@@ -114,7 +112,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveDown(list, elemOne);
+        result = MoveElementHelper.moveDown(list, elemOne);
 
         // verify
         assertThat(result).isTrue();
@@ -130,7 +128,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveUp(list, elemTwo);
+        result = MoveElementHelper.moveUp(list, elemTwo);
 
         // verify
         assertThat(result).isTrue();
@@ -146,7 +144,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveDown(list, elemTwo);
+        result = MoveElementHelper.moveDown(list, elemTwo);
 
         // verify
         assertThat(result).isFalse();
@@ -163,7 +161,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveUp(list, elemOne);
+        result = MoveElementHelper.moveUp(list, elemOne);
 
         // verify
         assertThat(result).isFalse();
@@ -180,7 +178,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveDown(list, elemOne);
+        result = MoveElementHelper.moveDown(list, elemOne);
 
         // verify
         assertThat(result).isTrue();
@@ -197,7 +195,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveUp(list, elemTwo);
+        result = MoveElementHelper.moveUp(list, elemTwo);
 
         // verify
         assertThat(result).isTrue();
@@ -214,7 +212,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveDown(list, elemTwo);
+        result = MoveElementHelper.moveDown(list, elemTwo);
 
         // verify
         assertThat(result).isTrue();
@@ -231,7 +229,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveUp(list, elemThree);
+        result = MoveElementHelper.moveUp(list, elemThree);
 
         // verify
         assertThat(result).isTrue();
@@ -248,7 +246,7 @@ public class MoveElementHelperTest {
         boolean result = false;
 
         // execute
-        result = tested.moveDown(list, elemThree);
+        result = MoveElementHelper.moveDown(list, elemThree);
 
         // verify
         assertThat(result).isFalse();

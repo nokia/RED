@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -40,11 +41,11 @@ public class DictionaryVariable extends AVariable {
     }
 
     public boolean moveLeftKeyValuePair(final DictionaryKeyValuePair pair) {
-        return getMoveHelper().moveLeft(items, pair);
+        return MoveElementHelper.moveLeft(items, pair);
     }
 
     public boolean moveRightKeyValuePair(final DictionaryKeyValuePair pair) {
-        return getMoveHelper().moveRight(items, pair);
+        return MoveElementHelper.moveRight(items, pair);
     }
 
     public List<DictionaryKeyValuePair> getItems() {

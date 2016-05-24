@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
@@ -141,11 +142,11 @@ public class VariableTable extends ARobotSectionTable {
     }
 
     public boolean moveUpVariable(final AVariable variable) {
-        return getMoveHelper().moveUp(variables, variable);
+        return MoveElementHelper.moveUp(variables, variable);
     }
 
     public boolean moveDownVariable(final AVariable variable) {
-        return getMoveHelper().moveDown(variables, variable);
+        return MoveElementHelper.moveDown(variables, variable);
     }
 
     public boolean isEmpty() {
