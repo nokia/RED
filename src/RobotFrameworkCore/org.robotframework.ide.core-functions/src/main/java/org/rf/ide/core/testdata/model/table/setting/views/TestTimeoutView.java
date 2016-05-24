@@ -14,14 +14,25 @@ public class TestTimeoutView extends TestTimeout {
 
     private final List<TestTimeout> timeouts;
 
+    private final boolean changeForceRebuild;
+
     public TestTimeoutView(final List<TestTimeout> timeouts) {
+        this(timeouts, false);
+    }
+
+    public TestTimeoutView(final List<TestTimeout> timeouts, final boolean changeForceRebuild) {
         super(timeouts.get(0).getDeclaration());
         this.timeouts = timeouts;
+        this.changeForceRebuild = changeForceRebuild;
 
         // join timeout for this view
         final TestTimeout timeout = new TestTimeout(getDeclaration());
         joinTimeout(timeout, timeouts);
         copyWithoutJoinIfNeededExecution(timeout);
+    }
+
+    protected boolean isForceRebuild() {
+        return changeForceRebuild;
     }
 
     private void copyWithoutJoinIfNeededExecution(final TestTimeout timeout) {
@@ -38,13 +49,17 @@ public class TestTimeoutView extends TestTimeout {
 
     @Override
     public void setTimeout(final RobotToken timeout) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setTimeout(timeout);
     }
 
     @Override
     public void setTimeout(final String timeout) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setTimeout(timeout);
     }
 
@@ -62,13 +77,17 @@ public class TestTimeoutView extends TestTimeout {
 
     @Override
     public void setMessageArgument(final int index, final String argument) {
-        joinIfNeeded();
+        if (super.getMessageArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setMessageArgument(index, argument);
     }
 
     @Override
     public void setMessageArgument(final int index, final RobotToken argument) {
-        joinIfNeeded();
+        if (super.getMessageArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setMessageArgument(index, argument);
     }
 

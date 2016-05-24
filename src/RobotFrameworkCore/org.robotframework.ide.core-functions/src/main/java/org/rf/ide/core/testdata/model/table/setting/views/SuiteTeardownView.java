@@ -14,13 +14,25 @@ public class SuiteTeardownView extends SuiteTeardown {
 
     private final List<SuiteTeardown> teardowns;
 
+    private final boolean changeForceRebuild;
+
     public SuiteTeardownView(final List<SuiteTeardown> teardowns) {
+        this(teardowns, false);
+    }
+
+    public SuiteTeardownView(final List<SuiteTeardown> teardowns, final boolean changeForceRebuild) {
         super(teardowns.get(0).getDeclaration());
         this.teardowns = teardowns;
+        this.changeForceRebuild = changeForceRebuild;
+
         // join setup for this view
         final SuiteTeardown teardown = new SuiteTeardown(getDeclaration());
         OneSettingJoinerHelper.joinKeywordBase(teardown, teardowns);
         copyWithoutJoinIfNeededExecution(teardown);
+    }
+
+    protected boolean isForceRebuild() {
+        return changeForceRebuild;
     }
 
     private void copyWithoutJoinIfNeededExecution(final SuiteTeardown teardown) {
@@ -36,13 +48,17 @@ public class SuiteTeardownView extends SuiteTeardown {
 
     @Override
     public void setKeywordName(final String keywordName) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setKeywordName(keywordName);
     }
 
     @Override
     public void setKeywordName(final RobotToken keywordName) {
-        joinIfNeeded();
+        if (isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setKeywordName(keywordName);
     }
 
@@ -60,13 +76,17 @@ public class SuiteTeardownView extends SuiteTeardown {
 
     @Override
     public void setArgument(final int index, final String argument) {
-        joinIfNeeded();
+        if (super.getArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 
     @Override
     public void setArgument(final int index, final RobotToken argument) {
-        joinIfNeeded();
+        if (super.getArguments().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setArgument(index, argument);
     }
 

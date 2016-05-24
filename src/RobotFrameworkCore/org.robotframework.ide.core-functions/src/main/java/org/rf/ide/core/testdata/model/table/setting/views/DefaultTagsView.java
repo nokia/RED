@@ -14,14 +14,25 @@ public class DefaultTagsView extends DefaultTags {
 
     private final List<DefaultTags> defaultTags;
 
+    private final boolean changeForceRebuild;
+
     public DefaultTagsView(final List<DefaultTags> defaultTags) {
+        this(defaultTags, false);
+    }
+
+    public DefaultTagsView(final List<DefaultTags> defaultTags, final boolean changeForceRebuild) {
         super(defaultTags.get(0).getDeclaration());
         this.defaultTags = defaultTags;
+        this.changeForceRebuild = changeForceRebuild;
 
         // join tags for this view
         final DefaultTags tags = new DefaultTags(getDeclaration());
         OneSettingJoinerHelper.joinATag(tags, defaultTags);
         copyWithoutJoinIfNeededExecution(tags);
+    }
+
+    protected boolean isForceRebuild() {
+        return changeForceRebuild;
     }
 
     private void copyWithoutJoinIfNeededExecution(final DefaultTags tags) {
@@ -48,13 +59,17 @@ public class DefaultTagsView extends DefaultTags {
 
     @Override
     public void setTag(final int index, final String tag) {
-        joinIfNeeded();
+        if (super.getTags().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setTag(index, tag);
     }
 
     @Override
     public void setTag(final int index, final RobotToken tag) {
-        joinIfNeeded();
+        if (super.getTags().size() <= index || isForceRebuild()) {
+            joinIfNeeded();
+        }
         super.setTag(index, tag);
     }
 
