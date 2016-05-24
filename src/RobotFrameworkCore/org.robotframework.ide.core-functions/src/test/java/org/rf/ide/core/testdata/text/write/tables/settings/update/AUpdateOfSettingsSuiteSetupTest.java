@@ -27,6 +27,25 @@ public abstract class AUpdateOfSettingsSuiteSetupTest {
     }
 
     @Test
+    public void test_emptyFile_updateSuiteSetup_withSetArgumentToEmptyValue() throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_SuiteSetupWithKeywordAndTwoArgumentsOneToRemove."
+                + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION
+                + "Output_SuiteSetupWithKeywordAndTwoArgumentsOneToRemove." + getExtension();
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final SettingTable settingTable = modelFile.getSettingTable();
+        final SuiteSetup suiteSetup = settingTable.getSuiteSetups().get(0);
+        suiteSetup.setArgument(0, "");
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    @Test
     public void test_emptyFile_updateSuiteSetup_andKeywordName() throws Exception {
         // prepare
         final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_KeywordSetNoOtherElements." + getExtension();
