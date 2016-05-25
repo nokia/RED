@@ -10,7 +10,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.setting.TestTimeout;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class TestTimeoutView extends TestTimeout {
+public class TestTimeoutView extends TestTimeout implements ISingleElementViewer {
 
     private final List<TestTimeout> timeouts;
 
@@ -31,7 +31,7 @@ public class TestTimeoutView extends TestTimeout {
         copyWithoutJoinIfNeededExecution(timeout);
     }
 
-    protected boolean isForceRebuild() {
+    public boolean isForceRebuild() {
         return changeForceRebuild;
     }
 
@@ -49,17 +49,13 @@ public class TestTimeoutView extends TestTimeout {
 
     @Override
     public void setTimeout(final RobotToken timeout) {
-        if (isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
         super.setTimeout(timeout);
     }
 
     @Override
     public void setTimeout(final String timeout) {
-        if (isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
         super.setTimeout(timeout);
     }
 
@@ -77,17 +73,13 @@ public class TestTimeoutView extends TestTimeout {
 
     @Override
     public void setMessageArgument(final int index, final String argument) {
-        if (super.getMessageArguments().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getMessageArguments(), index);
         super.setMessageArgument(index, argument);
     }
 
     @Override
     public void setMessageArgument(final int index, final RobotToken argument) {
-        if (super.getMessageArguments().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getMessageArguments(), index);
         super.setMessageArgument(index, argument);
     }
 
@@ -109,7 +101,7 @@ public class TestTimeoutView extends TestTimeout {
         super.setComment(rt);
     }
 
-    private synchronized void joinIfNeeded() {
+    public synchronized void joinIfNeeded() {
         if (timeouts.size() > 1) {
             TestTimeout joined = new TestTimeout(getDeclaration());
             joinTimeout(joined, timeouts);

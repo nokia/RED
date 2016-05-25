@@ -10,7 +10,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.setting.SuiteSetup;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class SuiteSetupView extends SuiteSetup {
+public class SuiteSetupView extends SuiteSetup implements ISingleElementViewer {
 
     private final List<SuiteSetup> setups;
 
@@ -30,7 +30,7 @@ public class SuiteSetupView extends SuiteSetup {
         this.changeForceRebuild = changeForceRebuild;
     }
 
-    protected boolean isForceRebuild() {
+    public boolean isForceRebuild() {
         return changeForceRebuild;
     }
 
@@ -47,17 +47,13 @@ public class SuiteSetupView extends SuiteSetup {
 
     @Override
     public void setKeywordName(final String keywordName) {
-        if (isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
         super.setKeywordName(keywordName);
     }
 
     @Override
     public void setKeywordName(final RobotToken keywordName) {
-        if (isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
         super.setKeywordName(keywordName);
     }
 
@@ -75,17 +71,13 @@ public class SuiteSetupView extends SuiteSetup {
 
     @Override
     public void setArgument(final int index, final String argument) {
-        if (super.getArguments().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getArguments(), index);
         super.setArgument(index, argument);
     }
 
     @Override
     public void setArgument(final int index, final RobotToken argument) {
-        if (super.getArguments().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getArguments(), index);
         super.setArgument(index, argument);
     }
 
@@ -107,7 +99,7 @@ public class SuiteSetupView extends SuiteSetup {
         super.addCommentPart(rt);
     }
 
-    private synchronized void joinIfNeeded() {
+    public synchronized void joinIfNeeded() {
         if (setups.size() > 1) {
             SuiteSetup joined = new SuiteSetup(getDeclaration());
             OneSettingJoinerHelper.joinKeywordBase(joined, setups);
