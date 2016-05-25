@@ -10,7 +10,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class SuiteDocumentationView extends SuiteDocumentation {
+public class SuiteDocumentationView extends SuiteDocumentation implements ISingleElementViewer {
 
     private final List<SuiteDocumentation> suiteDocs;
 
@@ -31,7 +31,7 @@ public class SuiteDocumentationView extends SuiteDocumentation {
         copyWithoutJoinIfNeededExecution(doc);
     }
 
-    protected boolean isForceRebuild() {
+    public boolean isForceRebuild() {
         return changeForceRebuild;
     }
 
@@ -59,17 +59,13 @@ public class SuiteDocumentationView extends SuiteDocumentation {
 
     @Override
     public void setDocumentationText(final int index, final String docText) {
-        if (super.getDocumentationText().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getDocumentationText(), index);
         super.setDocumentationText(index, docText);
     }
 
     @Override
     public void setDocumentationText(final int index, final RobotToken docText) {
-        if (super.getDocumentationText().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getDocumentationText(), index);
         super.setDocumentationText(index, docText);
     }
 
@@ -91,7 +87,7 @@ public class SuiteDocumentationView extends SuiteDocumentation {
         super.setComment(rt);
     }
 
-    private synchronized void joinIfNeeded() {
+    public synchronized void joinIfNeeded() {
         if (suiteDocs.size() > 1) {
             SuiteDocumentation joined = new SuiteDocumentation(getDeclaration());
             joinDoc(joined, suiteDocs);

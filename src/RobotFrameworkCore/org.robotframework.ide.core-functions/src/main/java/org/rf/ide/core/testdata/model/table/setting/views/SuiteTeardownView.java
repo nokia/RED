@@ -10,7 +10,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.setting.SuiteTeardown;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class SuiteTeardownView extends SuiteTeardown {
+public class SuiteTeardownView extends SuiteTeardown implements ISingleElementViewer {
 
     private final List<SuiteTeardown> teardowns;
 
@@ -31,7 +31,7 @@ public class SuiteTeardownView extends SuiteTeardown {
         copyWithoutJoinIfNeededExecution(teardown);
     }
 
-    protected boolean isForceRebuild() {
+    public boolean isForceRebuild() {
         return changeForceRebuild;
     }
 
@@ -48,17 +48,13 @@ public class SuiteTeardownView extends SuiteTeardown {
 
     @Override
     public void setKeywordName(final String keywordName) {
-        if (isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
         super.setKeywordName(keywordName);
     }
 
     @Override
     public void setKeywordName(final RobotToken keywordName) {
-        if (isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
         super.setKeywordName(keywordName);
     }
 
@@ -76,17 +72,13 @@ public class SuiteTeardownView extends SuiteTeardown {
 
     @Override
     public void setArgument(final int index, final String argument) {
-        if (super.getArguments().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getArguments(), index);
         super.setArgument(index, argument);
     }
 
     @Override
     public void setArgument(final int index, final RobotToken argument) {
-        if (super.getArguments().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getArguments(), index);
         super.setArgument(index, argument);
     }
 
@@ -108,7 +100,7 @@ public class SuiteTeardownView extends SuiteTeardown {
         super.addCommentPart(rt);
     }
 
-    private synchronized void joinIfNeeded() {
+    public synchronized void joinIfNeeded() {
         if (teardowns.size() > 1) {
             SuiteTeardown joined = new SuiteTeardown(getDeclaration());
             OneSettingJoinerHelper.joinKeywordBase(joined, teardowns);

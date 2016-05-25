@@ -13,6 +13,13 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class OneSettingJoinerHelper {
 
+    public static void applyJoinBeforeModificationIfNeeded(final ISingleElementViewer viewer, final List<RobotToken> tokens,
+            final int index) {
+        if ((tokens != null && tokens.size() <= index) || viewer.isForceRebuild()) {
+            viewer.joinIfNeeded();
+        }
+    }
+
     public static void joinKeywordBase(final AKeywordBaseSetting<?> current,
             final List<? extends AKeywordBaseSetting<?>> base) {
         for (final AKeywordBaseSetting<?> s : base) {
