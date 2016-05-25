@@ -10,7 +10,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class DefaultTagsView extends DefaultTags {
+public class DefaultTagsView extends DefaultTags implements ISingleElementViewer {
 
     private final List<DefaultTags> defaultTags;
 
@@ -31,7 +31,7 @@ public class DefaultTagsView extends DefaultTags {
         copyWithoutJoinIfNeededExecution(tags);
     }
 
-    protected boolean isForceRebuild() {
+    public boolean isForceRebuild() {
         return changeForceRebuild;
     }
 
@@ -59,17 +59,13 @@ public class DefaultTagsView extends DefaultTags {
 
     @Override
     public void setTag(final int index, final String tag) {
-        if (super.getTags().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getTags(), index);
         super.setTag(index, tag);
     }
 
     @Override
     public void setTag(final int index, final RobotToken tag) {
-        if (super.getTags().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getTags(), index);
         super.setTag(index, tag);
     }
 
@@ -91,7 +87,7 @@ public class DefaultTagsView extends DefaultTags {
         super.addCommentPart(rt);
     }
 
-    private synchronized void joinIfNeeded() {
+    public synchronized void joinIfNeeded() {
         if (defaultTags.size() > 1) {
             DefaultTags joined = new DefaultTags(getDeclaration());
             OneSettingJoinerHelper.joinATag(joined, defaultTags);

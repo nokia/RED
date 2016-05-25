@@ -10,7 +10,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class ForceTagsView extends ForceTags {
+public class ForceTagsView extends ForceTags implements ISingleElementViewer {
 
     private final List<ForceTags> forceTags;
 
@@ -30,7 +30,7 @@ public class ForceTagsView extends ForceTags {
         copyWithoutJoinIfNeededExecution(tags);
     }
 
-    protected boolean isForceRebuild() {
+    public boolean isForceRebuild() {
         return changeForceRebuild;
     }
 
@@ -58,17 +58,13 @@ public class ForceTagsView extends ForceTags {
 
     @Override
     public void setTag(final int index, final String tag) {
-        if (super.getTags().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getTags(), index);
         super.setTag(index, tag);
     }
 
     @Override
     public void setTag(final int index, final RobotToken tag) {
-        if (super.getTags().size() > index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getTags(), index);
         super.setTag(index, tag);
     }
 
@@ -90,7 +86,7 @@ public class ForceTagsView extends ForceTags {
         super.addCommentPart(rt);
     }
 
-    private synchronized void joinIfNeeded() {
+    public synchronized void joinIfNeeded() {
         if (forceTags.size() > 1) {
             ForceTags joined = new ForceTags(getDeclaration());
             OneSettingJoinerHelper.joinATag(joined, forceTags);

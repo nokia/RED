@@ -10,7 +10,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.setting.TestSetup;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class TestSetupView extends TestSetup {
+public class TestSetupView extends TestSetup implements ISingleElementViewer {
 
     private final List<TestSetup> setups;
 
@@ -30,7 +30,7 @@ public class TestSetupView extends TestSetup {
         copyWithoutJoinIfNeededExecution(setup);
     }
 
-    protected boolean isForceRebuild() {
+    public boolean isForceRebuild() {
         return changeForceRebuild;
     }
 
@@ -47,17 +47,13 @@ public class TestSetupView extends TestSetup {
 
     @Override
     public void setKeywordName(final String keywordName) {
-        if (isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
         super.setKeywordName(keywordName);
     }
 
     @Override
     public void setKeywordName(final RobotToken keywordName) {
-        if (isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, null, 0);
         super.setKeywordName(keywordName);
     }
 
@@ -75,17 +71,13 @@ public class TestSetupView extends TestSetup {
 
     @Override
     public void setArgument(final int index, final String argument) {
-        if (super.getArguments().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getArguments(), index);
         super.setArgument(index, argument);
     }
 
     @Override
     public void setArgument(final int index, final RobotToken argument) {
-        if (super.getArguments().size() <= index || isForceRebuild()) {
-            joinIfNeeded();
-        }
+        OneSettingJoinerHelper.applyJoinBeforeModificationIfNeeded(this, super.getArguments(), index);
         super.setArgument(index, argument);
     }
 
@@ -107,7 +99,7 @@ public class TestSetupView extends TestSetup {
         super.addCommentPart(rt);
     }
 
-    private synchronized void joinIfNeeded() {
+    public synchronized void joinIfNeeded() {
         if (setups.size() > 1) {
             TestSetup joined = new TestSetup(getDeclaration());
             OneSettingJoinerHelper.joinKeywordBase(joined, setups);
