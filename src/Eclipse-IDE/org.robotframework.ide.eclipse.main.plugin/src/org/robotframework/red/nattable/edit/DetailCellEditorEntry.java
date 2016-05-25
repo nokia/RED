@@ -17,6 +17,8 @@ import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -49,7 +51,7 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
     private boolean cannotClose;
 
     public DetailCellEditorEntry(final Composite parent, final Color hoverColor, final Color selectionColor) {
-        super(parent, SWT.NONE);
+        super(parent, SWT.NO_BACKGROUND);
         this.hoverColor = hoverColor;
         this.selectionColor = selectionColor;
 
@@ -74,7 +76,6 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
                 redraw();
             }
         });
-        addPaintListener(new SelectionPainter());
     }
 
     public void setEditorListener(final DetailEditorListener<D> listener) {
@@ -226,22 +227,38 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
         void editorApplied(D value);
     }
 
-    private class SelectionPainter implements PaintListener {
+    protected abstract class EntryControlPainter implements PaintListener {
 
         @Override
         public void paintControl(final PaintEvent e) {
+            final Image bufferImage = new Image(e.display, e.width, e.height);
+            final GC bufferGC = new GC(bufferImage);
+            
+            paintBackground(e, bufferGC);
+            paintForeground(e, bufferGC);
+
+            e.gc.drawImage(bufferImage, 0, 0);
+
+            bufferImage.dispose();
+            bufferGC.dispose();
+        }
+
+        private void paintBackground(final PaintEvent e, final GC bufferGC) {
             Color bgColorInUse = e.gc.getBackground();
 
             if (isSelected() && selectionColor != null) {
                 bgColorInUse = selectionColor;
-                e.gc.setBackground(bgColorInUse);
-                e.gc.fillRectangle(0, 0, e.width, e.height);
+                bufferGC.setBackground(bgColorInUse);
+                bufferGC.fillRectangle(0, 0, e.width, e.height);
             }
             if (isHovered() && hoverColor != null) {
-                e.gc.setBackground(hoverColor);
-                e.gc.fillRectangle(e.width - HOVER_BLOCK_WIDTH, 0, HOVER_BLOCK_WIDTH, e.height);
-                e.gc.setBackground(bgColorInUse);
+                bufferGC.setBackground(hoverColor);
+                bufferGC.fillRectangle(e.width - HOVER_BLOCK_WIDTH, 0, HOVER_BLOCK_WIDTH, e.height);
+                bufferGC.setBackground(bgColorInUse);
             }
         }
+
+        protected abstract void paintForeground(final PaintEvent e, final GC bufferGC);
     }
+
 }

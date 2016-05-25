@@ -7,6 +7,7 @@ package org.robotframework.red.nattable.edit;
 
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
+import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -36,22 +37,24 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
 
     @Override
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
+        editMode = EditModeEnum.DIALOG;
+
         composite = createEditorControl(parent);
         composite.setInput(getColumnIndex(), getRowIndex());
+
         return composite;
     }
 
     @Override
     public Rectangle calculateControlBounds(final Rectangle cellBounds) {
         final Point realSize = composite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-        final int height = Math.min(200, realSize.y);
 
-        return new Rectangle(cellBounds.x, cellBounds.y, cellBounds.width, height);
+        return new Rectangle(cellBounds.x, cellBounds.y, cellBounds.width, Math.min(200, realSize.y));
     }
 
     @Override
     public DetailCellEditorComposite<D> createEditorControl(final Composite parent) {
-        composite = new DetailCellEditorComposite<>(parent, editSupport);
+        final DetailCellEditorComposite<D> composite = new DetailCellEditorComposite<>(parent, editSupport);
         composite.setBackground(parent.getBackground());
 
         composite.getText().setFocus();
@@ -95,7 +98,13 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
             }
         });
         composite.setVisible(true);
+
         return composite;
+    }
+
+    @Override
+    public void close() {
+        super.close();
     }
 
     @Override
