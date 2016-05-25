@@ -14,13 +14,13 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
@@ -69,9 +69,10 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
                 commitEdit();
             }
         });
-        textEdit.addKeyListener(new KeyAdapter() {
+        textEdit.addTraverseListener(new TraverseListener() {
+
             @Override
-            public void keyPressed(final KeyEvent e) {
+            public void keyTraversed(final TraverseEvent e) {
                 if (e.keyCode == SWT.ESC) {
                     cancelEdit();
                 } else if (e.keyCode == SWT.CR) {
@@ -154,40 +155,43 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
         redraw();
     }
 
-    private class DictElementPainter implements PaintListener {
+    private class DictElementPainter extends EntryControlPainter {
 
         @Override
-        public void paintControl(final PaintEvent e) {
+        protected void paintForeground(final PaintEvent e, final GC bufferGC) {
+
             final int mid = e.width / 2;
 
             final int spacingAroundImage = 8;
 
             final int keyLimit = mid - 2 * 4 - spacingAroundImage;
             final int keyX = 4;
-            if (e.gc.textExtent(keyText).x < keyLimit) {
-                e.gc.drawText(keyText, keyX, 4);
+            if (bufferGC.textExtent(keyText).x < keyLimit) {
+                bufferGC.drawText(keyText, keyX, 4);
             } else {
                 final String suffix = "...";
-                final int suffixLength = e.gc.textExtent(suffix).x;
-                e.gc.drawText(LabelsMeasurer.cutTextToRender(e.gc, keyText, keyLimit - suffixLength) + suffix, keyX, 4);
+                final int suffixLength = bufferGC.textExtent(suffix).x;
+                bufferGC.drawText(LabelsMeasurer.cutTextToRender(bufferGC, keyText, keyLimit - suffixLength) + suffix,
+                        keyX, 4);
             }
 
             if (isHovered()) {
-                e.gc.drawImage(ImagesManager.getImage(RedImages.getArrowImage()), mid - spacingAroundImage, 4);
+                bufferGC.drawImage(ImagesManager.getImage(RedImages.getArrowImage()), mid - spacingAroundImage, 4);
             } else {
-                e.gc.drawImage(ImagesManager.getImage(RedImages.getGreyedImage(RedImages.getArrowImage())),
+                bufferGC.drawImage(ImagesManager.getImage(RedImages.getGreyedImage(RedImages.getArrowImage())),
                         mid - spacingAroundImage, 4);
             }
 
             final int valueLimit = mid - HOVER_BLOCK_WIDTH - 4 - spacingAroundImage;
             final int valueX = mid + spacingAroundImage + 4;
-            if (e.gc.textExtent(valueText).x < valueLimit) {
-                e.gc.drawText(valueText, valueX, 4);
+            if (bufferGC.textExtent(valueText).x < valueLimit) {
+                bufferGC.drawText(valueText, valueX, 4);
             } else {
                 final String suffix = "...";
-                final int suffixLength = e.gc.textExtent(suffix).x;
-                e.gc.drawText(LabelsMeasurer.cutTextToRender(e.gc, valueText, valueLimit - suffixLength) + suffix,
-                        valueX, 4);
+                final int suffixLength = bufferGC.textExtent(suffix).x;
+                bufferGC.drawText(
+                        LabelsMeasurer.cutTextToRender(bufferGC, valueText, valueLimit - suffixLength) + suffix, valueX,
+                        4);
             }
         }
     }

@@ -12,12 +12,11 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
@@ -64,9 +63,10 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
                 commitEdit();
             }
         });
-        textEdit.addKeyListener(new KeyAdapter() {
+        textEdit.addTraverseListener(new TraverseListener() {
+
             @Override
-            public void keyPressed(final KeyEvent e) {
+            public void keyTraversed(final TraverseEvent e) {
                 if (e.keyCode == SWT.ESC) {
                     cancelEdit();
                 } else if (e.keyCode == SWT.CR) {
@@ -151,38 +151,37 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
         indexText = "[" + Strings.padStart(Integer.toString(index), maxElementLength, '0') + "]";
     }
 
-    private class ListElementPainter implements PaintListener {
+    private class ListElementPainter extends EntryControlPainter {
 
         @Override
-        public void paintControl(final PaintEvent e) {
+        protected void paintForeground(final PaintEvent e, final GC bufferGC) {
             int x = 3;
 
             final Color fgColor = e.gc.getForeground();
             if (!isHovered()) {
-                e.gc.setForeground(ColorsManager.getColor(210, 210, 210));
+                bufferGC.setForeground(ColorsManager.getColor(210, 210, 210));
             }
-            e.gc.drawText(indexText, x, 4);
+            bufferGC.drawText(indexText, x, 4);
 
-            final int indexLabelWidth = e.gc.textExtent(indexText).x;
+            final int indexLabelWidth = bufferGC.textExtent(indexText).x;
             x += indexLabelWidth + SPACING_AROUND_LINE;
 
-            e.gc.setLineWidth(LINE_WIDTH);
-            e.gc.drawLine(x, 0, x, e.height);
-            e.gc.setForeground(fgColor);
+            bufferGC.setLineWidth(LINE_WIDTH);
+            bufferGC.drawLine(x, 0, x, e.height);
+            bufferGC.setForeground(fgColor);
 
             x += SPACING_AROUND_LINE + LINE_WIDTH;
 
             final int limit = e.width - 10 - x;
-            if (e.gc.textExtent(text).x < limit) {
-                e.gc.drawText(text, x, 4);
+            if (bufferGC.textExtent(text).x < limit) {
+                bufferGC.drawText(text, x, 4);
             } else {
                 // text is too long to be drawn; we will add ... suffix and will look for
                 // longest possible prefix which will fit;
                 final String suffix = "...";
-                final int suffixLength = e.gc.textExtent(suffix).x;
-                e.gc.drawText(LabelsMeasurer.cutTextToRender(e.gc, text, limit - suffixLength) + suffix, x, 4);
+                final int suffixLength = bufferGC.textExtent(suffix).x;
+                bufferGC.drawText(LabelsMeasurer.cutTextToRender(bufferGC, text, limit - suffixLength) + suffix, x, 4);
             }
-
         }
     }
 }
