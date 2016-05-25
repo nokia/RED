@@ -16,7 +16,6 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
@@ -158,9 +157,8 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
     private class DictElementPainter extends EntryControlPainter {
 
         @Override
-        protected void paintForeground(final PaintEvent e, final GC bufferGC) {
-
-            final int mid = e.width / 2;
+        protected void paintForeground(final int width, final int height, final GC bufferGC) {
+            final int mid = width / 2;
 
             final int spacingAroundImage = 8;
 

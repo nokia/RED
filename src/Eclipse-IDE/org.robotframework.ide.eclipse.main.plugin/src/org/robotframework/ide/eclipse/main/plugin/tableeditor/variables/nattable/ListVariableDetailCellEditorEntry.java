@@ -14,7 +14,6 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
@@ -154,11 +153,13 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
     private class ListElementPainter extends EntryControlPainter {
 
         @Override
-        protected void paintForeground(final PaintEvent e, final GC bufferGC) {
+        protected void paintForeground(final int width, final int height, final GC bufferGC) {
             int x = 3;
 
-            final Color fgColor = e.gc.getForeground();
-            if (!isHovered()) {
+            final Color fgColor = bufferGC.getForeground();
+            if (isHovered()) {
+                bufferGC.setForeground(ColorsManager.getColor(120, 180, 170));
+            } else {
                 bufferGC.setForeground(ColorsManager.getColor(210, 210, 210));
             }
             bufferGC.drawText(indexText, x, 4);
@@ -167,12 +168,12 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
             x += indexLabelWidth + SPACING_AROUND_LINE;
 
             bufferGC.setLineWidth(LINE_WIDTH);
-            bufferGC.drawLine(x, 0, x, e.height);
-            bufferGC.setForeground(fgColor);
+            bufferGC.drawLine(x, 0, x, height);
 
+            bufferGC.setForeground(fgColor);
             x += SPACING_AROUND_LINE + LINE_WIDTH;
 
-            final int limit = e.width - 10 - x;
+            final int limit = width - 10 - x;
             if (bufferGC.textExtent(text).x < limit) {
                 bufferGC.drawText(text, x, 4);
             } else {
