@@ -20,7 +20,7 @@ import ca.odell.glazedlists.SortedList;
  * @author Michal Anglart
  *
  */
-class VariablesDataProvider implements IDataProvider, IRowDataProvider<RobotVariable> {
+public class VariablesDataProvider implements IDataProvider, IRowDataProvider<RobotVariable> {
 
     private RobotVariablesSection section;
     private SortedList<RobotVariable> variables;
