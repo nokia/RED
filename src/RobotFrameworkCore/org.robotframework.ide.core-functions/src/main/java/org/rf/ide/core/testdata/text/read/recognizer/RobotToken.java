@@ -82,7 +82,7 @@ public class RobotToken implements IRobotLineElement {
             }
         }
         wasFirstInit = true;
-        this.text = text.intern();
+        this.text = (text != null) ? text.intern() : null;
     }
 
     public void clearDirtyFlag() {
