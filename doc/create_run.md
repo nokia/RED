@@ -1,6 +1,6 @@
 ## Create Project, add test,run
 
-In order to start working with RED & Eclipse, you need to set up couple of things first. Robot Perspective Workspace & project Create TestSuite Content assistant Running TestSuite Console and message log Execution status
+In order to start working with RED & Eclipse, you need to set up couple of things first. 
 
 ### Robot Perspective
 
