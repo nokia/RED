@@ -94,8 +94,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         } else if (size == index) {
             toModify.add(token);
         } else {
-            int toCreate = index - size - 1;
-            for (int i = 0; i < toCreate; i++) {
+            for (int i = size; i < index + 1; i++) {
                 RobotToken tempToken = new RobotToken();
                 tempToken.getTypes().clear();
                 if (expectedType == null) {
@@ -106,7 +105,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
                 toModify.add(tempToken);
             }
 
-            toModify.add(token);
+            toModify.set(index, token);
         }
     }
 

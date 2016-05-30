@@ -176,7 +176,8 @@ public class SettingTableModelUpdaterTest {
         final String newComment = "new comment";
 
         modelUpdater.update(setting, 0, newKeywordName);
-        modelUpdater.update(setting, 5, newArg2);
+        modelUpdater.update(setting, 3, newArg1);
+        modelUpdater.update(setting, 4, newArg2);
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getKeywordName(), newKeywordName, setting.getArguments(), settingArgs,
