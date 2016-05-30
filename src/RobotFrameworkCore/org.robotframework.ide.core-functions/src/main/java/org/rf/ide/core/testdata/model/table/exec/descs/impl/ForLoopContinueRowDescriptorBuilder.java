@@ -31,7 +31,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         AcceptResult result = new AcceptResult(false);
         RobotToken action = execRowLine.getAction();
         final String text = action.getText().toString();
-        if (text != null) {
+        if (text != null && execRowLine.getParent() instanceof IExecutableStepsHolder<?>) {
             final String trimmed = text.trim();
             if (RobotTokenType.FOR_CONTINUE_TOKEN.getRepresentation().get(0).equalsIgnoreCase(trimmed)
                     || (trimmed.isEmpty() && isTsv(execRowLine))

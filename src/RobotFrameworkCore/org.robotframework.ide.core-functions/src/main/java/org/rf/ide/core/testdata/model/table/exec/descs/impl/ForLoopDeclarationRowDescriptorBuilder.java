@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.CommentedVariablesFilter;
 import org.rf.ide.core.testdata.model.table.exec.CommentedVariablesFilter.FilteredVariables;
@@ -31,7 +32,8 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
 
     @Override
     public <T> AcceptResult acceptable(final RobotExecutableRow<T> execRowLine) {
-        return new AcceptResult(ForDescriptorInfo.isForToken(execRowLine.getAction()));
+        return new AcceptResult(ForDescriptorInfo.isForToken(execRowLine.getAction())
+                && execRowLine.getParent() instanceof IExecutableStepsHolder<?>);
     }
 
     @Override
