@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4M2r0AB_EeWittqS49qH2Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/22/16 4:23 PM
+Save-Time: 5/30/16 11:47 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -14,7 +14,7 @@ Content-Type: text/ecl
 Entry-Name: .content
 
 //restart RED to activate discovering
-get-menu "File/Restart" | click
+restart-aut
 wait-until-eclipse-is-ready
 get-view Welcome | close
 
