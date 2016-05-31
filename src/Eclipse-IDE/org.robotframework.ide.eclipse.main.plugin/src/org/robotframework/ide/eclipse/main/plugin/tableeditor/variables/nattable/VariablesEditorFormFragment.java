@@ -9,7 +9,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
@@ -80,9 +79,6 @@ import com.google.common.base.Supplier;
 
 public class VariablesEditorFormFragment implements ISectionFormFragment {
     
-    @Inject
-    protected IEventBroker eventBroker;
-
     @Inject
     private IEditorSite site;
 
@@ -155,7 +151,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
-        gridLayer.addConfiguration(new VariableValuesEditConfiguration(theme, dataProvider, eventBroker));
+        gridLayer
+                .addConfiguration(new VariableValuesEditConfiguration(theme, dataProvider, commandsStack));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 

@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable;
 
-import java.util.List;
-
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -23,15 +21,11 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
 import org.robotframework.red.swt.LabelsMeasurer;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 
 /**
  * @author Michal Anglart
@@ -116,24 +110,8 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
     }
 
     @Override
-    protected DictionaryKeyValuePair createNewValue() {
-        final List<String> splittedContent = Splitter.on('=').splitToList(textEdit.getText());
-        final String key = splittedContent.get(0);
-        final String value = Joiner.on('=').join(splittedContent.subList(1, splittedContent.size()));
-
-        final RobotToken raw = new RobotToken();
-        raw.setRaw(textEdit.getText());
-        raw.setText(textEdit.getText());
-
-        final RobotToken keyToken = new RobotToken();
-        keyToken.setRaw(key);
-        keyToken.setText(key);
-
-        final RobotToken valueToken = new RobotToken();
-        valueToken.setRaw(value);
-        valueToken.setText(value);
-
-        return new DictionaryKeyValuePair(raw, keyToken, valueToken);
+    protected String getNewValue() {
+        return textEdit.getText();
     }
 
     @Override

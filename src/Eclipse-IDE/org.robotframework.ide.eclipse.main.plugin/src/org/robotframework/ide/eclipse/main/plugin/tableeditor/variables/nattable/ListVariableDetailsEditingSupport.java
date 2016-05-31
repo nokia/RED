@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattabl
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
@@ -16,8 +15,13 @@ import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateCompoundVariableValueElementCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveDirection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveListVariableValueElementsCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.RemoveListVariableValueElementsCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetListVariableValueElementCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.nattable.edit.DetailCellEditorEditingSupport;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
@@ -33,15 +37,16 @@ public class ListVariableDetailsEditingSupport implements DetailCellEditorEditin
 
     private final VariablesDataProvider dataProvider;
 
-    private final IEventBroker eventBroker;
+    private final RobotEditorCommandsStack commandsStack;
 
     private RobotVariable model;
 
+
     public ListVariableDetailsEditingSupport(final TableTheme theme, final VariablesDataProvider dataProvider,
-            final IEventBroker eventBroker) {
+            final RobotEditorCommandsStack commandsStack) {
         this.theme = theme;
         this.dataProvider = dataProvider;
-        this.eventBroker = eventBroker;
+        this.commandsStack = commandsStack;
     }
 
     @Override
@@ -52,16 +57,18 @@ public class ListVariableDetailsEditingSupport implements DetailCellEditorEditin
 
     @Override
     public List<RobotToken> getDetailElements() {
-        if (model.getLinkedElement() instanceof ListVariable) {
-            final ListVariable variable = (ListVariable) model.getLinkedElement();
-            return new ArrayList<>(variable.getItems());
-
-        } else if (model.getLinkedElement() instanceof ScalarVariable
-                && model.getType() == VariableType.SCALAR_AS_LIST) {
+        if (model == null) {
+            throw new IllegalStateException("The input for editing support should be taken first");
+        }
+        if (model.getType() == VariableType.SCALAR_AS_LIST) {
             final ScalarVariable variable = (ScalarVariable) model.getLinkedElement();
             return new ArrayList<>(variable.getValues());
 
-        } else if (model.getLinkedElement() instanceof UnknownVariable) {
+        } else if (model.getType() == VariableType.LIST) {
+            final ListVariable variable = (ListVariable) model.getLinkedElement();
+            return new ArrayList<>(variable.getItems());
+
+        } else if (model.getType() == VariableType.INVALID) {
             final UnknownVariable variable = (UnknownVariable) model.getLinkedElement();
             return new ArrayList<>(variable.getItems());
         }
@@ -83,110 +90,26 @@ public class ListVariableDetailsEditingSupport implements DetailCellEditorEditin
 
     @Override
     public void addNewDetailElement(final String newElementContent) {
-        final RobotToken token = new RobotToken();
-        token.setText(newElementContent);
-
-        if (model.getLinkedElement() instanceof ListVariable) {
-            final ListVariable variable = (ListVariable) model.getLinkedElement();
-            variable.addItem(token);
-
-        } else if (model.getLinkedElement() instanceof ScalarVariable
-                && model.getType() == VariableType.SCALAR_AS_LIST) {
-            final ScalarVariable variable = (ScalarVariable) model.getLinkedElement();
-            variable.addValue(token);
-
-        } else if (model.getLinkedElement() instanceof UnknownVariable) {
-            final UnknownVariable variable = (UnknownVariable) model.getLinkedElement();
-            variable.addItem(token);
-        } else {
-            throw new IllegalStateException(
-                    "Variables of type " + model.getType() + " are not handled by this editing support");
-        }
-        
-        eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, model);
+        commandsStack.execute(new CreateCompoundVariableValueElementCommand(model, newElementContent));
     }
 
     @Override
     public void removeDetailElements(final List<RobotToken> elements) {
-        for (final RobotToken token : elements) {
-
-            if (model.getLinkedElement() instanceof ListVariable) {
-                final ListVariable variable = (ListVariable) model.getLinkedElement();
-                variable.removeItem(token);
-
-            } else if (model.getLinkedElement() instanceof ScalarVariable
-                    && model.getType() == VariableType.SCALAR_AS_LIST) {
-                final ScalarVariable variable = (ScalarVariable) model.getLinkedElement();
-                variable.removeValue(token);
-
-            } else if (model.getLinkedElement() instanceof UnknownVariable) {
-                final UnknownVariable variable = (UnknownVariable) model.getLinkedElement();
-                variable.removeItem(token);
-            } else {
-                throw new IllegalStateException(
-                        "Variables of type " + model.getType() + " are not handled by this editing support");
-            }
-        }
-
-        eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, model);
+        commandsStack.execute(new RemoveListVariableValueElementsCommand(model, elements));
     }
 
     @Override
     public void moveLeft(final List<RobotToken> elements) {
-        for (final RobotToken token : elements) {
-
-            if (model.getLinkedElement() instanceof ListVariable) {
-                final ListVariable variable = (ListVariable) model.getLinkedElement();
-                variable.moveLeftItem(token);
-
-            } else if (model.getLinkedElement() instanceof ScalarVariable
-                    && model.getType() == VariableType.SCALAR_AS_LIST) {
-                final ScalarVariable variable = (ScalarVariable) model.getLinkedElement();
-                variable.moveLeftValue(token);
-
-            } else if (model.getLinkedElement() instanceof UnknownVariable) {
-                final UnknownVariable variable = (UnknownVariable) model.getLinkedElement();
-                variable.moveLeftItem(token);
-            } else {
-                throw new IllegalStateException(
-                        "Variables of type " + model.getType() + " are not handled by this editing support");
-            }
-        }
-
-        eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, model);
+        commandsStack.execute(new MoveListVariableValueElementsCommand(model, elements, MoveDirection.UP));
     }
 
     @Override
     public void moveRight(final List<RobotToken> elements) {
-        for (final RobotToken token : elements) {
-
-            if (model.getLinkedElement() instanceof ListVariable) {
-                final ListVariable variable = (ListVariable) model.getLinkedElement();
-                variable.moveRightItem(token);
-
-            } else if (model.getLinkedElement() instanceof ScalarVariable
-                    && model.getType() == VariableType.SCALAR_AS_LIST) {
-                final ScalarVariable variable = (ScalarVariable) model.getLinkedElement();
-                variable.moveRightValue(token);
-
-            } else if (model.getLinkedElement() instanceof UnknownVariable) {
-                final UnknownVariable variable = (UnknownVariable) model.getLinkedElement();
-                variable.moveRightItem(token);
-            } else {
-                throw new IllegalStateException(
-                        "Variables of type " + model.getType() + " are not handled by this editing support");
-            }
-        }
-
-        eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, model);
+        commandsStack.execute(new MoveListVariableValueElementsCommand(model, elements, MoveDirection.DOWN));
     }
 
     @Override
-    public void setNewValue(final RobotToken oldValue, final RobotToken newValue) {
-        if (!oldValue.getText().equals(newValue.getText())) {
-            oldValue.setText(newValue.getText());
-
-            eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, model);
-        }
+    public void setNewValue(final RobotToken oldValue, final String newValue) {
+        commandsStack.execute(new SetListVariableValueElementCommand(model, oldValue, newValue));
     }
 }
