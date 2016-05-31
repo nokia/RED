@@ -20,12 +20,18 @@ import com.google.common.collect.ImmutableBiMap;
  */
 public class VariableColumnsPropertyAccessor implements IColumnPropertyAccessor<RobotVariable> {
 
-    private static ImmutableBiMap<Integer, String> properties = ImmutableBiMap.of(0, "name", 1, "value", 2, "comment");
+    private final ImmutableBiMap<Integer, String> properties = 
+            ImmutableBiMap.of(0, "name", 1, "value", 2, "comment");
 
     private final RobotEditorCommandsStack commandsStack;
 
     public VariableColumnsPropertyAccessor(final RobotEditorCommandsStack commandsStack) {
         this.commandsStack = commandsStack;
+    }
+
+    @Override
+    public int getColumnCount() {
+        return 3;
     }
 
     @Override
@@ -56,11 +62,6 @@ public class VariableColumnsPropertyAccessor implements IColumnPropertyAccessor<
         } else {
             throw new IllegalStateException("Unknown column with " + column + " index");
         }
-    }
-
-    @Override
-    public int getColumnCount() {
-        return 3;
     }
 
     @Override

@@ -128,10 +128,10 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
                     }
                 }
             });
-            entry.setEditorListener(new DetailEditorListener<D>() {
+            entry.setEditorListener(new DetailEditorListener() {
 
                 @Override
-                public void editorApplied(final D value) {
+                public void editorApplied(final String value) {
                     editSupport.setNewValue(detail, value);
                     entry.update(detail);
                 }

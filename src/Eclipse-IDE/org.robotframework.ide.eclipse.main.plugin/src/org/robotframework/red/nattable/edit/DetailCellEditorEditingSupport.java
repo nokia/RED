@@ -29,6 +29,6 @@ public interface DetailCellEditorEditingSupport<D> {
 
     void moveRight(List<D> detailsToMove);
 
-    void setNewValue(D oldValue, D newValue);
+    void setNewValue(D oldValue, String value);
     
 }
