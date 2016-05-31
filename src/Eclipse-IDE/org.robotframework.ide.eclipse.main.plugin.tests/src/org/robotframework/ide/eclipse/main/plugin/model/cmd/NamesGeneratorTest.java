@@ -55,4 +55,13 @@ public class NamesGeneratorTest {
         assertThat(NamesGenerator.generateUniqueName(parent, "name")).isEqualTo("name 201");
     }
 
+    @Test
+    public void generatedNameHaveNoSpace_whenAskedToNotIncludeIt() {
+        final ParentElement parent = new ParentElement(
+                new NamedElement("name"), 
+                new NamedElement("name 1"), 
+                new NamedElement("name 2"));
+
+        assertThat(NamesGenerator.generateUniqueName(parent, "name", false)).isEqualTo("name3");
+    }
 }
