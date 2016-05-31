@@ -5,15 +5,28 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Iterables.filter;
 
+import java.util.List;
+
+import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
-import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
+import org.rf.ide.core.testdata.model.table.variables.ListVariable;
+import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
+import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 
 public class SetVariableNameCommand extends EditorCommand {
 
@@ -27,60 +40,154 @@ public class SetVariableNameCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (variable.getType() == VariableType.INVALID && newName.equals(variable.getName())) {
-            return;
-        } else if (newName.equals(variable.getPrefix() + variable.getName() + variable.getSuffix())) {
+        final Optional<RobotToken> modifiedToken = modifyToken();
+        if (!modifiedToken.isPresent()) {
             return;
         }
 
-        boolean typeWasChanged;
-        if (newName.startsWith(VariableType.SCALAR.getIdentificator() + "{") && newName.endsWith("}")) {
+        final boolean typeHasChanged = typeChangeIsRequired();
+        if (typeHasChanged) {
+            final RobotVariablesSection section = variable.getParent();
+            final VariableTable table = (VariableTable) section.getLinkedElement();
 
-            typeWasChanged = setTypeIfNeeded(VariableType.SCALAR, VariableType.SCALAR_AS_LIST);
-            setName(newName);
-        } else if (newName.startsWith(VariableType.DICTIONARY.getIdentificator() + "{") && newName.endsWith("}")) {
+            final AVariable newHolder = createProjectedVariable(modifiedToken);
 
-            typeWasChanged = setTypeIfNeeded(VariableType.DICTIONARY);
-            setName(newName);
-        } else if (newName.startsWith(VariableType.LIST.getIdentificator() + "{") && newName.endsWith("}")) {
+            final int index = table.getVariables().indexOf(variable.getLinkedElement());
+            table.removeVariable((AVariable) variable.getLinkedElement());
+            table.addVariable(index, newHolder);
 
-            typeWasChanged = setTypeIfNeeded(VariableType.LIST);
-            setName(newName);
-        } else {
-
-            typeWasChanged = setTypeIfNeeded(VariableType.INVALID);
-            setName(newName);
+            variable.setLinkedElement(newHolder);
         }
-        if (typeWasChanged) {
+
+        ((AVariable) variable.getLinkedElement()).getType(); // in order to fix scalar to scalar as list
+        ((AVariable) variable.getLinkedElement()).setName(getNewHolderName());
+
+        if (typeHasChanged) {
             eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
         }
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
     }
 
-    private void setName(final String rawName) {
-        final IVariableHolder linkedVariable = variable.getLinkedElement();
+    private AVariable createProjectedVariable(final Optional<RobotToken> modifiedToken) {
+        final List<RobotToken> elementTokens = ((AVariable) variable.getLinkedElement()).getElementTokens();
+        final Iterable<RobotToken> valueTokens = filter(elementTokens,
+                containingOneOf(RobotTokenType.VARIABLES_VARIABLE_VALUE));
 
-        final RobotToken declaration = linkedVariable.getDeclaration();
-        declaration.setText(rawName);
+        final AVariable newHolder;
 
-        final String extractedName = linkedVariable.getType() == VariableType.INVALID ? rawName
-                : getNewNameWithoutMarks(rawName);
-        ((AVariable) linkedVariable).setName(extractedName);
-    }
-
-    private boolean setTypeIfNeeded(final VariableType... type) {
-        if (!newArrayList(type).contains(variable.getType())) {
-            // final IVariableHolder linkedVariable = variable.getLinkedElement();
-            // final RobotToken declaration = linkedVariable.getDeclaration();
-            // linkedVariable.setType(type.toVariableType());
-            // variable.setType(type);
-
-            return true;
+        switch (getProjectedType()) {
+            case SCALAR:
+                newHolder = createScalarHolder(modifiedToken, valueTokens);
+                break;
+            case LIST:
+                newHolder = createListHolder(modifiedToken, valueTokens);
+                break;
+            case DICTIONARY:
+                newHolder = createDictHolder(modifiedToken, valueTokens);
+                break;
+            default:
+                newHolder = createUnknownHolder(modifiedToken, valueTokens);
+                break;
         }
-        return false;
+
+        final Iterable<RobotToken> commentTokens = filter(elementTokens, containingOneOf(
+                RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_TOKEN, RobotTokenType.COMMENT_CONTINUE));
+        for (final RobotToken commentToken : commentTokens) {
+            newHolder.addCommentPart(commentToken);
+        }
+        return newHolder;
     }
 
-    private String getNewNameWithoutMarks(final String name) {
-        return name.substring(2, name.length() - 1);
+    private ScalarVariable createScalarHolder(final Optional<RobotToken> modifiedToken,
+            final Iterable<RobotToken> valueTokens) {
+        final ScalarVariable scalarHolder = new ScalarVariable(getNewHolderName(), modifiedToken.get(),
+                variable.getLinkedElement().getScope());
+        for (final RobotToken valueToken : valueTokens) {
+            scalarHolder.addValue(valueToken);
+        }
+        return scalarHolder;
+    }
+
+    private ListVariable createListHolder(final Optional<RobotToken> modifiedToken,
+            final Iterable<RobotToken> valueTokens) {
+        final ListVariable listHolder = new ListVariable(getNewHolderName(), modifiedToken.get(),
+                variable.getLinkedElement().getScope());
+        for (final RobotToken valueToken : valueTokens) {
+            listHolder.addItem(valueToken);
+        }
+        return listHolder;
+    }
+
+    private DictionaryVariable createDictHolder(final Optional<RobotToken> modifiedToken,
+            final Iterable<RobotToken> valueTokens) {
+        final DictionaryVariable dictHolder = new DictionaryVariable(getNewHolderName(), modifiedToken.get(),
+                variable.getLinkedElement().getScope());
+        for (final RobotToken valueToken : valueTokens) {
+            final DictionaryKeyValuePair keyValuePair = RobotTokens.toKeyValuePair(valueToken);
+            dictHolder.put(keyValuePair.getRaw(), keyValuePair.getKey(), keyValuePair.getValue());
+        }
+        return dictHolder;
+    }
+
+    private UnknownVariable createUnknownHolder(final Optional<RobotToken> modifiedToken,
+            final Iterable<RobotToken> valueTokens) {
+        final UnknownVariable unknownHolder = new UnknownVariable(getNewHolderName(), modifiedToken.get(),
+                variable.getLinkedElement().getScope());
+        for (final RobotToken valueToken : valueTokens) {
+            unknownHolder.addItem(valueToken);
+        }
+        return unknownHolder;
+    }
+
+    private static Predicate<RobotToken> containingOneOf(final RobotTokenType... types) {
+        return new Predicate<RobotToken>() {
+            @Override
+            public boolean apply(final RobotToken token) {
+                for (final RobotTokenType type : types) {
+                    if (token.getTypes().contains(type)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        };
+    }
+
+    private Optional<RobotToken> modifyToken() {
+        final RobotToken declaringToken = variable.getLinkedElement().getDeclaration();
+        if (declaringToken.getText().equals(newName)) {
+            return Optional.absent();
+        }
+        declaringToken.setRaw(newName);
+        declaringToken.setText(newName);
+        declaringToken.setType(getDeclaringTokenType());
+
+        return Optional.of(declaringToken);
+    }
+
+    private IRobotTokenType getDeclaringTokenType() {
+        if (newName.startsWith(VariableType.SCALAR.getIdentificator() + "{") && newName.endsWith("}")) {
+            return RobotTokenType.VARIABLES_SCALAR_DECLARATION;
+        } else if (newName.startsWith(VariableType.LIST.getIdentificator() + "{") && newName.endsWith("}")) {
+            return RobotTokenType.VARIABLES_LIST_DECLARATION;
+        } else if (newName.startsWith(VariableType.DICTIONARY.getIdentificator() + "{") && newName.endsWith("}")) {
+            return RobotTokenType.VARIABLES_DICTIONARY_DECLARATION;
+        }
+        return RobotTokenType.VARIABLES_UNKNOWN_DECLARATION;
+    }
+
+    private boolean typeChangeIsRequired() {
+        final VariableType projectedType = getProjectedType();
+        return variable.getType() != projectedType
+                && !(variable.getType() == VariableType.SCALAR_AS_LIST && projectedType == VariableType.SCALAR);
+    }
+
+    private VariableType getProjectedType() {
+        final VariableType projectedType = VariableType.getTypeByChar(newName.charAt(0));
+        return projectedType == null ? VariableType.INVALID : projectedType;
+    }
+
+    private String getNewHolderName() {
+        return getProjectedType() == VariableType.INVALID ? newName : newName.substring(2, newName.length() - 1);
     }
 }
