@@ -44,7 +44,7 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
 
     private boolean underEdit = false;
 
-    private DetailEditorListener<D> editorListener;
+    private DetailEditorListener editorListener;
 
     private Job validationJob;
 
@@ -78,7 +78,7 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
         });
     }
 
-    public void setEditorListener(final DetailEditorListener<D> listener) {
+    public void setEditorListener(final DetailEditorListener listener) {
         editorListener = listener;
     }
 
@@ -148,7 +148,7 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
         if (cannotClose) {
             return;
         }
-        final D newValue = createNewValue();
+        final String newValue = getNewValue();
         closeEditing();
         editorListener.editorApplied(newValue);
     }
@@ -166,7 +166,7 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
         }
     }
 
-    protected abstract D createNewValue();
+    protected abstract String getNewValue();
 
     public void cancelEdit() {
         closeEditing();
@@ -223,8 +223,8 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
         cannotClose = false;
     }
 
-    public static interface DetailEditorListener<D> {
-        void editorApplied(D value);
+    public static interface DetailEditorListener {
+        void editorApplied(String value);
     }
 
     protected abstract class EntryControlPainter implements PaintListener {
