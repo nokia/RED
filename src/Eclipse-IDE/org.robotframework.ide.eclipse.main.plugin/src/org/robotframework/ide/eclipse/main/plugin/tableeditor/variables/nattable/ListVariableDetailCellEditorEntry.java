@@ -119,11 +119,8 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
     }
 
     @Override
-    protected RobotToken createNewValue() {
-        final RobotToken newValue = new RobotToken();
-        newValue.setRaw(textEdit.getText());
-        newValue.setText(textEdit.getText());
-        return newValue;
+    protected String getNewValue() {
+        return textEdit.getText();
     }
 
     @Override
