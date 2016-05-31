@@ -9,6 +9,7 @@ import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetScalarValueCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -50,8 +51,7 @@ public class VariableColumnsPropertyAccessor implements IColumnPropertyAccessor<
     @Override
     public void setDataValue(final RobotVariable variable, final int column, final Object value) {
         if (column == 0) {
-            // do nothing now
-            // commandsStack.execute(new SetVariableNameCommand(variable, (String) value));
+            commandsStack.execute(new SetVariableNameCommand(variable, (String) value));
         } else if (column == 1) {
             // other types are handled by more sophisticated cell editors
             if (variable.getType() == VariableType.SCALAR) {
