@@ -35,7 +35,7 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
     private transient RobotVariablesSection parent;
 
     // FIXME : this would cause problems when copy&paste
-    private final IVariableHolder holder;
+    private IVariableHolder holder;
 
     RobotVariable(final RobotVariablesSection parent, final IVariableHolder variableHolder) {
         this.parent = parent;
@@ -57,6 +57,10 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
 
     public IVariableHolder getLinkedElement() {
         return holder;
+    }
+
+    public void setLinkedElement(final IVariableHolder holder) {
+        this.holder = holder;
     }
 
     @Override
