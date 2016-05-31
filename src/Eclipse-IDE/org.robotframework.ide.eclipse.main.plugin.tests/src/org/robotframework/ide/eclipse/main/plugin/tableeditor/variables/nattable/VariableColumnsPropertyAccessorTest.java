@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
@@ -20,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetScalarValueCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
@@ -138,6 +140,20 @@ public class VariableColumnsPropertyAccessorTest {
         accessor.setDataValue(variables.get(4), 1, "1729");
 
         verify(stack, never()).execute(Matchers.<EditorCommand> any());
+    }
+
+    @Test
+    public void nameChangeOfVariablesIsRequestedProperly() {
+        final RobotEditorCommandsStack stack = mock(RobotEditorCommandsStack.class);
+        final VariableColumnsPropertyAccessor accessor = new VariableColumnsPropertyAccessor(stack);
+
+        final List<RobotVariable> variables = createVariablesForTest();
+
+        for (final RobotVariable variable : variables) {
+            accessor.setDataValue(variable, 0, "new_name");
+        }
+
+        verify(stack, times(5)).execute(isA(SetVariableNameCommand.class));
     }
 
     @Test(expected = IllegalStateException.class)
