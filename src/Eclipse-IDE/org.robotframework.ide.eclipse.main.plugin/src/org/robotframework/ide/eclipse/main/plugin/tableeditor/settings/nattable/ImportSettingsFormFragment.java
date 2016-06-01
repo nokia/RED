@@ -33,6 +33,7 @@ import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.ui.menu.DebugMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -184,6 +185,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider);
+        
+        new NatTableContentTooltip(table);
         
         importSettingsSection.setClient(table);
 
