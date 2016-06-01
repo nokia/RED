@@ -32,7 +32,7 @@ public class RedTextCellEditor extends TextCellEditor {
     private final CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
     public RedTextCellEditor() {
-        this(0, 0);
+        this(0, 0, new DefaultRedCellEditorValueValidator());
     }
 
     public RedTextCellEditor(final CellEditorValueValidator<String> validator) {
@@ -40,7 +40,7 @@ public class RedTextCellEditor extends TextCellEditor {
     }
 
     public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift) {
-        this(selectionStartShift, selectionEndShift, null);
+        this(selectionStartShift, selectionEndShift, new DefaultRedCellEditorValueValidator());
     }
 
     public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift,

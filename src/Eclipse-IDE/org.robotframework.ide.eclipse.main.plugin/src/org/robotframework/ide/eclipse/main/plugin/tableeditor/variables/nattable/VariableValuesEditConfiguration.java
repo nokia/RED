@@ -12,7 +12,6 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
-import org.robotframework.red.nattable.edit.DefaultRedCellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditor;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
@@ -53,8 +52,7 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
     }
 
     private void configureValuesCellEditors(final IConfigRegistry configRegistry) {
-        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(new DefaultRedCellEditorValueValidator()),
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(),
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
