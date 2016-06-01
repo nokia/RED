@@ -92,7 +92,7 @@ public class DefaultTagsView extends DefaultTags implements ISingleElementViewer
             DefaultTags joined = new DefaultTags(getDeclaration());
             OneSettingJoinerHelper.joinATag(joined, defaultTags);
             defaultTags.clear();
-            defaultTags.add(joined);
+            defaultTags.add(this);
         }
     }
 

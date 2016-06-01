@@ -73,6 +73,7 @@ public class SuiteTeardownViewTest {
         // verify
         assertThat(getText(common)).containsExactly("key1", "arg1", "key2", "arg2", "newArg");
         assertThat(settingTable.getSuiteTeardowns()).hasSize(1);
+        assertThat(settingTable.getSuiteTeardowns().get(0)).isSameAs(common);
     }
 
     @Test

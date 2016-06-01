@@ -50,7 +50,7 @@ public class ForceTagsViewTest {
     }
 
     @Test
-    public void test_tags_retrival_afterTagRemove_twoForceTags() {
+    public void test_tags_retrival_afterTagRemove_singleForceTags() {
         // prepare
         final RobotFile robotFile = new RobotFile(null);
         robotFile.includeSettingTableSection();
@@ -79,6 +79,7 @@ public class ForceTagsViewTest {
         assertThat(joined.getTags()).hasSize(5);
         assertThat(getText(joined.getTags())).containsExactly("tag1", "tag2", "tag1a", "tag2a", "tag3");
         assertThat(settingTable.getForceTags()).hasSize(1);
+        assertThat(settingTable.getForceTags().get(0)).isSameAs(joined);
     }
 
     @Test

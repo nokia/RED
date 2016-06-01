@@ -91,7 +91,7 @@ public class ForceTagsView extends ForceTags implements ISingleElementViewer {
             ForceTags joined = new ForceTags(getDeclaration());
             OneSettingJoinerHelper.joinATag(joined, forceTags);
             forceTags.clear();
-            forceTags.add(joined);
+            forceTags.add(this);
         }
     }
 

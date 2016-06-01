@@ -104,7 +104,7 @@ public class TestSetupView extends TestSetup implements ISingleElementViewer {
             TestSetup joined = new TestSetup(getDeclaration());
             OneSettingJoinerHelper.joinKeywordBase(joined, setups);
             setups.clear();
-            setups.add(joined);
+            setups.add(this);
         }
     }
 }
