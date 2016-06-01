@@ -105,7 +105,7 @@ public class SuiteTeardownView extends SuiteTeardown implements ISingleElementVi
             SuiteTeardown joined = new SuiteTeardown(getDeclaration());
             OneSettingJoinerHelper.joinKeywordBase(joined, teardowns);
             teardowns.clear();
-            teardowns.add(joined);
+            teardowns.add(this);
         }
     }
 }

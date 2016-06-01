@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.text.write.tables.settings.update;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.nio.file.Path;
 
 import org.junit.Test;
@@ -24,6 +26,30 @@ public abstract class AUpdateOfSettingsSuiteSetupTest {
 
     public AUpdateOfSettingsSuiteSetupTest(final String extension) {
         this.extension = extension;
+    }
+
+    @Test
+    public void test_createArgumentOnPosition_2and3_whichNotExists_shouldReturnSingleLineSuiteSetup() throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION
+                + "Input_TwoSuiteSetups_commonViewUpdatedByArgInNotExistingPosition." + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION
+                + "Output_TwoSuiteSetups_commonViewUpdatedByArgInNotExistingPosition." + getExtension();
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final SettingTable settingTable = modelFile.getSettingTable();
+        final SuiteSetup suiteSetup = settingTable.suiteSetup().get();
+        suiteSetup.setArgument(2, "arg3");
+        suiteSetup.setArgument(3, "");
+
+        // verify
+        assertThat(settingTable.getSuiteSetups()).hasSize(1);
+        SuiteSetup suiteSetupCurrent = settingTable.getSuiteSetups().get(0);
+        assertThat(suiteSetupCurrent).isSameAs(suiteSetup);
+        assertThat(suiteSetupCurrent.getArguments()).hasSize(4);
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
     @Test
