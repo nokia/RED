@@ -144,6 +144,14 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
         panel.selectFirstEntry();
     }
 
+    void refreshEntriesPanel() {
+        panel.refresh();
+    }
+
+    void setPanelInput(final int column, final int row) {
+        panel.setInput(column, row);
+    }
+
     enum Mode {
         INLINED,
         WINDOWED

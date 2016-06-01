@@ -27,8 +27,6 @@ class DetailCellEditorComposite<D> extends Composite {
 
     private final Text text;
 
-    private final DetailCellEditorEntriesComposite<D> detailsEntriesComposite;
-
     private final DetailCellEditorEntriesControlsSwitcher<D> switcher;
 
     DetailCellEditorComposite(final Composite parent, final DetailCellEditorEditingSupport<D> editSupport) {
@@ -45,7 +43,7 @@ class DetailCellEditorComposite<D> extends Composite {
             }
         });
         this.text = createText();
-        this.detailsEntriesComposite = switcher.createEntriesPanel();
+        this.switcher.createEntriesPanel();
     }
 
     private Text createText() {
@@ -60,7 +58,7 @@ class DetailCellEditorComposite<D> extends Composite {
                     editSupport.addNewDetailElement(text.getText());
 
                     text.setText("");
-                    detailsEntriesComposite.refresh();
+                    switcher.refreshEntriesPanel();
                 }
             }
         });
@@ -84,6 +82,6 @@ class DetailCellEditorComposite<D> extends Composite {
     }
 
     void setInput(final int column, final int row) {
-        detailsEntriesComposite.setInput(column, row);
+        switcher.setPanelInput(column, row);
     }
 }
