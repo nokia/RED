@@ -33,7 +33,7 @@ public abstract class ACreationOfListVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        variableTable.createListVariable(0, "@{list}", new ArrayList<String>());
+        variableTable.createListVariable(0, "list", new ArrayList<String>());
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -48,12 +48,12 @@ public abstract class ACreationOfListVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        AVariable aVariable = variableTable.createListVariable(0, "@{list}", new ArrayList<String>());
-        RobotToken cmTok1 = new RobotToken();
+        final AVariable aVariable = variableTable.createListVariable(0, "list", new ArrayList<String>());
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         aVariable.addCommentPart(cmTok1);
@@ -76,7 +76,7 @@ public abstract class ACreationOfListVariableTest {
         final List<String> values = new ArrayList<>();
         values.add("value1");
 
-        variableTable.createListVariable(0, "@{list}", values);
+        variableTable.createListVariable(0, "list", values);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -95,13 +95,13 @@ public abstract class ACreationOfListVariableTest {
         final List<String> values = new ArrayList<>();
         values.add("value1");
 
-        AVariable aVariable = variableTable.createListVariable(0, "@{list}", values);
+        final AVariable aVariable = variableTable.createListVariable(0, "list", values);
         ;
-        RobotToken cmTok1 = new RobotToken();
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         aVariable.addCommentPart(cmTok1);
@@ -126,7 +126,7 @@ public abstract class ACreationOfListVariableTest {
         values.add("value2");
         values.add("value3");
 
-        variableTable.createListVariable(0, "@{list}", values);
+        variableTable.createListVariable(0, "list", values);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -147,12 +147,12 @@ public abstract class ACreationOfListVariableTest {
         values.add("value2");
         values.add("value3");
 
-        AVariable aVariable = variableTable.createListVariable(0, "@{list}", values);
-        RobotToken cmTok1 = new RobotToken();
+        final AVariable aVariable = variableTable.createListVariable(0, "list", values);
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         aVariable.addCommentPart(cmTok1);
@@ -178,7 +178,7 @@ public abstract class ACreationOfListVariableTest {
         values.add("");
         values.add("value");
 
-        AVariable aVariable = variableTable.createListVariable(0, "@{list}", values);
+        final AVariable aVariable = variableTable.createListVariable(0, "list", values);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -199,7 +199,7 @@ public abstract class ACreationOfListVariableTest {
         values.add("value");
         values.add("");
 
-        AVariable aVariable = variableTable.createListVariable(0, "@{list}", values);
+        final AVariable aVariable = variableTable.createListVariable(0, "list", values);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
