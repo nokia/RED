@@ -5,15 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable;
 
-import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Color;
@@ -22,8 +18,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.nattable.edit.CellEditorValueValidator;
+import org.robotframework.red.nattable.edit.DefaultRedCellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
 import org.robotframework.red.swt.LabelsMeasurer;
 
@@ -38,14 +35,17 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
 
     private Text textEdit;
 
-    private ControlDecoration decoration;
-
     DictVariableDetailCellEditorEntry(final Composite parent, final Color hoverColor,
             final Color selectionColor) {
         super(parent, hoverColor, selectionColor);
 
         addPaintListener(new DictElementPainter());
         GridLayoutFactory.fillDefaults().extendedMargins(0, HOVER_BLOCK_WIDTH, 0, 0).applyTo(this);
+    }
+
+    @Override
+    protected CellEditorValueValidator<String> getValidator() {
+        return new DefaultRedCellEditorValueValidator();
     }
 
     @Override
@@ -73,40 +73,12 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
                 }
             }
         });
-        textEdit.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(final ModifyEvent e) {
-                rescheduleValidation();
-            }
-        });
+        validationJobScheduler.armRevalidationOn(textEdit);
         GridDataFactory.fillDefaults().grab(true, false).indent(5, 2).applyTo(textEdit);
         layout();
 
         select(true);
         textEdit.setFocus();
-    }
-
-    @Override
-    protected void validate() {
-        final String value = textEdit.getText();
-        if (value.contains("  ")) {
-            blockClosing();
-
-            textEdit.setForeground(ColorsManager.getColor(255, 0, 0));
-            decoration = new ControlDecoration(textEdit, SWT.LEFT | SWT.TOP);
-            decoration.setDescriptionText("The dictionary map-value entry cannot contain two spaces");
-            decoration.setImage(FieldDecorationRegistry.getDefault()
-                    .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
-                    .getImage());
-        } else {
-            unblockClosing();
-
-            textEdit.setForeground(getForeground());
-            if (decoration != null) {
-                decoration.dispose();
-                decoration = null;
-            }
-        }
     }
 
     @Override
