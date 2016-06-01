@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/1/16 1:59 PM
+Save-Time: 6/1/16 2:18 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -70,13 +70,7 @@ proc "check-jython-version"{
 	global [val jybot_version [run-process-and-trim -process  [os-specific "jybot.bat"  "jybot" ] -arg1 "--version"  -ignoreStderr true -ignoreExitCode true ]]
 }
 
-let [val temp [substitute-variables "${system_property:RCPPT_projectPath}"]]{
-	if [$temp | equals ""] {
-		global [val RCPTT_project_path $user_RCPTT_project_path]
-	}-else{
-		global [val RCPTT_project_path $temp]
-	}
-}
+
 
 //set parameter is_product
 substitute-variables "${eclipse_home}" | let [val eclipse_home_path -input]{
