@@ -29,9 +29,13 @@ class DetailCellEditorComposite<D> extends Composite {
 
     private final DetailCellEditorEntriesControlsSwitcher<D> switcher;
 
-    DetailCellEditorComposite(final Composite parent, final DetailCellEditorEditingSupport<D> editSupport) {
+    private final CellEditorValueValidationJobScheduler<String> validationScheduler;
+
+    DetailCellEditorComposite(final Composite parent, final DetailCellEditorEditingSupport<D> editSupport,
+            final CellEditorValueValidationJobScheduler<String> validationScheduler) {
         super(parent, SWT.NONE);
         this.editSupport = editSupport;
+        this.validationScheduler = validationScheduler;
 
         setBackground(parent.getBackground());
         GridLayoutFactory.fillDefaults().applyTo(this);
@@ -54,7 +58,8 @@ class DetailCellEditorComposite<D> extends Composite {
                 if (e.keyCode == SWT.ARROW_DOWN) {
 
                     switcher.selectFirstEntry();
-                } else if (e.keyCode == SWT.CR && e.stateMask == 0 && !text.getText().isEmpty()) {
+                } else if (e.keyCode == SWT.CR && e.stateMask == 0 && !text.getText().isEmpty()
+                        && validationScheduler.canCloseCellEditor()) {
                     editSupport.addNewDetailElement(text.getText());
 
                     text.setText("");
