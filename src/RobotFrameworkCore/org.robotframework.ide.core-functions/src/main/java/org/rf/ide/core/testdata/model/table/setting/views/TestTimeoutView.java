@@ -106,7 +106,7 @@ public class TestTimeoutView extends TestTimeout implements ISingleElementViewer
             TestTimeout joined = new TestTimeout(getDeclaration());
             joinTimeout(joined, timeouts);
             timeouts.clear();
-            timeouts.add(joined);
+            timeouts.add(this);
         }
     }
 

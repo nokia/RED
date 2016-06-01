@@ -76,6 +76,7 @@ public class SuiteDocumentationViewTest {
         assertThat(getText(documentation.get().getDocumentationText())).containsExactly("doc1", "doc2", "doc3", "doc4",
                 "doc5");
         assertThat(settingTable.getDocumentation()).hasSize(1);
+        assertThat(settingTable.getDocumentation().get(0)).isSameAs(documentation.get());
     }
 
     @Test

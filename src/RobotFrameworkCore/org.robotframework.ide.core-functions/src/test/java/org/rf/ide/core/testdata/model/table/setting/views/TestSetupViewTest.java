@@ -73,6 +73,7 @@ public class TestSetupViewTest {
         // verify
         assertThat(getText(common)).containsExactly("key1", "arg1", "key2", "arg2", "newArg");
         assertThat(settingTable.getTestSetups()).hasSize(1);
+        assertThat(settingTable.getTestSetups().get(0)).isSameAs(common);
     }
 
     @Test
