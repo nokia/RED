@@ -34,7 +34,7 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        variableTable.createDictionaryVariable(0, "&{dict}", new ArrayList<Entry<String, String>>());
+        variableTable.createDictionaryVariable(0, "dict", new ArrayList<Entry<String, String>>());
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -50,12 +50,12 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        List<Entry<String, String>> data = new ArrayList<>();
+        final List<Entry<String, String>> data = new ArrayList<>();
         data.add(variableTable.createEntry("key1", "value1"));
         data.add(variableTable.createEntry("key2", "value2"));
         data.add(variableTable.createEntry("key3", "value3"));
 
-        variableTable.createDictionaryVariable(0, "&{dict}", data);
+        variableTable.createDictionaryVariable(0, "dict", data);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -71,14 +71,14 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        List<Entry<String, String>> data = new ArrayList<>();
+        final List<Entry<String, String>> data = new ArrayList<>();
 
-        AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
-        RobotToken cmTok1 = new RobotToken();
+        final AVariable aVariable = variableTable.createDictionaryVariable(0, "dict", data);
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         aVariable.addCommentPart(cmTok1);
@@ -98,17 +98,17 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        List<Entry<String, String>> data = new ArrayList<>();
+        final List<Entry<String, String>> data = new ArrayList<>();
         data.add(variableTable.createEntry("key1", "value1"));
         data.add(variableTable.createEntry("key2", "value2"));
         data.add(variableTable.createEntry("key3", "value3"));
 
-        AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
-        RobotToken cmTok1 = new RobotToken();
+        final AVariable aVariable = variableTable.createDictionaryVariable(0, "dict", data);
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         aVariable.addCommentPart(cmTok1);
@@ -128,12 +128,12 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        List<Entry<String, String>> data = new ArrayList<>();
+        final List<Entry<String, String>> data = new ArrayList<>();
         data.add(variableTable.createEntry("", ""));
         data.add(variableTable.createEntry("", ""));
         data.add(variableTable.createEntry("key", "value"));
 
-        AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
+        final AVariable aVariable = variableTable.createDictionaryVariable(0, "dict", data);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -149,12 +149,12 @@ public abstract class ACreationOfDictionaryVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        List<Entry<String, String>> data = new ArrayList<>();
+        final List<Entry<String, String>> data = new ArrayList<>();
         data.add(variableTable.createEntry("", ""));
         data.add(variableTable.createEntry("key", "value"));
         data.add(variableTable.createEntry("", ""));
 
-        AVariable aVariable = variableTable.createDictionaryVariable(0, "&{dict}", data);
+        final AVariable aVariable = variableTable.createDictionaryVariable(0, "dict", data);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);

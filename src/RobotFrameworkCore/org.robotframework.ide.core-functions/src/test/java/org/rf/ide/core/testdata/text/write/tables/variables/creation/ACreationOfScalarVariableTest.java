@@ -33,7 +33,7 @@ public abstract class ACreationOfScalarVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        variableTable.createScalarVariable(0, "${scalar}", new ArrayList<String>());
+        variableTable.createScalarVariable(0, "scalar", new ArrayList<String>());
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -48,12 +48,12 @@ public abstract class ACreationOfScalarVariableTest {
         // test data prepare
         modelFile.includeVariableTableSection();
         final VariableTable variableTable = modelFile.getVariableTable();
-        AVariable aVariable = variableTable.createScalarVariable(0, "${scalar}", new ArrayList<String>());
-        RobotToken cmTok1 = new RobotToken();
+        final AVariable aVariable = variableTable.createScalarVariable(0, "scalar", new ArrayList<String>());
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         aVariable.addCommentPart(cmTok1);
@@ -76,7 +76,7 @@ public abstract class ACreationOfScalarVariableTest {
         final List<String> values = new ArrayList<>();
         values.add("value1");
 
-        variableTable.createScalarVariable(0, "${scalar}", values);
+        variableTable.createScalarVariable(0, "scalar", values);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -95,12 +95,12 @@ public abstract class ACreationOfScalarVariableTest {
         final List<String> values = new ArrayList<>();
         values.add("value1");
 
-        AVariable aVariable = variableTable.createScalarVariable(0, "${scalar}", values);
-        RobotToken cmTok1 = new RobotToken();
+        final AVariable aVariable = variableTable.createScalarVariable(0, "scalar", values);
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         aVariable.addCommentPart(cmTok1);
@@ -125,7 +125,7 @@ public abstract class ACreationOfScalarVariableTest {
         values.add("value2");
         values.add("value3");
 
-        variableTable.createScalarVariable(0, "${scalar}", values);
+        variableTable.createScalarVariable(0, "scalar", values);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -146,12 +146,12 @@ public abstract class ACreationOfScalarVariableTest {
         values.add("value2");
         values.add("value3");
 
-        AVariable aVariable = variableTable.createScalarVariable(0, "${scalar}", values);
-        RobotToken cmTok1 = new RobotToken();
+        final AVariable aVariable = variableTable.createScalarVariable(0, "scalar", values);
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         aVariable.addCommentPart(cmTok1);
@@ -175,12 +175,12 @@ public abstract class ACreationOfScalarVariableTest {
         final List<String> values = new ArrayList<>();
         values.add("");
 
-        AVariable aVariable = variableTable.createScalarVariable(0, "${scalar}", values);
-        RobotToken cmTok1 = new RobotToken();
+        final AVariable aVariable = variableTable.createScalarVariable(0, "scalar", values);
+        final RobotToken cmTok1 = new RobotToken();
         cmTok1.setText("cm1");
-        RobotToken cmTok2 = new RobotToken();
+        final RobotToken cmTok2 = new RobotToken();
         cmTok2.setText("cm2");
-        RobotToken cmTok3 = new RobotToken();
+        final RobotToken cmTok3 = new RobotToken();
         cmTok3.setText("cm3");
 
         aVariable.addCommentPart(cmTok1);
