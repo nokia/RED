@@ -12,8 +12,9 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.red.nattable.edit.DefaultRedCellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditor;
-import org.robotframework.red.nattable.edit.HorizontalMovingTextCellEditor;
+import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
 class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
 
@@ -38,21 +39,22 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
 
     private void configureNamesCellEditors(final IConfigRegistry configRegistry) {
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new HorizontalMovingTextCellEditor(2, 1), DisplayMode.NORMAL,
+                new RedTextCellEditor(2, 1), DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new HorizontalMovingTextCellEditor(2, 1), DisplayMode.NORMAL,
+                new RedTextCellEditor(2, 1), DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR_AS_LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new HorizontalMovingTextCellEditor(2, 1), DisplayMode.NORMAL,
+                new RedTextCellEditor(2, 1), DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new HorizontalMovingTextCellEditor(2, 1), DisplayMode.NORMAL,
+                new RedTextCellEditor(2, 1), DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.DICTIONARY));
     }
 
     private void configureValuesCellEditors(final IConfigRegistry configRegistry) {
-        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new HorizontalMovingTextCellEditor(),
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                new RedTextCellEditor(new DefaultRedCellEditorValueValidator()),
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,

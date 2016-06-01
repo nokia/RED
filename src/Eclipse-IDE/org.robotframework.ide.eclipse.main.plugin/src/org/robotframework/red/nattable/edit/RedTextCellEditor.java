@@ -20,26 +20,36 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * Modified version of {@link org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor} which
- * will move left/right after commits
+ * will move left/right after commits and validate entries asynchronously.
  * 
  * @author Michal Anglart
  */
-public class HorizontalMovingTextCellEditor extends TextCellEditor {
+public class RedTextCellEditor extends TextCellEditor {
 
     private final int selectionStartShift;
-
     private final int selectionEndShift;
 
-    public HorizontalMovingTextCellEditor() {
+    private final CellEditorValueValidationJobScheduler<String> validationJobScheduler;
+
+    public RedTextCellEditor() {
         this(0, 0);
     }
 
-    public HorizontalMovingTextCellEditor(final int selectionStartShift, final int selectionEndShift) {
+    public RedTextCellEditor(final CellEditorValueValidator<String> validator) {
+        this(0, 0, validator);
+    }
+
+    public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift) {
+        this(selectionStartShift, selectionEndShift, null);
+    }
+
+    public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift,
+            final CellEditorValueValidator<String> validator) {
         super(true, true);
         this.selectionStartShift = selectionStartShift;
         this.selectionEndShift = selectionEndShift;
+        this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
     }
-
 
     @Override
     protected Text createEditorControl(final Composite parent, final int style) {
@@ -57,7 +67,7 @@ public class HorizontalMovingTextCellEditor extends TextCellEditor {
                 if (commitOnEnter && (event.keyCode == SWT.CR || event.keyCode == SWT.KEYPAD_CR)) {
                     final boolean commit = (event.stateMask == SWT.ALT) ? false : true;
                     MoveDirectionEnum move = MoveDirectionEnum.NONE;
-                    if (HorizontalMovingTextCellEditor.this.editMode == EditModeEnum.INLINE) {
+                    if (RedTextCellEditor.this.editMode == EditModeEnum.INLINE) {
                         if (event.stateMask == 0) {
                             move = MoveDirectionEnum.RIGHT;
                         } else if (event.stateMask == SWT.SHIFT) {
@@ -69,12 +79,12 @@ public class HorizontalMovingTextCellEditor extends TextCellEditor {
                         commit(move);
                     }
 
-                    if (HorizontalMovingTextCellEditor.this.editMode == EditModeEnum.DIALOG) {
+                    if (RedTextCellEditor.this.editMode == EditModeEnum.DIALOG) {
                         parent.forceFocus();
                     }
                 } else if (event.keyCode == SWT.ESC && event.stateMask == 0) {
                     close();
-                } else if (HorizontalMovingTextCellEditor.this.editMode == EditModeEnum.INLINE) {
+                } else if (RedTextCellEditor.this.editMode == EditModeEnum.INLINE) {
                     if (event.keyCode == SWT.ARROW_UP) {
                         commit(MoveDirectionEnum.UP);
                     } else if (event.keyCode == SWT.ARROW_DOWN) {
@@ -93,6 +103,8 @@ public class HorizontalMovingTextCellEditor extends TextCellEditor {
                 }
             }
         });
+        validationJobScheduler.armRevalidationOn(textControl);
+
         return textControl;
     }
 
@@ -100,11 +112,21 @@ public class HorizontalMovingTextCellEditor extends TextCellEditor {
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
         final Control control = super.activateCell(parent, originalCanonicalValue);
         if (selectionStartShift > 0 || selectionEndShift > 0) {
-            if (getEditorControl().getText().length() > 0) {
+            if (getEditorControl().getText().length() >= selectionStartShift + selectionEndShift) {
                 getEditorControl().setSelection(selectionStartShift,
                         getEditorControl().getText().length() - selectionEndShift);
             }
         }
         return control;
+    }
+
+    @Override
+    public boolean commit(final MoveDirectionEnum direction, final boolean closeAfterCommit,
+            final boolean skipValidation) {
+        if (validationJobScheduler.canCloseCellEditor()) {
+            return super.commit(direction, closeAfterCommit, skipValidation);
+        } else {
+            return false;
+        }
     }
 }
