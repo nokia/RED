@@ -24,15 +24,14 @@ public class VariableValuesEditConfigurationTest {
 
     @Test
     public void thereIsATextCellEditorRegisteredForScalarVariableValues() {
-        final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class), mock(VariablesDataProvider.class),
-                mock(RobotEditorCommandsStack.class));
+        final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
+                mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class));
 
         final IConfigRegistry configRegistry = new ConfigRegistry();
         config.configureRegistry(configRegistry);
 
         final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                DisplayMode.NORMAL,
-                VariableType.SCALAR.name());
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
         assertThat(editor).isInstanceOf(HorizontalMovingTextCellEditor.class);
     }
 
@@ -45,7 +44,8 @@ public class VariableValuesEditConfigurationTest {
         config.configureRegistry(configRegistry);
 
         final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                DisplayMode.NORMAL, VariableType.SCALAR_AS_LIST.name());
+                DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR_AS_LIST));
         assertThat(editor).isInstanceOf(DetailCellEditor.class);
     }
 
@@ -58,7 +58,7 @@ public class VariableValuesEditConfigurationTest {
         config.configureRegistry(configRegistry);
 
         final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                DisplayMode.NORMAL, VariableType.LIST.name());
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.LIST));
         assertThat(editor).isInstanceOf(DetailCellEditor.class);
     }
 
@@ -71,7 +71,8 @@ public class VariableValuesEditConfigurationTest {
         config.configureRegistry(configRegistry);
 
         final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                DisplayMode.NORMAL, VariableType.DICTIONARY.name());
+                DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.DICTIONARY));
         assertThat(editor).isInstanceOf(DetailCellEditor.class);
     }
 
@@ -84,7 +85,7 @@ public class VariableValuesEditConfigurationTest {
         config.configureRegistry(configRegistry);
 
         final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                DisplayMode.NORMAL, VariableType.DICTIONARY.name());
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.INVALID));
         assertThat(editor).isInstanceOf(DetailCellEditor.class);
     }
 }
