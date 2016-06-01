@@ -15,24 +15,17 @@ public class CreateFreshVariableCommand extends EditorCommand {
     private static final String DEFAULT_NAME = "var";
     private final RobotVariablesSection variablesSection;
     private final int index;
-    private final boolean notifySync;
 
     private final VariableType variableType;
 
     public CreateFreshVariableCommand(final RobotVariablesSection variablesSection) {
-        this(variablesSection, -1, true, VariableType.SCALAR);
+        this(variablesSection, -1, VariableType.SCALAR);
     }
 
     public CreateFreshVariableCommand(final RobotVariablesSection variablesSection, final int index,
             final VariableType variableType) {
-        this(variablesSection, index, false, variableType);
-    }
-
-    private CreateFreshVariableCommand(final RobotVariablesSection variablesSection, final int index,
-            final boolean notifySynchronously, final VariableType variableType) {
         this.variablesSection = variablesSection;
         this.index = index;
-        this.notifySync = notifySynchronously;
         this.variableType = variableType;
     }
 
@@ -46,10 +39,6 @@ public class CreateFreshVariableCommand extends EditorCommand {
             variablesSection.createVariable(index, variableType, name);
         }
 
-        if (notifySync) {
-            eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_ADDED, variablesSection);
-        } else {
-            eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_ADDED, variablesSection);
-        }
+        eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_ADDED, variablesSection);
     }
 }
