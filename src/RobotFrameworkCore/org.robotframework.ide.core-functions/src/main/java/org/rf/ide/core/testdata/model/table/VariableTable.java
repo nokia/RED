@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
@@ -47,8 +48,8 @@ public class VariableTable extends ARobotSectionTable {
 
     public ScalarVariable createScalarVariable(final int index, final String name, final List<String> values) {
         final RobotToken dec = new RobotToken();
-        dec.setRaw(name);
-        dec.setText(name);
+        dec.setRaw(VariableType.SCALAR.getIdentificator() + "{" + name + "}");
+        dec.setText(VariableType.SCALAR.getIdentificator() + "{" + name + "}");
         dec.setType(RobotTokenType.VARIABLES_SCALAR_DECLARATION);
 
         final ScalarVariable scalar = new ScalarVariable(name, dec, VariableScope.TEST_SUITE);
@@ -66,8 +67,8 @@ public class VariableTable extends ARobotSectionTable {
 
     public ListVariable createListVariable(final int index, final String name, final List<String> values) {
         final RobotToken dec = new RobotToken();
-        dec.setRaw(name);
-        dec.setText(name);
+        dec.setRaw(VariableType.LIST.getIdentificator() + "{" + name + "}");
+        dec.setText(VariableType.LIST.getIdentificator() + "{" + name + "}");
         dec.setType(RobotTokenType.VARIABLES_LIST_DECLARATION);
         final ListVariable list = new ListVariable(name, dec, VariableScope.TEST_SUITE);
         for (final String v : values) {
@@ -86,8 +87,8 @@ public class VariableTable extends ARobotSectionTable {
     public DictionaryVariable createDictionaryVariable(final int index, final String name,
             final List<Entry<String, String>> items) {
         final RobotToken dec = new RobotToken();
-        dec.setRaw(name);
-        dec.setText(name);
+        dec.setRaw(VariableType.DICTIONARY.getIdentificator() + "{" + name + "}");
+        dec.setText(VariableType.DICTIONARY.getIdentificator() + "{" + name + "}");
         dec.setType(RobotTokenType.VARIABLES_DICTIONARY_DECLARATION);
         final DictionaryVariable dict = new DictionaryVariable(name, dec, VariableScope.TEST_SUITE);
         for (final Entry<String, String> e : items) {
