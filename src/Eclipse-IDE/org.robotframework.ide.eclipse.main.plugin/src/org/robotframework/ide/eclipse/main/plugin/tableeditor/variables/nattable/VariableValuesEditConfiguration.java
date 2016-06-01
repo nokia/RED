@@ -32,21 +32,43 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
 
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
+        configureNamesCellEditors(configRegistry);
+        configureValuesCellEditors(configRegistry);
+    }
+
+    private void configureNamesCellEditors(final IConfigRegistry configRegistry) {
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                new HorizontalMovingTextCellEditor(2, 1), DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR));
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                new HorizontalMovingTextCellEditor(2, 1), DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR_AS_LIST));
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                new HorizontalMovingTextCellEditor(2, 1), DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.LIST));
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                new HorizontalMovingTextCellEditor(2, 1), DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.DICTIONARY));
+    }
+
+    private void configureValuesCellEditors(final IConfigRegistry configRegistry) {
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new HorizontalMovingTextCellEditor(),
-                DisplayMode.NORMAL, VariableType.SCALAR.name());
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack)),
-                DisplayMode.NORMAL, VariableType.SCALAR_AS_LIST.name());
+                DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR_AS_LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack)),
-                DisplayMode.NORMAL, VariableType.LIST.name());
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack)),
-                DisplayMode.NORMAL, VariableType.INVALID.name());
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.INVALID));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new DictVariableDetailsEditingSupport(theme, dataProvider, commandsStack)),
-                DisplayMode.NORMAL, VariableType.DICTIONARY.name());
+                DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.DICTIONARY));
     }
 }

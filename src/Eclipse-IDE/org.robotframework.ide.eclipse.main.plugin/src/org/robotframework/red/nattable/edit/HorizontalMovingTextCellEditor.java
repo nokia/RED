@@ -14,6 +14,7 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 
@@ -25,9 +26,20 @@ import org.eclipse.swt.widgets.Text;
  */
 public class HorizontalMovingTextCellEditor extends TextCellEditor {
 
+    private final int selectionStartShift;
+
+    private final int selectionEndShift;
+
     public HorizontalMovingTextCellEditor() {
-        super(true, true);
+        this(0, 0);
     }
+
+    public HorizontalMovingTextCellEditor(final int selectionStartShift, final int selectionEndShift) {
+        super(true, true);
+        this.selectionStartShift = selectionStartShift;
+        this.selectionEndShift = selectionEndShift;
+    }
+
 
     @Override
     protected Text createEditorControl(final Composite parent, final int style) {
@@ -84,4 +96,15 @@ public class HorizontalMovingTextCellEditor extends TextCellEditor {
         return textControl;
     }
 
+    @Override
+    protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
+        final Control control = super.activateCell(parent, originalCanonicalValue);
+        if (selectionStartShift > 0 || selectionEndShift > 0) {
+            if (getEditorControl().getText().length() > 0) {
+                getEditorControl().setSelection(selectionStartShift,
+                        getEditorControl().getText().length() - selectionEndShift);
+            }
+        }
+        return control;
+    }
 }

@@ -124,7 +124,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 270, 270,
                 new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider),
-                new VariableValuesTypeLabelAccumulator(dataProvider));
+                new VariableTypesAndColumnsLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
