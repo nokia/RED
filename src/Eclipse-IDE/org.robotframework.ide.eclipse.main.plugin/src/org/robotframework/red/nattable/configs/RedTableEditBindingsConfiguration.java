@@ -29,6 +29,9 @@ public class RedTableEditBindingsConfiguration extends AbstractUiBindingConfigur
     public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
         uiBindingRegistry.registerKeyBinding(new KeyEventMatcher(SWT.NONE, ' '), new KeyEditAction());
         uiBindingRegistry.registerKeyBinding(new KeyEventMatcher(SWT.NONE, SWT.F2), new KeyEditAction());
+        uiBindingRegistry.registerFirstKeyBinding(new KeyEventMatcher(SWT.NONE, SWT.CR), new KeyEditAction());
+        uiBindingRegistry.registerFirstKeyBinding(new KeyEventMatcher(SWT.SHIFT, SWT.CR), new KeyEditAction());
+        uiBindingRegistry.registerFirstKeyBinding(new KeyEventMatcher(SWT.NONE, SWT.KEYPAD_CR), new KeyEditAction());
         uiBindingRegistry.registerKeyBinding(new LetterOrDigitKeyEventMatcher(), new KeyEditAction());
         uiBindingRegistry.registerKeyBinding(new LetterOrDigitKeyEventMatcher(SWT.SHIFT), new KeyEditAction());
 
