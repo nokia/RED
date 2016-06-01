@@ -18,7 +18,7 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.nattable.edit.DetailCellEditor;
-import org.robotframework.red.nattable.edit.HorizontalMovingTextCellEditor;
+import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
 public class VariableValuesEditConfigurationTest {
 
@@ -32,7 +32,7 @@ public class VariableValuesEditConfigurationTest {
 
         final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
-        assertThat(editor).isInstanceOf(HorizontalMovingTextCellEditor.class);
+        assertThat(editor).isInstanceOf(RedTextCellEditor.class);
     }
 
     @Test
