@@ -104,7 +104,7 @@ public class TestTeardownView extends TestTeardown implements ISingleElementView
             TestTeardown joined = new TestTeardown(getDeclaration());
             OneSettingJoinerHelper.joinKeywordBase(joined, teardowns);
             teardowns.clear();
-            teardowns.add(joined);
+            teardowns.add(this);
         }
     }
 }

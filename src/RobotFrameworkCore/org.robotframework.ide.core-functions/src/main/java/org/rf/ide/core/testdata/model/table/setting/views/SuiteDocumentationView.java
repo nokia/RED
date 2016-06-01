@@ -92,7 +92,7 @@ public class SuiteDocumentationView extends SuiteDocumentation implements ISingl
             SuiteDocumentation joined = new SuiteDocumentation(getDeclaration());
             joinDoc(joined, suiteDocs);
             suiteDocs.clear();
-            suiteDocs.add(joined);
+            suiteDocs.add(this);
         }
     }
 

@@ -74,6 +74,7 @@ public class TestTimeoutViewTest {
         // verify
         assertThat(getText(tTimeout)).containsExactly("2 minutes", "arg1_tok1", "3 minutes", "arg1_tok2", "new_arg1");
         assertThat(settingTable.getTestTimeouts()).hasSize(1);
+        assertThat(settingTable.getTestTimeouts().get(0)).isSameAs(tTimeout);
     }
 
     @Test

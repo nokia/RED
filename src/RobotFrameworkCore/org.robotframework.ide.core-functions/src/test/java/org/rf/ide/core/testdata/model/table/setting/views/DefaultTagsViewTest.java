@@ -50,7 +50,7 @@ public class DefaultTagsViewTest {
     }
 
     @Test
-    public void test_tags_retrival_afterTagRemove_twoDefaultTags() {
+    public void test_tags_retrival_afterTagRemove_singleDefaultTags() {
         // prepare
         final RobotFile robotFile = new RobotFile(null);
         robotFile.includeSettingTableSection();
@@ -79,6 +79,7 @@ public class DefaultTagsViewTest {
         assertThat(joined.getTags()).hasSize(5);
         assertThat(getText(joined.getTags())).containsExactly("tag1", "tag2", "tag1a", "tag2a", "tag3");
         assertThat(settingTable.getDefaultTags()).hasSize(1);
+        assertThat(settingTable.getDefaultTags().get(0)).isSameAs(joined);
     }
 
     @Test

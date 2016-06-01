@@ -104,7 +104,7 @@ public class SuiteSetupView extends SuiteSetup implements ISingleElementViewer {
             SuiteSetup joined = new SuiteSetup(getDeclaration());
             OneSettingJoinerHelper.joinKeywordBase(joined, setups);
             setups.clear();
-            setups.add(joined);
+            setups.add(this);
         }
     }
 }
