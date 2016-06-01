@@ -17,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.edit.AlwaysDeactivatingCellEditor;
-import org.robotframework.red.nattable.edit.HorizontalMovingTextCellEditor;
+import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
 
 /**
@@ -46,7 +46,7 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, editableRule);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, createDeactivatingEditor(),
                 DisplayMode.NORMAL, AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new HorizontalMovingTextCellEditor(),
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(),
                 DisplayMode.NORMAL, GridRegion.BODY);
         configRegistry.registerConfigAttribute(EditConfigAttributes.DATA_VALIDATOR, new DefaultDataValidator());
         configRegistry.registerConfigAttribute(EditConfigAttributes.OPEN_ADJACENT_EDITOR, Boolean.TRUE,

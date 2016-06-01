@@ -31,8 +31,16 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
 
     private final DetailCellEditorEditingSupport<D> editSupport;
 
+    private final CellEditorValueValidationJobScheduler<String> validationJobScheduler;
+
     public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport) {
+        this(editSupport, new DefaultRedCellEditorValueValidator());
+    }
+
+    public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport,
+            final CellEditorValueValidator<String> validator) {
         this.editSupport = editSupport;
+        this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
     }
 
     @Override
@@ -54,7 +62,8 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
 
     @Override
     public DetailCellEditorComposite<D> createEditorControl(final Composite parent) {
-        final DetailCellEditorComposite<D> composite = new DetailCellEditorComposite<>(parent, editSupport);
+        final DetailCellEditorComposite<D> composite = new DetailCellEditorComposite<>(parent, editSupport,
+                validationJobScheduler);
         composite.setBackground(parent.getBackground());
 
         composite.getText().setFocus();
@@ -98,13 +107,19 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
             }
         });
         composite.setVisible(true);
+        validationJobScheduler.armRevalidationOn(composite.getText());
 
         return composite;
     }
 
     @Override
-    public void close() {
-        super.close();
+    public boolean commit(final MoveDirectionEnum direction, final boolean closeAfterCommit,
+            final boolean skipValidation) {
+        if (validationJobScheduler.canCloseCellEditor()) {
+            return super.commit(direction, closeAfterCommit, skipValidation);
+        } else {
+            return false;
+        }
     }
 
     @Override

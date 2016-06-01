@@ -5,12 +5,6 @@
  */
 package org.robotframework.red.nattable.edit;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
@@ -22,7 +16,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.robotframework.red.swt.SwtThread;
 
 /**
  * @author Michal Anglart
@@ -46,14 +39,18 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
 
     private DetailEditorListener editorListener;
 
-    private Job validationJob;
+    protected CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
-    private boolean cannotClose;
+    // private Job validationJob;
+    //
+    // private boolean cannotClose;
 
     public DetailCellEditorEntry(final Composite parent, final Color hoverColor, final Color selectionColor) {
         super(parent, SWT.NO_BACKGROUND);
         this.hoverColor = hoverColor;
         this.selectionColor = selectionColor;
+        this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(getValidator());
+
 
         setBackground(null);
         addMouseTrackListener(new MouseTrackAdapter() {
@@ -77,6 +74,8 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
             }
         });
     }
+
+    protected abstract CellEditorValueValidator<String> getValidator();
 
     public void setEditorListener(final DetailEditorListener listener) {
         editorListener = listener;
@@ -144,25 +143,10 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
     }
 
     public void commitEdit() {
-        waitForValidationJobToFinish();
-        if (cannotClose) {
-            return;
-        }
-        final String newValue = getNewValue();
-        closeEditing();
-        editorListener.editorApplied(newValue);
-    }
-
-    private void waitForValidationJobToFinish() {
-        // there could be an NPE if validationJob would be checked for nullity and then in other
-        // instruction
-        final Job theJob = validationJob;
-        if (theJob != null) {
-            try {
-                theJob.join();
-            } catch (final InterruptedException e) {
-                // nothing to do
-            }
+        if (validationJobScheduler.canCloseCellEditor()) {
+            final String newValue = getNewValue();
+            closeEditing();
+            editorListener.editorApplied(newValue);
         }
     }
 
@@ -170,7 +154,6 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
 
     public void cancelEdit() {
         closeEditing();
-        unblockClosing();
     }
 
     protected void closeEditing() {
@@ -178,50 +161,6 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
     }
 
     public abstract void update(final D detail);
-
-    protected final void rescheduleValidation() {
-        if (validationJob != null && validationJob.getState() == Job.SLEEPING) {
-            validationJob.cancel();
-        }
-        validationJob = createValidationJob();
-        validationJob.addJobChangeListener(new JobChangeAdapter() {
-
-            @Override
-            public void done(final IJobChangeEvent event) {
-                validationJob = null;
-            }
-        });
-        validationJob.schedule(300);
-    }
-
-    private Job createValidationJob() {
-        return new Job("validating input") {
-
-            @Override
-            protected IStatus run(final IProgressMonitor monitor) {
-                SwtThread.syncExec(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        validate();
-                    }
-                });
-                return Status.OK_STATUS;
-            }
-        };
-    }
-
-    protected void validate() {
-        // nothing to do, reimplement if needed
-    }
-
-    protected void blockClosing() {
-        cannotClose = true;
-    }
-
-    protected void unblockClosing() {
-        cannotClose = false;
-    }
 
     public static interface DetailEditorListener {
         void editorApplied(String value);
