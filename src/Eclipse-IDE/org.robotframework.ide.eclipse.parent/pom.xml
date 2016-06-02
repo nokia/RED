@@ -16,8 +16,11 @@
                 <property>
                     <name>eclipse.version</name>
                     <value>luna</value>
-                </property>            
+                </property>
             </activation>
+            <properties>
+                <tycho.version>0.22.0</tycho.version>
+            </properties>
             <repositories>
                 <repository>
                     <id>eclipse-luna</id>
@@ -46,8 +49,8 @@
                     <layout>p2</layout>
                 </repository>
                 <repository>
-                    <id>marketplace-client</id>
-                    <url>http://download.eclipse.org/mpc/mars/</url>
+                    <id>nattable</id>
+                    <url>http://download.eclipse.org/nattable/releases/1.4.0/repository/</url>
                     <layout>p2</layout>
                 </repository>
             </repositories>
@@ -67,9 +70,8 @@
                     <layout>p2</layout>
                 </repository>
                 <repository>
-                    <id>marketplace-client</id>
-                    <!--  change to neon when update site will become available -->
-                    <url>http://download.eclipse.org/mpc/mars/</url>
+                    <id>nattable</id>
+                    <url>http://download.eclipse.org/nattable/releases/1.4.0/repository/</url>
                     <layout>p2</layout>
                 </repository>
             </repositories>
