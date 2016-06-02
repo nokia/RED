@@ -22,6 +22,7 @@
 <unit id="org.eclipse.rcp.source.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.e4.core.tools.feature.source.feature.group" version="0.0.0"/>
 <unit id="org.eclipse.e4.core.tools.feature.feature.group" version="0.0.0"/>
+<unit id="org.eclipse.epp.mpc.feature.group" version="0.0.0"/>
 <repository location="http://download.eclipse.org/releases/mars/"/>
 </location>
 <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
@@ -30,10 +31,6 @@
 <unit id="org.eclipse.nebula.widgets.nattable.core.source.feature.feature.group" version="1.4.0.201606011907"/>
 <unit id="org.eclipse.nebula.widgets.nattable.extension.glazedlists.source.feature.feature.group" version="1.4.0.201606011907"/>
 <repository location="http://download.eclipse.org/nattable/releases/1.4.0/repository/"/>
-</location>
-<location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">
-<unit id="org.eclipse.epp.mpc.feature.group" version="1.4.2.v20160210-2005"/>
-<repository location="http://download.eclipse.org/mpc/mars/"/>
 </location>
 </locations>
 <targetJRE path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
