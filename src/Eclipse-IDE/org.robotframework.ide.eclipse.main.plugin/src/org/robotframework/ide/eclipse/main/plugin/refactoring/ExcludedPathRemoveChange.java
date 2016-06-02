@@ -41,7 +41,8 @@ class ExcludedPathRemoveChange extends Change {
 
     ExcludedPathRemoveChange(final IFile redXmlFile, final RobotProjectConfig config,
             final ExcludedFolderPath excludedPathToRemove) {
-        this(redXmlFile, config, excludedPathToRemove, PlatformUI.getWorkbench().getService(IEventBroker.class));
+        this(redXmlFile, config, excludedPathToRemove,
+                (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting

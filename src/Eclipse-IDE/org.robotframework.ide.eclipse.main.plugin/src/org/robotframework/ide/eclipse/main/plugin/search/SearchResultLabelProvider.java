@@ -27,7 +27,8 @@ class SearchResultLabelProvider extends RedCommonLabelProvider {
     public StyledString getStyledText(final Object element) {
         if (element instanceof IResource) {
             final IResource resource = (IResource) element;
-            final String label = resource.getAdapter(IWorkbenchAdapter.class).getLabel(resource);
+            final IWorkbenchAdapter workbenchAdapter = (IWorkbenchAdapter) resource.getAdapter(IWorkbenchAdapter.class);
+            final String label = workbenchAdapter.getLabel(resource);
             return new StyledString(label);
         } else if (element instanceof Libs) {
             return new StyledString("Libraries");
@@ -45,7 +46,8 @@ class SearchResultLabelProvider extends RedCommonLabelProvider {
     public Image getImage(final Object element) {
         if (element instanceof IResource) {
             final IResource resource = (IResource) element;
-            return ImagesManager.getImage(resource.getAdapter(IWorkbenchAdapter.class).getImageDescriptor(resource));
+            final IWorkbenchAdapter workbenchAdapter = (IWorkbenchAdapter) resource.getAdapter(IWorkbenchAdapter.class);
+            return ImagesManager.getImage(workbenchAdapter.getImageDescriptor(resource));
         } else if (element instanceof Libs) {
             return ImagesManager.getImage(RedImages.getLibraryImage());
         } else if (element instanceof LibraryWithParent) {
