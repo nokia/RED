@@ -24,6 +24,11 @@
                     <url>http://download.eclipse.org/releases/luna/</url>
                     <layout>p2</layout>
                 </repository>
+                <repository>
+                    <id>nattable</id>
+                    <url>http://download.eclipse.org/nattable/releases/1.4.0/repository/</url>
+                    <layout>p2</layout>
+                </repository>
             </repositories>
         </profile>
         <profile>
