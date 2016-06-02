@@ -30,7 +30,7 @@ public class RedSessionConsoleParticipant implements IConsolePageParticipant {
     private ActionsUpdater actionsUpdater;
 
     @Override
-    public <T> T getAdapter(final Class<T> adapter) {
+    public Object getAdapter(final Class adapter) {
         return null;
     }
 

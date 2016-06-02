@@ -313,7 +313,7 @@ public class RedSearchPage extends DialogPage implements ISearchPage {
                 final List<IResource> resources = transform(adaptables, new Function<IAdaptable, IResource>() {
                     @Override
                     public IResource apply(final IAdaptable adaptable) {
-                        return adaptable.getAdapter(IResource.class);
+                        return (IResource) adaptable.getAdapter(IResource.class);
                     }
                 });
                 resourcesRoots.addAll(filter(newHashSet(resources), Predicates.notNull()));
