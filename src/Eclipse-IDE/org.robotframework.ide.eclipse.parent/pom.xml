@@ -24,11 +24,6 @@
                     <url>http://download.eclipse.org/releases/luna/</url>
                     <layout>p2</layout>
                 </repository>
-                <repository>
-                    <id>marketplace-client</id>
-                    <url>http://download.eclipse.org/mpc/luna/</url>
-                    <layout>p2</layout>
-                </repository>
             </repositories>
         </profile>
         <profile>
