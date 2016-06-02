@@ -106,7 +106,7 @@ public class ImportLibraryComposite {
         this.fileModel = fileModel;
         this.shell = shell;
         robotProject = fileModel.getProject();
-        eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
+        eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     public Composite createImportResourcesComposite(final Composite parent) {

@@ -41,7 +41,8 @@ class ExcludedPathAddChange extends Change {
 
     ExcludedPathAddChange(final IFile redXmlFile, final RobotProjectConfig config,
             final ExcludedFolderPath excludedPathToAdd) {
-        this(redXmlFile, config, excludedPathToAdd, PlatformUI.getWorkbench().getService(IEventBroker.class));
+        this(redXmlFile, config, excludedPathToAdd,
+                (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting

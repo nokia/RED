@@ -39,7 +39,8 @@ class ExcludedPathModifyChange extends Change {
     private final IEventBroker eventBroker;
 
     ExcludedPathModifyChange(final IFile redXmlFile, final ExcludedFolderPath excludedPath, final IPath newPath) {
-        this(redXmlFile, excludedPath, newPath, PlatformUI.getWorkbench().getService(IEventBroker.class));
+        this(redXmlFile, excludedPath, newPath,
+                (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class));
     }
 
     @VisibleForTesting
