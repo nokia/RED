@@ -95,7 +95,8 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
                     committed = commit(MoveDirectionEnum.LEFT);
                 } else if (event.keyCode == SWT.CR && event.stateMask == 0 && composite.getText().getText().isEmpty()) {
                     committed = commit(MoveDirectionEnum.RIGHT);
-                } else if (event.keyCode == SWT.ESC && composite.getText().getText().isEmpty()) {
+                } else if ((event.keyCode == SWT.ESC || event.keyCode == SWT.KEYPAD_CR)
+                        && composite.getText().getText().isEmpty()) {
                     close();
                 } else if (event.keyCode == SWT.ESC && !composite.getText().getText().isEmpty()) {
                     composite.getText().setText("");
