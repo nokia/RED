@@ -1,0 +1,20 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>Headless - running validation in command line</h2>
+RED can be run in headless mode to provide validation info of included projects.<br>
+During validation, settings are read from red.xml of each of the projects thus preserving links to referenced libraries, variable mappings or include/exclude folders. Only opened projects are validated<br>
+Output of headless run is report of validated projects and xml report in checkstyle format.<br>
+<br>
+Syntax:<br>
+<i>eclipse -application org.robotframework.ide.eclipse.main.plugin.validation -data $WORKSPACE_PATH -nosplash -consoleLog --launcher.suppressErrors -import $PROJECT_PATHS -projects $PROJECT_NAMES -report $RAPORT_FILE </i>
+<br><br>
+$PROJECT_PATHS – list of paths to projects to be imported into workspace, separated by space <br>
+$PROJECT_NAMES – list of projects to be validated from workspace, separated by space <br>
+
+</body>
+</html>

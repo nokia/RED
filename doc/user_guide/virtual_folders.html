@@ -1,0 +1,22 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>Working with virtual folders mounted via SSH</h2>
+If there is a need to work with remote folders mounted as SSH, this can be done in multiple way.
+Take note that RED is parsing each file during validation thus you may experience reduce validation speed cause slower access to remote folders.
+<h3>Folder mount on OS level</h3> 
+Folders mounted as separate drive or mount points in the OS file system (eg. using sshfs for Windows).<br>
+This is preferred way to work with remote folders. RED uses local Robot and Python to execute actions on remote files to get information about libraries or variables from Python modules.<br>
+When including such folder into Project, use appropriate option in Advanced menu while creating or importing such folder (link to folder).
+<br>
+<h3>RemoteSystemExplorer plugin</h3>
+Another way of accessing such remote locations is to use Eclipse plugin RemoteSystemExplorer. <br>
+This plugin allows to access to remote folders only inside Eclipse application. 
+<br>RED will not be able to read and validate python variable files, generate libspecs from users libraries. 
+<br>It was also seen that RSE might cause Eclipse to be unresponsive while waiting for establish connection. 
+</body>
+</html>
