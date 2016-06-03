@@ -31,8 +31,8 @@ public class SetDictVariableValueElementCommandTest {
         final DictionaryKeyValuePair oldElement = ((DictionaryVariable) variable.getLinkedElement()).getItems().get(0);
 
         final SetDictVariableValueElementCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetDictVariableValueElementCommand(variable, oldElement, "a=1"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetDictVariableValueElementCommand(variable, oldElement, "a=1"));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("{a -> 1, b -> 2}");
@@ -47,8 +47,8 @@ public class SetDictVariableValueElementCommandTest {
         final DictionaryKeyValuePair oldElement = ((DictionaryVariable) variable.getLinkedElement()).getItems().get(0);
 
         final SetDictVariableValueElementCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetDictVariableValueElementCommand(variable, oldElement, "new_key=1"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetDictVariableValueElementCommand(variable, oldElement, "new_key=1"));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("{new_key -> 1, b -> 2}");
@@ -63,8 +63,8 @@ public class SetDictVariableValueElementCommandTest {
         final DictionaryKeyValuePair oldElement = ((DictionaryVariable) variable.getLinkedElement()).getItems().get(0);
 
         final SetDictVariableValueElementCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetDictVariableValueElementCommand(variable, oldElement, "a=new_value"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetDictVariableValueElementCommand(variable, oldElement, "a=new_value"));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("{a -> new_value, b -> 2}");

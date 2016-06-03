@@ -57,8 +57,8 @@ public class SetScalarValueCommandTest {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final SetScalarValueCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetScalarValueCommand(variable, "100"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetScalarValueCommand(variable, "100"));
         command.execute();
         
         assertThat(variable.getValue()).isEqualTo("100");
@@ -71,8 +71,8 @@ public class SetScalarValueCommandTest {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final SetScalarValueCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetScalarValueCommand(variable, "100"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetScalarValueCommand(variable, "100"));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("100");
@@ -85,8 +85,8 @@ public class SetScalarValueCommandTest {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final SetScalarValueCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetScalarValueCommand(variable, null));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetScalarValueCommand(variable, null));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("");

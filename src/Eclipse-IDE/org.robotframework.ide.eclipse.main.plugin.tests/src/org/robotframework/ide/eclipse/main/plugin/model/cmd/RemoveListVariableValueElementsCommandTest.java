@@ -57,8 +57,8 @@ public class RemoveListVariableValueElementsCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final RemoveListVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
+                .inWhich(eventBroker)
+                .isInjectedInto(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
         command.execute();
 
         assertThat(variable.getType()).isEqualTo(VariableType.SCALAR_AS_LIST);
@@ -75,8 +75,8 @@ public class RemoveListVariableValueElementsCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final RemoveListVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
+                .inWhich(eventBroker)
+                .isInjectedInto(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
         command.execute();
 
         assertThat(variable.getType()).isEqualTo(VariableType.SCALAR);
@@ -93,8 +93,8 @@ public class RemoveListVariableValueElementsCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final RemoveListVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
+                .inWhich(eventBroker)
+                .isInjectedInto(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("[1, 3]");
@@ -110,8 +110,8 @@ public class RemoveListVariableValueElementsCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final RemoveListVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
+                .inWhich(eventBroker)
+                .isInjectedInto(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("[1]");
