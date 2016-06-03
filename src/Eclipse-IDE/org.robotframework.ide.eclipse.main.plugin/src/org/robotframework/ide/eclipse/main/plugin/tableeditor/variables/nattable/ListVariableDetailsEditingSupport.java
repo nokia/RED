@@ -51,7 +51,7 @@ public class ListVariableDetailsEditingSupport implements DetailCellEditorEditin
 
     @Override
     public List<RobotToken> getInput(final int column, final int row) {
-        model = dataProvider.getRowObject(row);
+        model = (RobotVariable) dataProvider.getRowObject(row);
         return getDetailElements();
     }
 

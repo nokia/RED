@@ -27,8 +27,6 @@ public class RobotModelEvents {
 
     public static final String ROBOT_VARIABLES_SORTED = "robot/model/editor/file/structural/variable/sorted";
     
-    public static final String ROBOT_VARIABLE_EDIT = "robot/model/editor/file/structural/variable/edit";
-
 
     public static final String ROBOT_VARIABLE_DETAIL_CHANGE_ALL = "robot/model/editor/file/detail/variable/changed/*";
 

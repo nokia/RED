@@ -37,16 +37,17 @@ public class VariableTypesAndColumnsLabelAccumulator implements IConfigLabelAccu
 
     @Override
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
-        final RobotVariable variable = dataProvider.getRowObject(rowPosition);
-        if (variable == null) {
-            return;
-        }
-        if (columnPosition == 0) {
-            configLabels.addLabel(getNameColumnLabel(variable.getType()));
-        } else if (columnPosition == 1) {
-            configLabels.addLabel(getValueColumnLabel(variable.getType()));
-        } else if (columnPosition == 2) {
-            configLabels.addLabel(getCommentColumnLabel(variable.getType()));
+        final Object variable = dataProvider.getRowObject(rowPosition);
+        if (variable instanceof RobotVariable) {
+            final RobotVariable var = (RobotVariable) variable;
+            final VariableType type = var.getType();
+            if (columnPosition == 0) {
+                configLabels.addLabel(getNameColumnLabel(type));
+            } else if (columnPosition == 1) {
+                configLabels.addLabel(getValueColumnLabel(type));
+            } else if (columnPosition == 2) {
+                configLabels.addLabel(getCommentColumnLabel(type));
+            }
         }
     }
 }

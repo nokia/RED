@@ -47,7 +47,7 @@ public class DictVariableDetailsEditingSupport implements DetailCellEditorEditin
 
     @Override
     public List<DictionaryKeyValuePair> getInput(final int column, final int row) {
-        model = dataProvider.getRowObject(row);
+        model = (RobotVariable) dataProvider.getRowObject(row);
         return getDetailElements();
     }
 
