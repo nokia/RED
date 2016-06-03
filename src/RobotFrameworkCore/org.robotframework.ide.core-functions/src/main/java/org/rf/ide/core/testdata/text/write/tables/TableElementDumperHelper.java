@@ -211,7 +211,7 @@ public class TableElementDumperHelper {
                     dumps.add(e);
                 } else {
                     RobotToken rt = (RobotToken) e;
-                    if (rt == tokens.get(meatTokens)) {
+                    if (tokSize > meatTokens && rt == tokens.get(meatTokens)) {
                         dumps.add(rt);
                         meatTokens++;
                     } else {
