@@ -306,7 +306,7 @@ public class ImportLibraryComposite {
             final List<LibrarySpecification> specs = newArrayList();
             final Collection<LibrarySpecification> referencedLibraries = robotProject.getReferencedLibraries().values();
             for (final LibrarySpecification librarySpecification : referencedLibraries) {
-                if (librarySpecification.getName().equals(nameWithoutExtension)) {
+                if (librarySpecification != null && librarySpecification.getName().equals(nameWithoutExtension)) {
                     specs.add(librarySpecification);
                     break;
                 }
