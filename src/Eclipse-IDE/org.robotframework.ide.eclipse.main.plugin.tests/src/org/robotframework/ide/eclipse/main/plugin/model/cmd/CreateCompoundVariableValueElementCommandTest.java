@@ -70,7 +70,7 @@ public class CreateCompoundVariableValueElementCommandTest {
                 .isInjectedInto(new CreateCompoundVariableValueElementCommand(variable, "key=val"));
         command.execute();
 
-        assertThat(variable.getValue()).isEqualTo("{a -> 1, b -> 2, c -> 3, d -> 4, key -> val}");
+        assertThat(variable.getValue()).isEqualTo("{a = 1, b = 2, c = 3, d = 4, key = val}");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
 

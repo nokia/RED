@@ -83,7 +83,7 @@ public class MoveDictVariableValueElementsCommandTest {
                 new MoveDictVariableValueElementsCommand(variable, elements, MoveDirection.UP));
         command.execute();
 
-        assertThat(variable.getValue()).isEqualTo("{b -> 2, c -> 3, a -> 1, d -> 4}");
+        assertThat(variable.getValue()).isEqualTo("{b = 2, c = 3, a = 1, d = 4}");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
 
@@ -100,7 +100,7 @@ public class MoveDictVariableValueElementsCommandTest {
                 .isInjectedInto(new MoveDictVariableValueElementsCommand(variable, elements, MoveDirection.DOWN));
         command.execute();
 
-        assertThat(variable.getValue()).isEqualTo("{a -> 1, d -> 4, b -> 2, c -> 3}");
+        assertThat(variable.getValue()).isEqualTo("{a = 1, d = 4, b = 2, c = 3}");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
 

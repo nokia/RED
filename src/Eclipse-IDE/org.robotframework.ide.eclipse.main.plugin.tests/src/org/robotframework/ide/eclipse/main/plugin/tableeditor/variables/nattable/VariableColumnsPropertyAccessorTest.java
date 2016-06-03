@@ -59,7 +59,7 @@ public class VariableColumnsPropertyAccessorTest {
         assertThat(accessor.getDataValue(variables.get(0), 1)).isEqualTo("0");
         assertThat(accessor.getDataValue(variables.get(1), 1)).isEqualTo("[0, 1, 2]");
         assertThat(accessor.getDataValue(variables.get(2), 1)).isEqualTo("[1, 2, 3]");
-        assertThat(accessor.getDataValue(variables.get(3), 1)).isEqualTo("{a -> 1, b -> 2, c -> 3}");
+        assertThat(accessor.getDataValue(variables.get(3), 1)).isEqualTo("{a = 1, b = 2, c = 3}");
         assertThat(accessor.getDataValue(variables.get(4), 1)).isEqualTo("[0]");
     }
 
