@@ -270,9 +270,11 @@ public class ImportVariablesComposite {
     private void handleVariableAdd(final List<String> paths) {
         final List<ImportedVariablesFile> currentVariables = ((Settings) variablesViewer.getInput()).getImportedVariables();
         for (final String newPathString : paths) {
-            final ArrayList<String> args = newArrayList(newPathString);
-            commandsStack.execute(new CreateFreshGeneralSettingCommand(settingsSection, "Variables", args));
-            currentVariables.add(new ImportedVariablesFile(args));
+            if (!newPathString.isEmpty()) {
+                final ArrayList<String> args = newArrayList(newPathString);
+                commandsStack.execute(new CreateFreshGeneralSettingCommand(settingsSection, "Variables", args));
+                currentVariables.add(new ImportedVariablesFile(args));
+            }
         }
         variablesViewer.refresh();
     }

@@ -56,9 +56,7 @@ public class RedFileWatcher {
     public synchronized void registerPath(final Path fileDir, final String fileName,
             final IWatchEventHandler watchEventHandler) {
 
-        if (watcher == null) {
-            setupWatcher();
-        }
+        setupWatcher();
 
         if (watcher != null && fileDir != null && fileName != null) {
             try {
@@ -94,7 +92,7 @@ public class RedFileWatcher {
         }
     }
     
-    public synchronized void closeWatchService() {
+    public void closeWatchService() {
         try {
             if (watcher != null) {
                 watcher.close();
@@ -107,26 +105,20 @@ public class RedFileWatcher {
     }
 
     private void setupWatcher() {
-        registeredDirs.clear();
-        modifiedFilesQueue.clear();
-        createAndStartWatchService();
-    }
-
-    private void createAndStartWatchService() {
-        try {
-            watcher = FileSystems.getDefault().newWatchService();
-            startWatching();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if(watcher == null) {
+            registeredDirs.clear();
+            modifiedFilesQueue.clear();
+            try {
+                watcher = FileSystems.getDefault().newWatchService();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        setupWatchEventProducerThread();
+        setupWatchEventConsumerThread();
     }
 
-    private void startWatching() {
-        startEventProducerThread();
-        startEventConsumerThread();
-    }
-
-    private void startEventProducerThread() {
+    private void setupWatchEventProducerThread() {
         if (!isEventProducerThreadStarted.getAndSet(true)) {
             new Thread(new Runnable() {
 
@@ -140,7 +132,11 @@ public class RedFileWatcher {
                         WatchKey key;
                         try {
                             key = watcher.take();
-                        } catch (InterruptedException | ClosedWatchServiceException e) {
+                        } catch (final InterruptedException e) {
+                            break;
+                        } catch (final ClosedWatchServiceException e1) {
+                            watcher = null;
+                            e1.printStackTrace();
                             break;
                         }
                         for (WatchEvent<?> event : key.pollEvents()) {
@@ -171,14 +167,13 @@ public class RedFileWatcher {
                         }
                     }
                     isEventProducerThreadStarted.set(false);
-                    closeWatchService();
                     sendWatchServiceInterruptedEvent();
                 }
             }).start();
         }
     }
 
-    private void startEventConsumerThread() {
+    private void setupWatchEventConsumerThread() {
         if (!isEventConsumerThreadStarted.getAndSet(true)) {
             new Thread(new Runnable() {
 
@@ -199,7 +194,6 @@ public class RedFileWatcher {
                         }
                     }
                     isEventConsumerThreadStarted.set(false);
-                    closeWatchService();
                     sendWatchServiceInterruptedEvent();
                 }
             }).start();

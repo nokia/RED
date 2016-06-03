@@ -231,7 +231,7 @@ public class ImportResourcesComposite {
         final List<IPath> currentPaths = ((Settings) resourcesViewer.getInput()).getImportedResources();
         for (final String newPathString : paths) {
             final IPath newPath = new Path(newPathString);
-            if (!currentPaths.contains(newPath)) {
+            if (!currentPaths.contains(newPath) && !newPathString.isEmpty()) {
                 final ArrayList<String> args = newArrayList(newPathString);
                 commandsStack.execute(new CreateFreshGeneralSettingCommand(settingsSection, "Resource", args));
                 currentPaths.add(newPath);
