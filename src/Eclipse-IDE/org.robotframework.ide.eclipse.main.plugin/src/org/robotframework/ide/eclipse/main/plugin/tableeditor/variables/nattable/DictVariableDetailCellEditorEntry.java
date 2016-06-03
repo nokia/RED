@@ -124,9 +124,9 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
             }
 
             if (isHovered()) {
-                bufferGC.drawImage(ImagesManager.getImage(RedImages.getArrowImage()), mid - spacingAroundImage, 4);
+                bufferGC.drawImage(ImagesManager.getImage(RedImages.getDictionaryMappingImage()), mid - spacingAroundImage, 4);
             } else {
-                bufferGC.drawImage(ImagesManager.getImage(RedImages.getGreyedImage(RedImages.getArrowImage())),
+                bufferGC.drawImage(ImagesManager.getImage(RedImages.getGreyedImage(RedImages.getDictionaryMappingImage())),
                         mid - spacingAroundImage, 4);
             }
 
