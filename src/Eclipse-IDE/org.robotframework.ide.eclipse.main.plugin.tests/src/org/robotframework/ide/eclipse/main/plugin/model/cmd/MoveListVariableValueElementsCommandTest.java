@@ -55,8 +55,8 @@ public class MoveListVariableValueElementsCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final MoveListVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new MoveListVariableValueElementsCommand(variable, elementsToMove, MoveDirection.UP));
+                .inWhich(eventBroker)
+                .isInjectedInto(new MoveListVariableValueElementsCommand(variable, elementsToMove, MoveDirection.UP));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("[1, 2, 0, 3]");
@@ -71,7 +71,7 @@ public class MoveListVariableValueElementsCommandTest {
                 ((ScalarVariable) variable.getLinkedElement()).getValues().subList(1, 3));
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final MoveListVariableValueElementsCommand command = ContextInjector.prepareContext().with(eventBroker).inject(
+        final MoveListVariableValueElementsCommand command = ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(
                 new MoveListVariableValueElementsCommand(variable, elementsToMove, MoveDirection.DOWN));
         command.execute();
 
@@ -88,8 +88,8 @@ public class MoveListVariableValueElementsCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final MoveListVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new MoveListVariableValueElementsCommand(variable, elementsToRemove, MoveDirection.UP));
+                .inWhich(eventBroker)
+                .isInjectedInto(new MoveListVariableValueElementsCommand(variable, elementsToRemove, MoveDirection.UP));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("[2, 3, 1, 4]");
@@ -104,7 +104,7 @@ public class MoveListVariableValueElementsCommandTest {
                 ((ListVariable) variable.getLinkedElement()).getItems().subList(1, 3));
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final MoveListVariableValueElementsCommand command = ContextInjector.prepareContext().with(eventBroker).inject(
+        final MoveListVariableValueElementsCommand command = ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(
                 new MoveListVariableValueElementsCommand(variable, elementsToRemove, MoveDirection.DOWN));
         command.execute();
 
@@ -120,7 +120,7 @@ public class MoveListVariableValueElementsCommandTest {
                 ((UnknownVariable) variable.getLinkedElement()).getItems().subList(1, 3));
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final MoveListVariableValueElementsCommand command = ContextInjector.prepareContext().with(eventBroker).inject(
+        final MoveListVariableValueElementsCommand command = ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(
                 new MoveListVariableValueElementsCommand(variable, elementsToRemove, MoveDirection.UP));
         command.execute();
 
@@ -137,8 +137,8 @@ public class MoveListVariableValueElementsCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final MoveListVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new MoveListVariableValueElementsCommand(variable, elementsToRemove, MoveDirection.DOWN));
+                .inWhich(eventBroker)
+                .isInjectedInto(new MoveListVariableValueElementsCommand(variable, elementsToRemove, MoveDirection.DOWN));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("[1, 5, 2, 3]");

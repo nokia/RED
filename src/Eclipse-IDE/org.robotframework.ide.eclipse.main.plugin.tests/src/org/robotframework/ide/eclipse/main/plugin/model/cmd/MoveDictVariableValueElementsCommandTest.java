@@ -79,7 +79,7 @@ public class MoveDictVariableValueElementsCommandTest {
                 ((DictionaryVariable) variable.getLinkedElement()).getItems().subList(1, 3));
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        final MoveDictVariableValueElementsCommand command = ContextInjector.prepareContext().with(eventBroker).inject(
+        final MoveDictVariableValueElementsCommand command = ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(
                 new MoveDictVariableValueElementsCommand(variable, elements, MoveDirection.UP));
         command.execute();
 
@@ -96,8 +96,8 @@ public class MoveDictVariableValueElementsCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final MoveDictVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new MoveDictVariableValueElementsCommand(variable, elements, MoveDirection.DOWN));
+                .inWhich(eventBroker)
+                .isInjectedInto(new MoveDictVariableValueElementsCommand(variable, elements, MoveDirection.DOWN));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("{a -> 1, d -> 4, b -> 2, c -> 3}");

@@ -73,8 +73,8 @@ public class RemoveDictVariableValueElementsCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final RemoveDictVariableValueElementsCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new RemoveDictVariableValueElementsCommand(variable, elements));
+                .inWhich(eventBroker)
+                .isInjectedInto(new RemoveDictVariableValueElementsCommand(variable, elements));
         command.execute();
         
         assertThat(variable.getValue()).isEqualTo("{a -> 1, d -> 4}");

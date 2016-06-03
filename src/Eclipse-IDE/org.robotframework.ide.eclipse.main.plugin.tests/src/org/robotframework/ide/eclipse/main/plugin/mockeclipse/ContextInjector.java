@@ -29,12 +29,12 @@ public class ContextInjector {
         return new ContextInjector();
     }
 
-    public ContextInjector with(final Object object) {
+    public ContextInjector inWhich(final Object object) {
         objectsToInject.put(object.getClass(), object);
         return this;
     }
 
-    public <T> T inject(final T object) {
+    public <T> T isInjectedInto(final T object) {
         Class<?> clazz = object.getClass();
 
         try {
@@ -60,5 +60,9 @@ public class ContextInjector {
             throw new IllegalStateException("Unable to bind fields", e);
         }
         return object;
+    }
+
+    public <T> T areInjectedInto(final T object) {
+        return isInjectedInto(object);
     }
 }
