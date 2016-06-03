@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -25,9 +27,14 @@ public class DeleteVariableCommand extends EditorCommand {
         if (variablesToDelete.isEmpty()) {
             return;
         }
-        final RobotSuiteFileSection variableSection = variablesToDelete.get(0).getParent();
-        variableSection.getChildren().removeAll(variablesToDelete);
+        final RobotSuiteFileSection variablesSection = variablesToDelete.get(0).getParent();
+        variablesSection.getChildren().removeAll(variablesToDelete);
 
-        eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_REMOVED, variableSection);
+        final VariableTable table = (VariableTable) variablesSection.getLinkedElement();
+        for (final RobotVariable var : variablesToDelete) {
+            table.removeVariable((AVariable) var.getLinkedElement());
+
+        }
+        eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_REMOVED, variablesSection);
     }
 }
