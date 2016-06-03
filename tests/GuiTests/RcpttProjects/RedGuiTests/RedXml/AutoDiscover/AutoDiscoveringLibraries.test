@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _l6X6QPy3EeW7_PzjO98BIw
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/29/16 11:48 AM
+Save-Time: 6/3/16 9:37 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -385,4 +385,15 @@ with [get-window "Discovering libraries summary" | get-tree] {
 get-window "Discovering libraries summary" | get-button OK | click
 
 
+//remove this after fixing bug!!!!!!!!!!
+
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "divide - RobotProject\\/libs\\/t" | key-type Del
+    key-type "M1+s"
+}
+
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Reset Robot Environment" 
+    | click
+wait 1000    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
