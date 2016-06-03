@@ -69,7 +69,7 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
             public void keyTraversed(final TraverseEvent e) {
                 if (e.keyCode == SWT.ESC) {
                     cancelEdit();
-                } else if (e.keyCode == SWT.CR) {
+                } else if (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) {
                     commitEdit();
                 }
             }
