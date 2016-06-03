@@ -134,7 +134,7 @@ public class DictVariableDetailsEditingSupportTest {
         support.addNewDetailElement("key=value");
 
         verify(commandsStack).execute(isA(CreateCompoundVariableValueElementCommand.class));
-        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{a -> 1, b -> 2, c -> 3, key -> value}");
+        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{a = 1, b = 2, c = 3, key = value}");
     }
 
     @Test
@@ -150,7 +150,7 @@ public class DictVariableDetailsEditingSupportTest {
         support.removeDetailElements(newArrayList(input.get(0), input.get(2)));
 
         verify(commandsStack).execute(isA(RemoveDictVariableValueElementsCommand.class));
-        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{b -> 2}");
+        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{b = 2}");
     }
 
     @Test
@@ -166,7 +166,7 @@ public class DictVariableDetailsEditingSupportTest {
         support.moveLeft(newArrayList(input.get(0), input.get(2)));
 
         verify(commandsStack).execute(isA(MoveDictVariableValueElementsCommand.class));
-        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{a -> 1, c -> 3, b -> 2}");
+        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{a = 1, c = 3, b = 2}");
     }
 
     @Test
@@ -182,7 +182,7 @@ public class DictVariableDetailsEditingSupportTest {
         support.moveRight(newArrayList(input.get(0), input.get(2)));
 
         verify(commandsStack).execute(isA(MoveDictVariableValueElementsCommand.class));
-        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{b -> 2, a -> 1, c -> 3}");
+        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{b = 2, a = 1, c = 3}");
     }
 
     @Test
@@ -198,7 +198,7 @@ public class DictVariableDetailsEditingSupportTest {
         support.setNewValue(input.get(1), "x=42");
 
         verify(commandsStack).execute(isA(SetDictVariableValueElementCommand.class));
-        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{a -> 1, x -> 42, c -> 3}");
+        assertThat(section.getChildren().get(3).getValue()).isEqualTo("{a = 1, x = 42, c = 3}");
     }
 
     private static RobotVariablesSection createVariables() {

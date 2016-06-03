@@ -77,7 +77,7 @@ public class RemoveDictVariableValueElementsCommandTest {
                 .isInjectedInto(new RemoveDictVariableValueElementsCommand(variable, elements));
         command.execute();
         
-        assertThat(variable.getValue()).isEqualTo("{a -> 1, d -> 4}");
+        assertThat(variable.getValue()).isEqualTo("{a = 1, d = 4}");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
 
