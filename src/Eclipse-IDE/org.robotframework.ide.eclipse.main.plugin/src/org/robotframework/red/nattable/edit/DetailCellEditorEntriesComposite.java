@@ -261,7 +261,7 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
                 if (index < entries.size()) {
                     entries.selectOnlyEntry(index);
                 }
-            } else if (e.keyCode == SWT.CR) {
+            } else if (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) {
                 entries.openEntryForEdit(entry);
 
             } else if (e.keyCode == 'a' && e.stateMask == SWT.CTRL) {
