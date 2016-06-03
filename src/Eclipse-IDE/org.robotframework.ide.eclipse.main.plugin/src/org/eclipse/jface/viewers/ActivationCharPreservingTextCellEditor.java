@@ -23,36 +23,14 @@ import org.robotframework.red.jface.assist.RedContentProposalAdapter;
  */
 public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
-    private final String prefix;
-    private final String suffix;
     private final String contextToDeactivate;
     private RedContentProposalAdapter contentProposalAdapter;
 
-    /**
-     * Instantiates cell editor
-     * 
-     * @param viewerEditor
-     * @param parent
-     * @param contextToDeactivate
-     * @param prefix
-     *            The prefix which will be displayed in text control after
-     *            activation
-     * @param suffix
-     *            The suffix which will be displayed in text control after
-     *            activation
-     */
-    public ActivationCharPreservingTextCellEditor(final ColumnViewerEditor viewerEditor, final Composite parent,
-            final String contextToDeactivate, final String prefix, final String suffix) {
-        super(parent, SWT.SINGLE);
-        this.prefix = prefix;
-        this.suffix = suffix;
-        this.contextToDeactivate = contextToDeactivate;
-        registerActivationListener(viewerEditor);
-    }
-
     public ActivationCharPreservingTextCellEditor(final ColumnViewerEditor viewerEditor, final Composite parent,
             final String contextToDeactivate) {
-        this(viewerEditor, parent, contextToDeactivate, "", "");
+        super(parent, SWT.SINGLE);
+        this.contextToDeactivate = contextToDeactivate;
+        registerActivationListener(viewerEditor);
     }
 
     private void registerActivationListener(final ColumnViewerEditor viewerEditor) {
@@ -88,7 +66,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
         super.activate(activationEvent);
         if (activationEvent.eventType == ColumnViewerEditorActivationEvent.KEY_PRESSED
                 && activationEvent.character != SWT.CR) {
-            text.setText(prefix + Character.toString(activationEvent.character) + suffix);
+            text.setText(Character.toString(activationEvent.character));
         }
     }
 
@@ -119,7 +97,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
         @Override
         public void beforeEditorDeactivated(final ColumnViewerEditorDeactivationEvent event) {
-            final IContextService service = (IContextService) PlatformUI.getWorkbench()
+            final IContextService service = PlatformUI.getWorkbench()
                     .getService(
                     IContextService.class);
             service.deactivateContext(contextActivation);
@@ -127,7 +105,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
         @Override
         public void beforeEditorActivated(final ColumnViewerEditorActivationEvent event) {
-            final IContextService service = (IContextService) PlatformUI.getWorkbench()
+            final IContextService service = PlatformUI.getWorkbench()
                     .getService(
                     IContextService.class);
             contextActivation = service.activateContext(contextToDeactivate);
@@ -136,7 +114,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
         @Override
         public void afterEditorActivated(final ColumnViewerEditorActivationEvent event) {
             final Text text = (Text) ActivationCharPreservingTextCellEditor.this.getControl();
-            final int end = text.getText().length() - suffix.length();
+            final int end = text.getText().length();
             text.setSelection(end, end);
         }
 

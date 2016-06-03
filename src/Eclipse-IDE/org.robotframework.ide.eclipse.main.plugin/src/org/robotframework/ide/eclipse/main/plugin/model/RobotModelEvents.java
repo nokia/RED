@@ -39,15 +39,6 @@ public class RobotModelEvents {
     public static final String ROBOT_VARIABLE_COMMENT_CHANGE = "robot/model/editor/file/detail/variable/changed/comment";
     
     
-    public static final String ROBOT_VARIABLE_COLLECTION_ELEMENT_MOVE_UP = "robot/model/editor/file/structural/variable/collection/move/up";
-    
-    public static final String ROBOT_VARIABLE_COLLECTION_ELEMENT_MOVE_DOWN = "robot/model/editor/file/structural/variable/collection/move/down";
-    
-    public static final String ROBOT_VARIABLE_COLLECTION_ELEMENT_INSERT = "robot/model/editor/file/structural/variable/collection/insert";
-    
-    public static final String ROBOT_VARIABLE_COLLECTION_ELEMENT_DELETE= "robot/model/editor/file/structural/variable/collection/delete";
-
-    
     public static final String ROBOT_SETTINGS_STRUCTURAL_ALL = "robot/model/editor/file/structural/setting/*";
 
     public static final String ROBOT_SETTING_ADDED = "robot/model/editor/file/structural/setting/added";
