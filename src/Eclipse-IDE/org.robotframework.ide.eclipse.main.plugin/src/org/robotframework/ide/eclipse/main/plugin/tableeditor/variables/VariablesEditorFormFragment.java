@@ -432,7 +432,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     
     @Inject
     @Optional
-    private void variableEdit(@UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_EDIT) final RobotVariable variable) {
+    private void variableEdit(
+            @UIEventTopic("robot/model/editor/file/structural/variable/edit") final RobotVariable variable) {
         editSection.setExpanded(true);
     }
     

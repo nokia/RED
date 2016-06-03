@@ -11,7 +11,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -19,7 +18,6 @@ import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -37,12 +35,10 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
-import org.eclipse.nebula.widgets.nattable.ui.menu.DebugMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -98,7 +94,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     private NatTable table;
 
-    private RowSelectionProvider<RobotVariable> selectionProvider;
+    private RowSelectionProvider<Object> selectionProvider;
 
     private ISortModel sortModel;
 
@@ -150,7 +146,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
+        gridLayer.addConfiguration(
+                new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
         gridLayer
                 .addConfiguration(new VariableValuesEditConfiguration(theme, dataProvider, commandsStack));
 
@@ -161,10 +158,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
         sortModel = columnHeaderSortingLayer.getSortModel();
-        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider);
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
 
+        // tooltips support
         new NatTableContentTooltip(table);
-        // createContextMenu();
     }
 
     private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
@@ -179,13 +176,13 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         addCustomStyling(table, theme);
 
+        // sorting
         table.addConfiguration(new HeaderSortConfiguration());
-
-        // Add popup menu - build your own popup menu using the PopupMenuBuilder
-        table.addConfiguration(new HeaderMenuConfiguration(table));
-        table.addConfiguration(new DebugMenuConfiguration(table));
-
         table.addConfiguration(new VariablesTableSortingConfiguration());
+
+        // popup menus
+        table.addConfiguration(new HeaderMenuConfiguration(table));
+        table.addConfiguration(new VariablesTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
@@ -220,26 +217,18 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
                 final RobotVariablesSection section = dataProvider.getInput();
                 commandsStack.execute(new CreateFreshVariableCommand(section));
+
                 SwtThread.asyncExec(new Runnable() {
                     @Override
                     public void run() {
                         selectionLayer.selectCell(selectedCellColumn, selectedCellRow, false, false);
-                        table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
+                        // table.doCommand(new EditSelectionCommand(table,
+                        // table.getConfigRegistry()));
                     }
                 });
                 return section.getChildren().get(section.getChildren().size() - 1);
             }
         };
-    }
-
-    private void createContextMenu() {
-        final String menuId = "org.robotframework.ide.eclipse.editor.page.variables.contextMenu";
-
-        final MenuManager manager = new MenuManager("Robot suite editor variables page context menu", menuId);
-        final Menu menu = manager.createContextMenu(table);
-        table.setMenu(menu);
-
-        site.registerContextMenu(menuId, manager, selectionProvider, false);
     }
 
     private RobotVariablesSection getSection() {
