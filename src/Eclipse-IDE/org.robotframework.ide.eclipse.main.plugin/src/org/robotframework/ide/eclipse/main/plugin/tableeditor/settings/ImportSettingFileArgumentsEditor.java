@@ -28,7 +28,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Table;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
@@ -109,9 +108,6 @@ public class ImportSettingFileArgumentsEditor {
 
         @Override
         protected Object getValue(final Object element) {
-            if (element instanceof RobotCollectionElement) {
-                return element.toString();
-            }
             return element.toString();
         }
 

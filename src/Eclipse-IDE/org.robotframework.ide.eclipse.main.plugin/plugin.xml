@@ -2153,62 +2153,6 @@
           </reference>
        </enabledWhen>
     </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.DeleteCollectionElementHandler"
-          commandId="org.eclipse.ui.edit.delete">
-       <activeWhen>
-          <and>
-             <reference
-                   definitionId="org.robotframework.variablesPartIsActiveAndEditable">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.atLeastOneCollectionElementIsSelected">
-             </reference>
-          </and>
-       </activeWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.InsertNewCollectionElementHandler"
-          commandId="org.robotframework.ide.eclipse.insertNew">
-       <activeWhen>
-          <and>
-             <reference
-                   definitionId="org.robotframework.variablesPartIsActiveAndEditable">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.exactlyOneCollectionElementIsSelected">
-             </reference>
-          </and>
-       </activeWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveCollectionElementUpHandler"
-          commandId="org.robotframework.ide.eclipse.moveElementUp">
-       <activeWhen>
-          <and>
-             <reference
-                   definitionId="org.robotframework.variablesPartIsActiveAndEditable">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.exactlyOneCollectionElementIsSelected">
-             </reference>
-          </and>
-       </activeWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveCollectionElementDownHandler"
-          commandId="org.robotframework.ide.eclipse.moveElementDown">
-       <activeWhen>
-          <and>
-             <reference
-                   definitionId="org.robotframework.variablesPartIsActiveAndEditable">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.exactlyOneCollectionElementIsSelected">
-             </reference>
-          </and>
-       </activeWhen>
-    </handler>
  </extension>
  <extension
        name="Source part handlers"
@@ -3101,39 +3045,6 @@
     </menuContribution>
     <menuContribution
           allPopups="false"
-          locationURI="popup:org.robotframework.ide.eclipse.editor.page.variables.collection.elements.contextMenu?before=additions">
-       <command
-             commandId="org.robotframework.ide.eclipse.insertNew"
-             icon="resources/add.png"
-             label="Add new element"
-             style="push">
-       </command>
-       <separator
-             name="navigation"
-             visible="true">
-       </separator>
-       <command
-             commandId="org.robotframework.ide.eclipse.moveElementUp"
-             label="Move element up"
-             style="push">
-       </command>
-       <command
-             commandId="org.robotframework.ide.eclipse.moveElementDown"
-             label="Move element down"
-             style="push">
-       </command>
-       <separator
-             name="globals"
-             visible="true">
-       </separator>
-       <command
-             commandId="org.eclipse.ui.edit.delete"
-             label="Delete"
-             style="push">
-       </command>
-    </menuContribution>
-    <menuContribution
-          allPopups="false"
           locationURI="popup:org.robotframework.ide.eclipse.editor.page.settings.general.contextMenu?before=additions">
        <separator
              name="navigation"
@@ -3842,19 +3753,6 @@
        </with>
     </definition>
     <definition
-          id="org.robotframework.atLeastOneCollectionElementIsSelected">
-       <with
-             variable="selection">
-          <iterate
-                ifEmpty="false"
-                operator="and">
-             <instanceof
-                   value="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement">
-             </instanceof>
-          </iterate>
-       </with>
-    </definition>
-    <definition
           id="org.robotframework.selectedElementsHaveSameType">
        <with
              variable="selection">
@@ -3883,24 +3781,6 @@
                    operator="and">
                 <instanceof
                       value="org.robotframework.ide.eclipse.main.plugin.model.RobotElement">
-                </instanceof>
-             </iterate>
-             <count
-                   value="1">
-             </count>
-          </and>
-       </with>
-    </definition>
-    <definition
-          id="org.robotframework.exactlyOneCollectionElementIsSelected">
-       <with
-             variable="selection">
-          <and>
-             <iterate
-                   ifEmpty="false"
-                   operator="and">
-                <instanceof
-                      value="org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.RobotCollectionElement">
                 </instanceof>
              </iterate>
              <count
