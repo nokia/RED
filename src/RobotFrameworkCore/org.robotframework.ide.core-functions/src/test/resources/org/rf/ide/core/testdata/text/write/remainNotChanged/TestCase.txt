@@ -8,6 +8,7 @@ Test1
 	[Template]	template
 	[Timeout]	10 hours	ok		#done
 	Log		p2	mal
+	Log	p3 
 | | new
 
 
