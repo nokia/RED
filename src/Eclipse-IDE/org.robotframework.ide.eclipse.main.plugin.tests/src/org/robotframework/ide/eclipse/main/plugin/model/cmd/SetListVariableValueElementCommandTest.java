@@ -31,8 +31,8 @@ public class SetListVariableValueElementCommandTest {
         final RobotToken oldElement = ((ListVariable) variable.getLinkedElement()).getItems().get(0);
 
         final SetListVariableValueElementCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetListVariableValueElementCommand(variable, oldElement, "1"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetListVariableValueElementCommand(variable, oldElement, "1"));
         command.execute();
         
         assertThat(variable.getValue()).isEqualTo("[1, 2, 3]");
@@ -47,8 +47,8 @@ public class SetListVariableValueElementCommandTest {
         final RobotToken oldElement = ((ListVariable) variable.getLinkedElement()).getItems().get(0);
 
         final SetListVariableValueElementCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetListVariableValueElementCommand(variable, oldElement, "42"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetListVariableValueElementCommand(variable, oldElement, "42"));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("[42, 2, 3]");

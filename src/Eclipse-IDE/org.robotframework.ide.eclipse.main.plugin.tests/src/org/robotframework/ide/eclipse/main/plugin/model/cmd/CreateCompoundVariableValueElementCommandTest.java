@@ -38,8 +38,8 @@ public class CreateCompoundVariableValueElementCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final CreateCompoundVariableValueElementCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new CreateCompoundVariableValueElementCommand(variable, "3"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new CreateCompoundVariableValueElementCommand(variable, "3"));
         command.execute();
         
         assertThat(variable.getValue()).isEqualTo("[0, 1, 2, 3]");
@@ -52,8 +52,8 @@ public class CreateCompoundVariableValueElementCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final CreateCompoundVariableValueElementCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new CreateCompoundVariableValueElementCommand(variable, "4"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new CreateCompoundVariableValueElementCommand(variable, "4"));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("[1, 2, 3, 4]");
@@ -66,8 +66,8 @@ public class CreateCompoundVariableValueElementCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final CreateCompoundVariableValueElementCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new CreateCompoundVariableValueElementCommand(variable, "key=val"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new CreateCompoundVariableValueElementCommand(variable, "key=val"));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("{a -> 1, b -> 2, c -> 3, d -> 4, key -> val}");
@@ -80,8 +80,8 @@ public class CreateCompoundVariableValueElementCommandTest {
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final CreateCompoundVariableValueElementCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new CreateCompoundVariableValueElementCommand(variable, "4"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new CreateCompoundVariableValueElementCommand(variable, "4"));
         command.execute();
 
         assertThat(variable.getValue()).isEqualTo("[1, 2, 3, 4]");

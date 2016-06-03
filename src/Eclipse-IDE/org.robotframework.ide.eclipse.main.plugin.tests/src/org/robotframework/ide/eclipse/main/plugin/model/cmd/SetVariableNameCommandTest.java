@@ -32,8 +32,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(0);
         
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "${other_scalar}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -52,8 +52,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(0);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "@{other_list}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "@{other_list}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -73,8 +73,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(0);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "&{other_dict}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "&{other_dict}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -94,8 +94,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(0);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "{other_invalid}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "{other_invalid}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -115,8 +115,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(1);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -135,8 +135,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(1);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "@{other_list}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "@{other_list}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -156,8 +156,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(1);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "&{other_dict}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "&{other_dict}"));
 
         command.execute();
 
@@ -178,8 +178,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(1);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "{other_invalid}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "{other_invalid}"));
 
         command.execute();
 
@@ -200,8 +200,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(2);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -221,8 +221,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(2);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "@{other_list}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "@{other_list}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -241,8 +241,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(2);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "&{other_dict}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "&{other_dict}"));
 
         command.execute();
 
@@ -263,8 +263,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(2);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "{other_invalid}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "{other_invalid}"));
 
         command.execute();
 
@@ -285,8 +285,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(3);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -306,8 +306,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(3);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "@{other_list}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "@{other_list}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -327,8 +327,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(3);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "&{other_dict}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "&{other_dict}"));
 
         command.execute();
 
@@ -348,8 +348,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(3);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "{other_invalid}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "{other_invalid}"));
 
         command.execute();
 
@@ -370,8 +370,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(4);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "${other_scalar_as_list}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -391,8 +391,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(4);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "@{other_list}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "@{other_list}"));
         command.execute();
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_NAME_CHANGE, variable);
@@ -412,8 +412,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(4);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "&{other_dict}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "&{other_dict}"));
 
         command.execute();
 
@@ -434,8 +434,8 @@ public class SetVariableNameCommandTest {
         final RobotVariable variable = createVariables().get(4);
 
         final SetVariableNameCommand command = ContextInjector.prepareContext()
-                .with(eventBroker)
-                .inject(new SetVariableNameCommand(variable, "{other_invalid}"));
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetVariableNameCommand(variable, "{other_invalid}"));
 
         command.execute();
 
@@ -455,8 +455,8 @@ public class SetVariableNameCommandTest {
         for (final RobotVariable variable : createVariables()) {
             // the command changes name to already defined one
             final SetVariableNameCommand command = ContextInjector.prepareContext()
-                    .with(eventBroker)
-                    .inject(new SetVariableNameCommand(variable, getActualName(variable)));
+                    .inWhich(eventBroker)
+                    .isInjectedInto(new SetVariableNameCommand(variable, getActualName(variable)));
             command.execute();
         }
         verifyZeroInteractions(eventBroker);
