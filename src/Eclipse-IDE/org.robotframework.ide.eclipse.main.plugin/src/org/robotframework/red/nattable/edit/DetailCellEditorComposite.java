@@ -58,7 +58,8 @@ class DetailCellEditorComposite<D> extends Composite {
                 if (e.keyCode == SWT.ARROW_DOWN) {
 
                     switcher.selectFirstEntry();
-                } else if (e.keyCode == SWT.CR && e.stateMask == 0 && !text.getText().isEmpty()
+                } else if ((e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) && e.stateMask == 0
+                        && !text.getText().isEmpty()
                         && validationScheduler.canCloseCellEditor()) {
                     editSupport.addNewDetailElement(text.getText());
 
