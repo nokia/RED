@@ -20,7 +20,9 @@ import ca.odell.glazedlists.SortedList;
  * @author Michal Anglart
  *
  */
-public class VariablesDataProvider implements IDataProvider, IRowDataProvider<RobotVariable> {
+public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Object> {
+
+    private static final Object ADDING_TOKEN = new Object();
 
     private RobotVariablesSection section;
     private SortedList<RobotVariable> variables;
@@ -74,8 +76,10 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ro
             if (row == variables.size() - countInvisible()) {
                 return column == 0 ? "...add new scalar" : "";
             }
-            final RobotVariable variable = getRowObject(row);
-            return propertyAccessor.getDataValue(variable, column);
+            final Object variable = getRowObject(row);
+            if (variable instanceof RobotVariable) {
+                return propertyAccessor.getDataValue((RobotVariable) variable, column);
+            }
         }
         return "";
     }
@@ -103,12 +107,14 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ro
         if (value instanceof RobotVariable) {
             return;
         }
-        final RobotVariable variable = getRowObject(row);
-        propertyAccessor.setDataValue(variable, column, value);
+        final Object variable = getRowObject(row);
+        if (variable instanceof RobotVariable) {
+            propertyAccessor.setDataValue((RobotVariable) variable, column, value);
+        }
     }
 
     @Override
-    public RobotVariable getRowObject(final int rowIndex) {
+    public Object getRowObject(final int rowIndex) {
         if (section != null && rowIndex < variables.size()) {
             RobotVariable rowObject = null;
 
@@ -122,12 +128,14 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ro
                 realRowIndex++;
             }
             return rowObject;
+        } else if (rowIndex == variables.size()) {
+            return ADDING_TOKEN;
         }
         return null;
     }
 
     @Override
-    public int indexOfRowObject(final RobotVariable rowObject) {
+    public int indexOfRowObject(final Object rowObject) {
         if (section != null) {
             final int realRowIndex = variables.indexOf(rowObject);
             int filteredIndex = realRowIndex;
@@ -140,6 +148,8 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ro
                 }
             }
             return filteredIndex;
+        } else if (rowObject == ADDING_TOKEN) {
+            return variables.size();
         }
         return -1;
     }
