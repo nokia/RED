@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -145,7 +146,30 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
     }
 
     void refreshEntriesPanel() {
-        panel.refresh();
+        if (mode == Mode.WINDOWED) {
+            panel.refresh();
+        } else {
+            panel.refresh();
+
+            final Point realSize = parent.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+            parent.setSize(parent.getSize().x, Math.min(200, realSize.y));
+
+            final List<DetailCellEditorEntry<D>> entries = panel.getEntries().getEntries();
+            final DetailCellEditorEntry<D> lastEntry = entries.get(entries.size() - 1);
+            getScrolledAscendant(lastEntry).showControl(lastEntry);
+        }
+    }
+
+    private ScrolledComposite getScrolledAscendant(final Control control) {
+        Composite parent = control.getParent();
+        while (parent != null) {
+            if (parent instanceof ScrolledComposite) {
+                return (ScrolledComposite) parent;
+            }
+
+            parent = parent.getParent();
+        }
+        return null;
     }
 
     void setPanelInput(final int column, final int row) {
