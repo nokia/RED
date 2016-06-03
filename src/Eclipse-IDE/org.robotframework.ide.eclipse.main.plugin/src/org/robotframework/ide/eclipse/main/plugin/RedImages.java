@@ -18,10 +18,6 @@ public class RedImages {
 
     private static final Map<ImageDescriptor, ImageDescriptor> GRAY_IMAGES = new HashMap<>(0);
 
-    public static ImageDescriptor getDictionaryMappingImage() {
-        return RedPlugin.getImageDescriptor("resources/dictionary_mapping.png");
-    }
-
     public static ImageDescriptor getFilterImage() {
         return RedPlugin.getImageDescriptor("resources/filter.png");
     }
@@ -104,6 +100,10 @@ public class RedImages {
 
     public static ImageDescriptor getRobotDictionaryVariableImage() {
         return RedPlugin.getImageDescriptor("resources/variable_dict.png");
+    }
+
+    public static ImageDescriptor getDictionaryMappingImage() {
+        return RedPlugin.getImageDescriptor("resources/variable_dict_mapping.png");
     }
 
     public static ImageDescriptor getRobotSettingImage() {
