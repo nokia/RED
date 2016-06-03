@@ -68,6 +68,9 @@ public class CellEditorValueValidationJobScheduler<V> {
 
                     @Override
                     public ControlDecoration runCalculation() {
+                        if (control == null || control.isDisposed()) {
+                            return null;
+                        }
                         if (errorMsg == null) {
                             control.setForeground(control.getParent().getForeground());
                             return null;
