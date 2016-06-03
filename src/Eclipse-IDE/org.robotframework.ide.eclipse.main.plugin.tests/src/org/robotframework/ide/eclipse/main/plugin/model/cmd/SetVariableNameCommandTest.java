@@ -83,7 +83,7 @@ public class SetVariableNameCommandTest {
 
         assertThat(variable.getType()).isEqualTo(VariableType.DICTIONARY);
         assertThat(variable.getName()).isEqualTo("other_dict");
-        assertThat(variable.getValue()).isEqualTo("{0 -> }");
+        assertThat(variable.getValue()).isEqualTo("{0 = }");
         assertThat(variable.getComment()).isEqualTo("# comment 1");
     }
 
@@ -167,7 +167,7 @@ public class SetVariableNameCommandTest {
 
         assertThat(variable.getType()).isEqualTo(VariableType.DICTIONARY);
         assertThat(variable.getName()).isEqualTo("other_dict");
-        assertThat(variable.getValue()).isEqualTo("{0 -> , 1 -> , 2 -> }");
+        assertThat(variable.getValue()).isEqualTo("{0 = , 1 = , 2 = }");
         assertThat(variable.getComment()).isEqualTo("# comment 2");
     }
 
@@ -252,7 +252,7 @@ public class SetVariableNameCommandTest {
 
         assertThat(variable.getType()).isEqualTo(VariableType.DICTIONARY);
         assertThat(variable.getName()).isEqualTo("other_dict");
-        assertThat(variable.getValue()).isEqualTo("{1 -> , 2 -> , 3 -> }");
+        assertThat(variable.getValue()).isEqualTo("{1 = , 2 = , 3 = }");
         assertThat(variable.getComment()).isEqualTo("# comment 3");
     }
 
@@ -337,7 +337,7 @@ public class SetVariableNameCommandTest {
 
         assertThat(variable.getType()).isEqualTo(VariableType.DICTIONARY);
         assertThat(variable.getName()).isEqualTo("other_dict");
-        assertThat(variable.getValue()).isEqualTo("{a -> 1, b -> 2, c -> 3}");
+        assertThat(variable.getValue()).isEqualTo("{a = 1, b = 2, c = 3}");
         assertThat(variable.getComment()).isEqualTo("# comment 4");
     }
 
@@ -423,7 +423,7 @@ public class SetVariableNameCommandTest {
 
         assertThat(variable.getType()).isEqualTo(VariableType.DICTIONARY);
         assertThat(variable.getName()).isEqualTo("other_dict");
-        assertThat(variable.getValue()).isEqualTo("{0 -> }");
+        assertThat(variable.getValue()).isEqualTo("{0 = }");
         assertThat(variable.getComment()).isEqualTo("# comment 5");
     }
 
