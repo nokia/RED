@@ -104,7 +104,7 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
         } else if (getType() == VariableType.DICTIONARY) {
             final DictionaryVariable variable = (DictionaryVariable) holder;
             final List<DictionaryKeyValuePair> values = variable.getItems();
-            return "{" + Joiner.on(", ").join(transform(values, TokenFunctions.pairToString(" -> "))) + "}";
+            return "{" + Joiner.on(", ").join(transform(values, TokenFunctions.pairToString(" = "))) + "}";
 
         } else if (getType() == VariableType.INVALID) {
             final UnknownVariable variable = (UnknownVariable) holder;
