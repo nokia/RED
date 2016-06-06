@@ -46,9 +46,7 @@ public class PasteVariablesHandler extends DIParameterizedHandler<E4PasteVariabl
 
             if (probablyVariables instanceof RobotVariable[]) {
                 insertVariables(selection, (RobotVariable[]) probablyVariables);
-                return null;
             }
-
             return null;
         }
 
@@ -57,11 +55,11 @@ public class PasteVariablesHandler extends DIParameterizedHandler<E4PasteVariabl
                     RobotVariable.class);
 
             if (firstSelected.isPresent()) {
-                final int index = firstSelected.get().getParent().getChildren().indexOf(firstSelected);
-                commandsStack.execute(new InsertVariablesCommand(firstSelected.get().getParent(), index, variables));
+                final RobotVariable selectedVar = firstSelected.get();
+                final int index = selectedVar.getParent().getChildren().indexOf(selectedVar);
+                commandsStack.execute(new InsertVariablesCommand(selectedVar.getParent(), index, variables));
             } else {
-                final RobotVariablesSection section = fileModel.findSection(
-                        RobotVariablesSection.class).orNull();
+                final RobotVariablesSection section = fileModel.findSection(RobotVariablesSection.class).orNull();
                 if (section != null) {
                     commandsStack.execute(new InsertVariablesCommand(section, variables));
                 }

@@ -12,6 +12,7 @@ import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -39,15 +40,16 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
 
         if (variable.getType() == VariableType.SCALAR_AS_LIST) {
             final ScalarVariable var = (ScalarVariable) variable.getLinkedElement();
-            var.addValue(RobotTokens.create(newElementContent));
+            var.addValue(RobotToken.create(newElementContent));
+            var.addValue(RobotToken.create(newElementContent));
 
         } else if (variable.getType() == VariableType.LIST) {
             final ListVariable var = (ListVariable) variable.getLinkedElement();
-            var.addItem(RobotTokens.create(newElementContent));
+            var.addItem(RobotToken.create(newElementContent));
 
         } else if (variable.getType() == VariableType.INVALID) {
             final UnknownVariable var = (UnknownVariable) variable.getLinkedElement();
-            var.addItem(RobotTokens.create(newElementContent));
+            var.addItem(RobotToken.create(newElementContent));
 
         } else if (variable.getType() == VariableType.DICTIONARY) {
             final DictionaryVariable var = (DictionaryVariable) variable.getLinkedElement();
@@ -56,7 +58,7 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
             final String key = splittedContent.get(0);
             final String value = Joiner.on('=').join(splittedContent.subList(1, splittedContent.size()));
 
-            var.put(RobotTokens.create(newElementContent), RobotTokens.create(key), RobotTokens.create(value));
+            var.put(RobotToken.create(newElementContent), RobotToken.create(key), RobotToken.create(value));
 
         } else {
             throw new CommandExecutionException("Variables of type " + variable.getType()

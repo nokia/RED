@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -43,17 +44,17 @@ public class SetDictVariableValueElementCommand extends EditorCommand {
 
         boolean thereIsAChange = false;
         if (!oldElement.getRaw().getText().equals(newValue)) {
-            oldElement.setRaw(RobotTokens.create(newValue));
+            oldElement.setRaw(RobotToken.create(newValue));
 
             thereIsAChange = true;
         }
         if (!oldElement.getKey().getText().equals(key)) {
-            oldElement.setKey(RobotTokens.create(key));
+            oldElement.setKey(RobotToken.create(key));
 
             thereIsAChange = true;
         }
         if (!oldElement.getValue().getText().equals(value)) {
-            oldElement.setValue(RobotTokens.create(value));
+            oldElement.setValue(RobotToken.create(value));
 
             thereIsAChange = true;
         }
