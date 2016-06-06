@@ -31,7 +31,7 @@ public class MoveVariableUpCommand extends EditorCommand {
         }
         Collections.swap(variablesSection.getChildren(), index, index - 1);
 
-        final VariableTable table = (VariableTable) variablesSection.getLinkedElement();
+        final VariableTable table = variablesSection.getLinkedElement();
         table.moveUpVariable((AVariable) variable.getLinkedElement());
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_MOVED, variablesSection);

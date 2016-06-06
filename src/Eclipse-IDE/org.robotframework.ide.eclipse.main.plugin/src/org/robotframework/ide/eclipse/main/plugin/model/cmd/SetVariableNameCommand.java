@@ -48,7 +48,7 @@ public class SetVariableNameCommand extends EditorCommand {
         final boolean typeHasChanged = typeChangeIsRequired();
         if (typeHasChanged) {
             final RobotVariablesSection section = variable.getParent();
-            final VariableTable table = (VariableTable) section.getLinkedElement();
+            final VariableTable table = section.getLinkedElement();
 
             final AVariable newHolder = createProjectedVariable(modifiedToken);
 
