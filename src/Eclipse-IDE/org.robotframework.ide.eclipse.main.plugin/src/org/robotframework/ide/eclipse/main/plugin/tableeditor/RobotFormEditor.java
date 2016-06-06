@@ -66,7 +66,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorP
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable.SettingsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.VariablesEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.ErrorDialogWithLinkToPreferences;
 
