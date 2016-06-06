@@ -28,7 +28,7 @@ public class SetScalarValueCommand extends EditorCommand {
         if (variable.getType() != VariableType.SCALAR) {
             throw new CommandExecutionException("Invalid type of variable: " + variable.getType());
         }
-        final RobotToken token = RobotTokens.create(newValue);
+        final RobotToken token = RobotToken.create(newValue);
 
         final ScalarVariable scalar = (ScalarVariable) variable.getLinkedElement();
         if (scalar.getValues().isEmpty()) {

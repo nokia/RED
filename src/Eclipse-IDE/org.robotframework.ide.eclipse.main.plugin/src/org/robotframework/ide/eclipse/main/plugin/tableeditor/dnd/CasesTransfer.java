@@ -35,7 +35,17 @@ public class CasesTransfer extends ByteArrayTransfer {
     }
 
     public static boolean hasCases(final Clipboard clipboard) {
-        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null;
+        return clipboard != null && !clipboard.isDisposed() && clipboardContainCases(clipboard);
+    }
+
+    private static boolean clipboardContainCases(final Clipboard clipboard) {
+        final TransferData[] availableTypes = clipboard.getAvailableTypes();
+        for (final TransferData data : availableTypes) {
+            if (getInstance().isSupportedType(data)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -53,26 +63,18 @@ public class CasesTransfer extends ByteArrayTransfer {
         if (!(data instanceof RobotCase[])) {
             return;
         }
+
         final RobotCase[] objects = (RobotCase[]) data;
-        final int count = objects.length;
 
-        try {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            final ObjectOutputStream objectOut = new ObjectOutputStream(out);
+        try (final ByteArrayOutputStream out = new ByteArrayOutputStream();
+                final ObjectOutputStream objectOut = new ObjectOutputStream(out)) {
 
-            // write the number of resources
-            objectOut.writeInt(count);
-
-            // write each object
+            objectOut.writeInt(objects.length);
             for (int i = 0; i < objects.length; i++) {
                 objectOut.writeObject(objects[i]);
             }
+            super.javaToNative(out.toByteArray(), transferData);
 
-            // cleanup
-            objectOut.close();
-            out.close();
-            final byte[] bytes = out.toByteArray();
-            super.javaToNative(bytes, transferData);
         } catch (final IOException e) {
             StatusManager.getManager().handle(
                     new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
@@ -89,15 +91,14 @@ public class CasesTransfer extends ByteArrayTransfer {
         if (bytes == null) {
             return new RobotCase[0];
         }
-        try {
-            final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes));
+
+        try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
             final int count = in.readInt();
             final RobotCase[] objects = new RobotCase[count];
             for (int i = 0; i < count; i++) {
                 objects[i] = (RobotCase) in.readObject();
                 objects[i].fixParents();
             }
-            in.close();
             return objects;
         } catch (ClassNotFoundException | IOException e) {
             StatusManager.getManager().handle(

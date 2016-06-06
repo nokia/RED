@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 
@@ -23,8 +24,25 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
         super(parent, SECTION_NAME);
     }
 
-    private VariableTable getTable() {
-        return (VariableTable) super.sectionTable;
+    @Override
+    public VariableTable getLinkedElement() {
+        return (VariableTable) super.getLinkedElement();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<RobotVariable> getChildren() {
+        return (List<RobotVariable>) super.getChildren();
+    }
+
+    @Override
+    public void link(final ARobotSectionTable table) {
+        super.link(table);
+
+        for (final IVariableHolder variableHolder : getLinkedElement().getVariables()) {
+            final RobotVariable variable = new RobotVariable(this, variableHolder);
+            elements.add(variable);
+        }
     }
 
     public RobotVariable createVariable(final VariableType variableType, final String name) {
@@ -32,34 +50,33 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
     }
 
     public RobotVariable createVariable(final int index, final VariableType variableType, final String name) {
+        IVariableHolder var;
         if (variableType == VariableType.SCALAR) {
-            getTable().createScalarVariable(index, name, Lists.<String> newArrayList());
+            var = getLinkedElement().createScalarVariable(index, name, Lists.<String> newArrayList());
         } else if (variableType == VariableType.LIST) {
-            getTable().createListVariable(index, name, Lists.<String> newArrayList());
+            var = getLinkedElement().createListVariable(index, name, Lists.<String> newArrayList());
         } else if (variableType == VariableType.DICTIONARY) {
-            getTable().createDictionaryVariable(index, name, Lists.<Entry<String, String>> newArrayList());
+            var = getLinkedElement().createDictionaryVariable(index, name,
+                    Lists.<Entry<String, String>> newArrayList());
+        } else {
+            throw new IllegalArgumentException("Unable to create variable of type " + variableType.name());
         }
 
-        final IVariableHolder newVariableHolder = getTable().getVariables().get(index);
-        final RobotVariable robotVariable = new RobotVariable(this, newVariableHolder);
+        final RobotVariable robotVariable = new RobotVariable(this, var);
         elements.add(index, robotVariable);
-
         return robotVariable;
     }
 
-    @Override
-    public void link(final ARobotSectionTable table) {
-        super.link(table);
-
-        for (final IVariableHolder variableHolder : getTable().getVariables()) {
-            final RobotVariable variable = new RobotVariable(this, variableHolder);
-            elements.add(variable);
-        }
+    public RobotVariable createVariableFrom(final RobotVariable source) {
+        return createVariableFrom(getChildren().size(), source);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<RobotVariable> getChildren() {
-        return (List<RobotVariable>) super.getChildren();
+    public RobotVariable createVariableFrom(final int index, final RobotVariable source) {
+        final AVariable holderCopy = ((AVariable) source.getLinkedElement()).copy();
+        getLinkedElement().addVariable(index, holderCopy);
+
+        final RobotVariable robotVariable = new RobotVariable(this, holderCopy);
+        elements.add(index, robotVariable);
+        return robotVariable;
     }
 }
