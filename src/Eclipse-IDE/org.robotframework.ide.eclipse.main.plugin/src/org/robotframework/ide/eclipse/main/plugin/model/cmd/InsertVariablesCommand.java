@@ -32,15 +32,17 @@ public class InsertVariablesCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
+        int shift = 0;
         for (final RobotVariable variable : variablesToInsert) {
             variable.setParent(variablesSection);
-        }
-        if (index == -1) {
-            variablesSection.getChildren().addAll(variablesToInsert);
-        } else {
-            variablesSection.getChildren().addAll(index, variablesToInsert);
-        }
 
-        eventBroker.post(RobotModelEvents.ROBOT_VARIABLE_ADDED, variablesSection);
+            if (index == -1) {
+                variablesSection.createVariableFrom(variable);
+            } else {
+                variablesSection.createVariableFrom(index + shift, variable);
+            }
+            shift++;
+        }
+        eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_ADDED, variablesSection);
     }
 }

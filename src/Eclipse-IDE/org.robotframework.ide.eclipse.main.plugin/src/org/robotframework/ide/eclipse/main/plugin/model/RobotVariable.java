@@ -51,10 +51,6 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
         this.parent = variablesSection;
     }
 
-    public void fixParents() {
-        // nothing to do
-    }
-
     public IVariableHolder getLinkedElement() {
         return holder;
     }

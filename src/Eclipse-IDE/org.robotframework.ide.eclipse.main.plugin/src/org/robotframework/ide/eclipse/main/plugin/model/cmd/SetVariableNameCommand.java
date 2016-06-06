@@ -123,7 +123,7 @@ public class SetVariableNameCommand extends EditorCommand {
         final DictionaryVariable dictHolder = new DictionaryVariable(getNewHolderName(), modifiedToken.get(),
                 variable.getLinkedElement().getScope());
         for (final RobotToken valueToken : valueTokens) {
-            final DictionaryKeyValuePair keyValuePair = RobotTokens.toKeyValuePair(valueToken);
+            final DictionaryKeyValuePair keyValuePair = DictionaryKeyValuePair.createFromRaw(valueToken.getText());
             dictHolder.put(keyValuePair.getRaw(), keyValuePair.getKey(), keyValuePair.getValue());
         }
         return dictHolder;
