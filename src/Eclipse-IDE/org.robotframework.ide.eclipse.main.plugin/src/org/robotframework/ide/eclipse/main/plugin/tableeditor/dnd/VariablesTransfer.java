@@ -35,7 +35,22 @@ public class VariablesTransfer extends ByteArrayTransfer {
     }
 
     public static boolean hasVariables(final Clipboard clipboard) {
-        return clipboard != null && !clipboard.isDisposed() && clipboard.getContents(getInstance()) != null;
+        final TransferData[] availableTypes = clipboard.getAvailableTypes();
+        for (final TransferData data : availableTypes) {
+            VariablesTransfer.getInstance().isSupportedType(data);
+        }
+
+        return clipboard != null && !clipboard.isDisposed() && clipboardContainVariables(clipboard);
+    }
+
+    private static boolean clipboardContainVariables(final Clipboard clipboard) {
+        final TransferData[] availableTypes = clipboard.getAvailableTypes();
+        for (final TransferData data : availableTypes) {
+            if (getInstance().isSupportedType(data)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -54,25 +69,16 @@ public class VariablesTransfer extends ByteArrayTransfer {
             return;
         }
         final RobotVariable[] objects = (RobotVariable[]) data;
-        final int count = objects.length;
 
-        try {
-            final ByteArrayOutputStream out = new ByteArrayOutputStream();
-            final ObjectOutputStream objectOut = new ObjectOutputStream(out);
+        try (final ByteArrayOutputStream out = new ByteArrayOutputStream();
+                final ObjectOutputStream objectOut = new ObjectOutputStream(out)) {
 
-            // write the number of resources
-            objectOut.writeInt(count);
-
-            // write each object
+            objectOut.writeInt(objects.length);
             for (int i = 0; i < objects.length; i++) {
                 objectOut.writeObject(objects[i]);
             }
 
-            // cleanup
-            objectOut.close();
-            out.close();
-            final byte[] bytes = out.toByteArray();
-            super.javaToNative(bytes, transferData);
+            super.javaToNative(out.toByteArray(), transferData);
         } catch (final IOException e) {
             StatusManager.getManager().handle(
                     new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
@@ -89,15 +95,13 @@ public class VariablesTransfer extends ByteArrayTransfer {
         if (bytes == null) {
             return new RobotVariable[0];
         }
-        try {
-            final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes));
+
+        try (final ObjectInputStream in = new ObjectInputStream(new ByteArrayInputStream(bytes))) {
             final int count = in.readInt();
             final RobotVariable[] objects = new RobotVariable[count];
             for (int i = 0; i < count; i++) {
                 objects[i] = (RobotVariable) in.readObject();
-                objects[i].fixParents();
             }
-            in.close();
             return objects;
         } catch (ClassNotFoundException | IOException e) {
             StatusManager.getManager().handle(

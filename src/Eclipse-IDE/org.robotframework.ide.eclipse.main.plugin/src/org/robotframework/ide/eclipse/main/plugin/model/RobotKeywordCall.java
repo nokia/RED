@@ -73,10 +73,6 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         this.parent = parent;
     }
 
-    public void fixParents() {
-        // nothing to fix
-    }
-
     void fixParents(final IRobotCodeHoldingElement parent) {
         this.parent = parent;
     }
