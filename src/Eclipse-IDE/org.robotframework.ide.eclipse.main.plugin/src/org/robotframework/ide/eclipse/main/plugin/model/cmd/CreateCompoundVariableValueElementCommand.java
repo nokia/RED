@@ -41,7 +41,6 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
         if (variable.getType() == VariableType.SCALAR_AS_LIST) {
             final ScalarVariable var = (ScalarVariable) variable.getLinkedElement();
             var.addValue(RobotToken.create(newElementContent));
-            var.addValue(RobotToken.create(newElementContent));
 
         } else if (variable.getType() == VariableType.LIST) {
             final ListVariable var = (ListVariable) variable.getLinkedElement();
