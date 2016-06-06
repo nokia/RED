@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPar
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.nattable.VariablesEditorPart.VariablesEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart.VariablesEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
