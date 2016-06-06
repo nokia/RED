@@ -37,7 +37,7 @@ public class MoveVariableDownCommandTest {
         assertThat(varSection.getChildren()).hasSize(5);
         assertThat(varSection.getChildren().indexOf(variableToMove)).isEqualTo(4);
 
-        final VariableTable varTable = (VariableTable) varSection.getLinkedElement();
+        final VariableTable varTable = varSection.getLinkedElement();
         assertThat(varTable.getVariables().get(0).getName()).isEqualTo("scalar");
         assertThat(varTable.getVariables().get(1).getName()).isEqualTo("scalar_as_list");
         assertThat(varTable.getVariables().get(2).getName()).isEqualTo("list");
@@ -62,7 +62,7 @@ public class MoveVariableDownCommandTest {
         assertThat(varSection.getChildren()).hasSize(5);
         assertThat(varSection.getChildren().indexOf(variableToMove)).isEqualTo(1);
 
-        final VariableTable varTable = (VariableTable) varSection.getLinkedElement();
+        final VariableTable varTable = varSection.getLinkedElement();
         assertThat(varTable.getVariables().get(0).getName()).isEqualTo("scalar_as_list");
         assertThat(varTable.getVariables().get(1).getName()).isEqualTo("scalar");
         assertThat(varTable.getVariables().get(2).getName()).isEqualTo("list");
@@ -87,7 +87,7 @@ public class MoveVariableDownCommandTest {
         assertThat(varSection.getChildren()).hasSize(5);
         assertThat(varSection.getChildren().indexOf(variableToMove)).isEqualTo(3);
 
-        final VariableTable varTable = (VariableTable) varSection.getLinkedElement();
+        final VariableTable varTable = varSection.getLinkedElement();
         assertThat(varTable.getVariables().get(0).getName()).isEqualTo("scalar");
         assertThat(varTable.getVariables().get(1).getName()).isEqualTo("scalar_as_list");
         assertThat(varTable.getVariables().get(2).getName()).isEqualTo("dict");

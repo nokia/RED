@@ -57,7 +57,7 @@ public class DeleteVariableCommandTest {
         assertThat(variablesSection.findChild("dict")).isNull();
         assertThat(variablesSection.findChild("invalid}")).isNotNull();
         
-        final VariableTable varTable = (VariableTable) variablesSection.getLinkedElement();
+        final VariableTable varTable = variablesSection.getLinkedElement();
         assertThat(varTable.getVariables()).hasSize(3);
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_REMOVED, variablesSection);
