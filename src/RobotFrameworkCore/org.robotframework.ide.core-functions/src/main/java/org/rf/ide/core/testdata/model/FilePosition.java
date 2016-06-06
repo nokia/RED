@@ -5,10 +5,12 @@
  */
 package org.rf.ide.core.testdata.model;
 
+import java.io.Serializable;
+
 import org.rf.ide.core.testdata.model.table.ECompareResult;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 
-public class FilePosition {
+public class FilePosition implements Serializable {
 
     public static final int NOT_SET = IRobotLineElement.NOT_SET;
 
@@ -18,7 +20,7 @@ public class FilePosition {
 
     private final int offset;
 
-    public FilePosition(int line, int column, int offset) {
+    public FilePosition(final int line, final int column, final int offset) {
         this.line = line;
         this.column = column;
         this.offset = offset;
@@ -49,28 +51,28 @@ public class FilePosition {
         return (getLine() == NOT_SET && getColumn() == NOT_SET && getOffset() == NOT_SET);
     }
 
-    public boolean isBefore(FilePosition other) {
+    public boolean isBefore(final FilePosition other) {
         return (compare(other) == ECompareResult.LESS_THAN.getValue());
     }
 
-    public boolean isAfter(FilePosition other) {
+    public boolean isAfter(final FilePosition other) {
         return (compare(other) == ECompareResult.GREATER_THAN.getValue());
     }
 
-    public boolean isSamePlace(FilePosition other) {
+    public boolean isSamePlace(final FilePosition other) {
         return (compare(other) == ECompareResult.EQUAL_TO.getValue());
     }
 
-    public int compare(FilePosition other) {
+    public int compare(final FilePosition other) {
         return compare(other, true);
     }
 
-    public int compare(FilePosition other, boolean shouldCheckOffset) {
+    public int compare(final FilePosition other, final boolean shouldCheckOffset) {
         ECompareResult result;
         if (other != null) {
-            int otherOffset = other.getOffset();
-            int otherLine = other.getLine();
-            int otherColumn = other.getColumn();
+            final int otherOffset = other.getOffset();
+            final int otherLine = other.getLine();
+            final int otherColumn = other.getColumn();
 
             if (shouldCheckOffset) {
                 result = compare(offset, otherOffset);
@@ -95,7 +97,7 @@ public class FilePosition {
         return result.getValue();
     }
 
-    private ECompareResult compare(int valuePosO1, int valuePosO2) {
+    private ECompareResult compare(final int valuePosO1, final int valuePosO2) {
         ECompareResult result;
         if (valuePosO1 != NOT_SET && valuePosO2 != NOT_SET) {
             result = ECompareResult.map(Integer.compare(valuePosO1, valuePosO2));

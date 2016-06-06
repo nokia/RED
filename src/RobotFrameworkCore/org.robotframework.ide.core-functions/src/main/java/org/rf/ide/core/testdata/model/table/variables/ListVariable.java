@@ -60,4 +60,21 @@ public class ListVariable extends AVariable {
 
         return tokens;
     }
+
+    @Override
+    public ListVariable copy() {
+        final RobotToken dec = RobotToken.create(
+                VariableType.LIST.getIdentificator() + "{" + getName() + "}", getDeclaration().getTypes());
+
+        final ListVariable list = new ListVariable(getName(), dec, getScope());
+        for (final RobotToken valueToken : getItems()) {
+            final RobotToken token = RobotToken.create(valueToken.getText(), valueToken.getTypes());
+            list.addItem(token);
+        }
+        for (final RobotToken commentToken : getComment()) {
+            final RobotToken token = RobotToken.create(commentToken.getText(), commentToken.getTypes());
+            list.addCommentPart(token);
+        }
+        return list;
+    }
 }
