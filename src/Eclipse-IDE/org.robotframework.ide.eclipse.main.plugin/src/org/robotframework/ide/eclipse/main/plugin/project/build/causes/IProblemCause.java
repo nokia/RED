@@ -5,11 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.causes;
 
-import static com.google.common.collect.Iterables.retainAll;
-
 import java.util.List;
-
-import javax.print.attribute.standard.RequestingUserName;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;

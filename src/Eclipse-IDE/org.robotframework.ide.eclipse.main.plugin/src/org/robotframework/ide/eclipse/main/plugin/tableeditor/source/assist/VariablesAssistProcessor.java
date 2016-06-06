@@ -17,8 +17,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
@@ -66,7 +64,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             final String content = variable.isPresent()
                     ? document.get(variable.get().getOffset(), variable.get().getLength()) : "";
 
-            List<RedVariableProposal> variableProposals = assist.getVariables(offset);
+            final List<RedVariableProposal> variableProposals = assist.getVariables(offset);
             removeInvisibleGlobalVariables(variableProposals, getVirtualContentType(document, offset));
             
             final List<ICompletionProposal> proposals = newArrayList();

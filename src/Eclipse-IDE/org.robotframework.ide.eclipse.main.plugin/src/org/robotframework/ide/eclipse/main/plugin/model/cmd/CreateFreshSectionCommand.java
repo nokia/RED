@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshSectionCommand extends EditorCommand {
@@ -22,8 +21,7 @@ public class CreateFreshSectionCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final RobotSuiteFileSection section = suite.createRobotSection(sectionName);
-        
+        suite.createRobotSection(sectionName);
         eventBroker.post(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED, suite);
     }
 }

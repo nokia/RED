@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
@@ -19,7 +18,7 @@ public class SettingsMatchesCollection extends HeaderFilterMatchesCollection {
             collectMatches((RobotKeywordCall) element, filter);
         } else if (element instanceof RobotSettingsSection) {
             for (final RobotKeywordCall setting : ((RobotSettingsSection) element).getChildren()) {
-                collectMatches((RobotSetting) setting, filter);
+                collectMatches(setting, filter);
             }
         }
     }
