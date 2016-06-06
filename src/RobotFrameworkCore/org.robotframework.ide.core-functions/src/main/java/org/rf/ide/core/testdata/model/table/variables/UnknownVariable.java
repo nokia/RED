@@ -63,4 +63,20 @@ public class UnknownVariable extends AVariable {
 
         return tokens;
     }
+
+    @Override
+    public UnknownVariable copy() {
+        final RobotToken dec = RobotToken.create(getName(), getDeclaration().getTypes());
+
+        final UnknownVariable unknown = new UnknownVariable(getName(), dec, getScope());
+        for (final RobotToken valueToken : getItems()) {
+            final RobotToken token = RobotToken.create(valueToken.getText(), valueToken.getTypes());
+            unknown.addItem(token);
+        }
+        for (final RobotToken commentToken : getComment()) {
+            final RobotToken token = RobotToken.create(commentToken.getText(), commentToken.getTypes());
+            unknown.addCommentPart(token);
+        }
+        return unknown;
+    }
 }

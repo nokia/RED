@@ -5,7 +5,9 @@
  */
 package org.rf.ide.core.testdata.text.read.recognizer;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,7 +16,7 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
 
-public class RobotToken implements IRobotLineElement {
+public class RobotToken implements IRobotLineElement, Serializable {
 
     private FilePosition fp = new FilePosition(NOT_SET, NOT_SET, NOT_SET);
 
@@ -27,6 +29,19 @@ public class RobotToken implements IRobotLineElement {
     private boolean isDirty = false;
 
     private boolean wasFirstInit = false;
+
+    public static RobotToken create(final String rawAndText) {
+        return create(rawAndText, new ArrayList<IRobotTokenType>());
+    }
+
+    public static RobotToken create(final String rawAndText, final Collection<? extends IRobotTokenType> types) {
+        final RobotToken token = new RobotToken();
+        token.setRaw(rawAndText);
+        token.setText(rawAndText);
+        token.getTypes().clear();
+        token.getTypes().addAll(types);
+        return token;
+    }
 
     public RobotToken() {
         types.add(RobotTokenType.UNKNOWN);

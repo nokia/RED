@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.variables;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +19,7 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public abstract class AVariable extends AModelElement<VariableTable> implements IVariableHolder {
+public abstract class AVariable extends AModelElement<VariableTable> implements IVariableHolder, Serializable {
 
     protected VariableType type;
 
@@ -89,6 +90,8 @@ public abstract class AVariable extends AModelElement<VariableTable> implements 
     public RobotToken getDeclaration() {
         return declaration;
     }
+
+    public abstract AVariable copy();
 
     public enum VariableScope {
         /**
