@@ -59,7 +59,7 @@ class VariablesTableValidator implements ModelUnitValidator {
         if (!variablesSection.isPresent()) {
             return;
         }
-        final VariableTable variableTable = (VariableTable) variablesSection.get().getLinkedElement();
+        final VariableTable variableTable = variablesSection.get().getLinkedElement();
 
         reportVersionSpecificProblems(variableTable, monitor);
 
