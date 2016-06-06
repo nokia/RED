@@ -28,7 +28,7 @@ public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvid
 
     private SortedList<RobotKeywordCall> importSettings;
     
-    private ImportSettingsColumnsPropertyAccessor propertyAccessor;
+    private final ImportSettingsColumnsPropertyAccessor propertyAccessor;
 
     public ImportSettingsDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotSettingsSection section) {
@@ -161,7 +161,7 @@ public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvid
 
     private int calculateLongestArgumentsLength() {
         int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
-        final List<?> elements = (List<?>) importSettings;
+        final List<?> elements = importSettings;
         if (elements != null) {
             for (final Object element : elements) {
                 final RobotSetting setting = (RobotSetting) element;
