@@ -40,5 +40,12 @@ public class AddingElementStyleConfigurationTest {
                 eq(DisplayMode.SELECT), eq(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(ICellPainter.class),
                 eq(DisplayMode.NORMAL), eq(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+
+        verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
+                eq(DisplayMode.NORMAL), eq(AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL));
+        verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
+                eq(DisplayMode.SELECT), eq(AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL));
+        verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(ICellPainter.class),
+                eq(DisplayMode.NORMAL), eq(AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL));
     }
 }
