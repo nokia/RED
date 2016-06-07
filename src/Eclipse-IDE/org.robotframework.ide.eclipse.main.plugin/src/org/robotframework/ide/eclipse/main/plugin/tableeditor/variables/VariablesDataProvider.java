@@ -9,9 +9,11 @@ import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesMatchesCollection.VariableFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesTableAdderStatesConfiguration.VariablesAdderState;
 
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -22,7 +24,8 @@ import ca.odell.glazedlists.SortedList;
  */
 public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Object> {
 
-    private static final Object ADDING_TOKEN = new Object();
+    private final AddingToken addingToken = new AddingToken(VariablesAdderState.SCALAR, VariablesAdderState.LIST,
+            VariablesAdderState.DICTIONARY);
 
     private RobotVariablesSection section;
     private SortedList<RobotVariable> variables;
@@ -73,12 +76,11 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
     @Override
     public Object getDataValue(final int column, final int row) {
         if (section != null) {
-            if (row == variables.size() - countInvisible()) {
-                return column == 0 ? "...add new scalar" : "";
-            }
-            final Object variable = getRowObject(row);
-            if (variable instanceof RobotVariable) {
-                return propertyAccessor.getDataValue((RobotVariable) variable, column);
+            final Object element = getRowObject(row);
+            if (element instanceof RobotVariable) {
+                return propertyAccessor.getDataValue((RobotVariable) element, column);
+            } else if (element instanceof AddingToken && column == 0) {
+                return ((AddingToken) element).getLabel();
             }
         }
         return "";
@@ -129,7 +131,7 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
             }
             return rowObject;
         } else if (rowIndex == variables.size()) {
-            return ADDING_TOKEN;
+            return addingToken;
         }
         return null;
     }
@@ -148,7 +150,7 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
                 }
             }
             return filteredIndex;
-        } else if (rowObject == ADDING_TOKEN) {
+        } else if (rowObject == addingToken) {
             return variables.size();
         }
         return -1;
@@ -160,5 +162,13 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
 
     void setMatches(final HeaderFilterMatchesCollection matches) {
         this.filter = matches == null ? null : new VariableFilter(matches);
+    }
+
+    void switchAddderToNextState() {
+        addingToken.switchToNext();
+    }
+
+    public VariablesAdderState getAdderState() {
+        return (VariablesAdderState) addingToken.getState();
     }
 }

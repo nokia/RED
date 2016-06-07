@@ -18,8 +18,8 @@ public class CreateFreshVariableCommand extends EditorCommand {
 
     private final VariableType variableType;
 
-    public CreateFreshVariableCommand(final RobotVariablesSection variablesSection) {
-        this(variablesSection, -1, VariableType.SCALAR);
+    public CreateFreshVariableCommand(final RobotVariablesSection variablesSection, final VariableType variableType) {
+        this(variablesSection, -1, variableType);
     }
 
     public CreateFreshVariableCommand(final RobotVariablesSection variablesSection, final int index,
