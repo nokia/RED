@@ -119,7 +119,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 270, 270,
-                new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider),
+                new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider, true),
                 new VariableTypesAndColumnsLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
@@ -146,10 +146,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(
-                new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
-        gridLayer
-                .addConfiguration(new VariableValuesEditConfiguration(theme, dataProvider, commandsStack));
+        gridLayer.addConfiguration(new VariablesTableAdderStatesConfiguration(dataProvider));
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
+        gridLayer.addConfiguration(new VariableValuesEditConfiguration(theme, dataProvider, commandsStack));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 
@@ -212,16 +211,19 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             @Override
             public RobotVariable createNew() {
                 final PositionCoordinate selectedCellPosition = selectionLayer.getLastSelectedCellPosition();
-                final int selectedCellColumn = selectedCellPosition.columnPosition;
-                final int selectedCellRow = selectedCellPosition.rowPosition;
+                final int selectedCellColumn = selectedCellPosition == null ? -1 : selectedCellPosition.columnPosition;
+                final int selectedCellRow = selectedCellPosition == null ? -1 : selectedCellPosition.rowPosition;
 
                 final RobotVariablesSection section = dataProvider.getInput();
-                commandsStack.execute(new CreateFreshVariableCommand(section));
+                commandsStack.execute(
+                        new CreateFreshVariableCommand(section, dataProvider.getAdderState().getVariableType()));
 
                 SwtThread.asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        selectionLayer.selectCell(selectedCellColumn, selectedCellRow, false, false);
+                        if (selectedCellColumn > 0 && selectedCellRow > 0) {
+                            selectionLayer.selectCell(selectedCellColumn, selectedCellRow, false, false);
+                        }
                         // table.doCommand(new EditSelectionCommand(table,
                         // table.getConfigRegistry()));
                     }

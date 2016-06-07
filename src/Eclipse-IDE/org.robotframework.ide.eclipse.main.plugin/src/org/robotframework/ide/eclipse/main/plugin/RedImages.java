@@ -330,6 +330,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/sort_down.png");
     }
 
+    public static ImageDescriptor getAdderStateChangeImage() {
+        return RedPlugin.getImageDescriptor("resources/adder_state_change.png");
+    }
+
     public static ImageDescriptor getImageForFileWithExtension(final String extension) {
         final String extWithoutDot = extension.startsWith(".") ? extension.substring(1) : extension;
         return PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor("file." + extWithoutDot);

@@ -976,12 +976,6 @@
           parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
     </context>
     <context
-          description="Temporary context for Variables NatTable section editor page"
-          id="org.robotframework.ide.eclipse.tableeditor.variables.context2"
-          name="Variables NT Editor Context"
-          parentId="org.robotframework.ide.eclipse.tableeditor.tables.context">
-    </context>
-    <context
           description="Context for Test Cases section editor page"
           id="org.robotframework.ide.eclipse.tableeditor.cases.context"
           name="Test Cases Editor Context"

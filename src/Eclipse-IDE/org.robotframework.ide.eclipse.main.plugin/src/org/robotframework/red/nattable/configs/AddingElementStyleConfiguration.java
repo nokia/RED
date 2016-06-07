@@ -36,6 +36,8 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
 
     public static final String ELEMENT_ADDER_CONFIG_LABEL = "ELEMENT_ADDER";
 
+    public static final String ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL = "ELEMENT_ADDER_MULTISTATE";
+
     public static final String ELEMENT_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW";
 
     private final Font font;
@@ -62,18 +64,40 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
                 ELEMENT_ADDER_CONFIG_LABEL);
 
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
+                ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
+                ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
+
         final ImageDescriptor addImage = RedImages.getAddImage();
         final Image imageToUse = ImagesManager.getImage(isEditable ? addImage : RedImages.getGreyedImage(addImage));
 
         final ICellPainter cellPainter = new CellPainterDecorator(new TextPainter(false, true, 2), CellEdgeEnum.LEFT,
                 new ImagePainter(imageToUse));
+
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
                 ELEMENT_ADDER_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new DropdownPainter(cellPainter),
+                DisplayMode.NORMAL, ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
     }
 
     private Font getFont(final Font fontToReuse, final int style) {
         final Font currentFont = fontToReuse == null ? Display.getCurrent().getSystemFont() : fontToReuse;
         final FontDescriptor fontDescriptor = FontDescriptor.createFrom(currentFont).setStyle(style);
         return FontsManager.getFont(fontDescriptor);
+    }
+
+    private static class DropdownPainter extends CellPainterDecorator {
+
+        public DropdownPainter(final ICellPainter cellPainter) {
+            super(cellPainter, CellEdgeEnum.RIGHT, new DropdownImagePainter());
+        }
+    }
+
+    public static class DropdownImagePainter extends ImagePainter {
+
+        public DropdownImagePainter() {
+            super(ImagesManager.getImage(RedImages.getAdderStateChangeImage()));
+        }
     }
 }
