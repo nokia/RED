@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.model.presenter;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
@@ -58,7 +59,7 @@ public class DocumentationServiceHandler {
                 }
             }
 
-            if (currentLineNr != tokenLineNr) {
+            if (currentLineNr != tokenLineNr && tokenLineNr != FilePosition.NOT_SET) {
                 text.append("\n");
                 currentLineNr = tokenLineNr;
             } else if (tokId > 0) {
