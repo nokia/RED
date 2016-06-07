@@ -132,11 +132,7 @@ public class RedFileWatcher {
                         WatchKey key;
                         try {
                             key = watcher.take();
-                        } catch (final InterruptedException e) {
-                            break;
-                        } catch (final ClosedWatchServiceException e1) {
-                            watcher = null;
-                            e1.printStackTrace();
+                        } catch (InterruptedException | ClosedWatchServiceException e) {
                             break;
                         }
                         for (WatchEvent<?> event : key.pollEvents()) {
@@ -167,6 +163,7 @@ public class RedFileWatcher {
                         }
                     }
                     isEventProducerThreadStarted.set(false);
+                    closeWatchService();
                     sendWatchServiceInterruptedEvent();
                 }
             }).start();
@@ -194,6 +191,7 @@ public class RedFileWatcher {
                         }
                     }
                     isEventConsumerThreadStarted.set(false);
+                    closeWatchService();
                     sendWatchServiceInterruptedEvent();
                 }
             }).start();
