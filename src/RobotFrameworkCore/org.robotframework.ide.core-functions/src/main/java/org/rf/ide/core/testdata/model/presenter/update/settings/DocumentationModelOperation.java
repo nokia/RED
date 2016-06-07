@@ -44,8 +44,6 @@ public class DocumentationModelOperation implements ISettingTableElementOperatio
         final SuiteDocumentation suiteDocumentation = (SuiteDocumentation) modelElement;
         if (index >= 0) {
             suiteDocumentation.setDocumentationText(index, value);
-        } else {
-            suiteDocumentation.setComment(value);
         }
     }
 
