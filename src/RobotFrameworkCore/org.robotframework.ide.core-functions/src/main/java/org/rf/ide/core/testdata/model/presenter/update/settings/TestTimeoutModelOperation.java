@@ -49,8 +49,6 @@ public class TestTimeoutModelOperation implements ISettingTableElementOperation 
             testTimeout.setTimeout(value);
         } else if (index > 0) {
             testTimeout.setMessageArgument(index - 1, value);
-        } else {
-            testTimeout.setComment(value);
         }
     }
 

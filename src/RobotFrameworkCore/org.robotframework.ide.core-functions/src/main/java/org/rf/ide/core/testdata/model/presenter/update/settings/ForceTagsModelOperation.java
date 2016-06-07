@@ -45,8 +45,6 @@ public class ForceTagsModelOperation implements ISettingTableElementOperation {
         final ForceTags forceTags = (ForceTags) modelElement;
         if (index >= 0) {
             forceTags.setTag(index, value);
-        } else {
-            forceTags.setComment(value);
         }
     }
 

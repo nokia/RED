@@ -50,8 +50,6 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
             libraryImport.setPathOrName(value);
         } else if (index > 0) {
             libraryImport.setArguments(index - 1, value);
-        } else {
-            libraryImport.setComment(value);
         }
     }
 

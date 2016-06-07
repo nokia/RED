@@ -45,8 +45,6 @@ public class DefaultTagsModelOperation implements ISettingTableElementOperation 
         final DefaultTags defaultTags = (DefaultTags) modelElement;
         if (index >= 0) {
             defaultTags.setTag(index, value);
-        } else {
-            defaultTags.setComment(value);
         }
     }
 

@@ -13,6 +13,8 @@ import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
@@ -158,11 +160,13 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 args.add(metadataKey.getText().toString());
             }
             args.addAll(Lists.transform(metadataSetting.getValues(), TokenFunctions.tokenToString()));
-            final RobotSetting setting = new RobotSetting(this, SettingsGroup.METADATA, name, args, "");
+            final String comment = CommentServiceHandler.consolidate(metadataSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotSetting setting = new RobotSetting(this, SettingsGroup.METADATA, name, args, comment);
             setting.link(metadataSetting);
             elements.add(setting);
         }
         for (final AImported importSetting : settingsTable.getImports()) {
+            final String comment = CommentServiceHandler.consolidate(importSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
             if (importSetting instanceof LibraryImport) {
 
                 final LibraryImport libraryImport = (LibraryImport) importSetting;
@@ -175,7 +179,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 }
                 args.addAll(Lists.transform(libraryImport.getArguments(), TokenFunctions.tokenToString()));
 
-                final RobotSetting setting = new RobotSetting(this, SettingsGroup.LIBRARIES, name, args, "");
+                final RobotSetting setting = new RobotSetting(this, SettingsGroup.LIBRARIES, name, args, comment);
                 setting.link(libraryImport);
                 elements.add(setting);
             } else if (importSetting instanceof ResourceImport) {
@@ -189,7 +193,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                     args.add(pathOrName.getText().toString());
                 }
 
-                final RobotSetting setting = new RobotSetting(this, SettingsGroup.RESOURCES, name, args, "");
+                final RobotSetting setting = new RobotSetting(this, SettingsGroup.RESOURCES, name, args, comment);
                 setting.link(resourceImport);
                 elements.add(setting);
             } else if (importSetting instanceof VariablesImport) {
@@ -204,7 +208,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 }
                 args.addAll(Lists.transform(variablesImport.getArguments(), TokenFunctions.tokenToString()));
 
-                final RobotSetting setting = new RobotSetting(this, SettingsGroup.VARIABLES, name, args, "");
+                final RobotSetting setting = new RobotSetting(this, SettingsGroup.VARIABLES, name, args, comment);
                 setting.link(variablesImport);
                 elements.add(setting);
             }
@@ -215,7 +219,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             final String name = suiteDocumentation.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(suiteDocumentation.getDocumentationText(), TokenFunctions.tokenToString()));
-            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            final String comment = CommentServiceHandler.consolidate(suiteDocumentation, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(suiteDocumentation);
             elements.add(setting);
         }
@@ -227,7 +232,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 args.add(settingKeywordName.getText().toString());
             }
             args.addAll(Lists.transform(keywordSetting.getArguments(), TokenFunctions.tokenToString()));
-            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            final String comment = CommentServiceHandler.consolidate(keywordSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(keywordSetting);
             elements.add(setting);
         }
@@ -235,7 +241,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             final String name = tagSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(tagSetting.getTags(), TokenFunctions.tokenToString()));
-            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            final String comment = CommentServiceHandler.consolidate(tagSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(tagSetting);
             elements.add(setting);
         }
@@ -246,7 +253,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             if (templateKeyword != null) {
                 args.add(templateKeyword.getText().toString());
             }
-            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            final String comment = CommentServiceHandler.consolidate(templateSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(templateSetting);
             elements.add(setting);
         }
@@ -260,7 +268,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 args.add(timeout.getText().toString());
             }
             args.addAll(Lists.transform(testTimeout.getMessageArguments(), TokenFunctions.tokenToString()));
-            final RobotSetting setting = new RobotSetting(this, name, args, "");
+            final String comment = CommentServiceHandler.consolidate(testTimeout, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(testTimeout);
             elements.add(setting);
         }
