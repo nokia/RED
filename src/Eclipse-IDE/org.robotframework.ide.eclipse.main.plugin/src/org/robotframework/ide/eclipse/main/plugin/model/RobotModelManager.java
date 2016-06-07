@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.fileWatcher.RedFileWatcher;
 
 public final class RobotModelManager {
 
@@ -30,6 +31,8 @@ public final class RobotModelManager {
                 changes = InstanceHolder.INSTANCE.getModel().synchronizeChanges(event.getDelta());
 
                 notifyAboutChanges(changes);
+            } else if (event.getType() == IResourceChangeEvent.PRE_DELETE) {
+                RedFileWatcher.getInstance().closeWatchService();
             }
         }
 
