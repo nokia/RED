@@ -32,9 +32,10 @@ import com.google.common.collect.Iterables;
 
 public class RobotVariable implements RobotFileInternalElement, Serializable {
 
+    // this has to be transient in order not to try serializing whole model instead of simply
+    // its small part
     private transient RobotVariablesSection parent;
 
-    // FIXME : this would cause problems when copy&paste
     private IVariableHolder holder;
 
     RobotVariable(final RobotVariablesSection parent, final IVariableHolder variableHolder) {
