@@ -16,7 +16,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.MetadataM
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
 
-class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<RobotKeywordCall> {
+class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Object> {
+    
+    private static final Object ADDING_TOKEN = new Object();
 
     private RobotSettingsSection section;
 
@@ -63,8 +65,10 @@ class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Ro
             if (rowIndex == metadataSettings.size() - countInvisible()) {
                 return columnIndex == 0 ? "...add new metadata" : "";
             }
-            final RobotKeywordCall metadataSetting = getRowObject(rowIndex);
-            return propertyAccessor.getDataValue(metadataSetting, columnIndex);
+            final Object metadataSetting = getRowObject(rowIndex);
+            if (metadataSetting instanceof RobotKeywordCall) {
+                return propertyAccessor.getDataValue((RobotKeywordCall) metadataSetting, columnIndex);
+            }
         }
         return "";
     }
@@ -92,12 +96,14 @@ class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Ro
         if (newValue instanceof RobotKeywordCall) {
             return;
         }
-        final RobotKeywordCall metadataSetting = getRowObject(rowIndex);
-        propertyAccessor.setDataValue(metadataSetting, columnIndex, newValue);
+        final Object metadataSetting = getRowObject(rowIndex);
+        if (metadataSetting instanceof RobotKeywordCall) {
+            propertyAccessor.setDataValue((RobotKeywordCall) metadataSetting, columnIndex, newValue);
+        }
     }
 
     @Override
-    public RobotKeywordCall getRowObject(final int rowIndex) {
+    public Object getRowObject(final int rowIndex) {
         if (section != null && rowIndex < metadataSettings.size()) {
             RobotKeywordCall rowObject = null;
 
@@ -111,12 +117,14 @@ class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Ro
                 realRowIndex++;
             }
             return rowObject;
+        } else if (rowIndex == metadataSettings.size()) {
+            return ADDING_TOKEN;
         }
         return null;
     }
 
     @Override
-    public int indexOfRowObject(final RobotKeywordCall rowObject) {
+    public int indexOfRowObject(final Object rowObject) {
         if (section != null) {
             final int realRowIndex = metadataSettings.indexOf(rowObject);
             int filteredIndex = realRowIndex;
@@ -129,6 +137,8 @@ class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Ro
                 }
             }
             return filteredIndex;
+        } else if (rowObject == ADDING_TOKEN) {
+            return metadataSettings.size();
         }
         return -1;
     }
