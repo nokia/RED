@@ -11,13 +11,14 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public abstract class AImported extends AModelElement<SettingTable> {
+public abstract class AImported extends AModelElement<SettingTable> implements ICommentHolder {
 
     private final Type type;
 
@@ -35,14 +36,14 @@ public abstract class AImported extends AModelElement<SettingTable> {
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
-    
+
     public void setComment(final String comment) {
         RobotToken token = new RobotToken();
         token.setText(comment);
 
         setComment(token);
     }
-    
+
     public void setComment(final RobotToken rt) {
         this.comment.clear();
         addCommentPart(rt);
@@ -51,6 +52,16 @@ public abstract class AImported extends AModelElement<SettingTable> {
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
+    }
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
     }
 
     @Override
@@ -65,7 +76,7 @@ public abstract class AImported extends AModelElement<SettingTable> {
     public void setPathOrName(final RobotToken pathOrName) {
         this.pathOrName = updateOrCreate(this.pathOrName, pathOrName, type.getPathOrFileNameType());
     }
-    
+
     public void setPathOrName(final String pathOrName) {
         this.pathOrName = updateOrCreate(this.pathOrName, pathOrName, type.getPathOrFileNameType());
     }

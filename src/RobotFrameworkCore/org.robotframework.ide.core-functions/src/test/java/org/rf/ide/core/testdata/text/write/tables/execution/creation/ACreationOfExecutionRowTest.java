@@ -94,9 +94,9 @@ public abstract class ACreationOfExecutionRowTest {
         RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
 
-        robotExecutableRow.addComment(cm1);
-        robotExecutableRow.addComment(cm2);
-        robotExecutableRow.addComment(cm3);
+        robotExecutableRow.addCommentPart(cm1);
+        robotExecutableRow.addCommentPart(cm2);
+        robotExecutableRow.addCommentPart(cm3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileStore.getCommentOnlyCmpFile(),
@@ -134,9 +134,9 @@ public abstract class ACreationOfExecutionRowTest {
         RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
 
-        robotExecutableRow.addComment(cm1);
-        robotExecutableRow.addComment(cm2);
-        robotExecutableRow.addComment(cm3);
+        robotExecutableRow.addCommentPart(cm1);
+        robotExecutableRow.addCommentPart(cm2);
+        robotExecutableRow.addCommentPart(cm3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileStore.getActionWithCommentCmpFile(),
@@ -212,9 +212,9 @@ public abstract class ACreationOfExecutionRowTest {
         RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
 
-        robotExecutableRow.addComment(cm1);
-        robotExecutableRow.addComment(cm2);
-        robotExecutableRow.addComment(cm3);
+        robotExecutableRow.addCommentPart(cm1);
+        robotExecutableRow.addCommentPart(cm2);
+        robotExecutableRow.addCommentPart(cm3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileStore.getActionWithOneArgAndCommentCmpFile(),
@@ -304,9 +304,9 @@ public abstract class ACreationOfExecutionRowTest {
         RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
 
-        robotExecutableRow.addComment(cm1);
-        robotExecutableRow.addComment(cm2);
-        robotExecutableRow.addComment(cm3);
+        robotExecutableRow.addCommentPart(cm1);
+        robotExecutableRow.addCommentPart(cm2);
+        robotExecutableRow.addCommentPart(cm3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileStore.getActionWithThreeArgAndCommentCmpFile(),

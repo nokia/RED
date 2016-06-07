@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.model.table.VariableTable;
@@ -19,7 +20,10 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public abstract class AVariable extends AModelElement<VariableTable> implements IVariableHolder, Serializable {
+public abstract class AVariable extends AModelElement<VariableTable>
+        implements IVariableHolder, ICommentHolder, Serializable {
+
+    private static final long serialVersionUID = 3690914169761757467L;
 
     protected VariableType type;
 
@@ -74,8 +78,27 @@ public abstract class AVariable extends AModelElement<VariableTable> implements 
         this.comment.set(position, rt);
     }
 
-    public void removeCommentPart(final RobotToken rt) {
-        this.comment.remove(rt);
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
+    }
+
+    @Override
+    public void setComment(RobotToken comment) {
+        this.comment.clear();
+        addCommentPart(comment);
+    }
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
     }
 
     public boolean moveCommentPartLeft(final RobotToken rt) {

@@ -11,13 +11,14 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.IDataDrivenSetting;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestTemplate extends AModelElement<SettingTable> implements IDataDrivenSetting {
+public class TestTemplate extends AModelElement<SettingTable> implements IDataDrivenSetting, ICommentHolder {
 
     private final RobotToken declaration;
 
@@ -47,18 +48,20 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
     }
 
     public void setKeywordName(final RobotToken keywordName) {
-        this.keywordName = updateOrCreate(this.keywordName, keywordName, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
+        this.keywordName = updateOrCreate(this.keywordName, keywordName,
+                RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
     }
-    
+
     public void setKeywordName(final String keywordName) {
-        this.keywordName = updateOrCreate(this.keywordName, keywordName, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
+        this.keywordName = updateOrCreate(this.keywordName, keywordName,
+                RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_NAME);
     }
 
     @Override
     public List<RobotToken> getUnexpectedTrashArguments() {
         return Collections.unmodifiableList(unexpectedTrashArguments);
     }
-    
+
     public void addUnexpectedTrashArgument(final String trashArgument) {
         RobotToken rt = new RobotToken();
         rt.setText(trashArgument);
@@ -70,13 +73,15 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
         fixForTheType(trashArgument, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, true);
         this.unexpectedTrashArguments.add(trashArgument);
     }
-    
+
     public void setUnexpectedTrashArgument(final int index, final String argument) {
-        updateOrCreateTokenInside(unexpectedTrashArguments, index, argument, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
+        updateOrCreateTokenInside(unexpectedTrashArguments, index, argument,
+                RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
     }
 
     public void setUnexpectedTrashArgument(final int index, final RobotToken argument) {
-        updateOrCreateTokenInside(unexpectedTrashArguments, index, argument, RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
+        updateOrCreateTokenInside(unexpectedTrashArguments, index, argument,
+                RobotTokenType.SETTING_TEST_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
     }
 
     @Override
@@ -88,17 +93,28 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
         fixComment(getComment(), rt);
         this.comment.add(rt);
     }
-    
-    public void setComment(final String comment) {
-        RobotToken token = new RobotToken();
-        token.setText(comment);
 
-        setComment(token);
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
     }
-    
-    public void setComment(final RobotToken rt) {
+
+    @Override
+    public void setComment(RobotToken comment) {
         this.comment.clear();
-        addCommentPart(rt);
+        addCommentPart(comment);
+    }
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
     }
 
     @Override

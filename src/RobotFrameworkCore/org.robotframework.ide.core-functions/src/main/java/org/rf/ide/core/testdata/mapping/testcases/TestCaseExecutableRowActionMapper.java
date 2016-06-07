@@ -59,7 +59,7 @@ public class TestCaseExecutableRowActionMapper implements IParsingMapper {
             types.remove(RobotTokenType.TEST_CASE_ACTION_NAME);
             types.add(0, RobotTokenType.TEST_CASE_ACTION_ARGUMENT);
             types.add(RobotTokenType.START_HASH_COMMENT);
-            row.addComment(rt);
+            row.addCommentPart(rt);
         } else {
             row.setAction(rt);
         }
