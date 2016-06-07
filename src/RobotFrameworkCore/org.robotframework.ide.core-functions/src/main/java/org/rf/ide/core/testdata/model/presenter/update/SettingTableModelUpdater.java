@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ICommentHolder;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.settings.DefaultTagsModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.settings.DocumentationModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.settings.ForceTagsModelOperation;
@@ -47,7 +50,9 @@ public class SettingTableModelUpdater {
     }
     
     public void updateComment(final AModelElement<?> modelElement, final String value) {
-        update(modelElement, -1, value);
+        if (modelElement != null) {
+            CommentServiceHandler.update((ICommentHolder) modelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, value);
+        }
     }
 
     public AModelElement<?> create(final ARobotSectionTable sectionTable, final String settingName,

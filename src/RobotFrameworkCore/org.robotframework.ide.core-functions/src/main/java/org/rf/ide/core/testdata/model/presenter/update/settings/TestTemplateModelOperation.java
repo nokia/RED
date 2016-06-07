@@ -49,8 +49,6 @@ public class TestTemplateModelOperation implements ISettingTableElementOperation
             testTemplate.setKeywordName(value);
         } else if (index > 0) {
             testTemplate.setUnexpectedTrashArgument(index - 1, value);
-        } else {
-            testTemplate.setComment(value);
         }
     }
 

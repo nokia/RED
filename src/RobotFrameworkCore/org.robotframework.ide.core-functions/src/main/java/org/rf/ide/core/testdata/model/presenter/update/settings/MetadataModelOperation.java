@@ -49,8 +49,6 @@ public class MetadataModelOperation implements ISettingTableElementOperation {
             metadata.setKey(value);
         } else if (index > 0) {
             metadata.setValues(index - 1, value);
-        } else {
-            metadata.setComment(value);
         }
     }
 

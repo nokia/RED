@@ -135,11 +135,11 @@ public class RedFileWatcher {
                         } catch (InterruptedException | ClosedWatchServiceException e) {
                             break;
                         }
-                        for (WatchEvent<?> event : key.pollEvents()) {
-                            WatchEvent.Kind<?> kind = event.kind();
+                        for (WatchEvent<?> eventFromKey : key.pollEvents()) {
+                            WatchEvent.Kind<?> kind = eventFromKey.kind();
                             @SuppressWarnings("unchecked")
-                            WatchEvent<Path> ev = (WatchEvent<Path>) event;
-                            final Path fileNameFromEvent = ev.context();
+                            WatchEvent<Path> event = (WatchEvent<Path>) eventFromKey;
+                            final Path fileNameFromEvent = event.context();
 
                             if (kind == StandardWatchEventKinds.OVERFLOW) {
                                 continue;
