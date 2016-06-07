@@ -100,9 +100,9 @@ public abstract class ACreationOfThreeExecutionRowsTest {
         RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
 
-        execThree.addComment(cm1);
-        execThree.addComment(cm2);
-        execThree.addComment(cm3);
+        execThree.addCommentPart(cm1);
+        execThree.addCommentPart(cm2);
+        execThree.addCommentPart(cm3);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileStore.getThreeLinesWithoutCommentedLineCmpFile(),
@@ -141,9 +141,9 @@ public abstract class ACreationOfThreeExecutionRowsTest {
         RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
 
-        execOne.addComment(cm1);
-        execOne.addComment(cm2);
-        execOne.addComment(cm3);
+        execOne.addCommentPart(cm1);
+        execOne.addCommentPart(cm2);
+        execOne.addCommentPart(cm3);
 
         //// line 2
         RobotToken action2 = new RobotToken();
@@ -168,9 +168,9 @@ public abstract class ACreationOfThreeExecutionRowsTest {
         RobotToken cm3_2 = new RobotToken();
         cm3_2.setText("cm3a");
 
-        execTwo.addComment(cm1_2);
-        execTwo.addComment(cm2_2);
-        execTwo.addComment(cm3_2);
+        execTwo.addCommentPart(cm1_2);
+        execTwo.addCommentPart(cm2_2);
+        execTwo.addCommentPart(cm3_2);
 
         //// line 3
         // just empty
@@ -212,9 +212,9 @@ public abstract class ACreationOfThreeExecutionRowsTest {
         RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
 
-        execOne.addComment(cm1);
-        execOne.addComment(cm2);
-        execOne.addComment(cm3);
+        execOne.addCommentPart(cm1);
+        execOne.addCommentPart(cm2);
+        execOne.addCommentPart(cm3);
 
         //// line 2
         // just empty
@@ -242,9 +242,9 @@ public abstract class ACreationOfThreeExecutionRowsTest {
         RobotToken cm3_2 = new RobotToken();
         cm3_2.setText("cm3a");
 
-        execThree.addComment(cm1_2);
-        execThree.addComment(cm2_2);
-        execThree.addComment(cm3_2);
+        execThree.addCommentPart(cm1_2);
+        execThree.addCommentPart(cm2_2);
+        execThree.addCommentPart(cm3_2);
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(
                 fileStore.getThreeLinesWithCommentTheFirstEmptyLineInTheMiddleCmpFile(),

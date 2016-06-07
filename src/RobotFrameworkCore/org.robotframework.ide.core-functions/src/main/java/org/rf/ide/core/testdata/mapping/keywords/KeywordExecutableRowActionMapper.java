@@ -59,7 +59,7 @@ public class KeywordExecutableRowActionMapper implements IParsingMapper {
             types.remove(RobotTokenType.KEYWORD_ACTION_NAME);
             types.add(0, RobotTokenType.KEYWORD_ACTION_ARGUMENT);
             types.add(RobotTokenType.START_HASH_COMMENT);
-            row.addComment(rt);
+            row.addCommentPart(rt);
         } else {
             row.setAction(rt);
         }

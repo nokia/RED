@@ -11,12 +11,13 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.IDataDrivenSetting;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestCaseTemplate extends AModelElement<TestCase> implements IDataDrivenSetting {
+public class TestCaseTemplate extends AModelElement<TestCase> implements IDataDrivenSetting, ICommentHolder {
 
     private final RobotToken declaration;
 
@@ -68,6 +69,29 @@ public class TestCaseTemplate extends AModelElement<TestCase> implements IDataDr
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
+    }
+
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
+    }
+
+    @Override
+    public void setComment(RobotToken comment) {
+        this.comment.clear();
+        addCommentPart(comment);
+    }
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
     }
 
     @Override

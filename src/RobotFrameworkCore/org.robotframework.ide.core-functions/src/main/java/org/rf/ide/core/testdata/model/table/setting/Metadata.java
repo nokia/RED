@@ -11,12 +11,13 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class Metadata extends AModelElement<SettingTable> {
+public class Metadata extends AModelElement<SettingTable> implements ICommentHolder {
 
     private final RobotToken declaration;
 
@@ -33,7 +34,7 @@ public class Metadata extends AModelElement<SettingTable> {
     public void setKey(final RobotToken key) {
         this.key = updateOrCreate(this.key, key, RobotTokenType.SETTING_METADATA_KEY);
     }
-    
+
     public void setKey(final String key) {
         this.key = updateOrCreate(this.key, key, RobotTokenType.SETTING_METADATA_KEY);
     }
@@ -41,7 +42,7 @@ public class Metadata extends AModelElement<SettingTable> {
     public RobotToken getKey() {
         return key;
     }
-    
+
     public void addValue(final String value) {
         RobotToken rt = new RobotToken();
         rt.setText(value);
@@ -57,11 +58,11 @@ public class Metadata extends AModelElement<SettingTable> {
     public List<RobotToken> getValues() {
         return Collections.unmodifiableList(values);
     }
-    
+
     public void setValues(final int index, final String value) {
         updateOrCreateTokenInside(values, index, value, RobotTokenType.SETTING_METADATA_VALUE);
     }
-    
+
     public void setValues(final int index, final RobotToken value) {
         updateOrCreateTokenInside(values, index, value, RobotTokenType.SETTING_METADATA_VALUE);
     }
@@ -74,17 +75,28 @@ public class Metadata extends AModelElement<SettingTable> {
         fixComment(getComment(), rt);
         this.comment.add(rt);
     }
-    
-    public void setComment(final String comment) {
-        RobotToken token = new RobotToken();
-        token.setText(comment);
 
-        setComment(token);
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
     }
-    
-    public void setComment(final RobotToken rt) {
+
+    @Override
+    public void setComment(RobotToken comment) {
         this.comment.clear();
-        addCommentPart(rt);
+        addCommentPart(comment);
+    }
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
     }
 
     public RobotToken getDeclaration() {
