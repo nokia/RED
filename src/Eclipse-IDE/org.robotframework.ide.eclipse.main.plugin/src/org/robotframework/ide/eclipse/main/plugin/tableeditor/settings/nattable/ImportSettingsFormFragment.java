@@ -11,11 +11,13 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
@@ -34,11 +36,14 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
-import org.eclipse.nebula.widgets.nattable.ui.menu.DebugMenuConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -107,7 +112,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     
     private ISortModel sortModel;
 
-    private RowSelectionProvider<RobotKeywordCall> selectionProvider;
+    private RowSelectionProvider<Object> selectionProvider;
 
     @Override
     public ISelectionProvider getSelectionProvider() {
@@ -184,8 +189,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
         sortModel = columnHeaderSortingLayer.getSortModel();
-        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider);
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         
+        // tooltips support
         new NatTableContentTooltip(table);
         
         importSettingsSection.setClient(table);
@@ -204,17 +210,16 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         addCustomStyling(table, theme);
 
+        // sorting
         table.addConfiguration(new HeaderSortConfiguration());
-
-        // Add popup menu - build your own popup menu using the PopupMenuBuilder
-        table.addConfiguration(new HeaderMenuConfiguration(table));
-        table.addConfiguration(new DebugMenuConfiguration(table));
-
         table.addConfiguration(new SettingsDynamicTableSortingConfiguration());
+
+        // popup menus
+        table.addConfiguration(new HeaderMenuConfiguration(table));
+        table.addConfiguration(new ImportSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
-
         return table;
     }
     
@@ -263,6 +268,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         return new NewElementsCreator<RobotElement>() {
             @Override
             public RobotElement createNew() {
+                
                 SwtThread.asyncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -305,6 +311,28 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             return 1;
         }
 
+    }
+    
+    class ImportSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
+
+        private final Menu menu;
+
+        public ImportSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
+                final ISelectionProvider selectionProvider) {
+            final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu";
+
+            final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
+            this.menu = manager.createContextMenu(table);
+            table.setMenu(menu);
+
+            site.registerContextMenu(menuId, manager, selectionProvider, false);
+        }
+
+        @Override
+        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+            uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
+                    new PopupMenuAction(menu));
+        }
     }
     
     @Override
@@ -393,7 +421,13 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     @Optional
     private void whenSettingIsEdited(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_IMPORTS_EDIT) final RobotSetting setting) {
-        new ImportSettingsPopup(table.getShell(), commandsStack, fileModel, setting).open();
+        SwtThread.asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                new ImportSettingsPopup(site.getShell(), commandsStack, fileModel, setting).open();
+            }
+        });
     }
 
     private void refreshEverything() {

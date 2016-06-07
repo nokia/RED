@@ -20,7 +20,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsM
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
 
-public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvider<RobotKeywordCall> {
+public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvider<Object> {
+    
+    private static final Object ADDING_TOKEN = new Object();
 
     private RobotSettingsSection section;
 
@@ -74,8 +76,10 @@ public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvid
                 return columnIndex == 0 ? "...add new import" : "";
             }
 
-            final RobotKeywordCall importSetting = getRowObject(rowIndex);
-            return propertyAccessor.getDataValue(importSetting, columnIndex);
+            final Object importSetting = getRowObject(rowIndex);
+            if (importSetting instanceof RobotKeywordCall) {
+                return propertyAccessor.getDataValue((RobotKeywordCall) importSetting, columnIndex);
+            }
         }
         return "";
     }
@@ -86,9 +90,9 @@ public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvid
             return;
         }
         final String newStringValue = newValue != null ? (String) newValue : "";
-        final RobotKeywordCall importSetting = getRowObject(rowIndex);
-        if (importSetting != null) {
-            propertyAccessor.setDataValue(importSetting, columnIndex, newStringValue);
+        final Object importSetting = getRowObject(rowIndex);
+        if (importSetting != null && importSetting instanceof RobotKeywordCall) {
+            propertyAccessor.setDataValue((RobotKeywordCall) importSetting, columnIndex, newStringValue);
         }
     }
 
@@ -101,7 +105,7 @@ public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvid
     }
 
     @Override
-    public RobotKeywordCall getRowObject(final int rowIndex) {
+    public Object getRowObject(final int rowIndex) {
         if (section != null && rowIndex < importSettings.size()) {
             RobotKeywordCall rowObject = null;
 
@@ -115,14 +119,16 @@ public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvid
                 realRowIndex++;
             }
             return rowObject;
+        } else if (rowIndex == importSettings.size()) {
+            return ADDING_TOKEN;
         }
         return null;
     }
 
     @Override
-    public int indexOfRowObject(final RobotKeywordCall importSetting) {
+    public int indexOfRowObject(final Object rowObject) {
         if (section != null) {
-            final int realRowIndex = importSettings.indexOf(importSetting);
+            final int realRowIndex = importSettings.indexOf(rowObject);
             int filteredIndex = realRowIndex;
 
             RobotKeywordCall currentRowElement = null;
@@ -133,6 +139,8 @@ public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvid
                 }
             }
             return filteredIndex;
+        } else if (rowObject == ADDING_TOKEN) {
+            return importSettings.size();
         }
         return -1;
     }

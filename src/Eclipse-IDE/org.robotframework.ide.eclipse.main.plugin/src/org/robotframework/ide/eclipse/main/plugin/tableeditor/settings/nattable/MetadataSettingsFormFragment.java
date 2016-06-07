@@ -13,12 +13,14 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -45,11 +47,14 @@ import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
-import org.eclipse.nebula.widgets.nattable.ui.menu.DebugMenuConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
+import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -118,7 +123,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     
     private ISortModel sortModel;
 
-    private RowSelectionProvider<RobotKeywordCall> selectionProvider;
+    private RowSelectionProvider<Object> selectionProvider;
 
     @Override
     public ISelectionProvider getSelectionProvider() {
@@ -193,8 +198,9 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
         sortModel = columnHeaderSortingLayer.getSortModel();
-        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider);
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         
+        // tooltips support
         new NatTableContentTooltip(table);
 
         metadataSection.setClient(table);
@@ -212,13 +218,13 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
         addCustomStyling(table, theme);
 
+        // sorting
         table.addConfiguration(new HeaderSortConfiguration());
-
-        // Add popup menu - build your own popup menu using the PopupMenuBuilder
-        table.addConfiguration(new HeaderMenuConfiguration(table));
-        table.addConfiguration(new DebugMenuConfiguration(table));
-
         table.addConfiguration(new MetadataSettingsTableSortingConfiguration());
+
+        // popup menus
+        table.addConfiguration(new HeaderMenuConfiguration(table));
+        table.addConfiguration(new MetadataSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
@@ -302,6 +308,28 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                     DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 2);
         }
         
+    }
+    
+    class MetadataSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
+
+        private final Menu menu;
+
+        public MetadataSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
+                final ISelectionProvider selectionProvider) {
+            final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.metadata.contextMenu";
+
+            final MenuManager manager = new MenuManager("Robot suite editor metadata settings context menu", menuId);
+            this.menu = manager.createContextMenu(table);
+            table.setMenu(menu);
+
+            site.registerContextMenu(menuId, manager, selectionProvider, false);
+        }
+
+        @Override
+        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+            uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
+                    new PopupMenuAction(menu));
+        }
     }
 
     @Override
