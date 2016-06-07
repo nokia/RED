@@ -10,7 +10,6 @@ import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.data.validate.DefaultDataValidator;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.edit.config.DefaultEditConfiguration;
-import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -44,8 +43,9 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
     public void configureRegistry(final IConfigRegistry configRegistry) {
         super.configureRegistry(configRegistry);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, editableRule);
-        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, createDeactivatingEditor(),
-                DisplayMode.NORMAL, AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
+                AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(),
                 DisplayMode.NORMAL, GridRegion.BODY);
         configRegistry.registerConfigAttribute(EditConfigAttributes.DATA_VALIDATOR, new DefaultDataValidator());
@@ -53,9 +53,5 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
                 DisplayMode.EDIT, GridRegion.BODY);
         configRegistry.registerConfigAttribute(EditConfigAttributes.ACTIVATE_EDITOR_ON_TRAVERSAL, Boolean.TRUE,
                 DisplayMode.EDIT, GridRegion.BODY);
-    }
-
-    private ICellEditor createDeactivatingEditor() {
-        return new AlwaysDeactivatingCellEditor(creator);
     }
 }

@@ -18,14 +18,22 @@ public class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
 
     private final IDataProvider dataProvider;
 
+    private final boolean multistate;
+
     public AddingElementLabelAccumulator(final IDataProvider dataProvider) {
+        this(dataProvider, false);
+    }
+
+    public AddingElementLabelAccumulator(final IDataProvider dataProvider, final boolean multistate) {
         this.dataProvider = dataProvider;
+        this.multistate = multistate;
     }
 
     @Override
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
         if (columnPosition == 0 && dataProvider.getRowCount() - 1 == rowPosition) {
-            configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL);
+            configLabels.addLabel(multistate ? AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL
+                    : AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL);
         }
         if (dataProvider.getRowCount() - 1 == rowPosition) {
             configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
