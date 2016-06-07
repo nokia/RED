@@ -5,174 +5,226 @@
  */
 package org.rf.ide.core.testdata.model.presenter;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.ICommentHolder;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandlerTest.FakeCommentHolder.OperationEntry;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ITokenSeparatorPresenter;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class CommentServiceHandlerTest {
 
     @Test
-    public void test_read_threeCommentElement_oneToEscape_shouldReturn_textFromElements() {
-        assertCommentConsolidation("text_me1 | \\| toEscape | text_me3", " | ", "text_me1", "| toEscape", "text_me3");
-    }
-
-    @Test
-    public void test_read_threeCommentElement_oneIsEmptyString_shouldReturn_textFromElements() {
-        assertCommentConsolidation("text_me1 |  | text_me3", " | ", "text_me1", "", "text_me3");
-    }
-
-    @Test
-    public void test_read_threeCommentElement_shouldReturn_textFromElements() {
-        assertCommentConsolidation("text_me1 | text_me2 | text_me3", " | ", "text_me1", "text_me2", "text_me3");
-    }
-
-    @Test
-    public void test_read_oneCommentElement_shouldReturn_textFromElement() {
-        assertCommentConsolidation("text_me1", " | ", "text_me1");
-    }
-
-    @Test
-    public void test_read_emptyComment_shouldReturn_emptyString() {
-        assertCommentConsolidation("", " | ");
-    }
-
-    private void assertCommentConsolidation(final String textExpected, final String commentTokenSeparator,
-            final String... tokens) {
+    public void test_update_withOneCommentElement_with2ValuesToUnescape() {
         // prepare
-        List<RobotToken> comment = new ArrayList<>(0);
-        for (String t : tokens) {
-            comment.add(token(t));
-        }
-        FakeCommentHolder commentElement = new FakeCommentHolder(comment);
+        final FakeCommentHolder fComment = new FakeCommentHolder();
+        final List<RobotToken> commentParts = newArrayList(token("tok1"), token("tok2\\ | "), token("tok3"));
+        fComment.commentToks = commentParts;
 
         // execute
-        final String toShow = CommentServiceHandler.consolidate(commentElement, commentTokenSeparator);
+        CommentServiceHandler.update(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, "new comment2\\ | \\ | ");
 
         // verify
-        assertThat(toShow).isEqualTo(textExpected);
-        List<OperationEntry> operationsVsData = commentElement.operationsVsData;
-        assertThat(operationsVsData).hasSize(1);
-        OperationEntry operationEntry = operationsVsData.get(0);
-        assertThat(operationEntry.getKey()).isEqualTo("getComment<VOID>");
-        assertThat(operationEntry.getValue()).isEmpty();
+        assertThat(text(fComment.getComment())).containsExactly("new comment2 |  | ");
     }
 
     @Test
-    public void test_unescape_oneElementToUnEscapeWhitespaceAtTheBeginning_shouldReturn_unescapedText() {
-        assertThat(CommentServiceHandler.unescape(" \\| to_unescape", " | ")).isEqualTo(" | to_unescape");
+    public void test_update_withThreeCommentPart_withoutAnyEscape() {
+        // prepare
+        final FakeCommentHolder fComment = new FakeCommentHolder();
+        final List<RobotToken> commentParts = newArrayList(token("tok1"), token("tok2\\ | "), token("tok3"));
+        fComment.commentToks = commentParts;
+
+        // execute
+        CommentServiceHandler.update(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE,
+                "new comment | new comment 2 | new comment 3");
+
+        // verify
+        assertThat(text(fComment.getComment())).containsExactly("new comment", "new comment 2", "new comment 3");
     }
 
     @Test
-    public void test_unescape_oneElementToUnEscape_shouldReturn_unescapedText() {
-        assertThat(CommentServiceHandler.unescape("\\| to_unescape", " | ")).isEqualTo("| to_unescape");
+    public void test_update_withOneCommentPart_withoutAnyEscape() {
+        // prepare
+        final FakeCommentHolder fComment = new FakeCommentHolder();
+        final List<RobotToken> commentParts = newArrayList(token("tok1"), token("tok2\\ | "), token("tok3"));
+        fComment.commentToks = commentParts;
+
+        // execute
+        CommentServiceHandler.update(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, "new comment");
+
+        // verify
+        assertThat(text(fComment.getComment())).containsExactly("new comment");
     }
 
     @Test
-    public void test_unescape_nothingToUnEscape_shouldReturn_theSameText() {
-        assertThat(CommentServiceHandler.unescape("nothing_to_unescape", " | ")).isEqualTo("nothing_to_unescape");
+    public void test_consolidate_withThreeCommentTexts_withMiddleValueToEscape() {
+        // prepare
+        final FakeCommentHolder fComment = new FakeCommentHolder();
+        final List<RobotToken> commentParts = newArrayList(token("tok1"), token("tok2\\ | "), token("tok3"));
+        fComment.commentToks = commentParts;
+
+        // execute
+        final String toShow = CommentServiceHandler.consolidate(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+
+        // verify
+        assertThat(toShow).isEqualTo("tok1 | tok2\\ |  | tok3");
     }
 
     @Test
-    public void test_escape_oneElementToEscapeWhitespaceAtTheBeginning_shouldReturn_escapedText() {
-        assertThat(CommentServiceHandler.escape(" | to_escape", " | ")).isEqualTo(" \\| to_escape");
+    public void test_consolidate_withOneCommentText_with2ValuesToEscape() {
+        // prepare
+        final FakeCommentHolder fComment = new FakeCommentHolder();
+        final List<RobotToken> commentParts = newArrayList(token("tok1 |  | "));
+        fComment.commentToks = commentParts;
+
+        // execute
+        final String toShow = CommentServiceHandler.consolidate(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+
+        // verify
+        assertThat(toShow).isEqualTo("tok1\\ | \\ | ");
     }
 
     @Test
-    public void test_escape_oneElementToEscape_shouldReturn_escapedText() {
-        assertThat(CommentServiceHandler.escape("| to_escape", " | ")).isEqualTo("\\| to_escape");
+    public void test_consolidate_withOneCommentText_withValueToEscape() {
+        // prepare
+        final FakeCommentHolder fComment = new FakeCommentHolder();
+        final List<RobotToken> commentParts = newArrayList(token("tok1 | "));
+        fComment.commentToks = commentParts;
+
+        // execute
+        final String toShow = CommentServiceHandler.consolidate(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+
+        // verify
+        assertThat(toShow).isEqualTo("tok1\\ | ");
     }
 
     @Test
-    public void test_escape_nothingToEscape_shouldReturn_theSameText() {
-        assertThat(CommentServiceHandler.escape("nothing_to_escape", " | ")).isEqualTo("nothing_to_escape");
+    public void test_consolidate_withThreeCommentTexts_withoutValueToEscape() {
+        // prepare
+        final FakeCommentHolder fComment = new FakeCommentHolder();
+        final List<RobotToken> commentParts = newArrayList(token("tok1"), token("tok2"), token("tok3"));
+        fComment.commentToks = commentParts;
+
+        // execute
+        final String toShow = CommentServiceHandler.consolidate(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+
+        // verify
+        assertThat(toShow).isEqualTo("tok1 | tok2 | tok3");
     }
 
-    public static class FakeCommentHolder implements ICommentHolder {
+    @Test
+    public void test_consolidate_withOneCommentText_withoutValueToEscape() {
+        // prepare
+        final FakeCommentHolder fComment = new FakeCommentHolder();
+        final List<RobotToken> commentParts = newArrayList(token("tok1"));
+        fComment.commentToks = commentParts;
 
-        private List<OperationEntry> operationsVsData = new ArrayList<>(0);
+        // execute
+        final String toShow = CommentServiceHandler.consolidate(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
 
-        private final List<RobotToken> comment;
+        // verify
+        assertThat(toShow).isEqualTo("tok1");
+    }
 
-        public FakeCommentHolder(final List<RobotToken> tokens) {
-            this.comment = tokens;
+    @Test
+    public void test_consolidate_withEmptyCommentText_shouldReturn_emptyText() {
+        // prepare
+        final FakeCommentHolder fComment = new FakeCommentHolder();
+
+        // execute
+        final String toShow = CommentServiceHandler.consolidate(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+
+        // verify
+        assertThat(toShow).isEmpty();
+    }
+
+    @Test
+    public void test_ETokenSeparator_PIPE_WRAPPED_WITH_SPACE_pattern_toSplit_textWithUnEscapedPipeAtTheEnd_shouldReturn_twoElementList() {
+        // prepare
+        ITokenSeparatorPresenter separatorInView = CommentServiceHandler.ETokenSeparator.PIPE_WRAPPED_WITH_SPACE;
+
+        // execute
+        final String text = "nowy | ";
+        List<String> splitted = separatorInView.splitTextFromViewBySeparator(text);
+
+        // verify
+        assertThat(splitted).containsExactly("nowy", "");
+    }
+
+    @Test
+    public void test_ETokenSeparator_PIPE_WRAPPED_WITH_SPACE_pattern_toSplit_textWithUnEscapedPipeAndEscapedPipe_shouldReturn_twoElementList() {
+        // prepare
+        ITokenSeparatorPresenter separatorInView = CommentServiceHandler.ETokenSeparator.PIPE_WRAPPED_WITH_SPACE;
+
+        // execute
+        final String text = "nowy | textowy\\ | text";
+        List<String> splitted = separatorInView.splitTextFromViewBySeparator(text);
+
+        // verify
+        assertThat(splitted).containsExactly("nowy", "textowy\\ | text");
+    }
+
+    @Test
+    public void test_ETokenSeparator_PIPE_WRAPPED_WITH_SPACE_pattern_toSplit_textWithEscapedPipe_shouldReturn_oneElementList() {
+        // prepare
+        ITokenSeparatorPresenter separatorInView = CommentServiceHandler.ETokenSeparator.PIPE_WRAPPED_WITH_SPACE;
+
+        // execute
+        final String text = "nowy\\ | text";
+        List<String> splitted = separatorInView.splitTextFromViewBySeparator(text);
+
+        // verify
+        assertThat(splitted).containsExactly("nowy\\ | text");
+    }
+
+    @Test
+    public void test_ETokenSeparator_PIPE_WRAPPED_WITH_SPACE_pattern_toSplit_textWithNotEscapedPipe_shouldReturn_twoElementsList() {
+        // prepare
+        ITokenSeparatorPresenter separatorInView = CommentServiceHandler.ETokenSeparator.PIPE_WRAPPED_WITH_SPACE;
+
+        // execute
+        final String text = "nowy | text";
+        List<String> splitted = separatorInView.splitTextFromViewBySeparator(text);
+
+        // verify
+        assertThat(splitted).containsExactly("nowy", "text");
+    }
+
+    @Test
+    public void test_ETokenSeparator_PIPE_WRAPPED_WITH_SPACE_pattern_toSplit_emptyText_shouldReturn_emptyArray() {
+        // prepare
+        ITokenSeparatorPresenter separatorInView = CommentServiceHandler.ETokenSeparator.PIPE_WRAPPED_WITH_SPACE;
+
+        // execute
+        final String text = "";
+        List<String> splitted = separatorInView.splitTextFromViewBySeparator(text);
+
+        // verify
+        assertThat(splitted).containsExactly("");
+    }
+
+    @Test
+    public void test_ETokenSeparator_PIPE_WRAPPED_WITH_SPACE_getSeparatorAsText_shouldReturn_SPACE_PIPE_SPACE() {
+        // prepare
+        ITokenSeparatorPresenter separatorInView = CommentServiceHandler.ETokenSeparator.PIPE_WRAPPED_WITH_SPACE;
+
+        // execute & verify
+        assertThat(separatorInView.getSeparatorAsText()).isEqualTo(" | ");
+    }
+
+    private List<String> text(final List<RobotToken> toks) {
+        List<String> texts = new ArrayList<>(0);
+        for (final RobotToken t : toks) {
+            texts.add(t.getText());
         }
 
-        public static class OperationEntry implements Entry<String, List<Object>> {
-
-            private final String methodName;
-
-            private List<Object> methodParameters = new ArrayList<>(0);
-
-            public OperationEntry(final String methodName) {
-                this.methodName = methodName;
-            }
-
-            @Override
-            public String getKey() {
-                return methodName;
-            }
-
-            @Override
-            public List<Object> getValue() {
-                return methodParameters;
-            }
-
-            @Override
-            public List<Object> setValue(List<Object> value) {
-                this.methodParameters = value;
-                return value;
-            }
-        }
-
-        @Override
-        public List<RobotToken> getComment() {
-            operationsVsData.add(new OperationEntry("getComment<VOID>"));
-            return comment;
-        }
-
-        @Override
-        public void setComment(String commentText) {
-            OperationEntry currentOper = new OperationEntry("setComment<ONE_PARAM_STR>");
-            currentOper.setValue(new ArrayList<Object>(Arrays.asList(commentText)));
-            operationsVsData.add(currentOper);
-
-        }
-
-        @Override
-        public void setComment(RobotToken commentText) {
-            OperationEntry currentOper = new OperationEntry("setComment<ONE_PARAM_RobotToken>");
-            currentOper.setValue(new ArrayList<Object>(Arrays.asList(commentText)));
-            operationsVsData.add(currentOper);
-
-            comment.clear();
-            comment.add(commentText);
-        }
-
-        @Override
-        public void addCommentPart(RobotToken cmPart) {
-            OperationEntry currentOper = new OperationEntry("addCommentPart<ONE_PARAM_RobotToken>");
-            currentOper.setValue(new ArrayList<Object>(Arrays.asList(cmPart)));
-            operationsVsData.add(currentOper);
-
-            comment.add(cmPart);
-        }
-
-        @Override
-        public void removeCommentPart(int index) {
-            OperationEntry currentOper = new OperationEntry("removeCommentPart<ONE_PARAM_INT>");
-            currentOper.setValue(new ArrayList<Object>(Arrays.asList(index)));
-            operationsVsData.add(currentOper);
-
-            comment.remove(index);
-        }
+        return texts;
     }
 
     private RobotToken token(final String text) {
@@ -180,5 +232,40 @@ public class CommentServiceHandlerTest {
         tok.setText(text);
 
         return tok;
+    }
+
+    private class FakeCommentHolder implements ICommentHolder {
+
+        List<RobotToken> commentToks = new ArrayList<>();
+
+        @Override
+        public List<RobotToken> getComment() {
+            return commentToks;
+        }
+
+        @Override
+        public void setComment(final String comment) {
+
+        }
+
+        @Override
+        public void setComment(final RobotToken comment) {
+
+        }
+
+        @Override
+        public void addCommentPart(final RobotToken cmPart) {
+            commentToks.add(cmPart);
+        }
+
+        @Override
+        public void removeCommentPart(final int index) {
+
+        }
+
+        @Override
+        public void clearComment() {
+            commentToks.clear();
+        }
     }
 }
