@@ -11,12 +11,13 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TableHeader<T> extends AModelElement<T> {
+public class TableHeader<T> extends AModelElement<T> implements ICommentHolder {
 
     private final RobotToken tableHeader;
 
@@ -49,9 +50,32 @@ public class TableHeader<T> extends AModelElement<T> {
         return Collections.unmodifiableList(comment);
     }
 
-    public void addComment(final RobotToken commentWord) {
+    public void addCommentPart(final RobotToken commentWord) {
         fixComment(comment, commentWord);
         comment.add(commentWord);
+    }
+
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
+    }
+
+    @Override
+    public void setComment(RobotToken comment) {
+        this.comment.clear();
+        addCommentPart(comment);
+    }
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
     }
 
     @Override

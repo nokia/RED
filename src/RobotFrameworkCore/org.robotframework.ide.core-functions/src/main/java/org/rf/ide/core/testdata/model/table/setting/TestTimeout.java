@@ -11,12 +11,13 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestTimeout extends AModelElement<SettingTable> {
+public class TestTimeout extends AModelElement<SettingTable> implements ICommentHolder {
 
     private final RobotToken declaration;
 
@@ -46,7 +47,7 @@ public class TestTimeout extends AModelElement<SettingTable> {
     public void setTimeout(final RobotToken timeout) {
         this.timeout = updateOrCreate(this.timeout, timeout, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
     }
-    
+
     public void setTimeout(final String timeout) {
         this.timeout = updateOrCreate(this.timeout, timeout, RobotTokenType.SETTING_TEST_TIMEOUT_VALUE);
     }
@@ -54,7 +55,7 @@ public class TestTimeout extends AModelElement<SettingTable> {
     public List<RobotToken> getMessageArguments() {
         return Collections.unmodifiableList(message);
     }
-    
+
     public void addMessageArgument(final String messageArgument) {
         RobotToken rt = new RobotToken();
         rt.setText(messageArgument);
@@ -66,7 +67,7 @@ public class TestTimeout extends AModelElement<SettingTable> {
         fixForTheType(messageArgument, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE, true);
         this.message.add(messageArgument);
     }
-    
+
     public void setMessageArgument(final int index, final String argument) {
         updateOrCreateTokenInside(message, index, argument, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE);
     }
@@ -83,19 +84,29 @@ public class TestTimeout extends AModelElement<SettingTable> {
         fixComment(getComment(), rt);
         this.comment.add(rt);
     }
-    
-    public void setComment(final String comment) {
-        RobotToken token = new RobotToken();
-        token.setText(comment);
 
-        setComment(token);
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
     }
-    
-    public void setComment(final RobotToken rt) {
+
+    @Override
+    public void setComment(RobotToken comment) {
         this.comment.clear();
-        addCommentPart(rt);
+        addCommentPart(comment);
     }
 
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
+    }
 
     @Override
     public ModelType getModelType() {

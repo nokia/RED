@@ -116,7 +116,7 @@ public class ExecutableUnitsFixer {
             if (shouldMerge) {
                 if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || wasComment) {
                     wasComment = true;
-                    toUpdate.addComment(rt);
+                    toUpdate.addCommentPart(rt);
                 } else {
                     if (toUpdate.getAction().getFilePosition().isNotSet()) {
                         toUpdate.setAction(rt);

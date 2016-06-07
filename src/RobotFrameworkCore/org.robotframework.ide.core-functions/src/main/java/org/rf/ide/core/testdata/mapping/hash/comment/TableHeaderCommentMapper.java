@@ -46,7 +46,7 @@ public class TableHeaderCommentMapper implements IHashCommentMapper {
         final List<TableHeader<? extends ARobotSectionTable>> headers = table.getHeaders();
         if (!headers.isEmpty()) {
             final TableHeader<?> header = headers.get(headers.size() - 1);
-            header.addComment(rt);
+            header.addCommentPart(rt);
         } else {
             // FIXME: it is not possible
         }

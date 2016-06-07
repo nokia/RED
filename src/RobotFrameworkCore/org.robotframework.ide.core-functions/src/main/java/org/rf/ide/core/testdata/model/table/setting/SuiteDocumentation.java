@@ -11,12 +11,13 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class SuiteDocumentation extends AModelElement<SettingTable> {
+public class SuiteDocumentation extends AModelElement<SettingTable> implements ICommentHolder {
 
     private final RobotToken declaration;
 
@@ -27,7 +28,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
     public SuiteDocumentation(final RobotToken declaration) {
         this.declaration = declaration;
     }
-    
+
     public void addDocumentationText(final String text) {
         RobotToken rt = new RobotToken();
         rt.setText(text);
@@ -43,7 +44,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
     public List<RobotToken> getDocumentationText() {
         return Collections.unmodifiableList(text);
     }
-    
+
     public void setDocumentationText(final int index, final String docText) {
         updateOrCreateTokenInside(text, index, docText, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
     }
@@ -61,18 +62,29 @@ public class SuiteDocumentation extends AModelElement<SettingTable> {
         this.comment.add(rt);
     }
 
-    public void setComment(final String comment) {
-        RobotToken token = new RobotToken();
-        token.setText(comment);
-
-        setComment(token);
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
     }
 
-    public void setComment(final RobotToken rt) {
+    @Override
+    public void setComment(RobotToken comment) {
         this.comment.clear();
-        addCommentPart(rt);
+        addCommentPart(comment);
     }
-    
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
+    }
+
     public RobotToken getDeclaration() {
         return declaration;
     }

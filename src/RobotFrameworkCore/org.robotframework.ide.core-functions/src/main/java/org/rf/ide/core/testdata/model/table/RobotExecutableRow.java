@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.exec.descs.ExecutableRowDescriptorBuilder;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
@@ -22,7 +23,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
-public class RobotExecutableRow<T> extends AModelElement<T> {
+public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentHolder {
 
     private final static Pattern TSV_COMMENT = Pattern.compile("(\\s)*\"(\\s)*[#].*\"(\\s)*$");
 
@@ -103,21 +104,36 @@ public class RobotExecutableRow<T> extends AModelElement<T> {
         return argType;
     }
 
+    public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
+        this.comments.add(rt);
+    }
+
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comments);
     }
 
-    public void setComment(final String comment) {
-        this.comments.clear();
-        RobotToken token = new RobotToken();
-        token.setText(comment);
-
-        addComment(token);
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
     }
 
-    public void addComment(final RobotToken commentWord) {
-        fixComment(getComment(), commentWord);
-        this.comments.add(commentWord);
+    @Override
+    public void setComment(RobotToken comment) {
+        this.comments.clear();
+        addCommentPart(comment);
+    }
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comments.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comments.clear();
     }
 
     @Override

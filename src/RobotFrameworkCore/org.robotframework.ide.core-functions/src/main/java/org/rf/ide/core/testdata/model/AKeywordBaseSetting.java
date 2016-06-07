@@ -13,7 +13,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
+public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements ICommentHolder {
 
     private final RobotToken declaration;
 
@@ -77,16 +77,27 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
         return Collections.unmodifiableList(comment);
     }
 
-    public void setComment(final String comment) {
-        RobotToken token = new RobotToken();
-        token.setText(comment);
-
-        setComment(token);
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
     }
 
-    public void setComment(final RobotToken rt) {
+    @Override
+    public void setComment(RobotToken comment) {
         this.comment.clear();
-        addCommentPart(rt);
+        addCommentPart(comment);
+    }
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
     }
 
     public void addCommentPart(final RobotToken rt) {
@@ -135,7 +146,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> {
                 execRow.addArgument(arg);
             }
             for (final RobotToken c : baseSetting.getComment()) {
-                execRow.addComment(c);
+                execRow.addCommentPart(c);
             }
         }
 

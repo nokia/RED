@@ -11,11 +11,12 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class KeywordDocumentation extends AModelElement<UserKeyword> {
+public class KeywordDocumentation extends AModelElement<UserKeyword> implements ICommentHolder {
 
     private final RobotToken declaration;
 
@@ -75,5 +76,28 @@ public class KeywordDocumentation extends AModelElement<UserKeyword> {
         }
 
         return tokens;
+    }
+
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
+    }
+
+    @Override
+    public void setComment(RobotToken comment) {
+        this.comment.clear();
+        addCommentPart(comment);
+    }
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
     }
 }
