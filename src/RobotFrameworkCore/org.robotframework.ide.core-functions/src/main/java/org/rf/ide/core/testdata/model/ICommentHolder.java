@@ -20,4 +20,6 @@ public interface ICommentHolder {
     void addCommentPart(final RobotToken cmPart);
 
     void removeCommentPart(final int index);
+
+    void clearComment();
 }
