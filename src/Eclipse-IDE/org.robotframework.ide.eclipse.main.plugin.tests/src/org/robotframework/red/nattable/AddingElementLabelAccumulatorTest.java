@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.junit.Test;
-import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 
 public class AddingElementLabelAccumulatorTest {
@@ -33,6 +32,35 @@ public class AddingElementLabelAccumulatorTest {
                     assertThat(configLabels.getLabels())
                             .containsOnly(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL,
                                     AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                } else if (isInBottomRow) {
+                    assertThat(configLabels.getLabels())
+                            .containsOnly(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                } else {
+                    assertThat(configLabels.getLabels()).isEmpty();
+                }
+            }
+        }
+    }
+
+    @Test
+    public void whenAccumulatorAggregatesLabels_multistateAddingLabelIsOnlyAddedForLeftBottomCornerCell() {
+        final int rows = 20;
+        final int columns = 5;
+        final AddingElementLabelAccumulator accumulator = new AddingElementLabelAccumulator(
+                createProvider(columns, rows), true);
+
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                final boolean isInBottomRow = i == rows - 1;
+                final boolean isInLeftBottomCorner = isInBottomRow && j == 0;
+
+                final LabelStack configLabels = new LabelStack();
+                accumulator.accumulateConfigLabels(configLabels, j, i);
+
+                if (isInLeftBottomCorner) {
+                    assertThat(configLabels.getLabels()).containsOnly(
+                            AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL,
+                            AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else if (isInBottomRow) {
                     assertThat(configLabels.getLabels())
                             .containsOnly(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
