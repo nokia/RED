@@ -29,7 +29,7 @@ public class CreateFreshVariableCommandTest {
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshVariableCommand(variablesSection))
+                .isInjectedInto(new CreateFreshVariableCommand(variablesSection, VariableType.SCALAR))
                 .execute();
 
         assertThat(variablesSection.getChildren()).hasSize(6);
@@ -50,7 +50,7 @@ public class CreateFreshVariableCommandTest {
         for (int i = 0; i < 3; i++) {
             ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshVariableCommand(variablesSection))
+                .isInjectedInto(new CreateFreshVariableCommand(variablesSection, VariableType.SCALAR))
                 .execute();
         }
 
