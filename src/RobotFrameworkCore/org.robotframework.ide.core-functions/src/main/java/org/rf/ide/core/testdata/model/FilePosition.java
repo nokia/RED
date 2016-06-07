@@ -12,6 +12,8 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 
 public class FilePosition implements Serializable {
 
+    private static final long serialVersionUID = 5481992321406778250L;
+
     public static final int NOT_SET = IRobotLineElement.NOT_SET;
 
     private final int line;
