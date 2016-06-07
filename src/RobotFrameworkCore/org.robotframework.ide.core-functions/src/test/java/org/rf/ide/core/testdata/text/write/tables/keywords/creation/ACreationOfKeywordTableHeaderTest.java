@@ -66,10 +66,10 @@ public abstract class ACreationOfKeywordTableHeaderTest {
         final TableHeader<? extends ARobotSectionTable> tableHeader = modelFile.getKeywordTable().getHeaders().get(0);
         RobotToken commentOne = new RobotToken();
         commentOne.setText("comment");
-        tableHeader.addComment(commentOne);
+        tableHeader.addCommentPart(commentOne);
         RobotToken commentTwo = new RobotToken();
         commentTwo.setText("comment2");
-        tableHeader.addComment(commentTwo);
+        tableHeader.addCommentPart(commentTwo);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
@@ -92,7 +92,7 @@ public abstract class ACreationOfKeywordTableHeaderTest {
 
         RobotToken commentOne = new RobotToken();
         commentOne.setText("comment");
-        tableHeader.addComment(commentOne);
+        tableHeader.addCommentPart(commentOne);
 
         RobotToken columnTwo = new RobotToken();
         columnTwo.setText("*** col2 ***");
@@ -100,7 +100,7 @@ public abstract class ACreationOfKeywordTableHeaderTest {
 
         RobotToken commentTwo = new RobotToken();
         commentTwo.setText("comment2");
-        tableHeader.addComment(commentTwo);
+        tableHeader.addCommentPart(commentTwo);
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);

@@ -107,7 +107,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         RobotToken robotToken = lineElements.get(startIndex);
         if (robotToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             mapToComment = true;
-            rowWithoutLoopContinue.addComment(robotToken);
+            rowWithoutLoopContinue.addCommentPart(robotToken);
         } else {
             rowWithoutLoopContinue.setAction(robotToken);
         }
@@ -120,7 +120,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
             }
 
             if (mapToComment) {
-                rowWithoutLoopContinue.addComment(lineElement);
+                rowWithoutLoopContinue.addCommentPart(lineElement);
             } else {
                 rowWithoutLoopContinue.addArgument(lineElement);
             }

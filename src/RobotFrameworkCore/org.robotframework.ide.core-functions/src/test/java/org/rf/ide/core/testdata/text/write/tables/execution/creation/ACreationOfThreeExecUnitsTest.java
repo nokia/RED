@@ -105,9 +105,9 @@ public abstract class ACreationOfThreeExecUnitsTest {
         RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
 
-        execUnitThreeExecRowOne.addComment(cm1);
-        execUnitThreeExecRowOne.addComment(cm2);
-        execUnitThreeExecRowOne.addComment(cm3);
+        execUnitThreeExecRowOne.addCommentPart(cm1);
+        execUnitThreeExecRowOne.addCommentPart(cm2);
+        execUnitThreeExecRowOne.addCommentPart(cm3);
     }
 
     private void checkEnvironment() throws InvalidTestStoreException {

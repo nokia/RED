@@ -12,7 +12,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public abstract class ATags<T> extends AModelElement<T> {
+public abstract class ATags<T> extends AModelElement<T> implements ICommentHolder {
 
     private final RobotToken declaration;
 
@@ -37,7 +37,7 @@ public abstract class ATags<T> extends AModelElement<T> {
     public List<RobotToken> getTags() {
         return Collections.unmodifiableList(tags);
     }
-    
+
     public void addTag(final String tag) {
         RobotToken rt = new RobotToken();
         rt.setText(tag);
@@ -58,23 +58,34 @@ public abstract class ATags<T> extends AModelElement<T> {
     public void setTag(final int index, final RobotToken tag) {
         updateOrCreateTokenInside(tags, index, tag, getTagType());
     }
-    
+
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
-    
-    public void setComment(final String comment) {
-        RobotToken token = new RobotToken();
-        token.setText(comment);
 
-        setComment(token);
+    @Override
+    public void setComment(String comment) {
+        RobotToken tok = new RobotToken();
+        tok.setText(comment);
+        setComment(tok);
     }
 
-    public void setComment(final RobotToken rt) {
+    @Override
+    public void setComment(RobotToken comment) {
         this.comment.clear();
-        addCommentPart(rt);
+        addCommentPart(comment);
     }
-    
+
+    @Override
+    public void removeCommentPart(int index) {
+        this.comment.remove(index);
+    }
+
+    @Override
+    public void clearComment() {
+        this.comment.clear();
+    }
+
     public void addCommentPart(final RobotToken rt) {
         this.fixComment(comment, rt);
         this.comment.add(rt);
