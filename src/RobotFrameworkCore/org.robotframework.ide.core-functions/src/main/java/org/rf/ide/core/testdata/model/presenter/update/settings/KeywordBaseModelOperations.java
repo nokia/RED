@@ -31,8 +31,6 @@ public abstract class KeywordBaseModelOperations {
             setting.setKeywordName(value);
         } else if (index > 0) {
             setting.setArgument(index - 1, value);
-        } else {
-            setting.setComment(value);
         }
     }
 }

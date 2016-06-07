@@ -50,8 +50,6 @@ public class ResourceImportModelOperation implements ISettingTableElementOperati
             resourceImport.setPathOrName(value);
         } else if (index > 0) {
             resourceImport.setUnexpectedTrashArguments(index - 1, value);
-        } else {
-            resourceImport.setComment(value);
         }
     }
 

@@ -50,8 +50,6 @@ public class VariablesImportModelOperation implements ISettingTableElementOperat
             variablesImport.setPathOrName(value);
         } else if (index > 0) {
             variablesImport.setArguments(index - 1, value);
-        } else {
-            variablesImport.setComment(value);
         }
     }
 

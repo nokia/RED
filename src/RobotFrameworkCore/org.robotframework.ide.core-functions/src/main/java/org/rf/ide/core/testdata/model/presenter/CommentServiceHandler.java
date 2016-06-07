@@ -50,7 +50,7 @@ public class CommentServiceHandler {
 
     public static void update(final ICommentHolder comment, final ITokenSeparatorPresenter separator,
             final String newComment) {
-        if (newComment == null) {
+        if (newComment == null || newComment.isEmpty()) {
             comment.clearComment();
         } else {
             if (!consolidate(comment, separator).equals(newComment)) {
