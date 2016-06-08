@@ -122,7 +122,7 @@ public class SettingTable extends ARobotSectionTable {
 
     public void addImported(final AImported imported, final int position) {
         imported.setParent(this);
-        imports.set(position, imported);
+        imports.add(position, imported);
     }
 
     public void removeImported(final AImported imported) {
@@ -187,7 +187,7 @@ public class SettingTable extends ARobotSectionTable {
 
     public void addMetadata(final Metadata metadata, final int position) {
         metadata.setParent(this);
-        metadatas.set(position, metadata);
+        metadatas.add(position, metadata);
     }
 
     public void removeMetadata(final Metadata metadata) {
