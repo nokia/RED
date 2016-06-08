@@ -3,12 +3,11 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
-
-import java.util.List;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
@@ -16,9 +15,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 
 /**
  * @author Michal Anglart
@@ -52,12 +48,8 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
 
         } else if (variable.getType() == VariableType.DICTIONARY) {
             final DictionaryVariable var = (DictionaryVariable) variable.getLinkedElement();
-
-            final List<String> splittedContent = Splitter.on('=').splitToList(newElementContent);
-            final String key = splittedContent.get(0);
-            final String value = Joiner.on('=').join(splittedContent.subList(1, splittedContent.size()));
-
-            var.put(RobotToken.create(newElementContent), RobotToken.create(key), RobotToken.create(value));
+            final DictionaryKeyValuePair keyValuePair = DictionaryKeyValuePair.createFromRaw(newElementContent);
+            var.put(keyValuePair.getRaw(), keyValuePair.getKey(), keyValuePair.getValue());
 
         } else {
             throw new CommandExecutionException("Variables of type " + variable.getType()

@@ -319,6 +319,14 @@ public class RobotFormEditor extends FormEditor {
         return null;
     }
 
+    public SelectionLayerAccessor getSelectionLayerAccessor() {
+        final IEditorPart activeEditor = getActiveEditor();
+        if (activeEditor instanceof ISectionEditorPart) {
+            return ((ISectionEditorPart) activeEditor).getSelectionLayerAccessor();
+        }
+        return null;
+    }
+
     public RobotSuiteFile provideSuiteModel() {
         if (suiteModel != null) {
             return suiteModel;

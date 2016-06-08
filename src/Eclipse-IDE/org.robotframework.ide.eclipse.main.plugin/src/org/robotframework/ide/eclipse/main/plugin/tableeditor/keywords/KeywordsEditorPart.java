@@ -19,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPar
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart.KeywordsEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -88,6 +89,11 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
             return keywordsFragment.getFocusedViewerAccessor();
+        }
+
+        @Override
+        public SelectionLayerAccessor getSelectionLayerAccessor() {
+            return null;
         }
     }
 }
