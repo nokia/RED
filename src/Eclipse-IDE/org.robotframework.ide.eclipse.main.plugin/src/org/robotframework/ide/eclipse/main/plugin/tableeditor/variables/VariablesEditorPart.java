@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPar
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart.VariablesEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -89,6 +90,11 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
             return null;
+        }
+
+        @Override
+        public SelectionLayerAccessor getSelectionLayerAccessor() {
+            return variablesFragment.getSelectionLayerAccessor();
         }
     }
 }

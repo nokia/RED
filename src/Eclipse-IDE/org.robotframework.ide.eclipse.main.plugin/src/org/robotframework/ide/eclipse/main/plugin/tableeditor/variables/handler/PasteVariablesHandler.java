@@ -14,7 +14,8 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertVariablesCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.InsertVariablesCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.VariablesTransfer;
@@ -36,34 +37,37 @@ public class PasteVariablesHandler extends DIParameterizedHandler<E4PasteVariabl
         @Named(RobotEditorSources.SUITE_FILE_MODEL)
         private RobotSuiteFile fileModel;
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
-        public Object pasteVariables(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final Clipboard clipboard) {
+        public Object pasteVariables(final RobotEditorCommandsStack commandsStack,
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
             final Object probablyVariables = clipboard.getContents(VariablesTransfer.getInstance());
 
             if (probablyVariables instanceof RobotVariable[]) {
-                insertVariables(selection, (RobotVariable[]) probablyVariables);
+                final Optional<? extends EditorCommand> command = getInsertingCommand(selection,
+                        (RobotVariable[]) probablyVariables);
+                if (command.isPresent()) {
+                    commandsStack.execute(command.get());
+                }
             }
             return null;
         }
 
-        private void insertVariables(final IStructuredSelection selection, final RobotVariable[] variables) {
+        private Optional<? extends EditorCommand> getInsertingCommand(final IStructuredSelection selection,
+                final RobotVariable[] variables) {
             final Optional<RobotVariable> firstSelected = Selections.getOptionalFirstElement(selection,
                     RobotVariable.class);
 
             if (firstSelected.isPresent()) {
                 final RobotVariable selectedVar = firstSelected.get();
                 final int index = selectedVar.getParent().getChildren().indexOf(selectedVar);
-                commandsStack.execute(new InsertVariablesCommand(selectedVar.getParent(), index, variables));
+                return Optional.of(new InsertVariablesCommand(selectedVar.getParent(), index, variables));
             } else {
                 final RobotVariablesSection section = fileModel.findSection(RobotVariablesSection.class).orNull();
                 if (section != null) {
-                    commandsStack.execute(new InsertVariablesCommand(section, variables));
+                    return Optional.of(new InsertVariablesCommand(section, variables));
                 }
             }
+            return Optional.absent();
         }
     }
 }

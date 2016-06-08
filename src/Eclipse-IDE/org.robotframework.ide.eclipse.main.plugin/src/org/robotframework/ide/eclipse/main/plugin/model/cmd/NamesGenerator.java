@@ -17,9 +17,10 @@ import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 
-class NamesGenerator {
+public class NamesGenerator {
 
-    static String generateUniqueName(final RobotElement parent, final String prefix, final boolean includeSpace) {
+    public static String generateUniqueName(final RobotElement parent, final String prefix,
+            final boolean includeSpace) {
         final int maxNumber = getCurrentMaxNumber(parent, prefix);
         if (maxNumber < 0) {
             return prefix;

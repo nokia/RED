@@ -47,12 +47,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshVariableCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
@@ -96,10 +97,17 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     private RowSelectionProvider<Object> selectionProvider;
 
+    private SelectionLayerAccessor selectionLayerAccessor;
+
     private ISortModel sortModel;
+
 
     ISelectionProvider getSelectionProvider() {
         return selectionProvider;
+    }
+
+    SelectionLayerAccessor getSelectionLayerAccessor() {
+        return selectionLayerAccessor;
     }
 
     @Override
@@ -158,6 +166,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
 
         // tooltips support
         new NatTableContentTooltip(table);
@@ -295,7 +304,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenVariableDetailChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_DETAIL_CHANGE_ALL) final RobotVariable variable) {
         if (variable.getSuiteFile() == fileModel) {
-            table.update();
+            table.refresh();
             setDirty();
         }
     }
