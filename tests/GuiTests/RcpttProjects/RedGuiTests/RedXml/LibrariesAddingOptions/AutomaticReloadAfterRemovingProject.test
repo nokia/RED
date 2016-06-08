@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _fGM4sOxZEeWqTNBmS5Gi4w
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/8/16 1:54 PM
+Save-Time: 6/8/16 2:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -89,4 +89,46 @@ get-view "Project Explorer" | get-tree
     | get-item "SecondProject/Robot Referenced libraries/file2 SecondProject \\(1\\)/Multiply 3" | get-property index 
     | equals 0 | verify-true
     
+    
+    
+    
+//add the same project as was removed
+
+
+get-view "Project Explorer" | get-tree | select SecondProject | get-menu "New/Robot Project" | click
+with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Project name:"] | set-text RobotProject
+    get-button Finish | click
+}
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot python file" | click
+with [get-window "New Robot python file"] {
+    get-editbox -after [get-label "File name:"] | set-text "file1.py"
+    get-button Finish | click
+}
+with [get-editor "file1.py" | get-text-viewer] {
+    type-text "def new_fun():"
+    key-type Enter
+    key-type Tab
+    type-text "return 17"
+    key-type "M1+s"
+}
+get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+set-dialog-result File "platform:/resource/RobotProject/file1.py"
+with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
+    click
+    key-type "M1+s"
+}
+
+wait-for-disapearing_progressbar
+
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Referenced libraries/file1 RobotProject \\(1\\)/New Fun" | get-property index 
+    | equals 0 | verify-true
+    
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
+        | equals 1 | verify-true
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
