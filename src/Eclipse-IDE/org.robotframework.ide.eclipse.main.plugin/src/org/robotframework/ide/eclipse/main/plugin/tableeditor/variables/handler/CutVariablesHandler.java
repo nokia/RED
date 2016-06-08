@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.Transfer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteVariableCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.VariablesTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.CutVariablesHandler.E4CutVariablesHandler;
@@ -36,7 +36,7 @@ public class CutVariablesHandler extends DIParameterizedHandler<E4CutVariablesHa
             final List<RobotVariable> variables = Selections.getElements(selection, RobotVariable.class);
             clipboard.setContents(new RobotVariable[][] { variables.toArray(new RobotVariable[variables.size()]) },
                     new Transfer[] { VariablesTransfer.getInstance() });
-            commandsStack.execute(new DeleteVariableCommand(variables));
+            commandsStack.execute(new RemoveVariableCommand(variables));
 
             return null;
         }

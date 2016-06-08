@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static com.google.common.collect.Iterables.filter;
 
@@ -35,7 +35,7 @@ public class SetVariableNameCommand extends EditorCommand {
 
     public SetVariableNameCommand(final RobotVariable variable, final String newName) {
         this.variable = variable;
-        this.newName = newName;
+        this.newName = newName == null ? "" : newName;
     }
 
     @Override
@@ -183,6 +183,9 @@ public class SetVariableNameCommand extends EditorCommand {
     }
 
     private VariableType getProjectedType() {
+        if (newName.isEmpty()) {
+            return VariableType.INVALID;
+        }
         final VariableType projectedType = VariableType.getTypeByChar(newName.charAt(0));
         return projectedType == null ? VariableType.INVALID : projectedType;
     }

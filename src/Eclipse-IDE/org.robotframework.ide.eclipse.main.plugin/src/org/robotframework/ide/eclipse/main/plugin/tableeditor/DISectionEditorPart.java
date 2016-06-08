@@ -52,4 +52,9 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     public FocusedViewerAccessor getFocusedViewerAccessor() {
         return getComponent().getFocusedViewerAccessor();
     }
+
+    @Override
+    public SelectionLayerAccessor getSelectionLayerAccessor() {
+        return getComponent().getSelectionLayerAccessor();
+    }
 }

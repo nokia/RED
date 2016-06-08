@@ -13,7 +13,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteVariableCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.DeleteVariablesHandler.E4DeleteVariableHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -33,7 +33,7 @@ public class DeleteVariablesHandler extends DIParameterizedHandler<E4DeleteVaria
         @Execute
         public Object deleteVariables(@Named(Selections.SELECTION) final IStructuredSelection selection) {
             final List<RobotVariable> variables = Selections.getElements(selection, RobotVariable.class);
-            commandsStack.execute(new DeleteVariableCommand(variables));
+            commandsStack.execute(new RemoveVariableCommand(variables));
 
             return null;
         }

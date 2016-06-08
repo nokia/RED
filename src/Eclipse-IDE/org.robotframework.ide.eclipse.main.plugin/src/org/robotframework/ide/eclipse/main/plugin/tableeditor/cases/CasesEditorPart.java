@@ -19,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPar
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart.CasesEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -89,6 +90,11 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
             return casesFragment.getFocusedViewerAccessor();
+        }
+
+        @Override
+        public SelectionLayerAccessor getSelectionLayerAccessor() {
+            return null;
         }
     }
 }
