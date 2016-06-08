@@ -35,7 +35,6 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
-import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -189,7 +188,6 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new VariablesTableSortingConfiguration());
 
         // popup menus
-        table.addConfiguration(new HeaderMenuConfiguration(table));
         table.addConfiguration(new VariablesTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
