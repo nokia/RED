@@ -174,6 +174,26 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
                 continue;
             }
 
+            if (tokElem.getText().equals("\n...")) {
+                getDumperHelper().updateLine(model, lines, getDumperHelper().getLineSeparator(model));
+
+                RobotToken lineContinueToken = new RobotToken();
+                lineContinueToken.setRaw("...");
+                lineContinueToken.setText("...");
+                lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+
+                getDumperHelper().updateLine(model, lines,
+                        getDumperHelper().getSeparator(model, lines, lastToken, lineContinueToken));
+
+                getDumperHelper().updateLine(model, lines, lineContinueToken);
+
+                getDumperHelper().updateLine(model, lines,
+                        getDumperHelper().getSeparator(model, lines, lastToken, lineContinueToken));
+
+                lastToken = tokElem;
+                continue;
+            }
+
             if (!wasSeparatorBefore(lines)) {
                 Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokElem);
                 getDumperHelper().updateLine(model, lines, sep);

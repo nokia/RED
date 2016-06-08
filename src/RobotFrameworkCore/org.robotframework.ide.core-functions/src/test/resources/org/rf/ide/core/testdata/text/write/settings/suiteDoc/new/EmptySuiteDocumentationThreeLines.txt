@@ -1,0 +1,4 @@
+*** Setting ***
+Documentation	doc me	
+...	ok	
+...	ok2
