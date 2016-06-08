@@ -27,11 +27,11 @@ public class NewRobotFileTestHelper {
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(fileName);
         final String fileContent = DumperTestHelper.getINSTANCE()
                 .readWithLineSeparatorPresave(inputFile)
-                .replaceAll("\r\n", System.lineSeparator());
+                .replaceAll("(\r)?\n", System.lineSeparator());
         final RobotFileDumper dumper = new RobotFileDumper();
 
         // execute
-        final String dumpResult = dumper.dump(modelFile.getParent()).replaceAll("\r\n", System.lineSeparator());
+        final String dumpResult = dumper.dump(modelFile.getParent()).replaceAll("(\r)?\n", System.lineSeparator());
 
         // verify
         final TextCompareResult cmpResult = DumperTestHelper.getINSTANCE().compare(fileContent, dumpResult);
