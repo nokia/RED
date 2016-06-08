@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.text.write.tables.keywords.creation;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -21,6 +22,30 @@ public abstract class ACreationOfKeywordDocumentationTest {
 
     public ACreationOfKeywordDocumentationTest(final String extension) {
         this.extension = extension;
+    }
+
+    @Test
+    public void test_emptyFile_and_thanCreateKeywordCaseDocumentation_withName_andThreeLinesOfDocumentation()
+            throws Exception {
+        // prepare
+        final String filePath = PRETTY_NEW_DIR_LOCATION + "KeywordDocumentationWithThreeLinesCreation" + "."
+                + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeKeywordTableSection();
+        KeywordTable keywordTable = modelFile.getKeywordTable();
+
+        RobotToken keyName = new RobotToken();
+        keyName.setText("User Keyword");
+        UserKeyword uk = new UserKeyword(keyName);
+        keywordTable.addKeyword(uk);
+        KeywordDocumentation keyDoc = uk.newDocumentation();
+
+        DocumentationServiceHandler.update(keyDoc, "doc me" + "\n" + "textZero" + "\n" + "textTwo");
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test

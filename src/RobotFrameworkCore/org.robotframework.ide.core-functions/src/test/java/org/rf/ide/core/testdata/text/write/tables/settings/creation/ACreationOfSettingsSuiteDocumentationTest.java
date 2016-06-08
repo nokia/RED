@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.text.write.tables.settings.creation;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -87,6 +88,23 @@ public abstract class ACreationOfSettingsSuiteDocumentationTest {
         suiteDoc.addDocumentationText(text1);
         suiteDoc.addDocumentationText(text2);
         suiteDoc.addDocumentationText(text3);
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
+    }
+
+    @Test
+    public void test_emptyFile_createSuiteDoc_withMultipleLines() throws Exception {
+        // prepare
+        final String fileName = PRETTY_NEW_DIR_LOCATION + "EmptySuiteDocumentationThreeLines." + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeSettingTableSection();
+        final SettingTable settingTable = modelFile.getSettingTable();
+        final SuiteDocumentation suiteDoc = settingTable.newSuiteDocumentation();
+
+        DocumentationServiceHandler.update(suiteDoc, "doc me" + "\n" + "ok" + "\n" + "ok2");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(fileName, modelFile);
