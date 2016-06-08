@@ -27,4 +27,6 @@ public interface ISectionEditorPart {
 
     FocusedViewerAccessor getFocusedViewerAccessor();
 
+    SelectionLayerAccessor getSelectionLayerAccessor();
+
 }

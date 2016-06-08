@@ -11,7 +11,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveVariableUpCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.MoveVariableUpCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.MoveVariableUpHandler.E4MoveVariableUpHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;

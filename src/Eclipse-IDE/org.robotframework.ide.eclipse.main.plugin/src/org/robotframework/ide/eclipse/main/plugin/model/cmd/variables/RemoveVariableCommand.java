@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import java.util.List;
 
@@ -14,11 +14,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-public class DeleteVariableCommand extends EditorCommand {
+public class RemoveVariableCommand extends EditorCommand {
 
     private final List<RobotVariable> variablesToDelete;
 
-    public DeleteVariableCommand(final List<RobotVariable> variablesToDelete) {
+    public RemoveVariableCommand(final List<RobotVariable> variablesToDelete) {
         this.variablesToDelete = variablesToDelete;
     }
 

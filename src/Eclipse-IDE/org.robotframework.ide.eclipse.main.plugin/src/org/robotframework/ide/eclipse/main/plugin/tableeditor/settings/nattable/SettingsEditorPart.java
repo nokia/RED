@@ -22,6 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAcces
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable.SettingsEditorPart.SettingsEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -133,6 +134,11 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
+            return null;
+        }
+
+        @Override
+        public SelectionLayerAccessor getSelectionLayerAccessor() {
             return null;
         }
     }

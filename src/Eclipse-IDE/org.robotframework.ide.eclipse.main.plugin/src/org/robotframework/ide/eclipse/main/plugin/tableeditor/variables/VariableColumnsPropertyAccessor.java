@@ -8,8 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetScalarValueCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetVariableNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetScalarValueCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
