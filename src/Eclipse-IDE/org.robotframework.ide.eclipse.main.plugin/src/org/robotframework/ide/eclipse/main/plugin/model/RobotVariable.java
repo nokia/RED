@@ -167,6 +167,11 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
 
     @Override
     public Optional<? extends RobotElement> findElement(final int offset) {
+        final AVariable linkedElement = (AVariable) holder;
+        if (!linkedElement.getBeginPosition().isNotSet() && linkedElement.getBeginPosition().getOffset() <= offset
+                && offset <= linkedElement.getEndPosition().getOffset()) {
+            return Optional.of(this);
+        }
         return Optional.absent();
     }
 

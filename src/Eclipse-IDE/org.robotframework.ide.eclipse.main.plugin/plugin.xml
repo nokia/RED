@@ -1132,6 +1132,16 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.showInSource"
+          name="Show in source">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.showInTable"
+          name="Show in table">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.renameKeyword"
           name="Rename">
     </command>
@@ -1250,7 +1260,8 @@
                       value="1">
                 </count>
              </and>
-          </with></enabledWhen>
+          </with>
+       </enabledWhen>
        <activeWhen>
           <and>
              <reference
@@ -1286,6 +1297,52 @@
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.CollapseAllHandler"
           commandId="org.robotframework.ide.eclipse.collapseAll">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.SelectWholeRowHandler"
+          commandId="org.robotframework.ide.eclipse.selectWholeRow">
+       <enabledWhen>
+          <with
+                variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <instanceof
+                     value="org.robotframework.ide.eclipse.main.plugin.model.RobotElement">
+               </instanceof>
+            </iterate>
+          </with></enabledWhen>
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ShowInSourceHandler"
+          commandId="org.robotframework.ide.eclipse.showInSource">
+       <enabledWhen>
+          <with
+                variable="selection">
+             <and>
+                <count
+                      value="1">
+                </count>
+                <iterate
+                      ifEmpty="false"
+                      operator="and">
+                   <instanceof
+                         value="org.robotframework.ide.eclipse.main.plugin.model.RobotElement">
+                   </instanceof>
+                </iterate>
+             </and>
+          </with>
+       </enabledWhen>
        <activeWhen>
           <reference
                 definitionId="org.robotframework.editorContextIsActive">
@@ -2131,20 +2188,6 @@
           </reference>
        </enabledWhen>
     </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.SelectWholeRowHandler"
-          commandId="org.robotframework.ide.eclipse.selectWholeRow">
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.atLeastOneVariableIsSelected">
-          </reference>
-       </enabledWhen>
-       <activeWhen>
-          <reference
-                definitionId="org.robotframework.variablesPartIsActive">
-          </reference>
-       </activeWhen>
-    </handler>
  </extension>
  <extension
        name="Source part handlers"
@@ -2170,6 +2213,15 @@
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.OpenDeclarationHandler"
           commandId="org.robotframework.ide.eclipse.openDeclaration">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.sourcePartIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ShowInTableHandler"
+          commandId="org.robotframework.ide.eclipse.showInTable">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.sourcePartIsActive">
@@ -2470,6 +2522,18 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="F3">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.showInSource"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="F4">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.showInTable"
+          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="F4">
     </key>
     <key
           commandId="org.robotframework.red.toggleComment"
@@ -2946,10 +3010,15 @@
              name="navigation"
              visible="true">
        </separator>
-       <separator
-             name="globals"
-             visible="true">
-       </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInSource"
+             label="Show in source"
+             icon="resources/source.png"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
        <separator
              name="globals"
              visible="true">
@@ -3323,6 +3392,12 @@
             <visibleWhen
                   checkEnabled="true">
             </visibleWhen>
+         </command>
+         <command
+               commandId="org.robotframework.ide.eclipse.showInTable"
+               icon="resources/section.png"
+               label="Show in table"
+               style="push">
          </command>
       </menuContribution>
       <menuContribution
