@@ -20,8 +20,8 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreato
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetScalarValueCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetVariableNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetScalarValueCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariableColumnsPropertyAccessor;
