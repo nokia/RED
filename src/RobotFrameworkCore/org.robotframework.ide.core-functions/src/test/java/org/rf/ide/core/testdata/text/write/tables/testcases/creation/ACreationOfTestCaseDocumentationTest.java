@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.creation;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
@@ -21,6 +22,30 @@ public abstract class ACreationOfTestCaseDocumentationTest {
 
     public ACreationOfTestCaseDocumentationTest(final String extension) {
         this.extension = extension;
+    }
+
+    @Test
+    public void test_emptyFile_and_thanCreateTestCaseDocumentation_withName_andThreeLinesOfDocumentation()
+            throws Exception {
+        // prepare
+        final String filePath = PRETTY_NEW_DIR_LOCATION + "TestDocumentationWithThreeLinesCreation" + "."
+                + getExtension();
+        final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
+
+        // test data prepare
+        modelFile.includeTestCaseTableSection();
+        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+
+        RobotToken testCaseName = new RobotToken();
+        testCaseName.setText("TestCase");
+        TestCase testCase = new TestCase(testCaseName);
+        testCaseTable.addTest(testCase);
+        TestDocumentation testDoc = testCase.newDocumentation();
+
+        DocumentationServiceHandler.update(testDoc, "doc me" + "\n" + "textZero" + "\n" + "textTwo");
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(filePath, modelFile);
     }
 
     @Test

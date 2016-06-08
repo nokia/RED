@@ -12,11 +12,12 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestDocumentation extends AModelElement<TestCase> implements ICommentHolder {
+public class TestDocumentation extends AModelElement<TestCase> implements ICommentHolder, IDocumentationHolder {
 
     private final RobotToken declaration;
 
@@ -35,6 +36,24 @@ public class TestDocumentation extends AModelElement<TestCase> implements IComme
 
     public List<RobotToken> getDocumentationText() {
         return Collections.unmodifiableList(text);
+    }
+
+    public void setDocumentationText(final int index, final String docText) {
+        updateOrCreateTokenInside(text, index, docText, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT);
+    }
+
+    public void setDocumentationText(final int index, final RobotToken docText) {
+        updateOrCreateTokenInside(text, index, docText, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT);
+    }
+
+    @Override
+    public void removeDocumentationPart(int index) {
+        this.text.remove(index);
+    }
+
+    @Override
+    public void clearDocumentation() {
+        this.text.clear();
     }
 
     public List<RobotToken> getComment() {

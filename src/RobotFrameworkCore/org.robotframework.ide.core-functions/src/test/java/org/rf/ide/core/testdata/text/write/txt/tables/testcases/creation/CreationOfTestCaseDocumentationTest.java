@@ -7,9 +7,9 @@ package org.rf.ide.core.testdata.text.write.txt.tables.testcases.creation;
 
 import org.rf.ide.core.testdata.text.write.tables.testcases.creation.ACreationOfTestCaseDocumentationTest;
 
-public class CreationOfKeywordDocumentationTest extends ACreationOfTestCaseDocumentationTest {
+public class CreationOfTestCaseDocumentationTest extends ACreationOfTestCaseDocumentationTest {
 
-    public CreationOfKeywordDocumentationTest() {
+    public CreationOfTestCaseDocumentationTest() {
         super("txt");
     }
 }
