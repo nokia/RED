@@ -27,6 +27,13 @@ public class DocumentationServiceHandlerTest {
             + File.separatorChar + "presenter" + File.separatorChar;
 
     @Test
+    public void test_toShowConsolidated_singleLine_withEscape() throws Exception {
+        final String inFileName = DIR_PATH + "DocPresentationSingleLine_allToEscape.robot";
+        final String expectedText = "\\\\peta\n\r\t\\nok\\\\";
+        assertThatViewIsTheSameAsItShouldBe(inFileName, expectedText);
+    }
+
+    @Test
     public void test_toShowConsolidated_singleLine() throws Exception {
         final String inFileName = DIR_PATH + "DocPresentationSingleLine.robot";
         final String expectedText = "text1 text2 text3";

@@ -86,7 +86,45 @@ public class DocumentationServiceHandler {
     }
 
     private static String unescape(final String text) {
-        return text;
+        String newText = text;
+        if (text != null) {
+            StringBuilder unescape = new StringBuilder("");
+
+            int nrOfEscape = 0;
+            char[] chars = text.toCharArray();
+            for (char c : chars) {
+                if (c == '\\') {
+                    unescape.append(c);
+                    nrOfEscape++;
+                } else {
+                    if (nrOfEscape > 0) {
+                        if (nrOfEscape == 1) {
+                            if (c == 'n') {
+                                c = '\n';
+                            } else if (c == 't') {
+                                c = '\t';
+                            } else if (c == 'r') {
+                                c = '\r';
+                            }
+                        }
+
+                        unescape.setCharAt(unescape.length() - 1, c);
+                    } else {
+                        unescape.append(c);
+                    }
+
+                    nrOfEscape = 0;
+                }
+            }
+
+            if (nrOfEscape > 0) {
+                newText = unescape.substring(0, unescape.length() - 1);
+            } else {
+                newText = unescape.toString();
+            }
+        }
+
+        return newText;
     }
 
     /**
