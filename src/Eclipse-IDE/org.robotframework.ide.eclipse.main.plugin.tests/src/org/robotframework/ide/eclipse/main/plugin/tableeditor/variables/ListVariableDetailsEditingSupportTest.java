@@ -19,10 +19,10 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateCompoundVariableValueElementCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveListVariableValueElementsCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.RemoveListVariableValueElementsCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetListVariableValueElementCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CreateCompoundVariableValueElementCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.MoveListVariableValueElementsCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveListVariableValueElementsCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetListVariableValueElementCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 

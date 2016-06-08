@@ -19,10 +19,10 @@ import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.Diction
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateCompoundVariableValueElementCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveDictVariableValueElementsCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.RemoveDictVariableValueElementsCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetDictVariableValueElementCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CreateCompoundVariableValueElementCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.MoveDictVariableValueElementsCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveDictVariableValueElementsCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetDictVariableValueElementCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 

@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,8 +23,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveVariableCommand;
 
-public class DeleteVariableCommandTest {
+public class RemoveVariableCommandTest {
 
     @Test
     public void nothingHappens_whenThereAreNoVariablesToDelete() {
@@ -32,7 +33,7 @@ public class DeleteVariableCommandTest {
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new DeleteVariableCommand(new ArrayList<RobotVariable>()))
+                .isInjectedInto(new RemoveVariableCommand(new ArrayList<RobotVariable>()))
                 .execute();
         
         verifyZeroInteractions(eventBroker);
@@ -47,7 +48,7 @@ public class DeleteVariableCommandTest {
                 variablesSection.getChildren().get(3));
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new DeleteVariableCommand(varsToRemove))
+                .isInjectedInto(new RemoveVariableCommand(varsToRemove))
                 .execute();
 
         assertThat(variablesSection.getChildren()).hasSize(3);
