@@ -28,7 +28,7 @@ public class TestTimeoutModelOperation implements ISettingTableElementOperation 
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
         final TestTimeout newTestTimeout = settingsTable.newTestTimeout();
         if (!args.isEmpty()) {
             newTestTimeout.setTimeout(args.get(0));

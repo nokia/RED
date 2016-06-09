@@ -53,6 +53,28 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     public RobotSetting createSetting(final String name, final String comment, final String... args) {
         final List<String> settingArgs = newArrayList(args);
+        RobotSetting setting = newSetting(name, comment, settingArgs);
+        
+        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), -1, name, comment, settingArgs);
+        setting.link(newModelElement);
+        
+        elements.add(setting);
+
+        return setting;
+    }
+    
+    public void insertSetting(final String name, final String comment, final List<String> args, final int tableIndex,
+            final int allSettingsElementsIndex) {
+        RobotSetting setting = newSetting(name, comment, args);
+
+        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), tableIndex, name,
+                comment, args);
+        setting.link(newModelElement);
+
+        elements.add(allSettingsElementsIndex, setting);
+    }
+
+    private RobotSetting newSetting(final String name, final String comment, final List<String> settingArgs) {
         RobotSetting setting;
         if (name.equals(SettingsGroup.METADATA.getName())) {
             setting = new RobotSetting(this, SettingsGroup.METADATA, name, settingArgs, comment);
@@ -65,12 +87,6 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         } else {
             setting = new RobotSetting(this, SettingsGroup.NO_GROUP, name, settingArgs, comment);
         }
-        
-        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), name, comment, settingArgs);
-        setting.link(newModelElement);
-        
-        elements.add(setting);
-
         return setting;
     }
 

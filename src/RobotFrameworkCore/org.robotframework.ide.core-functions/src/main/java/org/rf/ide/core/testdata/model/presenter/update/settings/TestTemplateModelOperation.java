@@ -28,7 +28,7 @@ public class TestTemplateModelOperation implements ISettingTableElementOperation
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
         final TestTemplate newTestTemplate = settingsTable.newTestTemplate();
         if (!args.isEmpty()) {
             newTestTemplate.setKeywordName(args.get(0));

@@ -28,7 +28,7 @@ public class ForceTagsModelOperation implements ISettingTableElementOperation {
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
         final ForceTags newForceTags = settingsTable.newForceTag();
 
         for (int i = 0; i < args.size(); i++) {
