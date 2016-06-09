@@ -197,17 +197,12 @@ public class RedTextCellEditor extends TextCellEditor {
 
         @Override
         public void proposalPopupOpened(final RedContentProposalAdapter adapter) {
-            if (RedTextCellEditor.this.focusListener instanceof InlineFocusListener) {
-                ((InlineFocusListener) RedTextCellEditor.this.focusListener).handleFocusChanges = false;
-            }
+            RedTextCellEditor.this.removeEditorControlListeners();
         }
 
         @Override
         public void proposalPopupClosed(final RedContentProposalAdapter adapter) {
-            if (RedTextCellEditor.this.focusListener instanceof InlineFocusListener) {
-                ((InlineFocusListener) RedTextCellEditor.this.focusListener).handleFocusChanges = true;
-            }
-
+            RedTextCellEditor.this.addEditorControlListeners();
         }
 
         @Override
