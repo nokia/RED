@@ -10,6 +10,8 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.robotframework.ide.eclipse.main.plugin.assist.VariablesContentProposingSupport;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.nattable.edit.DetailCellEditor;
@@ -23,9 +25,12 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
 
     private final RobotEditorCommandsStack commandsStack;
 
-    VariableValuesEditConfiguration(final TableTheme theme, final VariablesDataProvider dataProvider,
-            final RobotEditorCommandsStack commandsStack) {
+    private final RobotSuiteFile suiteFile;
+
+    VariableValuesEditConfiguration(final TableTheme theme, final RobotSuiteFile suiteFile,
+            final VariablesDataProvider dataProvider, final RobotEditorCommandsStack commandsStack) {
         this.theme = theme;
+        this.suiteFile = suiteFile;
         this.dataProvider = dataProvider;
         this.commandsStack = commandsStack;
     }
@@ -52,7 +57,10 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
     }
 
     private void configureValuesCellEditors(final IConfigRegistry configRegistry) {
-        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(),
+        final RedTextCellEditor scalarCellEditor = new RedTextCellEditor(
+                new VariablesContentProposingSupport(suiteFile));
+
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, scalarCellEditor,
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,

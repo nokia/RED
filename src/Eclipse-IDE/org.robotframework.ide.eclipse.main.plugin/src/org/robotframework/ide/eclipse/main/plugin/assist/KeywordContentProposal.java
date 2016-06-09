@@ -6,11 +6,13 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.robotframework.red.jface.assist.IDecoratedContentProposal;
+import org.robotframework.red.jface.assist.IRedContentProposal;
 
 import com.google.common.base.Strings;
+import com.google.common.escape.Escaper;
+import com.google.common.xml.XmlEscapers;
 
-class KeywordContentProposal implements IDecoratedContentProposal {
+class KeywordContentProposal implements IRedContentProposal {
 
     private final RedKeywordProposal wrappedProposal;
 
@@ -53,15 +55,25 @@ class KeywordContentProposal implements IDecoratedContentProposal {
         final String sourceLabel = Strings.padEnd("Source:", 15, ' ');
         final String argsLabel = Strings.padEnd("Arguments:", 15, ' ');
 
+        final Escaper escaper = XmlEscapers.xmlAttributeEscaper();
+
         final StringBuilder builder = new StringBuilder();
         builder.append("<form>");
-        builder.append("<p><span font=\"monospace\">" + nameLabel + wrappedProposal.getLabel() + "</span></p>");
-        builder.append("<p><span font=\"monospace\">" + sourceLabel + wrappedProposal.getSourceName() + "</span></p>");
-        builder.append("<p><span font=\"monospace\">" + argsLabel + wrappedProposal.getArgumentsLabel() + "</span></p>");
+        builder.append("<p><span font=\"monospace\">" + nameLabel + escaper.escape(wrappedProposal.getLabel())
+                + "</span></p>");
+        builder.append("<p><span font=\"monospace\">" + sourceLabel + escaper.escape(wrappedProposal.getSourceName())
+                + "</span></p>");
+        builder.append("<p><span font=\"monospace\">" + argsLabel + escaper.escape(wrappedProposal.getArgumentsLabel())
+                + "</span></p>");
         builder.append("<p></p>");
         builder.append(wrappedProposal.getHtmlDocumentation());
         builder.append("</form>");
 
         return builder.toString();
+    }
+
+    @Override
+    public String getMatchingPrefix() {
+        return "";
     }
 }

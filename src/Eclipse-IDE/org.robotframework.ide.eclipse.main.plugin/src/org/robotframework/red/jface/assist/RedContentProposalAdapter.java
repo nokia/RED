@@ -8,6 +8,7 @@ package org.robotframework.red.jface.assist;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.fieldassist.IContentProposal;
@@ -17,7 +18,10 @@ import org.eclipse.jface.fieldassist.IControlContentAdapter2;
 import org.eclipse.jface.preference.JFacePreferences;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Util;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -37,10 +41,9 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.forms.widgets.FormText;
-import org.robotframework.ide.eclipse.main.plugin.RedTheme;
+import org.robotframework.red.viewers.StructuredContentProvider;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -63,6 +66,8 @@ public class RedContentProposalAdapter {
     private static final int POPUP_CHAR_HEIGHT = 10;
     private static final int POPUP_MINIMUM_WIDTH = 300;
     private static final int POPUP_OFFSET = 3;
+
+    private final ListenerList proposalListeners = new ListenerList();
 
     private final IContentProposalProvider proposalProvider;
     private ILabelProvider labelProvider;
@@ -147,7 +152,12 @@ public class RedContentProposalAdapter {
      *            the {@link ILabelProvider} used to show proposals.
      */
     public void setLabelProvider(final ILabelProvider labelProvider) {
-        this.labelProvider = labelProvider;
+        if (labelProvider instanceof IStyledLabelProvider) {
+            this.labelProvider = new TooltipsEnablingDelegatingStyledCellLabelProvider(
+                    (IStyledLabelProvider) labelProvider);
+        } else {
+            this.labelProvider = labelProvider;
+        }
     }
 
     /**
@@ -228,7 +238,6 @@ public class RedContentProposalAdapter {
                             if (e.character != 0) {
                                 watchModify = true;
                             }
-
                             return;
                         }
 
@@ -375,6 +384,7 @@ public class RedContentProposalAdapter {
                         }
                     });
                     internalPopupOpened();
+                    notifyPopupOpened();
                 } else if (!autoActivated) {
                     control.getDisplay().beep();
                 }
@@ -395,10 +405,10 @@ public class RedContentProposalAdapter {
      */
     private void proposalAccepted(final IContentProposal proposal) {
         switch (proposalAcceptanceStyle) {
-            case (PROPOSAL_SHOULD_REPLACE):
+            case PROPOSAL_SHOULD_REPLACE:
                 setControlContent(proposal.getContent(), proposal.getCursorPosition());
                 break;
-            case (PROPOSAL_SHOULD_INSERT):
+            case PROPOSAL_SHOULD_INSERT:
                 insertControlContent(proposal.getContent(), proposal.getCursorPosition());
                 break;
             default:
@@ -406,6 +416,7 @@ public class RedContentProposalAdapter {
                 // a custom way.
                 break;
         }
+        notifyProposalAccepted(proposal);
     }
 
     /*
@@ -625,7 +636,7 @@ public class RedContentProposalAdapter {
                     e.display.asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            if (isValid()) {
+                            if (popupExists()) {
                                 if (scrollbarClicked || hasFocus()) {
                                     return;
                                 }
@@ -660,8 +671,8 @@ public class RedContentProposalAdapter {
             // popup closure.
             void installListeners() {
                 // Listeners on this popup's table and scroll bar
-                proposalTable.addListener(SWT.FocusOut, this);
-                final ScrollBar scrollbar = proposalTable.getVerticalBar();
+                proposalTableViewer.getTable().addListener(SWT.FocusOut, this);
+                final ScrollBar scrollbar = proposalTableViewer.getTable().getVerticalBar();
                 if (scrollbar != null) {
                     scrollbar.addListener(SWT.Selection, this);
                 }
@@ -684,9 +695,9 @@ public class RedContentProposalAdapter {
 
             // Remove installed listeners
             void removeListeners() {
-                if (isValid()) {
-                    proposalTable.removeListener(SWT.FocusOut, this);
-                    final ScrollBar scrollbar = proposalTable.getVerticalBar();
+                if (popupExists()) {
+                    proposalTableViewer.getTable().removeListener(SWT.FocusOut, this);
+                    final ScrollBar scrollbar = proposalTableViewer.getTable().getVerticalBar();
                     if (scrollbar != null) {
                         scrollbar.removeListener(SWT.Selection, this);
                     }
@@ -716,7 +727,7 @@ public class RedContentProposalAdapter {
             // Key events from the control
             @Override
             public void handleEvent(final Event e) {
-                if (!isValid()) {
+                if (!popupExists()) {
                     return;
                 }
 
@@ -749,105 +760,88 @@ public class RedContentProposalAdapter {
                 // No character. Check for navigation keys.
 
                 if (key == 0) {
-                    int newSelection = proposalTable.getSelectionIndex();
-                    final int visibleRows = (proposalTable.getSize().y / proposalTable.getItemHeight()) - 1;
+                    int newSelection = proposalTableViewer.getTable().getSelectionIndex();
+                    final int visibleRows = (proposalTableViewer.getTable().getSize().y
+                            / proposalTableViewer.getTable().getItemHeight()) - 1;
                     switch (e.keyCode) {
-                    case SWT.ARROW_UP:
-                        newSelection -= 1;
-                        if (newSelection < 0) {
-                            newSelection = proposalTable.getItemCount() - 1;
-                        }
-                        // Not typical - usually we get this as a Traverse and
-                        // therefore it never propagates. Added for consistency.
-                        if (e.type == SWT.KeyDown) {
-                            // don't propagate to control
-                            e.doit = false;
-                        }
-
-                        break;
-
-                    case SWT.ARROW_DOWN:
-                        newSelection += 1;
-                        if (newSelection > proposalTable.getItemCount() - 1) {
-                            newSelection = 0;
-                        }
-                        // Not typical - usually we get this as a Traverse and
-                        // therefore it never propagates. Added for consistency.
-                        if (e.type == SWT.KeyDown) {
-                            // don't propagate to control
-                            e.doit = false;
-                        }
-
-                        break;
-
-                    case SWT.PAGE_DOWN:
-                        newSelection += visibleRows;
-                        if (newSelection >= proposalTable.getItemCount()) {
-                            newSelection = proposalTable.getItemCount() - 1;
-                        }
-                        if (e.type == SWT.KeyDown) {
-                            // don't propagate to control
-                            e.doit = false;
-                        }
-                        break;
-
-                    case SWT.PAGE_UP:
-                        newSelection -= visibleRows;
-                        if (newSelection < 0) {
-                            newSelection = 0;
-                        }
-                        if (e.type == SWT.KeyDown) {
-                            // don't propagate to control
-                            e.doit = false;
-                        }
-                        break;
-
-                    case SWT.HOME:
-                        newSelection = 0;
-                        if (e.type == SWT.KeyDown) {
-                            // don't propagate to control
-                            e.doit = false;
-                        }
-                        break;
-
-                    case SWT.END:
-                        newSelection = proposalTable.getItemCount() - 1;
-                        if (e.type == SWT.KeyDown) {
-                            // don't propagate to control
-                            e.doit = false;
-                        }
-                        break;
-
-                    // If received as a Traverse, these should propagate
-                    // to the control as keydown. If received as a keydown,
-                    // proposals should be recomputed since the cursor
-                    // position has changed.
-                    case SWT.ARROW_LEFT:
-                    case SWT.ARROW_RIGHT:
-                        if (e.type == SWT.Traverse) {
-                            e.doit = false;
-                        } else {
-                            e.doit = true;
-                                final String contents = getControlContentAdapter().getControlContents(control);
-                            // If there are no contents, changes in cursor
-                            // position have no effect. Note also that we do
-                            // not affect the filter text on ARROW_LEFT as
-                            // we would with BS.
-                            if (contents.length() > 0) {
-                                asyncRecomputeProposals(filterText);
+                        case SWT.ARROW_UP:
+                            newSelection -= 1;
+                            if (newSelection < 0) {
+                                newSelection = proposalTableViewer.getTable().getItemCount() - 1;
                             }
-                        }
-                        break;
+                            // Not typical - usually we get this as a Traverse and
+                            // therefore it never propagates. Added for consistency.
+                            e.doit = e.doit && e.type != SWT.KeyDown;
+                            break;
 
-                    // Any unknown keycodes will cause the popup to close.
-                    // Modifier keys are explicitly checked and ignored because
-                    // they are not complete yet (no character).
-                    default:
-                        if (e.keyCode != SWT.CAPS_LOCK && e.keyCode != SWT.NUM_LOCK && e.keyCode != SWT.MOD1
-                                && e.keyCode != SWT.MOD2 && e.keyCode != SWT.MOD3 && e.keyCode != SWT.MOD4) {
-                            close();
-                        }
-                        return;
+                        case SWT.ARROW_DOWN:
+                            newSelection += 1;
+                            if (newSelection > proposalTableViewer.getTable().getItemCount() - 1) {
+                                newSelection = 0;
+                            }
+
+                            // Not typical - usually we get this as a Traverse and
+                            // therefore it never propagates. Added for consistency.
+                            e.doit = e.doit && e.type != SWT.KeyDown;
+
+                            break;
+
+                        case SWT.PAGE_DOWN:
+                            newSelection += visibleRows;
+                            if (newSelection >= proposalTableViewer.getTable().getItemCount()) {
+                                newSelection = proposalTableViewer.getTable().getItemCount() - 1;
+                            }
+                            e.doit = e.doit && e.type != SWT.KeyDown;
+                            break;
+
+                        case SWT.PAGE_UP:
+                            newSelection -= visibleRows;
+                            if (newSelection < 0) {
+                                newSelection = 0;
+                            }
+                            e.doit = e.doit && e.type != SWT.KeyDown;
+                            break;
+
+                        case SWT.HOME:
+                            newSelection = 0;
+                            e.doit = e.doit && e.type != SWT.KeyDown;
+                            break;
+
+                        case SWT.END:
+                            newSelection = proposalTableViewer.getTable().getItemCount() - 1;
+                            e.doit = e.doit && e.type != SWT.KeyDown;
+                            break;
+
+                        // If received as a Traverse, these should propagate
+                        // to the control as keydown. If received as a keydown,
+                        // proposals should be recomputed since the cursor
+                        // position has changed.
+                        case SWT.ARROW_LEFT:
+                        case SWT.ARROW_RIGHT:
+                            if (e.type == SWT.Traverse) {
+                                e.doit = false;
+                            } else {
+                                e.doit = true;
+                                final String contents = getControlContentAdapter().getControlContents(control);
+                                // If there are no contents, changes in cursor
+                                // position have no effect. Note also that we do
+                                // not affect the filter text on ARROW_LEFT as
+                                // we would with BS.
+                                if (contents.length() > 0) {
+                                    asyncRecomputeProposals(filterText);
+                                }
+                            }
+                            break;
+
+                        // Any unknown keycodes will cause the popup to close.
+                        // Modifier keys are explicitly checked and ignored because
+                        // they are not complete yet (no character).
+                        default:
+                            if (e.keyCode != SWT.CAPS_LOCK && e.keyCode != SWT.NUM_LOCK && e.keyCode != SWT.MOD1
+                                    && e.keyCode != SWT.MOD2 && e.keyCode != SWT.MOD3 && e.keyCode != SWT.MOD4) {
+                                close();
+                            }
+                            return;
                     }
 
                     // If any of these navigation events caused a new selection,
@@ -862,51 +856,51 @@ public class RedContentProposalAdapter {
                 // Check for special keys involved in cancelling, accepting, or
                 // filtering the proposals.
                 switch (key) {
-                case SWT.ESC:
-                    e.doit = false;
-                    close();
-                    break;
-
-                case SWT.LF:
-                case SWT.CR:
-                    e.doit = false;
-                    final Object p = getSelectedProposal();
-                    if (p != null) {
-                        acceptCurrentProposal();
-                    } else {
+                    case SWT.ESC:
+                        e.doit = false;
                         close();
-                    }
-                    break;
+                        break;
 
-                case SWT.TAB:
-                    e.doit = false;
-                    getShell().setFocus();
-                    return;
+                    case SWT.LF:
+                    case SWT.CR:
+                        e.doit = false;
+                        final Object p = getSelectedProposal();
+                        if (p != null) {
+                            acceptCurrentProposal();
+                        } else {
+                            close();
+                        }
+                        break;
 
-                case SWT.BS:
-                    // There is no filtering provided by us, but some
-                    // clients provide their own filtering based on content.
-                    // Recompute the proposals if the cursor position
-                    // will change (is not at 0).
-                    final int pos = getControlContentAdapter().getCursorPosition(control);
-                    // We rely on the fact that the contents and pos do not yet
-                    // reflect the result of the BS. If the contents were
-                    // already empty, then BS should not cause
-                    // a recompute.
-                    if (pos > 0) {
-                        asyncRecomputeProposals(filterText);
-                    }
-                    break;
+                    case SWT.TAB:
+                        e.doit = false;
+                        getShell().setFocus();
+                        return;
 
-                default:
-                    // If the key is a defined unicode character, and not one of
-                    // the special cases processed above, update the filter text
-                    // and filter the proposals.
-                    if (Character.isDefined(key)) {
-                        // Recompute proposals after processing this event.
-                        asyncRecomputeProposals(filterText);
-                    }
-                    break;
+                    case SWT.BS:
+                        // There is no filtering provided by us, but some
+                        // clients provide their own filtering based on content.
+                        // Recompute the proposals if the cursor position
+                        // will change (is not at 0).
+                        final int pos = getControlContentAdapter().getCursorPosition(control);
+                        // We rely on the fact that the contents and pos do not yet
+                        // reflect the result of the BS. If the contents were
+                        // already empty, then BS should not cause
+                        // a recompute.
+                        if (pos > 0) {
+                            asyncRecomputeProposals(filterText);
+                        }
+                        break;
+
+                    default:
+                        // If the key is a defined unicode character, and not one of
+                        // the special cases processed above, update the filter text
+                        // and filter the proposals.
+                        if (Character.isDefined(key)) {
+                            // Recompute proposals after processing this event.
+                            asyncRecomputeProposals(filterText);
+                        }
+                        break;
                 }
             }
         }
@@ -1038,10 +1032,7 @@ public class RedContentProposalAdapter {
          */
         private PopupCloserListener popupCloser;
 
-        /*
-         * The table used to show the list of proposals.
-         */
-        private Table proposalTable;
+        private TableViewer proposalTableViewer;
 
         /*
          * The proposals to be shown (cached to avoid repeated requests).
@@ -1086,21 +1077,11 @@ public class RedContentProposalAdapter {
             this.proposals = proposals;
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.jface.dialogs.PopupDialog#getForeground()
-         */
         @Override
         protected Color getForeground() {
             return JFaceResources.getColorRegistry().get(JFacePreferences.CONTENT_ASSIST_FOREGROUND_COLOR);
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.jface.dialogs.PopupDialog#getBackground()
-         */
         @Override
         protected Color getBackground() {
             return JFaceResources.getColorRegistry().get(JFacePreferences.CONTENT_ASSIST_BACKGROUND_COLOR);
@@ -1116,59 +1097,23 @@ public class RedContentProposalAdapter {
          */
         @Override
         protected final Control createDialogArea(final Composite parent) {
-            // Use virtual where appropriate (see flag definition).
-            if (USE_VIRTUAL) {
-                proposalTable = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL);
+            final int style = USE_VIRTUAL ? SWT.H_SCROLL | SWT.V_SCROLL | SWT.VIRTUAL : SWT.H_SCROLL | SWT.V_SCROLL;
+            proposalTableViewer = new TableViewer(parent, style);
+            proposalTableViewer.setContentProvider(new StructuredContentProvider() {
 
-                final Listener listener = new Listener() {
-                    @Override
-                    public void handleEvent(final Event event) {
-                        handleSetData(event);
-                    }
-                };
-                proposalTable.addListener(SWT.SetData, listener);
-            } else {
-                proposalTable = new Table(parent, SWT.H_SCROLL | SWT.V_SCROLL);
-            }
-
-            // set the proposals to force population of the table.
+                @Override
+                public Object[] getElements(final Object inputElement) {
+                    return (Object[]) inputElement;
+                }
+            });
+            proposalTableViewer.setLabelProvider(labelProvider);
             setProposals(filterProposals(proposals, filterText));
 
-            final Color decorationColor = RedTheme.getEclipseDecorationColor();
-            proposalTable.addListener(SWT.MeasureItem, new Listener() {
-
-                @Override
-                public void handleEvent(final Event event) {
-                    final String dec = (String) event.item.getData("decoration");
-                    event.width += event.gc.textExtent(dec).x + 5;
-
-                }
-            });
-            proposalTable.addListener(SWT.PaintItem, new Listener() {
-                @Override
-                public void handleEvent(final Event event) {
-                    final String dec = (String) event.item.getData("decoration");
-
-                    final int itemHeight = proposalTable.getItemHeight();
-                    final int decorationHeight = event.gc.textExtent(dec).y;
-                    final int x = event.x + event.width;
-                    final int y = event.y + (itemHeight - decorationHeight) / 2;
-
-                    final Color oldFgColor = event.gc.getForeground();
-                    event.gc.setForeground(decorationColor);
-
-                    event.gc.drawText(dec, x, y, true);
-
-                    event.gc.setForeground(oldFgColor);
-                }
-            });
-            proposalTable.setHeaderVisible(false);
-            proposalTable.addSelectionListener(new SelectionListener() {
+            proposalTableViewer.getTable().setHeaderVisible(false);
+            proposalTableViewer.getTable().addSelectionListener(new SelectionListener() {
 
                 @Override
                 public void widgetSelected(final SelectionEvent e) {
-                    // If a proposal has been selected, show it in the secondary
-                    // popup. Otherwise close the popup.
                     if (e.item == null) {
                         if (infoPopup != null) {
                             infoPopup.close();
@@ -1184,14 +1129,9 @@ public class RedContentProposalAdapter {
                     acceptCurrentProposal();
                 }
             });
-            return proposalTable;
+            return proposalTableViewer.getTable();
         }
 
-        /*
-         * (non-Javadoc)
-         * 
-         * @see org.eclipse.jface.dialogs.PopupDialog.adjustBounds()
-         */
         @Override
         protected void adjustBounds() {
             // Get our control's location in display coordinates.
@@ -1210,9 +1150,9 @@ public class RedContentProposalAdapter {
             // up a layout on the table.
             if (popupSize == null) {
                 final GridData data = new GridData(GridData.FILL_BOTH);
-                data.heightHint = proposalTable.getItemHeight() * POPUP_CHAR_HEIGHT;
+                data.heightHint = proposalTableViewer.getTable().getItemHeight() * POPUP_CHAR_HEIGHT;
                 data.widthHint = Math.max(control.getSize().x, POPUP_MINIMUM_WIDTH);
-                proposalTable.setLayoutData(data);
+                proposalTableViewer.getTable().setLayoutData(data);
                 getShell().pack();
                 popupSize = getShell().getSize();
             }
@@ -1242,25 +1182,6 @@ public class RedContentProposalAdapter {
         }
 
         /*
-         * Handle the set data event. Set the item data of the requested item to
-         * the corresponding proposal in the proposal cache.
-         */
-        private void handleSetData(final Event event) {
-            final TableItem item = (TableItem) event.item;
-            final int index = proposalTable.indexOf(item);
-
-            if (0 <= index && index < proposals.length) {
-                final IDecoratedContentProposal current = (IDecoratedContentProposal) proposals[index];
-                item.setText(getString(current));
-                item.setImage(getImage(current));
-                item.setData(current);
-                item.setData("decoration", current.getLabelDecoration());
-            } else {
-                // this should not happen, but does on win32
-            }
-        }
-
-        /*
          * Caches the specified proposals and repopulates the table if it has
          * been created.
          */
@@ -1268,27 +1189,27 @@ public class RedContentProposalAdapter {
             this.proposals = newProposals == null || newProposals.length == 0 ? new IContentProposal[0] : newProposals;
 
             // If there is a table
-            if (isValid()) {
+            if (popupExists()) {
+                proposalTableViewer.setInput(proposals);
                 final int newSize = newProposals.length;
                 if (USE_VIRTUAL) {
                     // Set and clear the virtual table. Data will be
                     // provided in the SWT.SetData event handler.
-                    proposalTable.setItemCount(newSize);
-                    proposalTable.clearAll();
+                    proposalTableViewer.getTable().setItemCount(newSize);
+                    proposalTableViewer.getTable().clearAll();
                 } else {
                     // Populate the table manually
-                    proposalTable.setRedraw(false);
-                    proposalTable.setItemCount(newSize);
-                    final TableItem[] items = proposalTable.getItems();
+                    proposalTableViewer.getTable().setRedraw(false);
+                    proposalTableViewer.getTable().setItemCount(newSize);
+                    final TableItem[] items = proposalTableViewer.getTable().getItems();
                     for (int i = 0; i < items.length; i++) {
                         final TableItem item = items[i];
-                        final IDecoratedContentProposal proposal = (IDecoratedContentProposal) newProposals[i];
+                        final IRedContentProposal proposal = (IRedContentProposal) newProposals[i];
                         item.setText(getString(proposal));
                         item.setImage(getImage(proposal));
                         item.setData(proposal);
-                        item.setData("decoration", proposal.getLabelDecoration());
                     }
-                    proposalTable.setRedraw(true);
+                    proposalTableViewer.getTable().setRedraw(true);
                 }
                 // Default to the first selection if there is content.
                 if (newProposals.length > 0) {
@@ -1329,19 +1250,11 @@ public class RedContentProposalAdapter {
         }
 
         /*
-         * Return an empty array. Used so that something always shows in the
-         * proposal popup, even if no proposal provider was specified.
-         */
-        private IContentProposal[] getEmptyProposalArray() {
-            return new IContentProposal[0];
-        }
-
-        /*
          * Answer true if the popup is valid, which means the table has been
          * created and not disposed.
          */
-        private boolean isValid() {
-            return proposalTable != null && !proposalTable.isDisposed();
+        private boolean popupExists() {
+            return proposalTableViewer.getTable() != null && !proposalTableViewer.getTable().isDisposed();
         }
 
         /*
@@ -1349,10 +1262,10 @@ public class RedContentProposalAdapter {
          * check for whether the info popup has focus.
          */
         private boolean hasFocus() {
-            if (!isValid()) {
+            if (!popupExists()) {
                 return false;
             }
-            if (getShell().isFocusControl() || proposalTable.isFocusControl()) {
+            if (getShell().isFocusControl() || proposalTableViewer.getTable().isFocusControl()) {
                 return true;
             }
             if (infoPopup != null && infoPopup.hasFocus()) {
@@ -1364,13 +1277,13 @@ public class RedContentProposalAdapter {
         /*
          * Return the current selected proposal.
          */
-        private IDecoratedContentProposal getSelectedProposal() {
-            if (isValid()) {
-                final int i = proposalTable.getSelectionIndex();
+        private IRedContentProposal getSelectedProposal() {
+            if (popupExists()) {
+                final int i = proposalTableViewer.getTable().getSelectionIndex();
                 if (proposals == null || i < 0 || i >= proposals.length) {
                     return null;
                 }
-                return (IDecoratedContentProposal) proposals[i];
+                return (IRedContentProposal) proposals[i];
             }
             return null;
         }
@@ -1380,11 +1293,11 @@ public class RedContentProposalAdapter {
          */
         private void selectProposal(final int index) {
             Assert.isTrue(index >= 0, "Proposal index should never be negative"); //$NON-NLS-1$
-            if (!isValid() || proposals == null || index >= proposals.length) {
+            if (!popupExists() || proposals == null || index >= proposals.length) {
                 return;
             }
-            proposalTable.setSelection(index);
-            proposalTable.showSelection();
+            proposalTableViewer.getTable().setSelection(index);
+            proposalTableViewer.getTable().showSelection();
 
             showProposalDescription();
         }
@@ -1425,7 +1338,9 @@ public class RedContentProposalAdapter {
             if (infoPopup != null) {
                 infoPopup.close();
             }
-            return super.close();
+            final boolean closed = super.close();
+            notifyPopupClosed();
+            return closed;
         }
 
         /*
@@ -1448,7 +1363,7 @@ public class RedContentProposalAdapter {
                             Thread.sleep(SECONDARY_POPUP_DELAY);
                         } catch (final InterruptedException e) {
                         }
-                        if (!isValid()) {
+                        if (!popupExists()) {
                             return;
                         }
                         getShell().getDisplay().syncExec(new Runnable() {
@@ -1456,7 +1371,7 @@ public class RedContentProposalAdapter {
                             public void run() {
                                 // Query the current selection since we have
                                 // been delayed
-                                final IDecoratedContentProposal p = getSelectedProposal();
+                                final IRedContentProposal p = getSelectedProposal();
                                 if (p == null) {
                                     return;
                                 }
@@ -1505,18 +1420,9 @@ public class RedContentProposalAdapter {
         private void recomputeProposals(final String filterText) {
             IContentProposal[] allProposals = getProposals();
             if (allProposals == null) {
-                allProposals = getEmptyProposalArray();
+                allProposals = new IContentProposal[0];
             }
-            // If the non-filtered proposal list is empty, we should
-            // close the popup.
-            // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=147377
-            if (allProposals.length == 0) {
-                proposals = allProposals;
-                close();
-            } else {
-                // Keep the popup open, but filter by any provided filter text
-                setProposals(filterProposals(allProposals, filterText));
-            }
+            setProposals(filterProposals(allProposals, filterText));
         }
 
         /*
@@ -1526,7 +1432,7 @@ public class RedContentProposalAdapter {
          * to date with the event.
          */
         private void asyncRecomputeProposals(final String filterText) {
-            if (isValid()) {
+            if (popupExists()) {
                 control.getDisplay().asyncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -1568,5 +1474,40 @@ public class RedContentProposalAdapter {
             }
             return targetControlListener;
         }
+    }
+
+    public void addContentProposalListener(final RedContentProposalListener listener) {
+        proposalListeners.add(listener);
+    }
+
+    public void removeContentProposalListener(final RedContentProposalListener listener) {
+        proposalListeners.remove(listener);
+    }
+
+    private void notifyProposalAccepted(final IContentProposal proposal) {
+        for (final Object listener : proposalListeners.getListeners()) {
+            ((RedContentProposalListener) listener).proposalAccepted(proposal);
+        }
+    }
+
+    private void notifyPopupOpened() {
+        for (final Object listener : proposalListeners.getListeners()) {
+            ((RedContentProposalListener) listener).proposalPopupOpened(this);
+        }
+    }
+
+    private void notifyPopupClosed() {
+        for (final Object listener : proposalListeners.getListeners()) {
+            ((RedContentProposalListener) listener).proposalPopupClosed(this);
+        }
+    }
+
+    public static interface RedContentProposalListener {
+
+        void proposalAccepted(final IContentProposal proposal);
+
+        void proposalPopupClosed(final RedContentProposalAdapter adapter);
+
+        void proposalPopupOpened(final RedContentProposalAdapter adapter);
     }
 }

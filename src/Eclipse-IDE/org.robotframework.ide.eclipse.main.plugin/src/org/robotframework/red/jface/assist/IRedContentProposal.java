@@ -7,7 +7,9 @@ package org.robotframework.red.jface.assist;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 
-public interface IDecoratedContentProposal extends IContentProposal {
+public interface IRedContentProposal extends IContentProposal {
+
+    public String getMatchingPrefix();
 
     String getLabelDecoration();
 
