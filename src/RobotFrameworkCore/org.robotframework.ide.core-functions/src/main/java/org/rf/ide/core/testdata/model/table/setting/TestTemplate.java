@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.setting;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +19,9 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestTemplate extends AModelElement<SettingTable> implements IDataDrivenSetting, ICommentHolder {
+public class TestTemplate extends AModelElement<SettingTable> implements IDataDrivenSetting, ICommentHolder, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final RobotToken declaration;
 

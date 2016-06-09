@@ -29,8 +29,9 @@ public class VariablesImportModelOperation implements ISettingTableElementOperat
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
-        final VariablesImport newVariablesImport = settingsTable.newVariablesImport();
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
+        final VariablesImport newVariablesImport = isValidTableIndex(settingsTable, tableIndex)
+                ? settingsTable.newVariablesImport(tableIndex) : settingsTable.newVariablesImport();
         if (!args.isEmpty()) {
             newVariablesImport.setPathOrName(args.get(0));
         }
@@ -56,5 +57,9 @@ public class VariablesImportModelOperation implements ISettingTableElementOperat
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElement) {
         settingsTable.removeImported((AImported) modelElement);
+    }
+    
+    private boolean isValidTableIndex(final SettingTable settingsTable, final int tableIndex) {
+        return tableIndex >= 0 && tableIndex < settingsTable.getImports().size();
     }
 }

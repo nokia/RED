@@ -29,8 +29,9 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
-        final LibraryImport newLibraryImport = settingsTable.newLibraryImport();
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
+        final LibraryImport newLibraryImport = isValidTableIndex(settingsTable, tableIndex)
+                ? settingsTable.newLibraryImport(tableIndex) : settingsTable.newLibraryImport();
         if (!args.isEmpty()) {
             newLibraryImport.setPathOrName(args.get(0));
         }
@@ -56,5 +57,9 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElement) {
         settingsTable.removeImported((AImported) modelElement);
+    }
+    
+    private boolean isValidTableIndex(final SettingTable settingsTable, final int tableIndex) {
+        return tableIndex >= 0 && tableIndex < settingsTable.getImports().size();
     }
 }

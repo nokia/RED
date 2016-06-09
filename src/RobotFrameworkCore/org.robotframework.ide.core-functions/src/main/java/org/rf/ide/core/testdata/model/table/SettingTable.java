@@ -81,36 +81,48 @@ public class SettingTable extends ARobotSectionTable {
     public List<AImported> getImports() {
         return Collections.unmodifiableList(imports);
     }
-
+    
     public LibraryImport newLibraryImport() {
+        return newLibraryImport(imports.size());
+    }
+
+    public LibraryImport newLibraryImport(final int index) {
         RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_LIBRARY_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
         LibraryImport libImp = new LibraryImport(dec);
-        addImported(libImp);
+        addImported(libImp, index);
 
         return libImp;
     }
-
+    
     public ResourceImport newResourceImport() {
+        return newResourceImport(imports.size());
+    }
+
+    public ResourceImport newResourceImport(final int index) {
         RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_RESOURCE_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
         ResourceImport resImp = new ResourceImport(dec);
-        addImported(resImp);
+        addImported(resImp, index);
 
         return resImp;
     }
-
+    
     public VariablesImport newVariablesImport() {
+        return newVariablesImport(imports.size());
+    }
+
+    public VariablesImport newVariablesImport(final int index) {
         RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_VARIABLES_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
         VariablesImport varImp = new VariablesImport(dec);
-        addImported(varImp);
+        addImported(varImp, index);
 
         return varImp;
     }
@@ -170,12 +182,16 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public Metadata newMetadata() {
+        return newMetadata(metadatas.size());
+    }
+    
+    public Metadata newMetadata(final int index) {
         RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_METADATA_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
         Metadata metadata = new Metadata(dec);
-        addMetadata(metadata);
+        addMetadata(metadata, index);
 
         return metadata;
     }

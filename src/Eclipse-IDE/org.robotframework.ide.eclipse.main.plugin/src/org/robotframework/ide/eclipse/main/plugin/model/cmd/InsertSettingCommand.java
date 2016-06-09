@@ -8,39 +8,51 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import java.util.Arrays;
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+
+import com.google.common.base.Optional;
 
 public class InsertSettingCommand extends EditorCommand {
 
-    private final IRobotCodeHoldingElement parent;
-    private final int index;
+    private final RobotSettingsSection section;
+
+    private Optional<RobotSetting> firstSelectedSetting;
+
     private final List<RobotKeywordCall> settingsToInsert;
 
-    public InsertSettingCommand(final IRobotCodeHoldingElement parent, final RobotKeywordCall[] settingsToInsert) {
-        this(parent, -1, settingsToInsert);
-    }
-
-    public InsertSettingCommand(final IRobotCodeHoldingElement parent, final int index,
+    public InsertSettingCommand(final RobotSettingsSection parent, final Optional<RobotSetting> firstSelectedSetting,
             final RobotKeywordCall[] settingsToInsert) {
-        this.parent = parent;
-        this.index = index;
+        this.section = parent;
+        this.firstSelectedSetting = firstSelectedSetting;
         this.settingsToInsert = Arrays.asList(settingsToInsert);
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        for (final RobotKeywordCall call : settingsToInsert) {
-            call.setParent(parent);
-        }
-        if (index == -1) {
-            parent.getChildren().addAll(settingsToInsert);
-        } else {
-            parent.getChildren().addAll(index, settingsToInsert);
+
+        int tableIndex = -1;
+        int settingsElementsIndex = section.getChildren().size();
+        if (firstSelectedSetting.isPresent() && !settingsToInsert.isEmpty()) {
+            if (settingsToInsert.get(0).getName().equals(SettingsGroup.METADATA.getName())) {
+                tableIndex = section.getMetadataSettings().indexOf(firstSelectedSetting.get());
+            } else {
+                tableIndex = section.getImportSettings().indexOf(firstSelectedSetting.get());
+            }
+            settingsElementsIndex = section.getChildren().indexOf(firstSelectedSetting.get());
         }
 
-        eventBroker.post(RobotModelEvents.ROBOT_SETTING_ADDED, parent);
+        int shift = 0;
+        for (final RobotKeywordCall call : settingsToInsert) {
+            section.insertSetting(call.getName(), call.getComment(), call.getArguments(), tableIndex + shift,
+                    settingsElementsIndex + shift);
+            shift++;
+        }
+
+        eventBroker.post(RobotModelEvents.ROBOT_SETTING_ADDED, section);
     }
 }

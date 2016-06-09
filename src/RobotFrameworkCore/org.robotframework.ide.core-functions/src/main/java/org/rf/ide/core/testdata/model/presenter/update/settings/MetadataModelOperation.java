@@ -28,8 +28,9 @@ public class MetadataModelOperation implements ISettingTableElementOperation {
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
-        final Metadata newMetadata = settingsTable.newMetadata();
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
+        final Metadata newMetadata = isValidTableIndex(settingsTable, tableIndex)
+                ? settingsTable.newMetadata(tableIndex) : settingsTable.newMetadata();
         if (!args.isEmpty()) {
             newMetadata.setKey(args.get(0));
         }
@@ -55,5 +56,9 @@ public class MetadataModelOperation implements ISettingTableElementOperation {
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElement) {
         settingsTable.removeMetadata((Metadata) modelElement);
+    }
+    
+    private boolean isValidTableIndex(final SettingTable settingsTable, final int tableIndex) {
+        return tableIndex >= 0 && tableIndex < settingsTable.getMetadatas().size();
     }
 }

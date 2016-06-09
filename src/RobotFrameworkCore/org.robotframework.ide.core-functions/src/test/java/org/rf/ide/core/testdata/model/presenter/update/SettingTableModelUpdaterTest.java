@@ -38,6 +38,8 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public class SettingTableModelUpdaterTest {
 
+    private static final int INDEX = -1;
+
     private static SettingTable settingTable;
 
     private static SettingTableModelUpdater modelUpdater;
@@ -59,8 +61,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(keywordName);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.SUITE_SETUP.getName(),
-                comment, args);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.SUITE_SETUP.getName(), comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.SUITE_SETUP);
         SuiteSetup setting = (SuiteSetup) modelElement;
@@ -92,8 +94,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(keywordName);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.SUITE_TEARDOWN.getName(),
-                comment, args);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.SUITE_TEARDOWN.getName(), comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.SUITE_TEARDOWN);
         SuiteTeardown setting = (SuiteTeardown) modelElement;
@@ -126,7 +128,7 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(keywordName);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.TEST_SETUP.getName(),
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX, SettingName.TEST_SETUP.getName(),
                 comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.SUITE_TEST_SETUP);
@@ -160,8 +162,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(keywordName);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.TEST_TEARDOWN.getName(),
-                comment, args);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.TEST_TEARDOWN.getName(), comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.SUITE_TEST_TEARDOWN);
         TestTeardown setting = (TestTeardown) modelElement;
@@ -196,8 +198,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(template);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.TEST_TEMPLATE.getName(),
-                comment, args);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.TEST_TEMPLATE.getName(), comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.SUITE_TEST_TEMPLATE);
         TestTemplate setting = (TestTemplate) modelElement;
@@ -230,8 +232,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(timeout);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.TEST_TIMEOUT.getName(),
-                comment, args);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.TEST_TIMEOUT.getName(), comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.SUITE_TEST_TIMEOUT);
         TestTimeout setting = (TestTimeout) modelElement;
@@ -261,7 +263,7 @@ public class SettingTableModelUpdaterTest {
         final List<String> tags = newArrayList("tag1", "tag2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.FORCE_TAGS.getName(),
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX, SettingName.FORCE_TAGS.getName(),
                 comment, tags);
 
         assertTrue(modelElement.getModelType() == ModelType.FORCE_TAGS_SETTING);
@@ -288,8 +290,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> tags = newArrayList("tag1", "tag2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.DEFAULT_TAGS.getName(),
-                comment, tags);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.DEFAULT_TAGS.getName(), comment, tags);
 
         assertTrue(modelElement.getModelType() == ModelType.DEFAULT_TAGS_SETTING);
         DefaultTags setting = (DefaultTags) modelElement;
@@ -313,18 +315,17 @@ public class SettingTableModelUpdaterTest {
         final List<String> documentation = newArrayList("docPart1", "docPart2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.DOCUMENTATION.getName(),
-                comment, documentation);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.DOCUMENTATION.getName(), comment, documentation);
 
         assertTrue(modelElement.getModelType() == ModelType.SUITE_DOCUMENTATION);
         SuiteDocumentation setting = (SuiteDocumentation) modelElement;
         checkSetting(setting.getDocumentationText(), documentation, setting.getComment(), comment);
 
-        final List<String> newDocumentation = newArrayList("docPart3", "docPart4");
+        final List<String> newDocumentation = newArrayList("docPart3");
         final String newComment = "new comment";
 
         modelUpdater.update(setting, 0, newDocumentation.get(0));
-        modelUpdater.update(setting, 1, newDocumentation.get(1));
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getDocumentationText(), newDocumentation, setting.getComment(), newComment);
@@ -342,8 +343,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(libName);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.LIBRARY_IMPORT.getName(),
-                comment, args);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.LIBRARY_IMPORT.getName(), comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.LIBRARY_IMPORT_SETTING);
         LibraryImport setting = (LibraryImport) modelElement;
@@ -375,8 +376,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(resourceName);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.RESOURCE_IMPORT.getName(),
-                comment, args);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.RESOURCE_IMPORT.getName(), comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.RESOURCE_IMPORT_SETTING);
         ResourceImport setting = (ResourceImport) modelElement;
@@ -408,8 +409,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(varName);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.VARIABLES_IMPORT.getName(),
-                comment, args);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX,
+                SettingName.VARIABLES_IMPORT.getName(), comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.VARIABLES_IMPORT_SETTING);
         VariablesImport setting = (VariablesImport) modelElement;
@@ -441,8 +442,8 @@ public class SettingTableModelUpdaterTest {
         final List<String> args = newArrayList(metadata);
         args.addAll(settingArgs);
 
-        final AModelElement<?> modelElement = modelUpdater.create(settingTable, SettingName.METADATA.getName(), comment,
-                args);
+        final AModelElement<?> modelElement = modelUpdater.create(settingTable, INDEX, SettingName.METADATA.getName(),
+                comment, args);
 
         assertTrue(modelElement.getModelType() == ModelType.METADATA_SETTING);
         Metadata setting = (Metadata) modelElement;
@@ -468,7 +469,7 @@ public class SettingTableModelUpdaterTest {
 
     @Test
     public void testCreateWhenNoTableExists() {
-        assertNull(modelUpdater.create(null, SettingName.METADATA.getName(), "", newArrayList("")));
+        assertNull(modelUpdater.create(null, INDEX, SettingName.METADATA.getName(), "", newArrayList("")));
     }
 
     @Test
@@ -476,12 +477,12 @@ public class SettingTableModelUpdaterTest {
         RobotFile file = NewRobotFileTestHelper.getModelFileToModify("3.0");
         file.includeSettingTableSection();
         VariableTable variableTable = file.getVariableTable();
-        assertNull(modelUpdater.create(variableTable, SettingName.METADATA.getName(), "", newArrayList("")));
+        assertNull(modelUpdater.create(variableTable, INDEX, SettingName.METADATA.getName(), "", newArrayList("")));
     }
 
     @Test
     public void testCreateWithUnknownSetting() {
-        assertNull(modelUpdater.create(settingTable, "Unknown", "", newArrayList("")));
+        assertNull(modelUpdater.create(settingTable, INDEX, "Unknown", "", newArrayList("")));
     }
 
     private void checkSetting(final RobotToken actualKeywordName, final String expectedKeywordName,

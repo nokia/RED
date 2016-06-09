@@ -28,7 +28,7 @@ public class TestTeardownModelOperation extends KeywordBaseModelOperations imple
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
         return super.create(settingsTable.newTestTeardown(), args, comment);
     }
 
