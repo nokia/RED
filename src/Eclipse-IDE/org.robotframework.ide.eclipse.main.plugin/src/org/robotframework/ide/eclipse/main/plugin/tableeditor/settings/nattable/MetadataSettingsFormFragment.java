@@ -53,9 +53,12 @@ import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -227,6 +230,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         table.addConfiguration(new MetadataSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
+        
+        table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.metadata.context", site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return table;
     }

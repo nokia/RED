@@ -139,13 +139,13 @@ public class RedFileWatcher {
                             WatchEvent.Kind<?> kind = eventFromKey.kind();
                             @SuppressWarnings("unchecked")
                             WatchEvent<Path> event = (WatchEvent<Path>) eventFromKey;
-                            final Path fileNameFromEvent = event.context();
+                            final Path eventContext = event.context();
 
                             if (kind == StandardWatchEventKinds.OVERFLOW) {
                                 continue;
                             } else if (kind == StandardWatchEventKinds.ENTRY_MODIFY) {
 
-                                final String fileName = fileNameFromEvent.getFileName().toString();
+                                final String fileName = eventContext.getFileName().toString();
                                 if (registeredFiles.get(fileName) != null) {
                                     try {
                                         if (!modifiedFilesQueue.contains(fileName)) {

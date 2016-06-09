@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.ISettingTableElementOperation;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
@@ -28,7 +29,7 @@ public class DocumentationModelOperation implements ISettingTableElementOperatio
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
         final SuiteDocumentation newSuiteDocumentation = settingsTable.newSuiteDocumentation();
         for (int i = 0; i < args.size(); i++) {
             newSuiteDocumentation.addDocumentationText(args.get(i));
@@ -42,9 +43,7 @@ public class DocumentationModelOperation implements ISettingTableElementOperatio
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final SuiteDocumentation suiteDocumentation = (SuiteDocumentation) modelElement;
-        if (index >= 0) {
-            suiteDocumentation.setDocumentationText(index, value);
-        }
+        DocumentationServiceHandler.update(suiteDocumentation, value);
     }
 
     @Override

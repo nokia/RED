@@ -55,13 +55,13 @@ public class SettingTableModelUpdater {
         }
     }
 
-    public AModelElement<?> create(final ARobotSectionTable sectionTable, final String settingName,
-            final String comment, final List<String> args) {
+    public AModelElement<?> create(final ARobotSectionTable sectionTable, final int tableIndex,
+            final String settingName, final String comment, final List<String> args) {
 
         if (sectionTable != null && sectionTable instanceof SettingTable) {
             final ISettingTableElementOperation operationHandler = getOperationHandler(settingName);
             if (operationHandler != null) {
-                return operationHandler.create((SettingTable) sectionTable, args, comment);
+                return operationHandler.create((SettingTable) sectionTable, tableIndex, args, comment);
             }
         }
         return null;

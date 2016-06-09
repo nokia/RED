@@ -29,8 +29,9 @@ public class ResourceImportModelOperation implements ISettingTableElementOperati
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final List<String> args, final String comment) {
-        final ResourceImport newResourceImport = settingsTable.newResourceImport();
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
+        final ResourceImport newResourceImport = isValidTableIndex(settingsTable, tableIndex)
+                ? settingsTable.newResourceImport(tableIndex) : settingsTable.newResourceImport();
         if (!args.isEmpty()) {
             newResourceImport.setPathOrName(args.get(0));
         }
@@ -56,5 +57,9 @@ public class ResourceImportModelOperation implements ISettingTableElementOperati
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElement) {
         settingsTable.removeImported((AImported) modelElement);
+    }
+    
+    private boolean isValidTableIndex(final SettingTable settingsTable, final int tableIndex) {
+        return tableIndex >= 0 && tableIndex < settingsTable.getImports().size();
     }
 }

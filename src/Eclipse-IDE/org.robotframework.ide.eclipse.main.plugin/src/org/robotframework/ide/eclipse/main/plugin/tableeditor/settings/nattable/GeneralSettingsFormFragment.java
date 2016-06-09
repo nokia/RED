@@ -77,6 +77,8 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -115,7 +117,6 @@ import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 
-import com.google.common.base.Joiner;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 
@@ -211,11 +212,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             public void focusGained(final FocusEvent e) {
+                documentation.setText(getDocumentation(getSection(), true));
                 documentation.redraw();
             }
 
             @Override
             public void focusLost(final FocusEvent e) {
+                documentation.setText(getDocumentation(getSection(), false));
                 documentation.redraw();
             }
         });
@@ -226,14 +229,16 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 @Override
                 public void modifyText(final ModifyEvent e) {
-                    if (documentation.getText().equals(getDocumentation(getSection()))) {
+                    if (documentation.getCaretOffset() == 0) {
                         return;
                     }
+                    
                     setDirty();
 
                     if (documenationChangeJob != null && documenationChangeJob.getState() == Job.SLEEPING) {
                         documenationChangeJob.cancel();
                     }
+
                     documenationChangeJob = createDocumentationChangeJob(documentation.getText());
                     documenationChangeJob.schedule(300);
                 }
@@ -247,13 +252,18 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 .applyTo(documentation);
     }
 
-    private String getDocumentation(final RobotSettingsSection section) {
-        if (section == null) {
-            return "";
-        } else {
+    private String getDocumentation(final RobotSettingsSection section, final boolean hasFocus) {
+        if (section != null) {
             final RobotSetting docSetting = section.getSetting("Documentation");
-            return docSetting != null && !docSetting.getArguments().isEmpty() ? Joiner.on(" ").join(docSetting.getArguments()) : "";
+            if (docSetting != null && !docSetting.getArguments().isEmpty()) {
+                return hasFocus
+                        ? DocumentationServiceHandler
+                                .toEditConsolidated((IDocumentationHolder) docSetting.getLinkedElement())
+                        : DocumentationServiceHandler
+                                .toShowConsolidated((IDocumentationHolder) docSetting.getLinkedElement());
+            }
         }
+        return "";
     }
 
     private Job createDocumentationChangeJob(final String docu) {
@@ -266,6 +276,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 if (settingsSection == null) {
                     return Status.OK_STATUS;
                 }
+                
+                
 
                 final RobotSetting docSetting = settingsSection.getSetting("Documentation");
 
@@ -277,6 +289,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 } else if (docSetting != null) {
                     commandsStack.execute(new SetKeywordCallArgumentCommand(docSetting, 0, newDocumentation));
                 }
+
                 return Status.OK_STATUS;
             }
         };
@@ -371,6 +384,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.addConfiguration(new GeneralSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
+        
+        table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.metadata.context", site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return com.google.common.base.Optional.of(table);
     }
@@ -528,7 +543,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         final RobotSettingsSection section = getSection();
 
         documentation.setEditable(fileModel.isEditable() && section != null);
-        documentation.setText(getDocumentation(section));
+        documentation.setText(getDocumentation(section, documentation.isFocusControl()));
         
         if (table.isPresent()) {
             dataProvider.setInput(section);
