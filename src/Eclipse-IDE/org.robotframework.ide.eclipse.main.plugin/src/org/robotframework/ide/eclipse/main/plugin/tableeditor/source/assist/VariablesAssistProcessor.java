@@ -14,8 +14,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
@@ -71,7 +69,6 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
             for (final RedVariableProposal varProposal : variableProposals) {
                 if (varProposal.getName().toLowerCase().startsWith(prefix.toLowerCase())) {
                     final String additionalInfo = createSecondaryInfo(varProposal);
-                    final Image image = getImage(varProposal.getName());
 
                     final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
                             .will(assist.getAcceptanceMode())
@@ -82,7 +79,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
                             .secondaryPopupShouldBeDisplayed(additionalInfo)
                             .thenCursorWillStopAtTheEndOfInsertion()
                             .currentPrefixShouldBeDecorated()
-                            .proposalsShouldHaveIcon(image)
+                            .proposalsShouldHaveIcon(ImagesManager.getImage(varProposal.getImage()))
                             .create();
                     proposals.add(proposal);
                 }
@@ -114,16 +111,6 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
         if(SuiteSourcePartitionScanner.TEST_CASES_SECTION.equals(contentType) || SuiteSourcePartitionScanner.VARIABLES_SECTION.equals(contentType)) {
             varProposals.remove(RedVariableProposal.createBuiltIn("${SUITE_STATUS}", ""));
             varProposals.remove(RedVariableProposal.createBuiltIn("${SUITE_MESSAGE}", ""));
-        }
-    }
-
-    private Image getImage(final String name) {
-        if (name.startsWith("&")) {
-            return ImagesManager.getImage(RedImages.getRobotDictionaryVariableImage());
-        } else if (name.startsWith("@")) {
-            return ImagesManager.getImage(RedImages.getRobotListVariableImage());
-        } else {
-            return ImagesManager.getImage(RedImages.getRobotScalarVariableImage());
         }
     }
 

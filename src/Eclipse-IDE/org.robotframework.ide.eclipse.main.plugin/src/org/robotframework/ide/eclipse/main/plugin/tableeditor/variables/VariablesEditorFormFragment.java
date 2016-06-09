@@ -155,7 +155,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 cornerLayer);
         gridLayer.addConfiguration(new VariablesTableAdderStatesConfiguration(dataProvider));
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
-        gridLayer.addConfiguration(new VariableValuesEditConfiguration(theme, dataProvider, commandsStack));
+        gridLayer.addConfiguration(new VariableValuesEditConfiguration(theme, fileModel, dataProvider, commandsStack));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 

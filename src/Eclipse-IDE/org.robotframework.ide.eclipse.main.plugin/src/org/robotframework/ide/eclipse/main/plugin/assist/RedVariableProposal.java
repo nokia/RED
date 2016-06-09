@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 
 import com.google.common.base.Objects;
@@ -70,6 +72,16 @@ public final class RedVariableProposal {
 
     public VariableType getType() {
         return type;
+    }
+
+    public ImageDescriptor getImage() {
+        if (name.startsWith("&")) {
+            return RedImages.getRobotDictionaryVariableImage();
+        } else if (name.startsWith("@")) {
+            return RedImages.getRobotListVariableImage();
+        } else {
+            return RedImages.getRobotScalarVariableImage();
+        }
     }
 
     @Override
