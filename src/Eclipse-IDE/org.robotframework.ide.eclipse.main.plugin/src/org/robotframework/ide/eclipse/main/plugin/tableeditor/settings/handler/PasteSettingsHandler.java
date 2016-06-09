@@ -55,13 +55,12 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
                     RobotSetting.class);
 
             if (firstSelected.isPresent()) {
-                final int index = firstSelected.get().getParent().getChildren().indexOf(firstSelected);
-                commandsStack.execute(new InsertSettingCommand(firstSelected.get().getParent(), index, settings));
+                commandsStack.execute(new InsertSettingCommand(firstSelected.get().getParent(), firstSelected, settings));
             } else {
                 final RobotSettingsSection section = fileModel.findSection(
                         RobotSettingsSection.class).orNull();
                 if (section != null) {
-                    commandsStack.execute(new InsertSettingCommand(section, settings));
+                    commandsStack.execute(new InsertSettingCommand(section, firstSelected, settings));
                 }
             }
         }

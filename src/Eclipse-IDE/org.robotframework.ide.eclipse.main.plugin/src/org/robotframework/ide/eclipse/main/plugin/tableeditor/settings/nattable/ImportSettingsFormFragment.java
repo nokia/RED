@@ -219,6 +219,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         table.addConfiguration(new ImportSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
+        
+        table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.import.context", site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return table;
     }
