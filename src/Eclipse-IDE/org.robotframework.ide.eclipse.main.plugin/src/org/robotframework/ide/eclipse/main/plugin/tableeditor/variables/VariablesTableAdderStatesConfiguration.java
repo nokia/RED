@@ -31,7 +31,7 @@ class VariablesTableAdderStatesConfiguration extends AbstractUiBindingConfigurat
 
     @Override
     public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-        uiBindingRegistry.registerFirstMouseDownBinding(new CellPainterMouseEventMatcher(GridRegion.BODY,
+        uiBindingRegistry.registerFirstSingleClickBinding(new CellPainterMouseEventMatcher(GridRegion.BODY,
                 MouseEventMatcher.LEFT_BUTTON, DropdownImagePainter.class),
                 new ChangeAdderStateAction(variablesDataProvider));
     }
