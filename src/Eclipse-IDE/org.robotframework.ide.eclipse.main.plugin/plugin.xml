@@ -1767,7 +1767,7 @@
        name="Settings part handlers"
        point="org.eclipse.ui.handlers">
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CutSettingsCellContentHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CutInSettingsTableHandler"
           commandId="org.eclipse.ui.edit.cut">
        <activeWhen>
           <reference
@@ -1776,7 +1776,7 @@
        </activeWhen>
        <enabledWhen>
           <and>
-             <reference
+             <!--reference
                    definitionId="org.robotframework.singleElementHasFocusedCell">
              </reference>
              <reference
@@ -1784,12 +1784,15 @@
              </reference>
              <reference
                    definitionId="org.robotframework.focusedCellHasContent">
+             </reference-->
+             <reference
+             	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
              </reference>
           </and>
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.CopyCellContentHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CopyInSettingsTableHandler"
           commandId="org.eclipse.ui.edit.copy">
        <activeWhen>
           <reference
@@ -1798,17 +1801,20 @@
        </activeWhen>
        <enabledWhen>
           <and>
-             <reference
+             <!--reference
                    definitionId="org.robotframework.singleElementHasFocusedCell">
              </reference>
              <reference
                    definitionId="org.robotframework.focusedCellHasContent">
+             </reference-->
+             <reference
+             	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
              </reference>
           </and>
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteSettingsCellContentHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteInSettingsTableHandler"
           commandId="org.eclipse.ui.edit.paste">
        <activeWhen>
           <reference
@@ -1818,7 +1824,7 @@
        <enabledWhen>
           <with
                 variable="activeEditor">
-             <and>
+             <!--and>
                 <reference
                       definitionId="org.robotframework.exactlyOneElementIsSelected">
                 </reference>
@@ -1829,12 +1835,23 @@
                       property="org.robotframework.thereIsTextInClipboard"
                       value="true">
                 </test>
-             </and>
+             </and-->
+           <or>
+             <reference
+                   definitionId="org.robotframework.canPasteToGeneralSettingsSectionEditorTable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.canPasteToMetadataSettingsSectionEditorTable">
+             </reference>
+             <reference
+                   definitionId="org.robotframework.canPasteToImportSettingsSectionEditorTable">
+             </reference>
+          	</or>
           </with>
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteSettingsCellContentHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteInSettingsTableHandler"
           commandId="org.eclipse.ui.edit.delete">
        <activeWhen>
           <reference
@@ -1843,12 +1860,15 @@
        </activeWhen>
        <enabledWhen>
           <and>
-             <reference
+             <!--reference
                    definitionId="org.robotframework.singleElementHasFocusedCell">
              </reference>
              <reference
                    definitionId="org.robotframework.exactlyOneElementIsSelected">
-             </reference>
+             </reference-->
+            <reference
+            	definitionId="org.robotframework.atLeastOneSettingIsSelected">
+     		</reference>
           </and>
        </enabledWhen>
     </handler>
