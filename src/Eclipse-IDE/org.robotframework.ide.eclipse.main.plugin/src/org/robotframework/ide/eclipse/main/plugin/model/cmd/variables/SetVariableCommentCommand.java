@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -25,12 +27,13 @@ public class SetVariableCommentCommand extends EditorCommand {
         if (variable.getComment().equals(newComment)) {
             return;
         }
+
+        final AVariable holder = (AVariable) variable.getLinkedElement();
         if (newComment.isEmpty()) {
-            final AVariable holder = (AVariable) variable.getLinkedElement();
             holder.clearComment();
+        } else {
+            CommentServiceHandler.update(holder, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, newComment);
         }
-        
-        // variable.setComment(newComment);
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_COMMENT_CHANGE, variable);
     }
