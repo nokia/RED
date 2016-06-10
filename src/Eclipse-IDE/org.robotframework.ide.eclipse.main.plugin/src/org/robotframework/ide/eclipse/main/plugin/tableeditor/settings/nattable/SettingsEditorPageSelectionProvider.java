@@ -22,6 +22,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
@@ -106,6 +107,10 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
         if (activeFormFragment != null && activeFormFragment.getSelectionProvider() != null) {
             activeFormFragment.getSelectionProvider().setSelection(selection);
         }
+    }
+    
+    public SelectionLayerAccessor getSelectionLayerAccessor() {
+        return activeFormFragment != null ? activeFormFragment.getSelectionLayerAccessor() : null;
     }
     
     @SuppressWarnings("rawtypes")

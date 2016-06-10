@@ -17,6 +17,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestSetup extends AKeywordBaseSetting<SettingTable> {
 
+    private static final long serialVersionUID = 1L;
+
     public TestSetup(final RobotToken declaration) {
         super(declaration);
     }

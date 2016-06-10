@@ -14,6 +14,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class DefaultTags extends ATags<SettingTable> {
 
+    private static final long serialVersionUID = 1L;
+
     public DefaultTags(RobotToken declaration) {
         super(declaration);
     }

@@ -38,7 +38,6 @@ import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
@@ -61,6 +60,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsMatchesCollection;
@@ -113,10 +113,17 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private ISortModel sortModel;
 
     private RowSelectionProvider<Object> selectionProvider;
+    
+    private SelectionLayerAccessor selectionLayerAccessor;
 
     @Override
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
+    }
+    
+    @Override
+    public SelectionLayerAccessor getSelectionLayerAccessor() {
+        return selectionLayerAccessor;
     }
 
     @Override
@@ -190,6 +197,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
         
         // tooltips support
         new NatTableContentTooltip(table);
@@ -215,7 +223,6 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         table.addConfiguration(new SettingsDynamicTableSortingConfiguration());
 
         // popup menus
-        table.addConfiguration(new HeaderMenuConfiguration(table));
         table.addConfiguration(new ImportSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
@@ -381,6 +388,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
         if (setting.getSuiteFile() == fileModel) {
             table.update();
+            table.refresh();
             setDirty();
         }
     }

@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -12,7 +13,9 @@ import java.util.List;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public abstract class ATags<T> extends AModelElement<T> implements ICommentHolder {
+public abstract class ATags<T> extends AModelElement<T> implements ICommentHolder, Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private final RobotToken declaration;
 

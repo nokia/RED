@@ -58,7 +58,6 @@ import org.eclipse.nebula.widgets.nattable.style.Style;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -97,6 +96,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.GeneralSettingsModel;
@@ -147,6 +147,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private com.google.common.base.Optional<NatTable> table = com.google.common.base.Optional.absent();
 
     private StyledText documentation;
+    
+    private boolean hasFocusOnDocumentation;
 
     private Job documenationChangeJob;
 
@@ -156,9 +158,16 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private RowSelectionProvider<Entry<String, RobotElement>> selectionProvider;
 
+    private SelectionLayerAccessor selectionLayerAccessor;
+
     @Override
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
+    }
+    
+    @Override
+    public SelectionLayerAccessor getSelectionLayerAccessor() {
+        return selectionLayerAccessor;
     }
     
     @Override
@@ -213,12 +222,14 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             @Override
             public void focusGained(final FocusEvent e) {
                 documentation.setText(getDocumentation(getSection(), true));
+                hasFocusOnDocumentation = true;
                 documentation.redraw();
             }
 
             @Override
             public void focusLost(final FocusEvent e) {
                 documentation.setText(getDocumentation(getSection(), false));
+                hasFocusOnDocumentation = false;
                 documentation.redraw();
             }
         });
@@ -229,7 +240,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 @Override
                 public void modifyText(final ModifyEvent e) {
-                    if (documentation.getCaretOffset() == 0) {
+                    if (!hasFocusOnDocumentation || (hasFocusOnDocumentation
+                            && (documentation.getText().equals(getDocumentation(getSection(), true))
+                                    || documentation.getText().equals(getDocumentation(getSection(), false))))) {
                         return;
                     }
                     
@@ -276,8 +289,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 if (settingsSection == null) {
                     return Status.OK_STATUS;
                 }
-                
-                
 
                 final RobotSetting docSetting = settingsSection.getSetting("Documentation");
 
@@ -351,6 +362,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
         
         // tooltips support
         new NatTableContentTooltip(table.get());
@@ -380,12 +392,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.addConfiguration(new SettingsDynamicTableSortingConfiguration());
 
         // popup menus
-        table.addConfiguration(new HeaderMenuConfiguration(table));
         table.addConfiguration(new GeneralSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
         
-        table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.metadata.context", site));
+        table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.general.context", site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return com.google.common.base.Optional.of(table);
     }
@@ -510,7 +521,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         public void accumulateConfigLabels(LabelStack configLabels, int columnPosition, int rowPosition) {
             Entry<String, RobotElement> rowObject = (Entry<String, RobotElement>) dataProvider
                     .getRowObject(rowPosition);
-            if (rowObject != null && rowObject.getValue() == null) {
+            if (rowObject != null && rowObject.getValue() == null && columnPosition == 0) {
                 configLabels.addLabel(EMPTY_GENERAL_SETTING_LABEL);
             }
         }
@@ -644,6 +655,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             if (table.isPresent()) {
                 table.get().update();
             }
+            refreshTable();
             setDirty();
         }
     }
