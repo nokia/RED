@@ -40,6 +40,8 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
 
     private final DetailCellEditorEditingSupport<D> editSupport;
 
+    private final AssistanceSupport assistSupport;
+
     private final MainControlChooser mainControlChooseCallback;
 
     private final Mode mode;
@@ -48,11 +50,14 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
     private final DetailEntriesCollection<D> entries = new DetailEntriesCollection<>();
     private final EntriesChangeListener<D> entriesChangesListener;
 
+
     public DetailCellEditorEntriesComposite(final Composite parent, final DetailCellEditorEditingSupport<D> editSupport,
+            final AssistanceSupport assistSupport,
             final Mode mode, final EntriesChangeListener<D> entriesChangesListener,
             final MainControlChooser mainControlChooseCallback) {
         super(parent, SWT.NONE);
         this.editSupport = editSupport;
+        this.assistSupport = assistSupport;
         this.entriesChangesListener = entriesChangesListener;
         this.mainControlChooseCallback = mainControlChooseCallback;
         this.mode = mode;
@@ -113,7 +118,8 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
 
     private void createDetailEntryControls(final List<D> details) {
         for (final D detail : details) {
-            final DetailCellEditorEntry<D> entry = editSupport.createDetailEntry(entriesComposite, detail);
+            final DetailCellEditorEntry<D> entry = editSupport.createDetailEntry(entriesComposite, detail,
+                    assistSupport);
             GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 25).grab(true, false).applyTo(entry);
             entry.setBackground(getParent().getBackground());
             entry.addKeyListener(new EntryKeyPressListener(entry));

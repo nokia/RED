@@ -32,6 +32,8 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
 
     private final DetailCellEditorEditingSupport<D> editSupport;
 
+    private final AssistanceSupport assistSupport;
+
     private final MainControlChooser mainControlChooseCallback;
 
     private Mode mode = Mode.INLINED;
@@ -40,15 +42,18 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
 
     private DetailCellEditorEntriesComposite<D> panel;
 
+
     DetailCellEditorEntriesControlsSwitcher(final DetailCellEditorComposite<D> parent,
-            final DetailCellEditorEditingSupport<D> editSupport, final MainControlChooser mainControlChooseCallback) {
+            final DetailCellEditorEditingSupport<D> editSupport, final AssistanceSupport assistSupport,
+            final MainControlChooser mainControlChooseCallback) {
         this.parent = parent;
         this.editSupport = editSupport;
+        this.assistSupport = assistSupport;
         this.mainControlChooseCallback = mainControlChooseCallback;
     }
 
     DetailCellEditorEntriesComposite<D> createEntriesPanel() {
-        panel = new DetailCellEditorEntriesComposite<>(parent, editSupport,
+        panel = new DetailCellEditorEntriesComposite<>(parent, editSupport, assistSupport,
                 mode, new DetailCellEditorEntriesComposite.EntriesChangeListener<D>() {
                     @Override
                     public void entriesChanged(final List<DetailCellEditorEntry<D>> entries) {
@@ -102,7 +107,7 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
         final DialogContentCreator contentCreator = new DialogContentCreator() {
             @Override
             public Control create(final Composite parent) {
-                panel = new DetailCellEditorEntriesComposite<>(parent, editSupport, Mode.WINDOWED,
+                panel = new DetailCellEditorEntriesComposite<>(parent, editSupport, assistSupport, Mode.WINDOWED,
                         new EntriesChangeListener<D>(), mainControlChooseCallback);
                 panel.addDisposeListener(new DisposeListener() {
                     @Override

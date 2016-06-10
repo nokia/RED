@@ -21,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveDict
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetDictVariableValueElementCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.red.nattable.edit.AssistanceSupport;
 import org.robotframework.red.nattable.edit.DetailCellEditorEditingSupport;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
 
@@ -66,11 +67,11 @@ public class DictVariableDetailsEditingSupport implements DetailCellEditorEditin
 
     @Override
     public DetailCellEditorEntry<DictionaryKeyValuePair> createDetailEntry(final Composite parent,
-            final DictionaryKeyValuePair detail) {
+            final DictionaryKeyValuePair detail, final AssistanceSupport assistSupport) {
         final Color hoverColor = theme.getBodyHoveredCellBackground();
         final Color selectionColor = theme.getBodySelectedCellBackground();
-        final DictVariableDetailCellEditorEntry entry = new DictVariableDetailCellEditorEntry(parent, hoverColor,
-                selectionColor);
+        final DictVariableDetailCellEditorEntry entry = new DictVariableDetailCellEditorEntry(parent, assistSupport,
+                hoverColor, selectionColor);
         entry.update(detail);
         return entry;
     }
