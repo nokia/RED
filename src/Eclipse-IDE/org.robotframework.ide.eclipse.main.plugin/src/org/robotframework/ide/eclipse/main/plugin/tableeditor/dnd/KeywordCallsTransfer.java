@@ -42,6 +42,11 @@ public class KeywordCallsTransfer extends ByteArrayTransfer {
         return clipboard != null && !clipboard.isDisposed() && clipboardContainKeywordCalls(clipboard)
                 && hasKeywordCallsOnly(clipboard.getContents(getInstance()));
     }
+    
+    public static boolean hasSettings(final Clipboard clipboard) {
+        return clipboard != null && !clipboard.isDisposed() && clipboardContainKeywordCalls(clipboard)
+                && hasAllGroupSettingsOnly(clipboard.getContents(getInstance()));
+    }
 
     public static boolean hasGeneralSettings(final Clipboard clipboard) {
         return clipboard != null && !clipboard.isDisposed() && clipboardContainKeywordCalls(clipboard)
@@ -64,6 +69,17 @@ public class KeywordCallsTransfer extends ByteArrayTransfer {
             for (final Object item : ((Object[])content)) {
                 if (item.getClass() != RobotSetting.class
                         || !newHashSet(groups).contains(((RobotSetting) item).getGroup())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
+    private static boolean hasAllGroupSettingsOnly(final Object content) {
+        if (content instanceof Object[]) {
+            for (final Object item : ((Object[]) content)) {
+                if (item.getClass() != RobotSetting.class) {
                     return false;
                 }
             }

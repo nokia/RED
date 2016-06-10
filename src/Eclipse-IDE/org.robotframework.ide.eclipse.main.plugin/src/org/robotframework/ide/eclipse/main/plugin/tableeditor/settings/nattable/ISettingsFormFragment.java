@@ -7,10 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable
 
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 
 public interface ISettingsFormFragment {
 
     ISelectionProvider getSelectionProvider();
+    
+    SelectionLayerAccessor getSelectionLayerAccessor();
 
     NatTable getTable();
 }

@@ -9,6 +9,10 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.SettingTable;
+import org.rf.ide.core.testdata.model.table.setting.AImported;
+import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
@@ -33,6 +37,15 @@ public class MoveSettingDownCommand extends EditorCommand {
             return;
         }
         Collections.swap(section.getChildren(), currentIndex, downIndex);
+        
+        ARobotSectionTable linkedElement = section.getLinkedElement();
+        if (linkedElement != null && linkedElement instanceof SettingTable) {
+            if (setting.getGroup() == SettingsGroup.METADATA) {
+                ((SettingTable) linkedElement).moveDownMetadata((Metadata) setting.getLinkedElement());
+            } else {
+                ((SettingTable) linkedElement).moveDownImported((AImported) setting.getLinkedElement());
+            }
+        }
 
         eventBroker.post(RobotModelEvents.ROBOT_SETTING_MOVED, section);
     }
