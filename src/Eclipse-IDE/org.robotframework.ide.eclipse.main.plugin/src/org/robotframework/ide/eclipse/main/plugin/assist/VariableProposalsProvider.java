@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals.variablesSortedByTypesAndNames;
+import static org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.variablesSortedByOriginAndNames;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ class VariableProposalsProvider implements IContentProposalProvider {
         final String prefix = contents.substring(varStart, position);
 
         final List<RedVariableProposal> variableEntities = new RedVariableProposals(suiteFile)
-                .getVariableProposals(variablesSortedByTypesAndNames());
+                .getVariableProposals(variablesSortedByOriginAndNames());
 
         final List<VariableContentProposal> proposals = newArrayList();
         for (final RedVariableProposal proposedVariable : variableEntities) {

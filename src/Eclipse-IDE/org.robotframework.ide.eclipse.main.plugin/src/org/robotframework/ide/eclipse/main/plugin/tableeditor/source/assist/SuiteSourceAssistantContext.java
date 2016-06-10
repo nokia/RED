@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals.variablesSortedByTypesAndNames;
+import static org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.variablesSortedByOriginAndNames;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -81,7 +81,7 @@ public class SuiteSourceAssistantContext {
     }
 
     public List<RedVariableProposal> getVariables(final int offset) {
-        return new RedVariableProposals(suiteModel).getVariableProposals(variablesSortedByTypesAndNames(), offset);
+        return new RedVariableProposals(suiteModel).getVariableProposals(variablesSortedByOriginAndNames(), offset);
     }
 
     public List<RedKeywordProposal> getKeywords(final String prefix,
