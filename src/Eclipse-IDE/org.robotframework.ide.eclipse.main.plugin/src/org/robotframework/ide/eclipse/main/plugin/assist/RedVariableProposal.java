@@ -11,6 +11,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
 
 public final class RedVariableProposal {
@@ -25,7 +26,8 @@ public final class RedVariableProposal {
 
     private final VariableOrigin origin;
 
-    private RedVariableProposal(final String name, final String source, final String value, final String comment,
+    @VisibleForTesting
+    RedVariableProposal(final String name, final String source, final String value, final String comment,
             final VariableOrigin origin) {
         this.name = name;
         this.source = source;
@@ -115,7 +117,8 @@ public final class RedVariableProposal {
         return java.util.Objects.hash(name, source, value, comment, origin);
     }
 
-    private enum VariableOrigin {
+    @VisibleForTesting
+    enum VariableOrigin {
         LOCAL,
         IMPORTED,
         BUILTIN

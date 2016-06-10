@@ -22,7 +22,9 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescr
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
+import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 
 public class RedKeywordProposal extends KeywordEntity {
@@ -37,11 +39,12 @@ public class RedKeywordProposal extends KeywordEntity {
 
     private final ArgumentsDescriptor argumentsDescriptor;
 
-    private final LazyProvider<String> htmlDocumentationProvider;
+    private final Supplier<String> htmlDocumentationProvider;
 
-    private RedKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
+    @VisibleForTesting
+    RedKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
             final KeywordType type, final String name, final String decoration, final boolean hasDescription,
-            final ArgumentsDescriptor argumentsDescriptor, final LazyProvider<String> htmlDocumentationProvider,
+            final ArgumentsDescriptor argumentsDescriptor, final Supplier<String> htmlDocumentationProvider,
             final String documentation, final boolean isDeprecated, final IPath exposingFilePath) {
 
         super(scope, sourceName, name, sourceAlias, isDeprecated, exposingFilePath);
@@ -60,10 +63,9 @@ public class RedKeywordProposal extends KeywordEntity {
 
     static RedKeywordProposal create(final LibrarySpecification spec, final KeywordSpecification keyword,
             final KeywordScope scope, final String sourcePrefix, final IPath exposingFilepath) {
-        final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
-
+        final Supplier<String> htmlDocuProvider = new Supplier<String>() {
             @Override
-            public String provide() {
+            public String get() {
                 return keyword.getDocumentationAsHtml();
             }
         };
@@ -75,10 +77,10 @@ public class RedKeywordProposal extends KeywordEntity {
 
     static RedKeywordProposal create(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword,
             final KeywordScope scope, final String sourcePrefix) {
-        final LazyProvider<String> htmlDocuProvider = new LazyProvider<String>() {
+        final Supplier<String> htmlDocuProvider = new Supplier<String>() {
             @Override
-            public String provide() {
-                return "<p>to be implemented</p>";
+            public String get() {
+                return "<p>" + userKeyword.getDocumentation() + "</p>";
             }
         };
         final ArgumentsDescriptor argsDescriptor = userKeyword.createArgumentsDescriptor();
@@ -117,7 +119,7 @@ public class RedKeywordProposal extends KeywordEntity {
     }
 
     public String getHtmlDocumentation() {
-        return htmlDocumentationProvider.provide();
+        return htmlDocumentationProvider.get();
     }
 
     public String getArgumentsLabel() {
@@ -137,10 +139,6 @@ public class RedKeywordProposal extends KeywordEntity {
         }));
     }
 
-    private static interface LazyProvider<T> {
-        T provide();
-    }
-
     public String getDocumentation() {
         return String.format("Name: %s\nSource: %s\nArguments: %s\n\n%s", name, sourceName, getArgumentsLabel(),
                 documentation);
@@ -150,7 +148,8 @@ public class RedKeywordProposal extends KeywordEntity {
         return sourcePrefix;
     }
 
-    public enum KeywordType {
+    @VisibleForTesting
+    enum KeywordType {
         LIBRARY(RedImages.getKeywordImage()),
         USER_DEFINED(RedImages.getUserKeywordImage());
 
