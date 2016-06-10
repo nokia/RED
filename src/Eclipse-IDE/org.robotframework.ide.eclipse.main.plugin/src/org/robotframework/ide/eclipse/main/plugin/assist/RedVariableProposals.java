@@ -29,19 +29,6 @@ public class RedVariableProposals {
     public RedVariableProposals(final RobotSuiteFile suiteFile) {
         this.suiteFile = suiteFile;
     }
-    
-    public static Comparator<RedVariableProposal> variablesSortedByTypesAndNames() {
-        return new Comparator<RedVariableProposal>() {
-            @Override
-            public int compare(final RedVariableProposal proposal1, final RedVariableProposal proposal2) {
-                if (proposal1.getType() == proposal2.getType()) {
-                    return proposal1.getName().compareToIgnoreCase(proposal2.getName());
-                } else {
-                    return proposal1.getType().compareTo(proposal2.getType());
-                }
-            }
-        };
-    }
 
     public List<RedVariableProposal> getVariableProposals(final Comparator<RedVariableProposal> comparator,
             final int offset) {
