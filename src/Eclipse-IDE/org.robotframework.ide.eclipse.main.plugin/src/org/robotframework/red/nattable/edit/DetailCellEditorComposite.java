@@ -31,16 +31,21 @@ class DetailCellEditorComposite<D> extends Composite {
 
     private final CellEditorValueValidationJobScheduler<String> validationScheduler;
 
+    private final AssistanceSupport assistSupport;
+
     DetailCellEditorComposite(final Composite parent, final DetailCellEditorEditingSupport<D> editSupport,
+            final AssistanceSupport assistSupport,
             final CellEditorValueValidationJobScheduler<String> validationScheduler) {
         super(parent, SWT.NONE);
         this.editSupport = editSupport;
+        this.assistSupport = assistSupport;
         this.validationScheduler = validationScheduler;
 
         setBackground(parent.getBackground());
         GridLayoutFactory.fillDefaults().applyTo(this);
 
-        this.switcher = new DetailCellEditorEntriesControlsSwitcher<>(this, editSupport, new MainControlChooser() {
+        this.switcher = new DetailCellEditorEntriesControlsSwitcher<>(this, editSupport, assistSupport,
+                new MainControlChooser() {
             @Override
             public void focusMainControl() {
                 text.setFocus();
@@ -55,6 +60,9 @@ class DetailCellEditorComposite<D> extends Composite {
         text.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(final KeyEvent e) {
+                if (assistSupport.areContentProposalsShown()) {
+                    return;
+                }
                 if (e.keyCode == SWT.ARROW_DOWN) {
 
                     switcher.selectFirstEntry();

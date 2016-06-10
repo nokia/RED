@@ -19,7 +19,7 @@ public interface DetailCellEditorEditingSupport<D> {
 
     List<D> getDetailElements();
 
-    DetailCellEditorEntry<D> createDetailEntry(final Composite parent, final D detail);
+    DetailCellEditorEntry<D> createDetailEntry(final Composite parent, final D detail, AssistanceSupport assistSupport);
 
     void addNewDetailElement(String newElementContent);
 
