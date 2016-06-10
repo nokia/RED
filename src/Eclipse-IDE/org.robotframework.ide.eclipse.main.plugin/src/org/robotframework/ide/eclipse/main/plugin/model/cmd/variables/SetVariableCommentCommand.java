@@ -19,7 +19,7 @@ public class SetVariableCommentCommand extends EditorCommand {
 
     public SetVariableCommentCommand(final RobotVariable variable, final String newComment) {
         this.variable = variable;
-        this.newComment = newComment;
+        this.newComment = newComment == null ? "" : newComment;
     }
 
     @Override
