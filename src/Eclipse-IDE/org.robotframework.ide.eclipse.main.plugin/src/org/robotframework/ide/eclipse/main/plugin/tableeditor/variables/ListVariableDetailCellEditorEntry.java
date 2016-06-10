@@ -18,11 +18,15 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.jface.assist.RedContentProposalAdapter;
+import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
+import org.robotframework.red.nattable.edit.AssistanceSupport;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DefaultRedCellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
 import org.robotframework.red.swt.LabelsMeasurer;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 /**
@@ -31,15 +35,19 @@ import com.google.common.base.Strings;
  */
 class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken> {
 
+    private final AssistanceSupport assistSupport;
+
     private String text;
 
     private String indexText;
 
     private Text textEdit;
 
-    ListVariableDetailCellEditorEntry(final Composite parent, final Color hoverColor,
-            final Color selectionColor) {
+
+    ListVariableDetailCellEditorEntry(final Composite parent, final AssistanceSupport assistSupport,
+            final Color hoverColor, final Color selectionColor) {
         super(parent, hoverColor, selectionColor);
+        this.assistSupport = assistSupport;
 
         addPaintListener(new ListElementPainter());
         GridLayoutFactory.fillDefaults().extendedMargins(0, HOVER_BLOCK_WIDTH, 0, 0).applyTo(this);
@@ -67,6 +75,9 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
 
             @Override
             public void keyTraversed(final TraverseEvent e) {
+                if (assistSupport.areContentProposalsShown()) {
+                    return;
+                }
                 if (e.keyCode == SWT.ESC) {
                     cancelEdit();
                 } else if (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) {
@@ -75,6 +86,8 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
             }
         });
         validationJobScheduler.armRevalidationOn(textEdit);
+        assistSupport.install(textEdit, Optional.<RedContentProposalListener> absent(),
+                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
         GridDataFactory.fillDefaults().grab(true, false).indent(calculateControlIndent(), 2).applyTo(textEdit);
         layout();
 

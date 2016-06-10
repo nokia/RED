@@ -5,8 +5,6 @@
  */
 package org.robotframework.red.nattable.edit;
 
-import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.viewers.IContentProposingSupport;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
@@ -14,8 +12,6 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectio
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -26,6 +22,8 @@ import org.eclipse.swt.widgets.Text;
 import org.robotframework.ide.eclipse.main.plugin.assist.VariablesContentProposingSupport;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
+
+import com.google.common.base.Optional;
 
 /**
  * Modified version of {@link org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor} which
@@ -40,8 +38,9 @@ public class RedTextCellEditor extends TextCellEditor {
 
     private final CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
-    private final IContentProposingSupport support;
-    private RedContentProposalAdapter adapter;
+    private final AssistanceSupport support;
+    // private final IContentProposingSupport support;
+    // private RedContentProposalAdapter adapter;
 
     public RedTextCellEditor() {
         this(0, 0, new DefaultRedCellEditorValueValidator(), null);
@@ -69,7 +68,7 @@ public class RedTextCellEditor extends TextCellEditor {
         super(true, true);
         this.selectionStartShift = selectionStartShift;
         this.selectionEndShift = selectionEndShift;
-        this.support = support;
+        this.support = new AssistanceSupport(support);
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
     }
 
@@ -92,28 +91,10 @@ public class RedTextCellEditor extends TextCellEditor {
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
         final Control control = super.activateCell(parent, originalCanonicalValue);
 
-        if (support != null) {
-            adapter = new RedContentProposalAdapter(getEditorControl(), support.getControlAdapter(control),
-                    support.getProposalProvider(), support.getKeyStroke(), support.getActivationKeys());
-            adapter.setProposalAcceptanceStyle(RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
-            adapter.setLabelProvider(support.getLabelProvider());
-            adapter.setAutoActivationDelay(200);
-            adapter.addContentProposalListener(new ContentProposalsListener());
-
-            final ControlDecoration decoration = new ControlDecoration(control, SWT.RIGHT | SWT.TOP);
-            decoration.setDescriptionText("Press Ctrl+Space for content assist");
-            decoration.setImage(FieldDecorationRegistry.getDefault()
-                    .getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL)
-                    .getImage());
-            control.getParent().redraw();
-            control.addDisposeListener(new DisposeListener() {
-
-                @Override
-                public void widgetDisposed(final DisposeEvent e) {
-                    decoration.dispose();
-                }
-            });
-        }
+        final RedContentProposalListener assistListener = new ContentProposalsListener();
+        support.install(getEditorControl(), Optional.of(assistListener),
+                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+        parent.redraw();
 
         if (selectionStartShift > 0 || selectionEndShift > 0) {
             if (getEditorControl().getText().length() >= selectionStartShift + selectionEndShift) {
@@ -144,7 +125,7 @@ public class RedTextCellEditor extends TextCellEditor {
 
         @Override
         public void keyPressed(final KeyEvent event) {
-            if (areContentProposalsShown()) {
+            if (support.areContentProposalsShown()) {
                 return;
             }
 
@@ -165,10 +146,6 @@ public class RedTextCellEditor extends TextCellEditor {
                     commit(MoveDirectionEnum.DOWN);
                 }
             }
-        }
-
-        private boolean areContentProposalsShown() {
-            return adapter != null && adapter.isProposalPopupOpen();
         }
 
         private MoveDirectionEnum getMoveDirection(final KeyEvent event) {

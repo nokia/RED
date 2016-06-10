@@ -19,10 +19,15 @@ import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.jface.assist.RedContentProposalAdapter;
+import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
+import org.robotframework.red.nattable.edit.AssistanceSupport;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DefaultRedCellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
 import org.robotframework.red.swt.LabelsMeasurer;
+
+import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
@@ -30,14 +35,18 @@ import org.robotframework.red.swt.LabelsMeasurer;
  */
 class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<DictionaryKeyValuePair> {
 
+    private final AssistanceSupport assistSupport;
+
     private String keyText;
     private String valueText;
 
     private Text textEdit;
 
-    DictVariableDetailCellEditorEntry(final Composite parent, final Color hoverColor,
-            final Color selectionColor) {
+
+    DictVariableDetailCellEditorEntry(final Composite parent, final AssistanceSupport assistSupport,
+            final Color hoverColor, final Color selectionColor) {
         super(parent, hoverColor, selectionColor);
+        this.assistSupport = assistSupport;
 
         addPaintListener(new DictElementPainter());
         GridLayoutFactory.fillDefaults().extendedMargins(0, HOVER_BLOCK_WIDTH, 0, 0).applyTo(this);
@@ -66,6 +75,9 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
 
             @Override
             public void keyTraversed(final TraverseEvent e) {
+                if (assistSupport.areContentProposalsShown()) {
+                    return;
+                }
                 if (e.keyCode == SWT.ESC) {
                     cancelEdit();
                 } else if (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) {
@@ -74,6 +86,8 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
             }
         });
         validationJobScheduler.armRevalidationOn(textEdit);
+        assistSupport.install(textEdit, Optional.<RedContentProposalListener> absent(),
+                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
         GridDataFactory.fillDefaults().grab(true, false).indent(5, 2).applyTo(textEdit);
         layout();
 
