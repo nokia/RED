@@ -16,8 +16,8 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
-import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -154,7 +154,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
         gridLayer.addConfiguration(new VariablesTableAdderStatesConfiguration(dataProvider));
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator()));
         gridLayer.addConfiguration(new VariableValuesEditConfiguration(theme, fileModel, dataProvider, commandsStack));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
@@ -213,26 +213,17 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
     }
 
-    private NewElementsCreator<RobotVariable> newElementsCreator(final SelectionLayer selectionLayer) {
+    private NewElementsCreator<RobotVariable> newElementsCreator() {
         return new NewElementsCreator<RobotVariable>() {
             @Override
             public RobotVariable createNew() {
-                final PositionCoordinate selectedCellPosition = selectionLayer.getLastSelectedCellPosition();
-                final int selectedCellColumn = selectedCellPosition == null ? -1 : selectedCellPosition.columnPosition;
-                final int selectedCellRow = selectedCellPosition == null ? -1 : selectedCellPosition.rowPosition;
-
                 final RobotVariablesSection section = dataProvider.getInput();
                 commandsStack.execute(
                         new CreateFreshVariableCommand(section, dataProvider.getAdderState().getVariableType()));
-
                 SwtThread.asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        if (selectedCellColumn > 0 && selectedCellRow > 0) {
-                            selectionLayer.selectCell(selectedCellColumn, selectedCellRow, false, false);
-                        }
-                        // table.doCommand(new EditSelectionCommand(table,
-                        // table.getConfigRegistry()));
+                        table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
                     }
                 });
                 return section.getChildren().get(section.getChildren().size() - 1);

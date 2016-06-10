@@ -51,7 +51,7 @@ public class AlwaysDeactivatingCellEditor extends AbstractCellEditor {
 
     @Override
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
-        commit(MoveDirectionEnum.UP);
+        commit(MoveDirectionEnum.NONE);
         return null;
     }
 }
