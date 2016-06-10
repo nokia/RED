@@ -44,6 +44,8 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         private Optional<MetadataSettingsFormFragment> metadataFragment;
 
         private ImportSettingsFormFragment importFragment;
+        
+        private SettingsEditorPageSelectionProvider settingsEditorPageSelectionProvider;
 
         @Override
         protected String getContextId() {
@@ -125,11 +127,10 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            if (metadataFragment.isPresent()) {
-                return new SettingsEditorPageSelectionProvider(generalFragment, metadataFragment.get(), importFragment);
-            } else {
-                return new SettingsEditorPageSelectionProvider(generalFragment, importFragment);
+            if(settingsEditorPageSelectionProvider == null) {
+                settingsEditorPageSelectionProvider = createSettingsEditorPageSelectionProvider();
             }
+            return settingsEditorPageSelectionProvider;
         }
 
         @Override
@@ -139,7 +140,18 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public SelectionLayerAccessor getSelectionLayerAccessor() {
-            return null;
+            if(settingsEditorPageSelectionProvider == null) {
+                settingsEditorPageSelectionProvider = createSettingsEditorPageSelectionProvider();
+            }
+            return settingsEditorPageSelectionProvider.getSelectionLayerAccessor();
+        }
+        
+        private SettingsEditorPageSelectionProvider createSettingsEditorPageSelectionProvider() {
+            if (metadataFragment.isPresent()) {
+                return new SettingsEditorPageSelectionProvider(generalFragment, metadataFragment.get(), importFragment);
+            } else {
+                return new SettingsEditorPageSelectionProvider(generalFragment, importFragment);
+            }
         }
     }
 }
