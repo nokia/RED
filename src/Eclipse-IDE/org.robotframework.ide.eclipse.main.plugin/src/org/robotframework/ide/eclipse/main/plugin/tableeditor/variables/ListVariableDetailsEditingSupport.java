@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveList
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetListVariableValueElementCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.red.nattable.edit.AssistanceSupport;
 import org.robotframework.red.nattable.edit.DetailCellEditorEditingSupport;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
 
@@ -77,11 +78,12 @@ public class ListVariableDetailsEditingSupport implements DetailCellEditorEditin
     }
 
     @Override
-    public DetailCellEditorEntry<RobotToken> createDetailEntry(final Composite parent, final RobotToken detail) {
+    public DetailCellEditorEntry<RobotToken> createDetailEntry(final Composite parent, final RobotToken detail,
+            final AssistanceSupport assistSupport) {
         final Color hoverColor = theme.getBodyHoveredCellBackground();
         final Color selectionColor = theme.getBodySelectedCellBackground();
-        final ListVariableDetailCellEditorEntry entry = new ListVariableDetailCellEditorEntry(parent, hoverColor,
-                selectionColor);
+        final ListVariableDetailCellEditorEntry entry = new ListVariableDetailCellEditorEntry(parent, assistSupport,
+                hoverColor, selectionColor);
         entry.update(detail);
         entry.setIndex(getDetailElements().size(), getDetailElements().indexOf(detail));
         return entry;

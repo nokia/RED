@@ -5,19 +5,21 @@
  */
 package org.robotframework.red.nattable.edit;
 
+import org.eclipse.jface.viewers.IContentProposingSupport;
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.robotframework.red.jface.assist.RedContentProposalAdapter;
+import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 
+import com.google.common.base.Optional;
 
 /**
  * Cell editor which shows list of detailed entries which can be edited
@@ -33,13 +35,17 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
 
     private final CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
-    public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport) {
-        this(editSupport, new DefaultRedCellEditorValueValidator());
+    private final AssistanceSupport assistSupport;
+
+    public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport,
+            final IContentProposingSupport support) {
+        this(editSupport, new DefaultRedCellEditorValueValidator(), support);
     }
 
     public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport,
-            final CellEditorValueValidator<String> validator) {
+            final CellEditorValueValidator<String> validator, final IContentProposingSupport support) {
         this.editSupport = editSupport;
+        this.assistSupport = new AssistanceSupport(support);
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
     }
 
@@ -49,6 +55,10 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
 
         composite = createEditorControl(parent);
         composite.setInput(getColumnIndex(), getRowIndex());
+
+        assistSupport.install(composite.getText(), Optional.<RedContentProposalListener> absent(),
+                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+        parent.redraw();
 
         return composite;
     }
@@ -63,28 +73,17 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
     @Override
     public DetailCellEditorComposite<D> createEditorControl(final Composite parent) {
         final DetailCellEditorComposite<D> composite = new DetailCellEditorComposite<>(parent, editSupport,
-                validationJobScheduler);
+                assistSupport, validationJobScheduler);
         composite.setBackground(parent.getBackground());
 
         composite.getText().setFocus();
-        composite.getText().addKeyListener(new KeyAdapter() {
-
-            @Override
-            public void keyPressed(final KeyEvent e) {
-                if (e.keyCode == ' ' && e.stateMask == SWT.CTRL) {
-                    e.doit = false;
-
-                    // TODO : hook for providing content proposals window
-                    // final Rectangle bounds = composite.getBounds();
-                    // final Label lbl = new Label(parent, SWT.NONE);
-                    // lbl.setText("foo");
-                    // lbl.setBounds(bounds.x + bounds.width + 1, bounds.y, 100, 100);
-                }
-            }
-        });
         composite.getText().addTraverseListener(new TraverseListener() {
             @Override
             public void keyTraversed(final TraverseEvent event) {
+                if (assistSupport.areContentProposalsShown()) {
+                    return;
+                }
+
                 boolean committed = false;
                 if (event.keyCode == SWT.TAB && event.stateMask == SWT.SHIFT) {
                     committed = commit(MoveDirectionEnum.LEFT);
