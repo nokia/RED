@@ -25,7 +25,6 @@ import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.NullComparator;
-import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
@@ -53,12 +52,9 @@ import org.eclipse.nebula.widgets.nattable.ui.menu.HeaderMenuConfiguration;
 import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -192,7 +188,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator()));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 
@@ -277,20 +273,15 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         selectionProvider.setSelection(StructuredSelection.EMPTY);
     }
     
-    private NewElementsCreator<RobotElement> newElementsCreator(final SelectionLayer selectionLayer) {
+    private NewElementsCreator<RobotElement> newElementsCreator() {
         return new NewElementsCreator<RobotElement>() {
             @Override
             public RobotElement createNew() {
-                final PositionCoordinate selectedCellPosition = selectionLayer.getLastSelectedCellPosition();
-                final int selectedCellColumn = selectedCellPosition.columnPosition;
-                final int selectedCellRow = selectedCellPosition.rowPosition;
-
                 final RobotSettingsSection section = dataProvider.getInput();
                 commandsStack.execute(new CreateFreshGeneralSettingCommand(section, "Metadata", newArrayList("data")));
                 SwtThread.asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        selectionLayer.selectCell(selectedCellColumn, selectedCellRow, false, false);
                         table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
                     }
                 });
@@ -302,7 +293,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     class MetadataSettingsTableSortingConfiguration extends AbstractRegistryConfiguration {
 
         @Override
-        public void configureRegistry(IConfigRegistry configRegistry) {
+        public void configureRegistry(final IConfigRegistry configRegistry) {
             configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR,
                     DefaultComparator.getInstance(), DisplayMode.NORMAL,
                     ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 0);

@@ -27,6 +27,7 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayerPainter;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
@@ -85,6 +86,7 @@ public class RedNattableLayersFactory {
 
     public SelectionLayer createSelectionLayer(final TableTheme theme, final IUniqueIndexLayer hoverLayer) {
         final SelectionLayer selectionLayer = new SelectionLayer(hoverLayer, false);
+        ((SelectionModel) selectionLayer.getSelectionModel()).setClearSelectionOnChange(false);
         selectionLayer.addConfiguration(new SelectionLayerConfiguration());
         selectionLayer.setLayerPainter(new SelectionLayerPainter(theme.getGridBorderColor()));
         return selectionLayer;
