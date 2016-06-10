@@ -38,6 +38,9 @@ public class RobotToken implements IRobotLineElement, Serializable {
         final RobotToken token = new RobotToken();
         token.setRaw(rawAndText);
         token.setText(rawAndText);
+        if (!types.isEmpty()) {
+            token.getTypes().clear();
+        }
         token.getTypes().addAll(types);
         return token;
     }
