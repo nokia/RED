@@ -14,6 +14,9 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.rf.ide.core.testdata.model.ICommentHolder;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
@@ -28,7 +31,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 
 public class RobotVariable implements RobotFileInternalElement, Serializable {
 
@@ -113,7 +115,7 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
 
     @Override
     public String getComment() {
-        return Joiner.on(" ").join(Iterables.transform(holder.getComment(), TokenFunctions.tokenToString()));
+        return CommentServiceHandler.consolidate((ICommentHolder) holder, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
     }
 
     @Override

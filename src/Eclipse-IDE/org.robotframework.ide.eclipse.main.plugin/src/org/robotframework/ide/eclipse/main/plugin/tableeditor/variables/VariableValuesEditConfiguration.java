@@ -39,6 +39,7 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
     public void configureRegistry(final IConfigRegistry configRegistry) {
         configureNamesCellEditors(configRegistry);
         configureValuesCellEditors(configRegistry);
+        configureCommentCellEditors(configRegistry);
     }
 
     private void configureNamesCellEditors(final IConfigRegistry configRegistry) {
@@ -82,5 +83,21 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
                         proposalsSupport),
                 DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.DICTIONARY));
+    }
+
+    private void configureCommentCellEditors(final IConfigRegistry configRegistry) {
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(0, 0, null),
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getCommentColumnLabel(VariableType.SCALAR));
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(0, 0, null),
+                DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getCommentColumnLabel(VariableType.SCALAR_AS_LIST));
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(0, 0, null),
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getCommentColumnLabel(VariableType.LIST));
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(0, 0, null),
+                DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getCommentColumnLabel(VariableType.DICTIONARY));
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(0, 0, null),
+                DisplayMode.NORMAL,
+                VariableTypesAndColumnsLabelAccumulator.getCommentColumnLabel(VariableType.INVALID));
     }
 }

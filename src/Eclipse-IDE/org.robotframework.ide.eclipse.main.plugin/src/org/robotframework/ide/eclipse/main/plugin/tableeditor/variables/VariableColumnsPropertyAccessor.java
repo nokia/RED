@@ -9,6 +9,7 @@ import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetScalarValueCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
@@ -58,7 +59,7 @@ public class VariableColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 commandsStack.execute(new SetScalarValueCommand(variable, (String) value));
             }
         } else if (column == 2) {
-            // do nothing now
+            commandsStack.execute(new SetVariableCommentCommand(variable, (String) value));
         } else {
             throw new IllegalStateException("Unknown column with " + column + " index");
         }
