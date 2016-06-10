@@ -21,10 +21,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetScalarValueCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariableColumnsPropertyAccessor;
 
 public class VariableColumnsPropertyAccessorTest {
 
@@ -155,6 +155,20 @@ public class VariableColumnsPropertyAccessorTest {
         }
 
         verify(stack, times(5)).execute(isA(SetVariableNameCommand.class));
+    }
+
+    @Test
+    public void commentChangeOfVariablesIsRequestedProperly() {
+        final RobotEditorCommandsStack stack = mock(RobotEditorCommandsStack.class);
+        final VariableColumnsPropertyAccessor accessor = new VariableColumnsPropertyAccessor(stack);
+
+        final List<RobotVariable> variables = createVariablesForTest();
+
+        for (final RobotVariable variable : variables) {
+            accessor.setDataValue(variable, 2, "# new comment");
+        }
+
+        verify(stack, times(5)).execute(isA(SetVariableCommentCommand.class));
     }
 
     @Test(expected = IllegalStateException.class)
