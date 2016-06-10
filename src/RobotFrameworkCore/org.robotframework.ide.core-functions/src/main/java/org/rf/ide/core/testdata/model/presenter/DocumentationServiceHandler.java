@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
@@ -19,6 +20,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
  * @author wypych
  */
 public class DocumentationServiceHandler {
+
+    private final static Pattern LINE_CONTINUE = Pattern.compile("^\\n\\s*[...]\\s*$");
 
     /**
      * Consolidate documentation text to one String for edit. The escaped characters will be
@@ -46,6 +49,7 @@ public class DocumentationServiceHandler {
         final StringBuilder text = new StringBuilder();
 
         int currentLineNr = -1;
+        boolean prevNewLine = false;
 
         final List<RobotToken> docText = documentation.getDocumentationText();
         final int nrOfDocTokens = docText.size();
@@ -58,23 +62,28 @@ public class DocumentationServiceHandler {
             if (tokId == 0) {
                 if (tokenText.trim().equals("...")) {
                     currentLineNr = tokenLineNr;
+                    prevNewLine = true;
                     continue;
                 } else if (tokenLineNr == documentation.getBeginPosition().getLine()) {
                     currentLineNr = tokenLineNr;
                 }
             }
 
-            if (tokenText.equals("\n...")) {
+            if (LINE_CONTINUE.matcher(tokenText).find()) {
                 text.append("\n");
                 currentLineNr = tokenLineNr;
+                prevNewLine = true;
                 continue;
             } else if (currentLineNr != tokenLineNr && tokenLineNr != FilePosition.NOT_SET) {
                 text.append("\n");
                 currentLineNr = tokenLineNr;
             } else if (tokId > 0 && text.length() > 0) {
-                text.append(" ");
+                if (!prevNewLine) {
+                    text.append(" ");
+                }
             }
 
+            prevNewLine = false;
             if (shouldUnescapeTokens) {
                 text.append(unescape(tokenText));
             } else {

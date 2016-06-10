@@ -22,13 +22,12 @@ import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-
 @SuppressWarnings("PMD.GodClass")
 public class PreviousLineHandler {
 
     private final ElementPositionResolver posResolver;
-    private final ParsingStateHelper stateHelper;
 
+    private final ParsingStateHelper stateHelper;
 
     public PreviousLineHandler() {
         this.posResolver = new ElementPositionResolver();
@@ -37,93 +36,67 @@ public class PreviousLineHandler {
 
     private final Stack<ParsingState> storedStack = new Stack<>();
 
-
-    public LineContinueType computeLineContinue(
-            final Stack<ParsingState> parsingStates, boolean isNewLine,
-            final RobotFile model, final RobotLine currentLine,
-            final RobotToken currentToken) {
+    public LineContinueType computeLineContinue(final Stack<ParsingState> parsingStates, boolean isNewLine,
+            final RobotFile model, final RobotLine currentLine, final RobotToken currentToken) {
         LineContinueType continueType = LineContinueType.NONE;
 
-        if ((currentToken.getTypes().size() == 1 && currentToken.getTypes()
-                .contains(RobotTokenType.PREVIOUS_LINE_CONTINUE))
-                || isCommentContinue(currentToken, storedStack)) {
-            ParsingState currentState = stateHelper
-                    .getCurrentStatus(parsingStates);
+        if (isPreviousLineContinueToken(currentLine, currentToken) || isCommentContinue(currentToken, storedStack)) {
+            ParsingState currentState = stateHelper.getCurrentStatus(parsingStates);
 
             if (currentState == ParsingState.SETTING_TABLE_INSIDE) {
-                if (isNewLine && containsAnySetting(model)
-                        && isSomethingToContinue(model)) {
-                    if (posResolver
-                            .isCorrectPosition(
-                                    PositionExpected.LINE_CONTINUE_NEWLINE_FOR_SETTING_TABLE,
-                                    model, currentLine, currentToken)) {
+                if (isNewLine && containsAnySetting(model) && isSomethingToContinue(model)) {
+                    if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_NEWLINE_FOR_SETTING_TABLE, model,
+                            currentLine, currentToken)) {
                         continueType = LineContinueType.SETTING_TABLE_ELEMENT;
                     }
                 }
             } else if (currentState == ParsingState.VARIABLE_TABLE_INSIDE) {
-                if (isNewLine && containsAnyVariable(model)
-                        && isSomethingToContinue(model)) {
-                    if (posResolver
-                            .isCorrectPosition(
-                                    PositionExpected.LINE_CONTINUE_NEWLINE_FOR_VARIABLE_TABLE,
-                                    model, currentLine, currentToken)) {
+                if (isNewLine && containsAnyVariable(model) && isSomethingToContinue(model)) {
+                    if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_NEWLINE_FOR_VARIABLE_TABLE, model,
+                            currentLine, currentToken)) {
                         continueType = LineContinueType.VARIABLE_TABLE_ELEMENT;
                     }
                 }
             } else if (currentState == ParsingState.TEST_CASE_TABLE_INSIDE
                     || currentState == ParsingState.TEST_CASE_DECLARATION) {
                 if (isNewLine) {
-                    if (posResolver
-                            .isCorrectPosition(
-                                    PositionExpected.LINE_CONTINUE_NEWLINE_FOR_TESTCASE_TABLE,
-                                    model, currentLine, currentToken)) {
-                        ParsingState state = stateHelper
-                                .getCurrentStatus(storedStack);
+                    if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_NEWLINE_FOR_TESTCASE_TABLE, model,
+                            currentLine, currentToken)) {
+                        ParsingState state = stateHelper.getCurrentStatus(storedStack);
                         if (state == ParsingState.TEST_CASE_TABLE_HEADER) {
-                            storedStack
-                                    .remove(ParsingState.TEST_CASE_TABLE_HEADER);
-                            storedStack
-                                    .push(ParsingState.TEST_CASE_TABLE_INSIDE);
+                            storedStack.remove(ParsingState.TEST_CASE_TABLE_HEADER);
+                            storedStack.push(ParsingState.TEST_CASE_TABLE_INSIDE);
                         }
                         continueType = LineContinueType.TEST_CASE_TABLE_ELEMENT;
                     }
                 } else {
-                    if (posResolver
-                            .isCorrectPosition(
-                                    PositionExpected.LINE_CONTINUE_INLINED_FOR_TESTCASE_TABLE,
-                                    model, currentLine, currentToken)) {
+                    if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_INLINED_FOR_TESTCASE_TABLE, model,
+                            currentLine, currentToken)) {
                         continueType = LineContinueType.LINE_CONTINUE_INLINED;
                     }
                 }
             } else if (currentState == ParsingState.KEYWORD_TABLE_INSIDE
                     || currentState == ParsingState.KEYWORD_DECLARATION) {
                 if (isNewLine) {
-                    if (posResolver
-                            .isCorrectPosition(
-                                    PositionExpected.LINE_CONTINUE_NEWLINE_FOR_KEYWORD_TABLE,
-                                    model, currentLine, currentToken)) {
-                        ParsingState state = stateHelper
-                                .getCurrentStatus(storedStack);
+                    if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_NEWLINE_FOR_KEYWORD_TABLE, model,
+                            currentLine, currentToken)) {
+                        ParsingState state = stateHelper.getCurrentStatus(storedStack);
                         if (state == ParsingState.KEYWORD_TABLE_HEADER) {
-                            storedStack
-                                    .remove(ParsingState.KEYWORD_TABLE_HEADER);
+                            storedStack.remove(ParsingState.KEYWORD_TABLE_HEADER);
                             storedStack.push(ParsingState.KEYWORD_TABLE_INSIDE);
                         }
                         continueType = LineContinueType.KEYWORD_TABLE_ELEMENT;
                     }
                 } else {
-                    if (posResolver
-                            .isCorrectPosition(
-                                    PositionExpected.LINE_CONTINUE_INLINED_FOR_KEYWORD_TABLE,
-                                    model, currentLine, currentToken)) {
+                    if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_INLINED_FOR_KEYWORD_TABLE, model,
+                            currentLine, currentToken)) {
                         continueType = LineContinueType.LINE_CONTINUE_INLINED;
                     }
                 }
             } else if (currentState == ParsingState.TEST_CASE_INSIDE_ACTION
                     || currentState == ParsingState.KEYWORD_INSIDE_ACTION) {
-                if (posResolver.isCorrectPosition(
-                        PositionExpected.LINE_CONTINUE_INLINED_IN_FOR_LOOP,
-                        model, currentLine, currentToken)) {
+                if (posResolver.isCorrectPosition(PositionExpected.LINE_CONTINUE_INLINED_IN_FOR_LOOP, model,
+                        currentLine, currentToken)) {
                     continueType = LineContinueType.LINE_CONTINUE_INLINED;
                 }
             }
@@ -132,10 +105,24 @@ public class PreviousLineHandler {
         return continueType;
     }
 
+    @VisibleForTesting
+    protected boolean isPreviousLineContinueToken(final RobotLine currentLine, final RobotToken currentToken) {
+        boolean result = false;
+        if (currentToken.getTypes().size() == 1
+                && currentToken.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+            result = true;
+        } else {
+            result = currentToken.getText().matches("^( )?[.]{3}$");
+            if (result && !currentToken.getTypes().contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)) {
+                currentToken.getTypes().add(RobotTokenType.PREVIOUS_LINE_CONTINUE);
+            }
+        }
+
+        return result;
+    }
 
     @VisibleForTesting
-    protected boolean isCommentContinue(RobotToken currentToken,
-            Stack<ParsingState> storedStack) {
+    protected boolean isCommentContinue(RobotToken currentToken, Stack<ParsingState> storedStack) {
         boolean result = false;
 
         if (currentToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
@@ -146,7 +133,6 @@ public class PreviousLineHandler {
 
         return result;
     }
-
 
     public boolean isSomethingToContinue(final RobotFile model) {
         boolean result = false;
@@ -183,38 +169,31 @@ public class PreviousLineHandler {
         return result;
     }
 
-
     @VisibleForTesting
     protected boolean containsAnySetting(final RobotFile file) {
         return !file.getSettingTable().isEmpty();
     }
-
 
     @VisibleForTesting
     protected boolean containsAnyVariable(final RobotFile file) {
         return !file.getVariableTable().getVariables().isEmpty();
     }
 
-
     @VisibleForTesting
     protected boolean containsAnyTestCases(final RobotFile file) {
         return !file.getTestCaseTable().getTestCases().isEmpty();
     }
-
 
     @VisibleForTesting
     protected boolean containsAnyKeywords(final RobotFile file) {
         return !file.getKeywordTable().getKeywords().isEmpty();
     }
 
-
     public boolean isSomethingToDo(final LineContinueType type) {
         return (type != LineContinueType.NONE);
     }
 
-
-    public void restorePreviousStack(final LineContinueType continueType,
-            final Stack<ParsingState> parsingStates,
+    public void restorePreviousStack(final LineContinueType continueType, final Stack<ParsingState> parsingStates,
             final RobotLine currentLine, final RobotToken currentToken) {
         if (isSomethingToDo(continueType)) {
             parsingStates.clear();
@@ -223,25 +202,26 @@ public class PreviousLineHandler {
         }
     }
 
-
     public void flushNew(final Stack<ParsingState> parsingStates) {
         clear();
         storedStack.addAll(parsingStates);
     }
-
 
     public void clear() {
         storedStack.clear();
     }
 
     public static enum LineContinueType {
-        NONE, SETTING_TABLE_ELEMENT, VARIABLE_TABLE_ELEMENT, TEST_CASE_TABLE_ELEMENT, KEYWORD_TABLE_ELEMENT, LINE_CONTINUE_INLINED;
+        NONE,
+        SETTING_TABLE_ELEMENT,
+        VARIABLE_TABLE_ELEMENT,
+        TEST_CASE_TABLE_ELEMENT,
+        KEYWORD_TABLE_ELEMENT,
+        LINE_CONTINUE_INLINED;
     }
 
-
     @VisibleForTesting
-    protected void removeLastNotWantedStates(
-            final Stack<ParsingState> parsingStates) {
+    protected void removeLastNotWantedStates(final Stack<ParsingState> parsingStates) {
         for (int i = parsingStates.size() - 1; i >= 0; i--) {
             ParsingState state = parsingStates.get(i);
             if (state == ParsingState.COMMENT) {
