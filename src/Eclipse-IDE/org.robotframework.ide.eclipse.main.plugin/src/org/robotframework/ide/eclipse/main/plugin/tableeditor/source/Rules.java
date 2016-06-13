@@ -21,7 +21,6 @@ import com.google.common.base.Splitter;
 
 /**
  * @author Michal Anglart
- *
  */
 public class Rules {
 
@@ -45,6 +44,7 @@ public class Rules {
 
     static IRule createReadAllRule(final IToken token) {
         return new IRule() {
+
             @Override
             public IToken evaluate(final ICharacterScanner scanner) {
                 int next = scanner.read();
@@ -75,6 +75,7 @@ public class Rules {
 
     static IRule createSectionHeaderRule(final IToken token) {
         return new IRule() {
+
             @Override
             public IToken evaluate(final ICharacterScanner scanner) {
                 return getSectionHeader(scanner).isEmpty() ? Token.UNDEFINED : token;
@@ -115,7 +116,8 @@ public class Rules {
 
             @Override
             public IToken evaluate(final ICharacterScanner scanner) {
-                if (scanner.getColumn() > 1 || scanner.getColumn() == 1 && CharacterScannerUtilities.lookBack(scanner, 1).equals("\t")) {
+                if (scanner.getColumn() > 1
+                        || scanner.getColumn() == 1 && CharacterScannerUtilities.lookBack(scanner, 1).equals("\t")) {
                     if (((SuiteSourceTokenScanner) scanner).numberOfCellSeparatorsInLineBeforeOffset() != 0) {
                         return Token.UNDEFINED;
                     }
@@ -193,8 +195,8 @@ public class Rules {
                                 || lookAhead.startsWith(" \n") || lookAhead.startsWith(" \r")
                                 || lookAhead.equals(" "))) {
                             return token;
-                        } else if (ch == EOF || ch == '\r' || ch == '\n' || CharacterScannerUtilities
-                                .isCellSeparator(lookAhead)) {
+                        } else if (ch == EOF || ch == '\r' || ch == '\n'
+                                || CharacterScannerUtilities.isCellSeparator(lookAhead)) {
                             for (int i = 0; i < charactersRead; i++) {
                                 scanner.unread();
                             }
@@ -231,12 +233,13 @@ public class Rules {
             private boolean isKeywordBasedSetting(final String lineContentBefore) {
                 final String lowerCasedLine = lineContentBefore.trim().toLowerCase();
                 if (lowerCasedLine.contains("suite")) {
-                    return lowerCasedLine.contains("suite setup") || lowerCasedLine.contains("suite precondition") ||
-                            lowerCasedLine.contains("suite teardown") || lowerCasedLine.contains("suite postcondition");
+                    return lowerCasedLine.contains("suite setup") || lowerCasedLine.contains("suite precondition")
+                            || lowerCasedLine.contains("suite teardown")
+                            || lowerCasedLine.contains("suite postcondition");
                 } else if (lowerCasedLine.contains("test")) {
-                    return lowerCasedLine.contains("test setup") || lowerCasedLine.contains("test precondition") ||
-                            lowerCasedLine.contains("test teardown") || lowerCasedLine.contains("test postcondition") ||
-                            lowerCasedLine.contains("test template");
+                    return lowerCasedLine.contains("test setup") || lowerCasedLine.contains("test precondition")
+                            || lowerCasedLine.contains("test teardown") || lowerCasedLine.contains("test postcondition")
+                            || lowerCasedLine.contains("test template");
                 }
                 return false;
             }
@@ -324,6 +327,9 @@ public class Rules {
             }
             if (splitted.size() == 0 && expectedNumberOfVariables == 0) {
                 return true;
+            }
+            if (splitted.size() == 0 && expectedNumberOfVariables > 0) {
+                return false;
             }
 
             if (splitted.get(splitted.size() - 1).trim().endsWith("=")) {
