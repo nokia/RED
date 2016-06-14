@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 
+import org.eclipse.jface.dialogs.PopupDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -24,6 +26,7 @@ public class ImportSettingsPopup extends RobotPopupDialog {
     public ImportSettingsPopup(final Shell parent, final RobotEditorCommandsStack commandsStack,
             final RobotSuiteFile fileModel, final RobotSetting initialSetting) {
         super(parent);
+        setShellStyle(PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE | SWT.ON_TOP | SWT.APPLICATION_MODAL);
         this.commandsStack = commandsStack;
         this.fileModel = fileModel;
         this.initialSetting = initialSetting;

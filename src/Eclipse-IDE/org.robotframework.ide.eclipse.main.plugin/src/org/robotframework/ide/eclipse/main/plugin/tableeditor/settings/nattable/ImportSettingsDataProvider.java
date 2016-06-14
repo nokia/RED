@@ -111,7 +111,7 @@ public class ImportSettingsDataProvider implements IDataProvider, IRowDataProvid
 
             int count = 0;
             int realRowIndex = 0;
-            while (count <= rowIndex) {
+            while (count <= rowIndex && realRowIndex < importSettings.size()) {
                 rowObject = importSettings.get(realRowIndex);
                 if (isPassingThroughFilter(rowObject)) {
                     count++;

@@ -382,7 +382,9 @@ public class ImportVariablesComposite {
                     fileArgs.append(":" + args.get(i));
                 }
 
-                text.append(path.lastSegment());
+                if(path.lastSegment() != null) {
+                    text.append(path.lastSegment());
+                }
                 text.append(fileArgs.toString() + " - " + parentPath, new Styler() {
 
                     @Override
