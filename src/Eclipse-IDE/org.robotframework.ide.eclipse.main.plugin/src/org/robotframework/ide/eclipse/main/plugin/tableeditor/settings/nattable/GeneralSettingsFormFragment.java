@@ -634,7 +634,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     @Optional
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
-        if (file == fileModel && dataProvider.getInput() == null) {
+        if (file == fileModel) {
             setInput();
             refreshTable();
             setDirty();
@@ -645,7 +645,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     @Optional
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
-        if (file == fileModel && dataProvider.getInput() != null) {
+        if (file == fileModel) {
             setInput();
             refreshTable();
             setDirty();
@@ -670,7 +670,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private void whenSettingIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
-            sortModel.clear();
+            if (sortModel != null) {
+                sortModel.clear();
+            }
             setInput();
             refreshTable();
             setDirty();
