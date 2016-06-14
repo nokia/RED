@@ -12,6 +12,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 
+import com.google.common.io.Files;
+
 public class ImportSettingFilePathResolver {
     
     private ImportSettingFilePathResolver() {
@@ -43,7 +45,7 @@ public class ImportSettingFilePathResolver {
     
     public static String createFileNameWithoutExtension(final IPath path) {
         final String name = path.lastSegment();
-        return name.substring(0, name.length() - ("." + path.getFileExtension()).length());
+        return Files.getNameWithoutExtension(name);
     }
     
     public static IPath createFileAbsolutePath(final IPath filePath, final IProject project) {
