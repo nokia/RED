@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -277,7 +280,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         return new NewElementsCreator<RobotElement>() {
             @Override
             public RobotElement createNew() {
-                
+                dataProvider.setMatches(null);
                 SwtThread.asyncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -347,7 +350,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
-        settingsMatches.collect(dataProvider.getInput(), filter);
+        final List<RobotElement> settings = new ArrayList<>();
+        settings.addAll(dataProvider.getInput().getImportSettings());
+        settingsMatches.collect(settings, filter);
         return settingsMatches;
     }
 

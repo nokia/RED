@@ -312,7 +312,7 @@ public class ImportResourcesComposite {
 
         public StyledString getStyledText(final Object element) {
             final IPath path = (IPath) element;
-            final StyledString text = new StyledString(path.lastSegment());
+            final StyledString text = new StyledString(path.lastSegment() != null ? path.lastSegment() : "");
             final String parentPath = path.segmentCount() > 1 ? path.removeLastSegments(1).toString() : currentProject.getName();
             text.append(" - " + parentPath, new Styler() {
 
