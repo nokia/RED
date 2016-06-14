@@ -149,6 +149,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private StyledText documentation;
     
     private boolean hasFocusOnDocumentation;
+    
+    private int docSelection;
 
     private Job documenationChangeJob;
 
@@ -203,7 +205,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     private void createDocumentationControl(final Composite panel) {
-        documentation = new StyledText(panel, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        documentation = new StyledText(panel, SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         documentation.addPaintListener(new PaintListener() {
 
             @Override
@@ -247,6 +249,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     }
                     
                     setDirty();
+                    
+                    docSelection = documentation.getSelection().x;
 
                     if (documenationChangeJob != null && documenationChangeJob.getState() == Job.SLEEPING) {
                         documenationChangeJob.cancel();
@@ -260,8 +264,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         GridDataFactory.fillDefaults()
                 .grab(true, true)
-                .minSize(SWT.DEFAULT, 60)
-                .hint(SWT.DEFAULT, 100)
+                .hint(SWT.DEFAULT, 70)
                 .applyTo(documentation);
     }
 
@@ -555,6 +558,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         documentation.setEditable(fileModel.isEditable() && section != null);
         documentation.setText(getDocumentation(section, documentation.isFocusControl()));
+        if(hasFocusOnDocumentation) {
+            documentation.setSelection(docSelection);
+        }
         
         if (table.isPresent()) {
             dataProvider.setInput(section);
@@ -598,7 +604,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private void setDocumentationMatches(final HeaderFilterMatchesCollection settingsMatches) {
         clearDocumentationMatches();
-
         final Collection<Range<Integer>> ranges = settingsMatches.getRanges(documentation.getText());
         for (final Range<Integer> range : ranges) {
             final Color bg = ColorsManager.getColor(255, 255, 175);

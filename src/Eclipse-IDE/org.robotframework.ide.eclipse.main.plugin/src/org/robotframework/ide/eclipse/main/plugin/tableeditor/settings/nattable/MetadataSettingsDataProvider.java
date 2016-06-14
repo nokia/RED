@@ -109,7 +109,7 @@ class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Ob
 
             int count = 0;
             int realRowIndex = 0;
-            while (count <= rowIndex) {
+            while (count <= rowIndex && realRowIndex < metadataSettings.size()) {
                 rowObject = metadataSettings.get(realRowIndex);
                 if (isPassingThroughFilter(rowObject)) {
                     count++;

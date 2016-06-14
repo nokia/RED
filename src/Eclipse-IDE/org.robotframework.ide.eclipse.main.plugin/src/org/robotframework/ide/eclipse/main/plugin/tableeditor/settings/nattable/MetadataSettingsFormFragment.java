@@ -7,6 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -284,6 +287,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         return new NewElementsCreator<RobotElement>() {
             @Override
             public RobotElement createNew() {
+                dataProvider.setMatches(null);
                 final RobotSettingsSection section = dataProvider.getInput();
                 commandsStack.execute(new CreateFreshGeneralSettingCommand(section, "Metadata", newArrayList("data")));
                 SwtThread.asyncExec(new Runnable() {
@@ -338,7 +342,9 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final MetadataSettingsMatchesCollection settingsMatches = new MetadataSettingsMatchesCollection();
-        settingsMatches.collect(dataProvider.getInput(), filter);
+        final List<RobotElement> settings = new ArrayList<>();
+        settings.addAll(dataProvider.getInput().getMetadataSettings());
+        settingsMatches.collect(settings, filter);
         return settingsMatches;
     }
 
