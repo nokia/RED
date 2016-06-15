@@ -57,4 +57,9 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         return getComponent().getSelectionLayerAccessor();
     }
+    
+    @Override
+    public void waitForPendingJobs() {
+        getComponent().waitForPendingJobs();
+    }
 }
