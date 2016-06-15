@@ -115,4 +115,9 @@ public class KeywordReturn extends AModelElement<UserKeyword> implements ICommen
 
         return execRow;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(values, index);
+    }
 }

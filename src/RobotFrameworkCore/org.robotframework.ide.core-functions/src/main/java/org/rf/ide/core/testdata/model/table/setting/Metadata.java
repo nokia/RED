@@ -135,4 +135,9 @@ public class Metadata extends AModelElement<SettingTable> implements ICommentHol
 
         return tokens;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(values, index);
+    }
 }

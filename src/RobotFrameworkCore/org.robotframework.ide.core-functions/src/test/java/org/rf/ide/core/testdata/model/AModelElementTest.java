@@ -100,6 +100,12 @@ public class AModelElementTest {
         public RobotToken getDeclaration() {
             return null;
         }
+
+        @Override
+        public boolean removeElementToken(int index) {
+            // TODO Auto-generated method stub
+            return false;
+        }
     }
 
     private RobotToken token(final String text) {

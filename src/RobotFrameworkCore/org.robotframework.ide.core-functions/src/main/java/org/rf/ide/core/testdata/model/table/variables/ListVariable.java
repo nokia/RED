@@ -14,6 +14,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class ListVariable extends AVariable {
 
+    private static final long serialVersionUID = 8379328591736333157L;
+
     private final List<RobotToken> items = new ArrayList<>();
 
     public ListVariable(final String name, final RobotToken declaration, final VariableScope scope) {
@@ -63,8 +65,8 @@ public class ListVariable extends AVariable {
 
     @Override
     public ListVariable copy() {
-        final RobotToken dec = RobotToken.create(
-                VariableType.LIST.getIdentificator() + "{" + getName() + "}", getDeclaration().getTypes());
+        final RobotToken dec = RobotToken.create(VariableType.LIST.getIdentificator() + "{" + getName() + "}",
+                getDeclaration().getTypes());
 
         final ListVariable list = new ListVariable(getName(), dec, getScope());
         for (final RobotToken valueToken : getItems()) {
@@ -76,5 +78,10 @@ public class ListVariable extends AVariable {
             list.addCommentPart(token);
         }
         return list;
+    }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(items, index);
     }
 }

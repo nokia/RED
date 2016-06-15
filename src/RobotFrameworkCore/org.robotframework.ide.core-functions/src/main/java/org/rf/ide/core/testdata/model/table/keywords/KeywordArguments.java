@@ -101,4 +101,9 @@ public class KeywordArguments extends AModelElement<UserKeyword> implements ICom
     public void clearComment() {
         this.comment.clear();
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(arguments, index);
+    }
 }

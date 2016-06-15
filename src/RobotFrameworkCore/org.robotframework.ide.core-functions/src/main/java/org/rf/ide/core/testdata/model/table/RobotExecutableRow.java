@@ -233,4 +233,9 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     public IExecutableRowDescriptor<T> buildLineDescription() {
         return new ExecutableRowDescriptorBuilder().buildLineDescriptor(this);
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(arguments, index);
+    }
 }

@@ -12,31 +12,30 @@ import java.util.List;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class ResourceImport extends AImported {
 
     private static final long serialVersionUID = 1L;
-    
-    private final List<RobotToken> unexpectedTrashArguments = new ArrayList<>();
 
+    private final List<RobotToken> unexpectedTrashArguments = new ArrayList<>();
 
     public ResourceImport(final RobotToken resourceDeclaration) {
         super(Type.RESOURCE, resourceDeclaration);
     }
-
 
     public List<RobotToken> getUnexpectedTrashArguments() {
         return Collections.unmodifiableList(unexpectedTrashArguments);
     }
 
     public void setUnexpectedTrashArguments(final int index, final String trashArgument) {
-        updateOrCreateTokenInside(unexpectedTrashArguments, index, trashArgument, RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
+        updateOrCreateTokenInside(unexpectedTrashArguments, index, trashArgument,
+                RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
     }
-    
+
     public void setUnexpectedTrashArguments(final int index, final RobotToken trashArgument) {
-        updateOrCreateTokenInside(unexpectedTrashArguments, index, trashArgument, RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
+        updateOrCreateTokenInside(unexpectedTrashArguments, index, trashArgument,
+                RobotTokenType.SETTING_RESOURCE_UNWANTED_ARGUMENT);
     }
-    
+
     public void addUnexpectedTrashArgument(final String trashArgument) {
         RobotToken rt = new RobotToken();
         rt.setText(trashArgument);
@@ -48,12 +47,10 @@ public class ResourceImport extends AImported {
         this.unexpectedTrashArguments.add(trashArgument);
     }
 
-
     @Override
     public boolean isPresent() {
         return (getDeclaration() != null);
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {
@@ -69,5 +66,10 @@ public class ResourceImport extends AImported {
         }
 
         return tokens;
+    }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(unexpectedTrashArguments, index);
     }
 }

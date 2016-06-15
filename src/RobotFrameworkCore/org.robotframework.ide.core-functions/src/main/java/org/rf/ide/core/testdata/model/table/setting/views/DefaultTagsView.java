@@ -12,6 +12,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class DefaultTagsView extends DefaultTags implements ISingleElementViewer {
 
+    private static final long serialVersionUID = 737877218936160644L;
+
     private final List<DefaultTags> defaultTags;
 
     private final boolean changeForceRebuild;

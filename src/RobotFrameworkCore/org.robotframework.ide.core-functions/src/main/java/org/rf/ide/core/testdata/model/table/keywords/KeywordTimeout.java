@@ -111,4 +111,9 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
 
         return tokens;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(message, index);
+    }
 }
