@@ -19,7 +19,8 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestTemplate extends AModelElement<SettingTable> implements IDataDrivenSetting, ICommentHolder, Serializable {
+public class TestTemplate extends AModelElement<SettingTable>
+        implements IDataDrivenSetting, ICommentHolder, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -143,5 +144,10 @@ public class TestTemplate extends AModelElement<SettingTable> implements IDataDr
         }
 
         return tokens;
+    }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(unexpectedTrashArguments, index);
     }
 }

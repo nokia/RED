@@ -73,4 +73,9 @@ public class LibraryAlias extends AModelElement<LibraryImport> implements Serial
     public RobotToken getDeclaration() {
         return libraryAliasDeclaration;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        throw new UnsupportedOperationException("This operation should be performed from LibraryImport.");
+    }
 }

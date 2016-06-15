@@ -13,6 +13,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestCaseTags extends ATags<TestCase> {
 
+    private static final long serialVersionUID = -7809783360234115293L;
+
     public TestCaseTags(RobotToken declaration) {
         super(declaration);
     }

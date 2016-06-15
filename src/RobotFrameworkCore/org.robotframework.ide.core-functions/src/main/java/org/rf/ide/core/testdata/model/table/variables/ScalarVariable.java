@@ -14,6 +14,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class ScalarVariable extends AVariable {
 
+    private static final long serialVersionUID = 1805466263821781386L;
+
     private final List<RobotToken> values = new ArrayList<>();
 
     public ScalarVariable(final String name, final RobotToken declaration, final VariableScope scope) {
@@ -74,8 +76,8 @@ public class ScalarVariable extends AVariable {
 
     @Override
     public ScalarVariable copy() {
-        final RobotToken dec = RobotToken.create(
-                VariableType.SCALAR.getIdentificator() + "{" + getName() + "}", getDeclaration().getTypes());
+        final RobotToken dec = RobotToken.create(VariableType.SCALAR.getIdentificator() + "{" + getName() + "}",
+                getDeclaration().getTypes());
 
         final ScalarVariable scalar = new ScalarVariable(getName(), dec, getScope());
         for (final RobotToken valueToken : getValues()) {
@@ -87,5 +89,10 @@ public class ScalarVariable extends AVariable {
             scalar.addCommentPart(token);
         }
         return scalar;
+    }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(values, index);
     }
 }

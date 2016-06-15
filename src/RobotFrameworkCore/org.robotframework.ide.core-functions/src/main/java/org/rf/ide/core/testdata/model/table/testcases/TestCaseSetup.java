@@ -16,6 +16,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestCaseSetup extends AKeywordBaseSetting<TestCase> {
 
+    private static final long serialVersionUID = -8077850245108031679L;
+
     public TestCaseSetup(RobotToken declaration) {
         super(declaration);
     }

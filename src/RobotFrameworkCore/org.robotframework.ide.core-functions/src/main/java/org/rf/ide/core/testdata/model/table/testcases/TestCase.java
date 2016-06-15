@@ -378,4 +378,9 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
         return settings;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        throw new UnsupportedOperationException("This operation is not allowed inside TestCase.");
+    }
 }

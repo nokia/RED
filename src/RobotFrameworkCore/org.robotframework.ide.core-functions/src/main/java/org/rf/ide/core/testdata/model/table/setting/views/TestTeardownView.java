@@ -12,6 +12,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class TestTeardownView extends TestTeardown implements ISingleElementViewer {
 
+    private static final long serialVersionUID = 2216473610245038551L;
+
     private final List<TestTeardown> teardowns;
 
     private final boolean changeForceRebuild;
