@@ -631,7 +631,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // end in order to proceed with saving
         if (documenationChangeJob != null && isDocumentationModified) {
             try {
-                documenationChangeJob.join(3000, new NullProgressMonitor());
+                documenationChangeJob.join(3000, null);
             } catch (final InterruptedException e) {
                 RedPlugin.logError("Documentation change job was interrupted", e);
             }
