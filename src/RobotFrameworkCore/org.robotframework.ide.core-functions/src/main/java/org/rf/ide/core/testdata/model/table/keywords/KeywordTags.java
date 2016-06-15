@@ -13,6 +13,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordTags extends ATags<UserKeyword> {
 
+    private static final long serialVersionUID = 3856438108905759777L;
+
     public KeywordTags(RobotToken declaration) {
         super(declaration);
     }

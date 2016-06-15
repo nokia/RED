@@ -16,6 +16,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordTeardown extends AKeywordBaseSetting<UserKeyword> {
 
+    private static final long serialVersionUID = -1178191212392265716L;
+
     public KeywordTeardown(final RobotToken declaration) {
         super(declaration);
     }

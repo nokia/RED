@@ -12,18 +12,15 @@ import java.util.List;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class VariablesImport extends AImported {
 
     private static final long serialVersionUID = 1L;
-    
-    private final List<RobotToken> arguments = new ArrayList<>();
 
+    private final List<RobotToken> arguments = new ArrayList<>();
 
     public VariablesImport(final RobotToken variablesDeclaration) {
         super(Type.VARIABLES, variablesDeclaration);
     }
-
 
     public List<RobotToken> getArguments() {
         return Collections.unmodifiableList(arguments);
@@ -32,11 +29,11 @@ public class VariablesImport extends AImported {
     public void setArguments(final int index, final String argument) {
         updateOrCreateTokenInside(arguments, index, argument, RobotTokenType.SETTING_VARIABLES_ARGUMENT);
     }
-    
+
     public void setArguments(final int index, final RobotToken argument) {
         updateOrCreateTokenInside(arguments, index, argument, RobotTokenType.SETTING_VARIABLES_ARGUMENT);
     }
-    
+
     public void addArgument(final String argument) {
         RobotToken rt = new RobotToken();
         rt.setText(argument);
@@ -48,12 +45,10 @@ public class VariablesImport extends AImported {
         this.arguments.add(argument);
     }
 
-
     @Override
     public boolean isPresent() {
         return (getDeclaration() != null);
     }
-
 
     @Override
     public List<RobotToken> getElementTokens() {
@@ -69,5 +64,10 @@ public class VariablesImport extends AImported {
         }
 
         return tokens;
+    }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(arguments, index);
     }
 }

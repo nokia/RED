@@ -118,4 +118,9 @@ public class TestCaseTemplate extends AModelElement<TestCase> implements IDataDr
 
         return tokens;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(unexpectedTrashArguments, index);
+    }
 }

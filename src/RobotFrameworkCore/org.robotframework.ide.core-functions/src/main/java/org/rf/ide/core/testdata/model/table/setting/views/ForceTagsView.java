@@ -12,6 +12,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class ForceTagsView extends ForceTags implements ISingleElementViewer {
 
+    private static final long serialVersionUID = 5413048519586897277L;
+
     private final List<ForceTags> forceTags;
 
     private final boolean changeForceRebuild;

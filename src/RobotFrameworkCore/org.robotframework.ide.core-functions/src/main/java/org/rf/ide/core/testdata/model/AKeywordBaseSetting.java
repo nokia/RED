@@ -156,6 +156,11 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
         return execRow;
     }
 
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(arguments, index);
+    }
+
     public abstract IRobotTokenType getKeywordNameType();
 
     public abstract IRobotTokenType getArgumentType();

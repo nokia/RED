@@ -21,6 +21,18 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
 
     public abstract List<RobotToken> getElementTokens();
 
+    public abstract boolean removeElementToken(final int index);
+
+    protected boolean removeElementFromList(final List<?> l, final int index) {
+        if (index >= 0 && index < l.size()) {
+            l.remove(index);
+
+            return true;
+        }
+
+        return false;
+    }
+
     public abstract RobotToken getDeclaration();
 
     public void setParent(T parent) {

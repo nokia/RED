@@ -114,4 +114,9 @@ public class TestCaseTimeout extends AModelElement<TestCase> implements IComment
 
         return tokens;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(message, index);
+    }
 }

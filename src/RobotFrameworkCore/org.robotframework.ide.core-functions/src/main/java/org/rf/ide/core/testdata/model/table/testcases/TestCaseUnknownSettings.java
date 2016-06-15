@@ -98,4 +98,9 @@ public class TestCaseUnknownSettings extends AModelElement<TestCase> implements 
     public RobotToken getDeclaration() {
         return this.declaration;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(arguments, index);
+    }
 }

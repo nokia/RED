@@ -128,4 +128,9 @@ public class TableHeader<T> extends AModelElement<T> implements ICommentHolder {
         return String.format("TableHeader [tableHeader=%s, columnNames=%s, comment=%s]", tableHeader, columnNames,
                 comment);
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(columnNames, index);
+    }
 }

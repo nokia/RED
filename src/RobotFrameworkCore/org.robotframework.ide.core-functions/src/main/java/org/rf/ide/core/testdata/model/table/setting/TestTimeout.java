@@ -135,4 +135,9 @@ public class TestTimeout extends AModelElement<SettingTable> implements IComment
 
         return tokens;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(message, index);
+    }
 }
