@@ -21,6 +21,8 @@ import com.google.common.base.Splitter;
 
 public class DictionaryVariable extends AVariable {
 
+    private static final long serialVersionUID = 8147929506520793514L;
+
     private final List<DictionaryKeyValuePair> items = new ArrayList<>();
 
     public DictionaryVariable(final String name, final RobotToken declaration, final VariableScope scope) {
@@ -64,6 +66,8 @@ public class DictionaryVariable extends AVariable {
     }
 
     public static class DictionaryKeyValuePair implements Serializable {
+
+        private static final long serialVersionUID = 5844838131341640455L;
 
         public static DictionaryKeyValuePair createFromRaw(final String raw) {
             final List<String> splitted = Splitter.on('=').splitToList(raw);
@@ -153,5 +157,11 @@ public class DictionaryVariable extends AVariable {
             dict.addCommentPart(token);
         }
         return dict;
+    }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

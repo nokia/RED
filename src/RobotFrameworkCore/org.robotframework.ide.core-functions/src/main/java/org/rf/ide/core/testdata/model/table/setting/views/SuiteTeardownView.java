@@ -12,6 +12,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class SuiteTeardownView extends SuiteTeardown implements ISingleElementViewer {
 
+    private static final long serialVersionUID = 8749176995341442757L;
+
     private final List<SuiteTeardown> teardowns;
 
     private final boolean changeForceRebuild;

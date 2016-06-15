@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -118,5 +119,10 @@ public class TestDocumentation extends AModelElement<TestCase> implements IComme
         }
 
         return tokens;
+    }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        throw new UnsupportedOperationException("Please see " + DocumentationServiceHandler.class);
     }
 }

@@ -12,6 +12,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class TestTimeoutView extends TestTimeout implements ISingleElementViewer {
 
+    private static final long serialVersionUID = -4081479282712030528L;
+
     private final List<TestTimeout> timeouts;
 
     private final boolean changeForceRebuild;

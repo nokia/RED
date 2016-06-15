@@ -12,6 +12,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class TestSetupView extends TestSetup implements ISingleElementViewer {
 
+    private static final long serialVersionUID = 507193410421635171L;
+
     private final List<TestSetup> setups;
 
     private final boolean changeForceRebuild;

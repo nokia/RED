@@ -318,4 +318,9 @@ public class UserKeyword extends AModelElement<KeywordTable> implements IExecuta
 
         return settings;
     }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        throw new UnsupportedOperationException("This operation is not allowed inside UserKeyword.");
+    }
 }

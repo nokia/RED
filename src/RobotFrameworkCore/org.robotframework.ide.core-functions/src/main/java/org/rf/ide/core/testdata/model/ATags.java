@@ -111,5 +111,10 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
         return tokens;
     }
 
+    @Override
+    public boolean removeElementToken(int index) {
+        return super.removeElementFromList(tags, index);
+    }
+
     public abstract IRobotTokenType getTagType();
 }

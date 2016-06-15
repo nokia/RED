@@ -48,15 +48,15 @@ public class LibraryImport extends AImported {
     public List<RobotToken> getArguments() {
         return Collections.unmodifiableList(arguments);
     }
-    
+
     public void setArguments(final int index, final String argument) {
         updateOrCreateTokenInside(arguments, index, argument, RobotTokenType.SETTING_LIBRARY_ARGUMENT);
     }
-    
+
     public void setArguments(final int index, final RobotToken argument) {
         updateOrCreateTokenInside(arguments, index, argument, RobotTokenType.SETTING_LIBRARY_ARGUMENT);
     }
-    
+
     public void addArgument(final String argument) {
         RobotToken rt = new RobotToken();
         rt.setText(argument);
@@ -93,5 +93,30 @@ public class LibraryImport extends AImported {
         }
 
         return tokens;
+    }
+
+    @Override
+    public boolean removeElementToken(int index) {
+        int withoutAlias = arguments.size();
+        int withAlias = withoutAlias + getAlias().getElementTokens().size();
+
+        if (index >= 0) {
+            if (index < withoutAlias) {
+                arguments.remove(index);
+
+                return true;
+            } else if (index < withAlias) {
+                if (index == withoutAlias) {
+                    addArgument(getAlias().getLibraryAlias());
+                } else {
+                    addArgument(getAlias().getLibraryAliasDeclaration());
+                }
+
+                setAlias(new LibraryAlias(null));
+                return true;
+            }
+        }
+
+        return false;
     }
 }
