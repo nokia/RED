@@ -574,9 +574,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
-        final List<RobotElement> generalSettings = GeneralSettingsModel
-                .findGeneralSettingsList(dataProvider.getInput());
         final RobotSettingsSection settingsSection = getSection();
+        final List<RobotElement> generalSettings = GeneralSettingsModel.findGeneralSettingsList(settingsSection);
         if (settingsSection != null) {
             final RobotSetting setting = settingsSection.getSetting("Documentation");
             if (setting != null) {
