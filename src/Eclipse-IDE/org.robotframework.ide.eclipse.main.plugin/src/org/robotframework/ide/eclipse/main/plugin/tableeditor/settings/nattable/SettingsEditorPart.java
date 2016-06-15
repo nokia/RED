@@ -74,25 +74,27 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public void revealElement(final RobotElement robotElement) {
-            final RobotSetting setting = (RobotSetting) robotElement;
-            if (setting.getGroup() == SettingsGroup.NO_GROUP) {
-                generalFragment.revealSetting(setting);
-                if (metadataFragment.isPresent()) {
-                    metadataFragment.get().clearSettingsSelection();
+            if (robotElement instanceof RobotSetting) {
+                final RobotSetting setting = (RobotSetting) robotElement;
+                if (setting.getGroup() == SettingsGroup.NO_GROUP) {
+                    generalFragment.revealSetting(setting);
+                    if (metadataFragment.isPresent()) {
+                        metadataFragment.get().clearSettingsSelection();
+                    }
+                    importFragment.clearSettingsSelection();
+                } else if (setting.getGroup() == SettingsGroup.METADATA) {
+                    generalFragment.clearSettingsSelection();
+                    if (metadataFragment.isPresent()) {
+                        metadataFragment.get().revealSetting(setting);
+                    }
+                    importFragment.clearSettingsSelection();
+                } else if (SettingsGroup.getImportsGroupsSet().contains(setting.getGroup())) {
+                    generalFragment.clearSettingsSelection();
+                    if (metadataFragment.isPresent()) {
+                        metadataFragment.get().clearSettingsSelection();
+                    }
+                    importFragment.revealSetting(setting);
                 }
-                importFragment.clearSettingsSelection();
-            } else if (setting.getGroup() == SettingsGroup.METADATA) {
-                generalFragment.clearSettingsSelection();
-                if (metadataFragment.isPresent()) {
-                    metadataFragment.get().revealSetting(setting);
-                }
-                importFragment.clearSettingsSelection();
-            } else if (SettingsGroup.getImportsGroupsSet().contains(setting.getGroup())) {
-                generalFragment.clearSettingsSelection();
-                if (metadataFragment.isPresent()) {
-                    metadataFragment.get().clearSettingsSelection();
-                }
-                importFragment.revealSetting(setting);
             }
         }
 
