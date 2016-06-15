@@ -146,6 +146,13 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             return settingsEditorPageSelectionProvider.getSelectionLayerAccessor();
         }
         
+        @Override
+        public void waitForPendingJobs() {
+            if (generalFragment != null) {
+                generalFragment.waitForDocumentationChangeJob();
+            }
+        }
+        
         private SettingsEditorPageSelectionProvider createSettingsEditorPageSelectionProvider() {
             if (metadataFragment.isPresent()) {
                 return new SettingsEditorPageSelectionProvider(generalFragment, metadataFragment.get(), importFragment);

@@ -146,5 +146,10 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         public SelectionLayerAccessor getSelectionLayerAccessor() {
             return null;
         }
+        
+        @Override
+        public void waitForPendingJobs() {
+            return;
+        }
     }
 }

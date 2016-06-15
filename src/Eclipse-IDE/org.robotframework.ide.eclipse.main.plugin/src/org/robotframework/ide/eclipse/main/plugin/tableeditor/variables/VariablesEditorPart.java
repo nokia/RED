@@ -96,5 +96,10 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
         public SelectionLayerAccessor getSelectionLayerAccessor() {
             return variablesFragment.getSelectionLayerAccessor();
         }
+        
+        @Override
+        public void waitForPendingJobs() {
+            return;
+        }
     }
 }
