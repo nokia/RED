@@ -29,4 +29,5 @@ public interface ISectionEditorPart {
 
     SelectionLayerAccessor getSelectionLayerAccessor();
 
+    void waitForPendingJobs();
 }

@@ -145,6 +145,7 @@ public class RobotFormEditor extends FormEditor {
                 addEditorPart(new CasesEditorPart(), "Test Cases");
             }
             addEditorPart(new KeywordsEditorPart(), "Keywords");
+            //addEditorPart(new org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart(), "old Settings");
             addEditorPart(new SettingsEditorPart(), "Settings");
             addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new SuiteSourceEditor(), "Source", ImagesManager.getImage(RedImages.getSourceImage()));
@@ -238,6 +239,8 @@ public class RobotFormEditor extends FormEditor {
             monitor.setCanceled(true);
             return;
         }
+        
+        waitForPendingEditorJobs();
 
         if (!(getActiveEditor() instanceof SuiteSourceEditor)) {
             updateSourceFromModel(monitor);
@@ -250,6 +253,15 @@ public class RobotFormEditor extends FormEditor {
 
         if (shouldClose) {
             reopenEditor();
+        }
+    }
+    
+    private void waitForPendingEditorJobs() {
+        //jobs are sending model modification events, so it has to be done before dumping model to source
+        for (final IEditorPart part : parts) {
+            if(part instanceof ISectionEditorPart) {
+                ((ISectionEditorPart) part).waitForPendingJobs();
+            }
         }
     }
 

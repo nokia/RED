@@ -96,5 +96,10 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
         public SelectionLayerAccessor getSelectionLayerAccessor() {
             return null;
         }
+        
+        @Override
+        public void waitForPendingJobs() {
+            return;
+        }
     }
 }

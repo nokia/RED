@@ -16,6 +16,7 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -150,6 +151,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     
     private boolean hasFocusOnDocumentation;
     
+    private boolean isDocumentationModified;
+    
     private int docSelection;
 
     private Job documenationChangeJob;
@@ -249,6 +252,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     }
                     
                     setDirty();
+                    isDocumentationModified = true;
                     
                     docSelection = documentation.getSelection().x;
 
@@ -618,12 +622,16 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     @Persist
     public void whenSaving() {
+        isDocumentationModified = false;
+    }
+    
+    protected void waitForDocumentationChangeJob() {
         // user could just typed something into documentation box, so the job was scheduled, we need
         // to wait for it to
         // end in order to proceed with saving
-        if (documenationChangeJob != null) {
+        if (documenationChangeJob != null && isDocumentationModified) {
             try {
-                documenationChangeJob.join();
+                documenationChangeJob.join(3000, new NullProgressMonitor());
             } catch (final InterruptedException e) {
                 RedPlugin.logError("Documentation change job was interrupted", e);
             }

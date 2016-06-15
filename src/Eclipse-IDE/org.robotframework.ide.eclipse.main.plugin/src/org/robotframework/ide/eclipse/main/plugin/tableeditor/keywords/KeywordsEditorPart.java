@@ -95,5 +95,10 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         public SelectionLayerAccessor getSelectionLayerAccessor() {
             return null;
         }
+
+        @Override
+        public void waitForPendingJobs() {
+            return;
+        }
     }
 }
