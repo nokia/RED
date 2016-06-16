@@ -46,9 +46,13 @@ public class TestTimeoutModelOperation implements ISettingTableElementOperation 
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestTimeout testTimeout = (TestTimeout) modelElement;
         if (index == 0) {
-            testTimeout.setTimeout(value);
+            testTimeout.setTimeout(value != null ? value : "");
         } else if (index > 0) {
-            testTimeout.setMessageArgument(index - 1, value);
+            if(value != null) {
+                testTimeout.setMessageArgument(index - 1, value);
+            } else {
+                testTimeout.removeElementToken(index-1);
+            }
         }
     }
 

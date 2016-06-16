@@ -47,9 +47,13 @@ public class MetadataModelOperation implements ISettingTableElementOperation {
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final Metadata metadata = (Metadata) modelElement;
         if (index == 0) {
-            metadata.setKey(value);
+            metadata.setKey(value != null ? value : "");
         } else if (index > 0) {
-            metadata.setValues(index - 1, value);
+            if (value != null) {
+                metadata.setValues(index - 1, value);
+            } else {
+                metadata.removeElementToken(index - 1);
+            }
         }
     }
 

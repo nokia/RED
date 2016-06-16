@@ -48,9 +48,13 @@ public class ResourceImportModelOperation implements ISettingTableElementOperati
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final ResourceImport resourceImport = (ResourceImport) modelElement;
         if (index == 0) {
-            resourceImport.setPathOrName(value);
+            resourceImport.setPathOrName(value != null ? value : "");
         } else if (index > 0) {
-            resourceImport.setUnexpectedTrashArguments(index - 1, value);
+            if (value != null) {
+                resourceImport.setUnexpectedTrashArguments(index - 1, value);
+            } else {
+                resourceImport.removeElementToken(index - 1);
+            }
         }
     }
 

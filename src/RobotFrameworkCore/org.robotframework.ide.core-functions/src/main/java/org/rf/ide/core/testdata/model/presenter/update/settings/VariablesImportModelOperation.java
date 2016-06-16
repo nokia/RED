@@ -48,9 +48,13 @@ public class VariablesImportModelOperation implements ISettingTableElementOperat
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final VariablesImport variablesImport = (VariablesImport) modelElement;
         if (index == 0) {
-            variablesImport.setPathOrName(value);
+            variablesImport.setPathOrName(value != null ? value : "");
         } else if (index > 0) {
-            variablesImport.setArguments(index - 1, value);
+            if (value != null) {
+                variablesImport.setArguments(index - 1, value);
+            } else {
+                variablesImport.removeElementToken(index - 1);
+            }
         }
     }
 
