@@ -46,9 +46,13 @@ public class TestTemplateModelOperation implements ISettingTableElementOperation
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestTemplate testTemplate = (TestTemplate) modelElement;
         if (index == 0) {
-            testTemplate.setKeywordName(value);
+            testTemplate.setKeywordName(value != null ? value : "");
         } else if (index > 0) {
-            testTemplate.setUnexpectedTrashArgument(index - 1, value);
+            if(value != null) {
+                testTemplate.setUnexpectedTrashArgument(index - 1, value);
+            } else {
+                testTemplate.removeElementToken(index-1);
+            }
         }
     }
 

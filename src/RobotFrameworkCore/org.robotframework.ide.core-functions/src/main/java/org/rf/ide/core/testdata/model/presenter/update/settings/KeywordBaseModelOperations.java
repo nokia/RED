@@ -28,9 +28,13 @@ public abstract class KeywordBaseModelOperations {
 
     protected void update(final AKeywordBaseSetting<?> setting, final int index, final String value) {
         if (index == 0) {
-            setting.setKeywordName(value);
+            setting.setKeywordName(value != null ? value : "");
         } else if (index > 0) {
-            setting.setArgument(index - 1, value);
+            if (value != null) {
+                setting.setArgument(index - 1, value);
+            } else {
+                setting.removeElementToken(index - 1);
+            }
         }
     }
 }
