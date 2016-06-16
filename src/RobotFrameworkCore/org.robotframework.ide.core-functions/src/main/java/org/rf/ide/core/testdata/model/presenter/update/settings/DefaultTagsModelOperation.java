@@ -44,7 +44,11 @@ public class DefaultTagsModelOperation implements ISettingTableElementOperation 
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final DefaultTags defaultTags = (DefaultTags) modelElement;
         if (index >= 0) {
-            defaultTags.setTag(index, value);
+            if (value != null) {
+                defaultTags.setTag(index, value);
+            } else {
+                defaultTags.removeElementToken(index);
+            }
         }
     }
 

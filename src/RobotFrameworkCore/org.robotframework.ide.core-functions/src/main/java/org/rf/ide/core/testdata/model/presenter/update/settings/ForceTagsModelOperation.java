@@ -44,7 +44,11 @@ public class ForceTagsModelOperation implements ISettingTableElementOperation {
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final ForceTags forceTags = (ForceTags) modelElement;
         if (index >= 0) {
-            forceTags.setTag(index, value);
+            if (value != null) {
+                forceTags.setTag(index, value);
+            } else {
+                forceTags.removeElementToken(index);
+            }
         }
     }
 
