@@ -93,7 +93,7 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
             libraryImport.setPathOrName(value);
         } else if (index > 0) {
             if (value == null) {
-                libraryImport.removeElementToken(index);
+                libraryImport.removeElementToken(index-1);
             } else {
                 final int properIndex = index - 1;
 
