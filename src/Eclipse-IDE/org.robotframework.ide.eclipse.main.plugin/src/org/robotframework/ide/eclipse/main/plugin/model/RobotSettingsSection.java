@@ -43,7 +43,7 @@ import com.google.common.collect.Lists;
 public class RobotSettingsSection extends RobotSuiteFileSection implements IRobotCodeHoldingElement {
 
     public static final String SECTION_NAME = "Settings";
-    
+
     private final SettingTableModelUpdater settingTableModelUpdater;
 
     RobotSettingsSection(final RobotSuiteFile parent) {
@@ -54,15 +54,16 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
     public RobotSetting createSetting(final String name, final String comment, final String... args) {
         final List<String> settingArgs = newArrayList(args);
         RobotSetting setting = newSetting(name, comment, settingArgs);
-        
-        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), -1, name, comment, settingArgs);
+
+        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), -1, name, comment,
+                settingArgs);
         setting.link(newModelElement);
-        
+
         elements.add(setting);
 
         return setting;
     }
-    
+
     public void insertSetting(final String name, final String comment, final List<String> args, final int tableIndex,
             final int allSettingsElementsIndex) {
         RobotSetting setting = newSetting(name, comment, args);
@@ -103,23 +104,24 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
     public List<RobotKeywordCall> getResourcesSettings() {
         return getSettingsFromGroup(SettingsGroup.RESOURCES);
     }
-    
+
     public List<RobotKeywordCall> getVariablesSettings() {
         return getSettingsFromGroup(SettingsGroup.VARIABLES);
     }
 
     public List<RobotKeywordCall> getImportSettings() {
         return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
+
             @Override
             public boolean apply(final RobotKeywordCall element) {
-                return SettingsGroup.getImportsGroupsSet()
-                                .contains((((RobotSetting) element).getGroup()));
+                return SettingsGroup.getImportsGroupsSet().contains((((RobotSetting) element).getGroup()));
             }
         }));
     }
 
     private List<RobotKeywordCall> getSettingsFromGroup(final SettingsGroup group) {
         return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
+
             @Override
             public boolean apply(final RobotKeywordCall element) {
                 return (((RobotSetting) element).getGroup() == group);
@@ -167,7 +169,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         super.link(table);
 
         final SettingTable settingsTable = (SettingTable) sectionTable;
-        
+
         for (final Metadata metadataSetting : settingsTable.getMetadatas()) {
             final String name = metadataSetting.getDeclaration().getText().toString();
             final RobotToken metadataKey = metadataSetting.getKey();
@@ -176,13 +178,15 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 args.add(metadataKey.getText().toString());
             }
             args.addAll(Lists.transform(metadataSetting.getValues(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(metadataSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final String comment = CommentServiceHandler.consolidate(metadataSetting,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
             final RobotSetting setting = new RobotSetting(this, SettingsGroup.METADATA, name, args, comment);
             setting.link(metadataSetting);
             elements.add(setting);
         }
         for (final AImported importSetting : settingsTable.getImports()) {
-            final String comment = CommentServiceHandler.consolidate(importSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final String comment = CommentServiceHandler.consolidate(importSetting,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
             if (importSetting instanceof LibraryImport) {
 
                 final LibraryImport libraryImport = (LibraryImport) importSetting;
@@ -194,7 +198,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                     args.add(pathOrName.getText().toString());
                 }
                 args.addAll(Lists.transform(libraryImport.getArguments(), TokenFunctions.tokenToString()));
-
+                args.addAll(
+                        Lists.transform(libraryImport.getAlias().getElementTokens(), TokenFunctions.tokenToString()));
                 final RobotSetting setting = new RobotSetting(this, SettingsGroup.LIBRARIES, name, args, comment);
                 setting.link(libraryImport);
                 elements.add(setting);
@@ -235,7 +240,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             final String name = suiteDocumentation.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(suiteDocumentation.getDocumentationText(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(suiteDocumentation, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final String comment = CommentServiceHandler.consolidate(suiteDocumentation,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
             final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(suiteDocumentation);
             elements.add(setting);
@@ -248,7 +254,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 args.add(settingKeywordName.getText().toString());
             }
             args.addAll(Lists.transform(keywordSetting.getArguments(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(keywordSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final String comment = CommentServiceHandler.consolidate(keywordSetting,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
             final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(keywordSetting);
             elements.add(setting);
@@ -257,7 +264,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             final String name = tagSetting.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(tagSetting.getTags(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(tagSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final String comment = CommentServiceHandler.consolidate(tagSetting,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
             final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(tagSetting);
             elements.add(setting);
@@ -269,7 +277,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             if (templateKeyword != null) {
                 args.add(templateKeyword.getText().toString());
             }
-            final String comment = CommentServiceHandler.consolidate(templateSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final String comment = CommentServiceHandler.consolidate(templateSetting,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
             final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(templateSetting);
             elements.add(setting);
@@ -284,7 +293,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 args.add(timeout.getText().toString());
             }
             args.addAll(Lists.transform(testTimeout.getMessageArguments(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(testTimeout, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final String comment = CommentServiceHandler.consolidate(testTimeout,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
             final RobotSetting setting = new RobotSetting(this, name, args, comment);
             setting.link(testTimeout);
             elements.add(setting);
