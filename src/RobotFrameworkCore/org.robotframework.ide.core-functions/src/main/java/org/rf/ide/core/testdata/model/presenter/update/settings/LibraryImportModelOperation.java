@@ -90,7 +90,7 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final LibraryImport libraryImport = (LibraryImport) modelElement;
         if (index == 0) {
-            libraryImport.setPathOrName(value);
+            libraryImport.setPathOrName(value != null ? value : "");
         } else if (index > 0) {
             if (value == null) {
                 libraryImport.removeElementToken(index-1);
