@@ -41,6 +41,7 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
         public Object pasteKeywords(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
                 final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
+
             final Object probablySettings = clipboard.getContents(KeywordCallsTransfer.getInstance());
             if (probablySettings instanceof RobotKeywordCall[]) {
                 insertSettings(fileModel, commandsStack, selection, (RobotKeywordCall[]) probablySettings);

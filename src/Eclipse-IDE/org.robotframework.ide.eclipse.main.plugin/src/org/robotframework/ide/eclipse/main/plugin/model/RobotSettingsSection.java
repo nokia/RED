@@ -72,7 +72,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 comment, args);
         setting.link(newModelElement);
 
-        elements.add(allSettingsElementsIndex, setting);
+        if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex <= elements.size()) {
+            elements.add(allSettingsElementsIndex, setting);
+        }
     }
 
     private RobotSetting newSetting(final String name, final String comment, final List<String> settingArgs) {
