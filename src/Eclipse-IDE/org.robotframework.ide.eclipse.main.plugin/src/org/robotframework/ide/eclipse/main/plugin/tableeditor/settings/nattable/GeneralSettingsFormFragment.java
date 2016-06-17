@@ -268,7 +268,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         GridDataFactory.fillDefaults()
                 .grab(true, true)
-                .hint(SWT.DEFAULT, 70)
+                .hint(SWT.DEFAULT, 30)
                 .applyTo(documentation);
     }
 

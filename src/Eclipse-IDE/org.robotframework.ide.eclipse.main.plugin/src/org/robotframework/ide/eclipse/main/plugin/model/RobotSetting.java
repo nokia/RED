@@ -21,7 +21,7 @@ public class RobotSetting extends RobotKeywordCall {
         this(section, SettingsGroup.NO_GROUP, name, args, comment);
     }
 
-    RobotSetting(final RobotSettingsSection section, final SettingsGroup group, final String name,
+    public RobotSetting(final RobotSettingsSection section, final SettingsGroup group, final String name,
             final List<String> args, final String comment) {
         super(section, name, args, comment);
         this.group = group;
