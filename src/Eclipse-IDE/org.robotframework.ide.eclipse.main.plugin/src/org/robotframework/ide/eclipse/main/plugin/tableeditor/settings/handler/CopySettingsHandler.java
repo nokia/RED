@@ -33,8 +33,11 @@ public class CopySettingsHandler extends DIParameterizedHandler<E4CopySettingsHa
                 final Clipboard clipboard) {
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
             if (!settings.isEmpty()) {
+                
+                final List<RobotSetting> settingsCopy = SettingsTableHandlersSupport.createSettingsCopy(settings);
+                
                 clipboard.setContents(
-                        new RobotKeywordCall[][] { settings.toArray(new RobotKeywordCall[settings.size()]) },
+                        new RobotKeywordCall[][] { settingsCopy.toArray(new RobotKeywordCall[settingsCopy.size()]) },
                         new Transfer[] { KeywordCallsTransfer.getInstance() });
             }
             return null;
