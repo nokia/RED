@@ -61,7 +61,7 @@ public class VariablesImporter {
                     if (currentRobotFile.exists()) {
                         try {
                             final Path joinPath = Paths.get(currentRobotFile.getAbsolutePath()).resolveSibling(path);
-                            path = joinPath.toAbsolutePath().toFile().getAbsolutePath();
+                            path = joinPath.normalize().toAbsolutePath().toFile().getAbsolutePath();
                         } catch (final InvalidPathException ipe) {
                             final BuildMessage errorMsg = BuildMessage.createErrorMessage(
                                     "Problem with importing variable file " + path + " with error stack: " + ipe,

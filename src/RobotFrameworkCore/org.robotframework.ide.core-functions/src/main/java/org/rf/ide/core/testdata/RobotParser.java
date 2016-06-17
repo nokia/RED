@@ -65,7 +65,8 @@ public class RobotParser {
 
     private RobotParser(final RobotProjectHolder robotProject, final boolean shouldImportEagerly) {
         this.robotProject = robotProject;
-        this.robotVersionFromCommand =  robotProject.getRobotRuntime() != null ? robotProject.getRobotRuntime().getVersion() : null;
+        this.robotVersionFromCommand = robotProject.getRobotRuntime() != null
+                ? robotProject.getRobotRuntime().getVersion() : null;
         this.robotVersion = robotVersionFromCommand != null ? RobotVersion.from(robotVersionFromCommand) : null;
         this.shouldEagerImport = shouldImportEagerly;
     }
@@ -101,7 +102,9 @@ public class RobotParser {
 
             RobotFile fileModel = robotFile.getFileModel();
             if (fileModel.containsAnyRobotSection()) {
-                importExternal(robotFile);
+                List<File> alreadyImported = new ArrayList<File>();
+                alreadyImported.add(fileOrDir);
+                importExternal(robotFile, alreadyImported);
             } else {
                 if (fileModel.getFileContent().size() > MAX_NUMBER_OF_TRASH_LINES) {
                     fileModel.removeLines();
@@ -117,19 +120,24 @@ public class RobotParser {
     }
 
     public List<RobotFileOutput> parse(final File fileOrDir) {
+        return parse(fileOrDir, new ArrayList<File>());
+    }
+
+    public List<RobotFileOutput> parse(final File fileOrDir, final List<File> alreadyImported) {
         final List<RobotFileOutput> output = new ArrayList<>();
-        parse(fileOrDir, output);
+        parse(fileOrDir, output, alreadyImported);
         return output;
     }
 
-    private void parse(final File fileOrDir, final List<RobotFileOutput> output) {
-        if (fileOrDir != null) {
+    private void parse(final File fileOrDir, final List<RobotFileOutput> output, final List<File> alreadyImported) {
+        if (fileOrDir != null && !alreadyImported.contains(fileOrDir)) {
             final boolean isDir = fileOrDir.isDirectory();
             if (isDir) {
+                alreadyImported.add(fileOrDir);
                 final int currentOutputSize = output.size();
                 final File[] files = fileOrDir.listFiles();
                 for (final File f : files) {
-                    parse(f, output);
+                    parse(f, output, alreadyImported);
                 }
 
                 if (currentOutputSize < output.size()) {
@@ -138,6 +146,7 @@ public class RobotParser {
                     // information
                 }
             } else if (robotProject.shouldBeLoaded(fileOrDir)) {
+                alreadyImported.add(fileOrDir);
                 final IRobotFileParser parserToUse = getParser(fileOrDir, false);
 
                 if (parserToUse != null) {
@@ -151,7 +160,7 @@ public class RobotParser {
 
                     RobotFile fileModel = robotFile.getFileModel();
                     if (fileModel.containsAnyRobotSection()) {
-                        importExternal(robotFile);
+                        importExternal(robotFile, alreadyImported);
                     } else {
                         if (fileModel.getFileContent().size() > MAX_NUMBER_OF_TRASH_LINES) {
                             fileModel.removeLines();
@@ -163,19 +172,19 @@ public class RobotParser {
                 final RobotFileOutput fileByName = robotProject.findFileByName(fileOrDir);
 
                 if (fileByName != null) {
-                    importExternal(fileByName);
+                    importExternal(fileByName, alreadyImported);
                     output.add(fileByName);
                 }
             }
         }
     }
 
-    private void importExternal(final RobotFileOutput robotFile) {
+    private void importExternal(final RobotFileOutput robotFile, final List<File> alreadyImported) {
         if (robotFile.getStatus() == Status.PASSED) {
             if (shouldEagerImport) {
                 // eager get resources example
                 final ResourceImporter resImporter = new ResourceImporter();
-                resImporter.importResources(this, robotFile);
+                resImporter.importResources(this, robotFile, alreadyImported);
             }
 
             final VariablesImporter varImporter = new VariablesImporter();
