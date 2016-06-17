@@ -16,7 +16,6 @@ import javax.inject.Named;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Optional;
@@ -444,7 +443,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     public void revealSetting(final Entry<String, RobotElement> setting) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(generalSettingsSection);
-        selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
+        if (table.isPresent()) {
+            selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
+        }
         setFocus();
     }
     
@@ -454,9 +455,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             documentation.forceFocus();
             documentation.selectAll();
             clearSettingsSelection();
-        } else {
+        } else if (table.isPresent()) {
             final Object entry = getEntryForSetting(setting);
-            if (entry != null && table.isPresent()) {
+            if (entry != null) {
                 selectionProvider.setSelection(new StructuredSelection(new Object[] { entry }));
             }
             setFocus();
@@ -464,15 +465,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     private Object getEntryForSetting(final RobotSetting setting) {
-        if(table.isPresent()) {
-            final SortedList<Entry<String, RobotElement>> list = dataProvider.getSortedList();
-            for (Entry<String, RobotElement> entry : list) {
-                RobotElement robotElement = entry.getValue();
-                if(robotElement != null) {
-                    RobotSetting entrySetting = (RobotSetting) robotElement;
-                    if (setting == entrySetting) {
-                        return entry;
-                    }
+        final SortedList<Entry<String, RobotElement>> list = dataProvider.getSortedList();
+        for (Entry<String, RobotElement> entry : list) {
+            RobotElement robotElement = entry.getValue();
+            if (robotElement != null) {
+                RobotSetting entrySetting = (RobotSetting) robotElement;
+                if (setting == entrySetting) {
+                    return entry;
                 }
             }
         }
@@ -481,7 +480,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     public void clearSettingsSelection() {
-        selectionProvider.setSelection(StructuredSelection.EMPTY);
+        if (table.isPresent()) {
+            selectionProvider.setSelection(StructuredSelection.EMPTY);
+        }
     }
 
     class GeneralSettingsColumnHeaderDataProvider implements IDataProvider {
