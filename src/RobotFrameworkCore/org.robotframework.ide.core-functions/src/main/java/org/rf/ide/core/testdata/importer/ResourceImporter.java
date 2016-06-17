@@ -22,7 +22,8 @@ import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 
 public class ResourceImporter {
 
-    public List<ResourceImportReference> importResources(final RobotParser parser, final RobotFileOutput robotFile) {
+    public List<ResourceImportReference> importResources(final RobotParser parser, final RobotFileOutput robotFile,
+            final List<File> alreadyImported) {
         final List<ResourceImportReference> importedReferences = new ArrayList<>();
 
         final SettingTable settingTable = robotFile.getFileModel().getSettingTable();
@@ -37,7 +38,7 @@ public class ResourceImporter {
                     if (currentFile.exists()) {
                         try {
                             final Path joinPath = Paths.get(currentFile.getAbsolutePath()).resolveSibling(path);
-                            path = joinPath.toAbsolutePath().toFile().getAbsolutePath();
+                            path = joinPath.normalize().toAbsolutePath().toFile().getAbsolutePath();
                         } catch (final InvalidPathException ipe) {
                             robotFile.addBuildMessage(BuildMessage.createErrorMessage(
                                     "Problem with importing resource file " + currentFile + " with error stack: " + ipe,
@@ -47,7 +48,7 @@ public class ResourceImporter {
                     }
 
                     final File toImport = new File(path);
-                    final List<RobotFileOutput> parsed = parser.parse(toImport);
+                    final List<RobotFileOutput> parsed = parser.parse(toImport, alreadyImported);
                     if (parsed.isEmpty()) {
                         robotFile.addBuildMessage(BuildMessage.createErrorMessage("Couldn't import resource file.",
                                 toImport.getAbsolutePath()));
