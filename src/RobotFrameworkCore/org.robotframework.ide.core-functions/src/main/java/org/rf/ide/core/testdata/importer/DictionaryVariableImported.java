@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.importer;
 import java.util.Map;
 
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 
 
 public class DictionaryVariableImported extends
@@ -15,5 +16,10 @@ public class DictionaryVariableImported extends
 
     public DictionaryVariableImported(String name) {
         super(name, VariableType.DICTIONARY);
+    }
+
+    @Override
+    public IVariableHolder copy() {
+        return null;
     }
 }
