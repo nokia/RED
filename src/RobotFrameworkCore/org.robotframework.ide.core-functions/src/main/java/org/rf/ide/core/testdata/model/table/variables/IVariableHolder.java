@@ -30,4 +30,6 @@ public interface IVariableHolder {
 
 
     RobotToken getDeclaration();
+    
+    IVariableHolder copy();
 }

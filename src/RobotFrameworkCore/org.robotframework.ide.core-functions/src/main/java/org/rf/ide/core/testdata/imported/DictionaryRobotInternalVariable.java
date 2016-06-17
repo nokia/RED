@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.imported;
 import java.util.Map;
 
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 
 
 public class DictionaryRobotInternalVariable extends
@@ -15,5 +16,10 @@ public class DictionaryRobotInternalVariable extends
 
     public DictionaryRobotInternalVariable(final String name, final Map<String, ?> value) {
         super(name, value, VariableType.DICTIONARY);
+    }
+
+    @Override
+    public IVariableHolder copy() {
+        return null;
     }
 }
