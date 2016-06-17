@@ -37,6 +37,8 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             arguments.remove(index);
             if (value != null) {
                 arguments.add(index, value);
+            } else {
+                arguments.add(index, "");
             }
             changed = true;
         }
@@ -49,4 +51,9 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
         }
     }
+
+    public int getIndex() {
+        return index;
+    }
+
 }

@@ -22,7 +22,7 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (keywordCall.getComment().equals(newComment)) {
+        if (keywordCall.getComment() != null && keywordCall.getComment().equals(newComment)) {
             return;
         }
         keywordCall.setComment(newComment);
