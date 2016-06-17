@@ -282,8 +282,41 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         list.addAll(settingTable.getImports());
 
         Collections.sort(list, new SettingTableElementsComparator());
+        repositionElementsBaseOnList(list, settingTable.getImports());
+        repositionElementsBaseOnList(list, settingTable.getMetadatas());
 
         return list;
+    }
+
+    private void repositionElementsBaseOnList(final List<AModelElement<SettingTable>> src,
+            final List<? extends AModelElement<SettingTable>> correctors) {
+        if (!correctors.isEmpty()) {
+            int hitCorrectors = 0;
+
+            AModelElement<SettingTable> currentCorrector = correctors.get(hitCorrectors);
+            for (int i = 0; i < src.size(); i++) {
+                final AModelElement<SettingTable> m = src.get(i);
+                if (correctors.contains(m)) {
+                    if (currentCorrector == m) {
+                        hitCorrectors++;
+                        if (hitCorrectors < correctors.size()) {
+                            currentCorrector = correctors.get(hitCorrectors);
+                        }
+                    } else {
+                        if (currentCorrector.getBeginPosition().isNotSet()) {
+                            src.add(i, currentCorrector);
+                        } else {
+                            src.set(i, currentCorrector);
+                        }
+                        i--;
+                    }
+                }
+            }
+
+            if (hitCorrectors != correctors.size()) {
+                throw new IllegalStateException("Not all elements included in output before.");
+            }
+        }
     }
 
     private List<AModelElement<VariableTable>> sortVariables(final VariableTable variableTable) {
