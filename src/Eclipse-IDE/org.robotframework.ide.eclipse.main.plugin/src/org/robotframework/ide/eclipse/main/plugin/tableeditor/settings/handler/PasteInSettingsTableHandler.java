@@ -99,9 +99,10 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
                                     if (i > 0 && i < clipboardSettingColumnsIndexes.size()) {
                                         clipboardSettingColumnIndex = clipboardSettingColumnsIndexes.get(i);
                                     }
+                                    final String valueToPaste = getValueToPaste(settingFromClipboard,
+                                            clipboardSettingColumnIndex, columnCount);
                                     collectPasteCommandsForSelectedSettings(selectedSetting,
-                                            selectedSettingColumnsIndexes.get(i), settingFromClipboard,
-                                            clipboardSettingColumnIndex, columnCount, pasteCommands);
+                                            selectedSettingColumnsIndexes.get(i), columnCount, valueToPaste, pasteCommands);
                                 }
                             }
                         }
@@ -117,11 +118,9 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
         }
 
         private void collectPasteCommandsForSelectedSettings(final RobotSetting selectedSetting,
-                final int selectedSettingColumnIndex, final RobotSetting settingFromClipboard,
-                final int clipboardSettingColumnIndex, final int columnCount, final List<EditorCommand> pasteCommands) {
-
-            final String valueToPaste = getValueToPaste(settingFromClipboard, clipboardSettingColumnIndex, columnCount);
-
+                final int selectedSettingColumnIndex, final int columnCount, final String valueToPaste,
+                final List<EditorCommand> pasteCommands) {
+            
             if (selectedSettingColumnIndex == columnCount - 1) {
                 pasteCommands.add(new SetKeywordCallCommentCommand(selectedSetting, valueToPaste));
             } else {
