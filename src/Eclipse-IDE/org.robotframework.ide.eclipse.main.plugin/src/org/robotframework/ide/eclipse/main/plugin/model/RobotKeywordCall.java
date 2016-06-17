@@ -21,6 +21,8 @@ import com.google.common.base.Optional;
 
 public class RobotKeywordCall implements RobotFileInternalElement, Serializable {
 
+    private static final long serialVersionUID = 3968389012402369728L;
+    
     private String name;
     private List<String> args;
     private String comment;

@@ -1775,8 +1775,8 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <and>
-             <!--reference
+          <!--and>
+             <reference
                    definitionId="org.robotframework.singleElementHasFocusedCell">
              </reference>
              <reference
@@ -1784,11 +1784,16 @@
              </reference>
              <reference
                    definitionId="org.robotframework.focusedCellHasContent">
-             </reference-->
+             </reference>
+          </and-->
+          <or>
+             <reference
+             	definitionId="org.robotframework.table.noFullRowIsSelected">
+             </reference>
              <reference
              	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
              </reference>
-          </and>
+          </or>
        </enabledWhen>
     </handler>
     <handler
@@ -1800,17 +1805,22 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <and>
-             <!--reference
+          <!--and>
+             <reference
                    definitionId="org.robotframework.singleElementHasFocusedCell">
              </reference>
              <reference
                    definitionId="org.robotframework.focusedCellHasContent">
-             </reference-->
+             </reference>
+          </and-->
+          <or>
+             <reference
+             	definitionId="org.robotframework.table.noFullRowIsSelected">
+             </reference>
              <reference
              	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
              </reference>
-          </and>
+          </or>
        </enabledWhen>
     </handler>
     <handler
