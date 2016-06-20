@@ -18,15 +18,21 @@ public class RobotFileDumper {
 
     private static final List<IRobotFileDumper> AVAILABLE_FORMAT_DUMPERS = new ArrayList<>();
 
+    private DumpContext ctx = new DumpContext();
+
     static {
         AVAILABLE_FORMAT_DUMPERS.add(new TxtRobotFileDumper());
         AVAILABLE_FORMAT_DUMPERS.add(new TsvRobotFileDumper());
     }
 
+    public void setContext(final DumpContext ctx) {
+        this.ctx = ctx;
+    }
+
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public void dump(final File file, final RobotFileOutput output) throws Exception {
         IRobotFileDumper dumperToUse = getDumper(file);
-
+        dumperToUse.setContext(ctx);
         dumperToUse.dump(file, output.getFileModel());
     }
 
@@ -42,6 +48,7 @@ public class RobotFileDumper {
         if (dumper == null) {
             dumper = new TxtRobotFileDumper();
         }
+        dumper.setContext(ctx);
 
         return dumper.dump(output.getFileModel());
     }
