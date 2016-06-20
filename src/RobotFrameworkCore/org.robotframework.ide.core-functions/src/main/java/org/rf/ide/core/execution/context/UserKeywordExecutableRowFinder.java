@@ -102,7 +102,7 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
             final String resourceName = extractIfNameIsFromVariableDeclaration(nameElements[0]);
             final List<ResourceImportReference> referencesByFileName = new ArrayList<>();
             if(resourceImportReferences != null) {
-                findImportReferencesByFileName(resourceName, resourceImportReferences, referencesByFileName);
+                findImportReferencesByFileName(resourceName, resourceImportReferences, new ArrayList<>(), referencesByFileName);
             }
             return findImportReferenceByKeywordName(keywordContext.getName(), referencesByFileName);
         }
@@ -122,16 +122,21 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
     }
 
     private void findImportReferencesByFileName(final String name, final List<ResourceImportReference> references,
+            final List<ResourceImportReference> visitedReferences,
             final List<ResourceImportReference> resultReferences) {
         for (final ResourceImportReference resourceImportReference : references) {
-            if (name.equalsIgnoreCase(Files.getNameWithoutExtension(resourceImportReference.getReference()
-                    .getProcessedFile()
-                    .getAbsolutePath()))) {
+            if (name.equalsIgnoreCase(Files.getNameWithoutExtension(
+                    resourceImportReference.getReference().getProcessedFile().getAbsolutePath()))) {
                 resultReferences.add(resourceImportReference);
             }
-            //try to find in nested resource files
-            findImportReferencesByFileName(name, resourceImportReference.getReference().getResourceImportReferences(),
-                    resultReferences);
+
+            if (!visitedReferences.contains(resourceImportReference)) {
+                visitedReferences.add(resourceImportReference);
+                // try to find in nested resource files
+                findImportReferencesByFileName(name,
+                        resourceImportReference.getReference().getResourceImportReferences(), visitedReferences,
+                        resultReferences);
+            }
         }
     }
     
