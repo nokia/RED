@@ -102,7 +102,8 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
             final String resourceName = extractIfNameIsFromVariableDeclaration(nameElements[0]);
             final List<ResourceImportReference> referencesByFileName = new ArrayList<>();
             if(resourceImportReferences != null) {
-                findImportReferencesByFileName(resourceName, resourceImportReferences, new ArrayList<>(), referencesByFileName);
+                final List<ResourceImportReference> visitedReferences = new ArrayList<>();
+                findImportReferencesByFileName(resourceName, resourceImportReferences, visitedReferences, referencesByFileName);
             }
             return findImportReferenceByKeywordName(keywordContext.getName(), referencesByFileName);
         }
