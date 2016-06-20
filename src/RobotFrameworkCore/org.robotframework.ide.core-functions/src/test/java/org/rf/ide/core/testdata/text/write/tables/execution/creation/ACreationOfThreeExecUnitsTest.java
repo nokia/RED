@@ -56,11 +56,11 @@ public abstract class ACreationOfThreeExecUnitsTest {
             final TestFilesCompareStore fileStore) throws Exception {
         // prepare
         checkEnvironment();
-        RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> execUnitOneExecRowOne = (RobotExecutableRow<AModelElement<? extends ARobotSectionTable>>) execUnit
+        RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitOneExecRowOne = (RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>>) execUnit
                 .get(0).getExecutionContext().get(0);
-        RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> execUnitTwoExecRowOne = (RobotExecutableRow<AModelElement<? extends ARobotSectionTable>>) execUnit
+        RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitTwoExecRowOne = (RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>>) execUnit
                 .get(1).getExecutionContext().get(0);
-        RobotExecutableRow<AModelElement<? extends ARobotSectionTable>> execUnitThreeExecRowOne = (RobotExecutableRow<AModelElement<? extends ARobotSectionTable>>) execUnit
+        RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitThreeExecRowOne = (RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>>) execUnit
                 .get(2).getExecutionContext().get(0);
 
         // test data prepare
