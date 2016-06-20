@@ -151,6 +151,7 @@ public class RobotParser {
                     // to execute importing of variables before add to model,
                     // which replace previous object
                     parserToUse.parse(robotFile, fileOrDir);
+                    robotProject.addModelFile(robotFile);
 
                     RobotFile fileModel = robotFile.getFileModel();
                     if (fileModel.containsAnyRobotSection()) {
@@ -160,13 +161,10 @@ public class RobotParser {
                             fileModel.removeLines();
                         }
                     }
-                    robotProject.addModelFile(robotFile);
                 }
             } else {
                 final RobotFileOutput fileByName = robotProject.findFileByName(fileOrDir);
-
                 if (fileByName != null) {
-                    importExternal(fileByName);
                     output.add(fileByName);
                 }
             }
