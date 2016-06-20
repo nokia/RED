@@ -104,7 +104,7 @@ public class RobotParser {
             if (fileModel.containsAnyRobotSection()) {
                 List<File> alreadyImported = new ArrayList<File>();
                 alreadyImported.add(fileOrDir);
-                importExternal(robotFile, alreadyImported);
+                importExternal(robotFile);
             } else {
                 if (fileModel.getFileContent().size() > MAX_NUMBER_OF_TRASH_LINES) {
                     fileModel.removeLines();
@@ -120,24 +120,19 @@ public class RobotParser {
     }
 
     public List<RobotFileOutput> parse(final File fileOrDir) {
-        return parse(fileOrDir, new ArrayList<File>());
-    }
-
-    public List<RobotFileOutput> parse(final File fileOrDir, final List<File> alreadyImported) {
         final List<RobotFileOutput> output = new ArrayList<>();
-        parse(fileOrDir, output, alreadyImported);
+        parse(fileOrDir, output);
         return output;
     }
 
-    private void parse(final File fileOrDir, final List<RobotFileOutput> output, final List<File> alreadyImported) {
-        if (fileOrDir != null && !alreadyImported.contains(fileOrDir)) {
+    private void parse(final File fileOrDir, final List<RobotFileOutput> output) {
+        if (fileOrDir != null) {
             final boolean isDir = fileOrDir.isDirectory();
             if (isDir) {
-                alreadyImported.add(fileOrDir);
                 final int currentOutputSize = output.size();
                 final File[] files = fileOrDir.listFiles();
                 for (final File f : files) {
-                    parse(f, output, alreadyImported);
+                    parse(f, output);
                 }
 
                 if (currentOutputSize < output.size()) {
@@ -146,7 +141,6 @@ public class RobotParser {
                     // information
                 }
             } else if (robotProject.shouldBeLoaded(fileOrDir)) {
-                alreadyImported.add(fileOrDir);
                 final IRobotFileParser parserToUse = getParser(fileOrDir, false);
 
                 if (parserToUse != null) {
@@ -160,7 +154,7 @@ public class RobotParser {
 
                     RobotFile fileModel = robotFile.getFileModel();
                     if (fileModel.containsAnyRobotSection()) {
-                        importExternal(robotFile, alreadyImported);
+                        importExternal(robotFile);
                     } else {
                         if (fileModel.getFileContent().size() > MAX_NUMBER_OF_TRASH_LINES) {
                             fileModel.removeLines();
@@ -172,19 +166,19 @@ public class RobotParser {
                 final RobotFileOutput fileByName = robotProject.findFileByName(fileOrDir);
 
                 if (fileByName != null) {
-                    importExternal(fileByName, alreadyImported);
+                    importExternal(fileByName);
                     output.add(fileByName);
                 }
             }
         }
     }
 
-    private void importExternal(final RobotFileOutput robotFile, final List<File> alreadyImported) {
+    private void importExternal(final RobotFileOutput robotFile) {
         if (robotFile.getStatus() == Status.PASSED) {
             if (shouldEagerImport) {
                 // eager get resources example
                 final ResourceImporter resImporter = new ResourceImporter();
-                resImporter.importResources(this, robotFile, alreadyImported);
+                resImporter.importResources(this, robotFile);
             }
 
             final VariablesImporter varImporter = new VariablesImporter();

@@ -22,8 +22,7 @@ import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 
 public class ResourceImporter {
 
-    public List<ResourceImportReference> importResources(final RobotParser parser, final RobotFileOutput robotFile,
-            final List<File> alreadyImported) {
+    public List<ResourceImportReference> importResources(final RobotParser parser, final RobotFileOutput robotFile) {
         final List<ResourceImportReference> importedReferences = new ArrayList<>();
 
         final SettingTable settingTable = robotFile.getFileModel().getSettingTable();
@@ -48,7 +47,7 @@ public class ResourceImporter {
                     }
 
                     final File toImport = new File(path);
-                    final List<RobotFileOutput> parsed = parser.parse(toImport, alreadyImported);
+                    final List<RobotFileOutput> parsed = parser.parse(toImport);
                     if (parsed.isEmpty()) {
                         robotFile.addBuildMessage(BuildMessage.createErrorMessage("Couldn't import resource file.",
                                 toImport.getAbsolutePath()));
