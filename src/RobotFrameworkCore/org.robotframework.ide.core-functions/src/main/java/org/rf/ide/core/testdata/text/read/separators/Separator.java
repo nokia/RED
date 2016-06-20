@@ -168,6 +168,23 @@ public class Separator implements IRobotLineElement {
         return isDirty;
     }
 
+    public static Separator matchSeparator(final String text) {
+        Separator separator = null;
+        for (SeparatorType sep : SeparatorType.values()) {
+            VersionAvailabilityInfo info = sep.findVersionAvailablilityInfo(text);
+
+            if (info != null) {
+                separator = new Separator();
+                separator.setRaw(text);
+                separator.setText(text);
+                separator.setType(sep);
+                break;
+            }
+        }
+
+        return separator;
+    }
+
     @Override
     public VersionAvailabilityInfo getVersionInformation() {
         VersionAvailabilityInfo vai = null;

@@ -23,4 +23,6 @@ public interface IRobotFileDumper {
     String dump(final List<RobotLine> lines);
 
     List<RobotLine> dumpToLines(final RobotFile model);
+
+    void setContext(final DumpContext ctx);
 }
