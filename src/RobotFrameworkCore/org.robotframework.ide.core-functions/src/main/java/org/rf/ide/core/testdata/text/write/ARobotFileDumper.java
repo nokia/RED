@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.IRobotFileDumper;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -49,6 +50,8 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     private final List<ISectionTableDumper> tableDumpers;
 
     private final DumperHelper aDumpHelper;
+
+    private DumpContext dumpContext;
 
     public ARobotFileDumper() {
         this.aDumpHelper = new DumperHelper(this);
@@ -484,10 +487,18 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         }
 
         if (sep == null) {
+            sep = Separator.matchSeparator(dumpContext.getPreferedSeparator());
+        }
+
+        if (sep == null) {
             sep = getSeparatorDefault();
         }
 
         return sep;
+    }
+
+    public void setContext(final DumpContext ctx) {
+        this.dumpContext = ctx;
     }
 
     protected abstract Separator getSeparatorDefault();

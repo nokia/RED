@@ -44,8 +44,10 @@ import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -279,6 +281,7 @@ public class RobotFormEditor extends FormEditor {
     private void reopenEditor() {
         close(false);
         getSite().getShell().getDisplay().asyncExec(new Runnable() {
+
             @Override
             public void run() {
                 final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
@@ -318,8 +321,7 @@ public class RobotFormEditor extends FormEditor {
         suiteModel.dispose();
 
         final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
-        eventBroker.post(RobotModelEvents.SUITE_MODEL_DISPOSED,
-                RobotElementChange.createChangedElement(suiteModel));
+        eventBroker.post(RobotModelEvents.SUITE_MODEL_DISPOSED, RobotElementChange.createChangedElement(suiteModel));
         RobotArtifactsValidator.revalidate(suiteModel);
     }
 
@@ -392,7 +394,15 @@ public class RobotFormEditor extends FormEditor {
         if (!getDirtyEditors().isEmpty()) {
             final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
             final RobotFile model = provideSuiteModel().getLinkedElement();
-            document.set(new RobotFileDumper().dump(model.getParent()));
+            final String separatorFromPreference = RedPlugin.getDefault()
+                    .getPreferences()
+                    .getSeparatorToUse(model.getParent().getFileFormat() == FileFormat.TSV);
+            final DumpContext ctx = new DumpContext();
+            ctx.setPreferedSeparator(separatorFromPreference);
+
+            final RobotFileDumper dumper = new RobotFileDumper();
+            dumper.setContext(ctx);
+            document.set(dumper.dump(model.getParent()));
         }
         if (monitor != null) {
             editor.doSave(monitor);
@@ -439,7 +449,7 @@ public class RobotFormEditor extends FormEditor {
         }
         return null;
     }
-    
+
     private void checkRuntimeEnvironment(final RobotSuiteFile suiteFile) {
         if (suiteFile != null) {
             final RobotProject robotProject = suiteFile.getProject();
