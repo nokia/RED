@@ -53,7 +53,8 @@ import sys
 import socket
 import threading
 import inspect
-if sys.version_info < (3,0,0):
+
+if sys.version_info < (3, 0, 0):
     import SocketServer as socketserver
 else:
     import socketserver
@@ -89,7 +90,7 @@ except ImportError:
 try:
     from cStringIO import StringIO
 except ImportError:
-    if sys.version_info < (3,0,0):
+    if sys.version_info < (3, 0, 0):
         from StringIO import StringIO
     else:
         from io import StringIO
@@ -97,6 +98,7 @@ except ImportError:
 try:
     # RF 2.7.5
     from robot.running import EXECUTION_CONTEXTS
+
 
     def _is_logged(level):
         current = EXECUTION_CONTEXTS.current
@@ -120,6 +122,7 @@ except ImportError:
 # Setting Output encoding to UTF-8 and ignoring the platform specs
 # RIDE will expect UTF-8
 import robot.utils.encoding
+
 # Set output encoding to UTF-8 for piped output streams
 robot.utils.encoding.OUTPUT_ENCODING = 'UTF-8'
 # RF 2.6.3 and RF 2.5.7
@@ -134,8 +137,10 @@ class TestRunnerAgent:
     """
     ROBOT_LISTENER_API_VERSION = 2
 
+
     def __init__(self, *args):
         self.port = int(args[0])
+        self.MAX_VARIABLE_VALUE_TEXT_LENGTH = 2048
         HOST = "localhost"
         if len(args) >= 3:
             HOST = args[2]
@@ -156,7 +161,7 @@ class TestRunnerAgent:
     def _create_kill_server(self):
         self._killer = RobotKillerServer(self._debugger)
         self._server_thread = threading.Thread(
-            target=self._killer.serve_forever)
+                target=self._killer.serve_forever)
         self._server_thread.setDaemon(True)
         self._server_thread.start()
         self._send_server_port(self._killer.server_address[1])
@@ -173,7 +178,7 @@ class TestRunnerAgent:
                 from robot.conf.settings import RobotSettings
                 from robot.variables.scopes import GlobalVariables
                 variables = GlobalVariables(RobotSettings()).as_dict()
-            
+
             data = {}
             for k in variables.keys():
                 if not (k.startswith('${') or k.startswith('@{')):
@@ -181,9 +186,10 @@ class TestRunnerAgent:
                 else:
                     key = k
                 data[key] = str(variables[k])
-            self._send_socket('global_vars','global_vars',data)
+            self._send_socket('global_vars', 'global_vars', data)
         except Exception as e:
-            self.print_error_message('Global variables sending error: ' + str(e) + ' Global variables: ' + str(variables))
+            self.print_error_message(
+                'Global variables sending error: ' + str(e) + ' Global variables: ' + str(variables))
             pass
 
     def _send_server_port(self, port):
@@ -206,19 +212,19 @@ class TestRunnerAgent:
         if self._is_debug_enabled:
             self._send_vars()
         self._is_robot_paused = False
-        #if self._debugger.is_breakpoint(name, attrs):
+        # if self._debugger.is_breakpoint(name, attrs):
         if self._is_debug_enabled:
             if self._check_breakpoint():
                 self._is_robot_paused = True
-            #self._debugger.pause()
-        #self._wait_for_breakpoint_unlock()
-        #paused = self._debugger.is_paused()
+                # self._debugger.pause()
+        # self._wait_for_breakpoint_unlock()
+        # paused = self._debugger.is_paused()
         if self._is_robot_paused:
             self._send_socket('paused')
             self._wait_for_resume()
-        #self._debugger.start_keyword()
-        #if paused:
-        #    self._send_socket('continue')
+            # self._debugger.start_keyword()
+            # if paused:
+            #    self._send_socket('continue')
 
     def _wait_for_resume(self):
         data = ''
@@ -246,24 +252,33 @@ class TestRunnerAgent:
                             data[k] = str(self.fix_unicode(value))
                     except:
                         data[k] = 'None'
-            self._send_socket('vars','vars',data)
+            self._send_socket('vars', 'vars', data)
         except Exception as e:
             self.print_error_message('Variables sending error: ' + str(e) + ' Current variables: ' + str(vars))
 
-    def fix_unicode(self,data):
-       if sys.version_info < (3,0,0) and isinstance(data, unicode):
-           return data.encode('utf-8')
-       elif sys.version_info >= (3,0,0) and isinstance(data, str):
-           return data
-       elif isinstance(data, basestring):
-           return data.encode('unicode_escape')
-       elif isinstance(data, dict):
-           data = dict((self.fix_unicode(k), self.fix_unicode(data[k])) for k in data)
-       elif isinstance(data, list):
-           range_fun = xrange if sys.version_info < (3,0,0) else range
-           for i in range_fun(0, len(data)):
-               data[i] = self.fix_unicode(data[i])
-       return data
+    def fix_unicode(self, data):
+        if sys.version_info < (3, 0, 0) and isinstance(data, unicode):
+            v = data.encode('utf-8')
+            if len(v) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
+                v = v[:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
+            return v
+        elif sys.version_info >= (3, 0, 0) and isinstance(data, str):
+            v = data
+            if len(v) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
+                v = v[:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
+            return v
+        elif isinstance(data, basestring):
+            v = data.encode('unicode_escape')
+            if len(v) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
+                v = v[:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
+            return v
+        elif isinstance(data, dict):
+            data = dict((self.fix_unicode(k), self.fix_unicode(data[k])) for k in data)
+        elif isinstance(data, list):
+            range_fun = xrange if sys.version_info < (3, 0, 0) else range
+            for i in range_fun(0, len(data)):
+                data[i] = self.fix_unicode(data[i])
+        return data
 
     def _check_breakpoint(self):
         data = ''
@@ -311,24 +326,24 @@ class TestRunnerAgent:
                             from robot.libraries.Collections import Collections
                             if len(js[key]) == 2:
                                 if isinstance(vars[key], dict):
-                                    Collections().set_to_dictionary(vars[key],js[key][0],js[key][1])
+                                    Collections().set_to_dictionary(vars[key], js[key][0], js[key][1])
                                 else:
-                                    Collections().set_list_value(vars[key],js[key][0],js[key][1])
+                                    Collections().set_list_value(vars[key], js[key][0], js[key][1])
                             else:
                                 nestedList = vars[key]
                                 newValue = ''
                                 newValueIndex = 0
                                 indexList = 1
                                 for value in js[key]:
-                                    if indexList < (len(js[key])-1):
+                                    if indexList < (len(js[key]) - 1):
                                         nestedList = Collections().get_from_list(nestedList, int(value))
                                         indexList = indexList + 1
-                                    elif indexList == (len(js[key])-1):
+                                    elif indexList == (len(js[key]) - 1):
                                         newValueIndex = int(value)
                                         indexList = indexList + 1
                                     elif indexList == len(js[key]):
                                         newValue = value
-                                Collections().set_list_value(nestedList,newValueIndex,newValue)
+                                Collections().set_list_value(nestedList, newValueIndex, newValue)
                         else:
                             BuiltIn().set_test_variable(key, js[key][0])
             except Exception as e:
@@ -338,10 +353,10 @@ class TestRunnerAgent:
     def end_keyword(self, name, attrs):
         self._send_socket("end_keyword", name, attrs)
         self._debugger.end_keyword(attrs['status'] == 'PASS')
-        
+
     def resource_import(self, name, attributes):
         self._send_socket("resource_import", name, attributes)
-        
+
     def library_import(self, name, attributes):
         # equals org.python.core.ClasspathPyImporter.PYCLASSPATH_PREFIX
         import platform
@@ -377,6 +392,8 @@ class TestRunnerAgent:
 
     def log_message(self, message):
         if _is_logged(message['level']):
+            if len(message['message']) > self.MAX_VARIABLE_VALUE_TEXT_LENGTH:
+                message['message'] = message['message'][:self.MAX_VARIABLE_VALUE_TEXT_LENGTH] + ' <truncated>'
             self._send_socket("log_message", message)
 
     def log_file(self, path):
@@ -532,7 +549,7 @@ class EncodeError(StreamError):
     This exception is raised when an unencodable object is passed to the
     dump() method or function.
     """
-    wrapped_exceptions = (pickle.PicklingError, )
+    wrapped_exceptions = (pickle.PicklingError,)
 
 
 class DecodeError(StreamError):
@@ -630,8 +647,8 @@ class StreamHandler(object):
         else:
             def json_not_impl(dummy):
                 raise NotImplementedError(
-                    'Python version < 2.6 and simplejson not installed. Please'
-                    ' install simplejson.')
+                        'Python version < 2.6 and simplejson not installed. Please'
+                        ' install simplejson.')
 
             self._json_decoder = staticmethod(json_not_impl)
             self._json_encoder = staticmethod(json_not_impl)
@@ -658,11 +675,11 @@ class StreamHandler(object):
             write_list.append('P')
             s = pickle.dumps(obj, pickle.HIGHEST_PROTOCOL)
             write_list.extend([str(len(s)), '|', s])
-        if sys.version_info < (3,0,0):
+        if sys.version_info < (3, 0, 0):
             self.fp.write(''.join(write_list))
         else:
             self.fp.write(bytes(''.join(write_list), 'UTF-8'))
-        #self.fp.flush()
+            # self.fp.flush()
 
 
 def load(self):
