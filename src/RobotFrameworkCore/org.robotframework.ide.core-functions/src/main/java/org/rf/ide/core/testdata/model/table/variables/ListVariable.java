@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class ListVariable extends AVariable {
 
@@ -23,11 +24,12 @@ public class ListVariable extends AVariable {
     }
 
     public void addItem(final RobotToken item) {
+        fixForTheType(item, RobotTokenType.VARIABLES_VARIABLE_VALUE);
         items.add(item);
     }
 
     public void addItem(final RobotToken item, final int position) {
-        items.set(position, item);
+        updateOrCreateTokenInside(items, position, item, RobotTokenType.VARIABLES_VARIABLE_VALUE);
     }
 
     public void removeItem(final RobotToken item) {
