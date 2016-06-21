@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeyword
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CutSettingsHandler.E4CutSettingsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -40,7 +41,7 @@ public class CutSettingsHandler extends DIParameterizedHandler<E4CutSettingsHand
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
             if (!settings.isEmpty()) {
 
-                final List<RobotSetting> settingsCopy = SettingsTableHandlersSupport.createSettingsCopy(settings);
+                final List<RobotSetting> settingsCopy = TableHandlersSupport.createSettingsCopy(settings);
 
                 clipboard.setContents(
                         new RobotKeywordCall[][] { settingsCopy.toArray(new RobotKeywordCall[settingsCopy.size()]) },
@@ -48,7 +49,8 @@ public class CutSettingsHandler extends DIParameterizedHandler<E4CutSettingsHand
 
                 commandsStack.execute(new DeleteSettingKeywordCallCommand(settings));
 
-                editor.getSelectionLayerAccessor().getSelectionLayer().clear(); // needed when setting is cut/paste and selection remains on the same position 
+                // needed when setting is cut/paste and selection remains on the same position, pasting is performed on old, not existing setting
+                editor.getSelectionLayerAccessor().getSelectionLayer().clear(); 
             }
             return null;
         }

@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -29,14 +28,15 @@ public class DeleteSettingsHandler extends DIParameterizedHandler<E4DeleteSettin
 
     public static class E4DeleteSettingsHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
-        public Object deleteSettings(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor, @Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public Object deleteSettings(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+                final RobotEditorCommandsStack commandsStack,
+                @Named(Selections.SELECTION) final IStructuredSelection selection) {
+            
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
             commandsStack.execute(new DeleteSettingKeywordCallCommand(settings));
             
+            // needed for the same reason as in the cut handler
             editor.getSelectionLayerAccessor().getSelectionLayer().clear();
 
             return null;
