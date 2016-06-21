@@ -46,14 +46,14 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
             final SelectionLayer selectionLayer = selectionLayerAccessor.getSelectionLayer();
 
             final RobotVariablesSection section = getSection(selection);
-            final RemoveVariableCommand varsDeleteCommand = createVariablesRemovingCommand(section, selectionLayer);
+            //final RemoveVariableCommand varsDeleteCommand = createVariablesRemovingCommand(section, selectionLayer);
             final Collection<EditorCommand> detailsDeletingCommands = createCommandsForDetailsRemoval(section,
                     selectionLayer);
 
             for (final EditorCommand command : detailsDeletingCommands) {
                 commandsStack.execute(command);
             }
-            commandsStack.execute(varsDeleteCommand);
+            //commandsStack.execute(varsDeleteCommand);
 
             return null;
         }
@@ -82,16 +82,13 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
 
             final List<EditorCommand> commands = new ArrayList<>();
             for (final PositionCoordinate cellPosition : selectionLayer.getSelectedCellPositions()) {
-
-                if (!selectionLayer.isRowPositionFullySelected(cellPosition.rowPosition)) {
-                    final RobotVariable variable = variables.get(cellPosition.rowPosition);
-                    if (cellPosition.columnPosition == 0) {
-                        commands.add(new SetVariableNameCommand(variable, ""));
-                    } else if (cellPosition.columnPosition == 1) {
-                        commands.add(new CleanVariableValueCommand(variable));
-                    } else if (cellPosition.columnPosition == 2) {
-                        commands.add(new SetVariableCommentCommand(variable, ""));
-                    }
+                final RobotVariable variable = variables.get(cellPosition.rowPosition);
+                if (cellPosition.columnPosition == 0) {
+                    commands.add(new SetVariableNameCommand(variable, ""));
+                } else if (cellPosition.columnPosition == 1) {
+                    commands.add(new CleanVariableValueCommand(variable));
+                } else if (cellPosition.columnPosition == 2) {
+                    commands.add(new SetVariableCommentCommand(variable, ""));
                 }
             }
             return commands;
