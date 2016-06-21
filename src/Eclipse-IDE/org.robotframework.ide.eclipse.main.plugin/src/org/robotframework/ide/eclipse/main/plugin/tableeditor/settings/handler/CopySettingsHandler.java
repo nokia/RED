@@ -16,6 +16,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CopySettingsHandler.E4CopySettingsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -34,7 +35,7 @@ public class CopySettingsHandler extends DIParameterizedHandler<E4CopySettingsHa
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
             if (!settings.isEmpty()) {
                 
-                final List<RobotSetting> settingsCopy = SettingsTableHandlersSupport.createSettingsCopy(settings);
+                final List<RobotSetting> settingsCopy = TableHandlersSupport.createSettingsCopy(settings);
                 
                 clipboard.setContents(
                         new RobotKeywordCall[][] { settingsCopy.toArray(new RobotKeywordCall[settingsCopy.size()]) },

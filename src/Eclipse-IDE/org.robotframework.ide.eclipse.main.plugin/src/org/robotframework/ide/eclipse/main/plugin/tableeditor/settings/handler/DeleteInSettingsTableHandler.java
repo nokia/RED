@@ -24,6 +24,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommen
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteInSettingsTableHandler.E4DeleteInSettingsTableHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -42,19 +43,16 @@ public class DeleteInSettingsTableHandler extends DIParameterizedHandler<E4Delet
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
 
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
-
             if (!settings.isEmpty()) {
-                final RobotSettingsSection section = settings.get(0).getParent();
-                final SelectionLayer selectionLayer = editor.getSelectionLayerAccessor().getSelectionLayer();
-
-                final List<EditorCommand> detailsDeletingCommands = createCommandsForDetailsRemoval(section,
-                        settings, selectionLayer);
+                final List<EditorCommand> detailsDeletingCommands = createCommandsForDetailsRemoval(
+                        settings.get(0).getParent(), settings, editor.getSelectionLayerAccessor().getSelectionLayer());
                 Collections.reverse(detailsDeletingCommands); // deleting must be started from the biggest column index
- 
+
                 for (final EditorCommand command : detailsDeletingCommands) {
                     commandsStack.execute(command);
                 }
             }
+            
             return null;
         }
 
@@ -69,7 +67,8 @@ public class DeleteInSettingsTableHandler extends DIParameterizedHandler<E4Delet
             final int settingsTableColumnCount = selectionLayer.getColumnCount();
 
             for (final RobotSetting selectedSetting : settings) {
-                int tableIndexOfSelectedSetting = SettingsTableHandlersSupport.findTableIndexOfSelectedSetting(section, selectedSetting);
+                int tableIndexOfSelectedSetting = TableHandlersSupport.findTableIndexOfSelectedSetting(section,
+                        selectedSetting);
                 for (int i = 0; i < selectedCellPositions.length; i++) {
                     final PositionCoordinate selectedCell = selectedCellPositions[i];
                     if (tableIndexOfSelectedSetting == selectedCell.rowPosition) {
