@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z5QR0P4LEeSvjNrJkS7N6Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/7/16 2:34 PM
+Save-Time: 6/21/16 3:36 PM
 Tags: Bugs
 Testcase-Type: ecl
 
@@ -49,8 +49,9 @@ get-editor "TestFile.robot" | get-tab-folder |    get-tab-item Source | click
 
 //go to Source and check if Documenation was added
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-get-editor "TestFile.robot" | get-text-viewer | get-property text | contains "*** Settings ***\r\n"
-    + "Documentation    This is test documentation." | verify-true
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+    + "Documentation    This is test documentation.\n"
+    + "*** Test Cases ***" | verify-true
 
 //tsv
 get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
