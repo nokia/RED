@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -18,11 +17,11 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CopyInSettingsTableHandler.E4CopyInSettingsTableHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -35,9 +34,6 @@ public class CopyInSettingsTableHandler extends DIParameterizedHandler<E4CopyInS
 
     public static class E4CopyInSettingsTableHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
         public Object copy(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
@@ -47,20 +43,19 @@ public class CopyInSettingsTableHandler extends DIParameterizedHandler<E4CopyInS
                     .getSelectionLayer()
                     .getSelectedCellPositions();
             if (selectedCellPositions.length > 0 && !settings.isEmpty()) {
-                final PositionCoordinateSerializer[] serializablePositions = new PositionCoordinateSerializer[selectedCellPositions.length];
-                for (int i = 0; i < selectedCellPositions.length; i++) {
-                    serializablePositions[i] = new PositionCoordinateSerializer(selectedCellPositions[i]);
-                }
-                
-                final List<RobotSetting> settingsCopy = SettingsTableHandlersSupport.createSettingsCopy(settings);
-                
+                final PositionCoordinateSerializer[] serializablePositions = TableHandlersSupport
+                        .createSerializablePositionsCoordinates(selectedCellPositions);
+                final List<RobotSetting> settingsCopy = TableHandlersSupport.createSettingsCopy(settings);
+
                 clipboard.setContents(
-                        new Object[] { serializablePositions, settingsCopy.toArray(new RobotKeywordCall[settingsCopy.size()]) },
+                        new Object[] { serializablePositions,
+                                settingsCopy.toArray(new RobotKeywordCall[settingsCopy.size()]) },
                         new Transfer[] { PositionCoordinateTransfer.getInstance(),
                                 KeywordCallsTransfer.getInstance() });
             }
 
             return null;
         }
+
     }
 }

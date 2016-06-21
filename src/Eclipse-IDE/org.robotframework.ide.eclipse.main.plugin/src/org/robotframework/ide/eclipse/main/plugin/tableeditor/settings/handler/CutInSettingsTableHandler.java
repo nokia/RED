@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CutInSettingsTableHandler.E4CutInSettingsTableHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteInSettingsTableHandler.E4DeleteInSettingsTableHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -42,21 +43,19 @@ public class CutInSettingsTableHandler extends DIParameterizedHandler<E4CutInSet
         @Execute
         public Object cut(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
-            
+
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
             final PositionCoordinate[] selectedCellPositions = editor.getSelectionLayerAccessor()
                     .getSelectionLayer()
                     .getSelectedCellPositions();
             if (selectedCellPositions.length > 0 && !settings.isEmpty()) {
-                final PositionCoordinateSerializer[] serializablePositions = new PositionCoordinateSerializer[selectedCellPositions.length];
-                for (int i = 0; i < selectedCellPositions.length; i++) {
-                    serializablePositions[i] = new PositionCoordinateSerializer(selectedCellPositions[i]);
-                }
-                
-                final List<RobotSetting> settingsCopy = SettingsTableHandlersSupport.createSettingsCopy(settings);
-                
+                final PositionCoordinateSerializer[] serializablePositions = TableHandlersSupport
+                        .createSerializablePositionsCoordinates(selectedCellPositions);
+                final List<RobotSetting> settingsCopy = TableHandlersSupport.createSettingsCopy(settings);
+
                 clipboard.setContents(
-                        new Object[] { serializablePositions, settingsCopy.toArray(new RobotKeywordCall[settingsCopy.size()]) },
+                        new Object[] { serializablePositions,
+                                settingsCopy.toArray(new RobotKeywordCall[settingsCopy.size()]) },
                         new Transfer[] { PositionCoordinateTransfer.getInstance(),
                                 KeywordCallsTransfer.getInstance() });
             }
