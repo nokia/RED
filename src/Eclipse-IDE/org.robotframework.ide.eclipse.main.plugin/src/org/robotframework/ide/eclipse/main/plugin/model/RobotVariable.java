@@ -34,13 +34,15 @@ import com.google.common.base.Strings;
 
 public class RobotVariable implements RobotFileInternalElement, Serializable {
 
+    private static final long serialVersionUID = -8529873490503814703L;
+
     // this has to be transient in order not to try serializing whole model instead of simply
     // its small part
     private transient RobotVariablesSection parent;
 
     private IVariableHolder holder;
 
-    RobotVariable(final RobotVariablesSection parent, final IVariableHolder variableHolder) {
+    public RobotVariable(final RobotVariablesSection parent, final IVariableHolder variableHolder) {
         this.parent = parent;
         this.holder = variableHolder;
     }
