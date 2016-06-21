@@ -32,6 +32,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteInSettingsTableHandler.E4PasteInSettingsTableHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -61,49 +62,36 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
             if (!selectedSettings.isEmpty() && KeywordCallsTransfer.hasSettings(clipboard)
                     && PositionCoordinateTransfer.hasPositionsCoordinates(clipboard)) {
 
-                RobotKeywordCall[] settingsFromClipboard = null;
-                final Object probablySettings = clipboard.getContents(KeywordCallsTransfer.getInstance());
-                if (probablySettings instanceof RobotKeywordCall[]) {
-                    settingsFromClipboard = (RobotKeywordCall[]) probablySettings;
-                }
-                PositionCoordinateSerializer[] cellPositionsFromClipboard = null;
-                final Object probablyPositions = clipboard.getContents(PositionCoordinateTransfer.getInstance());
-                if (probablyPositions instanceof PositionCoordinateSerializer[]) {
-                    cellPositionsFromClipboard = (PositionCoordinateSerializer[]) probablyPositions;
-                }
+                RobotKeywordCall[] settingsFromClipboard = getSettingsFromClipboard(clipboard);
+                PositionCoordinateSerializer[] cellPositionsFromClipboard = TableHandlersSupport.getPositionsCoordinatesFromClipboard(clipboard);
 
                 if (settingsFromClipboard != null && settingsFromClipboard.length > 0
                         && cellPositionsFromClipboard != null && cellPositionsFromClipboard.length > 0) {
                     final SelectionLayer selectionLayer = editor.getSelectionLayerAccessor().getSelectionLayer();
                     final int columnCount = selectionLayer.getColumnCount();
-                    int settingIndex = 0;
+                    int settingFromClipboardIndex = 0;
                     int currentClipboardRowIndex = cellPositionsFromClipboard[0].getRowPosition();
                     for (RobotSetting selectedSetting : selectedSettings) {
-                        RobotSetting settingFromClipboard = null;
-                        if (settingIndex < settingsFromClipboard.length) {
-                            settingFromClipboard = (RobotSetting) settingsFromClipboard[settingIndex];
-                            settingIndex++;
-                        } else {
-                            settingFromClipboard = (RobotSetting) settingsFromClipboard[0];
+                        RobotSetting settingFromClipboard = (RobotSetting) settingsFromClipboard[settingFromClipboardIndex];
+                        if (settingFromClipboardIndex+1 < settingsFromClipboard.length) {
+                            settingFromClipboardIndex++;
                         }
-                        if (settingFromClipboard != null) {
-                            final List<Integer> selectedSettingColumnsIndexes = findColumnsToPaste(
-                                    selectedSetting.getParent(), selectedSetting, selectionLayer);
-                            final List<Integer> clipboardSettingColumnsIndexes = findCurrentClipboardSettingColumnsIndexes(
-                                    currentClipboardRowIndex, cellPositionsFromClipboard);
-                            currentClipboardRowIndex = calculateNextClipboardRowIndex(currentClipboardRowIndex,
-                                    cellPositionsFromClipboard);
-                            if (!clipboardSettingColumnsIndexes.isEmpty()) {
-                                for (int i = 0; i < selectedSettingColumnsIndexes.size(); i++) {
-                                    int clipboardSettingColumnIndex = clipboardSettingColumnsIndexes.get(0);
-                                    if (i > 0 && i < clipboardSettingColumnsIndexes.size()) {
-                                        clipboardSettingColumnIndex = clipboardSettingColumnsIndexes.get(i);
-                                    }
-                                    final String valueToPaste = getValueToPaste(settingFromClipboard,
-                                            clipboardSettingColumnIndex, columnCount);
-                                    collectPasteCommandsForSelectedSettings(selectedSetting,
-                                            selectedSettingColumnsIndexes.get(i), columnCount, valueToPaste, pasteCommands);
+                        final List<Integer> selectedSettingColumnsIndexes = findColumnsToPaste(
+                                selectedSetting.getParent(), selectedSetting, selectionLayer);
+                        final List<Integer> clipboardSettingColumnsIndexes = findCurrentClipboardSettingColumnsIndexes(
+                                currentClipboardRowIndex, cellPositionsFromClipboard);
+                        currentClipboardRowIndex = calculateNextClipboardRowIndex(currentClipboardRowIndex,
+                                cellPositionsFromClipboard);
+                        if (!clipboardSettingColumnsIndexes.isEmpty()) {
+                            for (int i = 0; i < selectedSettingColumnsIndexes.size(); i++) {
+                                int clipboardSettingColumnIndex = clipboardSettingColumnsIndexes.get(0);
+                                if (i > 0 && i < clipboardSettingColumnsIndexes.size()) {
+                                    clipboardSettingColumnIndex = clipboardSettingColumnsIndexes.get(i);
                                 }
+                                final String valueToPaste = getValueToPaste(settingFromClipboard,
+                                        clipboardSettingColumnIndex, columnCount);
+                                collectPasteCommandsForSelectedSettings(selectedSetting,
+                                        selectedSettingColumnsIndexes.get(i), columnCount, valueToPaste, pasteCommands);
                             }
                         }
                     }
@@ -115,6 +103,12 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
             }
 
             return null;
+        }
+
+        private RobotKeywordCall[] getSettingsFromClipboard(final Clipboard clipboard) {
+            final Object probablySettings = clipboard.getContents(KeywordCallsTransfer.getInstance());
+            return probablySettings != null && probablySettings instanceof RobotKeywordCall[]
+                    ? (RobotKeywordCall[]) probablySettings : null;
         }
 
         private void collectPasteCommandsForSelectedSettings(final RobotSetting selectedSetting,
@@ -176,7 +170,7 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
 
         public List<Integer> findColumnsToPaste(final RobotSettingsSection section, final RobotSetting selectedSetting,
                 final SelectionLayer selectionLayer) {
-            final int settingTableIndex = SettingsTableHandlersSupport.findTableIndexOfSelectedSetting(section,
+            final int settingTableIndex = TableHandlersSupport.findTableIndexOfSelectedSetting(section,
                     selectedSetting);
             final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
             final List<Integer> columns = new ArrayList<>();
