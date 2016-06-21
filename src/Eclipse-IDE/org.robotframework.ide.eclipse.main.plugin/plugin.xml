@@ -2064,11 +2064,19 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <and>
+          <!--and>
              <reference
                    definitionId="org.robotframework.table.onlyFullRowsAreSelected">
              </reference>
-          </and>
+          </and-->
+          <or>
+             <reference
+             	definitionId="org.robotframework.table.noFullRowIsSelected">
+             </reference>
+             <reference
+             	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+             </reference>
+          </or>
        </enabledWhen>
     </handler>
     <handler
@@ -2080,11 +2088,19 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <and>
+          <!--and>
              <reference
                    definitionId="org.robotframework.table.onlyFullRowsAreSelected">
              </reference>
-          </and>
+          </and-->
+          <or>
+             <reference
+             	definitionId="org.robotframework.table.noFullRowIsSelected">
+             </reference>
+             <reference
+             	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+             </reference>
+          </or>
        </enabledWhen>
     </handler>
     <handler
