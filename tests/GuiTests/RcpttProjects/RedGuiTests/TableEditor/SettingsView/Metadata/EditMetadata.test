@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KeFc8P4OEeSvjNrJkS7N6Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/9/16 5:58 PM
+Save-Time: 6/21/16 3:28 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -72,13 +72,13 @@ with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Source | click
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
-    + "Metadata\tnew\ttext\n"
+    + "Metadata    new    text\n"
     + "*** Test Cases ***" | verify-true
     
 //add to Source metadata
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
-        set-caret-pos 2 21
+        set-caret-pos 2 24
         key-type "NUMPAD_ENTER" "\\u000D"
         key-type "M1+SPACE"
         type-text me
@@ -128,23 +128,23 @@ with [get-editor "TestFile.robot" | get-section Metadata] {
         key-type Enter
     }
 }
+
 //check source    
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
-    + "Metadata\tnew\ttext\n"
+    + "Metadata    new    text\n"
     + "Metadata    Second line  is here  #with comment\n"
-    + "Metadata\tdata\tCAPITAL CASE\n"
+    + "Metadata    data    CAPITAL CASE\n"
     + "*** Test Cases ***" | verify-true
 
-
-   
+//save file   
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
         set-caret-pos 5 19
         key-type "M1+s"
     }
 }
-
+//go to Setting tab
 with [get-editor "TestFile.robot"] {    
     get-tab-folder | get-tab-item Settings | click
     
@@ -156,17 +156,20 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 }
     
 with [get-editor "TestFile.robot"] {    
-
     with [get-section Metadata | get-canvas] {
+    
+    	//delete first row 
         mouse-press 49 74 button1
         mouse-release 49 74 button1 524288
         mouse-press 49 74 button3
         mouse-release 49 74 button3 2097152
         get-menu "Row/Delete row" | click
+        //copy "Second line"
         mouse-move 62 51
         mouse-press 62 51 button3
         mouse-release 62 51 button3 2097152
         get-menu "Row/Copy row" | click
+        //paste menu on fisrt item
         mouse-move 67 37
         mouse-press 67 37 button1
         mouse-release 67 37 button1 524288
