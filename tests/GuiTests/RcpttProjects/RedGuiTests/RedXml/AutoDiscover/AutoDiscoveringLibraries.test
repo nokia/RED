@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _l6X6QPy3EeW7_PzjO98BIw
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/14/16 2:54 PM
+Save-Time: 6/22/16 2:36 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -338,8 +338,14 @@ with [get-editor "test_with_resource.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
+
+
 //check that no window was shown
 verify-error{get-window "Discovering libraries summary"}
+
+//workaround
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
 
 //uncomment lib that exist in suite file
 with [get-editor "test_with_resource.robot" | get-text-viewer] {
@@ -349,6 +355,7 @@ with [get-editor "test_with_resource.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
+// here random error
 wait 3000
 wait-for-discover-window
 
@@ -401,4 +408,6 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
 get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Robot Framework/Reset Robot Environment" 
     | click
 wait 1000    
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
