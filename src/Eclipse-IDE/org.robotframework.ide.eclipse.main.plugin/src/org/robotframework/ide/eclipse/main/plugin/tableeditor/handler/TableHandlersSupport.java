@@ -44,8 +44,11 @@ public class TableHandlersSupport {
     public static List<RobotSetting> createSettingsCopy(final List<RobotSetting> settings) {
         final List<RobotSetting> settingsCopy = new ArrayList<>();
         for (final RobotSetting robotSetting : settings) {
-            settingsCopy.add(new RobotSetting(null, robotSetting.getGroup(), new String(robotSetting.getName()),
-                    new ArrayList<>(robotSetting.getArguments()), new String(robotSetting.getComment())));
+            if (robotSetting.getName() != null && robotSetting.getArguments() != null
+                    && robotSetting.getComment() != null) {
+                settingsCopy.add(new RobotSetting(null, robotSetting.getGroup(), new String(robotSetting.getName()),
+                        new ArrayList<>(robotSetting.getArguments()), new String(robotSetting.getComment())));
+            }
         }
         return settingsCopy;
     }
