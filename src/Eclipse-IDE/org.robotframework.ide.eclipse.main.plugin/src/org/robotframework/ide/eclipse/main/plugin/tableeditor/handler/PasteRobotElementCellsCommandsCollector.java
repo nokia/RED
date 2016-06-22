@@ -28,11 +28,10 @@ public abstract class PasteRobotElementCellsCommandsCollector {
         final List<EditorCommand> pasteCommands = new ArrayList<>();
 
         if (!selectedElements.isEmpty() && hasRobotElementsInClipboard(clipboard)
-                && PositionCoordinateTransfer.hasPositionsCoordinates(clipboard)) {
+                && hasPositionsCoordinatesInClipboard(clipboard)) {
 
             final RobotElement[] robotElementsFromClipboard = getRobotElementsFromClipboard(clipboard);
-            final PositionCoordinateSerializer[] cellPositionsFromClipboard = TableHandlersSupport
-                    .getPositionsCoordinatesFromClipboard(clipboard);
+            final PositionCoordinateSerializer[] cellPositionsFromClipboard = getPositionsCoordinatesFromClipboard(clipboard);
 
             if (robotElementsFromClipboard != null && robotElementsFromClipboard.length > 0
                     && cellPositionsFromClipboard != null && cellPositionsFromClipboard.length > 0) {
@@ -71,6 +70,14 @@ public abstract class PasteRobotElementCellsCommandsCollector {
 
         return pasteCommands;
 
+    }
+
+    protected boolean hasPositionsCoordinatesInClipboard(final Clipboard clipboard) {
+        return PositionCoordinateTransfer.hasPositionsCoordinates(clipboard);
+    }
+    
+    protected PositionCoordinateSerializer[] getPositionsCoordinatesFromClipboard(final Clipboard clipboard) {
+        return TableHandlersSupport.getPositionsCoordinatesFromClipboard(clipboard);
     }
 
     protected abstract boolean hasRobotElementsInClipboard(final Clipboard clipboard);
