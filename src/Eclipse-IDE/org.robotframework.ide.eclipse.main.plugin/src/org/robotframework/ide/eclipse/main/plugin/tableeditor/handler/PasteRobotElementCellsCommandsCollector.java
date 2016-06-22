@@ -57,10 +57,10 @@ public abstract class PasteRobotElementCellsCommandsCollector {
                             if (i > 0 && i < clipboardElementColumnsIndexes.size()) {
                                 clipboardElementColumnIndex = clipboardElementColumnsIndexes.get(i);
                             }
-                            final String valueToPaste = findValueToPaste(elementFromClipboard,
+                            final List<String> valuesToPaste = findValuesToPaste(elementFromClipboard,
                                     clipboardElementColumnIndex, tableColumnsCount);
                             collectPasteCommandsForSelectedElement(selectedElement,
-                                    selectedElementColumnsIndexes.get(i), valueToPaste, tableColumnsCount,
+                                    selectedElementColumnsIndexes.get(i), valuesToPaste, tableColumnsCount,
                                     pasteCommands);
                         }
                     }
@@ -80,11 +80,11 @@ public abstract class PasteRobotElementCellsCommandsCollector {
     protected abstract int findSelectedElementTableIndex(final RobotElement section,
             final RobotElement selectedElement);
 
-    protected abstract String findValueToPaste(final RobotElement elementFromClipboard,
+    protected abstract List<String> findValuesToPaste(final RobotElement elementFromClipboard,
             final int clipboardElementColumnIndex, final int tableColumnsCount);
 
     protected abstract void collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
-            final int selectedElementColumnIndex, final String valueToPaste, final int tableColumnsCount,
+            final int selectedElementColumnIndex, final List<String> valuesToPaste, final int tableColumnsCount,
             final List<EditorCommand> pasteCommands);
 
     private List<Integer> findSelectedColumnsIndexes(final int selectedElementTableIndex,

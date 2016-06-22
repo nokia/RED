@@ -5,13 +5,20 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.eclipse.swt.dnd.Clipboard;
+import org.rf.ide.core.testdata.model.presenter.update.variables.VariablesValueConverter;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
+import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetDictItemsCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetListItemsCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetScalarValueCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableNameCommand;
@@ -44,46 +51,47 @@ public class PasteVariablesCellsCommandsCollector extends PasteRobotElementCells
     }
 
     @Override
-    protected String findValueToPaste(final RobotElement elementFromClipboard, final int clipboardVariableColumnIndex,
+    protected List<String> findValuesToPaste(final RobotElement elementFromClipboard, final int clipboardVariableColumnIndex,
             final int tableColumnsCount) {
-        String valueToPaste = "";
         final RobotVariable variableFromClipboard = (RobotVariable) elementFromClipboard;
         if (clipboardVariableColumnIndex == 0) {
-            valueToPaste = variableFromClipboard.getLinkedElement().getDeclaration().getText();
+            return newArrayList(variableFromClipboard.getLinkedElement().getDeclaration().getText());
         } else if (clipboardVariableColumnIndex == 1) {
             if (variableFromClipboard.getType() == VariableType.SCALAR) {
-                valueToPaste = variableFromClipboard.getValue();
+                return newArrayList(variableFromClipboard.getValue());
             } else if (variableFromClipboard.getType() == VariableType.LIST) {
-
+                ListVariable listVariable = (ListVariable) variableFromClipboard.getLinkedElement();
+                return VariablesValueConverter.convert(listVariable.getItems(), String.class);
             } else if (variableFromClipboard.getType() == VariableType.DICTIONARY) {
-
+                DictionaryVariable dictVariable = (DictionaryVariable) variableFromClipboard.getLinkedElement();
+                return VariablesValueConverter.convert(dictVariable.getItems(), String.class);
             }
         } else {
-            valueToPaste = variableFromClipboard.getComment();
+            return newArrayList(variableFromClipboard.getComment());
         }
 
-        return valueToPaste;
+        return newArrayList();
     }
 
     @Override
     protected void collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
-            final int selectedElementColumnIndex, final String valueToPaste, final int tableColumnsCount,
+            final int selectedElementColumnIndex, final List<String> valuesToPaste, final int tableColumnsCount,
             final List<EditorCommand> pasteCommands) {
 
-        if (selectedElement instanceof RobotVariable) {
+        if (selectedElement instanceof RobotVariable && !valuesToPaste.isEmpty()) {
             final RobotVariable selectedVariable = (RobotVariable) selectedElement;
             if (selectedElementColumnIndex == 0) {
-                pasteCommands.add(new SetVariableNameCommand(selectedVariable, valueToPaste));
+                pasteCommands.add(new SetVariableNameCommand(selectedVariable, valuesToPaste.get(0)));
             } else if (selectedElementColumnIndex == 1) {
                 if (selectedVariable.getType() == VariableType.SCALAR) {
-                    pasteCommands.add(new SetScalarValueCommand(selectedVariable, valueToPaste));
+                    pasteCommands.add(new SetScalarValueCommand(selectedVariable, valuesToPaste.get(0)));
                 } else if (selectedVariable.getType() == VariableType.LIST) {
-                    // TODO: copy list items
+                    pasteCommands.add(new SetListItemsCommand(selectedVariable, valuesToPaste));
                 } else if (selectedVariable.getType() == VariableType.DICTIONARY) {
-                    // TODO: copy dict pairs
+                    pasteCommands.add(new SetDictItemsCommand(selectedVariable, valuesToPaste));
                 }
             } else {
-                pasteCommands.add(new SetVariableCommentCommand(selectedVariable, valueToPaste));
+                pasteCommands.add(new SetVariableCommentCommand(selectedVariable, valuesToPaste.get(0)));
             }
         }
     }
