@@ -45,4 +45,9 @@ public class VariableTableModelUpdater {
 
         return v;
     }
+
+    @VisibleForTesting
+    protected List<IVariableTableElementOperation<?>> getHandlers() {
+        return handlers;
+    }
 }
