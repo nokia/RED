@@ -29,8 +29,8 @@ public class ScalarVariableModelUpdater implements IVariableTableElementOperatio
         final ScalarVariable var = (ScalarVariable) dst;
 
         int size = toAdd.size();
-        for (int i = startIndexForModification; i < size; i++) {
-            var.addValue(toAdd.get(i), i);
+        for (int i = 0; i < size; i++) {
+            var.addValue(toAdd.get(i), startIndexForModification + i);
         }
     }
 }
