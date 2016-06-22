@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.eclipse.swt.dnd.Clipboard;
@@ -23,7 +25,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandl
 
 /**
  * @author mmarzec
- *
  */
 public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsCommandsCollector {
 
@@ -38,52 +39,52 @@ public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsC
         return probablySettings != null && probablySettings instanceof RobotKeywordCall[]
                 ? (RobotKeywordCall[]) probablySettings : null;
     }
-    
+
     @Override
     protected int findSelectedElementTableIndex(final RobotElement section, final RobotElement selectedElement) {
         return section instanceof RobotSettingsSection && selectedElement instanceof RobotSetting ? TableHandlersSupport
                 .findTableIndexOfSelectedSetting((RobotSettingsSection) section, (RobotSetting) selectedElement) : -1;
     }
-    
+
     @Override
-    protected String findValueToPaste(final RobotElement elementFromClipboard, final int clipboardSettingColumnIndex,
-            final int tableColumnsCount) {
-        
-        String valueToPaste = "";
+    protected List<String> findValuesToPaste(final RobotElement elementFromClipboard,
+            final int clipboardSettingColumnIndex, final int tableColumnsCount) {
+
         final RobotSetting settingFromClipboard = (RobotSetting) elementFromClipboard;
         final List<String> arguments = settingFromClipboard.getArguments();
         if (settingFromClipboard.getGroup() == SettingsGroup.METADATA) {
             if (!arguments.isEmpty()) {
                 if (clipboardSettingColumnIndex == 0) {
-                    valueToPaste = arguments.get(0);
+                    return newArrayList(arguments.get(0));
                 } else if (clipboardSettingColumnIndex == 1 && arguments.size() > 0) {
-                    valueToPaste = arguments.get(1);
+                    return newArrayList(arguments.get(1));
 
                 } else if (clipboardSettingColumnIndex == 2) {
-                    valueToPaste = settingFromClipboard.getComment();
+                    return newArrayList(settingFromClipboard.getComment());
                 }
             }
         } else {
             if (clipboardSettingColumnIndex == 0) {
-                valueToPaste = settingFromClipboard.getName();
+                return newArrayList(settingFromClipboard.getName());
             } else {
                 int argIndex = clipboardSettingColumnIndex - 1;
                 if (argIndex < arguments.size()) {
-                    valueToPaste = arguments.get(argIndex);
+                    return newArrayList(arguments.get(argIndex));
                 } else if (clipboardSettingColumnIndex == tableColumnsCount - 1) {
-                    valueToPaste = settingFromClipboard.getComment();
+                    return newArrayList(settingFromClipboard.getComment());
                 }
             }
         }
-        return valueToPaste;
+        return newArrayList();
     }
 
     @Override
     protected void collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
-            final int selectedElementColumnIndex, final String valueToPaste, final int tableColumnsCount,
+            final int selectedElementColumnIndex, final List<String> valuesToPaste, final int tableColumnsCount,
             final List<EditorCommand> pasteCommands) {
 
-        if (selectedElement instanceof RobotSetting) {
+        if (selectedElement instanceof RobotSetting && !valuesToPaste.isEmpty()) {
+            final String valueToPaste = valuesToPaste.get(0);
             final RobotSetting selectedSetting = (RobotSetting) selectedElement;
             if (selectedElementColumnIndex == tableColumnsCount - 1) {
                 pasteCommands.add(new SetKeywordCallCommentCommand(selectedSetting, valueToPaste));
