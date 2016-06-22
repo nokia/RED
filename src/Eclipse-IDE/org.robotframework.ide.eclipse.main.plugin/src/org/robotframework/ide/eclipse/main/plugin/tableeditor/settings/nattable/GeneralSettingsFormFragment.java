@@ -480,7 +480,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     public void clearSettingsSelection() {
-        if (table.isPresent()) {
+        if (selectionProvider != null) {
             selectionProvider.setSelection(StructuredSelection.EMPTY);
         }
     }

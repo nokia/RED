@@ -56,7 +56,7 @@ public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsC
             if (!arguments.isEmpty()) {
                 if (clipboardSettingColumnIndex == 0) {
                     return newArrayList(arguments.get(0));
-                } else if (clipboardSettingColumnIndex == 1 && arguments.size() > 0) {
+                } else if (clipboardSettingColumnIndex == 1 && arguments.size() > 1) {
                     return newArrayList(arguments.get(1));
 
                 } else if (clipboardSettingColumnIndex == 2) {
