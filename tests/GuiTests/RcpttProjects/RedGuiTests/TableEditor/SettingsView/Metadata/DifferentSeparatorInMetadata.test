@@ -1,0 +1,226 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _zPR4wDb1EeaJIKJT0Mv9ow
+Element-Name: DifferentSeparatorInMetadata
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _xbGiMDbxEeaJIKJT0Mv9ow
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 6/22/16 1:59 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot"|  get-tab-folder | get-tab-item Settings | click
+
+//check Setting table
+proc "check-values-in-row" [val row] [val setting] [val col1 ""] [val col2 ""] [val col3 ""] [val col4 ""] [val col5 ""] [val col6 ""]{
+	get-editor "TestFile.robot" | get-section General | get-canvas | get-object| invoke getCellByPosition 1 $row | invoke getDataValue| eq $setting |verify-true
+	get-editor "TestFile.robot" | get-section General | get-canvas | get-object| invoke getCellByPosition 2 $row | invoke getDataValue| eq  $col1 |verify-true
+	get-editor "TestFile.robot" | get-section General | get-canvas | get-object| invoke getCellByPosition 3 $row | invoke getDataValue| eq  $col2 |verify-true
+	get-editor "TestFile.robot" | get-section General | get-canvas | get-object| invoke getCellByPosition 4 $row | invoke getDataValue| eq  $col3 |verify-true
+	get-editor "TestFile.robot" | get-section General | get-canvas | get-object| invoke getCellByPosition 5 $row | invoke getDataValue| eq  $col4 |verify-true
+	get-editor "TestFile.robot" | get-section General | get-canvas | get-object| invoke getCellByPosition 6 $row | invoke getDataValue| eq  $col5 |verify-true
+	get-editor "TestFile.robot" | get-section General | get-canvas | get-object| invoke getCellByPosition 7 $row | invoke getDataValue| eq  $col6 |verify-true
+}
+
+check-values-in-row -row 1 -setting "Suite Setup" -col1 "Convert To Binary" -col2 "58"
+check-values-in-row -row 2 -setting "Suite Teardown"
+check-values-in-row -row 3 -setting "Test Setup" -col1 "Catenate" -col2 "text" -col3 "2"
+check-values-in-row -row 4 -setting "Test Teardown" 
+check-values-in-row -row 5 -setting "Test Template"
+check-values-in-row -row 6 -setting "Test Timeout" -col1 "5s"
+check-values-in-row -row 7 -setting "Force Tags" -col1 "music" -col6 "#this is tag" 
+check-values-in-row -row 8 -setting "Default Tags" 
+
+
+
+
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    get-section General | click
+    with [get-section Metadata] {
+        click
+	}
+}
+get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 1|  invoke getDataValue| eq "zorro" |verify-true
+get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 2 1|  invoke getDataValue| eq "" |verify-true
+get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 3 1|  invoke getDataValue| eq "" |verify-true
+
+
+get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 2|  invoke getDataValue| eq "abc" |verify-true
+get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 2 2|  invoke getDataValue| eq "" |verify-true
+get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 3 2|  invoke getDataValue| eq "" |verify-true
+    
+    
+   
+//add value to first Metadata
+with [get-editor "TestFile.robot"] {
+//    get-tab-folder | get-tab-item Settings | click
+//    get-section General | click
+    with [get-section Metadata] {
+        //click
+        with [get-canvas] {
+            mouse-press 368 26 button1
+            mouse-release 368 26 button1 524288
+            mouse-press 368 26 button1
+            mouse-double-click 368 26 button1
+            mouse-release 368 26 button1 524288
+        }
+        with [get-editbox] {
+            type-text 1
+            key-type Enter
+        }
+        get-canvas | mouse-move 257 418
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+//check Source (value with pipe should be added)
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
+    + "| Resource | res.robot    \n\n"
+    + "| Force Tags |  music | #this is tag\n"
+    + "| Suite Setup | Convert To Binary | 58    \n\n"
+    + "| Metadata | zorro | 1\n\n"
+    + "| Test Timeout | 5s\n"
+    + " Test Setup    Catenate  text   2\n"
+    + "Metadata  abc\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+
+// add value and comment to second Metadata   
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    with [get-section Metadata] {
+        with [get-canvas] {
+            mouse-press 356 57 button1
+            mouse-release 356 57 button1 524288
+            mouse-press 356 57 button1
+            mouse-double-click 356 57 button1
+            mouse-release 356 57 button1 524288
+        }
+        with [get-editbox] {
+            type-text 2
+            key-type "NUMPAD_ENTER" "\\u000D"
+        }
+        with [get-editbox] {
+            type-text comment
+        }
+        get-canvas | mouse-move 563 422
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+//check Source (no pipes)
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
+    + "| Resource | res.robot    \n\n"
+    + "| Force Tags |  music | #this is tag\n"
+    + "| Suite Setup | Convert To Binary | 58    \n\n"
+    + "| Metadata | zorro | 1\n\n"
+    + "| Test Timeout | 5s\n"
+    + " Test Setup    Catenate  text   2\n"
+    + "Metadata  abc  2    #comment\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+//add new Metadata
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    with [get-section Metadata | get-canvas] {
+        mouse-press 109 77 button1
+        mouse-release 109 77 button1 524288
+        mouse-press 109 77 button1
+        mouse-double-click 109 77 button1
+        mouse-release 109 77 button1 524288
+        mouse-move 352 70
+        mouse-press 352 70 button1
+        mouse-release 352 70 button1 524288
+        type-text 3
+        mouse-move 361 407
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+//check that in Source default separator is added
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
+    + "| Resource | res.robot    \n\n"
+    + "| Force Tags |  music | #this is tag\n"
+    + "| Suite Setup | Convert To Binary | 58    \n\n"
+    + "| Metadata | zorro | 1\n\n"
+    + "| Test Timeout | 5s\n"
+    + " Test Setup    Catenate  text   2\n"
+    + "Metadata  abc  2    #comment\n\n"
+    + "Metadata    data    3\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+//change preference to  pipe    
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor"
+    with [get-group "General settings"] {
+        get-button "user defined separator should be used" | click
+        get-editbox -after [get-label "user defined separator (use '|', 's' for space or 't' for tab)"] | set-text "s|s"
+    }
+    get-button Apply | click
+    get-button OK | click
+}
+
+//add next Matadata
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    with [get-section Metadata] {
+        with [get-canvas] {
+            mouse-press 89 98 button1
+            mouse-release 89 98 button1 524288
+            mouse-press 89 98 button1
+            mouse-double-click 89 98 button1
+            mouse-release 89 98 button1 524288
+        }
+        get-editbox | set-text meta
+        with [get-canvas] {
+            mouse-move 332 105
+            mouse-press 332 105 button1
+            mouse-release 332 105 button1 524288
+            type-text 4
+        }
+        get-editbox | set-text 55
+        with [get-canvas] {
+            mouse-move 640 102
+            mouse-press 640 102 button1
+            mouse-release 640 102 button1 524288
+            type-text text
+        }
+        get-editbox | set-text text
+        get-canvas | mouse-move 398 422
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+//check if was added with pipes
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
+    + "| Resource | res.robot    \n\n"
+    + "| Force Tags |  music | #this is tag\n"
+    + "| Suite Setup | Convert To Binary | 58    \n\n"
+    + "| Metadata | zorro | 1\n\n"
+    + "| Test Timeout | 5s\n"
+    + " Test Setup    Catenate  text   2\n"
+    + "Metadata  abc  2    #comment\n\n"
+    + "Metadata    data    3\n"
+    + "| Metadata | meta | 55 | #text\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
