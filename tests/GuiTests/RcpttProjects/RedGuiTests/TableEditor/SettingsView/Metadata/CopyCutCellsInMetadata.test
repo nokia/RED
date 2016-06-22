@@ -1,0 +1,214 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: CopyCutCellsInMetadata
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _emIDYDe5EeaJIKJT0Mv9ow
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 6/22/16 5:54 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open editor
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+//add Metada
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Metadata    a1    1    #comment1\n"
+    + "Metadata    a2    2    #comment2\n"
+    + "Metadata    a3    3    #comment3\n"
+    + "Metadata    a4    4    #comment4\n"
+    + "Metadata    a5    5    #comment5\n"
+    + "Metadata    a6    6    #comment6\n"
+    + "Metadata    a7    7    #comment7\n"
+    + "Metadata    a8    8    #comment8\n"
+    + "Metadata    a9    9    #comment9\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7"
+    
+//open Settings tab
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    get-section General | click
+    get-section Metadata | click
+}
+
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    with [get-section Metadata | get-canvas] {
+    
+    	//cut metadata=a1 by menu
+        mouse-press 36 36 button1
+        mouse-release 36 36 button1 524288
+        mouse-press 36 36 button3
+        mouse-release 36 36 button3 2097152
+        get-menu Cut | click
+        
+        //cut value=2 by menu
+        mouse-move 333 48
+        mouse-press 333 48 button3
+        mouse-release 333 48 button3 2097152
+        get-menu Cut | click
+        
+        //cut comment=comment3 by menu
+        mouse-move 629 72
+        mouse-press 629 72 button3
+        mouse-release 629 72 button3 2097152
+        get-menu Cut | click
+        
+        //zmien a4
+         mouse-press 52 98 button1
+        mouse-release 52 98 button1 524288
+        key-type F2
+        
+        with [get-editbox] {
+	        type-text new
+	        key-type Enter
+	    }
+	    
+	   
+	        mouse-press 52 98 button1
+	        mouse-release 52 98 button1 524288
+	        key-type "M1+x"
+	        mouse-move 994 11
+	    
+	    
+	    //        //paste a4 to"5"
+        mouse-move 338 119
+        mouse-press 338 119 button1
+        mouse-release 338 119 button1 524288
+        key-type "M1+v"
+        
+        //paste a4 to comment5
+        mouse-move 597 119
+        mouse-press 597 119 button1
+        mouse-release 597 119 button1 524288
+        key-type "M1+v"
+        
+        //paste at to metadata=a5
+        mouse-move 147 117
+        mouse-press 147 117 button1
+        mouse-release 147 117 button1 524288
+        key-type "M1+v"
+        
+        //select entire row a6
+        mouse-move 2 142
+        mouse-press 2 142 button1
+        mouse-release 2 142 button1 524288
+        key-type "M1+x"
+        
+        //cut entire row a7
+        mouse-move 41 164
+        mouse-press 41 164 button3
+        mouse-release 41 164 button3 2097152
+        get-menu "Row/Cut row" | click
+        
+        //paste ro a7 above a9
+        mouse-move 47 184
+        mouse-press 47 184 button3
+        mouse-release 47 184 button3 2097152
+        get-menu "Row/Paste row" | click
+        mouse-move 335 24
+        key-type "M1+s"
+    }
+}   
+
+wait 2000
+proc "check-values-in-row" [val row] [val metadata] [val val] [val comment]{
+	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $metadata |verify-true
+	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $val |verify-true
+	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $comment |verify-true
+
+}
+
+check-values-in-row -row 1 -metadata "\\" -val "1" -comment "#comment1"
+check-values-in-row -row 2 -metadata "a2" -val "" -comment "#comment2"
+check-values-in-row -row 3 -metadata "a3" -val "3" -comment ""
+check-values-in-row -row 4 -metadata "\\" -val "4" -comment "#comment4"
+
+check-values-in-row -row 5 -metadata "new" -val "new" -comment "#new"
+check-values-in-row -row 6 -metadata "\\" -val "" -comment ""
+check-values-in-row -row 7 -metadata "a8" -val "8" -comment "#comment8"
+check-values-in-row -row 8 -metadata "a7" -val "7" -comment "#comment7"
+check-values-in-row -row 9 -metadata "a9" -val "9" -comment "#comment9"
+
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+
+//check Source
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Metadata    \\    1    #comment1\n"
+    + "Metadata    a2    #comment2\n"
+    + "Metadata    a3    3    \n"
+    + "Metadata    \\    4    #comment4\n"
+    + "Metadata    new    new    #new\n"
+    + "Metadata    \\    \n"
+    + "Metadata    a8    8    #comment8\n"
+    + "Metadata    a7    7    #comment7\n"
+    + "Metadata    a9    9    #comment9\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+
+
+//reset Metadata
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Metadata    a1    1    #comment1\n"
+    + "Metadata    a2    2    #comment2\n"
+    + "Metadata    a3    3    #comment3\n"
+    + "Metadata    a4    4    #comment4\n"
+    + "Metadata    a5    5    #comment5\n"
+    + "Metadata    a6    6    #comment6\n"
+    + "Metadata    a7    7    #comment7\n"
+    + "Metadata    a8    8    #comment8\n"
+    + "Metadata    a9    9    #comment9\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7"
+wait 2000
+
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Settings | click
+    wait 2000
+    with [get-section Metadata | get-canvas] {
+    	//set first cell
+        mouse-press 81 33 button1
+        mouse-release 81 33 button1 524288
+        key-type Right
+        //cut value "1"
+        key-type "M1+x"
+        key-type Down
+        //paste in value "2"
+        key-type "M1+v"
+        key-type Down
+        key-type Right
+        //cut comment3
+        key-type "M1+x"
+        key-type Down -times 2
+        key-type Left
+        key-type Down
+        //past on value "6"
+        key-type "M1+v"
+        mouse-move 949 80
+    }
+}
+
+check-values-in-row -row 1 -metadata "a1" -val "" -comment "#comment1"
+check-values-in-row -row 2 -metadata "a2" -val "1" -comment "#comment2"
+//check-values-in-row -row 3 -metadata "a3" -val "3" -comment ""
+check-values-in-row -row 4 -metadata "a4" -val "4" -comment "#comment4"
+
+check-values-in-row -row 5 -metadata "a5" -val "5" -comment "#comment5"
+check-values-in-row -row 6 -metadata "a6" -val "#comment3" -comment "#comment6"
+check-values-in-row -row 7 -metadata "a7" -val "7" -comment "#comment7"
+check-values-in-row -row 8 -metadata "a8" -val "8" -comment "#comment8"
+check-values-in-row -row 9 -metadata "a9" -val "9" -comment "#comment9"   
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
