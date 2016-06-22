@@ -109,6 +109,14 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
                 }
             }
         } else {
+            Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, elemDeclaration);
+            if (sep.getTypes().contains(SeparatorType.PIPE)) {
+                String text = sep.getText();
+                text = text.replace("^\\s*[|]", "|");
+                sep.setText(text);
+                sep.setRaw(text);
+                getDumperHelper().updateLine(model, lines, sep);
+            }
             getDumperHelper().updateLine(model, lines, elemDeclaration);
             lastToken = elemDeclaration;
         }
