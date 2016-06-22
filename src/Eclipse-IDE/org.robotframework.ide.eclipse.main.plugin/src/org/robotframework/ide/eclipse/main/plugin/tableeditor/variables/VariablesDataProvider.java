@@ -20,7 +20,6 @@ import ca.odell.glazedlists.SortedList;
 
 /**
  * @author Michal Anglart
- *
  */
 public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Object> {
 
@@ -28,6 +27,7 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
             VariablesAdderState.DICTIONARY);
 
     private RobotVariablesSection section;
+
     private SortedList<RobotVariable> variables;
 
     private VariableFilter filter;
@@ -122,7 +122,7 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
 
             int count = 0;
             int realRowIndex = 0;
-            while (count <= rowIndex) {
+            while (count <= rowIndex && realRowIndex < variables.size()) {
                 rowObject = variables.get(realRowIndex);
                 if (isPassingThroughFilter(rowObject)) {
                     count++;
