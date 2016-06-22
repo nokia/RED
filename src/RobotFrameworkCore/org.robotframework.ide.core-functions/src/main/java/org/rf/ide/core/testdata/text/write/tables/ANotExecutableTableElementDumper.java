@@ -112,7 +112,7 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
             Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, elemDeclaration);
             if (sep.getTypes().contains(SeparatorType.PIPE)) {
                 String text = sep.getText();
-                text = text.replace("^\\s*[|]", "|");
+                text = text.substring(text.indexOf('|'));
                 sep.setText(text);
                 sep.setRaw(text);
                 getDumperHelper().updateLine(model, lines, sep);
