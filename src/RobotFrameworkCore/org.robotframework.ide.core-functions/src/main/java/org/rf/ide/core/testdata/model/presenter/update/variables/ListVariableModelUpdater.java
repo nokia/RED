@@ -29,8 +29,8 @@ public class ListVariableModelUpdater implements IVariableTableElementOperation<
         final ListVariable var = (ListVariable) dst;
 
         int size = toAdd.size();
-        for (int i = startIndexForModification; i < size; i++) {
-            var.addItem(toAdd.get(i), i);
+        for (int i = 0; i < size; i++) {
+            var.addItem(toAdd.get(i), startIndexForModification + i);
         }
     }
 }
