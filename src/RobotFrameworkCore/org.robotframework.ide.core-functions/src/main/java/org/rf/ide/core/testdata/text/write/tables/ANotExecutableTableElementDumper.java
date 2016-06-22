@@ -153,8 +153,18 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
             final IRobotLineElement tokElem = tokens.get(tokenId);
             Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokElem);
-            getDumperHelper().updateLine(model, lines, sep);
-            lastToken = sep;
+            boolean addSep = true;
+            if (!lines.isEmpty()) {
+                final List<IRobotLineElement> lastLineElems = lines.get(lines.size() - 1).getLineElements();
+                if (lastLineElems.get(lastLineElems.size() - 1) instanceof Separator) {
+                    addSep = false;
+                }
+            }
+
+            if (addSep) {
+                getDumperHelper().updateLine(model, lines, sep);
+                lastToken = sep;
+            }
 
             getDumperHelper().updateLine(model, lines, tokElem);
             lastToken = tokElem;
