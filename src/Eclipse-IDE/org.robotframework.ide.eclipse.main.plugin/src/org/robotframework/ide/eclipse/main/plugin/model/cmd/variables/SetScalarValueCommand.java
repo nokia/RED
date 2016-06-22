@@ -5,9 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import org.rf.ide.core.testdata.model.presenter.update.VariableTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
-import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -28,14 +30,8 @@ public class SetScalarValueCommand extends EditorCommand {
         if (variable.getType() != VariableType.SCALAR) {
             throw new CommandExecutionException("Invalid type of variable: " + variable.getType());
         }
-        final RobotToken token = RobotToken.create(newValue);
 
-        final ScalarVariable scalar = (ScalarVariable) variable.getLinkedElement();
-        if (scalar.getValues().isEmpty()) {
-            scalar.addValue(token);
-        } else {
-            scalar.addValue(token, 0);
-        }
+        new VariableTableModelUpdater().addOrSet((AVariable) variable.getLinkedElement(), 0, newArrayList(newValue));
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
