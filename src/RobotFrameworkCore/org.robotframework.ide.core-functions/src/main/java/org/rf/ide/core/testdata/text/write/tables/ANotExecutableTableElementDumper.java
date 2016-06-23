@@ -174,6 +174,15 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
                 lastToken = sep;
             }
 
+            if (tokElem.getText().equals("\n...")) {
+                Separator sepGot = getDumperHelper().getSeparator(model, lines, lastToken, tokElem);
+                if (sepGot.getTypes().contains(SeparatorType.PIPE)) {
+                    String text = sepGot.getText();
+                    text = text.substring(text.indexOf('|'));
+                    ((RobotToken) tokElem).setText("\n" + text + "...");
+                }
+            }
+
             getDumperHelper().updateLine(model, lines, tokElem);
             lastToken = tokElem;
 
