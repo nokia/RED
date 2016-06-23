@@ -279,6 +279,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             if (templateKeyword != null) {
                 args.add(templateKeyword.getText().toString());
             }
+            args.addAll(Lists.transform(templateSetting.getUnexpectedTrashArguments(), TokenFunctions.tokenToString()));
             final String comment = CommentServiceHandler.consolidate(templateSetting,
                     ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
             final RobotSetting setting = new RobotSetting(this, name, args, comment);
