@@ -60,7 +60,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         final List<PasteCommandsInput> pasteCommandsInputs = commandsCollector.getPasteCommandsInputs();
         verifyPasteCommandsInputSize(columnsToPaste, rowsToPaste, pasteCommandsInputs);
-        verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste, rowsToPaste);
+        verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste);
         verifyPasteCommandsInputValues(pasteCommandsInputs, settingsFromClipboard, columnsToCopy.length,
                 columnsToPaste.length - 1, rowsToPaste);
         assertEquals(settingsFromClipboard[0].getComment(),
@@ -101,7 +101,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         final List<PasteCommandsInput> pasteCommandsInputs = commandsCollector.getPasteCommandsInputs();
         verifyPasteCommandsInputSize(columnsToPaste, rowsToPaste, pasteCommandsInputs);
-        verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste, rowsToPaste);
+        verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste);
         verifyPasteCommandsInputValues(pasteCommandsInputs, settingsFromClipboard, columnsToCopy.length,
                 columnsToPaste.length, rowsToPaste);
     }
@@ -139,13 +139,13 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         final List<PasteCommandsInput> pasteCommandsInputs = commandsCollector.getPasteCommandsInputs();
         verifyPasteCommandsInputSize(columnsToPaste, rowsToPaste, pasteCommandsInputs);
-        verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste, rowsToPaste);
+        verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste);
         verifyPasteCommandsInputValues(pasteCommandsInputs, settingsFromClipboard, columnsToCopy.length,
                 columnsToPaste.length, rowsToPaste);
     }
 
     @Test
-    public void testCollectPasteCommands_pasteOneColumnFromOneMetadataToThreeColumnsInTwoMetadatas() {
+    public void testCollectPasteCommands_pasteOneColumnFromOneMetadataToTwoColumnsInTwoMetadatas() {
 
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Metadata  ver1  1.0  # comment1")
@@ -164,7 +164,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         final PositionCoordinateSerializer[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
                 rowsToCopy);
 
-        final int[] columnsToPaste = new int[] { 0, 1, 2 };
+        final int[] columnsToPaste = new int[] { 0, 1 };
         final int[] rowsToPaste = new int[] { 1, 2 };
 
         final List<RobotElement> selectedSettings = getSettingsByRowNumbers(metadataSettings, rowsToPaste);
@@ -177,7 +177,45 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         final List<PasteCommandsInput> pasteCommandsInputs = commandsCollector.getPasteCommandsInputs();
         verifyPasteCommandsInputSize(columnsToPaste, rowsToPaste, pasteCommandsInputs);
-        verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste, rowsToPaste);
+        verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste);
+        verifyPasteCommandsInputValues(pasteCommandsInputs, settingsFromClipboard, columnsToCopy.length,
+                columnsToPaste.length, rowsToPaste);
+    }
+    
+    @Test
+    public void testCollectPasteCommands_pasteOneColumnFromOneMetadataToOneColumnInTwoMetadatas() {
+
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
+                .appendLine("Metadata  ver1  1.0  # comment1")
+                .appendLine("Metadata  ver2  2.0  # comment2")
+                .appendLine("Metadata  ver3  3.0  # comment3")
+                .build();
+
+        final RobotSettingsSection section = file.findSection(RobotSettingsSection.class).get();
+        final List<RobotKeywordCall> metadataSettings = section.getMetadataSettings();
+
+        final int[] columnsToCopy = new int[] { 0 };
+        final int[] rowsToCopy = new int[] { 0 };
+
+        final RobotSetting[] settingsFromClipboard = getSettingsByRowNumbers(metadataSettings, rowsToCopy)
+                .toArray(new RobotSetting[0]);
+        final PositionCoordinateSerializer[] cellPositionsFromClipboard = createPositionsToCopy(columnsToCopy,
+                rowsToCopy);
+
+        final int[] columnsToPaste = new int[] { 1 };
+        final int[] rowsToPaste = new int[] { 0, 1 };
+
+        final List<RobotElement> selectedSettings = getSettingsByRowNumbers(metadataSettings, rowsToPaste);
+        SelectionLayer selectionLayer = createSelectionToPaste(columnsToPaste, rowsToPaste, 3);
+
+        final DummyPasteSettingsCellsCommandsCollector commandsCollector = createDummyCommandsCollector(
+                settingsFromClipboard, cellPositionsFromClipboard);
+
+        commandsCollector.collectPasteCommands(selectionLayer, selectedSettings, null);
+
+        final List<PasteCommandsInput> pasteCommandsInputs = commandsCollector.getPasteCommandsInputs();
+        verifyPasteCommandsInputSize(columnsToPaste, rowsToPaste, pasteCommandsInputs);
+        verifySelectedSettingsInPasteCommandsInput(pasteCommandsInputs, selectedSettings, columnsToPaste);
         verifyPasteCommandsInputValues(pasteCommandsInputs, settingsFromClipboard, columnsToCopy.length,
                 columnsToPaste.length, rowsToPaste);
     }
@@ -190,7 +228,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
     private void verifyPasteCommandsInputValues(final List<PasteCommandsInput> pasteCommandsInputs,
             final RobotSetting[] settingsFromClipboard, final int argsToCopySize, final int argsToPasteSize,
             final int[] rowsToPaste) {
-        int pasteCommandInputsCounter = 0;
+        int pasteCommandInputsShift = 0;
         int settingFromClipboardIndex = 0;
         for (int i = 0; i < rowsToPaste.length; i++) {
             final RobotSetting settingFromClipboard = settingsFromClipboard[settingFromClipboardIndex];
@@ -201,22 +239,22 @@ public class PasteSettingsCellsCommandsCollectorTest {
             int settingFromClipboardColumnIndex = 0;
             for (int j = 0; j < argsToPasteSize; j++) {
                 assertEquals(arguments.get(settingFromClipboardColumnIndex),
-                        pasteCommandsInputs.get(j + pasteCommandInputsCounter).getValueToPaste());
+                        pasteCommandsInputs.get(j + pasteCommandInputsShift).getValueToPaste());
                 if (settingFromClipboardColumnIndex + 1 < argsToCopySize) {
                     settingFromClipboardColumnIndex++;
                 }
             }
-            pasteCommandInputsCounter += rowsToPaste.length;
+            pasteCommandInputsShift += argsToPasteSize;
         }
     }
 
     private void verifySelectedSettingsInPasteCommandsInput(final List<PasteCommandsInput> pasteCommandsInputs,
-            final List<RobotElement> selectedSettings, final int[] columnsToPaste, final int[] rowsToPaste) {
-        int pasteCommandInputsCounter = 0;
+            final List<RobotElement> selectedSettings, final int[] columnsToPaste) {
+        int pasteCommandInputsShift = 0;
         for (RobotElement selectedSetting : selectedSettings) {
-            verifySelectedSetting(pasteCommandsInputs.subList(pasteCommandInputsCounter,
-                    pasteCommandInputsCounter + rowsToPaste.length), selectedSetting, columnsToPaste);
-            pasteCommandInputsCounter += columnsToPaste.length;
+            verifySelectedSetting(pasteCommandsInputs.subList(pasteCommandInputsShift,
+                    pasteCommandInputsShift + columnsToPaste.length), selectedSetting, columnsToPaste);
+            pasteCommandInputsShift += columnsToPaste.length;
         }
     }
 
