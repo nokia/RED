@@ -123,6 +123,8 @@ import com.google.common.collect.Range;
 import ca.odell.glazedlists.SortedList;
 
 public class GeneralSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
+    
+    public static final String GENERAL_SETTINGS_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.settings.general.context";
 
     @Inject
     private IEditorSite site;
@@ -399,8 +401,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         table.configure();
 
-        table.addFocusListener(new SettingsTableFocusListener(
-                "org.robotframework.ide.eclipse.tableeditor.settings.general.context", site));
+        table.addFocusListener(new SettingsTableFocusListener(GENERAL_SETTINGS_CONTEXT_ID, site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return com.google.common.base.Optional.of(table);
     }
