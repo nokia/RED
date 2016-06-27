@@ -247,6 +247,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         table.setFocus();
     }
 
+    @SuppressWarnings("restriction")
     private void setDirty() {
         dirtyProviderService.setDirtyState(true);
     }
