@@ -5,24 +5,33 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.ui.ISources;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.GeneralSettingsModel;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteSettingsHandler.E4PasteSettingsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -38,32 +47,43 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
     public static class E4PasteSettingsHandler {
 
         @Execute
-        public Object pasteKeywords(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
+        public Object pasteKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+                @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
                 final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
 
             final Object probablySettings = clipboard.getContents(KeywordCallsTransfer.getInstance());
             if (probablySettings instanceof RobotKeywordCall[]) {
-                insertSettings(fileModel, commandsStack, selection, (RobotKeywordCall[]) probablySettings);
+                insertSettings(editor, fileModel, commandsStack, selection, (RobotKeywordCall[]) probablySettings);
             }
             return null;
         }
 
-        private void insertSettings(final RobotSuiteFile fileModel, final RobotEditorCommandsStack commandsStack,
-                final IStructuredSelection selection, final RobotKeywordCall[] settings) {
+        private void insertSettings(final RobotFormEditor editor, final RobotSuiteFile fileModel,
+                final RobotEditorCommandsStack commandsStack, final IStructuredSelection selection,
+                final RobotKeywordCall[] settings) {
+            
             final Optional<RobotSetting> firstSelected = Selections.getOptionalFirstElement(selection,
                     RobotSetting.class);
 
-            if (firstSelected.isPresent()) {
-                if (firstSelected.get().getGroup() == SettingsGroup.NO_GROUP) {
-                    insertArgumentsInNoGroupSetting(commandsStack, firstSelected.get(), settings);
+            if (isNoGroupSetting(settings)) {
+                RobotSetting selectedSetting = null;
+                if (firstSelected.isPresent()) {
+                    selectedSetting = firstSelected.get();
                 } else {
-                    commandsStack.execute(
-                            new InsertSettingCommand(firstSelected.get().getParent(), firstSelected, settings));
+                    final List<RobotElement> newGeneralSettings = createNewGeneralSettingsIfNotPresentInSection(
+                            fileModel, editor.getSelectionLayerAccessor().getSelectionLayer(), commandsStack);
+                    if (!newGeneralSettings.isEmpty()) {
+                        selectedSetting = (RobotSetting) newGeneralSettings.get(0);
+                    }
+                }
+                if (selectedSetting != null) {
+                    insertArgumentsInNoGroupSetting(commandsStack, selectedSetting, settings);
                 }
             } else {
-                final RobotSettingsSection section = fileModel.findSection(RobotSettingsSection.class).orNull();
-                if (section != null && !isNoGroupSetting(settings)) {
+                final RobotSettingsSection section = firstSelected.isPresent() ? firstSelected.get().getParent()
+                        : fileModel.findSection(RobotSettingsSection.class).orNull();
+                if (section != null) {
                     commandsStack.execute(new InsertSettingCommand(section, firstSelected, settings));
                 }
             }
@@ -83,9 +103,41 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
             }
         }
 
-        public boolean isNoGroupSetting(final RobotKeywordCall[] settings) {
+        private boolean isNoGroupSetting(final RobotKeywordCall[] settings) {
             return settings.length > 0 && settings[0] instanceof RobotSetting
                     && ((RobotSetting) settings[0]).getGroup() == SettingsGroup.NO_GROUP;
+        }
+
+        static List<RobotElement> createNewGeneralSettingsIfNotPresentInSection(final RobotSuiteFile fileModel,
+                final SelectionLayer selectionLayer, final RobotEditorCommandsStack commandsStack) {
+
+            final List<RobotElement> newSettings = new ArrayList<>();
+            final Optional<RobotSettingsSection> section = fileModel.findSection(RobotSettingsSection.class);
+            if (section.isPresent()) {
+                final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
+                final Map<String, RobotElement> settingsMappingBeforeAddition = GeneralSettingsModel
+                        .fillSettingsMapping(section.get());
+                final String[] generalSettingsNames = settingsMappingBeforeAddition.keySet().toArray(new String[0]);
+                final List<Integer> createdRows = new ArrayList<>();
+                for (PositionCoordinate position : selectedCellPositions) {
+                    final int selectedRowNumber = position.getRowPosition();
+                    if (!createdRows.contains(selectedRowNumber) && selectedRowNumber >= 0
+                            && selectedRowNumber < generalSettingsNames.length
+                            && settingsMappingBeforeAddition.get(generalSettingsNames[selectedRowNumber]) == null) {
+                        commandsStack.execute(new CreateFreshGeneralSettingCommand(section.get(),
+                                generalSettingsNames[selectedRowNumber], new ArrayList<String>()));
+                        final Map<String, RobotElement> settingsMappingAfterAddition = GeneralSettingsModel
+                                .fillSettingsMapping(section.get());
+                        final RobotElement newGeneralSetting = settingsMappingAfterAddition
+                                .get(generalSettingsNames[selectedRowNumber]);
+                        if (newGeneralSetting != null) {
+                            newSettings.add(newGeneralSetting);
+                        }
+                    }
+                    createdRows.add(selectedRowNumber);
+                }
+            }
+            return newSettings;
         }
     }
 }
