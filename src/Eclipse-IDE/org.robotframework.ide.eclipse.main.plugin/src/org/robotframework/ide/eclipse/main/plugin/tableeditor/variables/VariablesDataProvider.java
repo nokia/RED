@@ -126,10 +126,13 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
                 rowObject = variables.get(realRowIndex);
                 if (isPassingThroughFilter(rowObject)) {
                     count++;
+                } else {
+                    rowObject = null;
                 }
                 realRowIndex++;
             }
-            return rowObject;
+
+            return (rowObject == null) ? addingToken : rowObject;
         } else if (rowIndex == variables.size()) {
             return addingToken;
         }
