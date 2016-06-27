@@ -74,7 +74,7 @@ import org.robotframework.red.swt.SwtThread;
 import com.google.common.base.Supplier;
 
 public class VariablesEditorFormFragment implements ISectionFormFragment {
-    
+
     @Inject
     private IEditorSite site;
 
@@ -100,7 +100,6 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     private ISortModel sortModel;
 
-
     ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
@@ -112,7 +111,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Override
     public void initialize(final Composite parent) {
         final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
-        
+
         final ConfigRegistry configRegistry = new ConfigRegistry();
 
         final RedNattableDataProvidersFactory dataProvidersFactory = new RedNattableDataProvidersFactory();
@@ -128,8 +127,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 270, 270,
                 new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider, true),
                 new VariableTypesAndColumnsLabelAccumulator(dataProvider));
-        final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory
-                .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
+        final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory.createGlazedListEventsLayer(bodyDataLayer,
+                dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
         final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
         final ViewportLayer bodyViewportLayer = factory.createViewportLayer(bodySelectionLayer);
@@ -141,7 +140,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final SortHeaderLayer<RobotVariable> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
                 columnHeaderDataLayer, columnHeaderLayer, dataProvider.getPropertyAccessor(), configRegistry,
                 dataProvider.getSortedList());
-        
+
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
                 rowHeaderDataProvider);
@@ -198,6 +197,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
         final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
                 new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
+
                     @Override
                     public HeaderFilterMatchesCollection get() {
                         return matches;
@@ -215,12 +215,15 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     private NewElementsCreator<RobotVariable> newElementsCreator() {
         return new NewElementsCreator<RobotVariable>() {
+
             @Override
             public RobotVariable createNew() {
+                dataProvider.setMatches(null);
                 final RobotVariablesSection section = dataProvider.getInput();
                 commandsStack.execute(
                         new CreateFreshVariableCommand(section, dataProvider.getAdderState().getVariableType()));
                 SwtThread.asyncExec(new Runnable() {
+
                     @Override
                     public void run() {
                         table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
@@ -243,7 +246,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     public void setFocus() {
         table.setFocus();
     }
-    
+
     private void setDirty() {
         dirtyProviderService.setDirtyState(true);
     }
@@ -283,7 +286,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         if (file == fileModel && dataProvider.getInput() != null) {
             dataProvider.setInput(getSection());
             table.refresh();
-            
+
             setDirty();
         }
     }
