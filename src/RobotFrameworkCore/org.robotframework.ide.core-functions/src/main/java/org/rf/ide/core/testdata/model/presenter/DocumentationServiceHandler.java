@@ -46,52 +46,57 @@ public class DocumentationServiceHandler {
     }
 
     private static String consolidate(final IDocumentationHolder documentation, final boolean shouldUnescapeTokens) {
-        final StringBuilder text = new StringBuilder();
+        synchronized (documentation) {
+            final StringBuilder text = new StringBuilder();
 
-        int currentLineNr = -1;
-        boolean prevNewLine = false;
+            int currentLineNr = -1;
+            boolean prevNewLine = false;
 
-        final List<RobotToken> docText = documentation.getDocumentationText();
-        final int nrOfDocTokens = docText.size();
-        for (int tokId = 0; tokId < nrOfDocTokens; tokId++) {
-            final RobotToken docPart = docText.get(tokId);
+            final List<RobotToken> docText = documentation.getDocumentationText();
+            final int nrOfDocTokens = docText.size();
+            for (int tokId = 0; tokId < nrOfDocTokens; tokId++) {
+                final RobotToken docPart = docText.get(tokId);
 
-            final int tokenLineNr = docPart.getLineNumber();
-            final String tokenText = docPart.getText();
+                final int tokenLineNr = docPart.getLineNumber();
+                final String tokenText = docPart.getText();
 
-            if (tokId == 0) {
-                if (tokenText.trim().equals("...")) {
+                if (tokId == 0) {
+                    if (tokenText.trim().equals("...")) {
+                        currentLineNr = tokenLineNr;
+                        prevNewLine = true;
+                        continue;
+                    } else if (tokenLineNr == documentation.getBeginPosition().getLine()) {
+                        currentLineNr = tokenLineNr;
+                    }
+                }
+
+                if (LINE_CONTINUE.matcher(tokenText).find()) {
+                    text.append("\n");
                     currentLineNr = tokenLineNr;
                     prevNewLine = true;
                     continue;
-                } else if (tokenLineNr == documentation.getBeginPosition().getLine()) {
+                } else if (currentLineNr != tokenLineNr && tokenLineNr != FilePosition.NOT_SET) {
+                    text.append("\n");
+                    for (int i = 0; i < tokenLineNr - currentLineNr - 1; i++) {
+                        text.append("\n");
+                    }
                     currentLineNr = tokenLineNr;
+                } else if (tokId > 0 && text.length() > 0) {
+                    if (!prevNewLine && !tokenText.isEmpty()) {
+                        text.append(" ");
+                    }
+                }
+
+                prevNewLine = false;
+                if (shouldUnescapeTokens) {
+                    text.append(unescape(tokenText));
+                } else {
+                    text.append(tokenText);
                 }
             }
 
-            if (LINE_CONTINUE.matcher(tokenText).find()) {
-                text.append("\n");
-                currentLineNr = tokenLineNr;
-                prevNewLine = true;
-                continue;
-            } else if (currentLineNr != tokenLineNr && tokenLineNr != FilePosition.NOT_SET) {
-                text.append("\n");
-                currentLineNr = tokenLineNr;
-            } else if (tokId > 0 && text.length() > 0) {
-                if (!prevNewLine) {
-                    text.append(" ");
-                }
-            }
-
-            prevNewLine = false;
-            if (shouldUnescapeTokens) {
-                text.append(unescape(tokenText));
-            } else {
-                text.append(tokenText);
-            }
+            return text.toString();
         }
-
-        return text.toString();
     }
 
     private static String unescape(final String text) {
@@ -143,29 +148,34 @@ public class DocumentationServiceHandler {
      * @param newDocumentation
      */
     public static void update(final IDocumentationHolder documentation, final String newDocumentation) {
-        if (newDocumentation == null || newDocumentation.isEmpty()) {
-            documentation.clearDocumentation();
-            return;
-        }
+        synchronized (documentation) {
+            if (newDocumentation == null || newDocumentation.isEmpty()) {
+                documentation.clearDocumentation();
+                return;
+            }
 
-        if (!toEditConsolidated(documentation).equals(newDocumentation)) {
-            documentation.clearDocumentation();
-            final List<String> lines = splitToLines(newDocumentation);
-            final int numberOfLines = lines.size();
+            if (!toEditConsolidated(documentation).equals(newDocumentation)) {
+                documentation.clearDocumentation();
+                final List<String> lines = splitToLines(newDocumentation);
+                final int numberOfLines = lines.size();
 
-            if (numberOfLines > 0) {
-                RobotToken tok = new RobotToken();
-                tok.setText(lines.get(0));
-                documentation.addDocumentationText(tok);
+                if (numberOfLines > 0) {
+                    RobotToken tok = new RobotToken();
+                    tok.setText(lines.get(0));
+                    documentation.addDocumentationText(tok);
 
-                for (int lineNr = 1; lineNr < numberOfLines; lineNr++) {
-                    RobotToken newLine = new RobotToken();
-                    newLine.setText("\n...");
-                    documentation.addDocumentationText(newLine);
+                    for (int lineNr = 1; lineNr < numberOfLines; lineNr++) {
+                        RobotToken newLine = new RobotToken();
+                        newLine.setText("\n...");
+                        documentation.addDocumentationText(newLine);
 
-                    RobotToken docPart = new RobotToken();
-                    docPart.setText(lines.get(lineNr));
-                    documentation.addDocumentationText(docPart);
+                        final String lineText = lines.get(lineNr);
+                        if (!lineText.isEmpty()) {
+                            RobotToken docPart = new RobotToken();
+                            docPart.setText(lineText);
+                            documentation.addDocumentationText(docPart);
+                        }
+                    }
                 }
             }
         }
