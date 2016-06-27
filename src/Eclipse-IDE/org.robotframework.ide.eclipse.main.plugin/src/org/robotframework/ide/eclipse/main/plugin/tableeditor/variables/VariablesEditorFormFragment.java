@@ -18,6 +18,7 @@ import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
+import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -285,6 +286,10 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel && dataProvider.getInput() != null) {
+            final ICellEditor activeCellEditor = table.getActiveCellEditor();
+            if (activeCellEditor != null && !activeCellEditor.isClosed()) {
+                activeCellEditor.close();
+            }
             dataProvider.setInput(getSection());
             table.refresh();
 
