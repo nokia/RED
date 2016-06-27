@@ -289,7 +289,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                final String newDocumentation = docu;
+                final String newDocumentation = docu.replaceAll("\t", "\\\\t");
                 final RobotSettingsSection settingsSection = getSection();
                 if (settingsSection == null) {
                     return Status.OK_STATUS;
