@@ -12,8 +12,10 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.ui.ISources;
+import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -21,6 +23,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteInSettingsTableHandler.E4PasteInSettingsTableHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteSettingsHandler.E4PasteSettingsHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable.GeneralSettingsFormFragment;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -41,11 +45,20 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
 
         @Execute
         public Object paste(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
-                @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard,
+                final IContextService contextService) {
 
+            final SelectionLayer selectionLayer = editor.getSelectionLayerAccessor().getSelectionLayer();
             final List<RobotElement> selectedSettings = Selections.getElements(selection, RobotElement.class);
-            final List<EditorCommand> pasteCommands = new PasteSettingsCellsCommandsCollector().collectPasteCommands(
-                    editor.getSelectionLayerAccessor().getSelectionLayer(), selectedSettings, clipboard);
+
+            if (selectedSettings.isEmpty() && contextService.getActiveContextIds()
+                    .contains(GeneralSettingsFormFragment.GENERAL_SETTINGS_CONTEXT_ID)) {
+                selectedSettings.addAll(E4PasteSettingsHandler.createNewGeneralSettingsIfNotPresentInSection(fileModel,
+                        selectionLayer, commandsStack));
+            }
+
+            final List<EditorCommand> pasteCommands = new PasteSettingsCellsCommandsCollector()
+                    .collectPasteCommands(selectionLayer, selectedSettings, clipboard);
 
             for (EditorCommand command : pasteCommands) {
                 commandsStack.execute(command);
@@ -53,5 +66,6 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
 
             return null;
         }
+
     }
 }
