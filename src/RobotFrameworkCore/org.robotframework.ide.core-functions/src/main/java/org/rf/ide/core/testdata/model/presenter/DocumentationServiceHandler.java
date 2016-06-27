@@ -161,7 +161,7 @@ public class DocumentationServiceHandler {
 
                 if (numberOfLines > 0) {
                     RobotToken tok = new RobotToken();
-                    tok.setText(lines.get(0));
+                    tok.setText(smartTrimmedRight(lines.get(0)));
                     documentation.addDocumentationText(tok);
 
                     for (int lineNr = 1; lineNr < numberOfLines; lineNr++) {
@@ -170,15 +170,45 @@ public class DocumentationServiceHandler {
                         documentation.addDocumentationText(newLine);
 
                         final String lineText = lines.get(lineNr);
+
                         if (!lineText.isEmpty()) {
                             RobotToken docPart = new RobotToken();
-                            docPart.setText(lineText);
+                            docPart.setText(smartTrimmedRight(lineText));
                             documentation.addDocumentationText(docPart);
                         }
                     }
                 }
             }
         }
+    }
+
+    private static String smartTrimmedRight(final String current) {
+        String t = current;
+
+        final char[] cArray = current.toCharArray();
+        final int size = cArray.length;
+        int toCut = 0;
+        int escapeChars = 0;
+        for (int i = size - 1; i >= 0; i--) {
+            final char theChar = cArray[i];
+            if (theChar == ' ') {
+                toCut++;
+            } else if (theChar == '\\') {
+                escapeChars++;
+            } else {
+                break;
+            }
+        }
+
+        if (toCut > 0) {
+            if (escapeChars == 1) {
+                t = current.substring(0, size - (toCut - 1));
+            } else {
+                t = current.substring(0, size - toCut);
+            }
+        }
+
+        return t;
     }
 
     private static List<String> splitToLines(final String newDocumentation) {
