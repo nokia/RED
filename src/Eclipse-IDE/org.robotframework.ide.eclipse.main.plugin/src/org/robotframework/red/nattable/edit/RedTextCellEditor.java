@@ -28,7 +28,7 @@ import com.google.common.base.Optional;
 /**
  * Modified version of {@link org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor} which
  * will move left/right after commits and validate entries asynchronously.
- * 
+ *
  * @author Michal Anglart
  */
 public class RedTextCellEditor extends TextCellEditor {
@@ -82,7 +82,6 @@ public class RedTextCellEditor extends TextCellEditor {
         textControl.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 
         textControl.addKeyListener(new TextKeyListener(parent));
-        validationJobScheduler.armRevalidationOn(textControl);
 
         return textControl;
     }
@@ -90,6 +89,8 @@ public class RedTextCellEditor extends TextCellEditor {
     @Override
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
         final Control control = super.activateCell(parent, originalCanonicalValue);
+
+        validationJobScheduler.armRevalidationOn(getEditorControl());
 
         final RedContentProposalListener assistListener = new ContentProposalsListener();
         support.install(getEditorControl(), Optional.of(assistListener),
