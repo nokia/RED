@@ -147,11 +147,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private com.google.common.base.Optional<NatTable> table = com.google.common.base.Optional.absent();
 
     private StyledText documentation;
-    
+
     private boolean hasFocusOnDocumentation;
-    
+
     private boolean isDocumentationModified;
-    
+
     private int docSelection;
 
     private Job documenationChangeJob;
@@ -168,12 +168,12 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
-    
+
     @Override
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         return selectionLayerAccessor;
     }
-    
+
     @Override
     public NatTable getTable() {
         return table.orNull();
@@ -249,10 +249,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
                         return;
                     }
-                    
+
                     setDirty();
                     isDocumentationModified = true;
-                    
+
                     docSelection = documentation.getSelection().x;
 
                     if (documenationChangeJob != null && documenationChangeJob.getState() == Job.SLEEPING) {
@@ -265,10 +265,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             });
         }
 
-        GridDataFactory.fillDefaults()
-                .grab(true, true)
-                .hint(SWT.DEFAULT, 30)
-                .applyTo(documentation);
+        GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 30).applyTo(documentation);
     }
 
     private String getDocumentation(final RobotSettingsSection section, final boolean hasFocus) {
@@ -290,7 +287,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                final String newDocumentation = docu.replaceAll("\t", " ").replaceAll("  +", " ");
+                final String newDocumentation = docu;
                 final RobotSettingsSection settingsSection = getSection();
                 if (settingsSection == null) {
                     return Status.OK_STATUS;
@@ -369,7 +366,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
-        
+
         // tooltips support
         new NatTableContentTooltip(table.get());
     }
@@ -401,8 +398,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         table.addConfiguration(new GeneralSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
-        
-        table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.general.context", site));
+
+        table.addFocusListener(new SettingsTableFocusListener(
+                "org.robotframework.ide.eclipse.tableeditor.settings.general.context", site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return com.google.common.base.Optional.of(table);
     }
@@ -448,7 +446,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
         setFocus();
     }
-    
+
     public void revealSetting(final RobotSetting setting) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(generalSettingsSection);
         if ("Documentation".equals(setting.getName())) {
@@ -535,7 +533,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
 
     }
-    
+
     class GeneralSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
 
         private final Menu menu;
@@ -563,10 +561,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         documentation.setEditable(fileModel.isEditable() && section != null);
         documentation.setText(getDocumentation(section, documentation.isFocusControl()));
-        if(hasFocusOnDocumentation) {
+        if (hasFocusOnDocumentation) {
             documentation.setSelection(docSelection);
         }
-        
+
         if (table.isPresent()) {
             dataProvider.setInput(section);
         }
@@ -624,7 +622,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     public void whenSaving() {
         isDocumentationModified = false;
     }
-    
+
     protected void waitForDocumentationChangeJob() {
         // user could just typed something into documentation box, so the job was scheduled, we need
         // to wait for it to
