@@ -418,6 +418,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         FilePosition fp = lastToken.getFilePosition();
         FilePosition fpTok = currentToken.getFilePosition();
 
+        boolean wasLastToken = false;
         IRobotLineElement tokenToSearch = null;
         final int offset;
         if (fpTok.isNotSet()) {
@@ -425,6 +426,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                 tokenToSearch = lastToken;
                 offset = -1;
             } else {
+                wasLastToken = true;
                 tokenToSearch = lastToken;
                 offset = fp.getOffset();
             }
@@ -448,7 +450,8 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         final Optional<Integer> tokenPos = line.getElementPositionInLine(tokenToSearch);
         if (tokenPos.isPresent()) {
             Integer tokPos = tokenPos.get();
-            for (int index = tokPos - 1; index >= 0; index--) {
+            int start = (wasLastToken) ? tokPos + 1 : tokPos - 1;
+            for (int index = start; index < elems.size() && index >= 0; index--) {
                 IRobotLineElement elem = elems.get(index);
                 if (elem instanceof RobotToken) {
                     break;
