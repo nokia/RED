@@ -144,7 +144,7 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
     }
 
     void selectFirstEntry() {
-        if (mode == Mode.INLINED) {
+        if (mode == Mode.INLINED && !panel.getEntries().isEmpty()) {
             switchToWindowingMode();
         }
         panel.selectFirstEntry();
