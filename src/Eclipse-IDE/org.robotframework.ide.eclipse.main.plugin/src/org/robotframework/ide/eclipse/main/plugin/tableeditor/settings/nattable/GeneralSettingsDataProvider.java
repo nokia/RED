@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable
 
 import java.util.Map.Entry;
 
-import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -17,11 +16,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatche
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.GeneralSettingsModel;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsMatchesFilter;
+import org.robotframework.red.nattable.IFilteringDataProvider;
 
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
 
-public class GeneralSettingsDataProvider implements IDataProvider, IRowDataProvider<Entry<String, RobotElement>> {
+public class GeneralSettingsDataProvider
+        implements IFilteringDataProvider, IRowDataProvider<Entry<String, RobotElement>> {
 
     private RobotSettingsSection section;
 
@@ -29,7 +30,7 @@ public class GeneralSettingsDataProvider implements IDataProvider, IRowDataProvi
 
     private SortedList<Entry<String, RobotElement>> generalSettings;
 
-    private GeneralSettingsColumnsPropertyAccessor propertyAccessor;
+    private final GeneralSettingsColumnsPropertyAccessor propertyAccessor;
 
     public GeneralSettingsDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotSettingsSection section) {
@@ -138,6 +139,11 @@ public class GeneralSettingsDataProvider implements IDataProvider, IRowDataProvi
         this.filter = matches == null ? null : new SettingsMatchesFilter(matches);
     }
 
+    @Override
+    public boolean isFilterSet() {
+        return filter != null;
+    }
+
     private int countInvisible() {
         int numberOfInvisible = 0;
         for (final Entry<String, RobotElement> settingEntry : generalSettings) {
@@ -170,10 +176,8 @@ public class GeneralSettingsDataProvider implements IDataProvider, IRowDataProvi
         return propertyAccessor;
     }
 
-    
+
     public SortedList<Entry<String, RobotElement>> getSortedList() {
         return generalSettings;
     }
-
-    
 }
