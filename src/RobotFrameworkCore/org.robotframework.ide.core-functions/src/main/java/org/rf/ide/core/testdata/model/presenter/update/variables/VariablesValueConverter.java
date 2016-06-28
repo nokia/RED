@@ -8,7 +8,6 @@ package org.rf.ide.core.testdata.model.presenter.update.variables;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
@@ -22,7 +21,7 @@ public class VariablesValueConverter {
     }
 
     public static DictionaryKeyValuePair fromString(final String c) {
-        return DictionaryVariable.DictionaryKeyValuePair.createFromRaw(c);
+        return DictionaryKeyValuePair.createFromRaw(c);
     }
 
     public static DictionaryKeyValuePair fromRobotToken(final RobotToken c) {
@@ -34,27 +33,27 @@ public class VariablesValueConverter {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> List<T> convert(final List<?> elems, final Class<?> toConversion) {
+    public static <T> List<T> convert(final List<?> elems, final Class<T> toConversion) {
         final List<T> c = new ArrayList<T>();
         for (final Object o : elems) {
             final Class<?> oClass = o.getClass();
             if (oClass == toConversion) {
-                c.add((T) o);
+                c.add((T) toConversion.cast(o));
             } else if (toConversion == RobotToken.class) {
                 if (oClass == String.class) {
-                    c.add((T) toRobotToken((String) o));
+                    c.add((T) toConversion.cast(toRobotToken((String) o)));
                 } else if (oClass == DictionaryKeyValuePair.class) {
-                    c.add((T) fromDictionaryKeyValuePair((DictionaryKeyValuePair) o));
+                    c.add((T) toConversion.cast(fromDictionaryKeyValuePair((DictionaryKeyValuePair) o)));
                 }
             } else if (toConversion == DictionaryKeyValuePair.class) {
                 if (oClass == String.class) {
-                    c.add((T) fromString((String) o));
+                    c.add((T) toConversion.cast(fromString((String) o)));
                 } else if (oClass == RobotToken.class) {
-                    c.add((T) fromRobotToken((RobotToken) o));
+                    c.add((T) toConversion.cast(fromRobotToken((RobotToken) o)));
                 }
             } else {
                 // possible class exception
-                c.add((T) o);
+                c.add((T) toConversion.cast(o));
             }
         }
 
