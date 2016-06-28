@@ -12,6 +12,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -309,21 +310,38 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenVariableIsAddedOrRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+    private void whenVariableIsAdded(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_ADDED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
-            dataProvider.setInput(getSection());
-            table.refresh();
-            setDirty();
+            sortModel.clear();
         }
+        whenVariableIsAddedOrRemoved(section);
     }
 
     @Inject
     @Optional
-    private void whenVariableIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_ADDED) final RobotSuiteFileSection variablesSection) {
-        if (variablesSection.getSuiteFile() == fileModel) {
+    private void whenVariableIsRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_REMOVED) final RobotSuiteFileSection section) {
+        whenVariableIsAddedOrRemoved(section);
+    }
+
+    @Inject
+    @Optional
+    private void whenVariableIsMoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_MOVED) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+        }
+        final ISelection oldSelection = selectionProvider.getSelection();
+        whenVariableIsAddedOrRemoved(section);
+        selectionProvider.setSelection(oldSelection);
+    }
+
+    private void whenVariableIsAddedOrRemoved(final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            dataProvider.setInput(getSection());
+            table.refresh();
+            setDirty();
         }
     }
 
