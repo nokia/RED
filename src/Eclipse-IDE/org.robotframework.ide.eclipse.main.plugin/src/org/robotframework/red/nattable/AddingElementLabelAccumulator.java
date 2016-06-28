@@ -31,6 +31,10 @@ public class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
 
     @Override
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
+        if (dataProvider instanceof IFilteringDataProvider && ((IFilteringDataProvider) dataProvider).isFilterSet()) {
+            return;
+        }
+
         if (columnPosition == 0 && dataProvider.getRowCount() - 1 == rowPosition) {
             configLabels.addLabel(multistate ? AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL
                     : AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL);
