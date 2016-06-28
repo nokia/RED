@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
@@ -14,6 +13,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatche
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesMatchesCollection.VariableFilter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesTableAdderStatesConfiguration.VariablesAdderState;
+import org.robotframework.red.nattable.IFilteringDataProvider;
 
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
@@ -21,7 +21,7 @@ import ca.odell.glazedlists.SortedList;
 /**
  * @author Michal Anglart
  */
-public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Object> {
+public class VariablesDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
 
     private final AddingToken addingToken = new AddingToken(VariablesAdderState.SCALAR, VariablesAdderState.LIST,
             VariablesAdderState.DICTIONARY);
@@ -79,7 +79,7 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
             final Object element = getRowObject(row);
             if (element instanceof RobotVariable) {
                 return propertyAccessor.getDataValue((RobotVariable) element, column);
-            } else if (element instanceof AddingToken && column == 0) {
+            } else if (element instanceof AddingToken && column == 0 && !isFilterSet()) {
                 return ((AddingToken) element).getLabel();
             }
         }
@@ -89,7 +89,8 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
     @Override
     public int getRowCount() {
         if (section != null) {
-            return variables.size() - countInvisible() + 1;
+            final int addingTokens = isFilterSet() ? 1 : 0;
+            return variables.size() - countInvisible() + 1 - addingTokens;
         }
         return 0;
     }
@@ -157,6 +158,11 @@ public class VariablesDataProvider implements IDataProvider, IRowDataProvider<Ob
             return variables.size();
         }
         return -1;
+    }
+
+    @Override
+    public boolean isFilterSet() {
+        return filter != null;
     }
 
     private boolean isPassingThroughFilter(final RobotVariable rowObject) {

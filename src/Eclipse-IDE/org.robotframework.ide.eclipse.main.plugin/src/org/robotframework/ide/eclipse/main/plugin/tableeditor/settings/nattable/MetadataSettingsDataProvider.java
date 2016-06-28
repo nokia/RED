@@ -5,26 +5,26 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable;
 
-import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.MetadataMatchesFilter;
+import org.robotframework.red.nattable.IFilteringDataProvider;
 
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
 
-class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Object> {
-    
+class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
+
     private static final Object ADDING_TOKEN = new Object();
 
     private RobotSettingsSection section;
 
     private SortedList<RobotKeywordCall> metadataSettings;
 
-    private MetadataSettingsColumnsPropertyAccessor propertyAccessor;
+    private final MetadataSettingsColumnsPropertyAccessor propertyAccessor;
 
     private MetadataMatchesFilter filter;
 
@@ -62,7 +62,7 @@ class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Ob
     @Override
     public Object getDataValue(final int columnIndex, final int rowIndex) {
         if (section != null) {
-            if (rowIndex == metadataSettings.size() - countInvisible()) {
+            if (rowIndex == metadataSettings.size() - countInvisible() && !isFilterSet()) {
                 return columnIndex == 0 ? "...add new metadata" : "";
             }
             final Object metadataSetting = getRowObject(rowIndex);
@@ -76,7 +76,8 @@ class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Ob
     @Override
     public int getRowCount() {
         if (section != null) {
-            return metadataSettings.size() - countInvisible() + 1;
+            final int addingTokens = isFilterSet() ? 1 : 0;
+            return metadataSettings.size() - countInvisible() + 1 - addingTokens;
         }
         return 0;
     }
@@ -149,6 +150,11 @@ class MetadataSettingsDataProvider implements IDataProvider, IRowDataProvider<Ob
 
     void setMatches(final HeaderFilterMatchesCollection matches) {
         this.filter = matches == null ? null : new MetadataMatchesFilter(matches);
+    }
+
+    @Override
+    public boolean isFilterSet() {
+        return filter != null;
     }
 
     public MetadataSettingsColumnsPropertyAccessor getPropertyAccessor() {
