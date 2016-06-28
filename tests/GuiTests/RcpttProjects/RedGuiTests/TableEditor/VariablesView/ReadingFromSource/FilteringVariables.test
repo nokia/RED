@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dUgVID04EeaUDrMBSMf5Ag
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/28/16 5:20 PM
+Save-Time: 6/28/16 5:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -76,5 +76,6 @@ is-row-fully-selected -row 0
 //select empty list
 get-view Outline | get-tree | select "TestFile.robot/Variables/" |click
 is-row-fully-selected -row 5
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
