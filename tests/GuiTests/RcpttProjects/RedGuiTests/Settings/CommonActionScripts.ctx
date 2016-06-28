@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/2/16 11:18 AM
+Save-Time: 6/27/16 3:49 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -28,7 +28,7 @@ proc "restore-interpreters"{
 				try -times 10 -delay 1500 -command{
 				    get-button Discover | click
 				}
-				try -times 5 -delay 1000 -command{
+				try -times 10 -delay 1500 -command{
 				    get-table | get-item "Robot Framework .*\(Python .*\)" | check
 				}
 				    get-button OK | click
