@@ -25,10 +25,10 @@ public class VariableTableModelUpdater {
         handlers.add(new DictionaryVariableModelUpdater());
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public void addOrSet(final AVariable dst, final int startIndexForModification, final List<?> toAdd) {
-        final IVariableTableElementOperation<?> handler = findHandler(dst);
-        List converted = handler.convert(toAdd);
+    @SuppressWarnings({ "unchecked" })
+    public <T> void addOrSet(final AVariable dst, final int startIndexForModification, final List<?> toAdd) {
+        final IVariableTableElementOperation<T> handler = findHandler(dst);
+        List<T> converted = handler.convert(toAdd);
         handler.addOrSet(dst, startIndexForModification, converted);
     }
 
