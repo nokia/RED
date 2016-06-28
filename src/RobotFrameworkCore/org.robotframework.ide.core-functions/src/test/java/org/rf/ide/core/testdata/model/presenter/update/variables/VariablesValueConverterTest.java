@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -109,6 +110,19 @@ public class VariablesValueConverterTest {
         assertKeyValuePair(converted.get(0), "key1", "value2");
         assertKeyValuePair(converted.get(1), "key2", "value3");
         assertThat(converted.get(2)).isSameAs(pair);
+    }
+
+    @Test(expected = ClassCastException.class)
+    public void test_wrongClassToConvert() {
+        // prepare
+        final List<Object> objs = new ArrayList<>();
+        objs.add(new String("xyz"));
+
+        // execute
+        List<Double> c = VariablesValueConverter.convert(objs, Double.class);
+
+        // verify
+        Assert.fail("Shouldn't reach here.");
     }
 
     private void assertKeyValuePair(final DictionaryKeyValuePair pair, final String key, final String value) {
