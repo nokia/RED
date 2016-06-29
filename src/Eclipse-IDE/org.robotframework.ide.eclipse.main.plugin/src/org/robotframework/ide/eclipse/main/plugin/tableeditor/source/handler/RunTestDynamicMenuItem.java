@@ -44,6 +44,10 @@ public class RunTestDynamicMenuItem extends CompoundContributionItem {
     @Override
     protected IContributionItem[] getContributionItems() {
         final IWorkbenchWindow activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        if (!(activeWindow.getActivePage().getActiveEditor() instanceof RobotFormEditor)) {
+            return new IContributionItem[0];
+        }
+
         final ITextSelection selection = (ITextSelection) activeWindow.getSelectionService().getSelection();
         final RobotFormEditor suiteEditor = (RobotFormEditor) activeWindow.getActivePage().getActiveEditor();
         final RobotSuiteFile suiteModel = suiteEditor.provideSuiteModel();
@@ -66,7 +70,7 @@ public class RunTestDynamicMenuItem extends CompoundContributionItem {
                 serviceLocator, id, RUN_TEST_COMMAND_ID, SWT.PUSH);
         contributionParameters.label = getModeName() + " test: '" + testCase.getName() + "'";
         contributionParameters.icon = getImageDescriptor();
-        final HashMap<String, String> parameters = new HashMap<String, String>();
+        final HashMap<String, String> parameters = new HashMap<>();
         parameters.put(RUN_TEST_COMMAND_MODE_PARAMETER, getModeName().toUpperCase());
         contributionParameters.parameters = parameters;
         return new CommandContributionItem(contributionParameters);
