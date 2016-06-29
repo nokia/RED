@@ -5,13 +5,14 @@ Element-Name: ProceduresForVaraibleView
 Element-Type: context
 Element-Version: 2.0
 Id: _9iuJED04EeaUDrMBSMf5Ag
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/28/16 5:05 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 6/29/16 5:41 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
+//rows starts from 1
 proc "check-variable_row" [val file] [val row] [val var] [val value] [val comment "" ] 
 {
 	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $var |verify-true
@@ -19,9 +20,18 @@ proc "check-variable_row" [val file] [val row] [val var] [val value] [val commen
 	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $comment |verify-true
 }
 
-
+//rows starts from 0
 proc "is-row-fully-selected" [val row]{
 	get-editor "TestFile.robot"| get-canvas -after [get-label Variables] -index 1 | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
 		| invoke isRowPositionFullySelected $row | eq true | verify-true
 } 
+
+
+proc "check-if-one-line-is-selected"{
+	with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().hasRowSelection()" | equals true | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedRowCount()" | equals 1 | verify-true
+	}
+}	
+	
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--

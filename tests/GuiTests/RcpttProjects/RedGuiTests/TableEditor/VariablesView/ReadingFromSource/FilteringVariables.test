@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dUgVID04EeaUDrMBSMf5Ag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/29/16 3:18 PM
+Save-Time: 6/29/16 5:39 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -71,10 +71,7 @@ with [get-view Outline | get-tree] {
     select "TestFile.robot/Variables/var" | double-click
 }
 
-with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
-    get-property "getLayer().getBodyLayer().getScrollableLayer().hasRowSelection()" | equals true | verify-true
-    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedRowCount()" | equals 1 | verify-true
-}
+check-if-one-line-is-selected
 is-row-fully-selected -row 0
 
 //select empty list
@@ -87,10 +84,7 @@ get-view Outline | get-tree | select "TestFile.robot/Variables/hidden" |click
 //filter is cleared
 get-editor "TestFile.robot" | get-editbox -after [get-label Variables] | get-property text | equals "" | verify-true
 
-with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
-    get-property "getLayer().getBodyLayer().getScrollableLayer().hasRowSelection()" | equals true | verify-true
-    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedRowCount()" | equals 1 | verify-true
-}
+check-if-one-line-is-selected
 is-row-fully-selected -row 3
 
 
@@ -115,10 +109,7 @@ check-variable_row -file "TestFile.robot" -row "13" -var "...add new scalar" -va
 
 //select variable after moving filter
 get-view Outline | get-tree | select "TestFile.robot/Variables/var5" |click
-with [get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1] {
-    get-property "getLayer().getBodyLayer().getScrollableLayer().hasRowSelection()" | equals true | verify-true
-    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedRowCount()" | equals 1 | verify-true
-}
+check-if-one-line-is-selected
 is-row-fully-selected -row 9
 
 

@@ -1,0 +1,116 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9iuJED04EeaUDrMBSMf5Ag
+Element-Name: ShowinVariablesFromSource
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _i_9NQD4CEeaMlbNjowJCaw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 6/29/16 5:53 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variable ***\n"
+    + "${var}    1\n"
+    + "${var1}    2        #var1\n"
+    + "${a}    3\n"
+    + "${hidden}    hidden    #AAcomment\n"
+    + "${cccccccccccccccccccc}    aaaa\n"
+    + "${ttttttttttttttt}    text  #coment with aA\n"
+    + "#no vlaue for aaa\n"
+    + "&{var3}    4=4  \n"
+    + "${var4}    5\n"
+    + "@{var5}    6    #this is var5\n"
+    + "&{b}    7=7    #this is b\n"
+    + "&{VAR6}    8=8\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" 
+//select from menu to go to Variable table    
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 9 6
+        get-menu "Show in table" | click
+    }
+}
+
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Variables | verify-true
+check-if-one-line-is-selected
+is-row-fully-selected -row 7
+
+
+//press F4 to go back to Source
+with [get-editor "TestFile.robot"] {
+	get-canvas -after [get-label Variables] -index 1 | key-type F4
+}
+
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
+
+//check if variable is selected
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "getSelectionText()" | equals "&{var3}" | verify-true
+}
+
+//set caret on "hidden"
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 5 5
+        key-type F4
+    }
+}
+//check if variable table is shown
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Variables | verify-true
+check-if-one-line-is-selected
+is-row-fully-selected -row 3
+
+//go twice down on $ttttttt 
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down -times 2
+        key-type F4
+    }
+}
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "getSelectionText()" | equals "${ttttttttttttttt}" | verify-true
+}
+
+//move caret by arrow to var4 and press F4
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 7 15
+    key-type Down -times 3
+    key-type Left -times 7
+    key-type F4
+}
+
+get-eclipse-window | key-type F4
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    get-property "getSelectionText()" | equals "${var4}" | verify-true
+}
+
+//remove all varaibles and fo to Variable table - nothing is happening
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 12 15
+    select-range 13 15 2 1
+    key-type BackSpace
+    key-type "M1+s"
+    wait 2000
+    get-menu "Show in table" | click
+}
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
+
+//set caret on Varaible section and go to Variable view - nihing is happpening
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 1 9
+    get-menu "Show in table" | click
+}
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
