@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -49,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CreateFreshVariableCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -76,6 +78,9 @@ import org.robotframework.red.swt.SwtThread;
 import com.google.common.base.Supplier;
 
 public class VariablesEditorFormFragment implements ISectionFormFragment {
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private IEditorSite site;
@@ -241,6 +246,11 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     void revealVariable(final RobotVariable robotVariable) {
+        if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(robotVariable)) {
+            final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+                    + RobotVariablesSection.SECTION_NAME;
+            eventBroker.send(topic, new FilterSwitchRequest(RobotVariablesSection.SECTION_NAME, ""));
+        }
         selectionProvider.setSelection(new StructuredSelection(new Object[] { robotVariable }));
     }
 

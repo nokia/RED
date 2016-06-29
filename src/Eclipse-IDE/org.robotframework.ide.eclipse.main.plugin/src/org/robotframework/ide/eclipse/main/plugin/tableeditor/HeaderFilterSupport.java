@@ -10,13 +10,17 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
+import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.window.DefaultToolTip;
 import org.eclipse.jface.window.ToolTip;
@@ -43,19 +47,20 @@ class HeaderFilterSupport {
     private final Collection<HeaderFilterMatchesCollector> collectors;
 
     private Text filter;
+    private Job notifyingJob = null;
 
     private final Form form;
     private final FormToolkit toolkit;
 
     private final IEventBroker broker;
-    private final String topic;
+    private final String sectionId;
 
     HeaderFilterSupport(final Form form, final FormToolkit toolkit, final IEventBroker broker,
-            final String topic, final List<? extends HeaderFilterMatchesCollector> collectors) {
+            final String sectionId, final List<? extends HeaderFilterMatchesCollector> collectors) {
         this.form = form;
         this.toolkit = toolkit;
         this.broker = broker;
-        this.topic = topic;
+        this.sectionId = sectionId;
         this.collectors = newArrayList(collectors);
     }
 
@@ -77,8 +82,6 @@ class HeaderFilterSupport {
             }
         });
         filter.addModifyListener(new ModifyListener() {
-
-            private Job notifyingJob = null;
 
             @Override
             public void modifyText(final ModifyEvent e) {
@@ -102,7 +105,7 @@ class HeaderFilterSupport {
                                     }
                                 }
                                 showProperTooltip(matches);
-                                broker.send(topic, matches);
+                                broker.send(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/" + sectionId, matches);
                             }
                         });
                         monitor.done();
@@ -149,12 +152,25 @@ class HeaderFilterSupport {
         filter.dispose();
         filter = null;
         form.setHeadClient(null);
-        broker.send(topic, null);
+        broker.send(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/" + sectionId, null);
     }
 
     void addFormMessageIfNeeded() {
         if (filter != null && !filter.getText().isEmpty() && form.getMessage() == null) {
             form.setMessage("Filtering is enabled", IMessageProvider.INFORMATION);
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenUserRequestedFilterSwitch(
+            @UIEventTopic(RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST) final FilterSwitchRequest request)
+            throws InterruptedException {
+        if (request.getId().equals(sectionId)) {
+            filter.setText(request.getNewFilter());
+            if (notifyingJob != null) {
+                notifyingJob.join();
+            }
         }
     }
 }

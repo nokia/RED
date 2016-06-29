@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -33,7 +34,6 @@ import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -66,8 +66,8 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
-import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -97,6 +97,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -131,6 +132,9 @@ import ca.odell.glazedlists.SortedList;
 public class GeneralSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
     public static final String GENERAL_SETTINGS_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.settings.general.context";
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private IEditorSite site;
@@ -274,10 +278,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             });
         }
 
-        documentation.addKeyListener(new KeyListener() {
-
+        documentation.addKeyListener(new KeyAdapter() {
             @Override
-            public void keyReleased(KeyEvent e) {
+            public void keyReleased(final KeyEvent e) {
                 if (e.stateMask == SWT.CTRL) {
                     final int C_KEY = 0x3;
                     final int X_KEY = 0x18;
@@ -287,12 +290,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                         documentation.cut();
                     }
                 }
-            }
-
-            @Override
-            public void keyPressed(KeyEvent e) {
-                // TODO Auto-generated method stub
-
             }
         });
 
@@ -309,7 +306,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         copy.setText("&Copy\tCtrl+C");
         copy.addSelectionListener(new SelectionAdapter() {
 
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
                 documentation.copy();
             }
         });
@@ -318,7 +316,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         cut.setText("Cu&t\tCtrl+X");
         cut.addSelectionListener(new SelectionAdapter() {
 
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
                 documentation.cut();
             }
         });
@@ -327,7 +326,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         paste.setText("&Paste\tCtrl+V");
         paste.addSelectionListener(new SelectionAdapter() {
 
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
                 documentation.paste();
             }
         });
@@ -522,6 +522,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         } else if (table.isPresent()) {
             final Object entry = getEntryForSetting(setting);
             if (entry != null) {
+                if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(setting)) {
+                    final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+                            + RobotSettingsSection.SECTION_NAME;
+                    eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
+                }
                 selectionProvider.setSelection(new StructuredSelection(new Object[] { entry }));
             }
             setFocus();
@@ -530,10 +535,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private Object getEntryForSetting(final RobotSetting setting) {
         final SortedList<Entry<String, RobotElement>> list = dataProvider.getSortedList();
-        for (Entry<String, RobotElement> entry : list) {
-            RobotElement robotElement = entry.getValue();
+        for (final Entry<String, RobotElement> entry : list) {
+            final RobotElement robotElement = entry.getValue();
             if (robotElement != null) {
-                RobotSetting entrySetting = (RobotSetting) robotElement;
+                final RobotSetting entrySetting = (RobotSetting) robotElement;
                 if (setting == entrySetting) {
                     return entry;
                 }
@@ -583,16 +588,15 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         public static final String EMPTY_GENERAL_SETTING_LABEL = "EMPTY_GENERAL_SETTING";
 
-        private final IRowDataProvider<?> dataProvider;
+        private final GeneralSettingsDataProvider dataProvider;
 
-        public EmptyGeneralSettingLabelAcumulator(final IRowDataProvider<?> dataProvider) {
+        public EmptyGeneralSettingLabelAcumulator(final GeneralSettingsDataProvider dataProvider) {
             this.dataProvider = dataProvider;
         }
 
         @Override
-        public void accumulateConfigLabels(LabelStack configLabels, int columnPosition, int rowPosition) {
-            Entry<String, RobotElement> rowObject = (Entry<String, RobotElement>) dataProvider
-                    .getRowObject(rowPosition);
+        public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
+            final Entry<String, RobotElement> rowObject = dataProvider.getRowObject(rowPosition);
             if (rowObject != null && rowObject.getValue() == null && columnPosition == 0) {
                 configLabels.addLabel(EMPTY_GENERAL_SETTING_LABEL);
             }

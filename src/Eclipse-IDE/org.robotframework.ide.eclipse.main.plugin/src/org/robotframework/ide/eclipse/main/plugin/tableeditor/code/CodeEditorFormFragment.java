@@ -132,13 +132,13 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
         viewer.addSelectionChangedListener(createSelectionChangeListener());
 
         ViewersConfigurator.enableDeselectionPossibility(viewer);
-        ViewersConfigurator.enableContextMenuOnHeader(viewer, 
+        ViewersConfigurator.enableContextMenuOnHeader(viewer,
             new MenuProvider() {
                 @Override
                 public Menu provide() {
                     return viewerMenu;
                 }
-            }, 
+            },
             new MenuProvider() {
                 @Override
                 public Menu provide() {
@@ -281,6 +281,13 @@ public abstract class CodeEditorFormFragment implements ISectionFormFragment {
     }
 
     public void revealElement(final RobotElement robotElement) {
+        // TODO : uncomment and implement when switching implementation to nattable
+
+        // if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(robotVariable)) {
+        // final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+        // + RobotVariablesSection.SECTION_NAME;
+        // eventBroker.send(topic, new FilterSwitchRequest(RobotVariablesSection.SECTION_NAME, ""));
+        // }
         viewer.setSelection(new StructuredSelection(new Object[] { robotElement }));
     }
 
