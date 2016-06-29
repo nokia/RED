@@ -8,7 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
@@ -45,6 +47,7 @@ import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.painter.layer.NatGridLayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.EditTraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
@@ -72,13 +75,15 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorSite;
@@ -276,7 +281,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 }
             });
         }
-
+        
         documentation.addKeyListener(new KeyAdapter() {
 
             @Override
@@ -298,44 +303,48 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     protected void createPopupMenu() {
-        final Control c = documentation;
-        final Menu noteMenu = new Menu(c);
-        c.setMenu(noteMenu);
+        final Menu docMenu = new Menu(documentation);
+        documentation.setMenu(docMenu);
 
-        final MenuItem editViewSwitch = new MenuItem(noteMenu, SWT.NONE);
-        editViewSwitch.setImage(ImagesManager.getImage(RedImages.getEditImage()));
+        final MenuItem modeItem = new MenuItem(docMenu, SWT.NONE);
+        modeItem.setImage(ImagesManager.getImage(RedImages.getEditImage()));
         if (hasEditDocRepresentation) {
-            editViewSwitch.setText("&View mode");
-            documentation.setEditable(true);
-
-        } else {
-            editViewSwitch.setText("&Edit mode");
+            modeItem.setText("&Edit mode");
             documentation.setEditable(false);
 
         }
-        editViewSwitch.addSelectionListener(new SelectionAdapter() {
+        documentation.addMouseListener(new MouseAdapter() {
 
-            public void widgetSelected(SelectionEvent e) {
-                if (!hasEditDocRepresentation) {
-                    documentation.setText(getDocumentation(getSection(), true));
+            @Override
+            public void mouseUp(MouseEvent e) {
+                if (!hasEditDocRepresentation && e.button == 1) {
                     hasEditDocRepresentation = true;
-                    editViewSwitch.setText("&View mode");
+                    documentation.setText(getDocumentation(getSection(), true));
                     documentation.setEditable(true);
-                } else {
-                    documentation.setText(getDocumentation(getSection(), false));
-                    hasEditDocRepresentation = false;
-                    editViewSwitch.setText("&Edit mode");
-                    documentation.setEditable(false);
-
+                    modeItem.setText("&View mode");
                 }
             }
         });
+        modeItem.addSelectionListener(new SelectionAdapter() {
 
-        new MenuItem(noteMenu, SWT.SEPARATOR);
+            public void widgetSelected(SelectionEvent e) {
+                if (!hasEditDocRepresentation) {
+                    hasEditDocRepresentation = true;
+                    modeItem.setText("&View mode");
+                } else {
+                    hasEditDocRepresentation = false;
+                    modeItem.setText("&Edit mode");
+                }
+                documentation.setText(getDocumentation(getSection(), hasEditDocRepresentation));
+                documentation.setEditable(hasEditDocRepresentation);
+            }
+        });
 
-        final MenuItem copy = new MenuItem(noteMenu, SWT.NONE);
-        copy.setText("&Copy\tCtrl+C");
-        copy.addSelectionListener(new SelectionAdapter() {
+        new MenuItem(docMenu, SWT.SEPARATOR);
+
+        final MenuItem copyItem = new MenuItem(docMenu, SWT.NONE);
+        copyItem.setText("&Copy\tCtrl+C");
+        copyItem.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -343,9 +352,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             }
         });
 
-        final MenuItem cut = new MenuItem(noteMenu, SWT.NONE);
-        cut.setText("Cu&t\tCtrl+X");
-        cut.addSelectionListener(new SelectionAdapter() {
+        final MenuItem cutItem = new MenuItem(docMenu, SWT.NONE);
+        cutItem.setText("Cu&t\tCtrl+X");
+        cutItem.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -353,9 +362,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             }
         });
 
-        final MenuItem paste = new MenuItem(noteMenu, SWT.NONE);
-        paste.setText("&Paste\tCtrl+V");
-        paste.addSelectionListener(new SelectionAdapter() {
+        final MenuItem pasteItem = new MenuItem(docMenu, SWT.NONE);
+        pasteItem.setText("&Paste\tCtrl+V");
+        pasteItem.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
@@ -467,7 +476,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
 
         // tooltips support
-        new NatTableContentTooltip(table.get());
+        new GeneralSettingsTableContentTooltip(table.get());
     }
 
     public void addGeneralSettingsConfigAttributes(final ConfigRegistry configRegistry) {
@@ -656,6 +665,48 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
             uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
                     new PopupMenuAction(menu));
+        }
+    }
+    
+    private class GeneralSettingsTableContentTooltip extends NatTableContentTooltip {
+
+        private final Map<String, String> tooltips = new HashMap<>();
+
+        {
+            tooltips.put("Suite Setup",
+                    "The keyword %s is executed before executing any of the test cases or lower level suites");
+            tooltips.put("Suite Teardown",
+                    "The keyword %s is executed after all test cases and lower level suites have been executed");
+            tooltips.put("Test Setup",
+                    "The keyword %s is executed before every test cases in this suite unless test cases override it");
+            tooltips.put("Test Teardown",
+                    "The keyword %s is executed after every test cases in this suite unless test cases override it");
+            tooltips.put("Test Template", "The keyword %s is used as default template keyword in this suite");
+            tooltips.put("Test Timeout",
+                    "Specifies default timeout for each test case in this suite, which can be overridden by test case settings.\n"
+                            + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+            tooltips.put("Force Tags", "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
+            tooltips.put("Default Tags",
+                    "Sets tags to all tests cases in this suite, unless test case specifies own tags");
+        }
+
+        public GeneralSettingsTableContentTooltip(final NatTable natTable, final String... tooltipRegions) {
+            super(natTable, tooltipRegions);
+        }
+
+        @Override
+        protected String getText(final Event event) {
+            String text = super.getText(event);
+            final int col = this.natTable.getColumnPositionByX(event.x);
+            if (col == 1 && text != null && tooltips.containsKey(text)) {
+                final int row = this.natTable.getRowPositionByY(event.y);
+                final ILayerCell cell = this.natTable.getCellByPosition(col + 1, row);
+                final String keyword = cell != null && cell.getDataValue() != null
+                        && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue()
+                                : "given in first argument";
+                text = String.format(tooltips.get(text), keyword);
+            }
+            return text;
         }
     }
 
