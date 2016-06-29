@@ -14,6 +14,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
@@ -69,6 +70,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -100,6 +102,9 @@ import com.google.common.base.Supplier;
 public class MetadataSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
     @Inject
+    private IEventBroker eventBroker;
+
+    @Inject
     private IEditorSite site;
 
     @Inject
@@ -111,39 +116,39 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
     @Inject
     private IDirtyProviderService dirtyProviderService;
-    
+
     @Inject
     private RedFormToolkit toolkit;
 
     private HeaderFilterMatchesCollection matches;
-    
+
     private Section metadataSection;
 
     private NatTable table;
 
     private MetadataSettingsDataProvider dataProvider;
-    
+
     private ISortModel sortModel;
 
     private RowSelectionProvider<Object> selectionProvider;
-    
+
     private SelectionLayerAccessor selectionLayerAccessor;
 
     @Override
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
-    
+
     @Override
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         return selectionLayerAccessor;
     }
-    
+
     @Override
     public NatTable getTable() {
         return table;
     }
-    
+
     @Override
     public void initialize(final Composite parent) {
         metadataSection = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
@@ -159,9 +164,9 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     public void setupNatTable(final Composite parent) {
 
         final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
-        
+
         final ConfigRegistry configRegistry = new ConfigRegistry();
-        
+
         final RedNattableDataProvidersFactory dataProvidersFactory = new RedNattableDataProvidersFactory();
         final RedNattableLayersFactory factory = new RedNattableLayersFactory();
 
@@ -178,7 +183,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
         final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
         final ViewportLayer bodyViewportLayer = factory.createViewportLayer(bodySelectionLayer);
-        
+
         // column header layers
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider);
         final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
@@ -194,7 +199,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         // corner layer
         final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
                 rowHeaderDataProvider, rowHeaderLayer);
-        
+
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
@@ -209,13 +214,13 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
-        
+
         // tooltips support
         new NatTableContentTooltip(table);
 
         metadataSection.setClient(table);
     }
-    
+
     private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
             final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
@@ -236,12 +241,12 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         table.addConfiguration(new MetadataSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
-        
+
         table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.metadata.context", site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return table;
     }
-    
+
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
         final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
                 new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
@@ -275,14 +280,20 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
     public void revealSetting(final RobotKeywordCall setting) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(metadataSection);
+
+        if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(setting)) {
+            final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+                    + RobotSettingsSection.SECTION_NAME;
+            eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
+        }
         selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
         setFocus();
     }
-    
+
     public void clearSettingsSelection() {
         selectionProvider.setSelection(StructuredSelection.EMPTY);
     }
-    
+
     private NewElementsCreator<RobotElement> newElementsCreator() {
         return new NewElementsCreator<RobotElement>() {
             @Override
@@ -300,7 +311,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             }
         };
     }
-    
+
     class MetadataSettingsTableSortingConfiguration extends AbstractRegistryConfiguration {
 
         @Override
@@ -314,9 +325,9 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new NullComparator(),
                     DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 2);
         }
-        
+
     }
-    
+
     class MetadataSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
 
         private final Menu menu;

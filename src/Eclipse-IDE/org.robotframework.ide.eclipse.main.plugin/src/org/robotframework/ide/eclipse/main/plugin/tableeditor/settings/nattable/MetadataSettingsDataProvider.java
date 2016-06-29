@@ -144,7 +144,7 @@ class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataPr
         return -1;
     }
 
-    private boolean isPassingThroughFilter(final RobotKeywordCall rowObject) {
+    boolean isPassingThroughFilter(final RobotKeywordCall rowObject) {
         return filter == null || filter.select(null, null, rowObject);
     }
 

@@ -83,7 +83,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
         toolkit = createToolkit(parent);
 
         final IEditorSite site = editorPart.getEditorSite();
-        final IEclipseContext parentContext = (IEclipseContext) site.getService(IEclipseContext.class);
+        final IEclipseContext parentContext = site.getService(IEclipseContext.class);
         context = parentContext.getActiveLeaf();
         context.set(RobotEditorCommandsStack.class, commandsStack);
         context.set(RedFormToolkit.class, toolkit);
@@ -138,9 +138,9 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     private void addFilteringSupport() {
         final boolean isFilteringEnabled = new RobotSuiteEditorDialogSettings().isHeaderFilteringEnabled();
 
-        filterSupport = new HeaderFilterSupport(form, toolkit, eventBroker,
-                RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/" + getSectionName().replaceAll(" ", "_"),
+        filterSupport = new HeaderFilterSupport(form, toolkit, eventBroker, getSectionName().replaceAll(" ", "_"),
                 formFragments);
+        ContextInjectionFactory.inject(filterSupport, context);
 
         final HeaderFilterSwitchAction filterSwitchAction = new HeaderFilterSwitchAction(filterSupport, isFilteringEnabled, eventBroker);
         ContextInjectionFactory.inject(filterSwitchAction, context);
@@ -173,7 +173,7 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
     protected abstract ISelectionProvider getSelectionProvider();
 
     private void prepareCommandsContext(final IWorkbenchPartSite site) {
-        final IContextService service = (IContextService) site.getService(IContextService.class);
+        final IContextService service = site.getService(IContextService.class);
         service.activateContext(SECTION_EDITOR_PART_CONTEXT_ID);
         service.activateContext(getContextId());
     }

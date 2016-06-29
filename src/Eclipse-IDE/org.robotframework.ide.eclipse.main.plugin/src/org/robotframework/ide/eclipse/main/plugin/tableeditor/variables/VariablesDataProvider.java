@@ -165,7 +165,7 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
         return filter != null;
     }
 
-    private boolean isPassingThroughFilter(final RobotVariable rowObject) {
+    boolean isPassingThroughFilter(final RobotVariable rowObject) {
         return filter == null || filter.isMatching(rowObject);
     }
 

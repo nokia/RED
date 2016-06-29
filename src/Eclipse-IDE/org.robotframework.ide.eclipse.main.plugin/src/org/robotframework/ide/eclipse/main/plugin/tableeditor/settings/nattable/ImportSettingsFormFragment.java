@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
@@ -58,6 +59,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -90,6 +92,9 @@ import com.google.common.base.Supplier;
 public class ImportSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
     @Inject
+    private IEventBroker eventBroker;
+
+    @Inject
     private IEditorSite site;
 
     @Inject
@@ -101,29 +106,29 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
     @Inject
     private IDirtyProviderService dirtyProviderService;
-    
+
     @Inject
     private RedFormToolkit toolkit;
 
     private HeaderFilterMatchesCollection matches;
-    
+
     private Section importSettingsSection;
 
     private NatTable table;
 
     private ImportSettingsDataProvider dataProvider;
-    
+
     private ISortModel sortModel;
 
     private RowSelectionProvider<Object> selectionProvider;
-    
+
     private SelectionLayerAccessor selectionLayerAccessor;
 
     @Override
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
-    
+
     @Override
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         return selectionLayerAccessor;
@@ -150,9 +155,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private void setupNatTable(final Composite parent) {
 
         final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
-        
+
         final ConfigRegistry configRegistry = new ConfigRegistry();
-        
+
         final RedNattableDataProvidersFactory dataProvidersFactory = new RedNattableDataProvidersFactory();
         final RedNattableLayersFactory factory = new RedNattableLayersFactory();
 
@@ -177,7 +182,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         final SortHeaderLayer<RobotKeywordCall> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
                 columnHeaderDataLayer, columnHeaderLayer, dataProvider.getPropertyAccessor(), configRegistry,
                 dataProvider.getSortedList());
-        
+
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
                 rowHeaderDataProvider);
@@ -201,14 +206,14 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
-        
+
         // tooltips support
         new NatTableContentTooltip(table);
-        
+
         importSettingsSection.setClient(table);
 
     }
-    
+
     private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
             final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
@@ -229,12 +234,12 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         table.addConfiguration(new ImportSettingsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
-        
+
         table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.import.context", site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return table;
     }
-    
+
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
         final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
                 new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
@@ -265,17 +270,22 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private RobotSettingsSection getSection() {
         return fileModel.findSection(RobotSettingsSection.class).orNull();
     }
-    
+
     public void revealSetting(final RobotSetting setting) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(importSettingsSection);
+        if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(setting)) {
+            final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+                    + RobotSettingsSection.SECTION_NAME;
+            eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
+        }
         selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
         setFocus();
     }
-    
+
     public void clearSettingsSelection() {
         selectionProvider.setSelection(StructuredSelection.EMPTY);
     }
-    
+
     private NewElementsCreator<RobotElement> newElementsCreator(final SelectionLayer selectionLayer) {
         return new NewElementsCreator<RobotElement>() {
             @Override
@@ -324,7 +334,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         }
 
     }
-    
+
     class ImportSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
 
         private final Menu menu;
@@ -346,7 +356,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                     new PopupMenuAction(menu));
         }
     }
-    
+
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
