@@ -107,7 +107,7 @@ public class CellEditorValueValidationJobScheduler<V> {
     }
 
     public void armRevalidationOn(final Text textControl) {
-        if (validator == null) {
+        if (validator == null || textControl == null || textControl.isDisposed()) {
             return;
         }
         textControl.addModifyListener(new ModifyListener() {
