@@ -11,6 +11,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelection;
@@ -35,6 +36,7 @@ import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
 import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
@@ -257,6 +259,23 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Override
     public void setFocus() {
         table.setFocus();
+    }
+
+    @Persist
+    public void onSave() {
+        final ICellEditor cellEditor = table.getActiveCellEditor();
+        if (cellEditor != null && !cellEditor.isClosed()) {
+            final boolean commited = cellEditor.commit(MoveDirectionEnum.NONE);
+            if (!commited) {
+                cellEditor.close();
+            }
+        }
+        SwtThread.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                setFocus();
+            }
+        });
     }
 
     @SuppressWarnings("restriction")
