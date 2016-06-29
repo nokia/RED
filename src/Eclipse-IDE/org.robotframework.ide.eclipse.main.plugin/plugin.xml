@@ -3444,6 +3444,15 @@
                icon="resources/section.png"
                label="Show in table"
                style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+      		</visibleWhen>
          </command>
       </menuContribution>
       <menuContribution
@@ -3451,6 +3460,15 @@
             locationURI="popup:#TextEditorContext?after=additions">
          <menu
                label="Refactor">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
          </menu>
          <menu
                label="Source">
@@ -3464,14 +3482,41 @@
                   label="Format source"
                   style="push">
             </command>
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
          </menu>
          <dynamic
                class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestDynamicMenuItem"
                id="org.robotframework.red.menu.dynamic.source.run">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
          </dynamic>
          <dynamic
                class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestInDebugDynamicMenuItem"
                id="org.robotframework.red.menu.dynamic.source.debug">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
          </dynamic>
       </menuContribution>
    </extension>

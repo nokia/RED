@@ -53,7 +53,7 @@ public class RedImages {
     public static ImageDescriptor getRefreshImage() {
         return RedPlugin.getImageDescriptor("resources/refresh.png");
     }
-    
+
     public static ImageDescriptor getRobotImage() {
         return RedPlugin.getImageDescriptor("resources/robot.png");
     }
@@ -113,7 +113,7 @@ public class RedImages {
     public static ImageDescriptor getSourceImage() {
         return RedPlugin.getImageDescriptor("resources/source.png");
     }
-    
+
     public static ImageDescriptor getRobotFileImage() {
         return RedPlugin.getImageDescriptor("resources/file_robot.png");
     }
@@ -213,27 +213,27 @@ public class RedImages {
     public static ImageDescriptor getFocusSectionImage() {
         return RedPlugin.getImageDescriptor("resources/focus_section.png");
     }
-    
+
     public static ImageDescriptor getResourceImage() {
         return RedPlugin.getImageDescriptor("resources/resource.png");
     }
-    
+
     public static ImageDescriptor getCollapseAllImage() {
         return RedPlugin.getImageDescriptor("resources/collapseall.png");
     }
-    
+
     public static ImageDescriptor getExpandAllImage() {
         return RedPlugin.getImageDescriptor("resources/expandall.png");
     }
-    
+
     public static ImageDescriptor getRelaunchImage() {
         return RedPlugin.getImageDescriptor("resources/relaunch.png");
     }
-    
+
     public static ImageDescriptor getRelaunchFailedImage() {
         return RedPlugin.getImageDescriptor("resources/relaunchf.png");
     }
-    
+
     public static ImageDescriptor getFailuresImage() {
         return RedPlugin.getImageDescriptor("resources/failures.png");
     }
@@ -269,7 +269,7 @@ public class RedImages {
     public static ImageDescriptor getSuccessImage() {
         return RedPlugin.getImageDescriptor("resources/success.png");
     }
-    
+
     public static ImageDescriptor getBigSuccessImage() {
         return RedPlugin.getImageDescriptor("resources/success_big.png");
     }
@@ -277,7 +277,7 @@ public class RedImages {
     public static ImageDescriptor getErrorImage() {
         return RedPlugin.getImageDescriptor("resources/error.png");
     }
-    
+
     public static ImageDescriptor getFatalErrorImage() {
         return RedPlugin.getImageDescriptor("resources/error_fatal.png");
     }
@@ -289,11 +289,11 @@ public class RedImages {
     public static ImageDescriptor getBigWarningImage() {
         return RedPlugin.getImageDescriptor("resources/warning_big.png");
     }
-    
+
     public static ImageDescriptor getTagImage() {
         return RedPlugin.getImageDescriptor("resources/tag.png");
     }
-    
+
     public static ImageDescriptor getRemoveTagImage() {
         return RedPlugin.getImageDescriptor("resources/close_tag.png");
     }
@@ -317,11 +317,11 @@ public class RedImages {
     public static ImageDescriptor getRemoteDisconnectedImage() {
         return RedPlugin.getImageDescriptor("resources/remote_disconnected.png");
     }
-    
+
     public static ImageDescriptor getElementImage() {
         return RedPlugin.getImageDescriptor("resources/generic_element.png");
     }
-    
+
     public static ImageDescriptor getSortUpImage() {
         return RedPlugin.getImageDescriptor("resources/sort_up.png");
     }
@@ -334,6 +334,18 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/adder_state_change.png");
     }
 
+    public static ImageDescriptor getWordwrapImage() {
+        return RedPlugin.getImageDescriptor("resources/wordwrap.png");
+    }
+
+    public static ImageDescriptor getBlockSelectionModeImage() {
+        return RedPlugin.getImageDescriptor("resources/block_selection_mode.png");
+    }
+
+    public static ImageDescriptor getShowWhitespaceCharImage() {
+        return RedPlugin.getImageDescriptor("resources/show_whitespace_chars.png");
+    }
+
     public static ImageDescriptor getImageForFileWithExtension(final String extension) {
         final String extWithoutDot = extension.startsWith(".") ? extension.substring(1) : extension;
         return PlatformUI.getWorkbench().getEditorRegistry().getImageDescriptor("file." + extWithoutDot);
@@ -342,7 +354,7 @@ public class RedImages {
 
     /**
      * For given image descriptor the gray version descriptor is created.
-     * 
+     *
      * @param descriptor
      * @return Gray version of image from parameter.
      */
