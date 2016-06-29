@@ -131,7 +131,7 @@ public class GeneralSettingsDataProvider
         return -1;
     }
 
-    private boolean isPassingThroughFilter(final RobotSetting rowObject) {
+    boolean isPassingThroughFilter(final RobotSetting rowObject) {
         return filter == null || filter.select(null, null, rowObject);
     }
 
