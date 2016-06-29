@@ -16,10 +16,10 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.part.MultiPageEditorActionBarContributor;
-import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 
 
@@ -34,7 +34,7 @@ public class RobotFormEditorActionBarContributor extends MultiPageEditorActionBa
         final StatusLineContributionItem positionItem = new StatusLineContributionItem(linesDef.category);
         positionItem.setText("1:1");
         statusFields.put(linesDef, positionItem);
-        
+
         final StatusFieldDef delimiterDef = new StatusFieldDef(DELIMITERS_INFO_ID, "ConvertDelimiters");
         final StatusLineContributionItem delimiterItem = new StatusLineContributionItem(delimiterDef.category);
         delimiterItem.setText("LF");
@@ -54,9 +54,9 @@ public class RobotFormEditorActionBarContributor extends MultiPageEditorActionBa
         if (activeEditor instanceof ITextEditor) {
             final ITextEditor editor = (ITextEditor) activeEditor;
             addTextActionIfNeeded(editor, ITextEditorActionConstants.BLOCK_SELECTION_MODE,
-                    "icons/full/etool16/block_selection_mode.gif");
+                    RedImages.getBlockSelectionModeImage());
             addTextActionIfNeeded(editor, ITextEditorActionConstants.SHOW_WHITESPACE_CHARACTERS,
-                    "icons/full/etool16/show_whitespace_chars.gif");
+                    RedImages.getShowWhitespaceCharImage());
         } else {
             getActionBars().getToolBarManager().remove(ITextEditorActionConstants.BLOCK_SELECTION_MODE);
             getActionBars().getToolBarManager().remove(ITextEditorActionConstants.SHOW_WHITESPACE_CHARACTERS);
@@ -65,12 +65,10 @@ public class RobotFormEditorActionBarContributor extends MultiPageEditorActionBa
         getActionBars().updateActionBars();
     }
 
-    private void addTextActionIfNeeded(final ITextEditor editor, final String id, final String imagePath) {
+    private void addTextActionIfNeeded(final ITextEditor editor, final String id, final ImageDescriptor image) {
         final IContributionItem item = getActionBars().getToolBarManager().find(id);
         if (item == null) {
             final IAction action = getAction(editor, id);
-            final ImageDescriptor image = AbstractUIPlugin
-                    .imageDescriptorFromPlugin("org.eclipse.ui.workbench.texteditor", imagePath);
             action.setImageDescriptor(image);
             getActionBars().getToolBarManager().add(action);
         }
