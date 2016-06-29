@@ -61,7 +61,7 @@ public class DocumentationServiceHandler {
                 final String tokenText = docPart.getText();
 
                 if (tokId == 0) {
-                    if (tokenText.trim().equals("...")) {
+                    if (tokenText.trim().equals("...") || tokenText.trim().equals("\n...")) {
                         currentLineNr = tokenLineNr;
                         prevNewLine = true;
                         continue;
@@ -70,7 +70,7 @@ public class DocumentationServiceHandler {
                     }
                 }
 
-                if (LINE_CONTINUE.matcher(tokenText).find()) {
+                if (LINE_CONTINUE.matcher(tokenText).find() || tokenText.equals("\n...")) {
                     text.append("\n");
                     currentLineNr = tokenLineNr;
                     prevNewLine = true;
