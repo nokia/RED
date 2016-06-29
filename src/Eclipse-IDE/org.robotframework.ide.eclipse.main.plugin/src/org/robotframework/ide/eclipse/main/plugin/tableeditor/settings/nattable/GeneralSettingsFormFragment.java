@@ -86,6 +86,7 @@ import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -113,6 +114,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsM
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.graphics.ColorsManager;
+import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
@@ -167,7 +169,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private boolean isDocumentationModified;
 
-    private int docSelection;
+    private boolean hasEditDocRepresentation;
 
     private Job documenationChangeJob;
 
@@ -242,16 +244,12 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             public void focusGained(final FocusEvent e) {
-                documentation.setText(getDocumentation(getSection(), true));
                 hasFocusOnDocumentation = true;
-                documentation.redraw();
             }
 
             @Override
             public void focusLost(final FocusEvent e) {
-                documentation.setText(getDocumentation(getSection(), false));
                 hasFocusOnDocumentation = false;
-                documentation.redraw();
             }
         });
         toolkit.adapt(documentation, true, false);
@@ -269,8 +267,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     setDirty();
                     isDocumentationModified = true;
 
-                    docSelection = documentation.getSelection().x;
-
                     if (documenationChangeJob != null && documenationChangeJob.getState() == Job.SLEEPING) {
                         documenationChangeJob.cancel();
                     }
@@ -282,6 +278,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
 
         documentation.addKeyListener(new KeyAdapter() {
+
             @Override
             public void keyReleased(final KeyEvent e) {
                 if (e.stateMask == SWT.CTRL) {
@@ -304,6 +301,37 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         final Control c = documentation;
         final Menu noteMenu = new Menu(c);
         c.setMenu(noteMenu);
+
+        final MenuItem editViewSwitch = new MenuItem(noteMenu, SWT.NONE);
+        editViewSwitch.setImage(ImagesManager.getImage(RedImages.getEditImage()));
+        if (hasEditDocRepresentation) {
+            editViewSwitch.setText("&View mode");
+            documentation.setEditable(true);
+
+        } else {
+            editViewSwitch.setText("&Edit mode");
+            documentation.setEditable(false);
+
+        }
+        editViewSwitch.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent e) {
+                if (!hasEditDocRepresentation) {
+                    documentation.setText(getDocumentation(getSection(), true));
+                    hasEditDocRepresentation = true;
+                    editViewSwitch.setText("&View mode");
+                    documentation.setEditable(true);
+                } else {
+                    documentation.setText(getDocumentation(getSection(), false));
+                    hasEditDocRepresentation = false;
+                    editViewSwitch.setText("&Edit mode");
+                    documentation.setEditable(false);
+
+                }
+            }
+        });
+
+        new MenuItem(noteMenu, SWT.SEPARATOR);
 
         final MenuItem copy = new MenuItem(noteMenu, SWT.NONE);
         copy.setText("&Copy\tCtrl+C");
@@ -334,6 +362,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 documentation.paste();
             }
         });
+
     }
 
     private String getDocumentation(final RobotSettingsSection section, final boolean hasFocus) {
@@ -598,7 +627,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
 
         @Override
-        public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
+        public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition,
+                final int rowPosition) {
             final Entry<String, RobotElement> rowObject = dataProvider.getRowObject(rowPosition);
             if (rowObject != null && rowObject.getValue() == null && columnPosition == 0) {
                 configLabels.addLabel(EMPTY_GENERAL_SETTING_LABEL);
@@ -632,10 +662,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private void setInput() {
         final RobotSettingsSection section = getSection();
 
-        documentation.setEditable(fileModel.isEditable() && section != null);
-        documentation.setText(getDocumentation(section, documentation.isFocusControl()));
-        if (hasFocusOnDocumentation) {
-            documentation.setSelection(docSelection);
+        if (fileModel.isEditable() && section != null && hasEditDocRepresentation) {
+            documentation.setEditable(true);
+        } else {
+            documentation.setEditable(false);
+        }
+        if (!hasFocusOnDocumentation) {
+            documentation.setText(getDocumentation(section, hasEditDocRepresentation));
         }
 
         if (table.isPresent()) {
@@ -705,6 +738,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             }
         }
         SwtThread.asyncExec(new Runnable() {
+
             @Override
             public void run() {
                 setFocus();
