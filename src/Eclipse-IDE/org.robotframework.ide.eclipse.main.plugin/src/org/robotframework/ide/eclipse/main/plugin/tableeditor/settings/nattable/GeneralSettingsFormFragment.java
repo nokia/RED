@@ -34,6 +34,7 @@ import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -50,6 +51,7 @@ import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
 import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
@@ -123,6 +125,7 @@ import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
@@ -689,8 +692,24 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     @Persist
-    public void whenSaving() {
+    public void onSave() {
         isDocumentationModified = false;
+        if (!table.isPresent()) {
+            return;
+        }
+        final ICellEditor cellEditor = table.get().getActiveCellEditor();
+        if (cellEditor != null && !cellEditor.isClosed()) {
+            final boolean commited = cellEditor.commit(MoveDirectionEnum.NONE);
+            if (!commited) {
+                cellEditor.close();
+            }
+        }
+        SwtThread.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                setFocus();
+            }
+        });
     }
 
     protected void waitForDocumentationChangeJob() {
