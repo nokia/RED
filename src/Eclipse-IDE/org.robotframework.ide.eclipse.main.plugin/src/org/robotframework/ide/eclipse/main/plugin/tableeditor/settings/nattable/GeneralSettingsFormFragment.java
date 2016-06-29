@@ -66,13 +66,19 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -123,7 +129,7 @@ import com.google.common.collect.Range;
 import ca.odell.glazedlists.SortedList;
 
 public class GeneralSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
-    
+
     public static final String GENERAL_SETTINGS_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.settings.general.context";
 
     @Inject
@@ -165,6 +171,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private RowSelectionProvider<Entry<String, RobotElement>> selectionProvider;
 
     private SelectionLayerAccessor selectionLayerAccessor;
+
+    private final Object DOCUMENTATION_LOCK = new Object();
 
     @Override
     public ISelectionProvider getSelectionProvider() {
@@ -251,7 +259,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
                         return;
                     }
-
                     setDirty();
                     isDocumentationModified = true;
 
@@ -267,21 +274,79 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             });
         }
 
+        documentation.addKeyListener(new KeyListener() {
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                if (e.stateMask == SWT.CTRL) {
+                    final int C_KEY = 0x3;
+                    final int X_KEY = 0x18;
+                    if (e.character == C_KEY) {
+                        documentation.copy();
+                    } else if (e.character == X_KEY) {
+                        documentation.cut();
+                    }
+                }
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+        createPopupMenu();
         GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 30).applyTo(documentation);
     }
 
-    private String getDocumentation(final RobotSettingsSection section, final boolean hasFocus) {
-        if (section != null) {
-            final RobotSetting docSetting = section.getSetting("Documentation");
-            if (docSetting != null && !docSetting.getArguments().isEmpty()) {
-                return hasFocus
-                        ? DocumentationServiceHandler
-                                .toEditConsolidated((IDocumentationHolder) docSetting.getLinkedElement())
-                        : DocumentationServiceHandler
-                                .toShowConsolidated((IDocumentationHolder) docSetting.getLinkedElement());
+    protected void createPopupMenu() {
+        final Control c = documentation;
+        final Menu noteMenu = new Menu(c);
+        c.setMenu(noteMenu);
+
+        final MenuItem copy = new MenuItem(noteMenu, SWT.NONE);
+        copy.setText("&Copy\tCtrl+C");
+        copy.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent e) {
+                documentation.copy();
             }
+        });
+
+        final MenuItem cut = new MenuItem(noteMenu, SWT.NONE);
+        cut.setText("Cu&t\tCtrl+X");
+        cut.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent e) {
+                documentation.cut();
+            }
+        });
+
+        final MenuItem paste = new MenuItem(noteMenu, SWT.NONE);
+        paste.setText("&Paste\tCtrl+V");
+        paste.addSelectionListener(new SelectionAdapter() {
+
+            public void widgetSelected(SelectionEvent e) {
+                documentation.paste();
+            }
+        });
+    }
+
+    private String getDocumentation(final RobotSettingsSection section, final boolean hasFocus) {
+        synchronized (DOCUMENTATION_LOCK) {
+            if (section != null) {
+                final RobotSetting docSetting = section.getSetting("Documentation");
+                if (docSetting != null && !docSetting.getArguments().isEmpty()) {
+                    return hasFocus
+                            ? DocumentationServiceHandler
+                                    .toEditConsolidated((IDocumentationHolder) docSetting.getLinkedElement())
+                            : DocumentationServiceHandler
+                                    .toShowConsolidated((IDocumentationHolder) docSetting.getLinkedElement());
+                }
+            }
+            return "";
         }
-        return "";
     }
 
     private Job createDocumentationChangeJob(final String docu) {
