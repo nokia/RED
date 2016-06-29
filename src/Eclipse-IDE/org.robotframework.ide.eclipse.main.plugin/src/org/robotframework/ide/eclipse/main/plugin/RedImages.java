@@ -345,6 +345,10 @@ public class RedImages {
     public static ImageDescriptor getShowWhitespaceCharImage() {
         return RedPlugin.getImageDescriptor("resources/show_whitespace_chars.png");
     }
+    
+    public static ImageDescriptor getEditImage() {
+        return RedPlugin.getImageDescriptor("resources/edit.png");
+    }
 
     public static ImageDescriptor getImageForFileWithExtension(final String extension) {
         final String extWithoutDot = extension.startsWith(".") ? extension.substring(1) : extension;
