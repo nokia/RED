@@ -1,4 +1,5 @@
 
+## locality-sensitive hashing algorithm & Robot Framework
 ##About
 Proof-Of-Concept with using locality-sensitive hashing algorithm to find TCs and KWs which are similar to each other.
 This may indicate that some parts are the same (by copy/paste) or similar (same logic with different variables) which is valuable input for test refactoring and simplification.
@@ -18,6 +19,8 @@ number of hash computations=N-elements
 
 number of hash comparisions= N*(N-1)/2
 ## Docs
-(https://en.wikipedia.org/wiki/Nilsimsa_Hash)
-(https://github.com/boakley/robotframework-lint)
-(https://github.com/diffeo/py-nilsimsa)
+https://en.wikipedia.org/wiki/Nilsimsa_Hash
+
+https://github.com/boakley/robotframework-lint
+
+https://github.com/diffeo/py-nilsimsa
