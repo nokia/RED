@@ -31,6 +31,8 @@ http://master.dl.sourceforge.net/project/red-robot-editor/repository
 We recommend to not to do direct update of newer version, instead perform unistall old RED and install new RED after Eclipse restart.
 Open Help -> Installation Details, select old RED feature and perform unistall, restart Eclipse
 
+## RED Help
+![RED Robot Editor's application help](https://github.com/nokia/RED/tree/master/red_help)
 ## Look & feel
 ![](https://github.com/nokia/RED/blob/master/doc/img/red_overview_source_1.png "Robot perspective with text editor")
 
