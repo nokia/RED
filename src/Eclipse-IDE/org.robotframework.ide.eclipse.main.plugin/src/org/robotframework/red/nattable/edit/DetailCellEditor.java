@@ -5,7 +5,10 @@
  */
 package org.robotframework.red.nattable.edit;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.IContentProposingSupport;
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
@@ -47,6 +50,11 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
         this.editSupport = editSupport;
         this.assistSupport = new AssistanceSupport(support);
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
+    }
+
+    @Override
+    public boolean supportMultiEdit(final IConfigRegistry configRegistry, final List<String> configLabels) {
+        return false;
     }
 
     @Override
