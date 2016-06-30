@@ -5,6 +5,9 @@
  */
 package org.robotframework.red.nattable.edit;
 
+import java.util.List;
+
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
 import org.eclipse.nebula.widgets.nattable.edit.editor.IEditErrorHandler;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
@@ -26,6 +29,11 @@ public class AlwaysDeactivatingCellEditor extends AbstractCellEditor {
 
     public <T> AlwaysDeactivatingCellEditor(final NewElementsCreator<T> creator) {
         this.creator = creator;
+    }
+
+    @Override
+    public boolean supportMultiEdit(final IConfigRegistry configRegistry, final List<String> configLabels) {
+        return false;
     }
 
     @Override
