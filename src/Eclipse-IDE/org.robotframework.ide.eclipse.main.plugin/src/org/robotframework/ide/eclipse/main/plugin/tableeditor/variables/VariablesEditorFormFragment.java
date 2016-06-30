@@ -321,6 +321,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 activeCellEditor.close();
             }
             dataProvider.setInput(getSection());
+            selectionLayerAccessor.getSelectionLayer().clear();
             table.refresh();
 
             setDirty();
