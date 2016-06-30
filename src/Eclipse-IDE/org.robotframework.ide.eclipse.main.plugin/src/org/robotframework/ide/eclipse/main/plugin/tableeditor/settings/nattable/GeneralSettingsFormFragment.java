@@ -87,6 +87,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
@@ -281,7 +283,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 }
             });
         }
-        
+
         documentation.addKeyListener(new KeyAdapter() {
 
             @Override
@@ -289,6 +291,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 if (e.stateMask == SWT.CTRL) {
                     final int C_KEY = 0x3;
                     final int X_KEY = 0x18;
+
                     if (e.character == C_KEY) {
                         documentation.copy();
                     } else if (e.character == X_KEY) {
@@ -307,9 +310,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         documentation.setMenu(docMenu);
 
         final MenuItem modeItem = new MenuItem(docMenu, SWT.NONE);
-        modeItem.setImage(ImagesManager.getImage(RedImages.getEditImage()));
+        modeItem.setText("&View mode");
+        modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
         if (hasEditDocRepresentation) {
             modeItem.setText("&Edit mode");
+            modeItem.setImage(ImagesManager.getImage(RedImages.getEditImage()));
             documentation.setEditable(false);
 
         }
@@ -322,6 +327,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     documentation.setText(getDocumentation(getSection(), true));
                     documentation.setEditable(true);
                     modeItem.setText("&View mode");
+                    modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
                 }
             }
         });
@@ -331,8 +337,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 if (!hasEditDocRepresentation) {
                     hasEditDocRepresentation = true;
                     modeItem.setText("&View mode");
+                    modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
                 } else {
                     hasEditDocRepresentation = false;
+                    modeItem.setImage(ImagesManager.getImage(RedImages.getEditImage()));
                     modeItem.setText("&Edit mode");
                 }
                 documentation.setText(getDocumentation(getSection(), hasEditDocRepresentation));
@@ -344,6 +352,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         final MenuItem copyItem = new MenuItem(docMenu, SWT.NONE);
         copyItem.setText("&Copy\tCtrl+C");
+        copyItem.setImage(ImagesManager
+                .getImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY)));
         copyItem.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -354,6 +364,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         final MenuItem cutItem = new MenuItem(docMenu, SWT.NONE);
         cutItem.setText("Cu&t\tCtrl+X");
+        cutItem.setImage(ImagesManager
+                .getImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_CUT)));
         cutItem.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -364,6 +376,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         final MenuItem pasteItem = new MenuItem(docMenu, SWT.NONE);
         pasteItem.setText("&Paste\tCtrl+V");
+        pasteItem.setImage(ImagesManager.getImage(
+                PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_PASTE)));
         pasteItem.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -667,7 +681,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     new PopupMenuAction(menu));
         }
     }
-    
+
     private class GeneralSettingsTableContentTooltip extends NatTableContentTooltip {
 
         private final Map<String, String> tooltips = new HashMap<>();
