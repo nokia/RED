@@ -7,6 +7,7 @@ This may indicate that some parts are the same (by copy/paste) or similar (same 
 ##Script
 ###Usage
 nilsimsa_POC.py <file or directory with RF tests/resources> 
+
 nilsimsa_POC.py -h for more options
 ###Dependencies
 Script uses parser from Robot Framework Lint [https://github.com/boakley/robotframework-lint] and nilsimsa implementation [https://github.com/diffeo/py-nilsimsa]
