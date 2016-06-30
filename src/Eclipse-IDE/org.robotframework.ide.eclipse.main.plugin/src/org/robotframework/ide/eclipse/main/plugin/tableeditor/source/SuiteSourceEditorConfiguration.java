@@ -83,8 +83,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.
 import org.robotframework.red.graphics.ColorsManager;
 
 class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
-    
+
     private final SuiteSourceEditor editor;
+
+    private IReconciler reconciler;
 
     public SuiteSourceEditorConfiguration(final SuiteSourceEditor editor) {
         this.editor = editor;
@@ -367,7 +369,7 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ColoringPreference settingPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.SETTING);
         final IToken setting = new Token(createAttribute(settingPref));
-        
+
         final ColoringPreference garbagePref = preferences
                 .getSyntaxColoring(SyntaxHighlightingCategory.DEFAULT_SECTION);
         final IToken defaultSection = new Token(createAttribute(garbagePref));
@@ -413,7 +415,10 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
     @Override
     public IReconciler getReconciler(final ISourceViewer sourceViewer) {
-        return new MonoReconciler(getReconcilingStrategy(), true);
+        if (reconciler == null) {
+            reconciler = new MonoReconciler(getReconcilingStrategy(), true);
+        }
+        return reconciler;
     }
 
     private IReconcilingStrategy getReconcilingStrategy() {
