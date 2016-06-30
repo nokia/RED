@@ -841,6 +841,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
             setInput();
+            documentation.setText("");
             refreshTable();
             setDirty();
         }
