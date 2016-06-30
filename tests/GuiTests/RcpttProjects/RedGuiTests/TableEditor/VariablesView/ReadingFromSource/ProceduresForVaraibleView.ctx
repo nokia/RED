@@ -6,14 +6,16 @@ Element-Type: context
 Element-Version: 2.0
 Id: _9iuJED04EeaUDrMBSMf5Ag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 6/29/16 5:41 PM
+Save-Time: 6/30/16 6:49 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
+//HINT: do not use hexstring in comments! As parameter in procedure they are converted to decimal value
+
 //rows starts from 1
-proc "check-variable_row" [val file] [val row] [val var] [val value] [val comment "" ] 
+proc "check-variable-row" [val file] [val row] [val var] [val value] [val comment "" ] 
 {
 	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $var |verify-true
 	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $value |verify-true
