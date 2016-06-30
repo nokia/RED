@@ -101,7 +101,7 @@ public class CellEditorValueValidationJobScheduler<V> {
             try {
                 job.join();
             } catch (final InterruptedException e) {
-                // nothing to do
+                throw new IllegalStateException("Cell editor validation job has been interrupted!", e);
             }
         }
     }
