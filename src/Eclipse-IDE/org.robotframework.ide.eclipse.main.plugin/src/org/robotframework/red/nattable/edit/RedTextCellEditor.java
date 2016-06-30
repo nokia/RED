@@ -97,7 +97,7 @@ public class RedTextCellEditor extends TextCellEditor {
                 RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
         parent.redraw();
 
-        if (selectionStartShift > 0 || selectionEndShift > 0) {
+        if ((selectionStartShift > 0 || selectionEndShift > 0) && !getEditorControl().isDisposed()) {
             if (getEditorControl().getText().length() >= selectionStartShift + selectionEndShift) {
                 getEditorControl().setSelection(selectionStartShift,
                         getEditorControl().getText().length() - selectionEndShift);
