@@ -321,7 +321,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         documentation.addMouseListener(new MouseAdapter() {
 
             @Override
-            public void mouseUp(MouseEvent e) {
+            public void mouseUp(final MouseEvent e) {
                 if (!hasEditDocRepresentation && e.button == 1) {
                     hasEditDocRepresentation = true;
                     documentation.setText(getDocumentation(getSection(), true));
@@ -333,7 +333,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         });
         modeItem.addSelectionListener(new SelectionAdapter() {
 
-            public void widgetSelected(SelectionEvent e) {
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
                 if (!hasEditDocRepresentation) {
                     hasEditDocRepresentation = true;
                     modeItem.setText("&View mode");
@@ -431,7 +432,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         };
     }
 
-    public void setupNatTable(final Composite parent) {
+    private void setupNatTable(final Composite parent) {
 
         final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
 
@@ -840,9 +841,18 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
+            if (table.isPresent()) {
+                final ICellEditor activeCellEditor = getTable().getActiveCellEditor();
+                if (activeCellEditor != null && !activeCellEditor.isClosed()) {
+                    activeCellEditor.close();
+                }
+            }
+
             setInput();
             documentation.setText("");
+            selectionLayerAccessor.getSelectionLayer().clear();
             refreshTable();
+
             setDirty();
         }
     }
