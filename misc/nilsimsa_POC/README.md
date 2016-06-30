@@ -15,6 +15,7 @@ For each item, nilsimsa digest is computed and compared in pairs with rest of th
 Result file consist similarity metric (-128 to 128, higher->more similar) for compared pairs sorted descending  
 ###Computational complexity
 number of hash computations=N-elements
+
 number of hash comparisions= N*(N-1)/2
 ## Docs
 [https://en.wikipedia.org/wiki/Nilsimsa_Hash]
