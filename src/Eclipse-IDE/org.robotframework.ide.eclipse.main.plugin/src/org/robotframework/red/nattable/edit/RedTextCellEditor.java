@@ -12,6 +12,8 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectio
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -39,8 +41,6 @@ public class RedTextCellEditor extends TextCellEditor {
     private final CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
     private final AssistanceSupport support;
-    // private final IContentProposingSupport support;
-    // private RedContentProposalAdapter adapter;
 
     public RedTextCellEditor() {
         this(0, 0, new DefaultRedCellEditorValueValidator(), null);
@@ -88,22 +88,21 @@ public class RedTextCellEditor extends TextCellEditor {
 
     @Override
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
-        final Control control = super.activateCell(parent, originalCanonicalValue);
+        final Text text = (Text) super.activateCell(parent, originalCanonicalValue);
 
-        validationJobScheduler.armRevalidationOn(getEditorControl());
+        validationJobScheduler.armRevalidationOn(text);
 
         final RedContentProposalListener assistListener = new ContentProposalsListener();
-        support.install(getEditorControl(), Optional.of(assistListener),
+        support.install(text, Optional.of(assistListener),
                 RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
         parent.redraw();
 
-        if ((selectionStartShift > 0 || selectionEndShift > 0) && !getEditorControl().isDisposed()) {
-            if (getEditorControl().getText().length() >= selectionStartShift + selectionEndShift) {
-                getEditorControl().setSelection(selectionStartShift,
-                        getEditorControl().getText().length() - selectionEndShift);
+        if ((selectionStartShift > 0 || selectionEndShift > 0) && !text.isDisposed()) {
+            if (text.getText().length() >= selectionStartShift + selectionEndShift) {
+                text.setSelection(selectionStartShift, text.getText().length() - selectionEndShift);
             }
         }
-        return control;
+        return text;
     }
 
     @Override
