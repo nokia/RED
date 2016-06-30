@@ -8,6 +8,8 @@ package org.robotframework.red.nattable.edit;
 import org.eclipse.nebula.widgets.nattable.edit.editor.AbstractCellEditor;
 import org.eclipse.nebula.widgets.nattable.edit.editor.IEditErrorHandler;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.robotframework.red.nattable.NewElementsCreator;
@@ -19,6 +21,8 @@ import org.robotframework.red.nattable.NewElementsCreator;
 public class AlwaysDeactivatingCellEditor extends AbstractCellEditor {
 
     private final NewElementsCreator<?> creator;
+
+    private Canvas canvas;
 
     public <T> AlwaysDeactivatingCellEditor(final NewElementsCreator<T> creator) {
         this.creator = creator;
@@ -40,18 +44,19 @@ public class AlwaysDeactivatingCellEditor extends AbstractCellEditor {
     }
 
     @Override
-    public Control getEditorControl() {
-        return null;
+    public Control createEditorControl(final Composite parent) {
+        return new Canvas(parent, SWT.NONE);
     }
 
     @Override
-    public Control createEditorControl(final Composite parent) {
-        return null;
+    public Control getEditorControl() {
+        return canvas;
     }
 
     @Override
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
+        this.canvas = (Canvas) createEditorControl(parent);
         commit(MoveDirectionEnum.NONE);
-        return null;
+        return canvas;
     }
 }
