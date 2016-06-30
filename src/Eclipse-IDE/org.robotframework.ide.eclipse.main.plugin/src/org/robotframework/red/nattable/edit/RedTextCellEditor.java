@@ -94,13 +94,16 @@ public class RedTextCellEditor extends TextCellEditor {
 
     @Override
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
+        // workaround: switching off the focus listener during activation; this was causing
+        // some incosistent state where newly created cell editor was not responsive
+        ((InlineFocusListener) focusListener).handleFocusChanges = false;
+
         final Text text = (Text) super.activateCell(parent, originalCanonicalValue);
 
         validationJobScheduler.armRevalidationOn(text);
 
         final RedContentProposalListener assistListener = new ContentProposalsListener();
-        support.install(text, Optional.of(assistListener),
-                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+        support.install(text, Optional.of(assistListener), RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
         parent.redraw();
 
         if ((selectionStartShift > 0 || selectionEndShift > 0) && !text.isDisposed()) {
@@ -108,6 +111,7 @@ public class RedTextCellEditor extends TextCellEditor {
                 text.setSelection(selectionStartShift, text.getText().length() - selectionEndShift);
             }
         }
+        ((InlineFocusListener) focusListener).handleFocusChanges = true;
         return text;
     }
 
