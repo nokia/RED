@@ -411,8 +411,15 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel && dataProvider.getInput() != null) {
+            final ICellEditor activeCellEditor = table.getActiveCellEditor();
+            if (activeCellEditor != null && !activeCellEditor.isClosed()) {
+                activeCellEditor.close();
+            }
+
             dataProvider.setInput(getSection());
+            selectionLayerAccessor.getSelectionLayer().clear();
             table.refresh();
+
             setDirty();
         }
     }
