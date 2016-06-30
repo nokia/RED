@@ -34,7 +34,7 @@ public class AssistanceSupport {
 
     public void install(final Text textControl, final Optional<RedContentProposalListener> listener,
             final int acceptanceStyle) {
-        if (support == null) {
+        if (support == null || textControl.isDisposed()) {
             return;
         }
 
