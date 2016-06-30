@@ -164,7 +164,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         setupNatTable(metadataSection);
     }
 
-    public void setupNatTable(final Composite parent) {
+    private void setupNatTable(final Composite parent) {
 
         final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
 
@@ -395,6 +395,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         if (file == fileModel && dataProvider.getInput() == null) {
             dataProvider.setInput(getSection());
             table.refresh();
+
             setDirty();
         }
     }
@@ -404,8 +405,15 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel && dataProvider.getInput() != null) {
+            final ICellEditor activeCellEditor = table.getActiveCellEditor();
+            if (activeCellEditor != null && !activeCellEditor.isClosed()) {
+                activeCellEditor.close();
+            }
+
             dataProvider.setInput(getSection());
+            selectionLayerAccessor.getSelectionLayer().clear();
             table.refresh();
+
             setDirty();
         }
     }
