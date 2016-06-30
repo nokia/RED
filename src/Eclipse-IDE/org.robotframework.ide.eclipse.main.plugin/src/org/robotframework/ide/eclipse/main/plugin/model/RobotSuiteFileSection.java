@@ -82,7 +82,9 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
                 final FilePosition begin = header.getBeginPosition();
                 final FilePosition end = header.getEndPosition();
 
-                positions.add(new Position(begin.getOffset(), end.getOffset() - begin.getOffset()));
+                if (!begin.isNotSet() && !end.isNotSet()) {
+                    positions.add(new Position(begin.getOffset(), end.getOffset() - begin.getOffset()));
+                }
             }
         }
         return positions;
