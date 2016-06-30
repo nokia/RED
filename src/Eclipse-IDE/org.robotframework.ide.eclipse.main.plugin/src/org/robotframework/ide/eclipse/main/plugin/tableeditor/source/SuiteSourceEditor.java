@@ -16,6 +16,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewerExtension;
+import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.IVerticalRuler;
 import org.eclipse.jface.text.source.IVerticalRulerExtension;
@@ -102,7 +103,7 @@ public class SuiteSourceEditor extends TextEditor {
         new SuiteSourceOccurrenceMarksHighlighter(fileModel.getFile(), viewer.getDocument()).install(viewer);
         installBreakpointTogglingOnDoubleClick();
         installStatusBarUpdater(viewer);
-        
+
         setFontFromPreference(viewer);
         addFontChangeListener(viewer);
 
@@ -171,7 +172,7 @@ public class SuiteSourceEditor extends TextEditor {
         final String delimiter = DocumentUtilities.getDelimiter(document);
         find.setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
     }
-	
+
     private void installBreakpointTogglingOnDoubleClick() {
         getVerticalRuler().getControl().addMouseListener(new MouseAdapter() {
 
@@ -236,7 +237,7 @@ public class SuiteSourceEditor extends TextEditor {
 
     /**
      * Returns line number of cursor position.
-     * 
+     *
      * @return Line number indexed from 1
      */
     public int getCurrentLine() {
@@ -246,13 +247,13 @@ public class SuiteSourceEditor extends TextEditor {
 
     /**
      * Returns line number from ruler activity.
-     * 
+     *
      * @return Line number indexed from 1
      */
     public int getLineFromRulerActivity() {
         return getVerticalRuler().getLineOfLastMouseButtonActivity() + 1;
     }
-    
+
     private void addFontChangeListener(final ProjectionViewer viewer) {
         PlatformUI.getWorkbench()
                 .getThemeManager()
@@ -267,7 +268,7 @@ public class SuiteSourceEditor extends TextEditor {
                     }
                 });
     }
-    
+
     private void setFontFromPreference(final ProjectionViewer viewer) {
         final Font redSourceEditorFont = RedTheme.getRedSourceEditorFont();
         final Font defaultTextEditorFont = RedTheme.getTextEditorFont();
@@ -277,7 +278,7 @@ public class SuiteSourceEditor extends TextEditor {
             setFont(viewer, RedTheme.getRedSourceEditorFont());
         }
     }
-    
+
     private void setFont(final ISourceViewer sourceViewer, final Font font) {
         if (sourceViewer.getDocument() != null) {
             final ISelectionProvider provider = sourceViewer.getSelectionProvider();
@@ -315,5 +316,15 @@ public class SuiteSourceEditor extends TextEditor {
                 e.setFont(font);
             }
         }
+    }
+
+    public void enableReconcilation() {
+        final IReconciler reconciler = getSourceViewerConfiguration().getReconciler(getSourceViewer());
+        reconciler.install(getSourceViewer());
+    }
+
+    public void disableReconcilation() {
+        final IReconciler reconciler = getSourceViewerConfiguration().getReconciler(getSourceViewer());
+        reconciler.uninstall();
     }
 }
