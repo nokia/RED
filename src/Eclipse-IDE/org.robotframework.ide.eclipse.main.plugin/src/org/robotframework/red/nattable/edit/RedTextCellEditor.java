@@ -5,15 +5,16 @@
  */
 package org.robotframework.red.nattable.edit;
 
+import java.util.List;
+
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.viewers.IContentProposingSupport;
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -70,6 +71,11 @@ public class RedTextCellEditor extends TextCellEditor {
         this.selectionEndShift = selectionEndShift;
         this.support = new AssistanceSupport(support);
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
+    }
+
+    @Override
+    public boolean supportMultiEdit(final IConfigRegistry configRegistry, final List<String> configLabels) {
+        return false;
     }
 
     @Override
