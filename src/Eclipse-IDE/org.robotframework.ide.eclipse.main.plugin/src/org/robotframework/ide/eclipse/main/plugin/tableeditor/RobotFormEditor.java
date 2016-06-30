@@ -71,6 +71,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.jface.dialogs.ErrorDialogWithLinkToPreferences;
+import org.robotframework.red.swt.SwtThread;
 
 public class RobotFormEditor extends FormEditor {
 
@@ -381,10 +382,24 @@ public class RobotFormEditor extends FormEditor {
 
     private void updateActivePage() {
         if (getActiveEditor() instanceof ISectionEditorPart) {
+
             final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
             page.updateOnActivation();
 
-            getSourceEditor().disableReconcilation();
+            if (isDirty()) {
+                SwtThread.asyncExec(new Runnable() {
+                    // there are some locking threads involved which results in blocking
+                    // main thread for hundreds of milliseconds thus giving stops when switching
+                    // from source part to some section editor part
+                    @Override
+                    public void run() {
+                        getSourceEditor().disableReconcilation();
+                    }
+                });
+            } else {
+                getSourceEditor().disableReconcilation();
+            }
+
         } else if (getActiveEditor() instanceof SuiteSourceEditor) {
             getSourceEditor().enableReconcilation();
 
