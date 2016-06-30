@@ -9,6 +9,8 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -44,7 +46,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         private Optional<MetadataSettingsFormFragment> metadataFragment;
 
         private ImportSettingsFormFragment importFragment;
-        
+
         private SettingsEditorPageSelectionProvider settingsEditorPageSelectionProvider;
 
         @Override
@@ -129,7 +131,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            if(settingsEditorPageSelectionProvider == null) {
+            if (settingsEditorPageSelectionProvider == null) {
                 settingsEditorPageSelectionProvider = createSettingsEditorPageSelectionProvider();
             }
             return settingsEditorPageSelectionProvider;
@@ -142,25 +144,33 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public SelectionLayerAccessor getSelectionLayerAccessor() {
-            if(settingsEditorPageSelectionProvider == null) {
+            if (settingsEditorPageSelectionProvider == null) {
                 settingsEditorPageSelectionProvider = createSettingsEditorPageSelectionProvider();
             }
             return settingsEditorPageSelectionProvider.getSelectionLayerAccessor();
         }
-        
+
         @Override
         public void waitForPendingJobs() {
             if (generalFragment != null) {
                 generalFragment.waitForDocumentationChangeJob();
             }
         }
-        
+
         private SettingsEditorPageSelectionProvider createSettingsEditorPageSelectionProvider() {
             if (metadataFragment.isPresent()) {
                 return new SettingsEditorPageSelectionProvider(generalFragment, metadataFragment.get(), importFragment);
             } else {
                 return new SettingsEditorPageSelectionProvider(generalFragment, importFragment);
             }
+        }
+
+        @Override
+        @Persist
+        public void onSave() {
+            // override to do not lost focus on save
+            final IDirtyProviderService dirtyProviderService = getContext().getActive(IDirtyProviderService.class);
+            dirtyProviderService.setDirtyState(false);
         }
     }
 }

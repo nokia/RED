@@ -82,6 +82,7 @@ import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Menu;
@@ -326,6 +327,12 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     hasEditDocRepresentation = true;
                     documentation.setText(getDocumentation(getSection(), true));
                     documentation.setEditable(true);
+                    if (documentation.getTextBounds(0, documentation.getCharCount() - 1)
+                            .contains(new Point(e.x, e.y))) {
+                        documentation.setCaretOffset(documentation.getOffsetAtLocation(new Point(e.x, e.y)));
+                    } else {
+                        documentation.setCaretOffset(documentation.getCharCount());
+                    }
                     modeItem.setText("&View mode");
                     modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
                 }
