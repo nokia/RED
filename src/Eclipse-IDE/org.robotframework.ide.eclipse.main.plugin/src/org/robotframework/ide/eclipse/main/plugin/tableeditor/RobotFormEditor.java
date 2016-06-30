@@ -241,11 +241,11 @@ public class RobotFormEditor extends FormEditor {
             monitor.setCanceled(true);
             return;
         }
-        
+
         waitForPendingEditorJobs();
 
         if (!(getActiveEditor() instanceof SuiteSourceEditor)) {
-            updateSourceFromModel(monitor);
+            updateSourceFromModel();
         }
         for (final IEditorPart dirtyEditor : getDirtyEditors()) {
             dirtyEditor.doSave(monitor);
@@ -257,7 +257,7 @@ public class RobotFormEditor extends FormEditor {
             reopenEditor();
         }
     }
-    
+
     private void waitForPendingEditorJobs() {
         //jobs are sending model modification events, so it has to be done before dumping model to source
         for (final IEditorPart part : parts) {
@@ -383,12 +383,16 @@ public class RobotFormEditor extends FormEditor {
         if (getActiveEditor() instanceof ISectionEditorPart) {
             final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
             page.updateOnActivation();
+
+            getSourceEditor().disableReconcilation();
         } else if (getActiveEditor() instanceof SuiteSourceEditor) {
-            updateSourceFromModel(null);
+            getSourceEditor().enableReconcilation();
+
+            updateSourceFromModel();
         }
     }
 
-    private void updateSourceFromModel(final IProgressMonitor monitor) {
+    private void updateSourceFromModel() {
         final SuiteSourceEditor editor = getSourceEditor();
 
         if (!getDirtyEditors().isEmpty()) {
@@ -403,9 +407,6 @@ public class RobotFormEditor extends FormEditor {
             final RobotFileDumper dumper = new RobotFileDumper();
             dumper.setContext(ctx);
             document.set(dumper.dump(model.getParent()));
-        }
-        if (monitor != null) {
-            editor.doSave(monitor);
         }
     }
 
