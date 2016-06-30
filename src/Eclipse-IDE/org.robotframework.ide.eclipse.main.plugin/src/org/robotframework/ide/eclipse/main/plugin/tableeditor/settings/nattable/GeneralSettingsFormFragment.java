@@ -325,10 +325,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             public void mouseUp(final MouseEvent e) {
                 if (!hasEditDocRepresentation && e.button == 1) {
                     hasEditDocRepresentation = true;
-                    documentation.setText(getDocumentation(getSection(), true));
-                    documentation.setEditable(true);
-                    if (documentation.getTextBounds(0, documentation.getCharCount() - 1)
-                            .contains(new Point(e.x, e.y))) {
+                    final RobotSettingsSection section = getSection();
+                    documentation.setText(getDocumentation(section, true));
+                    if (section != null && section.getLinkedElement().isPresent()) {
+                        documentation.setEditable(true);
+                    }
+                    if (documentation.getCharCount() > 0 && documentation
+                            .getTextBounds(0, documentation.getCharCount() - 1).contains(new Point(e.x, e.y))) {
                         documentation.setCaretOffset(documentation.getOffsetAtLocation(new Point(e.x, e.y)));
                     } else {
                         documentation.setCaretOffset(documentation.getCharCount());
@@ -351,8 +354,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     modeItem.setImage(ImagesManager.getImage(RedImages.getEditImage()));
                     modeItem.setText("&Edit mode");
                 }
-                documentation.setText(getDocumentation(getSection(), hasEditDocRepresentation));
-                documentation.setEditable(hasEditDocRepresentation);
+                final RobotSettingsSection section = getSection();
+                documentation.setText(getDocumentation(section, hasEditDocRepresentation));
+                if (section != null && section.getLinkedElement().isPresent()) {
+                    documentation.setEditable(hasEditDocRepresentation);
+                }
             }
         });
 
