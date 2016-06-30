@@ -351,9 +351,11 @@ public class RedContentProposalAdapter {
                 }
             }
         };
-        control.addListener(SWT.KeyDown, controlListener);
-        control.addListener(SWT.Traverse, controlListener);
-        control.addListener(SWT.Modify, controlListener);
+        if (!control.isDisposed()) {
+            control.addListener(SWT.KeyDown, controlListener);
+            control.addListener(SWT.Traverse, controlListener);
+            control.addListener(SWT.Modify, controlListener);
+        }
     }
 
     /**
@@ -1456,7 +1458,7 @@ public class RedContentProposalAdapter {
 
             // Check each string for a match. Use the string displayed to the
             // user, not the proposal content.
-            final ArrayList<IContentProposal> list = new ArrayList<IContentProposal>();
+            final ArrayList<IContentProposal> list = new ArrayList<>();
             for (int i = 0; i < proposals.length; i++) {
                 final String string = getString(proposals[i]);
                 if (string.length() >= filterString.length()
