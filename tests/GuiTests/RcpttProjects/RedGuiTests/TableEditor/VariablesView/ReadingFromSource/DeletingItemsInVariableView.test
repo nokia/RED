@@ -1,0 +1,92 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9iuJED04EeaUDrMBSMf5Ag
+Element-Name: DeletingItemsInVariableView
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _3FhY0D68EeaMlbNjowJCaw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 6/30/16 6:50 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variable ***\n"
+    + "${var}    1\n"
+    + "${var1}    2        #var1\n"
+    + "${a}    3\n"
+    + "${hidden}    hidden    #AAcomment\n"
+    + "${cccccccccccccccccccc}    aaaa\n"
+    + "${ttttttttttttttt}    text  #coment with aA\n"
+    + "#no vlaue for aaa\n"
+    + "&{var3}    4=4  \n"
+    + "${var4}    5\n"
+    + "@{var5}    6    #this is var5\n"
+    + "&{b}    7=7    #this is b\n"
+    + "&{VAR6}    8=8\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" 
+    
+//go to view    
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+    
+    	//set focus on  $cccccccc
+        set-caret-pos 6 18
+        key-type F4
+    }
+    with [get-canvas -after [get-label Variables] -index 1] {
+    	//set focus on fisrt var and delete it
+        key-type Up -times 4
+        key-type Del
+        
+        //remove valu in secod row
+        key-type Down
+        key-type Right
+        key-type Del
+        
+        //remove commnet in 4th line
+        key-type Down -times 2
+        key-type Right
+        key-type Del
+        
+        //select entire row  with var $ttttttttt
+        key-type Down -times 2
+        key-type "M2+ARROW_LEFT" -times 2
+        key-type Del
+        
+        //remove value for dict b
+        key-type Down
+        key-type Left
+        key-type Down -times 4
+        key-type Del
+    }
+}
+
+check-variable-row -file "TestFile.robot" -row 1 -var "" -value "[1]"
+check-variable-row -file "TestFile.robot" -row 2 -var "${var1}" -value "" -comment "#var1"
+check-variable-row -file "TestFile.robot" -row 3 -var "${a}" -value "3" 
+
+check-variable-row -file "TestFile.robot" -row 4 -var "${hidden}" -value "hidden"
+check-variable-row -file "TestFile.robot" -row 5 -var "${cccccccccccccccccccc}" -value "aaaa"
+check-variable-row -file "TestFile.robot" -row 6 -var "" -value "[]"
+
+check-variable-row -file "TestFile.robot" -row 7 -var "@{}" -value "[]" -comment "#no vlaue for aaa"
+check-variable-row -file "TestFile.robot" -row 8 -var "&{var3}" -value "{4 = 4}"
+check-variable-row -file "TestFile.robot" -row 9 -var "${var4}" -value "5"
+
+check-variable-row -file "TestFile.robot" -row 10 -var "@{var5}" -value "[6]" -comment "#this is var5"
+check-variable-row -file "TestFile.robot" -row 11 -var "&{b}" -value "{}" -comment "#this is b"
+check-variable-row -file "TestFile.robot" -row 12 -var "&{VAR6}" -value "{8 = 8}" 
+
+
+
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
