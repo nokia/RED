@@ -6,7 +6,7 @@ This may indicate that some parts are the same (by copy/paste) or similar (same 
 
 ##Script
 ###Usage
-nilsimsa_POC.py <file or directory with RF tests/resources> 
+nilsimsa_POC.py file_or_dir_with_RF_tests 
 
 nilsimsa_POC.py -h for more options
 ###Dependencies
