@@ -298,6 +298,14 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     } else if (e.character == X_KEY) {
                         documentation.cut();
                     }
+                } else if (e.stateMask == SWT.NONE && e.character == SWT.TAB) {
+                    if (documentation.isEnabled()) {
+                        int caretOffset = documentation.getCaretOffset();
+                        int lengthBefore = documentation.getCharCount();
+                        documentation.setText(documentation.getText().replaceAll("\\t", "\\\\t"));
+                        int lengthAfter = documentation.getCharCount();
+                        documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
+                    }
                 }
             }
         });
