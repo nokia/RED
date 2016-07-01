@@ -187,7 +187,7 @@ public class SetVariableNameCommand extends EditorCommand {
             return VariableType.INVALID;
         }
         final VariableType projectedType = VariableType.getTypeByChar(newName.charAt(0));
-        return projectedType == null ? VariableType.INVALID : projectedType;
+        return projectedType == null || !newName.endsWith("}") ? VariableType.INVALID : projectedType;
     }
 
     private String getNewHolderName() {
