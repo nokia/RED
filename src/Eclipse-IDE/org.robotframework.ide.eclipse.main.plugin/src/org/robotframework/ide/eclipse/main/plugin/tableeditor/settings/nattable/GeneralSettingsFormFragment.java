@@ -891,20 +891,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             setDirty();
         }
     }
-    
-    @Inject
-    @Optional
-    private void whenSettingIsMoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel && sortModel != null) {
-            sortModel.clear();
-        }
-        if (selectionProvider != null) {
-            final ISelection oldSelection = selectionProvider.getSelection();
-            whenSettingIsAddedOrRemoved(section);
-            selectionProvider.setSelection(oldSelection);
-        }
-    }
 
     @Inject
     @Optional
