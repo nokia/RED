@@ -29,7 +29,7 @@ public class CopyVariablesHandler extends DIParameterizedHandler<E4CopyVariables
     public static class E4CopyVariablesHandler {
 
         @Execute
-        public Object copyVariables(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void copyVariables(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final Clipboard clipboard) {
 
             final List<RobotVariable> variables = Selections.getElements(selection, RobotVariable.class);
@@ -39,8 +39,6 @@ public class CopyVariablesHandler extends DIParameterizedHandler<E4CopyVariables
                         new RobotVariable[][] { variablesCopy.toArray(new RobotVariable[variablesCopy.size()]) },
                         new Transfer[] { VariablesTransfer.getInstance() });
             }
-
-            return null;
         }
     }
 }
