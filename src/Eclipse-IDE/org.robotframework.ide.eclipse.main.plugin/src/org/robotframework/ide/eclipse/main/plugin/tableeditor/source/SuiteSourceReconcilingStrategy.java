@@ -106,7 +106,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
         positions.addAll(calculateKeywordsFoldingPositions(model));
 
         final int additionalLength = DocumentUtilities.getDelimiter(document).length();
-        return newArrayList(transform(positions, delimiterShiftedPosition(additionalLength)));
+        return newArrayList(transform(positions, delimiterShiftedPosition(additionalLength, document.getLength())));
     }
 
     private List<Position> calculateSectionsFoldingPositions(final RobotSuiteFile model) {
@@ -143,12 +143,18 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
         };
     }
 
-    private static Function<Position, Position> delimiterShiftedPosition(final int additionalLength) {
+    private static Function<Position, Position> delimiterShiftedPosition(final int additionalLength,
+            final int documentLength) {
         return new Function<Position, Position>() {
 
             @Override
             public Position apply(final Position position) {
-                return new Position(position.getOffset(), position.getLength() + additionalLength);
+                final int length = position.getLength() + additionalLength;
+                if (position.getOffset() + length > documentLength) {
+                    return new Position(position.getOffset(), documentLength - position.getOffset());
+                } else {
+                    return new Position(position.getOffset(), length);
+                }
             }
         };
     }
