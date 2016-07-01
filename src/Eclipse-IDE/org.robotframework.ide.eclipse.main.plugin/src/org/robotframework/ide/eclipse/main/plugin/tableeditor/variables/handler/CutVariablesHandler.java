@@ -33,7 +33,7 @@ public class CutVariablesHandler extends DIParameterizedHandler<E4CutVariablesHa
     public static class E4CutVariablesHandler {
 
         @Execute
-        public Object cutVariables(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+        public void cutVariables(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
 
@@ -47,7 +47,6 @@ public class CutVariablesHandler extends DIParameterizedHandler<E4CutVariablesHa
 
                 editor.getSelectionLayerAccessor().getSelectionLayer().clear();
             }
-            return null;
         }
     }
 }
