@@ -19,6 +19,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 
@@ -39,6 +42,8 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
     private final CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
     private final AssistanceSupport assistSupport;
+
+    private IContextActivation contextActivation;
 
     public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport,
             final IContentProposingSupport support) {
@@ -68,6 +73,8 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
                 RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
         parent.redraw();
 
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
+        contextActivation = service.activateContext(RedTextCellEditor.DETAILS_EDITING_CONTEXT_ID);
         return composite;
     }
 
@@ -128,6 +135,14 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void close() {
+        super.close();
+
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
+        service.deactivateContext(contextActivation);
     }
 
     @Override
