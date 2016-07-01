@@ -38,6 +38,7 @@ public class DIParameterizedHandler<C> extends AbstractHandler {
                 child.set((String) key, event.getParameters().get(key));
             }
         }
-        return ContextInjectionFactory.invoke(component, Execute.class, child);
+        ContextInjectionFactory.invoke(component, Execute.class, child);
+        return null;
     }
 }
