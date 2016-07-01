@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _8mYawAiBEearkLC-7wHL-g
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/22/16 5:57 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/1/16 10:00 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -16,6 +16,13 @@ Entry-Name: .content
 
 //open red.xml and add new path to PYTHONPAT
 get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
+
+try -times 10 -delay 1000 -command{
+	get-editor "RobotProject/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
+    | verify-true
+}
+
+
 with [get-editor "RobotProject/red.xml"] {
     get-tab-folder | get-tab-item "Referenced libraries" | click
     with [get-section "Referenced libraries" | get-button "Auto discover libraries after test suite save action"] {
@@ -100,6 +107,9 @@ with [get-editor "lib_with_variable.robot" | get-text-viewer] {
 //run test    
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 
     | click
+try -times 5 -delay 1000 -command{
+	get-view Console | get-button Terminate | get-property "isEnabled()" | equals false | verify-true
+}
 
 //check console
 get-view Console | get-text-viewer | get-property text 
@@ -129,6 +139,8 @@ if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{
 
 //change path to Project
 get-tab-folder -index 1 | get-tab-item "RobotProject/red.xml" | click
+wait 1000
+
 with [get-editor "RobotProject/red.xml" | get-section Paths] {
     get-combo -after [get-label "Relative paths defined below are relative to:"] | select PROJECT
     get-table | select "\\win_path\\/addons" | key-type "M1+s"
