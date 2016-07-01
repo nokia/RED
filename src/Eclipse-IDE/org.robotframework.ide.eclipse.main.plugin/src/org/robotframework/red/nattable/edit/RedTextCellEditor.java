@@ -22,6 +22,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextActivation;
+import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.ide.eclipse.main.plugin.assist.VariablesContentProposingSupport;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
@@ -36,6 +39,8 @@ import com.google.common.base.Optional;
  */
 public class RedTextCellEditor extends TextCellEditor {
 
+    public static final String DETAILS_EDITING_CONTEXT_ID = "org.robotframework.ide.eclipse.details.context";
+
     private final int selectionStartShift;
     private final int selectionEndShift;
 
@@ -43,6 +48,8 @@ public class RedTextCellEditor extends TextCellEditor {
 
     private final AssistanceSupport support;
 
+    private IContextActivation contextActivation;
+    
     public RedTextCellEditor() {
         this(0, 0, new DefaultRedCellEditorValueValidator(), null);
     }
@@ -112,6 +119,10 @@ public class RedTextCellEditor extends TextCellEditor {
             }
         }
         ((InlineFocusListener) focusListener).handleFocusChanges = true;
+
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
+        contextActivation = service.activateContext(DETAILS_EDITING_CONTEXT_ID);
+        
         return text;
     }
 
@@ -123,6 +134,14 @@ public class RedTextCellEditor extends TextCellEditor {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public void close() {
+        super.close();
+
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
+        service.deactivateContext(contextActivation);
     }
 
     private class TextKeyListener extends KeyAdapter {
