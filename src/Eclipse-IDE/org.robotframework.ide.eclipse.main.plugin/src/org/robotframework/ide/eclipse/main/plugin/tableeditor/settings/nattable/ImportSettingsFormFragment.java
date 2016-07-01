@@ -145,7 +145,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
     @Override
     public void initialize(final Composite parent) {
-        importSettingsSection = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+        importSettingsSection = toolkit.createSection(parent,
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         importSettingsSection.setText("Imports");
         final boolean isResourceFile = fileModel.isResourceFile();
         importSettingsSection.setExpanded(isResourceFile);
@@ -240,7 +241,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         table.configure();
 
-        table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.import.context", site));
+        table.addFocusListener(new SettingsTableFocusListener(
+                "org.robotframework.ide.eclipse.tableeditor.settings.import.context", site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return table;
     }
@@ -248,6 +250,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
         final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
                 new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
+
                     @Override
                     public HeaderFilterMatchesCollection get() {
                         return matches;
@@ -268,6 +271,11 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         table.setFocus();
     }
 
+    @Override
+    public void invokeSaveAction() {
+        onSave();
+    }
+
     @Persist
     public void onSave() {
         final ICellEditor cellEditor = table.getActiveCellEditor();
@@ -278,6 +286,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             }
         }
         SwtThread.asyncExec(new Runnable() {
+
             @Override
             public void run() {
                 setFocus();
@@ -310,10 +319,12 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
     private NewElementsCreator<RobotElement> newElementsCreator(final SelectionLayer selectionLayer) {
         return new NewElementsCreator<RobotElement>() {
+
             @Override
             public RobotElement createNew() {
                 dataProvider.setMatches(null);
                 SwtThread.asyncExec(new Runnable() {
+
                     @Override
                     public void run() {
                         new ImportSettingsPopup(site.getShell(), commandsStack, fileModel, null).open();

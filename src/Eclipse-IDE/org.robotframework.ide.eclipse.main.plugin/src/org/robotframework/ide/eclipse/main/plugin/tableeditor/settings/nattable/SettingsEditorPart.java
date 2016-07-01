@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -165,10 +166,15 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             }
         }
 
-        @Override
         @Persist
         public void onSave() {
-            // override to do not lost focus on save
+            ISelection selection = settingsEditorPageSelectionProvider.getSelection();
+
+            if (selection != null && !selection.isEmpty()) {
+                ISettingsFormFragment activeFormFragment = settingsEditorPageSelectionProvider.getActiveFormFragment();
+                activeFormFragment.invokeSaveAction();
+            }
+
             final IDirtyProviderService dirtyProviderService = getContext().getActive(IDirtyProviderService.class);
             dirtyProviderService.setDirtyState(false);
         }

@@ -12,8 +12,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 public interface ISettingsFormFragment {
 
     ISelectionProvider getSelectionProvider();
-    
+
     SelectionLayerAccessor getSelectionLayerAccessor();
 
     NatTable getTable();
+
+    void invokeSaveAction();
 }
