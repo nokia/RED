@@ -20,6 +20,7 @@ import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
@@ -427,6 +428,18 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             table.refresh();
             setDirty();
         }
+    }
+    
+    @Inject
+    @Optional
+    private void whenSettingIsMoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            sortModel.clear();
+        }
+        final ISelection oldSelection = selectionProvider.getSelection();
+        whenSettingIsAddedOrRemoved(section);
+        selectionProvider.setSelection(oldSelection);
     }
 
     @Inject
