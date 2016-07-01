@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _fGM4sOxZEeWqTNBmS5Gi4w
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/14/16 2:49 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/1/16 10:07 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -22,14 +22,14 @@ proc "wait-for-disapearing_progressbar"{
 
 proc "wait-for-collapsing_explorer"{
 	try -times 5 -delay 1000 -command{
-		get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" 
+		get-view "Project Explorer" | get-tree | get-item "RemovingProject/Robot Referenced libraries" 
 	       | get-property "getExpanded()" | equals false | verify-true
 	}
 }
 
 //open python file and change function name
-get-view "Project Explorer" | get-tree | select "RobotProject/file1.py" | select "RobotProject/file1.py" 
-    | select "RobotProject/file1.py" | get-menu "Open With/Text Editor" | click
+get-view "Project Explorer" | get-tree | select "RemovingProject/file1.py" | select "RemovingProject/file1.py" 
+    | select "RemovingProject/file1.py" | get-menu "Open With/Text Editor" | click
 with [get-editor "file1.py" | get-text-viewer] {
     set-caret-pos 1 8
     type-text 2
@@ -42,7 +42,7 @@ wait-for-collapsing_explorer
 
 //see if new value is in PE
 get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/file1 RobotProject \\(1\\)/Sum 2" | get-property index 
+    | get-item "RemovingProject/Robot Referenced libraries/file1 RemovingProject \\(1\\)/Sum 2" | get-property index 
     | equals 0 | verify-true
 get-view "Project Explorer" | get-tree | select "SecondProject/file2.py" | select "SecondProject/file2.py" 
     | get-menu "Open With/Text Editor" | click
@@ -63,8 +63,8 @@ get-view "Project Explorer" | get-tree
     
 //delete first project    
 with [get-view "Project Explorer" | get-tree] {
-    select RobotProject | get-menu Refresh | click
-    select RobotProject | get-menu Delete | click
+    select RemovingProject | get-menu Refresh | click
+    select RemovingProject | get-menu Delete | click
 }
 with [get-window "Delete Resources"] {
     get-button "Delete project contents on disk (cannot be undone)" | check
@@ -98,10 +98,10 @@ get-view "Project Explorer" | get-tree
 
 get-view "Project Explorer" | get-tree | select SecondProject | get-menu "New/Robot Project" | click
 with [get-window "New Robot project"] {
-    get-editbox -after [get-label "Project name:"] | set-text RobotProject
+    get-editbox -after [get-label "Project name:"] | set-text RemovingProject
     get-button Finish | click
 }
-get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot python file" | click
+get-view "Project Explorer" | get-tree | select RemovingProject | get-menu "New/Robot python file" | click
 with [get-window "New Robot python file"] {
     get-editbox -after [get-label "File name:"] | set-text "file1.py"
     get-button Finish | click
@@ -113,10 +113,10 @@ with [get-editor "file1.py" | get-text-viewer] {
     type-text "return 17"
     key-type "M1+s"
 }
-get-view "Project Explorer" | get-tree | select "RobotProject/red.xml" | double-click
-get-editor "RobotProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
-set-dialog-result File "platform:/resource/RobotProject/file1.py"
-with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
+get-view "Project Explorer" | get-tree | select "RemovingProject/red.xml" | double-click
+get-editor "RemovingProject/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+set-dialog-result File "platform:/resource/RemovingProject/file1.py"
+with [get-editor "RemovingProject/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
     click
     key-type "M1+s"
 }
@@ -124,12 +124,12 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | g
 wait-for-disapearing_progressbar
 
 get-view "Project Explorer" | get-tree 
-    | get-item "RobotProject/Robot Referenced libraries/file1 RobotProject \\(1\\)/New Fun" | get-property index 
+    | get-item "RemovingProject/Robot Referenced libraries/file1 RemovingProject \\(1\\)/New Fun" | get-property index 
     | equals 0 | verify-true
     
 with [get-view "Project Explorer" | get-tree] {
-    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
-    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
+    get-item "RemovingProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
+    get-item "RemovingProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
         | equals 1 | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
