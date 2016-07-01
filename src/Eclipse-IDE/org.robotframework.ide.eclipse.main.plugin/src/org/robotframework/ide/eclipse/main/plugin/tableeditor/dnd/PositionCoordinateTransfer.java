@@ -37,11 +37,6 @@ public class PositionCoordinateTransfer extends ByteArrayTransfer {
     }
 
     public static boolean hasPositionsCoordinates(final Clipboard clipboard) {
-        final TransferData[] availableTypes = clipboard.getAvailableTypes();
-        for (final TransferData data : availableTypes) {
-            PositionCoordinateTransfer.getInstance().isSupportedType(data);
-        }
-
         return clipboard != null && !clipboard.isDisposed() && clipboardContainPositionsCoordinates(clipboard);
     }
 
@@ -119,9 +114,9 @@ public class PositionCoordinateTransfer extends ByteArrayTransfer {
 
         private static final long serialVersionUID = 1L;
 
-        private int columnPosition;
+        private final int columnPosition;
 
-        private int rowPosition;
+        private final int rowPosition;
 
         public PositionCoordinateSerializer(final PositionCoordinate positionCoordinate) {
             this.columnPosition = positionCoordinate.columnPosition;
