@@ -38,7 +38,7 @@ public class PasteVariablesHandler extends DIParameterizedHandler<E4PasteVariabl
         private RobotSuiteFile fileModel;
 
         @Execute
-        public Object pasteVariables(final RobotEditorCommandsStack commandsStack,
+        public void pasteVariables(final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
             final Object probablyVariables = clipboard.getContents(VariablesTransfer.getInstance());
 
@@ -49,7 +49,6 @@ public class PasteVariablesHandler extends DIParameterizedHandler<E4PasteVariabl
                     commandsStack.execute(command.get());
                 }
             }
-            return null;
         }
 
         private Optional<? extends EditorCommand> getInsertingCommand(final IStructuredSelection selection,

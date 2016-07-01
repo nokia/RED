@@ -34,7 +34,7 @@ public class CopyInVariableTableHandler extends DIParameterizedHandler<E4CopyInV
     public static class E4CopyInVariableTableHandler {
 
         @Execute
-        public Object copy(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+        public void copy(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
             // final SelectionLayerAccessor selectionLayerAccessor =
             // editor.getSelectionLayerAccessor();
@@ -60,8 +60,6 @@ public class CopyInVariableTableHandler extends DIParameterizedHandler<E4CopyInV
                                 variablesCopy.toArray(new RobotVariable[variablesCopy.size()]) },
                         new Transfer[] { PositionCoordinateTransfer.getInstance(), VariablesTransfer.getInstance() });
             }
-
-            return null;
         }
     }
 }
