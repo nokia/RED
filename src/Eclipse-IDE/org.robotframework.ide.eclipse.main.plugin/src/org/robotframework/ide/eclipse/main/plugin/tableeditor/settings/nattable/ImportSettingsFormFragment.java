@@ -146,8 +146,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     public void initialize(final Composite parent) {
         importSettingsSection = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         importSettingsSection.setText("Imports");
-        importSettingsSection.setExpanded(false);
-        GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(importSettingsSection);
+        final boolean isResourceFile = fileModel.isResourceFile();
+        importSettingsSection.setExpanded(isResourceFile);
+        GridDataFactory.fillDefaults().grab(true, isResourceFile).minSize(1, 22).applyTo(importSettingsSection);
         Sections.switchGridCellGrabbingOnExpansion(importSettingsSection);
         Sections.installMaximazingPossibility(importSettingsSection);
 
