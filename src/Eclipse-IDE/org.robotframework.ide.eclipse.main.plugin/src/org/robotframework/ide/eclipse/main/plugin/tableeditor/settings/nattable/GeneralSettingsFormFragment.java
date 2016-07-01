@@ -28,6 +28,7 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
@@ -888,6 +889,20 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             }
             refreshTable();
             setDirty();
+        }
+    }
+    
+    @Inject
+    @Optional
+    private void whenSettingIsMoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel && sortModel != null) {
+            sortModel.clear();
+        }
+        if (selectionProvider != null) {
+            final ISelection oldSelection = selectionProvider.getSelection();
+            whenSettingIsAddedOrRemoved(section);
+            selectionProvider.setSelection(oldSelection);
         }
     }
 
