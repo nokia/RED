@@ -3172,6 +3172,15 @@
              name="navigation"
              visible="true">
        </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInSource"
+             label="Show in source"
+             icon="resources/source.png"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
        <separator
              name="globals"
              visible="true">
@@ -3244,6 +3253,15 @@
              name="navigation"
              visible="true">
        </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInSource"
+             label="Show in source"
+             icon="resources/source.png"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
        <separator
              name="globals"
              visible="true">
@@ -3325,6 +3343,15 @@
              label="Edit"
              icon="resources/edit.png"
              style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInSource"
+             label="Show in source"
+             icon="resources/source.png"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
        </command>
        <separator
              name="globals"
