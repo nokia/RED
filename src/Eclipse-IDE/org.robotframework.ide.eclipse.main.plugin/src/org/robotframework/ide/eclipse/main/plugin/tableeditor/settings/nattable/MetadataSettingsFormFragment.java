@@ -246,7 +246,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
         table.configure();
 
-        table.addFocusListener(new SettingsTableFocusListener("org.robotframework.ide.eclipse.tableeditor.settings.metadata.context", site));
+        table.addFocusListener(new SettingsTableFocusListener(
+                "org.robotframework.ide.eclipse.tableeditor.settings.metadata.context", site));
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
         return table;
     }
@@ -254,6 +255,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
         final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
                 new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
+
                     @Override
                     public HeaderFilterMatchesCollection get() {
                         return matches;
@@ -274,6 +276,11 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         table.setFocus();
     }
 
+    @Override
+    public void invokeSaveAction() {
+        onSave();
+    }
+
     @Persist
     public void onSave() {
         final ICellEditor cellEditor = table.getActiveCellEditor();
@@ -284,6 +291,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             }
         }
         SwtThread.asyncExec(new Runnable() {
+
             @Override
             public void run() {
                 setFocus();
@@ -317,12 +325,14 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
     private NewElementsCreator<RobotElement> newElementsCreator() {
         return new NewElementsCreator<RobotElement>() {
+
             @Override
             public RobotElement createNew() {
                 dataProvider.setMatches(null);
                 final RobotSettingsSection section = dataProvider.getInput();
                 commandsStack.execute(new CreateFreshGeneralSettingCommand(section, "Metadata", newArrayList("data")));
                 SwtThread.asyncExec(new Runnable() {
+
                     @Override
                     public void run() {
                         table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));

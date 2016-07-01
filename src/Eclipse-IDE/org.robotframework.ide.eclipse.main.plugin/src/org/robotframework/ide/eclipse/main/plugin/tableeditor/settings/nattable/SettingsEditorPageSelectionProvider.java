@@ -30,13 +30,13 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 
 public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
-    
+
     private List<ISettingsFormFragment> formFragments;
 
     private ISettingsFormFragment activeFormFragment;
-    
+
     private final List<TranslatingSelectionChangeListener> listeners = newArrayList();
-    
+
     public SettingsEditorPageSelectionProvider(final ISettingsFormFragment... formFragments) {
         this.formFragments = newArrayList(Iterables.filter(Arrays.asList(formFragments), Predicates.notNull()));
         for (final ISettingsFormFragment formFragment : formFragments) {
@@ -45,8 +45,9 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
     }
 
     private void addFocusListener(final ISettingsFormFragment formFragment) {
-        if(formFragment.getTable() != null) {
+        if (formFragment.getTable() != null) {
             formFragment.getTable().addFocusListener(new FocusAdapter() {
+
                 @Override
                 public void focusGained(final FocusEvent e) {
                     activeFormFragment = formFragment;
@@ -59,9 +60,9 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
     public void addSelectionChangedListener(final ISelectionChangedListener listener) {
         final TranslatingSelectionChangeListener wrappingListener = new TranslatingSelectionChangeListener(listener);
         listeners.add(wrappingListener);
-        
+
         for (final ISettingsFormFragment formFragment : formFragments) {
-            if(formFragment.getTable() != null && formFragment.getSelectionProvider() != null) {
+            if (formFragment.getTable() != null && formFragment.getSelectionProvider() != null) {
                 formFragment.getSelectionProvider().addSelectionChangedListener(wrappingListener);
                 formFragment.getTable().addDisposeListener(new DisposeListener() {
 
@@ -94,9 +95,9 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
         if (foundListener == null) {
             return;
         }
-        
+
         for (final ISettingsFormFragment formFragment : formFragments) {
-            if(formFragment.getSelectionProvider() != null) {
+            if (formFragment.getSelectionProvider() != null) {
                 formFragment.getSelectionProvider().removeSelectionChangedListener(foundListener);
             }
         }
@@ -108,11 +109,11 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
             activeFormFragment.getSelectionProvider().setSelection(selection);
         }
     }
-    
+
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         return activeFormFragment != null ? activeFormFragment.getSelectionLayerAccessor() : null;
     }
-    
+
     @SuppressWarnings("rawtypes")
     private ISelection translateEntriesToSettings(final ISelection selection) {
         if (selection instanceof IStructuredSelection) {
@@ -121,9 +122,9 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
             final List<Entry> entries = Selections.getElements(structuredSelection, Entry.class);
 
             if (!entries.isEmpty() && entries.size() == size) {
-                return new StructuredSelection(newArrayList(Iterables.filter(
-                        Iterables.transform(entries,
-                        new Function<Entry, RobotElement>() {
+                return new StructuredSelection(
+                        newArrayList(Iterables.filter(Iterables.transform(entries, new Function<Entry, RobotElement>() {
+
                             @Override
                             public RobotElement apply(final Entry entry) {
                                 return (RobotElement) entry.getValue();
@@ -134,7 +135,7 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
         }
         return selection;
     }
-    
+
     private class TranslatingSelectionChangeListener implements ISelectionChangedListener {
 
         private final ISelectionChangedListener wrappedListener;
@@ -148,6 +149,10 @@ public class SettingsEditorPageSelectionProvider implements ISelectionProvider {
             wrappedListener.selectionChanged(new SelectionChangedEvent(event.getSelectionProvider(),
                     translateEntriesToSettings(event.getSelection())));
         }
+    }
+
+    public ISettingsFormFragment getActiveFormFragment() {
+        return activeFormFragment;
     }
 
 }

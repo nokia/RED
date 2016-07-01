@@ -812,6 +812,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         documentation.setStyleRange(null);
     }
 
+    @Override
+    public void invokeSaveAction() {
+        onSave();
+    }
+
     @Persist
     public void onSave() {
         isDocumentationModified = false;
