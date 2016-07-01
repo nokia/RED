@@ -29,12 +29,10 @@ public class MoveVariableUpHandler extends DIParameterizedHandler<E4MoveVariable
         private RobotEditorCommandsStack stack;
 
         @Execute
-        public Object moveVariableUp(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void moveVariableUp(@Named(Selections.SELECTION) final IStructuredSelection selection) {
 
             final RobotVariable selectedVariable = Selections.getSingleElement(selection, RobotVariable.class);
             stack.execute(new MoveVariableUpCommand(selectedVariable));
-
-            return null;
         }
     }
 }

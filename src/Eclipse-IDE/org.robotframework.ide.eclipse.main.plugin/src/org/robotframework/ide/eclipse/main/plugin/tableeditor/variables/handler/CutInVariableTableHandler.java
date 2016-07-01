@@ -40,7 +40,7 @@ public class CutInVariableTableHandler extends DIParameterizedHandler<E4CutInVar
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public Object cut(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+        public void cut(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
 //            final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
 //
@@ -69,10 +69,8 @@ public class CutInVariableTableHandler extends DIParameterizedHandler<E4CutInVar
                         new Transfer[] { PositionCoordinateTransfer.getInstance(), VariablesTransfer.getInstance() });
             }
             
-            E4DeleteInVariableTableHandler deleteHandler = new E4DeleteInVariableTableHandler();
+            final E4DeleteInVariableTableHandler deleteHandler = new E4DeleteInVariableTableHandler();
             deleteHandler.delete(commandsStack, editor, selection);
-            
-            return null;
         }
     }
 }
