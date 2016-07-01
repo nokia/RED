@@ -35,11 +35,6 @@ public class VariablesTransfer extends ByteArrayTransfer {
     }
 
     public static boolean hasVariables(final Clipboard clipboard) {
-        final TransferData[] availableTypes = clipboard.getAvailableTypes();
-        for (final TransferData data : availableTypes) {
-            VariablesTransfer.getInstance().isSupportedType(data);
-        }
-
         return clipboard != null && !clipboard.isDisposed() && clipboardContainVariables(clipboard);
     }
 
