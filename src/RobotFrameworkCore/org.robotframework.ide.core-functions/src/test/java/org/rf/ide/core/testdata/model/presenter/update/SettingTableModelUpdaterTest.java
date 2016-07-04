@@ -11,6 +11,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.BeforeClass;
@@ -320,7 +322,8 @@ public class SettingTableModelUpdaterTest {
 
         assertTrue(modelElement.getModelType() == ModelType.SUITE_DOCUMENTATION);
         SuiteDocumentation setting = (SuiteDocumentation) modelElement;
-        checkSetting(setting.getDocumentationText(), documentation, setting.getComment(), comment);
+        checkSetting(setting.getDocumentationText(), new ArrayList<String>(Arrays.asList("docPart1 docPart2")),
+                setting.getComment(), comment);
 
         final List<String> newDocumentation = newArrayList("docPart3");
         final String newComment = "new comment";
