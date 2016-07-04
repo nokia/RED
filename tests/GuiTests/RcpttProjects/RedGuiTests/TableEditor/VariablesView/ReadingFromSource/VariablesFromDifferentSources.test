@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _58w70DoTEeaMk_UgyvYHpA
-Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/1/16 9:20 AM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 7/4/16 9:21 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -20,26 +20,26 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
 
 
 
-check-variable-row-file "TestFile.robot" -row 1 -var "${var}"  -value "1"
-check-variable-row-file "TestFile.robot" -row 2 -var "${var1}"  -value "text with space"
-check-variable-row-file "TestFile.robot" -row 3 -var "${path}"  -value "C:\\new\\file.txt"
-check-variable-row-file "TestFile.robot" -row 4 -var "${ref}"  -value "/ref/ref/file.jpg" -comment "#image"
-check-variable-row-file "TestFile.robot" -row 5 -var "${a}"  -value "${a}"
+check-variable-row -file "TestFile.robot" -row 1 -var "${var}"  -value "1"
+check-variable-row -file "TestFile.robot" -row 2 -var "${var1}"  -value "text with space"
+check-variable-row -file "TestFile.robot" -row 3 -var "${path}"  -value "C:\\new\\file.txt"
+check-variable-row -file "TestFile.robot" -row 4 -var "${ref}"  -value "/ref/ref/file.jpg" -comment "#image"
+check-variable-row -file "TestFile.robot" -row 5 -var "${a}"  -value "${a}"
 
-check-variable-row-file "TestFile.robot" -row 6 -var "${B}"  -value ""
-check-variable-row-file "TestFile.robot" -row 7 -var "@{}"  -value "[]" -comment "#list"
-check-variable-row-file "TestFile.robot" -row 8 -var "@{list}"  -value "[a1, a2, a3, a4]"
-check-variable-row-file "TestFile.robot" -row 9 -var "@{}"  -value "[]" -comment "#dict"
-check-variable-row-file "TestFile.robot" -row 10 -var "&{newDict}"  -value "{music = rock, tree = birch-tree, vege = tomato}" -comment "#some stupid dict"
+check-variable-row -file "TestFile.robot" -row 6 -var "${B}"  -value ""
+check-variable-row -file "TestFile.robot" -row 7 -var "@{}"  -value "[]" -comment "#list"
+check-variable-row -file "TestFile.robot" -row 8 -var "@{list}"  -value "[a1, a2, a3, a4]"
+check-variable-row -file "TestFile.robot" -row 9 -var "@{}"  -value "[]" -comment "#dict"
+check-variable-row -file "TestFile.robot" -row 10 -var "&{newDict}"  -value "{music = rock, tree = birch-tree, vege = tomato}" -comment "#some stupid dict"
 
-check-variable-row-file "TestFile.robot" -row 11 -var "${plus_one}"  -value "${a+1}"
-check-variable-row-file "TestFile.robot" -row 12 -var "@{EMPTY LIST}"  -value "[${EMPTY}, ${SPACE}]"
-check-variable-row-file "TestFile.robot" -row 13 -var "${this is param}"  -value "8"
-check-variable-row-file "TestFile.robot" -row 14 -var "@{list with equals sign}"  -value "[item1, item2, ${b}]"
-check-variable-row-file "TestFile.robot" -row 15 -var "@{}"  -value "[]" -comment "#I forgot to add param name"
+check-variable-row -file "TestFile.robot" -row 11 -var "${plus_one}"  -value "${a+1}"
+check-variable-row -file "TestFile.robot" -row 12 -var "@{EMPTY LIST}"  -value "[${EMPTY}, ${SPACE}]"
+check-variable-row -file "TestFile.robot" -row 13 -var "${this is param}"  -value "8"
+check-variable-row -file "TestFile.robot" -row 14 -var "@{list with equals sign}"  -value "[item1, item2, ${b}]"
+check-variable-row -file "TestFile.robot" -row 15 -var "@{}"  -value "[]" -comment "#I forgot to add param name"
 
-check-variable-row-file "TestFile.robot" -row 16 -var "@{multiline}"  -value "[line1, line2, line3]" 
-check-variable-row-file "TestFile.robot" -row 17 -var "${very long param name with vary long value and commnet}"  -value "This is very long param value with very long param name. Some part of it should be visible" -comment  "# this is long comment too. But not some much because I am lazy"
+check-variable-row -file "TestFile.robot" -row 16 -var "@{multiline}"  -value "[line1, line2, line3]" 
+check-variable-row -file "TestFile.robot" -row 17 -var "${very long param name with vary long value and commnet}"  -value "This is very long param value with very long param name. Some part of it should be visible" -comment  "# this is long comment too. But not some much because I am lazy"
 
 //add new variables is Source
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
@@ -67,28 +67,28 @@ with [get-editor "TestFile.robot"] {
 }
 
 wait 4000
-check-variable-row-file "TestFile.robot" -row 1 -var "@{list is now first}"  -value "[first item]"
-check-variable-row-file "TestFile.robot" -row 2 -var "${var}"  -value "1"
-check-variable-row-file "TestFile.robot" -row 3 -var "${var1}"  -value "text with space"
-check-variable-row-file "TestFile.robot" -row 4 -var "${path}"  -value "C:\\new\\file.txt"
-check-variable-row-file "TestFile.robot" -row 5 -var "${ref}"  -value "/ref/ref/file.jpg" -comment "#image"
-check-variable-row-file "TestFile.robot" -row 6 -var "${a}"  -value "${a}"
+check-variable-row -file "TestFile.robot" -row 1 -var "@{list is now first}"  -value "[first item]"
+check-variable-row -file "TestFile.robot" -row 2 -var "${var}"  -value "1"
+check-variable-row -file "TestFile.robot" -row 3 -var "${var1}"  -value "text with space"
+check-variable-row -file "TestFile.robot" -row 4 -var "${path}"  -value "C:\\new\\file.txt"
+check-variable-row -file "TestFile.robot" -row 5 -var "${ref}"  -value "/ref/ref/file.jpg" -comment "#image"
+check-variable-row -file "TestFile.robot" -row 6 -var "${a}"  -value "${a}"
 
-check-variable-row-file "TestFile.robot" -row 7 -var "${B}"  -value ""
-check-variable-row-file "TestFile.robot" -row 8 -var "@{}"  -value "[]" -comment "#list"
-check-variable-row-file "TestFile.robot" -row 9 -var "@{list}"  -value "[a1, a2, a3, a4]"
-check-variable-row-file "TestFile.robot" -row 10 -var "&{after_list}"  -value "{planet = Earth}"
-check-variable-row-file "TestFile.robot" -row 11 -var "@{}"  -value "[]" -comment "#dict"
-check-variable-row-file "TestFile.robot" -row 12 -var "&{newDict}"  -value "{music = rock, tree = birch-tree, vege = tomato}" -comment "#some stupid dict"
+check-variable-row -file "TestFile.robot" -row 7 -var "${B}"  -value ""
+check-variable-row -file "TestFile.robot" -row 8 -var "@{}"  -value "[]" -comment "#list"
+check-variable-row -file "TestFile.robot" -row 9 -var "@{list}"  -value "[a1, a2, a3, a4]"
+check-variable-row -file "TestFile.robot" -row 10 -var "&{after_list}"  -value "{planet = Earth}"
+check-variable-row -file "TestFile.robot" -row 11 -var "@{}"  -value "[]" -comment "#dict"
+check-variable-row -file "TestFile.robot" -row 12 -var "&{newDict}"  -value "{music = rock, tree = birch-tree, vege = tomato}" -comment "#some stupid dict"
 
-check-variable-row-file "TestFile.robot" -row 13 -var "${plus_one}"  -value "${a+1}"
-check-variable-row-file "TestFile.robot" -row 14 -var "@{EMPTY LIST}"  -value "[${EMPTY}, ${SPACE}]"
-check-variable-row-file "TestFile.robot" -row 15 -var "${this is param}"  -value "8"
-check-variable-row-file "TestFile.robot" -row 16 -var "@{list with equals sign}"  -value "[item1, item2, ${b}]"
-check-variable-row-file "TestFile.robot" -row 17 -var "@{}"  -value "[]" -comment "#I forgot to add param name"
+check-variable-row -file "TestFile.robot" -row 13 -var "${plus_one}"  -value "${a+1}"
+check-variable-row -file "TestFile.robot" -row 14 -var "@{EMPTY LIST}"  -value "[${EMPTY}, ${SPACE}]"
+check-variable-row -file "TestFile.robot" -row 15 -var "${this is param}"  -value "8"
+check-variable-row -file "TestFile.robot" -row 16 -var "@{list with equals sign}"  -value "[item1, item2, ${b}]"
+check-variable-row -file "TestFile.robot" -row 17 -var "@{}"  -value "[]" -comment "#I forgot to add param name"
 
-check-variable-row-file "TestFile.robot" -row 18 -var "@{multiline}"  -value "[line1, line2, line3]" 
-check-variable-row-file "TestFile.robot" -row 19 -var "${very long param name with vary long value and commnet}"  -value "This is very long param value with very long param name. Some part of it should be visible" -comment  "# this is long comment too. But not some much because I am lazy"
+check-variable-row -file "TestFile.robot" -row 18 -var "@{multiline}"  -value "[line1, line2, line3]" 
+check-variable-row -file "TestFile.robot" -row 19 -var "${very long param name with vary long value and commnet}"  -value "This is very long param value with very long param name. Some part of it should be visible" -comment  "# this is long comment too. But not some much because I am lazy"
 
 //remove variables
 with [get-editor "TestFile.robot"] {
@@ -102,11 +102,11 @@ with [get-editor "TestFile.robot"] {
 }
 
 wait 3000
-check-variable-row-file "TestFile.robot" -row 1 -var "@{list is now first}"  -value "[first item]"
-check-variable-row-file "TestFile.robot" -row 2 -var "${var}"  -value "1"
-check-variable-row-file "TestFile.robot" -row 3 -var "${var1}"  -value "text with space"
-check-variable-row-file "TestFile.robot" -row 4 -var "${path}"  -value "C:\\new\\file.txt"
-check-variable-row-file "TestFile.robot" -row 5 -var "${ref}"  -value "/ref/ref/file.jpg" -comment "#image"
+check-variable-row -file "TestFile.robot" -row 1 -var "@{list is now first}"  -value "[first item]"
+check-variable-row -file "TestFile.robot" -row 2 -var "${var}"  -value "1"
+check-variable-row -file "TestFile.robot" -row 3 -var "${var1}"  -value "text with space"
+check-variable-row -file "TestFile.robot" -row 4 -var "${path}"  -value "C:\\new\\file.txt"
+check-variable-row -file "TestFile.robot" -row 5 -var "${ref}"  -value "/ref/ref/file.jpg" -comment "#image"
 
 
 //removed 3. item
@@ -121,10 +121,10 @@ with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Variables | click
 }
 wait 3000
-check-variable-row-file "TestFile.robot" -row 1 -var "@{list is now first}"  -value "[first item]"
-check-variable-row-file "TestFile.robot" -row 2 -var "${var}"  -value "1"
-check-variable-row-file "TestFile.robot" -row 3 -var "${var1}"  -value "text with space"
-check-variable-row-file "TestFile.robot" -row 4 -var "${ref}"  -value "/ref/ref/file.jpg" -comment "#image"
+check-variable-row -file "TestFile.robot" -row 1 -var "@{list is now first}"  -value "[first item]"
+check-variable-row -file "TestFile.robot" -row 2 -var "${var}"  -value "1"
+check-variable-row -file "TestFile.robot" -row 3 -var "${var1}"  -value "text with space"
+check-variable-row -file "TestFile.robot" -row 4 -var "${ref}"  -value "/ref/ref/file.jpg" -comment "#image"
 
 
 //==================================== pipes ==============================================================
@@ -133,9 +133,9 @@ check-variable-row-file "TestFile.robot" -row 4 -var "${ref}"  -value "/ref/ref/
 get-view "Project Explorer" | get-tree | select "RobotProject/pipes.robot" | double-click
 get-editor "pipes.robot" | get-tab-folder | get-tab-item Variables | click
 
-check-variable-row-file "pipes.robot" -row 1 -var "${var}"  -value "1"
-check-variable-row-file "pipes.robot" -row 2 -var "@{list}"  -value "[5, 6, \\, 8]"
-check-variable-row-file "pipes.robot" -row 3 -var "&{newDict}"  -value "{key = value}"
+check-variable-row -file "pipes.robot" -row 1 -var "${var}"  -value "1"
+check-variable-row -file "pipes.robot" -row 2 -var "@{list}"  -value "[5, 6, \\, 8]"
+check-variable-row -file "pipes.robot" -row 3 -var "&{newDict}"  -value "{key = value}"
 
 
 //========================================== tsv =========================================================
@@ -144,10 +144,10 @@ get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv" | do
 get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Variables | click
 
 
-check-variable-row-file "tsv_file.tsv" -row 1 -var "${tsv_arg1}"  -value "${new}" -comment "# | param with param"
-check-variable-row-file "tsv_file.tsv" -row 2 -var "${NEW}"  -value "78"
-check-variable-row-file "tsv_file.tsv" -row 3 -var "@{list from tsv}"  -value "[path1, path2, path3]"
-check-variable-row-file "tsv_file.tsv" -row 4 -var "${after keyword}"  -value "33-898" -comment "#CODE"
+check-variable-row -file "tsv_file.tsv" -row 1 -var "${tsv_arg1}"  -value "${new}" -comment "# | param with param"
+check-variable-row -file "tsv_file.tsv" -row 2 -var "${NEW}"  -value "78"
+check-variable-row -file "tsv_file.tsv" -row 3 -var "@{list from tsv}"  -value "[path1, path2, path3]"
+check-variable-row -file "tsv_file.tsv" -row 4 -var "${after keyword}"  -value "33-898" -comment "#CODE"
 
 //add item to list on second position
 get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Source | click
@@ -160,10 +160,10 @@ with [get-editor "tsv_file.tsv"] {
     get-tab-folder | get-tab-item Variables | click
 }
 wait 3000
-check-variable-row-file "tsv_file.tsv" -row 1 -var "${tsv_arg1}"  -value "${new}" -comment "# | param with param"
-check-variable-row-file "tsv_file.tsv" -row 2 -var "${NEW}"  -value "78"
-check-variable-row-file "tsv_file.tsv" -row 3 -var "@{list from tsv}"  -value "[path1, path_4, path2, path3]"
-check-variable-row-file "tsv_file.tsv" -row 4 -var "${after keyword}"  -value "33-898" -comment "#CODE"
+check-variable-row -file "tsv_file.tsv" -row 1 -var "${tsv_arg1}"  -value "${new}" -comment "# | param with param"
+check-variable-row -file "tsv_file.tsv" -row 2 -var "${NEW}"  -value "78"
+check-variable-row -file "tsv_file.tsv" -row 3 -var "@{list from tsv}"  -value "[path1, path_4, path2, path3]"
+check-variable-row -file "tsv_file.tsv" -row 4 -var "${after keyword}"  -value "33-898" -comment "#CODE"
 
 //remove variable with middle section
 get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Source | click
@@ -178,9 +178,9 @@ with [get-editor "tsv_file.tsv"] {
 }
 wait 3000
 
-check-variable-row-file "tsv_file.tsv" -row 1 -var "${tsv_arg1}"  -value "${new}" -comment "# | param with param"
-check-variable-row-file "tsv_file.tsv" -row 2 -var "@{list from tsv}"  -value "[path1, path_4, path2, path3]"
-check-variable-row-file "tsv_file.tsv" -row 3 -var "${after keyword}"  -value "33-898" -comment "#CODE"
+check-variable-row -file "tsv_file.tsv" -row 1 -var "${tsv_arg1}"  -value "${new}" -comment "# | param with param"
+check-variable-row -file "tsv_file.tsv" -row 2 -var "@{list from tsv}"  -value "[path1, path_4, path2, path3]"
+check-variable-row -file "tsv_file.tsv" -row 3 -var "${after keyword}"  -value "33-898" -comment "#CODE"
 
 
 
