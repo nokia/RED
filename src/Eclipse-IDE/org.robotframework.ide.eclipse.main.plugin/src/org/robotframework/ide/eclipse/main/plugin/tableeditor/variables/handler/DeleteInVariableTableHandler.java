@@ -19,7 +19,6 @@ import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CleanVariableValueCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -39,23 +38,19 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
     public static class E4DeleteInVariableTableHandler {
 
         @Execute
-        public Object delete(final RobotEditorCommandsStack commandsStack,
+        public void delete(final RobotEditorCommandsStack commandsStack,
                 @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
             final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
             final SelectionLayer selectionLayer = selectionLayerAccessor.getSelectionLayer();
 
             final RobotVariablesSection section = getSection(selection);
-            //final RemoveVariableCommand varsDeleteCommand = createVariablesRemovingCommand(section, selectionLayer);
             final Collection<EditorCommand> detailsDeletingCommands = createCommandsForDetailsRemoval(section,
                     selectionLayer);
 
             for (final EditorCommand command : detailsDeletingCommands) {
                 commandsStack.execute(command);
             }
-            //commandsStack.execute(varsDeleteCommand);
-
-            return null;
         }
 
         private RobotVariablesSection getSection(final IStructuredSelection selection) {
@@ -65,25 +60,22 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
         }
 
 
-        private RemoveVariableCommand createVariablesRemovingCommand(final RobotVariablesSection section,
-                final SelectionLayer selectionLayer) {
-
-            final List<RobotVariable> varsToRemove = new ArrayList<>();
-            final int[] fullySelectedRows = selectionLayer.getFullySelectedRowPositions();
-            for (final int row : fullySelectedRows) {
-                varsToRemove.add(section.getChildren().get(row));
-            }
-            return new RemoveVariableCommand(varsToRemove);
-        }
-
         private Collection<EditorCommand> createCommandsForDetailsRemoval(final RobotVariablesSection section,
                 final SelectionLayer selectionLayer) {
             final List<RobotVariable> variables = section.getChildren();
 
+            // TODO : decide on behavior of fully selected rows; uncomment if change is needed
+            // final List<RobotVariable> varsToRemove = new ArrayList<>();
             final List<EditorCommand> commands = new ArrayList<>();
             for (final PositionCoordinate cellPosition : selectionLayer.getSelectedCellPositions()) {
+
                 final RobotVariable variable = variables.get(cellPosition.rowPosition);
-                if (cellPosition.columnPosition == 0) {
+
+                /*
+                 * if (selectionLayer.isRowPositionFullySelected(cellPosition.rowPosition)) {
+                 * varsToRemove.add(variable);
+                 * } else
+                 */if (cellPosition.columnPosition == 0) {
                     commands.add(new SetVariableNameCommand(variable, ""));
                 } else if (cellPosition.columnPosition == 1) {
                     commands.add(new CleanVariableValueCommand(variable));
@@ -91,6 +83,9 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
                     commands.add(new SetVariableCommentCommand(variable, ""));
                 }
             }
+            // if (!varsToRemove.isEmpty()) {
+                // commands.add(new RemoveVariableCommand(varsToRemove));
+            // }
             return commands;
         }
     }
