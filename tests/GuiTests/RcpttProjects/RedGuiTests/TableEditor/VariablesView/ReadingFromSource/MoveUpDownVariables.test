@@ -1,0 +1,98 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9iuJED04EeaUDrMBSMf5Ag
+Element-Name: MoveUpDownVariables
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _nmsXcEHqEeaEVfxTnoQ14g
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 7/4/16 3:43 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variable ***\n"
+    + "${var}    0    #comment0\n"
+    + "${var1}    1    #comment1\n"
+    + "${var2}    2    #comment2\n"
+    + "${var3}    3    #comment3\n"
+    + "${var4}    4    #comment4\n"
+    + "${var5}    5    #comment5\n"
+    + "${var6}    6    #comment6\n"
+    + "${var7}    7    #comment7\n"
+    + "${var8}    8    #comment8\n"
+    + "${var9}    9    #comment9\n"
+    + "${var10}    10    #comment10\n\n\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7"
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s" 
+
+//move var3 4 times down
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 5 5
+        key-type F4
+        wait 3000
+    }
+    get-canvas -after [get-label Variables] -index 1 | key-type "M1+ARROW_DOWN" -times 4
+}
+
+is-row-fully-selected -row 7
+
+
+//move var3 2 times up
+with [get-editor "TestFile.robot"] {
+    get-canvas -after [get-label Variables] -index 1 | key-type "M1+ARROW_UP" -times 2
+}
+
+is-row-fully-selected -row 5
+
+//select  value "8" and move down
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right -times 1
+        key-type Down -times 3
+        key-type "M1+ARROW_DOWN" -times 2
+    }
+}
+is-row-fully-selected -row 10
+
+//move commnet2 4 times (more then max)
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right -times 2
+        key-type Up -times 8
+        key-type "M1+ARROW_UP" -times 4
+    }
+}
+
+is-row-fully-selected -row 0
+
+
+//check Source - last value should not be after 2 new lines - minor bug
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variable ***\n"
+    + "${var2}    2    #comment2\n"
+    + "${var}    0    #comment0\n"
+    + "${var1}    1    #comment1\n"
+    + "${var4}    4    #comment4\n"
+    + "${var5}    5    #comment5\n"
+    + "${var3}    3    #comment3\n"
+    + "${var6}    6    #comment6\n"
+    + "${var7}    7    #comment7\n"
+    + "${var9}    9    #comment9\n"
+    + "${var10}    10    #comment10\n\n\n\n"
+    + "${var8}    8    #comment8\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
