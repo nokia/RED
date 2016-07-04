@@ -148,7 +148,9 @@ public class RobotFormEditor extends FormEditor {
                 addEditorPart(new CasesEditorPart(), "Test Cases");
             }
             addEditorPart(new KeywordsEditorPart(), "Keywords");
-            //addEditorPart(new org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart(), "old Settings");
+            // addEditorPart(new
+            // org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart(),
+            // "old Settings");
             addEditorPart(new SettingsEditorPart(), "Settings");
             addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new SuiteSourceEditor(), "Source", ImagesManager.getImage(RedImages.getSourceImage()));
@@ -260,9 +262,10 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void waitForPendingEditorJobs() {
-        //jobs are sending model modification events, so it has to be done before dumping model to source
+        // jobs are sending model modification events, so it has to be done before dumping model to
+        // source
         for (final IEditorPart part : parts) {
-            if(part instanceof ISectionEditorPart) {
+            if (part instanceof ISectionEditorPart) {
                 ((ISectionEditorPart) part).waitForPendingJobs();
             }
         }
@@ -388,6 +391,7 @@ public class RobotFormEditor extends FormEditor {
 
             if (isDirty()) {
                 SwtThread.asyncExec(new Runnable() {
+
                     // there are some locking threads involved which results in blocking
                     // main thread for hundreds of milliseconds thus giving stops when switching
                     // from source part to some section editor part
@@ -421,7 +425,9 @@ public class RobotFormEditor extends FormEditor {
 
             final RobotFileDumper dumper = new RobotFileDumper();
             dumper.setContext(ctx);
-            document.set(dumper.dump(model.getParent()));
+            final String content = dumper.dump(model.getParent());
+            suiteModel.getProject().getRobotParser().reuseForChangedContent(model.getParent(), content);
+            document.set(content);
         }
     }
 
