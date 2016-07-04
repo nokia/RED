@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -156,6 +157,12 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             section.link(model.getVariableTable());
             sections.add(section);
         }
+        sections.sort(new Comparator<RobotSuiteFileSection>() {
+            @Override
+            public int compare(final RobotSuiteFileSection section1, final RobotSuiteFileSection section2) {
+                return Integer.compare(section1.getHeaderLine(), section2.getHeaderLine());
+            }
+        });
     }
 
     protected RobotFileOutput parseModel(final ParsingStrategy parsingStrategy) {
