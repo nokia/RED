@@ -413,8 +413,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel && dataProvider.getInput() == null) {
-            dataProvider.setInput(getSection());
-            table.refresh();
+            refreshTable();
             setDirty();
         }
     }
@@ -428,11 +427,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             if (activeCellEditor != null && !activeCellEditor.isClosed()) {
                 activeCellEditor.close();
             }
-
-            dataProvider.setInput(getSection());
+            refreshTable();
             selectionLayerAccessor.getSelectionLayer().clear();
-            table.refresh();
-
             setDirty();
         }
     }
@@ -450,6 +446,23 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     
     @Inject
     @Optional
+    private void whenSettingIsAdded(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_ADDED) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            sortModel.clear();
+        }
+        whenSettingIsAddedOrRemoved(section);
+    }
+
+    @Inject
+    @Optional
+    private void whenSettingIsRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_REMOVED) final RobotSuiteFileSection section) {
+        whenSettingIsAddedOrRemoved(section);
+    }
+
+    @Inject
+    @Optional
     private void whenSettingIsMoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
@@ -460,14 +473,10 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         selectionProvider.setSelection(oldSelection);
     }
 
-    @Inject
-    @Optional
-    private void whenSettingIsAddedOrRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
+    private void whenSettingIsAddedOrRemoved(final RobotSuiteFileSection section) {
+        if (section != null && section.getSuiteFile() == fileModel) {
             sortModel.clear();
-            dataProvider.setInput(getSection());
-            table.refresh();
+            refreshTable();
             setDirty();
         }
     }
@@ -480,7 +489,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             final RobotSuiteFile suite = change.getElement() instanceof RobotSuiteFile
                     ? (RobotSuiteFile) change.getElement() : null;
             if (suite == fileModel) {
-                refreshEverything();
+                refreshTable();
             }
         }
     }
@@ -490,7 +499,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private void whenReconcilationWasDone(
             @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
-            refreshEverything();
+            refreshTable();
         }
     }
 
@@ -507,7 +516,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         });
     }
 
-    private void refreshEverything() {
+    private void refreshTable() {
         dataProvider.setInput(getSection());
         table.refresh();
     }
