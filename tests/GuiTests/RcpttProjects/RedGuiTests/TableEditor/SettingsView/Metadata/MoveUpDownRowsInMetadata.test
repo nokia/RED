@@ -6,17 +6,39 @@ Element-Version: 3.0
 External-Reference: 
 Id: _MWfzsDiJEeas8aQC5hr2rw
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/22/16 5:54 PM
+Save-Time: 7/4/16 3:22 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+proc "check-if-one-line-is-selected"{
+	with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().hasRowSelection()" | equals true | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedRowCount()" | equals 1 | verify-true
+	}
+}	
+	
+
+//rows starts from 0
+proc "is-row-fully-selected" [val row]{
+	get-editor "TestFile.robot" | get-section Metadata | get-canvas| get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+		| invoke isRowPositionFullySelected $row | eq true | verify-true
+	check-if-one-line-is-selected	
+} 
+
+proc "check-values-in-row" [val row] [val metadata] [val val] [val comment]{
+	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $metadata |verify-true
+	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $val |verify-true
+	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $comment |verify-true
+
+}
+
 //open editor
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 
-//add Metada
+//add Metadata
 get-editor "TestFile.robot" | get-text-viewer | set-text "*** Settings ***\n"
     + "Metadata    a1    1    #comment1\n"
     + "Metadata    a2    2    #comment2\n"
@@ -40,19 +62,26 @@ with [get-editor "TestFile.robot"] {
 
 //move values
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
-	//move a8 down by menu
+	//move a8 down by menu (8th row)
     mouse-press 76 192 button1
     mouse-release 76 192 button1 524288
     mouse-press 76 192 button3
     mouse-release 76 192 button3 2097152
     get-menu "Row/Move up" | click
-    
+}
+
+is-row-fully-selected -row 6
+
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     //move value 5 by arrows
     mouse-move 323 117
     mouse-press 323 117 button1
     mouse-release 323 117 button1 524288
     key-type "M1+ARROW_UP"
-    
+}
+
+is-row-fully-selected -row 3
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
     //move value a3 up by menu
     mouse-move 606 78
     mouse-press 606 78 button1
@@ -60,7 +89,11 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     mouse-press 606 78 button3
     mouse-release 606 78 button3 2097152
     get-menu "Row/Move up" | click
-    
+}
+
+is-row-fully-selected -row 1
+
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
     //move comment4 down by menu
     mouse-move 632 124
     mouse-press 632 124 button1
@@ -68,13 +101,19 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     mouse-press 632 124 button3
     mouse-release 632 124 button3 2097152
     get-menu "Row/Move down" | click
-    
+}
+is-row-fully-selected -row 5
+
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
     //move a7 down by arrow
     mouse-move 138 178
     mouse-press 138 178 button1
     mouse-release 138 178 button1 524288
     key-type "M1+ARROW_DOWN"
-    
+}
+is-row-fully-selected -row 8
+
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
     //move first value up (nothing should happen)
     mouse-move 88 32
     mouse-press 88 32 button1
@@ -82,7 +121,20 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     mouse-press 88 32 button3
     mouse-release 88 32 button3 2097152
     get-menu "Row/Move up" | click
-    
+}
+
+//check that row was not moved and row is not fully selected
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedColumnPositions().length" | equals 1 
+        | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedColumnPositions().int[0]" | equals 0 
+        | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCells().size()" | equals 1 | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedRowCount()" | equals 1 | verify-true
+}
+
+
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {    
     //move last value down (nothong should happen)
     mouse-move 332 208
     mouse-press 332 208 button1
@@ -93,12 +145,18 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     mouse-move 924 328
 }
 
-proc "check-values-in-row" [val row] [val metadata] [val val] [val comment]{
-	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $metadata |verify-true
-	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $val |verify-true
-	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $comment |verify-true
-
+//check that row was not moved and row is not fully selected
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedColumnPositions().length" | equals 1 
+        | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedColumnPositions().int[0]" | equals 1
+        | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCells().size()" | equals 1 | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedRowCount()" | equals 1 | verify-true
 }
+
+
+
 
 check-values-in-row -row 1 -metadata "a1" -val "1" -comment "#comment1"
 check-values-in-row -row 2 -metadata "a3" -val "3" -comment "#comment3"
@@ -111,7 +169,41 @@ check-values-in-row -row 7 -metadata "a8" -val "8" -comment "#comment8"
 check-values-in-row -row 8 -metadata "a9" -val "9" -comment "#comment9"
 check-values-in-row -row 9 -metadata "a7" -val "7" -comment "#comment7"
 
+//go to Source and check text
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Metadata    a1    1    #comment1\n"
+    + "Metadata    a3    3    #comment3\n"
+    + "Metadata    a2    2    #comment2\n"
+    + "Metadata    a5    5    #comment5\n"
+    + "Metadata    a6    6    #comment6\n"
+    + "Metadata    a4    4    #comment4\n"
+    + "Metadata    a8    8    #comment8\n"
+    + "Metadata    a9    9    #comment9\n\n"
+    + "Metadata    a7    7    #comment7\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+with [get-editor "TestFile.robot"] {
+    with [get-tab-folder] {
+        get-tab-item Settings | click
+    }
+}
 
-//test dla przesuwania z focem:
+//move "4" times up
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
+    mouse-press 340 150 button1
+    mouse-release 340 150 button1 524288
+    key-type "M1+ARROW_UP" -times 3
+}
+
+is-row-fully-selected -row 2
+
+//move "4" 4 times down
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
+    key-type "M1+ARROW_DOWN" -times 4
+}
+
+is-row-fully-selected -row 6
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
