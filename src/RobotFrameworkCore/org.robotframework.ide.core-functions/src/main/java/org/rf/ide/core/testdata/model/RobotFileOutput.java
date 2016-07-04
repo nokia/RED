@@ -46,6 +46,10 @@ public class RobotFileOutput {
         this.fileModel = new RobotFile(this);
     }
 
+    public void update(final RobotFileOutput newView) {
+
+    }
+
     public String getFileLineSeparator() {
         String result = "";
 
