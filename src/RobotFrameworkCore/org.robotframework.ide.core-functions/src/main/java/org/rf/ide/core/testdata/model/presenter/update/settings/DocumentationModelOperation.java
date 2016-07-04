@@ -16,6 +16,8 @@ import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
+import com.google.common.base.Joiner;
+
 public class DocumentationModelOperation implements ISettingTableElementOperation {
 
     @Override
@@ -29,11 +31,11 @@ public class DocumentationModelOperation implements ISettingTableElementOperatio
     }
 
     @Override
-    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment) {
+    public AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args,
+            final String comment) {
         final SuiteDocumentation newSuiteDocumentation = settingsTable.newSuiteDocumentation();
-        for (int i = 0; i < args.size(); i++) {
-            newSuiteDocumentation.addDocumentationText(args.get(i));
-        }
+        DocumentationServiceHandler.update(newSuiteDocumentation, Joiner.on(' ').join(args));
+
         if (comment != null && !comment.isEmpty()) {
             newSuiteDocumentation.setComment(comment);
         }
