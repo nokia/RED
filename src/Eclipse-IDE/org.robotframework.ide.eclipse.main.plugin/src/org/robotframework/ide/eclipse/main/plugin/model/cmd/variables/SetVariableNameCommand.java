@@ -35,7 +35,7 @@ public class SetVariableNameCommand extends EditorCommand {
 
     public SetVariableNameCommand(final RobotVariable variable, final String newName) {
         this.variable = variable;
-        this.newName = newName == null ? "" : newName;
+        this.newName = newName == null || newName.isEmpty() ? "${}" : newName;
     }
 
     @Override
