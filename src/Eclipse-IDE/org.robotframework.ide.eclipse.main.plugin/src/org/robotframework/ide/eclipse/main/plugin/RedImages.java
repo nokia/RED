@@ -322,6 +322,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/generic_element.png");
     }
 
+    public static ImageDescriptor getSortImage() {
+        return RedPlugin.getImageDescriptor("resources/sort_alphabetically.png");
+    }
+
     public static ImageDescriptor getSortUpImage() {
         return RedPlugin.getImageDescriptor("resources/sort_up.png");
     }
