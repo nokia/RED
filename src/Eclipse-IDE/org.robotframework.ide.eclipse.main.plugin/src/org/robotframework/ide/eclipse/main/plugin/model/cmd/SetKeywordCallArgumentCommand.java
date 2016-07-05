@@ -7,7 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -30,7 +33,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         boolean changed = false;
 
         for (int i = arguments.size(); i <= index; i++) {
-            arguments.add("");
+            arguments.add("\\");
             changed = true;
         }
         if (!arguments.get(index).equals(value)) {
@@ -43,12 +46,21 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             changed = true;
         }
         if (changed) {
-            new SettingTableModelUpdater().update(keywordCall.getLinkedElement(), index, value);
+            updateModelElement();
             // it has to be send, not posted
             // otherwise it is not possible to traverse between cells, because the cell
             // is traversed and then main thread has to handle incoming posted event which
             // closes currently active cell editor
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
+        }
+    }
+
+    private void updateModelElement() {
+        final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
+        if(linkedElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+            ((RobotExecutableRow<?>) linkedElement).setArgument(index, value);
+        } else {
+            new SettingTableModelUpdater().update(linkedElement, index, value);
         }
     }
 
