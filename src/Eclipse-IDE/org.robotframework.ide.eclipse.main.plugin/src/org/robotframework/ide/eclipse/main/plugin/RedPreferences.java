@@ -26,6 +26,7 @@ public class RedPreferences {
     public static final String SEPARATOR_MODE = "separatorMode";
     public static final String SEPARATOR_TO_USE = "separatorToUse";
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
+    public static final String BEHAVIOR_ON_CELL_COMMIT = "cellCommitBehavior";
 
     public static final String ASSISTANT_COMPLETION_MODE = "assistantCompletionMode";
     public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "assistantAutoActivationEnabled";
@@ -67,6 +68,10 @@ public class RedPreferences {
 
     public int getMimalNumberOfArgumentColumns() {
         return store.getInt(MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS);
+    }
+
+    public CellCommitBehavior getCellCommitBehavior() {
+        return CellCommitBehavior.valueOf(store.getString(BEHAVIOR_ON_CELL_COMMIT));
     }
 
     public AcceptanceMode getAssistantAcceptanceMode() {
@@ -125,5 +130,10 @@ public class RedPreferences {
         ALWAYS_TABS,
         ALWAYS_USER_DEFINED_SEPARATOR,
         FILETYPE_DEPENDENT
+    }
+
+    public enum CellCommitBehavior {
+        STAY_IN_SAME_CELL,
+        MOVE_TO_ADJACENT_CELL
     }
 }
