@@ -25,6 +25,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.assist.VariablesContentProposingSupport;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
@@ -178,6 +180,12 @@ public class RedTextCellEditor extends TextCellEditor {
         }
 
         private MoveDirectionEnum getMoveDirection(final KeyEvent event) {
+            if (RedPlugin.getDefault()
+                    .getPreferences()
+                    .getCellCommitBehavior() == CellCommitBehavior.STAY_IN_SAME_CELL) {
+                return MoveDirectionEnum.NONE;
+            }
+
             if (RedTextCellEditor.this.editMode == EditModeEnum.INLINE) {
                 if (event.stateMask == 0) {
                     return MoveDirectionEnum.RIGHT;
