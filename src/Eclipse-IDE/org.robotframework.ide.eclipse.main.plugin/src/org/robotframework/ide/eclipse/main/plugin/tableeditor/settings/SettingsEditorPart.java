@@ -9,6 +9,9 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.Persist;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -45,6 +48,8 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         private ImportSettingsFormFragment importFragment;
 
+        private SettingsEditorPageSelectionProvider settingsEditorPageSelectionProvider;
+
         @Override
         protected String getContextId() {
             return CONTEXT_ID;
@@ -72,25 +77,27 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         public void revealElement(final RobotElement robotElement) {
-            final RobotSetting setting = (RobotSetting) robotElement;
-            if (setting.getGroup() == SettingsGroup.NO_GROUP) {
-                generalFragment.revealSetting(setting);
-                if (metadataFragment.isPresent()) {
-                    metadataFragment.get().clearSettingsSelection();
+            if (robotElement instanceof RobotSetting) {
+                final RobotSetting setting = (RobotSetting) robotElement;
+                if (setting.getGroup() == SettingsGroup.NO_GROUP) {
+                    generalFragment.revealSetting(setting);
+                    if (metadataFragment.isPresent()) {
+                        metadataFragment.get().clearSettingsSelection();
+                    }
+                    importFragment.clearSettingsSelection();
+                } else if (setting.getGroup() == SettingsGroup.METADATA) {
+                    generalFragment.clearSettingsSelection();
+                    if (metadataFragment.isPresent()) {
+                        metadataFragment.get().revealSetting(setting);
+                    }
+                    importFragment.clearSettingsSelection();
+                } else if (SettingsGroup.getImportsGroupsSet().contains(setting.getGroup())) {
+                    generalFragment.clearSettingsSelection();
+                    if (metadataFragment.isPresent()) {
+                        metadataFragment.get().clearSettingsSelection();
+                    }
+                    importFragment.revealSetting(setting);
                 }
-                importFragment.clearSettingsSelection();
-            } else if (setting.getGroup() == SettingsGroup.METADATA) {
-                generalFragment.clearSettingsSelection();
-                if (metadataFragment.isPresent()) {
-                    metadataFragment.get().revealSetting(setting);
-                }
-                importFragment.clearSettingsSelection();
-            } else if (SettingsGroup.getImportsGroupsSet().contains(setting.getGroup())) {
-                generalFragment.clearSettingsSelection();
-                if (metadataFragment.isPresent()) {
-                    metadataFragment.get().clearSettingsSelection();
-                }
-                importFragment.revealSetting(setting);
             }
         }
 
@@ -112,6 +119,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             } else {
                 return newArrayList(generalFragment, importFragment);
             }
+
         }
 
         private boolean shouldShowMetadata() {
@@ -124,32 +132,53 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            if (metadataFragment.isPresent()) {
-                return new SettingsEditorPageSelectionProvider(generalFragment.getViewer(),
-                        metadataFragment.get().getViewer(), importFragment.getViewer());
-            } else {
-                return new SettingsEditorPageSelectionProvider(generalFragment.getViewer(), importFragment.getViewer());
+            if (settingsEditorPageSelectionProvider == null) {
+                settingsEditorPageSelectionProvider = createSettingsEditorPageSelectionProvider();
             }
+            return settingsEditorPageSelectionProvider;
         }
 
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
-            if (metadataFragment.isPresent() && metadataFragment.get().getViewer().getTable().isFocusControl()) {
-                return metadataFragment.get().getFocusedViewerAccessor();
-            } else if (importFragment.getViewer().getTable().isFocusControl()) {
-                return importFragment.getFocusedViewerAccessor();
-            }
-            return generalFragment.getFocusedViewerAccessor();
+            return null;
         }
 
         @Override
         public SelectionLayerAccessor getSelectionLayerAccessor() {
-            return null;
+            if (settingsEditorPageSelectionProvider == null) {
+                settingsEditorPageSelectionProvider = createSettingsEditorPageSelectionProvider();
+            }
+            return settingsEditorPageSelectionProvider.getSelectionLayerAccessor();
         }
-        
+
         @Override
         public void waitForPendingJobs() {
-            return;
+            if (generalFragment != null) {
+                generalFragment.waitForDocumentationChangeJob();
+            }
+        }
+
+        private SettingsEditorPageSelectionProvider createSettingsEditorPageSelectionProvider() {
+            if (metadataFragment.isPresent()) {
+                return new SettingsEditorPageSelectionProvider(generalFragment, metadataFragment.get(), importFragment);
+            } else {
+                return new SettingsEditorPageSelectionProvider(generalFragment, importFragment);
+            }
+        }
+
+        @Override
+        @Persist
+        public void onSave() {
+            final ISelection selection = settingsEditorPageSelectionProvider.getSelection();
+
+            // when documentation is not selected, invoke save action on table
+            if (selection != null && !selection.isEmpty()) {
+                final ISettingsFormFragment activeFormFragment = settingsEditorPageSelectionProvider.getActiveFormFragment();
+                activeFormFragment.invokeSaveAction();
+            }
+
+            final IDirtyProviderService dirtyProviderService = getContext().getActive(IDirtyProviderService.class);
+            dirtyProviderService.setDirtyState(false);
         }
     }
 }

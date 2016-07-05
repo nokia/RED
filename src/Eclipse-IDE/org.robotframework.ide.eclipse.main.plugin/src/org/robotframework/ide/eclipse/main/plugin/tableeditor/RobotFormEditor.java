@@ -66,7 +66,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescr
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable.SettingsEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesEditorPart;
 import org.robotframework.red.graphics.ImagesManager;
@@ -148,9 +148,6 @@ public class RobotFormEditor extends FormEditor {
                 addEditorPart(new CasesEditorPart(), "Test Cases");
             }
             addEditorPart(new KeywordsEditorPart(), "Keywords");
-            // addEditorPart(new
-            // org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart(),
-            // "old Settings");
             addEditorPart(new SettingsEditorPart(), "Settings");
             addEditorPart(new VariablesEditorPart(), "Variables");
             addEditorPart(new SuiteSourceEditor(), "Source", ImagesManager.getImage(RedImages.getSourceImage()));
