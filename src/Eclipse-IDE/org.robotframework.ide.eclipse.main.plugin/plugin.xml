@@ -677,6 +677,64 @@
                    checkEnabled="true">
              </visibleWhen>
           </command>
+          <command
+                commandId="org.robotframework.red.configureRobotNature"
+                label="Configure as Robot project"
+                style="push">
+             <parameter
+                   name="org.robotframework.red.configureRobotNature.enablement"
+                   value="enable">
+             </parameter>
+             <visibleWhen
+                   checkEnabled="false">
+                <with
+                      variable="selection">
+                   <iterate
+                         ifEmpty="false"
+                         operator="and">
+                      <and>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                         <not>
+                         	<test
+                            	property="org.eclipse.core.resources.projectNature"
+                               	value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                         	</test>
+                         </not>
+                      </and>
+                   </iterate>
+                </with>
+             </visibleWhen>
+          </command>
+          <command
+                commandId="org.robotframework.red.configureRobotNature"
+                label="Deconfigure as Robot project"
+                style="push">
+             <parameter
+                   name="org.robotframework.red.configureRobotNature.enablement"
+                   value="disable">
+             </parameter>
+             <visibleWhen
+                   checkEnabled="false">
+                <with
+                      variable="selection">
+                   <iterate
+                         ifEmpty="false"
+                         operator="and">
+                      <and>
+                         <instanceof
+                               value="org.eclipse.core.resources.IProject">
+                         </instanceof>
+                        <test
+                              property="org.eclipse.core.resources.projectNature"
+                              value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                        </test>
+                      </and>
+                   </iterate>
+                </with>
+             </visibleWhen>
+          </command>
           <separator
                 name="validation"
                 visible="true">
@@ -710,6 +768,22 @@
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ConfigureRobotNatureHandler"
+          commandId="org.robotframework.red.configureRobotNature">
+       <activeWhen>
+          <with
+                variable="selection">
+             <iterate
+                   ifEmpty="false"
+                   operator="and">
+               <instanceof
+                     value="org.eclipse.core.resources.IProject">
+               </instanceof>
+             </iterate>
+          </with>
+       </activeWhen>
+    </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ReloadPythonModulesHandler"
           commandId="org.robotframework.red.reloadProjectRuntimeEnvironment">
@@ -1066,6 +1140,16 @@
           id="org.robotframework.ide.eclipse.robotCommands"
           name="Robot">
     </category>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.configureRobotNature"
+          name="Configure Robot nature">
+       <commandParameter
+             id="org.robotframework.red.configureRobotNature.enablement"
+             name="Enable/Disable Robot nature"
+             optional="false">
+       </commandParameter>
+    </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.red.reloadProjectRuntimeEnvironment"
