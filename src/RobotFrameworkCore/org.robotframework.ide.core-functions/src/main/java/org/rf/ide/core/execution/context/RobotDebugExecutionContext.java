@@ -27,6 +27,8 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 public class RobotDebugExecutionContext {
 
     public static final String MAIN_KEYWORD_TYPE = "Keyword";
+    
+    public static final String FOR_LOOP_ITEM_KEYWORD_TYPE = "For Item";
 
     private RobotFile currentModel;
 
@@ -195,17 +197,25 @@ public class RobotDebugExecutionContext {
                 executableRowFindersManager.clearForLoopState();
             }
         }
-        if (!keywordType.equalsIgnoreCase(MAIN_KEYWORD_TYPE)) {
+        if (!isMainKeyword(keywordType) && !isForLoopItemKeyword(keywordType)) {
             isSetupTeardownKeywordStarted = false;
         }
+    }
+    
+    private boolean isMainKeyword(final String keywordType) {
+        return keywordType.equalsIgnoreCase(MAIN_KEYWORD_TYPE);
     }
 
     private boolean isForLoopKeyword(final String keywordType) {
         return ForLoopKeywordTypes.isForLoopKeywordType(keywordType);
     }
+    
+    private boolean isForLoopItemKeyword(final String keywordType) {
+        return keywordType.equalsIgnoreCase(FOR_LOOP_ITEM_KEYWORD_TYPE);
+    }
 
     private boolean isSetupTeardownStartKeyword(final String keywordType) {
-        return !keywordType.equalsIgnoreCase(MAIN_KEYWORD_TYPE) && !isForLoopKeyword(keywordType);
+        return !isMainKeyword(keywordType) && !isForLoopKeyword(keywordType);
     }
 
     private boolean isKeywordDirectlyFromTestCase() {
@@ -217,7 +227,8 @@ public class RobotDebugExecutionContext {
                 || (!executableRowFindersManager.hasCurrentTestCase()
                         && SetupTeardownExecutableRowFinder.SetupTeardownKeywordTypes
                                 .isNewSetupTeardownType(keywordType))
-                || (isSetupTeardownKeywordStarted && keywordType.equalsIgnoreCase(MAIN_KEYWORD_TYPE));
+                || (isSetupTeardownKeywordStarted && (isMainKeyword(keywordType)
+                        || ForLoopKeywordTypes.isForLoopKeywordType(keywordType) || isForLoopItemKeyword(keywordType)));
     }
 
     public boolean isTestCaseTeardownKeyword(final String keywordType) {
