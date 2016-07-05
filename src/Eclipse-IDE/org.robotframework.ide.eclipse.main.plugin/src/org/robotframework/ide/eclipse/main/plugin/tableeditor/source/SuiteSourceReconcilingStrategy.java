@@ -84,7 +84,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     private void reparseModel() {
         final RobotSuiteFile suiteModel = getSuiteModel();
         suiteModel.reparseEverything(document.get());
-        final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         eventBroker.post(RobotModelEvents.REPARSING_DONE, suiteModel);
     }
 
@@ -151,7 +151,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
             public Position apply(final Position position) {
                 final int length = position.getLength() + additionalLength;
                 if (position.getOffset() + length > documentLength) {
-                    return new Position(position.getOffset(), documentLength - position.getOffset());
+                    return new Position(position.getOffset(), Math.max(0, documentLength - position.getOffset()));
                 } else {
                     return new Position(position.getOffset(), length);
                 }
