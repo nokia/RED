@@ -5,66 +5,97 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.RowExposingTableViewer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerEditor;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
-import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.viewers.ViewersConfigurator;
-import org.eclipse.jface.window.ToolTip;
+import org.eclipse.jface.viewers.Stylers;
+import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.hover.HoverLayer;
+import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
+import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.painter.layer.NatGridLayerPainter;
+import org.eclipse.nebula.widgets.nattable.selection.EditTraversalStrategy;
+import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
+import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
+import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
+import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
+import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
+import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor.ViewerColumnsManagingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportSettingsPopup;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
-import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
-import org.robotframework.red.viewers.Viewers;
+import org.robotframework.red.nattable.NewElementsCreator;
+import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
+import org.robotframework.red.nattable.RedNattableLayersFactory;
+import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
+import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
+import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
+import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
+import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
+import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
+import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
+import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
+import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.red.swt.SwtThread;
 
-import com.google.common.base.Function;
 import com.google.common.base.Supplier;
-import com.google.common.collect.Lists;
 
-public class ImportSettingsFormFragment implements ISectionFormFragment {
+public class ImportSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private IEditorSite site;
@@ -82,120 +113,184 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     @Inject
     private RedFormToolkit toolkit;
 
-    private RowExposingTableViewer viewer;
-
-    private Section section;
-
     private HeaderFilterMatchesCollection matches;
 
-    TableViewer getViewer() {
-        return viewer;
+    private Section importSettingsSection;
+
+    private NatTable table;
+
+    private ImportSettingsDataProvider dataProvider;
+
+    private ISortModel sortModel;
+
+    private RowSelectionProvider<Object> selectionProvider;
+
+    private SelectionLayerAccessor selectionLayerAccessor;
+
+    @Override
+    public ISelectionProvider getSelectionProvider() {
+        return selectionProvider;
+    }
+
+    @Override
+    public SelectionLayerAccessor getSelectionLayerAccessor() {
+        return selectionLayerAccessor;
+    }
+
+    @Override
+    public NatTable getTable() {
+        return table;
     }
 
     @Override
     public void initialize(final Composite parent) {
-        section = toolkit.createSection(parent, ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
-        section.setText("Imports");
-        section.setExpanded(false);
-        GridDataFactory.fillDefaults().grab(true, false).minSize(1, 22).applyTo(section);
-        Sections.switchGridCellGrabbingOnExpansion(section);
-        Sections.installMaximazingPossibility(section);
+        importSettingsSection = toolkit.createSection(parent,
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+        importSettingsSection.setText("Imports");
+        final boolean isResourceFile = fileModel.isResourceFile();
+        importSettingsSection.setExpanded(isResourceFile);
+        GridDataFactory.fillDefaults().grab(true, isResourceFile).minSize(1, 22).applyTo(importSettingsSection);
+        Sections.switchGridCellGrabbingOnExpansion(importSettingsSection);
+        Sections.installMaximazingPossibility(importSettingsSection);
 
-        createViewer();
-        createColumns();
+        setupNatTable(importSettingsSection);
 
-        createContextMenu();
-        viewer.setInput(getSection());
     }
 
-    private void createViewer() {
-        viewer = new RowExposingTableViewer(section, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.getTable());
-        section.setClient(viewer.getTable());
-        viewer.getTable().setLinesVisible(true);
-        viewer.getTable().setHeaderVisible(true);
-        ViewersConfigurator.configureRowsHeight(viewer, 1.5);
-        ViewersConfigurator.disableContextMenuOnHeader(viewer);
+    private void setupNatTable(final Composite parent) {
 
-        viewer.setContentProvider(new ImportSettingsContentProvider(fileModel.isEditable()));
-        viewer.setComparer(new SettingElementsComparer());
-        Viewers.boundViewerWithContext(viewer, site,
-                "org.robotframework.ide.eclipse.tableeditor.settings.import.context");
-        CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
-        ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
+        final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
+
+        final ConfigRegistry configRegistry = new ConfigRegistry();
+
+        final RedNattableDataProvidersFactory dataProvidersFactory = new RedNattableDataProvidersFactory();
+        final RedNattableLayersFactory factory = new RedNattableLayersFactory();
+
+        // data providers
+        dataProvider = new ImportSettingsDataProvider(commandsStack, getSection());
+        final IDataProvider columnHeaderDataProvider = new ImportSettingsColumnHeaderDataProvider();
+        final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
+
+        // body layers
+        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 120, 150);
+        final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
+                .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
+        final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
+        final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
+        final ViewportLayer bodyViewportLayer = factory.createViewportLayer(bodySelectionLayer);
+
+        // column header layers
+        final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider,
+                new SettingsDynamicTableColumnHeaderLabelAcumulator(dataProvider));
+        final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
+                bodySelectionLayer, bodyViewportLayer);
+        final SortHeaderLayer<RobotKeywordCall> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
+                columnHeaderDataLayer, columnHeaderLayer, dataProvider.getPropertyAccessor(), configRegistry,
+                dataProvider.getSortedList());
+
+        // row header layers
+        final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
+                rowHeaderDataProvider);
+
+        // corner layer
+        final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
+                rowHeaderDataProvider, rowHeaderLayer);
+
+        // combined grid layer
+        final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
+                cornerLayer);
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer),
+                SettingsTableEditableRule.createEditableRule(fileModel)));
+
+        table = createTable(parent, theme, gridLayer, configRegistry);
+
+        bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
+                new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
+                new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
+
+        sortModel = columnHeaderSortingLayer.getSortModel();
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
+
+        // tooltips support
+        new NatTableContentTooltip(table);
+
+        importSettingsSection.setClient(table);
+
     }
 
-    private void createColumns() {
-        final NewElementsCreator<RobotElement> creator = newElementsCreator();
-        final Supplier<HeaderFilterMatchesCollection> matchesProvider = getMatchesProvider();
-        ViewerColumnsFactory.newColumn("Import").withWidth(140)
-            .labelsProvidedBy(new KeywordCallNameLabelProvider(matchesProvider))
-            .editingSupportedBy(new ImportSettingsEditingSupport(viewer, commandsStack, creator))
-            .editingEnabledOnlyWhen(fileModel.isEditable())
-            .createFor(viewer);
+    private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
+            final ConfigRegistry configRegistry) {
+        final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
+        final NatTable table = new NatTable(parent, style, gridLayer, false);
+        table.setConfigRegistry(configRegistry);
+        table.setLayerPainter(
+                new NatGridLayerPainter(table, theme.getGridBorderColor(), RedNattableLayersFactory.ROW_HEIGHT));
+        table.setBackground(theme.getBodyBackgroundOddRowBackground());
+        table.setForeground(parent.getForeground());
 
-        for (int i = 0; i < calcualateLongestArgumentsLength(); i++) {
-            final String name = i == 0 ? "Name / Path" : "";
-            createArgumentColumn(name, i, matchesProvider, creator);
+        addCustomStyling(table, theme);
+
+        // sorting
+        table.addConfiguration(new HeaderSortConfiguration());
+        table.addConfiguration(new SettingsDynamicTableSortingConfiguration());
+
+        // popup menus
+        table.addConfiguration(new ImportSettingsTableMenuConfiguration(site, table, selectionProvider));
+
+        table.configure();
+
+        table.addFocusListener(new SettingsTableFocusListener(
+                "org.robotframework.ide.eclipse.tableeditor.settings.import.context", site));
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+        return table;
+    }
+
+    private void addCustomStyling(final NatTable table, final TableTheme theme) {
+        final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
+                new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
+
+                    @Override
+                    public HeaderFilterMatchesCollection get() {
+                        return matches;
+                    }
+                }, Stylers.Common.MATCH_STYLER));
+
+        table.addConfiguration(tableStyle);
+        table.addConfiguration(new HoveredCellStyleConfiguration(theme));
+        table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
+        table.addConfiguration(new RowHeaderStyleConfiguration(theme));
+        table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
+        table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
+        table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
+    }
+
+    @Override
+    public void setFocus() {
+        table.setFocus();
+    }
+
+    @Override
+    public void invokeSaveAction() {
+        onSave();
+    }
+
+    @Persist
+    public void onSave() {
+        final ICellEditor cellEditor = table.getActiveCellEditor();
+        if (cellEditor != null && !cellEditor.isClosed()) {
+            final boolean commited = cellEditor.commit(MoveDirectionEnum.NONE);
+            if (!commited) {
+                cellEditor.close();
+            }
         }
-        ViewerColumnsFactory.newColumn("Comment").withWidth(200)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(50)
-            .labelsProvidedBy(new SettingsCommentsLabelProvider(matchesProvider))
-            .editingSupportedBy(new SettingsCommentsEditingSupport(viewer, commandsStack, creator))
-            .editingEnabledOnlyWhen(fileModel.isEditable())
-            .createFor(viewer);
-    }
+        SwtThread.asyncExec(new Runnable() {
 
-    private Supplier<HeaderFilterMatchesCollection> getMatchesProvider() {
-        return new Supplier<HeaderFilterMatchesCollection>() {
             @Override
-            public HeaderFilterMatchesCollection get() {
-                return matches;
+            public void run() {
+                setFocus();
             }
-        };
-    }
-
-    private NewElementsCreator<RobotElement> newElementsCreator() {
-        return new NewElementsCreator<RobotElement>() {
-            @Override
-            public RobotElement createNew() {
-                new ImportSettingsPopup(viewer.getControl().getShell(), commandsStack, fileModel, null).open();
-                return null;
-            }
-        };
-    }
-
-    private int calcualateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
-        final List<?> elements = (List<?>) viewer.getInput();
-        if (elements != null) {
-            for (final Object element : elements) {
-                final RobotSetting setting = (RobotSetting) element;
-                if (setting != null) {
-                    max = Math.max(max, setting.getArguments().size());
-                }
-            }
-        }
-        return max;
-    }
-
-    private void createArgumentColumn(final String name, final int index,
-            final Supplier<HeaderFilterMatchesCollection> matchesProvider,
-            final NewElementsCreator<RobotElement> creator) {
-        ViewerColumnsFactory.newColumn(name).withWidth(120)
-                .labelsProvidedBy(new SettingsArgsLabelProvider(matchesProvider, index))
-                .editingSupportedBy(new SettingsArgsEditingSupport(viewer, index, commandsStack, creator))
-                .editingEnabledOnlyWhen(fileModel.isEditable()).createFor(viewer);
-    }
-
-    private void createContextMenu() {
-        final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu";
-
-        final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
-        final Table control = viewer.getTable();
-        final Menu menu = manager.createContextMenu(control);
-        control.setMenu(menu);
-        site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
+        });
     }
 
     private void setDirty() {
@@ -206,62 +301,100 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
         return fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
-    @Override
-    public void setFocus() {
-        viewer.getTable().setFocus();
-    }
-
     public void revealSetting(final RobotSetting setting) {
-        Sections.maximizeChosenSectionAndMinimalizeOthers(section);
-        viewer.setSelection(new StructuredSelection(setting));
+        Sections.maximizeChosenSectionAndMinimalizeOthers(importSettingsSection);
+        if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(setting)) {
+            final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+                    + RobotSettingsSection.SECTION_NAME;
+            eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
+        }
+        selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
         setFocus();
     }
 
     public void clearSettingsSelection() {
-        viewer.setSelection(StructuredSelection.EMPTY);
+        selectionProvider.setSelection(StructuredSelection.EMPTY);
     }
 
-    public FocusedViewerAccessor getFocusedViewerAccessor() {
-        final ViewerColumnsManagingStrategy columnsManagingStrategy = new ViewerColumnsManagingStrategy() {
-            @Override
-            public void addColumn(final ColumnViewer viewer) {
-                final RowExposingTableViewer tableViewer = (RowExposingTableViewer) viewer;
-                final int index = tableViewer.getTable().getColumnCount() - 2;
-
-                final String name = index == 0 ? "Name / Path" : "";
-                createArgumentColumn(name, index, getMatchesProvider(), newElementsCreator());
-                tableViewer.moveLastColumnTo(index + 1);
-                tableViewer.reflowColumnsWidth();
-            }
+    private NewElementsCreator<RobotElement> newElementsCreator(final SelectionLayer selectionLayer) {
+        return new NewElementsCreator<RobotElement>() {
 
             @Override
-            public void removeColumn(final ColumnViewer viewer) {
-                final RowExposingTableViewer tableViewer = (RowExposingTableViewer) viewer;
+            public RobotElement createNew() {
+                dataProvider.setMatches(null);
+                SwtThread.asyncExec(new Runnable() {
 
-                final int columnCount = tableViewer.getTable().getColumnCount();
-                if (columnCount <= 2) {
-                    return;
-                }
-                // always remove last columns which displays arguments
-                final int position = columnCount - 2;
-                final int orderIndexBeforeRemoving = tableViewer.getTable().getColumnOrder()[position];
-                tableViewer.removeColumnAtPosition(position);
-                tableViewer.reflowColumnsWidth();
-
-                final TableViewerEditor editor = (TableViewerEditor) tableViewer.getColumnViewerEditor();
-                final ViewerCell focusCell = editor.getFocusCell();
-                if (focusCell.getColumnIndex() == orderIndexBeforeRemoving) {
-                    tableViewer.setFocusCell(tableViewer.getTable().getColumnCount() - 2);
-                }
+                    @Override
+                    public void run() {
+                        new ImportSettingsPopup(site.getShell(), commandsStack, fileModel, null).open();
+                    }
+                });
+                selectionLayer.clear();
+                return null;
             }
         };
-        return new FocusedViewerAccessor(columnsManagingStrategy, viewer);
+    }
+
+    class ImportSettingsColumnHeaderDataProvider implements IDataProvider {
+
+        @Override
+        public Object getDataValue(final int columnIndex, final int rowIndex) {
+            String columnName = "";
+            if (columnIndex == 0) {
+                columnName = "Import";
+            } else if (columnIndex == 1) {
+                columnName = "Name / Path";
+            } else if (columnIndex == dataProvider.getColumnCount() - 1) {
+                columnName = "Comment";
+            }
+            return columnName;
+        }
+
+        @Override
+        public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return dataProvider.getColumnCount();
+        }
+
+        @Override
+        public int getRowCount() {
+            return 1;
+        }
+
+    }
+
+    class ImportSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
+
+        private final Menu menu;
+
+        public ImportSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
+                final ISelectionProvider selectionProvider) {
+            final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu";
+
+            final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
+            this.menu = manager.createContextMenu(table);
+            table.setMenu(menu);
+
+            site.registerContextMenu(menuId, manager, selectionProvider, false);
+        }
+
+        @Override
+        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+            uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
+                    new PopupMenuAction(menu));
+        }
     }
 
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
-        settingsMatches.collect(getDisplayedSettings(), filter);
+        final List<RobotElement> settings = new ArrayList<>();
+        settings.addAll(dataProvider.getInput().getImportSettings());
+        settingsMatches.collect(settings, filter);
         return settingsMatches;
     }
 
@@ -270,26 +403,16 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
             + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
-
-        try {
-            viewer.getTable().setRedraw(false);
-            if (matches == null) {
-                viewer.setFilters(new ViewerFilter[0]);
-            } else {
-                viewer.setFilters(new ViewerFilter[] { new SettingsMatchesFilter(matches) });
-            }
-        } finally {
-            viewer.getTable().setRedraw(true);
-        }
+        dataProvider.setMatches(matches);
+        table.refresh();
     }
 
     @Inject
     @Optional
     private void whenSectionIsCreated(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
-        if (file == fileModel) {
-            viewer.setInput(getSection());
-            viewer.refresh();
+        if (file == fileModel && dataProvider.getInput() == null) {
+            refreshTable();
             setDirty();
         }
     }
@@ -298,9 +421,13 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
-        if (file == fileModel) {
-            viewer.setInput(getSection());
-            viewer.refresh();
+        if (file == fileModel && dataProvider.getInput() != null) {
+            final ICellEditor activeCellEditor = table.getActiveCellEditor();
+            if (activeCellEditor != null && !activeCellEditor.isClosed()) {
+                activeCellEditor.close();
+            }
+            refreshTable();
+            selectionLayerAccessor.getSelectionLayer().clear();
             setDirty();
         }
     }
@@ -309,36 +436,46 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
-        if (setting.getSuiteFile() == fileModel && getDisplayedSettings().contains(setting)) {
-            viewer.update(setting, null);
+        if (setting.getSuiteFile() == fileModel) {
+            table.update();
+            table.refresh();
             setDirty();
         }
     }
-
-    private List<RobotElement> getDisplayedSettings() {
-        final TableItem[] items = viewer.getTable().getItems();
-        if (items == null) {
-            return newArrayList();
+    
+    @Inject
+    @Optional
+    private void whenSettingIsAdded(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_ADDED) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            sortModel.clear();
         }
-        final List<RobotElement> settingDisplayed = Lists.transform(newArrayList(items),
-                new Function<TableItem, RobotElement>() {
-                    @Override
-                    public RobotSetting apply(final TableItem item) {
-                        if (item.getData() instanceof RobotSetting) {
-                            return (RobotSetting) item.getData();
-                        }
-                        return null;
-                    }
-                });
-        return settingDisplayed;
+        whenSettingIsAddedOrRemoved(section);
     }
 
     @Inject
     @Optional
-    private void whenSettingIsAddedOrRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+    private void whenSettingIsRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_REMOVED) final RobotSuiteFileSection section) {
+        whenSettingIsAddedOrRemoved(section);
+    }
+
+    @Inject
+    @Optional
+    private void whenSettingIsMoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
-            viewer.refresh();
+            sortModel.clear();
+        }
+        final ISelection oldSelection = selectionProvider.getSelection();
+        whenSettingIsAddedOrRemoved(section);
+        selectionProvider.setSelection(oldSelection);
+    }
+
+    private void whenSettingIsAddedOrRemoved(final RobotSuiteFileSection section) {
+        if (section != null && section.getSuiteFile() == fileModel) {
+            sortModel.clear();
+            refreshTable();
             setDirty();
         }
     }
@@ -351,7 +488,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
             final RobotSuiteFile suite = change.getElement() instanceof RobotSuiteFile
                     ? (RobotSuiteFile) change.getElement() : null;
             if (suite == fileModel) {
-                refreshEverything();
+                refreshTable();
             }
         }
     }
@@ -361,21 +498,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     private void whenReconcilationWasDone(
             @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
-            refreshEverything();
-        }
-    }
-
-    private void refreshEverything() {
-        try {
-            viewer.getTable().setRedraw(false);
-            final ViewerCell focusCell = viewer.getColumnViewerEditor().getFocusCell();
-            viewer.setInput(getSection());
-            viewer.refresh();
-            if (focusCell != null) {
-                viewer.setFocusCell(focusCell.getColumnIndex());
-            }
-        } finally {
-            viewer.getTable().setRedraw(true);
+            refreshTable();
         }
     }
 
@@ -383,6 +506,17 @@ public class ImportSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenSettingIsEdited(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_IMPORTS_EDIT) final RobotSetting setting) {
-        new ImportSettingsPopup(viewer.getControl().getShell(), commandsStack, fileModel, setting).open();
+        SwtThread.asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                new ImportSettingsPopup(site.getShell(), commandsStack, fileModel, setting).open();
+            }
+        });
+    }
+
+    private void refreshTable() {
+        dataProvider.setInput(getSection());
+        table.refresh();
     }
 }
