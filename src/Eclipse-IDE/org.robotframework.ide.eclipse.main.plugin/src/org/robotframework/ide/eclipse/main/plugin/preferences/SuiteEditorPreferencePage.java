@@ -26,6 +26,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.red.jface.preferences.RegexValidatedStringFieldEditor;
 
@@ -68,11 +69,12 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                if ("org.eclipse.ui.preferencePages.GeneralTextEditor".equals(e.text))
+                if ("org.eclipse.ui.preferencePages.GeneralTextEditor".equals(e.text)) {
                     PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null, null);
-                else if ("org.eclipse.ui.preferencePages.ColorsAndFonts".equals(e.text))
+                } else if ("org.eclipse.ui.preferencePages.ColorsAndFonts".equals(e.text)) {
                     PreferencesUtil.createPreferenceDialogOn(parent.getShell(), e.text, null,
                             "selectFont:org.robotframework.ide.textfont");
+                }
             }
         });
     }
@@ -80,14 +82,13 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
     private void createGeneralSettingsGroup(final Composite parent) {
         generalGroup = new Group(parent, SWT.NONE);
         generalGroup.setText("General settings");
-        GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(generalGroup);
+        GridDataFactory.fillDefaults().indent(0, 5).grab(true, false).span(2, 1).applyTo(generalGroup);
         GridLayoutFactory.fillDefaults().applyTo(generalGroup);
         
         editors = new RadioGroupFieldEditor(RedPreferences.SEPARATOR_MODE,
-                "When Tab key is pressed in source editor", 1, createLabelsAndValues(), generalGroup);
+                "When Tab key is pressed in source editor", 1, createTabPressLabelsAndValues(), generalGroup);
         addField(editors);
-        final Label label = editors.getLabelControl(generalGroup);
-        GridDataFactory.fillDefaults().indent(5, 10).applyTo(label);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(editors.getLabelControl(generalGroup));
         
         final String regex = "^(ss+)|t+|((s|t)+\\|(s|t)+)$";
         separatorEditor = new RegexValidatedStringFieldEditor(RedPreferences.SEPARATOR_TO_USE,
@@ -96,6 +97,7 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
                 "User defined spearator should have at least one tab or two spaces, or bar '|' sourrounded "
                         + "with at least one space or tab");
         addField(separatorEditor);
+        GridDataFactory.fillDefaults().indent(5, 0).applyTo(separatorEditor.getLabelControl(generalGroup));
         final SeparatorsMode currentMode = SeparatorsMode
                 .valueOf(getPreferenceStore().getString(RedPreferences.SEPARATOR_MODE));
         separatorEditor.setEnabled(currentMode != SeparatorsMode.ALWAYS_TABS, generalGroup);
@@ -110,7 +112,7 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
         super.propertyChange(event);
     }
 
-    private String[][] createLabelsAndValues() {
+    private String[][] createTabPressLabelsAndValues() {
         return new String[][] {
                 new String[] { "the tab character ('\\t') should be used", SeparatorsMode.ALWAYS_TABS.name() },
                 new String[] { "user defined separator should be used",
@@ -126,10 +128,25 @@ public class SuiteEditorPreferencePage extends FieldEditorPreferencePage impleme
         GridDataFactory.fillDefaults().grab(true, false).span(2, 1).applyTo(tablesGroup);
         GridLayoutFactory.fillDefaults().applyTo(tablesGroup);
 
-        final IntegerFieldEditor editor = new IntegerFieldEditor(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS,
+        final IntegerFieldEditor columnsEditor = new IntegerFieldEditor(
+                RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS,
                 "Default number of columns for arguments in table editors", tablesGroup, 2);
-        editor.setValidRange(1, 20);
-        addField(editor);
+        columnsEditor.setValidRange(1, 20);
+        addField(columnsEditor);
+        GridDataFactory.fillDefaults().indent(5, 5).applyTo(columnsEditor.getLabelControl(tablesGroup));
+
+        final ComboBoxFieldEditor behaviorOnCellCommitEditor = new ComboBoxFieldEditor(
+                RedPreferences.BEHAVIOR_ON_CELL_COMMIT, "After pressing Enter in cell under edit", "", 5,
+                createCellCommitLabelsAndValues(),
+                tablesGroup);
+        addField(behaviorOnCellCommitEditor);
+    }
+
+    private String[][] createCellCommitLabelsAndValues() {
+        return new String[][] {
+                new String[] { "stay in the same cell", CellCommitBehavior.STAY_IN_SAME_CELL.name() },
+                new String[] { "move to next cell (previous with Shift pressed)",
+                        CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name() } };
     }
 
 }
