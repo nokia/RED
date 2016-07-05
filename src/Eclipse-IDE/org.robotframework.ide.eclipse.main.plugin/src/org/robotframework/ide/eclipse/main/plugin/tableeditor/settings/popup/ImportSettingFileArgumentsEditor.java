@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup;
 
 import static com.google.common.collect.Lists.newArrayList;
 
