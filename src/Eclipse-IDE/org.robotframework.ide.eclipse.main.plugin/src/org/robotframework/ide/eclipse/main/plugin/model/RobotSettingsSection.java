@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
@@ -53,7 +54,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     public RobotSetting createSetting(final String name, final String comment, final String... args) {
         final List<String> settingArgs = newArrayList(args);
-        RobotSetting setting = newSetting(name, comment, settingArgs);
+        final RobotSetting setting = newSetting(name, comment, settingArgs);
 
         final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), -1, name, comment,
                 settingArgs);
@@ -66,7 +67,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     public void insertSetting(final String name, final String comment, final List<String> args, final int tableIndex,
             final int allSettingsElementsIndex) {
-        RobotSetting setting = newSetting(name, comment, args);
+        final RobotSetting setting = newSetting(name, comment, args);
 
         final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), tableIndex, name,
                 comment, args);
@@ -286,7 +287,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             setting.link(templateSetting);
             elements.add(setting);
         }
-        Optional<TestTimeout> timeoutSetting = settingsTable.testTimeout();
+        final Optional<TestTimeout> timeoutSetting = settingsTable.testTimeout();
         if (timeoutSetting.isPresent()) {
             final TestTimeout testTimeout = timeoutSetting.get();
             final String name = testTimeout.getDeclaration().getText().toString();
@@ -302,6 +303,15 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             setting.link(testTimeout);
             elements.add(setting);
         }
+        elements.sort(new Comparator<RobotFileInternalElement>() {
+
+            @Override
+            public int compare(final RobotFileInternalElement o1, final RobotFileInternalElement o2) {
+                final RobotSetting s1 = (RobotSetting) o1;
+                final RobotSetting s2 = (RobotSetting) o2;
+                return Integer.compare(s1.getDefinitionPosition().getOffset(), s2.getDefinitionPosition().getOffset());
+            }
+        });
     }
 
     private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {
