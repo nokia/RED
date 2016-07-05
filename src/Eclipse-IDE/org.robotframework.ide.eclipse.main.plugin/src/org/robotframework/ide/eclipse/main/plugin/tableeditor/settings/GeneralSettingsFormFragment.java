@@ -8,7 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.inject.Inject;
@@ -19,42 +21,81 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
-import org.eclipse.jface.viewers.RowExposingTableViewer;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerEditor;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.jface.viewers.ViewerColumnsFactory;
-import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.viewers.ViewersConfigurator;
-import org.eclipse.jface.window.ToolTip;
+import org.eclipse.jface.viewers.Stylers;
+import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
+import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
+import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
+import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
+import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.hover.HoverLayer;
+import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
+import org.eclipse.nebula.widgets.nattable.layer.ILayer;
+import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
+import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
+import org.eclipse.nebula.widgets.nattable.painter.layer.NatGridLayerPainter;
+import org.eclipse.nebula.widgets.nattable.selection.EditTraversalStrategy;
+import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
+import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
+import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
+import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
+import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
+import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
+import org.eclipse.nebula.widgets.nattable.style.Style;
+import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
+import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
+import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -68,24 +109,44 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor.ViewerColumnsManagingStrategy;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.viewers.Viewers;
+import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
+import org.robotframework.red.nattable.RedNattableLayersFactory;
+import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
+import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
+import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
+import org.robotframework.red.nattable.configs.GeneralTableStyleConfiguration;
+import org.robotframework.red.nattable.configs.HeaderSortConfiguration;
+import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
+import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
+import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
+import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 
-public class GeneralSettingsFormFragment implements ISectionFormFragment {
+import ca.odell.glazedlists.SortedList;
+
+public class GeneralSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
+
+    public static final String GENERAL_SETTINGS_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.settings.general.context";
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private IEditorSite site;
@@ -103,38 +164,62 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     @Inject
     private RedFormToolkit toolkit;
 
-    private com.google.common.base.Optional<RowExposingTableViewer> viewer = com.google.common.base.Optional.absent();
+    private HeaderFilterMatchesCollection matches;
+
+    private Section generalSettingsSection;
+
+    private com.google.common.base.Optional<NatTable> table = com.google.common.base.Optional.absent();
 
     private StyledText documentation;
 
+    private boolean hasFocusOnDocumentation;
+
+    private boolean isDocumentationModified;
+
+    private boolean hasEditDocRepresentation;
+
     private Job documenationChangeJob;
 
-    private Section section;
+    private GeneralSettingsDataProvider dataProvider;
 
-    private HeaderFilterMatchesCollection matches;
+    private ISortModel sortModel;
 
-    TableViewer getViewer() {
-        return viewer.orNull();
+    private RowSelectionProvider<Entry<String, RobotElement>> selectionProvider;
+
+    private SelectionLayerAccessor selectionLayerAccessor;
+
+    private final Object DOCUMENTATION_LOCK = new Object();
+
+    @Override
+    public ISelectionProvider getSelectionProvider() {
+        return selectionProvider;
+    }
+
+    @Override
+    public SelectionLayerAccessor getSelectionLayerAccessor() {
+        return selectionLayerAccessor;
+    }
+
+    @Override
+    public NatTable getTable() {
+        return table.orNull();
     }
 
     @Override
     public void initialize(final Composite parent) {
-        section = toolkit.createSection(parent, ExpandableComposite.TWISTIE
-                | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
-        section.setExpanded(true);
-        section.setText("General");
-        section.setDescription("Provide test suite documentation and general settings");
-        GridDataFactory.fillDefaults().grab(true, true).minSize(1, 22).indent(0, 5).applyTo(section);
-        Sections.switchGridCellGrabbingOnExpansion(section);
-        Sections.installMaximazingPossibility(section);
+        generalSettingsSection = toolkit.createSection(parent,
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR | Section.DESCRIPTION);
+        generalSettingsSection.setExpanded(true);
+        generalSettingsSection.setText("General");
+        generalSettingsSection.setDescription("Provide test suite documentation and general settings");
+        GridDataFactory.fillDefaults().grab(true, true).minSize(1, 22).indent(0, 5).applyTo(generalSettingsSection);
+        Sections.switchGridCellGrabbingOnExpansion(generalSettingsSection);
+        Sections.installMaximazingPossibility(generalSettingsSection);
 
-        final Composite panel = createPanel(section);
+        final Composite panel = createPanel(generalSettingsSection);
         createDocumentationControl(panel);
         if (!fileModel.isResourceFile()) {
-            createViewer(panel);
-
-            createColumns();
-            createContextMenu();
+            setupNatTable(panel);
             setInput();
         }
     }
@@ -148,8 +233,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     }
 
     private void createDocumentationControl(final Composite panel) {
-        documentation = new StyledText(panel, SWT.MULTI | SWT.WRAP | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+        documentation = new StyledText(panel, SWT.MULTI | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         documentation.addPaintListener(new PaintListener() {
+
             @Override
             public void paintControl(final PaintEvent e) {
                 final StyledText text = (StyledText) e.widget;
@@ -162,44 +248,189 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
             }
         });
         documentation.addFocusListener(new FocusAdapter() {
+
             @Override
             public void focusGained(final FocusEvent e) {
-                documentation.redraw();
+                hasFocusOnDocumentation = true;
             }
+
             @Override
             public void focusLost(final FocusEvent e) {
-                documentation.redraw();
+                hasFocusOnDocumentation = false;
             }
         });
         toolkit.adapt(documentation, true, false);
         toolkit.paintBordersFor(documentation);
         if (fileModel.isEditable()) {
             documentation.addModifyListener(new ModifyListener() {
+
                 @Override
                 public void modifyText(final ModifyEvent e) {
-                    if (documentation.getText().equals(getDocumentation(getSection()))) {
+                    if (!hasFocusOnDocumentation || (hasFocusOnDocumentation
+                            && (documentation.getText().equals(getDocumentation(getSection(), true))
+                                    || documentation.getText().equals(getDocumentation(getSection(), false))))) {
                         return;
                     }
                     setDirty();
-                    
+                    isDocumentationModified = true;
+
                     if (documenationChangeJob != null && documenationChangeJob.getState() == Job.SLEEPING) {
                         documenationChangeJob.cancel();
                     }
+
                     documenationChangeJob = createDocumentationChangeJob(documentation.getText());
                     documenationChangeJob.schedule(300);
                 }
             });
         }
 
-        GridDataFactory.fillDefaults().grab(true, true).minSize(SWT.DEFAULT, 60).hint(SWT.DEFAULT, 100)
-                .applyTo(documentation);
+        documentation.addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(final KeyEvent e) {
+                if (e.stateMask == SWT.CTRL) {
+                    final int C_KEY = 0x3;
+                    final int X_KEY = 0x18;
+
+                    if (e.character == C_KEY) {
+                        documentation.copy();
+                    } else if (e.character == X_KEY) {
+                        documentation.cut();
+                    }
+                } else if (e.stateMask == SWT.NONE && e.character == SWT.TAB) {
+                    if (documentation.isEnabled()) {
+                        int caretOffset = documentation.getCaretOffset();
+                        int lengthBefore = documentation.getCharCount();
+                        documentation.setText(documentation.getText().replaceAll("\\t", "\\\\t"));
+                        int lengthAfter = documentation.getCharCount();
+                        documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
+                    }
+                }
+            }
+        });
+
+        createPopupMenu();
+        GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 30).applyTo(documentation);
+    }
+
+    protected void createPopupMenu() {
+        final Menu docMenu = new Menu(documentation);
+        documentation.setMenu(docMenu);
+
+        final MenuItem modeItem = new MenuItem(docMenu, SWT.NONE);
+        modeItem.setText("&View mode");
+        modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
+        if (hasEditDocRepresentation) {
+            modeItem.setText("&Edit mode");
+            modeItem.setImage(ImagesManager.getImage(RedImages.getEditImage()));
+            documentation.setEditable(false);
+
+        }
+        documentation.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseUp(final MouseEvent e) {
+                if (!hasEditDocRepresentation && e.button == 1) {
+                    hasEditDocRepresentation = true;
+                    final RobotSettingsSection section = getSection();
+                    documentation.setText(getDocumentation(section, true));
+                    if (section != null && section.getLinkedElement().isPresent()) {
+                        documentation.setEditable(true);
+                    }
+                    if (documentation.getCharCount() > 0 && documentation
+                            .getTextBounds(0, documentation.getCharCount() - 1).contains(new Point(e.x, e.y))) {
+                        documentation.setCaretOffset(documentation.getOffsetAtLocation(new Point(e.x, e.y)));
+                    } else {
+                        documentation.setCaretOffset(documentation.getCharCount());
+                    }
+                    modeItem.setText("&View mode");
+                    modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
+                }
+            }
+        });
+        modeItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                if (!hasEditDocRepresentation) {
+                    hasEditDocRepresentation = true;
+                    modeItem.setText("&View mode");
+                    modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
+                } else {
+                    hasEditDocRepresentation = false;
+                    modeItem.setImage(ImagesManager.getImage(RedImages.getEditImage()));
+                    modeItem.setText("&Edit mode");
+                }
+                final RobotSettingsSection section = getSection();
+                documentation.setText(getDocumentation(section, hasEditDocRepresentation));
+                if (section != null && section.getLinkedElement().isPresent()) {
+                    documentation.setEditable(hasEditDocRepresentation);
+                }
+            }
+        });
+
+        new MenuItem(docMenu, SWT.SEPARATOR);
+
+        final MenuItem copyItem = new MenuItem(docMenu, SWT.NONE);
+        copyItem.setText("&Copy\tCtrl+C");
+        copyItem.setImage(ImagesManager
+                .getImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_COPY)));
+        copyItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                documentation.copy();
+            }
+        });
+
+        final MenuItem cutItem = new MenuItem(docMenu, SWT.NONE);
+        cutItem.setText("Cu&t\tCtrl+X");
+        cutItem.setImage(ImagesManager
+                .getImage(PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_CUT)));
+        cutItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                documentation.cut();
+            }
+        });
+
+        final MenuItem pasteItem = new MenuItem(docMenu, SWT.NONE);
+        pasteItem.setText("&Paste\tCtrl+V");
+        pasteItem.setImage(ImagesManager.getImage(
+                PlatformUI.getWorkbench().getSharedImages().getImageDescriptor(ISharedImages.IMG_TOOL_PASTE)));
+        pasteItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent e) {
+                documentation.paste();
+            }
+        });
+
+    }
+
+    private String getDocumentation(final RobotSettingsSection section, final boolean hasFocus) {
+        synchronized (DOCUMENTATION_LOCK) {
+            if (section != null) {
+                final RobotSetting docSetting = section.getSetting("Documentation");
+                if (docSetting != null && !docSetting.getArguments().isEmpty()) {
+                    return hasFocus
+                            ? DocumentationServiceHandler
+                                    .toEditConsolidated((IDocumentationHolder) docSetting.getLinkedElement())
+                            : DocumentationServiceHandler
+                                    .toShowConsolidated((IDocumentationHolder) docSetting.getLinkedElement());
+                }
+            }
+            return "";
+        }
     }
 
     private Job createDocumentationChangeJob(final String docu) {
         return new Job("changing documentation") {
+
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                final String newDocumentation = docu.replaceAll("\t", " ").replaceAll("  +", " ");
+                final String newDocumentation = docu.replaceAll("\t", "\\\\t");
                 final RobotSettingsSection settingsSection = getSection();
                 if (settingsSection == null) {
                     return Status.OK_STATUS;
@@ -215,205 +446,327 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
                 } else if (docSetting != null) {
                     commandsStack.execute(new SetKeywordCallArgumentCommand(docSetting, 0, newDocumentation));
                 }
+
                 return Status.OK_STATUS;
             }
         };
     }
 
-    private void createViewer(final Composite panel) {
-        viewer = com.google.common.base.Optional
-                .of(new RowExposingTableViewer(panel, SWT.MULTI | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL));
-        viewer.get().getTable().setLinesVisible(true);
-        viewer.get().getTable().setHeaderVisible(true);
-        viewer.get().getTable().addListener(SWT.MeasureItem, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-                event.height = Double.valueOf(event.gc.getFontMetrics().getHeight() * 1.5).intValue();
-            }
-        });
-        viewer.get().setContentProvider(new GeneralSettingsContentProvider());
-        viewer.get().setComparer(new SettingElementsComparer());
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(viewer.get().getTable());
-        Viewers.boundViewerWithContext(viewer.get(), site,
-                "org.robotframework.ide.eclipse.tableeditor.settings.general.context");
-        CellsActivationStrategy.addActivationStrategy(viewer.get(), RowTabbingStrategy.MOVE_IN_CYCLE);
-        ColumnViewerToolTipSupport.enableFor(viewer.get(), ToolTip.NO_RECREATE);
-        ViewersConfigurator.disableContextMenuOnHeader(viewer.get());
+    private void setupNatTable(final Composite parent) {
+
+        final TableTheme theme = TableThemes.getTheme(parent.getBackground().getRGB());
+
+        final ConfigRegistry configRegistry = new ConfigRegistry();
+
+        final RedNattableDataProvidersFactory dataProvidersFactory = new RedNattableDataProvidersFactory();
+        final RedNattableLayersFactory factory = new RedNattableLayersFactory();
+
+        // data providers
+        dataProvider = new GeneralSettingsDataProvider(commandsStack, getSection());
+        final IDataProvider columnHeaderDataProvider = new GeneralSettingsColumnHeaderDataProvider();
+        final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
+
+        // body layers
+        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 120, 150,
+                new AlternatingRowConfigLabelAccumulator(), new EmptyGeneralSettingLabelAcumulator(dataProvider));
+        final GlazedListsEventLayer<Entry<String, RobotElement>> bodyEventLayer = factory
+                .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
+        final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
+        final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
+        final ViewportLayer bodyViewportLayer = factory.createViewportLayer(bodySelectionLayer);
+
+        // column header layers
+        final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider,
+                new SettingsDynamicTableColumnHeaderLabelAcumulator(dataProvider));
+        final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
+                bodySelectionLayer, bodyViewportLayer);
+        final SortHeaderLayer<Entry<String, RobotElement>> columnHeaderSortingLayer = factory
+                .createSortingColumnHeaderLayer(columnHeaderDataLayer, columnHeaderLayer,
+                        dataProvider.getPropertyAccessor(), configRegistry, dataProvider.getSortedList());
+
+        // row header layers
+        final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
+                rowHeaderDataProvider);
+
+        // corner layer
+        final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
+                rowHeaderDataProvider, rowHeaderLayer);
+
+        // combined grid layer
+        final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
+                cornerLayer);
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, null,
+                SettingsTableEditableRule.createEditableRule(fileModel)));
+
+        addGeneralSettingsConfigAttributes(configRegistry);
+
+        table = createTable(parent, theme, gridLayer, configRegistry);
+
+        bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
+                new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table.get()),
+                new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table.get())));
+
+        sortModel = columnHeaderSortingLayer.getSortModel();
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
+
+        // tooltips support
+        new GeneralSettingsTableContentTooltip(table.get());
     }
 
-    private void createColumns() {
-        final Supplier<HeaderFilterMatchesCollection> matcherProvider = getMatchesProvider();
-        createNameColumn(matcherProvider);
+    public void addGeneralSettingsConfigAttributes(final ConfigRegistry configRegistry) {
+        final Style style = new Style();
+        style.setAttributeValue(CellStyleAttributes.FOREGROUND_COLOR, GUIHelper.COLOR_GRAY);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
+                EmptyGeneralSettingLabelAcumulator.EMPTY_GENERAL_SETTING_LABEL);
+    }
 
-        for (int i = 0; i < calculateLongestArgumentsLength(); i++) {
-            createArgumentColumn(i, matcherProvider);
+    private com.google.common.base.Optional<NatTable> createTable(final Composite parent, final TableTheme theme,
+            final GridLayer gridLayer, final ConfigRegistry configRegistry) {
+        final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
+        final NatTable table = new NatTable(parent, style, gridLayer, false);
+        table.setConfigRegistry(configRegistry);
+        table.setLayerPainter(
+                new NatGridLayerPainter(table, theme.getGridBorderColor(), RedNattableLayersFactory.ROW_HEIGHT));
+        table.setBackground(theme.getBodyBackgroundOddRowBackground());
+        table.setForeground(parent.getForeground());
+
+        addCustomStyling(table, theme);
+
+        // sorting
+        table.addConfiguration(new HeaderSortConfiguration());
+        table.addConfiguration(new SettingsDynamicTableSortingConfiguration());
+
+        // popup menus
+        table.addConfiguration(new GeneralSettingsTableMenuConfiguration(site, table, selectionProvider));
+
+        table.configure();
+
+        table.addFocusListener(new SettingsTableFocusListener(GENERAL_SETTINGS_CONTEXT_ID, site));
+        GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
+        return com.google.common.base.Optional.of(table);
+    }
+
+    private void addCustomStyling(final NatTable table, final TableTheme theme) {
+        final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
+                new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
+
+                    @Override
+                    public HeaderFilterMatchesCollection get() {
+                        return matches;
+                    }
+                }, Stylers.Common.MATCH_STYLER));
+
+        table.addConfiguration(tableStyle);
+        table.addConfiguration(new HoveredCellStyleConfiguration(theme));
+        table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
+        table.addConfiguration(new RowHeaderStyleConfiguration(theme));
+        table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
+        table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
+        table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
+    }
+
+    @Override
+    public void setFocus() {
+        if (table.isPresent()) {
+            table.get().setFocus();
         }
-        createCommentColumn(matcherProvider);
     }
 
-    private Supplier<HeaderFilterMatchesCollection> getMatchesProvider() {
-        return new Supplier<HeaderFilterMatchesCollection>() {
-            @Override
-            public HeaderFilterMatchesCollection get() {
-                return matches;
-            }
-        };
-    }
-
-    private void createNameColumn(final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
-        ViewerColumnsFactory.newColumn("Setting").withWidth(100)
-                .labelsProvidedBy(new GeneralSettingsNamesLabelProvider(matcherProvider))
-                .createFor(viewer.get());
-    }
-
-    private void createArgumentColumn(final int index, final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
-        ViewerColumnsFactory.newColumn("").withWidth(120)
-            .labelsProvidedBy(new GeneralSettingsArgsLabelProvider(matcherProvider, index))
-            .editingSupportedBy(new GeneralSettingsArgsEditingSupport(viewer.get(), index, commandsStack))
-            .editingEnabledOnlyWhen(fileModel.isEditable())
-            .createFor(viewer.get());
-    }
-
-    private void createCommentColumn(final Supplier<HeaderFilterMatchesCollection> matcherProvider) {
-        ViewerColumnsFactory.newColumn("Comment").withWidth(200)
-            .shouldGrabAllTheSpaceLeft(true).withMinWidth(100)
-            .labelsProvidedBy(new GeneralSettingsCommentsLabelProvider(matcherProvider))
-            .editingSupportedBy(new GeneralSettingsCommentsEditingSupport(viewer.get(), commandsStack))
-            .editingEnabledOnlyWhen(fileModel.isEditable())
-            .createFor(viewer.get());
-    }
-
-    private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
-        for (final RobotElement setting : GeneralSettingsModel.findGeneralSettingsList(getSection())) {
-            max = Math.max(max, ((RobotSetting) setting).getArguments().size());
-        }
-        return max;
-    }
-
-    private void createContextMenu() {
-        final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.general.contextMenu";
-
-        final MenuManager manager = new MenuManager("Robot suite editor general settings context menu", menuId);
-        final Table control = viewer.get().getTable();
-        final Menu menu = manager.createContextMenu(control);
-        control.setMenu(menu);
-        site.registerContextMenu(menuId, manager, site.getSelectionProvider(), false);
-    }
-
-    private void setInput() {
-        final RobotSettingsSection section = getSection();
-
-        documentation.setEditable(fileModel.isEditable() && section != null);
-        documentation.setText(getDocumentation(section));
-
-        if (viewer.isPresent()) {
-            viewer.get().setInput(section);
-        }
-    }
-
-    private String getDocumentation(final RobotSettingsSection section) {
-        if (section == null) {
-            return "";
-        } else {
-            final RobotSetting docSetting = section.getSetting("Documentation");
-            return docSetting != null && !docSetting.getArguments().isEmpty() ? docSetting.getArguments().get(0) : "";
-        }
+    private void setDirty() {
+        dirtyProviderService.setDirtyState(true);
     }
 
     private RobotSettingsSection getSection() {
         return fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
-    @Override
-    public void setFocus() {
-        if (viewer.isPresent()) {
-            viewer.get().getTable().setFocus();
-            // there is some problem with measuring table row height sometimes, so
-            // the table needs to be laid out in its parent
-            viewer.get().getTable().getParent().layout();
+    public void revealSetting(final Entry<String, RobotElement> setting) {
+        Sections.maximizeChosenSectionAndMinimalizeOthers(generalSettingsSection);
+        if (table.isPresent()) {
+            selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
         }
+        setFocus();
     }
 
     public void revealSetting(final RobotSetting setting) {
-        Sections.maximizeChosenSectionAndMinimalizeOthers(section);
+        Sections.maximizeChosenSectionAndMinimalizeOthers(generalSettingsSection);
         if ("Documentation".equals(setting.getName())) {
             documentation.forceFocus();
             documentation.selectAll();
             clearSettingsSelection();
-        } else {
+        } else if (table.isPresent()) {
             final Object entry = getEntryForSetting(setting);
-            if (entry != null && viewer.isPresent()) {
-                viewer.get().setSelection(new StructuredSelection(entry));
+            if (entry != null) {
+                if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(setting)) {
+                    final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+                            + RobotSettingsSection.SECTION_NAME;
+                    eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
+                }
+                selectionProvider.setSelection(new StructuredSelection(new Object[] { entry }));
             }
             setFocus();
         }
     }
 
     private Object getEntryForSetting(final RobotSetting setting) {
-        final TableItem[] items = viewer.get().getTable().getItems();
-        for (final TableItem item : items) {
-            if (item.getData() instanceof Entry<?, ?>) {
-                final Object value = ((Entry<?, ?>) item.getData()).getValue();
-                if (setting == value) {
-                    return item.getData();
+        final SortedList<Entry<String, RobotElement>> list = dataProvider.getSortedList();
+        for (final Entry<String, RobotElement> entry : list) {
+            final RobotElement robotElement = entry.getValue();
+            if (robotElement != null) {
+                final RobotSetting entrySetting = (RobotSetting) robotElement;
+                if (setting == entrySetting) {
+                    return entry;
                 }
             }
         }
+
         return null;
     }
 
     public void clearSettingsSelection() {
-        if (viewer.isPresent()) {
-            viewer.get().setSelection(StructuredSelection.EMPTY);
+        if (selectionProvider != null) {
+            selectionProvider.setSelection(StructuredSelection.EMPTY);
         }
     }
 
-    public FocusedViewerAccessor getFocusedViewerAccessor() {
-        if (!viewer.isPresent()) {
-            return null;
+    class GeneralSettingsColumnHeaderDataProvider implements IDataProvider {
+
+        @Override
+        public Object getDataValue(final int columnIndex, final int rowIndex) {
+            String columnName = "";
+            if (columnIndex == 0) {
+                columnName = "Setting";
+            } else if (columnIndex == dataProvider.getColumnCount() - 1) {
+                columnName = "Comment";
+            }
+            return columnName;
         }
-        final ViewerColumnsManagingStrategy columnsManagingStrategy = new ViewerColumnsManagingStrategy() {
-            @Override
-            public void addColumn(final ColumnViewer viewer) {
-                final RowExposingTableViewer tableViewer = (RowExposingTableViewer) viewer;
-                final int index = tableViewer.getTable().getColumnCount() - 2;
 
-                createArgumentColumn(index, getMatchesProvider());
-                tableViewer.moveLastColumnTo(index + 1);
-                tableViewer.reflowColumnsWidth();
+        @Override
+        public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return dataProvider.getColumnCount();
+        }
+
+        @Override
+        public int getRowCount() {
+            return 1;
+        }
+
+    }
+
+    class EmptyGeneralSettingLabelAcumulator implements IConfigLabelAccumulator {
+
+        public static final String EMPTY_GENERAL_SETTING_LABEL = "EMPTY_GENERAL_SETTING";
+
+        private final GeneralSettingsDataProvider dataProvider;
+
+        public EmptyGeneralSettingLabelAcumulator(final GeneralSettingsDataProvider dataProvider) {
+            this.dataProvider = dataProvider;
+        }
+
+        @Override
+        public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition,
+                final int rowPosition) {
+            final Entry<String, RobotElement> rowObject = dataProvider.getRowObject(rowPosition);
+            if (rowObject != null && rowObject.getValue() == null && columnPosition == 0) {
+                configLabels.addLabel(EMPTY_GENERAL_SETTING_LABEL);
             }
+        }
 
-            @Override
-            public void removeColumn(final ColumnViewer viewer) {
-                final RowExposingTableViewer tableViewer = (RowExposingTableViewer) viewer;
+    }
 
-                final int columnCount = tableViewer.getTable().getColumnCount();
-                if (columnCount <= 2) {
-                    return;
-                }
-                // always remove last columns which displays arguments
-                final int position = columnCount - 2;
-                final int orderIndexBeforeRemoving = tableViewer.getTable().getColumnOrder()[position];
-                tableViewer.removeColumnAtPosition(position);
-                tableViewer.reflowColumnsWidth();
+    class GeneralSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
 
-                final TableViewerEditor editor = (TableViewerEditor) tableViewer.getColumnViewerEditor();
-                final ViewerCell focusCell = editor.getFocusCell();
-                if (focusCell.getColumnIndex() == orderIndexBeforeRemoving) {
-                    tableViewer.setFocusCell(tableViewer.getTable().getColumnCount() - 2);
-                }
+        private final Menu menu;
+
+        public GeneralSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
+                final ISelectionProvider selectionProvider) {
+            final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.general.contextMenu";
+
+            final MenuManager manager = new MenuManager("Robot suite editor general settings context menu", menuId);
+            this.menu = manager.createContextMenu(table);
+            table.setMenu(menu);
+
+            site.registerContextMenu(menuId, manager, selectionProvider, false);
+        }
+
+        @Override
+        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+            uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
+                    new PopupMenuAction(menu));
+        }
+    }
+
+    private class GeneralSettingsTableContentTooltip extends NatTableContentTooltip {
+
+        private final Map<String, String> tooltips = new HashMap<>();
+
+        {
+            tooltips.put("Suite Setup",
+                    "The keyword %s is executed before executing any of the test cases or lower level suites");
+            tooltips.put("Suite Teardown",
+                    "The keyword %s is executed after all test cases and lower level suites have been executed");
+            tooltips.put("Test Setup",
+                    "The keyword %s is executed before every test cases in this suite unless test cases override it");
+            tooltips.put("Test Teardown",
+                    "The keyword %s is executed after every test cases in this suite unless test cases override it");
+            tooltips.put("Test Template", "The keyword %s is used as default template keyword in this suite");
+            tooltips.put("Test Timeout",
+                    "Specifies default timeout for each test case in this suite, which can be overridden by test case settings.\n"
+                            + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+            tooltips.put("Force Tags", "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
+            tooltips.put("Default Tags",
+                    "Sets tags to all tests cases in this suite, unless test case specifies own tags");
+        }
+
+        public GeneralSettingsTableContentTooltip(final NatTable natTable, final String... tooltipRegions) {
+            super(natTable, tooltipRegions);
+        }
+
+        @Override
+        protected String getText(final Event event) {
+            String text = super.getText(event);
+            final int col = this.natTable.getColumnPositionByX(event.x);
+            if (col == 1 && text != null && tooltips.containsKey(text)) {
+                final int row = this.natTable.getRowPositionByY(event.y);
+                final ILayerCell cell = this.natTable.getCellByPosition(col + 1, row);
+                final String keyword = cell != null && cell.getDataValue() != null
+                        && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue()
+                                : "given in first argument";
+                text = String.format(tooltips.get(text), keyword);
             }
-        };
-        return new FocusedViewerAccessor(columnsManagingStrategy, viewer.get());
+            return text;
+        }
+    }
+
+    private void setInput() {
+        final RobotSettingsSection section = getSection();
+
+        if (fileModel.isEditable() && section != null && hasEditDocRepresentation) {
+            documentation.setEditable(true);
+        } else {
+            documentation.setEditable(false);
+        }
+        if (!hasFocusOnDocumentation) {
+            documentation.setText(getDocumentation(section, hasEditDocRepresentation));
+        }
+
+        if (table.isPresent()) {
+            dataProvider.setInput(section);
+        }
     }
 
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
-        final List<RobotElement> generalSettings = GeneralSettingsModel
-                .findGeneralSettingsList(viewer.isPresent() ? (RobotSettingsSection) viewer.get().getInput() : null);
         final RobotSettingsSection settingsSection = getSection();
+        final List<RobotElement> generalSettings = GeneralSettingsModel.findGeneralSettingsList(settingsSection);
         if (settingsSection != null) {
             final RobotSetting setting = settingsSection.getSetting("Documentation");
             if (setting != null) {
@@ -437,29 +790,19 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
             setDocumentationMatches(matches);
         }
 
-        if (viewer.isPresent()) {
-            try {
-                viewer.get().getTable().setRedraw(false);
-                if (matches == null) {
-                    viewer.get().setFilters(new ViewerFilter[0]);
-                } else {
-                    viewer.get().setFilters(new ViewerFilter[] { new SettingsMatchesFilter(matches) });
-                }
-            } finally {
-                viewer.get().getTable().setRedraw(true);
-            }
+        if (table.isPresent()) {
+            dataProvider.setMatches(matches);
+            table.get().refresh();
         }
-
     }
 
     private void setDocumentationMatches(final HeaderFilterMatchesCollection settingsMatches) {
         clearDocumentationMatches();
-
         final Collection<Range<Integer>> ranges = settingsMatches.getRanges(documentation.getText());
         for (final Range<Integer> range : ranges) {
             final Color bg = ColorsManager.getColor(255, 255, 175);
-            documentation.setStyleRange(new StyleRange(range.lowerEndpoint(), range.upperEndpoint()
-                    - range.lowerEndpoint(), null, bg));
+            documentation.setStyleRange(
+                    new StyleRange(range.lowerEndpoint(), range.upperEndpoint() - range.lowerEndpoint(), null, bg));
         }
     }
 
@@ -467,21 +810,44 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         documentation.setStyleRange(null);
     }
 
+    @Override
+    public void invokeSaveAction() {
+        onSave();
+    }
+
     @Persist
-    public void whenSaving() {
-        // user could just typed something into documentation box, so the job was scheduled, we need to wait for it to
+    public void onSave() {
+        isDocumentationModified = false;
+        if (!table.isPresent()) {
+            return;
+        }
+        final ICellEditor cellEditor = table.get().getActiveCellEditor();
+        if (cellEditor != null && !cellEditor.isClosed()) {
+            final boolean commited = cellEditor.commit(MoveDirectionEnum.NONE);
+            if (!commited) {
+                cellEditor.close();
+            }
+        }
+        SwtThread.asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                setFocus();
+            }
+        });
+    }
+
+    protected void waitForDocumentationChangeJob() {
+        // user could just typed something into documentation box, so the job was scheduled, we need
+        // to wait for it to
         // end in order to proceed with saving
-        if (documenationChangeJob != null) {
+        if (documenationChangeJob != null && isDocumentationModified) {
             try {
-                documenationChangeJob.join();
+                documenationChangeJob.join(3000, null);
             } catch (final InterruptedException e) {
                 RedPlugin.logError("Documentation change job was interrupted", e);
             }
         }
-    }
-
-    private void setDirty() {
-        dirtyProviderService.setDirtyState(true);
     }
 
     @Inject
@@ -490,6 +856,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED) final RobotSuiteFile file) {
         if (file == fileModel) {
             setInput();
+            refreshTable();
             setDirty();
         }
     }
@@ -499,7 +866,18 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     private void whenSectionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED) final RobotSuiteFile file) {
         if (file == fileModel) {
+            if (table.isPresent()) {
+                final ICellEditor activeCellEditor = getTable().getActiveCellEditor();
+                if (activeCellEditor != null && !activeCellEditor.isClosed()) {
+                    activeCellEditor.close();
+                }
+            }
+
             setInput();
+            documentation.setText("");
+            selectionLayerAccessor.getSelectionLayer().clear();
+            refreshTable();
+
             setDirty();
         }
     }
@@ -509,9 +887,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     private void whenSettingDetailsChanges(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotSetting setting) {
         if (setting.getSuiteFile() == fileModel && setting.getGroup() == SettingsGroup.NO_GROUP) {
-            if (viewer.isPresent()) {
-                viewer.get().refresh();
+            if (table.isPresent()) {
+                table.get().update();
             }
+            refreshTable();
             setDirty();
         }
     }
@@ -520,10 +899,12 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
     @Optional
     private void whenSettingIsAddedOrRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTINGS_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
-        if (section == getSection()) {
-            if (viewer.isPresent()) {
-                viewer.get().refresh();
+        if (section.getSuiteFile() == fileModel) {
+            if (sortModel != null) {
+                sortModel.clear();
             }
+            setInput();
+            refreshTable();
             setDirty();
         }
     }
@@ -550,21 +931,14 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment {
         }
     }
 
-    private void refreshEverything() {
-        try {
-            ViewerCell focusCell = null;
-            if (viewer.isPresent()) {
-                viewer.get().getTable().setRedraw(false);
-                focusCell = viewer.get().getColumnViewerEditor().getFocusCell();
-            }
-            setInput();
-            if (focusCell != null) {
-                viewer.get().setFocusCell(focusCell.getColumnIndex());
-            }
-        } finally {
-            if (viewer.isPresent()) {
-                viewer.get().getTable().setRedraw(true);
-            }
+    private void refreshTable() {
+        if (table.isPresent()) {
+            table.get().refresh();
         }
+    }
+
+    private void refreshEverything() {
+        setInput();
+        refreshTable();
     }
 }

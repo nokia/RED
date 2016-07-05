@@ -58,8 +58,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSe
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFileArgumentsDialog;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.ImportSettingFilePathResolver;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
