@@ -9,15 +9,15 @@ import java.text.Collator;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 
-public class KeywordsSectionSorter extends ViewerSorter {
+public class RobotElementsSorter extends ViewerSorter {
 
-    public KeywordsSectionSorter() {
+    public RobotElementsSorter() {
         // nothing to do
     }
 
-    public KeywordsSectionSorter(final Collator collator) {
+    public RobotElementsSorter(final Collator collator) {
         super(collator);
     }
 
@@ -34,11 +34,11 @@ public class KeywordsSectionSorter extends ViewerSorter {
         if (cat1 != cat2) {
             return cat1 - cat2;
         }
-        final RobotKeywordDefinition def1 = (RobotKeywordDefinition) e1;
-        final RobotKeywordDefinition def2 = (RobotKeywordDefinition) e2;
+        final RobotElement el1 = (RobotElement) e1;
+        final RobotElement el2 = (RobotElement) e2;
 
-        final int index1 = def1.getParent().getChildren().indexOf(def1);
-        final int index2 = def2.getParent().getChildren().indexOf(def2);
+        final int index1 = el1.getParent().getChildren().indexOf(el1);
+        final int index2 = el2.getParent().getChildren().indexOf(el2);
 
         return index1 - index2;
     }

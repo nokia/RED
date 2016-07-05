@@ -7,11 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.navigator;
 
 import java.text.Collator;
 
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
-public class SettingsSectionSorter extends ViewerSorter {
+public class SettingsSectionSorter extends RobotElementsSorter {
 
     public SettingsSectionSorter() {
         // nothing to do
@@ -29,10 +27,5 @@ public class SettingsSectionSorter extends ViewerSorter {
             return SettingsGroup.getImportsGroupsSet().contains(group) ? 2 : 1;
         }
         return 0;
-    }
-
-    @Override
-    public int compare(final Viewer viewer, final Object e1, final Object e2) {
-        return category(e1) - category(e2);
     }
 }

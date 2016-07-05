@@ -489,14 +489,6 @@
              id="org.robotframework.robotelement.actions.provider">
        </actionProvider>
        <commonSorter
-             class="org.robotframework.ide.eclipse.main.plugin.navigator.VariablesSectionSorter">
-          <parentExpression>
-             <instanceof
-                   value="org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection">
-             </instanceof>
-          </parentExpression>
-       </commonSorter>
-       <commonSorter
              class="org.robotframework.ide.eclipse.main.plugin.navigator.SettingsSectionSorter">
           <parentExpression>
              <instanceof
@@ -505,11 +497,25 @@
           </parentExpression>
        </commonSorter>
        <commonSorter
-             class="org.robotframework.ide.eclipse.main.plugin.navigator.KeywordsSectionSorter">
+             class="org.robotframework.ide.eclipse.main.plugin.navigator.RobotElementsSorter">
           <parentExpression>
-             <instanceof
-                   value="org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection">
-             </instanceof>
+             <or>
+                <instanceof
+                      value="org.eclipse.core.resources.IFile">
+                </instanceof>
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection">
+                </instanceof>
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection">
+                </instanceof>
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection">
+                </instanceof>
+                <instanceof
+                      value="org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement">
+                </instanceof>
+             </or>
           </parentExpression>
        </commonSorter>
     </navigatorContent>
