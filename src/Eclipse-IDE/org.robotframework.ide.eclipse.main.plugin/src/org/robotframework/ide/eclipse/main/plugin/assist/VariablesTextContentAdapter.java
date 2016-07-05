@@ -23,7 +23,7 @@ public class VariablesTextContentAdapter extends TextContentAdapter {
         final String currentTextAfterSelection = textControl.getText().substring(textControl.getSelection().x);
 
         int maxCommon = 0;
-        for (int i = 0; i < text.length() && i < currentTextBeforeSelection.length(); i++) {
+        for (int i = 0; i < text.length() && i <= currentTextBeforeSelection.length(); i++) {
             final String currentSuffix = currentTextBeforeSelection.substring(currentTextBeforeSelection.length() - i,
                     currentTextBeforeSelection.length());
             final String toInsertPrefix = text.substring(0, i);
