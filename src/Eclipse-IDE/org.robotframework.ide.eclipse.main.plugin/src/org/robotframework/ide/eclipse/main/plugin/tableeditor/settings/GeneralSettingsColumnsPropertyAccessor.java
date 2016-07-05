@@ -73,7 +73,7 @@ public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAc
                     commandsStack.execute(new SetKeywordCallCommentCommand(setting, newStringValue));
                 }
             } else if (columnIndex > 0 && newValue != null && section != null) {
-                final List<String> args = newArrayList(Collections.nCopies(columnIndex - 1, ""));
+                final List<String> args = newArrayList(Collections.nCopies(columnIndex - 1, "\\"));
                 if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(
                             new CreateFreshGeneralSettingCommand(section, rowObject.getKey(), args, newStringValue));
