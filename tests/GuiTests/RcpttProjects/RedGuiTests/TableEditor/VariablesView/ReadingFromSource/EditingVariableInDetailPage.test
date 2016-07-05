@@ -1,0 +1,375 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9iuJED04EeaUDrMBSMf5Ag
+Element-Name: EditingVariableInDetailPage
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _OBHP4EKkEeaEVfxTnoQ14g
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 7/5/16 5:51 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add variable ans save file
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Setting ***\n"
+    + "*** Variable ***\n"
+    + "${var}    8\n"
+    + "@{var1}    1    2   3   here is value 4    5  text\n"
+    + "&{newDict}    key=value    4=4    \"this is key\"=\"value\"    ${var} = 4\n"
+    + "&{second_dict}=    here=equals\n"
+    + "${A 1}    ${VAR}    \n"
+    + "@{empty list}        \n"
+    + "&{empty dictionary}   \n\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "test \n"
+    + "    log  7"
+    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+s"
+} 
+
+//go to var1   
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 4 6
+        key-type F4
+    }
+    //set focus on value
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    get-editbox -after [get-label Variables] -index 1 | key-type Down
+}
+
+//open detail page
+with [get-window -class DetailCellEditorDialog] {
+	//go to last item
+    get-canvas | key-type Down
+    get-canvas -index 1 | key-type Down
+    get-canvas -index 2 | key-type Down
+    get-canvas -index 3 | key-type Down
+    get-canvas -index 4 | key-type Down
+    
+    //remove last item - checking where focus will be set (should be at new lats item)
+    get-canvas -index 5 | key-type Del
+    
+    //move to "3" item and delete it
+    get-canvas -index 4 | key-type Up
+    get-canvas -index 3 | key-type Up
+    get-canvas -index 2 | key-type Del
+}
+//check how now delat page looks like
+with [get-window -class DetailCellEditorDialog | get-control Any -index 1] {
+    get-property "getChildren().Control[0].getTabList().Control[0].getToolTipText()" | equals 1 | verify-true
+    get-property "getChildren().Control[0].getTabList().Control[1].getToolTipText()" | equals 2 | verify-true
+    get-property "getChildren().Control[0].getTabList().Control[2].getToolTipText()" | equals "here is value 4" | verify-true
+    get-property "getChildren().Control[0].getTabList().Control[3].getToolTipText()" | equals 5 | verify-true
+}
+
+//adit values
+with [get-window -class DetailCellEditorDialog] {
+	//set focus on second item on "2"
+    get-canvas -index 1 | key-type Up
+    
+    //set new value
+    get-canvas -index 1 | key-type Enter
+    get-editbox | set-text "second value"
+    get-canvas -index 1 | key-type Enter
+    
+    //change value on more time
+    get-editbox | type-text " - new"
+    
+    //go to 4th item and set new value
+    get-canvas -index 1 | key-type Down
+    get-canvas -index 2 | key-type Down
+    get-canvas -index 3 | key-type Enter
+    get-editbox | set-text "last value"
+    get-canvas -index 3 | key-type ESC
+}
+get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_ESCAPE"
+
+get-button "Save (M1+S)" | click
+
+
+// -----------------------------------------------dict ------------------------------------------------
+//got to dictionary
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    get-editbox -after [get-label Variables] -index 1 | key-type Down
+}
+
+
+with [get-window -class DetailCellEditorDialog] {
+	//remove first item
+    get-canvas | key-type Del
+    
+    //remove last item
+    get-canvas | key-type Down
+    get-canvas -index 1 | key-type Down
+    get-canvas -index 2 | key-type Del
+    
+    //add new text to last item
+    get-canvas -index 1 | key-type Enter
+    with [get-editbox] {
+        key-type Left
+        type-text " new text\""
+    }
+    
+    //change firts item
+    get-canvas -index 1 | key-type Up
+    get-canvas | key-type Enter
+    get-editbox | set-text "888=99"
+    get-canvas | key-type "NUMPAD_ENTER" "\\u000D"
+    get-editbox | set-text "888=999"
+    get-canvas | key-type ESC
+}
+get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1 | key-type "M1+s"
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+    + "*** Variable ***\n"
+    + "${var}    8\n"
+    + "@{var1}    1    second value - new   here is value 4    last value  \n"
+    + "&{newDict}    888=999    \"this is key\"=\"value\" new text\"\n"
+    + "&{second_dict}=    here=equals\n"
+    + "${A 1}    ${VAR}    \n"
+    + "@{empty list}\n"
+    + "&{empty dictionary}\n\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+//restart view
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+s"
+} 
+get-editor "TestFile.robot" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click  
+    
+//edit empty list
+
+//set focus on @{empty list}
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 8 7
+        key-type F4
+      
+    }
+    //move to value
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    //add new items 
+    with [get-editbox -after [get-label Variables] -index 1] {
+    	//add item by keyboard
+        type-text item1
+        key-type Enter
+      
+        key-type "M1+SPACE"
+        key-type Enter
+
+		//open content assist
+        key-type Enter
+        key-type "M1+SPACE"
+    }
+}
+//select "&{newDict}" by mouse
+get-window -class ContentProposalPopup | get-table | select "&{newDict}" | double-click
+
+with [get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1] {
+	//accept "&{newDict}"
+    key-type "NUMPAD_ENTER" "\\u000D"
+
+	//add @{empty list} by content assist
+    key-type "M1+SPACE"
+    key-type Down -times 5
+    key-type Enter -times 2 
+}
+
+//enter $ sign - add ${\n}
+with [get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1] {
+    type-text "$"
+    key-type "M1+SPACE"
+    key-type Down -times 4
+    key-type Enter
+    key-type Enter
+}
+
+//enter @ sign - add @{empty list}
+with [get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1] {
+    type-text "@"
+    key-type "M1+SPACE"
+    key-type Enter
+    key-type Enter
+}
+
+//enter & sign &{second dict}
+with [get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1] {
+    type-text "&"
+    key-type "M1+SPACE"
+    key-type Down -times 2
+    key-type Enter
+    key-type Enter
+    key-type "M1+s"
+}
+
+//check source
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+    + "*** Variable ***\n"
+    + "${var}    8\n"
+    + "@{var1}    1    second value - new   here is value 4    last value  \n"
+    + "&{newDict}    888=999    \"this is key\"=\"value\" new text\"\n"
+    + "&{second_dict}=    here=equals\n"
+    + "${A 1}    ${VAR}    \n"
+    + "@{empty list}    item1    ${A 1}    &{newDict}    @{empty list}    ${\\n"
+    + "}    @{empty list}    &{second_dict}\n"
+    + "&{empty dictionary}\n\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+//close editor
+get-editor "TestFile.robot" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click  
+
+
+// adding values to dictionary
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 9 13
+        key-type F4
+    }
+    
+    //open editor on value
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        //enter text by keyboard
+        set-text "item=value"
+        key-type Enter -times 2
+        
+        //add key
+        set-text "only item"
+        key-type Enter -times 2
+        
+        //add only value
+        set-text "=only value"
+        key-type Enter -times 2
+        
+        //open content assist
+        key-type "M1+SPACE"
+        
+        //add ${True}
+        key-type Up
+        wait 300
+        key-type Up -times 4
+        key-type Enter
+        
+		//add value for $TRUE
+        type-text "=false"
+        key-type Enter
+    }
+}
+
+//get-editor "TestFile.robot" | get-editbox -after [get-label Variables] -index 1 | click-text
+with [get-editor "TestFile.robot" | get-control Any -after [get-label Variables] -index 9] {
+    get-property "getTabList().Control[0].getTabList().Control[0].getTabList().Control[0].getToolTipText()" 
+        | equals "item --> value" | verify-true
+    get-property "getTabList().Control[0].getTabList().Control[0].getTabList().Control[1].getToolTipText()" 
+        | equals "only item -->" | verify-true
+    get-property "getTabList().Control[0].getTabList().Control[0].getTabList().Control[2].getToolTipText()" 
+        | equals "--> only value" | verify-true
+    get-property "getTabList().Control[0].getTabList().Control[0].getTabList().Control[3].getToolTipText()" 
+        | equals "${True} --> false" | verify-true
+}
+
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label Variables] -index 1] {
+        key-type Esc
+        key-type "M1+s"
+    }
+    get-canvas -after [get-label Variables] -index 1 | key-type Up -times 6
+    get-canvas -after [get-label Variables] -index 1 | key-type Enter
+} 
+ 
+
+// ---------------------------varaible -------------------------------------
+//add value by content assist
+with [get-editor "TestFile.robot"] {
+    //type $ character
+    get-editbox -after [get-label Variables] -index 1 | type-text "$"
+    get-editbox -after [get-label Variables] -index 1 |key-type "M1+SPACE"
+}
+
+//select  "${EXECDIR}"
+get-window -class ContentProposalPopup | get-table | select "${EXECDIR}" | double-click
+
+//go back to value
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label Variables] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
+    get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Left
+        key-type Enter
+    }
+    //clear 
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text ""
+        
+        //set &{second dict}
+        key-type "M1+SPACE"
+        key-type Down -times 4
+        key-type Enter
+        key-type Enter
+    }
+    get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_ESCAPE"
+}
+
+//go back to variable
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Left
+        key-type Enter
+    }
+    //set new value but press Escape - old will be recover
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text value
+        key-type  Esc
+    }
+}
+
+
+get-button "Save (M1+S)" | click
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+ 
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+    + "*** Variable ***\n"
+    + "${var}    &{second_dict}\n"
+    + "@{var1}    1    second value - new   here is value 4    last value  \n"
+    + "&{newDict}    888=999    \"this is key\"=\"value\" new text\"\n"
+    + "&{second_dict}=    here=equals\n"
+    + "${A 1}    ${VAR}    \n"
+    + "@{empty list}    item1    ${A 1}    &{newDict}    @{empty list}    ${\\n}    @{empty list}    &{second_dict}\n"
+    + "&{empty dictionary}    item=value    only item    =only value    ${True}=false\n\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true    
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
