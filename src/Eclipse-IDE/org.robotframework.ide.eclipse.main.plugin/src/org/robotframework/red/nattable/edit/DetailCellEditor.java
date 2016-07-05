@@ -22,6 +22,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 
@@ -106,9 +108,9 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
                     committed = commit(MoveDirectionEnum.RIGHT);
                 } else if (event.keyCode == SWT.CR && event.stateMask == SWT.SHIFT
                         && composite.getText().getText().isEmpty()) {
-                    committed = commit(MoveDirectionEnum.LEFT);
+                    committed = commit(getCommitMoveDirection(MoveDirectionEnum.LEFT));
                 } else if (event.keyCode == SWT.CR && event.stateMask == 0 && composite.getText().getText().isEmpty()) {
-                    committed = commit(MoveDirectionEnum.RIGHT);
+                    committed = commit(getCommitMoveDirection(MoveDirectionEnum.RIGHT));
                 } else if ((event.keyCode == SWT.ESC || event.keyCode == SWT.KEYPAD_CR)
                         && composite.getText().getText().isEmpty()) {
                     close();
@@ -119,6 +121,13 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
                 if (!committed) {
                     event.doit = false;
                 }
+            }
+
+            private MoveDirectionEnum getCommitMoveDirection(final MoveDirectionEnum defaultDirection) {
+                return RedPlugin.getDefault()
+                        .getPreferences()
+                        .getCellCommitBehavior() == CellCommitBehavior.STAY_IN_SAME_CELL ? MoveDirectionEnum.NONE
+                                : defaultDirection;
             }
         });
         composite.setVisible(true);
