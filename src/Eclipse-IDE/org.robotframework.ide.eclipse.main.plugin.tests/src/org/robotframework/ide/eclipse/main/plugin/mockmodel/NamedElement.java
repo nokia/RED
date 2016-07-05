@@ -17,7 +17,14 @@ public class NamedElement implements RobotElement {
 
     private final String name;
 
+    private final RobotElement parent;
+
     public NamedElement(final String name) {
+        this(null, name);
+    }
+
+    public NamedElement(final RobotElement parent, final String name) {
+        this.parent = parent;
         this.name = name;
     }
 
@@ -28,7 +35,7 @@ public class NamedElement implements RobotElement {
 
     @Override
     public RobotElement getParent() {
-        return null;
+        return parent;
     }
 
     @Override
