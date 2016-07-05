@@ -11,6 +11,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.text.TextSelection;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -18,12 +20,16 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
@@ -57,9 +63,10 @@ class RobotOutlinePage extends ContentOutlinePage {
         super.createControl(parent);
 
         getTreeViewer().setContentProvider(new RobotOutlineContentProvider());
+        final NavigatorLabelProvider labelProvider = new NavigatorLabelProvider();
         ViewerColumnsFactory.newColumn("")
             .withWidth(400)
-            .labelsProvidedBy(new NavigatorLabelProvider())
+            .labelsProvidedBy(labelProvider)
             .createFor(getTreeViewer());
 
         getTreeViewer().setInput(new Object[] { suiteModel });
@@ -67,6 +74,8 @@ class RobotOutlinePage extends ContentOutlinePage {
 
         selectionListener = createSelectionListener();
         getTreeViewer().addSelectionChangedListener(selectionListener);
+
+        getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
 
         editor.getSourceEditor().getViewer().getTextWidget().addCaretListener(createCaretListener());
     }
@@ -151,5 +160,45 @@ class RobotOutlinePage extends ContentOutlinePage {
         getTreeViewer().removeSelectionChangedListener(selectionListener);
 
         super.dispose();
+    }
+
+    private class SortOutlineAction extends Action {
+
+        private final NavigatorLabelProvider labelProvider;
+
+        public SortOutlineAction(final NavigatorLabelProvider labelProvider) {
+            super("Sort", IAction.AS_CHECK_BOX);
+            setImageDescriptor(RedImages.getSortImage());
+            this.labelProvider = labelProvider;
+        }
+
+        @Override
+        public void run() {
+            if (isChecked()) {
+                getTreeViewer().setComparator(new ViewerComparator() {
+
+                    @Override
+                    public int compare(final Viewer viewer, final Object e1, final Object e2) {
+
+                        if (((RobotElement) e1).getParent() instanceof RobotCodeHoldingElement
+                                && ((RobotElement) e2).getParent() instanceof RobotCodeHoldingElement) {
+                            // we don't want to sort the code inside keywords/test cases
+
+                            final RobotElement el1 = (RobotElement) e1;
+                            final RobotElement el2 = (RobotElement) e2;
+
+                            final int index1 = el1.getParent().getChildren().indexOf(el1);
+                            final int index2 = el2.getParent().getChildren().indexOf(el2);
+
+                            return index1 - index2;
+                        } else {
+                            return labelProvider.getText(e1).compareToIgnoreCase(labelProvider.getText(e2));
+                        }
+                    }
+                });
+            } else {
+                getTreeViewer().setComparator(null);
+            }
+        }
     }
 }
