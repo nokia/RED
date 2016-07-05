@@ -266,6 +266,8 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
                 refresh();
                 if (index < entries.size()) {
                     entries.selectOnlyEntry(index);
+                } else if (!entries.isEmpty()) {
+                    entries.selectOnlyLastEntry();
                 }
             } else if (e.keyCode == SWT.CR || e.keyCode == SWT.KEYPAD_CR) {
                 entries.openEntryForEdit(entry);
