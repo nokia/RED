@@ -41,16 +41,11 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
 
     protected CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
-    // private Job validationJob;
-    //
-    // private boolean cannotClose;
-
     public DetailCellEditorEntry(final Composite parent, final Color hoverColor, final Color selectionColor) {
         super(parent, SWT.NO_BACKGROUND);
         this.hoverColor = hoverColor;
         this.selectionColor = selectionColor;
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(getValidator());
-
 
         setBackground(null);
         addMouseTrackListener(new MouseTrackAdapter() {
