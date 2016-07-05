@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.nattable;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -11,6 +11,7 @@ import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsTableEditableRule;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 
 public class SettingsTableEditableRuleTest {
