@@ -1,0 +1,75 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Context-Type: org.eclipse.rcptt.ctx.ecl
+Element-Name: ProceduresForSettingsView
+Element-Type: context
+Element-Version: 2.0
+Id: _2rVvIENaEeaEVfxTnoQ14g
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 7/6/16 2:09 PM
+
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
+Content-Type: text/ecl
+Entry-Name: .ecl.context
+
+proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""]  [val c5 ""]  [val c6 ""]
+{
+	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $setting |verify-true
+	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $c1 |verify-true
+	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $c2 |verify-true
+	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 4 $row|  invoke getDataValue| eq $c3 |verify-true
+	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 5 $row|  invoke getDataValue| eq $c4 |verify-true
+	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue| eq $c5 |verify-true
+	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue| eq $c6 |verify-true
+}
+
+proc "check-metadata-row"[val file] [val row] [val metadata] [val val] [val comment]{
+	get-editor $file | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $metadata |verify-true
+	get-editor $file | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $val |verify-true
+	get-editor $file | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $comment |verify-true
+
+}
+
+
+proc "check-imports-row-for_11_columns" [val file] [val row] [val import] [val name] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] 
+  [val c5 ""] [val c6 ""] [val c7 ""] [val c8 ""] [val c9 ""] [val c10 ""] [val c11 ""] [val default_length true]
+{
+	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $import |verify-true
+	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $name |verify-true
+	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $c1 |verify-true
+	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 4 $row|  invoke getDataValue| eq $c2 |verify-true
+	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 5 $row|  invoke getDataValue| eq $c3 |verify-true
+	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue| eq $c4 |verify-true
+	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue| eq $c5 |verify-true
+	
+	if [$default_length | eq false]{
+		get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 8 $row|  invoke getDataValue| eq $c6 |verify-true
+		get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 9 $row|  invoke getDataValue| eq $c7 |verify-true
+		get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 10 $row|  invoke getDataValue| eq $c8 |verify-true
+		get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 11 $row|  invoke getDataValue| eq $c9 |verify-true
+		get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 12 $row|  invoke getDataValue| eq $c10 |verify-true
+		get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 13 $row|  invoke getDataValue| eq $c11 |verify-true
+	}
+}
+
+
+
+
+//rows starts from 0
+proc "is-row-fully-selected" [val row]{
+	get-editor "TestFile.robot" | get-section Metadata | get-canvas| get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+		| invoke isRowPositionFullySelected $row | eq true | verify-true
+		
+	with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().hasRowSelection()" | equals true | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedRowCount()" | equals 1 | verify-true
+	}
+} 
+
+proc "check-metadata-single-row" [val file] [val row] [val metadata ""] [val val ""] [val comment ""]{
+	get-editor $file | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $metadata |verify-true
+	get-editor $file | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $val |verify-true
+	get-editor $file | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $comment |verify-true
+
+}
+------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
