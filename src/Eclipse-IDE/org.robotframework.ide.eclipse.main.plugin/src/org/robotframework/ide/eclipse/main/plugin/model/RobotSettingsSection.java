@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
@@ -54,10 +55,16 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     public RobotSetting createSetting(final String name, final String comment, final String... args) {
         final List<String> settingArgs = newArrayList(args);
-        final RobotSetting setting = newSetting(name, comment, settingArgs);
-
+        
         final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), -1, name, comment,
                 settingArgs);
+        
+        String consolidatedComment = comment;
+        if (!comment.isEmpty()) {
+            consolidatedComment = CommentServiceHandler.consolidate((ICommentHolder) newModelElement,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+        }
+        final RobotSetting setting = newSetting(name, consolidatedComment, settingArgs);
         setting.link(newModelElement);
 
         elements.add(setting);
