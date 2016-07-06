@@ -423,7 +423,6 @@ public class RobotFormEditor extends FormEditor {
             final RobotFileDumper dumper = new RobotFileDumper();
             dumper.setContext(ctx);
             final String content = dumper.dump(model.getParent());
-            suiteModel.getProject().getRobotParser().reuseForChangedContent(model.getParent(), content);
             document.set(content);
         }
     }
