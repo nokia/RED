@@ -1,12 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _2rVvIENaEeaEVfxTnoQ14g
 Element-Name: EditMetadata
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _KeFc8P4OEeSvjNrJkS7N6Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/21/16 3:39 PM
+Save-Time: 7/6/16 2:09 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -92,14 +93,10 @@ with [get-editor "TestFile.robot"] {
 
 
 //check if added in Source is shown in table
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 1 1| invoke getDataValue| eq "new" |verify-true
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 2 1| invoke getDataValue| eq "text" |verify-true
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 3 1| invoke getDataValue| eq "" |verify-true
+check-metadata-single-row -file "TestFile.robot" -row 1 -metadata  "new" -val "text"
 
 try -times 5 -delay 1000 -command{
-	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 1 2| invoke getDataValue| eq "Second line" |verify-true
-	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 2 2| invoke getDataValue| eq "is here" |verify-true
-	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 3 2| invoke getDataValue| eq "#with comment" |verify-true
+	check-metadata-single-row -file "TestFile.robot" -row 2 -metadata "Second line" -val "is here" -comment "#with comment"
 }
 
 //add new line
@@ -181,19 +178,11 @@ with [get-editor "TestFile.robot"] {
 
 
 //check if added in Source is shown in table
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 1 1| invoke getDataValue| eq "Second line" |verify-true
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 2 1| invoke getDataValue| eq "is here" |verify-true
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 3 1| invoke getDataValue| eq "#with comment"  |verify-true
 
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 1 2| invoke getDataValue| eq "new" |verify-true
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 2 2| invoke getDataValue| eq "text" |verify-true
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 3 2| invoke getDataValue| eq "" |verify-true
+check-metadata-single-row -file "TestFile.robot" -row 1 -metadata "Second line" -val "is here" -comment "#with comment" 
+check-metadata-single-row -file "TestFile.robot" -row 2 -metadata "new" -val "text" 
+check-metadata-single-row -file "TestFile.robot" -row 3 -metadata "Second line" -val "is here" -comment "#with comment" 
 
-
-
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 1 3| invoke getDataValue| eq "Second line" |verify-true
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 2 3| invoke getDataValue| eq "is here" |verify-true
-get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object| invoke getCellByPosition 3 3| invoke getDataValue| eq "#with comment" |verify-true
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

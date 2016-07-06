@@ -1,12 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _2rVvIENaEeaEVfxTnoQ14g
 Element-Name: CopyCutCellsInMetadata
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _emIDYDe5EeaJIKJT0Mv9ow
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/22/16 6:01 PM
+Save-Time: 7/6/16 2:26 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -118,23 +119,17 @@ with [get-editor "TestFile.robot"] {
 }   
 
 wait 2000
-proc "check-values-in-row" [val row] [val metadata] [val val] [val comment]{
-	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $metadata |verify-true
-	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $val |verify-true
-	get-editor "TestFile.robot" | get-section Metadata | get-canvas | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $comment |verify-true
 
-}
+check-metadata-row -file "TestFile.robot" -row 1 -metadata "\\" -val "1" -comment "#comment1"
+check-metadata-row -file "TestFile.robot" -row 2 -metadata "a2" -val "" -comment "#comment2"
+check-metadata-row -file "TestFile.robot" -row 3 -metadata "a3" -val "3" -comment ""
+check-metadata-row -file "TestFile.robot" -row 4 -metadata "\\" -val "4" -comment "#comment4"
 
-check-values-in-row -row 1 -metadata "\\" -val "1" -comment "#comment1"
-check-values-in-row -row 2 -metadata "a2" -val "" -comment "#comment2"
-check-values-in-row -row 3 -metadata "a3" -val "3" -comment ""
-check-values-in-row -row 4 -metadata "\\" -val "4" -comment "#comment4"
-
-check-values-in-row -row 5 -metadata "new" -val "new" -comment "#new"
-check-values-in-row -row 6 -metadata "\\" -val "" -comment ""
-check-values-in-row -row 7 -metadata "a8" -val "8" -comment "#comment8"
-check-values-in-row -row 8 -metadata "a7" -val "7" -comment "#comment7"
-check-values-in-row -row 9 -metadata "a9" -val "9" -comment "#comment9"
+check-metadata-row -file "TestFile.robot" -row 5 -metadata "new" -val "new" -comment "#new"
+check-metadata-row -file "TestFile.robot" -row 6 -metadata "\\" -val "" -comment ""
+check-metadata-row -file "TestFile.robot" -row 7 -metadata "a8" -val "8" -comment "#comment8"
+check-metadata-row -file "TestFile.robot" -row 8 -metadata "a7" -val "7" -comment "#comment7"
+check-metadata-row -file "TestFile.robot" -row 9 -metadata "a9" -val "9" -comment "#comment9"
 
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
@@ -198,16 +193,16 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
-check-values-in-row -row 1 -metadata "a1" -val "" -comment "#comment1"
-check-values-in-row -row 2 -metadata "a2" -val "1" -comment "#comment2"
-//check-values-in-row -row 3 -metadata "a3" -val "3" -comment ""
-check-values-in-row -row 4 -metadata "a4" -val "4" -comment "#comment4"
+check-metadata-row -file "TestFile.robot" -row 1 -metadata "a1" -val "" -comment "#comment1"
+check-metadata-row -file "TestFile.robot" -row 2 -metadata "a2" -val "1" -comment "#comment2"
+check-metadata-row -file "TestFile.robot" -row 3 -metadata "a3" -val "3" -comment ""
+check-metadata-row -file "TestFile.robot" -row 4 -metadata "a4" -val "4" -comment "#comment4"
 
-check-values-in-row -row 5 -metadata "a5" -val "5" -comment "#comment5"
-check-values-in-row -row 6 -metadata "a6" -val "#comment3" -comment "#comment6"
-check-values-in-row -row 7 -metadata "a7" -val "7" -comment "#comment7"
-check-values-in-row -row 8 -metadata "a8" -val "8" -comment "#comment8"
-check-values-in-row -row 9 -metadata "a9" -val "9" -comment "#comment9"   
+check-metadata-row -file "TestFile.robot" -row 5 -metadata "a5" -val "5" -comment "#comment5"
+check-metadata-row -file "TestFile.robot" -row 6 -metadata "a6" -val "#comment3" -comment "#comment6"
+check-metadata-row -file "TestFile.robot" -row 7 -metadata "a7" -val "7" -comment "#comment7"
+check-metadata-row -file "TestFile.robot" -row 8 -metadata "a8" -val "8" -comment "#comment8"
+check-metadata-row -file "TestFile.robot" -row 9 -metadata "a9" -val "9" -comment "#comment9"   
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
