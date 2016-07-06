@@ -14,8 +14,10 @@ import java.util.Set;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.type.TypeReference;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -185,7 +187,7 @@ public class RobotDebugEventDispatcher extends Job {
         printRemoteDebugSuiteMessage(suiteFilePath);
         
         final IFile currentSuiteFile = keywordExecutionManager.extractCurrentSuite(suiteFilePath);
-        
+
         if (currentSuiteFile != null) {
             final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(currentSuiteFile);
             final RobotParser robotParser = robotSuiteFile.getProject().getEagerRobotParser();
@@ -408,9 +410,45 @@ public class RobotDebugEventDispatcher extends Job {
             showError("Robot Event Dispatcher Error", message);
             throw new MissingFileToExecuteException(message);
         }
+        
+        if (keywordExecutionManager.getCurrentSuiteFile() == null && keywordExecutionManager.getCurrentSuiteLocation() != null) {
+            tryToFindInitSuiteFile();
+        }
+        
         if (executionContext.isTestCaseTeardownKeyword(keywordType)) {
             target.clearStackFrames();
         }
+    }
+    
+    private void tryToFindInitSuiteFile() {
+        final IContainer suiteContainer = ResourcesPlugin.getWorkspace()
+                .getRoot()
+                .getContainerForLocation(keywordExecutionManager.getCurrentSuiteLocation());
+        if (suiteContainer != null && suiteContainer.getType() == IResource.FOLDER) {
+            final IResource initFile = findInitFile(suiteContainer);
+            if (initFile != null && initFile.getType() == IResource.FILE) {
+                final IFile currentSuiteFile = (IFile) initFile;
+                keywordExecutionManager.setCurrentSuiteParent(suiteContainer);
+                keywordExecutionManager.setCurrentSuiteName(initFile.getName());
+                keywordExecutionManager.setCurrentSuiteFile(currentSuiteFile);
+                final RobotSuiteFile robotSuiteFile = RedPlugin.getModelManager().createSuiteFile(currentSuiteFile);
+                final RobotParser robotParser = robotSuiteFile.getProject().getEagerRobotParser();
+                executionContext.startSuite(robotParser.parse(currentSuiteFile.getLocation().toFile()).get(0),
+                        robotParser);
+            }
+        }
+    }
+    
+    private IResource findInitFile(final IContainer suiteContainer) {
+        IResource member = suiteContainer.findMember("__init__.robot");
+        if (member != null) {
+            return member;
+        }
+        member = suiteContainer.findMember("__init__.txt");
+        if (member != null) {
+            return member;
+        }
+        return suiteContainer.findMember("__init__.tsv");
     }
     
     private void showError(final String title, final String message) {

@@ -30,6 +30,8 @@ public class KeywordExecutionManager {
     private final List<IResource> suiteFilesToDebug;
 
     private IFile currentSuiteFile;
+    
+    private IPath currentSuiteLocation;
 
     private String currentSuiteName = "";
 
@@ -55,6 +57,7 @@ public class KeywordExecutionManager {
         if (currentSuiteFile != null) {
             currentSuiteParent = currentSuiteFile.getParent();
         }
+        currentSuiteLocation = suiteFilePath;
         return currentSuiteFile;
     }
 
@@ -202,15 +205,23 @@ public class KeywordExecutionManager {
         return currentSuiteFile;
     }
 
+    public void setCurrentSuiteFile(final IFile currentSuiteFile) {
+        this.currentSuiteFile = currentSuiteFile;
+    }
+
     public String getCurrentSuiteName() {
         return currentSuiteName;
+    }
+    
+    public void setCurrentSuiteName(final String currentSuiteName) {
+        this.currentSuiteName = currentSuiteName;
     }
 
     public IContainer getCurrentResourceParent() {
         return currentResourceParent;
     }
 
-    public void setCurrentResourceParent(IContainer currentResourceParent) {
+    public void setCurrentResourceParent(final IContainer currentResourceParent) {
         this.currentResourceParent = currentResourceParent;
     }
 
@@ -218,7 +229,7 @@ public class KeywordExecutionManager {
         return currentResourceFile;
     }
 
-    public void setCurrentResourceFile(String currentResourceFile) {
+    public void setCurrentResourceFile(final String currentResourceFile) {
         this.currentResourceFile = currentResourceFile;
     }
 
@@ -226,8 +237,16 @@ public class KeywordExecutionManager {
         return breakpointCondition;
     }
 
-    public void setBreakpointCondition(String breakpointCondition) {
+    public void setBreakpointCondition(final String breakpointCondition) {
         this.breakpointCondition = breakpointCondition;
+    }
+
+    public IPath getCurrentSuiteLocation() {
+        return currentSuiteLocation;
+    }
+
+    public void setCurrentSuiteParent(final IContainer currentSuiteParent) {
+        this.currentSuiteParent = currentSuiteParent;
     }
 
 }
