@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KeFc8P4OEeSvjNrJkS7N6Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/6/16 2:09 PM
+Save-Time: 7/6/16 2:59 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -183,6 +183,65 @@ check-metadata-single-row -file "TestFile.robot" -row 1 -metadata "Second line" 
 check-metadata-single-row -file "TestFile.robot" -row 2 -metadata "new" -val "text" 
 check-metadata-single-row -file "TestFile.robot" -row 3 -metadata "Second line" -val "is here" -comment "#with comment" 
 
+
+//check focus after saving
+with [get-editor "TestFile.robot" | get-section Metadata] {
+    with [get-canvas] {
+        key-type Right
+        key-type Enter
+    }
+    //change value
+    with [get-editbox] {
+        type-text "new value"
+        key-type Enter
+    }
+    //save and go to comment in second line
+    get-editbox | key-type "M1+s"
+    with [get-canvas] {
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox] {
+        type-text "second line comment"
+        key-type Enter
+    }
+}
+
+//check if last line is selected
+get-editor "TestFile.robot" | get-section Metadata | get-editbox | get-property "getSelectionText()" 
+    | equals "Second line" | verify-true
+    
+//turn off edit mode    
+with [get-editor "TestFile.robot" | get-section Metadata] {
+    with [get-editbox] {
+        key-type "TRAVERSE_ESCAPE"
+    }
+    with [get-canvas] {
+    	//go rigtr nad go back to metada name
+        key-type Tab
+        key-type "M2+TAB"
+        key-type Enter
+    }
+    with [get-editbox] {
+        type-text "last line"
+        key-type "M1+s"
+    }
+}
+
+//check where focus is
+with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectionModel().toString()" 
+        | equals "[Rectangle {0, 2, 1, 1}]" | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedColumnPositions().length" | equals 1 
+        | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedColumnPositions().int[0]" | equals 0 
+        | verify-true
+}
+
+
+check-metadata-single-row -file "TestFile.robot" -row 1 -metadata "Second line" -val "new value" -comment "#with comment" 
+check-metadata-single-row -file "TestFile.robot" -row 2 -metadata "new" -val "text"  -comment "#second line comment"
+check-metadata-single-row -file "TestFile.robot" -row 3 -metadata "last line" -val "is here" -comment "#with comment" 
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
