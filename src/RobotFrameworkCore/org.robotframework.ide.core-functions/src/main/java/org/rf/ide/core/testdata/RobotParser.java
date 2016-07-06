@@ -79,12 +79,6 @@ public class RobotParser {
         return shouldEagerImport;
     }
 
-    public void reuseForChangedContent(final RobotFileOutput toUpdate, final String content) {
-        final RobotFileOutput current = parseEditorContent(content, toUpdate.getProcessedFile());
-
-        toUpdate.update(current);
-    }
-
     /**
      * Should be used for unsaved editor content. Parsed output is not replacing
      * saved robot model in {@link RobotProjectHolder} object.
