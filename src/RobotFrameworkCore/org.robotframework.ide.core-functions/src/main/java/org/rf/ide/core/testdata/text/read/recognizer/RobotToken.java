@@ -18,6 +18,8 @@ import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
 
 public class RobotToken implements IRobotLineElement, Serializable {
 
+    private static final long serialVersionUID = -7333635148571215189L;
+
     private FilePosition fp = new FilePosition(NOT_SET, NOT_SET, NOT_SET);
 
     private String raw = "";
