@@ -38,7 +38,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         this.comment = comment;
     }
 
-    void link(final AModelElement<?> executableRow) {
+    public void link(final AModelElement<?> executableRow) {
         this.linkedElement = executableRow;
     }
 

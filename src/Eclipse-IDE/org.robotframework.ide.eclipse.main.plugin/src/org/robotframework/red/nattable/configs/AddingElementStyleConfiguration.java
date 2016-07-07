@@ -35,8 +35,10 @@ import org.robotframework.red.graphics.ImagesManager;
 public class AddingElementStyleConfiguration extends AbstractRegistryConfiguration {
 
     public static final String ELEMENT_ADDER_CONFIG_LABEL = "ELEMENT_ADDER";
-
+    
     public static final String ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL = "ELEMENT_ADDER_MULTISTATE";
+    
+    public static final String ELEMENT_IN_TREE_ADDER_CONFIG_LABEL = "ELEMENT_ADDER_IN_TREE";
 
     public static final String ELEMENT_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW";
 
@@ -68,6 +70,11 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
                 ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
                 ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
+        
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
+                ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
+                ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
 
         final ImageDescriptor addImage = RedImages.getAddImage();
         final Image imageToUse = ImagesManager.getImage(isEditable ? addImage : RedImages.getGreyedImage(addImage));
@@ -79,6 +86,8 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
                 ELEMENT_ADDER_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new DropdownPainter(cellPainter),
                 DisplayMode.NORMAL, ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
+                ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
     }
 
     private Font getFont(final Font fontToReuse, final int style) {
