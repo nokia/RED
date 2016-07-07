@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -25,6 +26,10 @@ public class SetKeywordDefinitionNameCommand extends EditorCommand {
             return;
         }
         definition.setName(name);
+        
+        final RobotToken nameToken = new RobotToken();
+        nameToken.setText(name);
+        definition.getLinkedElement().setKeywordName(nameToken);
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_NAME_CHANGE, definition);
     }
