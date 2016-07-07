@@ -27,13 +27,11 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
 
     public RobotKeywordDefinition createKeywordDefinition(final int index, final String name) {
         final RobotKeywordDefinition keywordDefinition = new RobotKeywordDefinition(this, name, "");
+        
+        KeywordTable keywordsTable = (KeywordTable) this.getLinkedElement();
+        keywordDefinition.link(keywordsTable.createUserKeyword(name));
+        
         elements.add(index, keywordDefinition);
-        return keywordDefinition;
-    }
-
-    public RobotKeywordDefinition createKeywordDefinition(final String name, final String comment) {
-        final RobotKeywordDefinition keywordDefinition = new RobotKeywordDefinition(this, name, comment);
-        elements.add(keywordDefinition);
         return keywordDefinition;
     }
 

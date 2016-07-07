@@ -13,6 +13,8 @@ import java.util.List;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 
 import com.google.common.base.Optional;
 
@@ -37,6 +39,13 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
 
     public RobotKeywordCall createKeywordCall(final int index) {
         final RobotKeywordCall call = new RobotKeywordCall(this, "", new ArrayList<String>(), "");
+        
+        if (this instanceof RobotKeywordDefinition) {
+            final RobotExecutableRow<UserKeyword> robotExecutableRow = new RobotExecutableRow<UserKeyword>();
+            ((RobotKeywordDefinition) this).getLinkedElement().addKeywordExecutionRow(robotExecutableRow);
+            call.link(robotExecutableRow);
+        }
+        
         getChildren().add(index, call);
         return call;
     }
