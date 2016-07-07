@@ -31,41 +31,21 @@ public class RedXmlSearchPathsPropertyTesterTest {
 
     @Test
     public void falseIsReturned_whenExpectedValueIsAString() {
-        final boolean testResult = tester.test(SearchPath.create(""), RedXmlSearchPathsPropertyTester.IS_SYSTEMPATH,
+        final boolean testResult = tester.test(SearchPath.create(""), RedXmlSearchPathsPropertyTester.IS_SYSTEM_PATH,
                 null, "value");
 
         assertThat(testResult).isFalse();
     }
 
     @Test
-    public void falseIsReturned_whenSearchPathIsSystemButItWasntExpected() {
-        final boolean testResult = testIsSystemProperty(SearchPath.create("", true), false);
-
-        assertThat(testResult).isFalse();
+    public void testIsSystemPathProperty() {
+        assertThat(isSystemPath(SearchPath.create("", true), false)).isFalse();
+        assertThat(isSystemPath(SearchPath.create("", true), true)).isTrue();
+        assertThat(isSystemPath(SearchPath.create(""), true)).isFalse();
+        assertThat(isSystemPath(SearchPath.create(""), false)).isTrue();
     }
 
-    @Test
-    public void trueIsReturned_whenSearchPathIsSystemAndItWasExpected() {
-        final boolean testResult = testIsSystemProperty(SearchPath.create("", true), true);
-
-        assertThat(testResult).isTrue();
-    }
-
-    @Test
-    public void falseIsReturned_whenSearchPathIsNotSystemButItWasntExpected() {
-        final boolean testResult = testIsSystemProperty(SearchPath.create(""), true);
-
-        assertThat(testResult).isFalse();
-    }
-
-    @Test
-    public void trueIsReturned_whenSearchPathIsNotSystemAndItWasExpected() {
-        final boolean testResult = testIsSystemProperty(SearchPath.create(""), false);
-
-        assertThat(testResult).isTrue();
-    }
-
-    private boolean testIsSystemProperty(final SearchPath path, final boolean expected) {
-        return tester.test(path, RedXmlSearchPathsPropertyTester.IS_SYSTEMPATH, null, expected);
+    private boolean isSystemPath(final SearchPath path, final boolean expected) {
+        return tester.test(path, RedXmlSearchPathsPropertyTester.IS_SYSTEM_PATH, null, expected);
     }
 }
