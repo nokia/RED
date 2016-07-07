@@ -27,25 +27,25 @@ public abstract class ACreationOfKeywordExecutableThreeStepsTest extends ACreati
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public IExecutableStepsHolder getExecutableWithName() {
-        UserKeyword execUnit = createModelWithOneKeywordInside();
+        final UserKeyword execUnit = createModelWithOneKeywordInside();
         execUnit.getKeywordName().setText("UserKeyword");
 
-        return (IExecutableStepsHolder<UserKeyword>) execUnit;
+        return execUnit;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public IExecutableStepsHolder getExecutableWithoutName() {
-        return (IExecutableStepsHolder<UserKeyword>) createModelWithOneKeywordInside();
+        return createModelWithOneKeywordInside();
     }
 
     private UserKeyword createModelWithOneKeywordInside() {
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
         modelFile.includeKeywordTableSection();
-        KeywordTable keywordTable = modelFile.getKeywordTable();
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
 
-        RobotToken keywordName = new RobotToken();
-        UserKeyword execUnit = new UserKeyword(keywordName);
+        final RobotToken keywordName = new RobotToken();
+        final UserKeyword execUnit = new UserKeyword(keywordName);
         execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
         execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());
         execUnit.addKeywordExecutionRow(new RobotExecutableRow<UserKeyword>());

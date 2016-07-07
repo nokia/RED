@@ -27,25 +27,25 @@ public abstract class ACreationOfTestCaseExecutableOneStepTest extends ACreation
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public IExecutableStepsHolder getExecutableWithName() {
-        TestCase execUnit = createModelWithOneTestCaseInside();
+        final TestCase execUnit = createModelWithOneTestCaseInside();
         execUnit.getTestName().setText("TestCase");
 
-        return (IExecutableStepsHolder<TestCase>) execUnit;
+        return execUnit;
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public IExecutableStepsHolder getExecutableWithoutName() {
-        return (IExecutableStepsHolder<TestCase>) createModelWithOneTestCaseInside();
+        return createModelWithOneTestCaseInside();
     }
 
     private TestCase createModelWithOneTestCaseInside() {
         final RobotFile modelFile = NewRobotFileTestHelper.getModelFileToModify("2.9");
         modelFile.includeTestCaseTableSection();
-        TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
 
-        RobotToken testName = new RobotToken();
-        TestCase execUnit = new TestCase(testName);
+        final RobotToken testName = new RobotToken();
+        final TestCase execUnit = new TestCase(testName);
         execUnit.addTestExecutionRow(new RobotExecutableRow<TestCase>());
         testCaseTable.addTest(execUnit);
 
