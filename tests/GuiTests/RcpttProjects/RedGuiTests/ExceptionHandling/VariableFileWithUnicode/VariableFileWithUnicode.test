@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _HWVnoKS8EeWCSZzk3osblg
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 1/7/16 12:49 PM
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 7/7/16 5:10 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -29,7 +29,6 @@ with [get-editor "txt_test.robot" | get-text-viewer] {
 	type-text "test1"
 	key-type Enter
     type-text "    log    ${ascivar}"
-    key-type "M1+SPACE"
     key-type "M1+s"
 }
 
