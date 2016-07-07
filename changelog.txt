@@ -1,30 +1,36 @@
-RED 0.6.4 - 2016/05/05
+RED 0.6.5 - 2016/07/07
 
 Bug
-
-      Support for listener API made in RF 2.9
-      Cannot debug Suite Setup inside __init__ file on RF ver > 3.0
+	#21 - Editor do not open when separator is pipe and for-item text after \ is like ${a} s
+	#23 - RED run of of memory during debugging StackOverflowException happens 
+	#29 - Missing suite file for execution during debug caused by __init__.py file 
+    Not refreshing decorator for Exclude/Include options
+    Removing by right click entries from red.xml (variable files, referenced libs) does not work under mint
+    NP when path in Library is windows on Linux machine
+    Jython server process do not close own subprocesses
+    Cannot debug Suite Setup inside __init__ file on RF ver > 3.0
+    Error after deleting project with Libs
+    Referenced libs are not generated after removing second project
+    adding ${} in path to lib produces annoying popup
+    Editor do not open when separator is pipe and for-item text after `\` is like `${a} s`
+    RED run of of memory during debugging StackOverflowException happens often
+	Elements order in navigator is different than in outline view
 
 Enhancement
-
-      Extend current RobotFileValidation to show an information get from parser
-      Discover python libs inside jar when adding java libs in red.xml
-      Run configuration  use default interpreter than previously used
-      Add Marketplace to RED product
-      Text box to include users lib dependency paths to PythonPath / ClassPath
-      Merge Remote Libs to Referenced Libs in Red.xml
-      Option  relative paths to Workspace/Project in libs and vars in red.xml
-      Custom PythonPathClassPath  handling relative paths
-      Disabling option "Show discovering summary after test .." after unselecting "auto discover"
-      Disable autodiscovering of libraries for not RF files i.e. JPG
-      Autodiscovering  show in Progress dialog information, which suite (resource) is currently check
+	It should be possible to add/remove RED project nature without editing project file
+    Use eclipse refactoring API to reflect project changes in excluded paths
+    Provide initial infrastructure for Search feature
+    Create Join View for Setting section multiple declaration elements
+    Common documentation controller
+    Common comment controller
+    Create variable operation helper inside RED core
+	PREFERENCES - cell selection can stay in same cell after commiting editor
 
 Feature
+    Variable view on Nebula - sync with model
+    Settings table on Nebula
 
-      Reload library when lib file is changed
-      Automatic import lib to red.xml
-      POC  Nebula NAT table
-      UpdateSite on SourceForge  setup&tests
-      Changing button "Update Robot" to searching interpreters in PATH in Preference
-
+Task
+    Dumper for testcases & keywords
+    Merge Nebula from branch to trunk
 
