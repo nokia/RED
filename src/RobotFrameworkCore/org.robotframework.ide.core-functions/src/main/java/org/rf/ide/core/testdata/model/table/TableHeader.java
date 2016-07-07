@@ -46,10 +46,12 @@ public class TableHeader<T> extends AModelElement<T> implements ICommentHolder {
         return tableHeader;
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
+    @Override
     public void addCommentPart(final RobotToken commentWord) {
         fixComment(comment, commentWord);
         comment.add(commentWord);

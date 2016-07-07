@@ -76,6 +76,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
         updateOrCreateTokenInside(arguments, index, argument, getArgumentType());
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
@@ -103,6 +104,7 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
         this.comment.clear();
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);

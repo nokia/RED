@@ -24,6 +24,7 @@ public class IndexDeclaration extends AContainerOperation {
     }
 
 
+    @Override
     public void setLevelUpElement(final IElementDeclaration levelUpElement) {
         this.levelUpElement = levelUpElement;
     }

@@ -70,10 +70,12 @@ public class Metadata extends AModelElement<SettingTable> implements ICommentHol
         updateOrCreateTokenInside(values, index, value, RobotTokenType.SETTING_METADATA_VALUE);
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
@@ -102,6 +104,7 @@ public class Metadata extends AModelElement<SettingTable> implements ICommentHol
         this.comment.clear();
     }
 
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }

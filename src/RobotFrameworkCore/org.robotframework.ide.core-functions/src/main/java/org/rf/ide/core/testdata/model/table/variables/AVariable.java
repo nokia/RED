@@ -114,6 +114,7 @@ public abstract class AVariable extends AModelElement<VariableTable>
         return declaration;
     }
 
+    @Override
     public abstract AVariable copy();
 
     public enum VariableScope {

@@ -66,6 +66,7 @@ public class TestCaseTemplate extends AModelElement<TestCase> implements IDataDr
         return Collections.unmodifiableList(comment);
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);

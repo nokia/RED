@@ -30,6 +30,7 @@ public class UnknownSetting extends AModelElement<SettingTable> {
         return (declaration != null);
     }
 
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }
