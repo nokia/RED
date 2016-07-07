@@ -59,8 +59,6 @@ public class SettingTable extends ARobotSectionTable {
 
     private final List<UnknownSetting> unknownSettings = new ArrayList<>();
 
-    private final DataDrivenKeywordName<TestTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
-
     private final SettingTableMultipleElementsViewCreator joiner = new SettingTableMultipleElementsViewCreator();
 
     public SettingTable(final RobotFile parent) {
@@ -87,11 +85,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public LibraryImport newLibraryImport(final int index) {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_LIBRARY_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        LibraryImport libImp = new LibraryImport(dec);
+        final LibraryImport libImp = new LibraryImport(dec);
         addImported(libImp, index);
 
         return libImp;
@@ -102,11 +100,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public ResourceImport newResourceImport(final int index) {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_RESOURCE_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        ResourceImport resImp = new ResourceImport(dec);
+        final ResourceImport resImp = new ResourceImport(dec);
         addImported(resImp, index);
 
         return resImp;
@@ -117,11 +115,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public VariablesImport newVariablesImport(final int index) {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_VARIABLES_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        VariablesImport varImp = new VariablesImport(dec);
+        final VariablesImport varImp = new VariablesImport(dec);
         addImported(varImp, index);
 
         return varImp;
@@ -158,11 +156,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public SuiteDocumentation newSuiteDocumentation() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_DOCUMENTATION_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        SuiteDocumentation suiteDoc = new SuiteDocumentation(dec);
+        final SuiteDocumentation suiteDoc = new SuiteDocumentation(dec);
         addDocumentation(suiteDoc);
 
         return suiteDoc;
@@ -186,11 +184,11 @@ public class SettingTable extends ARobotSectionTable {
     }
     
     public Metadata newMetadata(final int index) {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_METADATA_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        Metadata metadata = new Metadata(dec);
+        final Metadata metadata = new Metadata(dec);
         addMetadata(metadata, index);
 
         return metadata;
@@ -227,11 +225,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public SuiteSetup newSuiteSetup() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        SuiteSetup suiteSetup = new SuiteSetup(dec);
+        final SuiteSetup suiteSetup = new SuiteSetup(dec);
         addSuiteSetup(suiteSetup);
 
         return suiteSetup;
@@ -255,11 +253,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public SuiteTeardown newSuiteTeardown() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        SuiteTeardown suiteTeardown = new SuiteTeardown(dec);
+        final SuiteTeardown suiteTeardown = new SuiteTeardown(dec);
         addSuiteTeardown(suiteTeardown);
 
         return suiteTeardown;
@@ -279,11 +277,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public ForceTags newForceTag() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_FORCE_TAGS_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        ForceTags tags = new ForceTags(dec);
+        final ForceTags tags = new ForceTags(dec);
         addForceTags(tags);
 
         return tags;
@@ -311,11 +309,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public DefaultTags newDefaultTag() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        DefaultTags tags = new DefaultTags(dec);
+        final DefaultTags tags = new DefaultTags(dec);
         addDefaultTags(tags);
 
         return tags;
@@ -339,11 +337,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public TestSetup newTestSetup() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_TEST_SETUP_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        TestSetup testSetup = new TestSetup(dec);
+        final TestSetup testSetup = new TestSetup(dec);
         addTestSetup(testSetup);
 
         return testSetup;
@@ -367,11 +365,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public TestTeardown newTestTeardown() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        TestTeardown testTeardown = new TestTeardown(dec);
+        final TestTeardown testTeardown = new TestTeardown(dec);
         addTestTeardown(testTeardown);
 
         return testTeardown;
@@ -393,7 +391,7 @@ public class SettingTable extends ARobotSectionTable {
     public String getRobotViewAboutTestTemplate() {
         String templateName = null;
         boolean useGenerator = true;
-        RobotVersion robotVersion = getParent().getParent().getRobotVersion();
+        final RobotVersion robotVersion = getParent().getParent().getRobotVersion();
         if (robotVersion != null && robotVersion.isNewerThan(new RobotVersion(2, 9))) {
             if (isDuplicatedTemplatesDeclaration()) {
                 useGenerator = false;
@@ -401,7 +399,7 @@ public class SettingTable extends ARobotSectionTable {
         }
 
         if (useGenerator) {
-            templateName = templateKeywordGenerator.createRepresentation(testTemplates);
+            templateName = DataDrivenKeywordName.createRepresentation(testTemplates);
         }
 
         return templateName;
@@ -412,11 +410,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public TestTemplate newTestTemplate() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        TestTemplate testTemplate = new TestTemplate(dec);
+        final TestTemplate testTemplate = new TestTemplate(dec);
         addTestTemplate(testTemplate);
 
         return testTemplate;
@@ -440,11 +438,11 @@ public class SettingTable extends ARobotSectionTable {
     }
 
     public TestTimeout newTestTimeout() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getRobotVersion()).getRepresentation());
 
-        TestTimeout testTimeout = new TestTimeout(dec);
+        final TestTimeout testTimeout = new TestTimeout(dec);
         addTestTimeout(testTimeout);
 
         return testTimeout;

@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +24,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
-public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentHolder {
+public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentHolder, Serializable {
+
+    private static final long serialVersionUID = -4158729064542423691L;
 
     private final static Pattern TSV_COMMENT = Pattern.compile("(\\s)*\"(\\s)*[#].*\"(\\s)*$");
 
@@ -52,7 +55,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     private IRobotTokenType getActionType() {
         IRobotTokenType actType = null;
         if (getParent() != null) {
-            Class<? extends Object> parentClass = getParent().getClass();
+            final Class<? extends Object> parentClass = getParent().getClass();
             if (parentClass == TestCase.class) {
                 actType = RobotTokenType.TEST_CASE_ACTION_NAME;
             } else if (parentClass == UserKeyword.class) {
@@ -68,7 +71,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     public void setArgument(final int index, final String argument) {
-        RobotToken token = new RobotToken();
+        final RobotToken token = new RobotToken();
         token.setText(argument);
 
         setArgument(index, token);
@@ -79,7 +82,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     public void addArgument(final RobotToken argument) {
-        IRobotTokenType argType = getArgumentType();
+        final IRobotTokenType argType = getArgumentType();
         if (argType != null) {
             fixForTheType(argument, argType, true);
         }
@@ -93,7 +96,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     private IRobotTokenType getArgumentType() {
         IRobotTokenType argType = null;
         if (getParent() != null) {
-            Class<? extends Object> parentClass = getParent().getClass();
+            final Class<? extends Object> parentClass = getParent().getClass();
             if (parentClass == TestCase.class) {
                 argType = RobotTokenType.TEST_CASE_ACTION_ARGUMENT;
             } else if (parentClass == UserKeyword.class) {
@@ -116,20 +119,20 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     @Override
-    public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+    public void setComment(final String comment) {
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comments.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comments.remove(index);
     }
 
@@ -160,9 +163,9 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         }
 
         if (types.contains(RobotTokenType.UNKNOWN) && type == ModelType.UNKNOWN) {
-            T parent = getParent();
+            final T parent = getParent();
             if (parent != null) {
-                AModelElement<?> parentModel = (AModelElement<?>) parent;
+                final AModelElement<?> parentModel = (AModelElement<?>) parent;
                 if (parentModel.getModelType() == ModelType.TEST_CASE) {
                     type = ModelType.TEST_CASE_EXECUTABLE_ROW;
                 } else if (parentModel.getModelType() == ModelType.USER_KEYWORD) {
@@ -194,12 +197,13 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         if (action != null && !action.getFilePosition().isNotSet()) {
             if (getParent() instanceof IExecutableStepsHolder) {
                 @SuppressWarnings("unchecked")
+                final
                 IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
-                FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
+                final FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
 
                 if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                    String raw = action.getRaw().trim();
-                    List<RobotToken> elementTokens = getElementTokens();
+                    final String raw = action.getRaw().trim();
+                    final List<RobotToken> elementTokens = getElementTokens();
                     if (raw.equals("\\")) {
                         if (elementTokens.size() > 1) {
                             if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
@@ -237,7 +241,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(arguments, index);
     }
 }

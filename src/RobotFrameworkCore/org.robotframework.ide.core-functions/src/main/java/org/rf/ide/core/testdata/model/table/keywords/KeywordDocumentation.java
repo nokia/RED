@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.keywords;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +19,10 @@ import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class KeywordDocumentation extends AModelElement<UserKeyword> implements ICommentHolder, IDocumentationHolder {
+public class KeywordDocumentation extends AModelElement<UserKeyword>
+        implements ICommentHolder, IDocumentationHolder, Serializable {
+
+    private static final long serialVersionUID = -137837198550190001L;
 
     private final RobotToken declaration;
 
@@ -52,7 +56,7 @@ public class KeywordDocumentation extends AModelElement<UserKeyword> implements 
     }
 
     @Override
-    public void removeDocumentationPart(int index) {
+    public void removeDocumentationPart(final int index) {
         this.text.remove(index);
     }
 
@@ -105,20 +109,20 @@ public class KeywordDocumentation extends AModelElement<UserKeyword> implements 
     }
 
     @Override
-    public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+    public void setComment(final String comment) {
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -128,7 +132,7 @@ public class KeywordDocumentation extends AModelElement<UserKeyword> implements 
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("Please see " + DocumentationServiceHandler.class);
     }
 }
