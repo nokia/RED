@@ -24,8 +24,11 @@ public class SetKeywordDefinitionCommentCommand extends EditorCommand {
         if (keyword.getComment().equals(newComment)) {
             return;
         }
-        keyword.setComment(newComment);
-
+        
+        //User Keyword has no comment inside
+        
+        //keyword.setComment(newComment);
+       
         // it has to be send, not posted
         // otherwise it is not possible to traverse between cells, because the
         // cell

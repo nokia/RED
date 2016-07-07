@@ -11,6 +11,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -57,8 +58,12 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
 
     private void updateModelElement() {
         final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
-        if(linkedElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+        ModelType modelType = linkedElement.getModelType();
+        if(modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
             ((RobotExecutableRow<?>) linkedElement).setArgument(index, value);
+        } else if (modelType == ModelType.USER_KEYWORD_TIMEOUT || modelType == ModelType.USER_KEYWORD_TAGS
+                || modelType == ModelType.USER_KEYWORD_TEARDOWN || modelType == ModelType.USER_KEYWORD_RETURN) {
+            // TODO: create updater for keyword setting
         } else {
             new SettingTableModelUpdater().update(linkedElement, index, value);
         }

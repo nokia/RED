@@ -8,7 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -31,7 +34,11 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         RobotDefinitionSetting argumentsSetting = definition.getArgumentsSetting();
         if (argumentsSetting == null) {
             argumentsSetting = definition.createDefinitionSetting(0, RobotKeywordDefinition.ARGUMENTS,
-                    new ArrayList<String>(), "");
+                   new ArrayList<String>(), "");
+            
+            KeywordArguments newArguments = definition.getLinkedElement().newArguments();
+            ((RobotKeywordCall)argumentsSetting).link(newArguments);
+            
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
         }
 
@@ -48,6 +55,12 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             changed = true;
         }
         if (changed) {
+            
+            RobotToken argToken = new RobotToken();
+            argToken.setText(value);
+            // TODO: Set arg on index
+            ((KeywordArguments)argumentsSetting.getLinkedElement()).addArgument(argToken);
+            
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
         }
 
