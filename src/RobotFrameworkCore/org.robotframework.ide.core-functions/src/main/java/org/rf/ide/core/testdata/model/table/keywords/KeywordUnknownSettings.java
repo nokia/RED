@@ -41,10 +41,12 @@ public class KeywordUnknownSettings extends AModelElement<UserKeyword> implement
         return (declaration != null);
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         this.comment.add(rt);
     }

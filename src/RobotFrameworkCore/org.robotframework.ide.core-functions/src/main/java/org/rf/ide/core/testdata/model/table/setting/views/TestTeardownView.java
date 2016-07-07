@@ -43,6 +43,7 @@ public class TestTeardownView extends TestTeardown implements ISingleElementView
         }
     }
 
+    @Override
     public boolean isForceRebuild() {
         return changeForceRebuild;
     }
@@ -101,6 +102,7 @@ public class TestTeardownView extends TestTeardown implements ISingleElementView
         super.addCommentPart(rt);
     }
 
+    @Override
     public synchronized void joinIfNeeded() {
         if (teardowns.size() > 1) {
             TestTeardown joined = new TestTeardown(getDeclaration());

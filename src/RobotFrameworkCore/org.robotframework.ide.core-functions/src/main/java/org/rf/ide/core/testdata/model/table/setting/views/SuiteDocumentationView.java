@@ -31,6 +31,7 @@ public class SuiteDocumentationView extends SuiteDocumentation implements ISingl
         copyWithoutJoinIfNeededExecution(doc);
     }
 
+    @Override
     public boolean isForceRebuild() {
         return changeForceRebuild;
     }
@@ -87,6 +88,7 @@ public class SuiteDocumentationView extends SuiteDocumentation implements ISingl
         super.setComment(rt);
     }
 
+    @Override
     public synchronized void joinIfNeeded() {
         if (suiteDocs.size() > 1) {
             SuiteDocumentation joined = new SuiteDocumentation(getDeclaration());

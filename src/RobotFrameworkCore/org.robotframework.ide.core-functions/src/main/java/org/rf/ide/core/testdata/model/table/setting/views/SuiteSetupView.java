@@ -32,6 +32,7 @@ public class SuiteSetupView extends SuiteSetup implements ISingleElementViewer {
         this.changeForceRebuild = changeForceRebuild;
     }
 
+    @Override
     public boolean isForceRebuild() {
         return changeForceRebuild;
     }
@@ -101,6 +102,7 @@ public class SuiteSetupView extends SuiteSetup implements ISingleElementViewer {
         super.addCommentPart(rt);
     }
 
+    @Override
     public synchronized void joinIfNeeded() {
         if (setups.size() > 1) {
             SuiteSetup joined = new SuiteSetup(getDeclaration());

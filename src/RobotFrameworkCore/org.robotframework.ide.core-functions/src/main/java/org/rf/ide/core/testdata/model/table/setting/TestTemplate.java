@@ -93,6 +93,7 @@ public class TestTemplate extends AModelElement<SettingTable>
         return comment;
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
