@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/6/16 5:21 PM
+Save-Time: 7/7/16 9:15 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -21,40 +21,40 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
 
 //select element from outlin by click or double click
 get-view Outline | get-tree | select "TestFile.robot/Variables/var1" | double-click
-is-row-fully-selected -file "TestFile.robot" -row 1
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 1
 
 get-view Outline | get-tree | select [get-item "TestFile.robot/Variables" | get-item "" -index 1]
-is-row-fully-selected -file "TestFile.robot" -row 8
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 8
 
 get-view Outline | get-tree | select "TestFile.robot/Variables/multiline"
-is-row-fully-selected -file "TestFile.robot" -row 15
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 15
 
 get-view Outline | get-tree | select "TestFile.robot/Variables/list" | click
-is-row-fully-selected -file "TestFile.robot" -row 7
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 7
 
 //select var from Project explorer
 
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFile.robot/Variables/var" | double-click
 }
-is-row-fully-selected -file "TestFile.robot" -row 0
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 0
 
 with [get-view "Project Explorer" | get-tree] {
     select [get-item "RobotProject/TestFile.robot/Variables" | get-item "" -index 1] | double-click
 }
-is-row-fully-selected -file "TestFile.robot" -row 8
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 8
 
 with [get-view "Project Explorer" | get-tree] {
     select "RobotProject/TestFile.robot/Variables/list with equals sign" | double-click
 }
-is-row-fully-selected -file "TestFile.robot" -row 13
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 13
 
 //select focus on newDict
 get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1 | key-type Up -times 4
 
 //use project explorer 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot/Variables/ref" | double-click
-is-row-fully-selected -file "TestFile.robot" -row 3
+is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 3
 
 
 get-editor "TestFile.robot" | get-canvas -after [get-label Variables] -index 1 | get-menu "Add new scalar" | click
@@ -145,4 +145,8 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/TestFile.robot/Variables" | get-property "getItems().TreeItem[18].getText()" 
         | equals "very long param name with vary long value and commnet" | verify-true
 }
+
+
+
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
