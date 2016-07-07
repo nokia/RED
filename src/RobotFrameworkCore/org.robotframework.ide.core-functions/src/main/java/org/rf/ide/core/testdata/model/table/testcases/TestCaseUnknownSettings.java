@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.testcases;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -16,7 +17,9 @@ import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public class TestCaseUnknownSettings extends AModelElement<TestCase> implements ICommentHolder {
+public class TestCaseUnknownSettings extends AModelElement<TestCase> implements ICommentHolder, Serializable {
+
+    private static final long serialVersionUID = 1287278852243033746L;
 
     private final RobotToken declaration;
 
@@ -58,20 +61,20 @@ public class TestCaseUnknownSettings extends AModelElement<TestCase> implements 
     }
 
     @Override
-    public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+    public void setComment(final String comment) {
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -87,7 +90,7 @@ public class TestCaseUnknownSettings extends AModelElement<TestCase> implements 
 
     @Override
     public List<RobotToken> getElementTokens() {
-        List<RobotToken> elems = new LinkedList<>();
+        final List<RobotToken> elems = new LinkedList<>();
         if (isPresent()) {
             elems.add(declaration);
             elems.addAll(arguments);
@@ -102,7 +105,7 @@ public class TestCaseUnknownSettings extends AModelElement<TestCase> implements 
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(arguments, index);
     }
 }
