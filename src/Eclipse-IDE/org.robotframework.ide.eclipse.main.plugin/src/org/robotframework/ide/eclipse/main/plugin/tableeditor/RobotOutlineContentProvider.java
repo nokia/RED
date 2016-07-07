@@ -8,7 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -48,6 +50,8 @@ import com.google.common.collect.Multimap;
 
 public class RobotOutlineContentProvider extends TreeContentProvider {
 
+    private final Map<SettingsGroup, ArtificialGroupingRobotElement> groupingElements = new HashMap<>();
+
     private TreeViewer viewer;
 
     @Inject
@@ -60,6 +64,10 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
         ContextInjectionFactory.inject(this, activeContext);
     }
 
+    ArtificialGroupingRobotElement getGroupingElement(final SettingsGroup group) {
+        return groupingElements.get(group);
+    }
+
 	@Override
 	public void dispose() {
         final IEclipseContext activeContext = getContext().getActiveLeaf();
@@ -67,7 +75,7 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
 	}
 
     private IEclipseContext getContext() {
-        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }
 
 	@Override
@@ -95,6 +103,8 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
     }
 	
     private List<RobotElement> groupedChildren(final List<? extends RobotElement> children) {
+        groupingElements.clear();
+        
         final List<RobotElement> grouped = new ArrayList<>(children);
         final Multimap<SettingsGroup, RobotSetting> removedElements = LinkedHashMultimap.create();
 
@@ -109,7 +119,9 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
             }
         }
         for (final SettingsGroup key : removedElements.keySet()) {
-            grouped.add(new ArtificialGroupingRobotElement(key, new ArrayList<>(removedElements.get(key))));
+            final ArtificialGroupingRobotElement groupingElement = new ArtificialGroupingRobotElement(key, new ArrayList<>(removedElements.get(key)));
+            grouped.add(groupingElement);
+            groupingElements.put(key, groupingElement);
         }
         return grouped;
     }
@@ -123,7 +135,7 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
                     final AModelElement<?> linkedElement = ((RobotKeywordCall) element).getLinkedElement();
                     if (linkedElement != null && linkedElement instanceof RobotExecutableRow<?>) {
                         final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-                        //TODO: checking row type should be done without building line description 
+                        //TODO: checking row type should be done without building line description
                         return row.isExecutable() && row.buildLineDescription().getRowType() != ERowType.FOR_CONTINUE;
                     }
                 }
