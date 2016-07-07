@@ -28,7 +28,6 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
@@ -468,6 +467,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 120, 150,
+                new GeneralSettingsAssistanceLabelAccumulator(dataProvider),
                 new AlternatingRowConfigLabelAccumulator(), new EmptyGeneralSettingLabelAcumulator(dataProvider));
         final GlazedListsEventLayer<Entry<String, RobotElement>> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
@@ -497,6 +497,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 cornerLayer);
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, null,
                 SettingsTableEditableRule.createEditableRule(fileModel)));
+        gridLayer.addConfiguration(new GeneralSettingsEditConfiguration(fileModel));
 
         addGeneralSettingsConfigAttributes(configRegistry);
 
