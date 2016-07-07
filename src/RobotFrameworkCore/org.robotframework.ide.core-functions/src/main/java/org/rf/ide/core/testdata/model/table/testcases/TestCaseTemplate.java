@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.testcases;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,7 +18,10 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestCaseTemplate extends AModelElement<TestCase> implements IDataDrivenSetting, ICommentHolder {
+public class TestCaseTemplate extends AModelElement<TestCase>
+        implements IDataDrivenSetting, ICommentHolder, Serializable {
+
+    private static final long serialVersionUID = -3597368615403861260L;
 
     private final RobotToken declaration;
 
@@ -73,20 +77,20 @@ public class TestCaseTemplate extends AModelElement<TestCase> implements IDataDr
     }
 
     @Override
-    public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+    public void setComment(final String comment) {
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -121,7 +125,7 @@ public class TestCaseTemplate extends AModelElement<TestCase> implements IDataDr
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(unexpectedTrashArguments, index);
     }
 }
