@@ -14,7 +14,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 public class VariablesValueConverter {
 
     public static RobotToken toRobotToken(final String c) {
-        RobotToken t = new RobotToken();
+        final RobotToken t = new RobotToken();
         t.setText(c);
 
         return t;
@@ -32,28 +32,27 @@ public class VariablesValueConverter {
         return toRobotToken(pair.getRaw().getText());
     }
 
-    @SuppressWarnings("unchecked")
     public static <T> List<T> convert(final List<?> elems, final Class<T> toConversion) {
-        final List<T> c = new ArrayList<T>();
+        final List<T> c = new ArrayList<>();
         for (final Object o : elems) {
             final Class<?> oClass = o.getClass();
             if (oClass == toConversion) {
-                c.add((T) toConversion.cast(o));
+                c.add(toConversion.cast(o));
             } else if (toConversion == RobotToken.class) {
                 if (oClass == String.class) {
-                    c.add((T) toConversion.cast(toRobotToken((String) o)));
+                    c.add(toConversion.cast(toRobotToken((String) o)));
                 } else if (oClass == DictionaryKeyValuePair.class) {
-                    c.add((T) toConversion.cast(fromDictionaryKeyValuePair((DictionaryKeyValuePair) o)));
+                    c.add(toConversion.cast(fromDictionaryKeyValuePair((DictionaryKeyValuePair) o)));
                 }
             } else if (toConversion == DictionaryKeyValuePair.class) {
                 if (oClass == String.class) {
-                    c.add((T) toConversion.cast(fromString((String) o)));
+                    c.add(toConversion.cast(fromString((String) o)));
                 } else if (oClass == RobotToken.class) {
-                    c.add((T) toConversion.cast(fromRobotToken((RobotToken) o)));
+                    c.add(toConversion.cast(fromRobotToken((RobotToken) o)));
                 }
             } else {
                 // possible class exception
-                c.add((T) toConversion.cast(o));
+                c.add(toConversion.cast(o));
             }
         }
 
