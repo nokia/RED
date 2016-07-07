@@ -11,24 +11,24 @@ import org.rf.ide.core.testdata.model.IDataDrivenSetting;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
-public class DataDrivenKeywordName<T extends IDataDrivenSetting> {
+public class DataDrivenKeywordName {
 
-    public String createRepresentation(final List<T> templateArguments) {
+    public static <T extends IDataDrivenSetting> String createRepresentation(final List<T> templateArguments) {
         String templateKeywordName = null;
         if (!templateArguments.isEmpty()) {
-            StringBuilder templateName = new StringBuilder("");
-            int templatesNumber = templateArguments.size();
+            final StringBuilder templateName = new StringBuilder("");
+            final int templatesNumber = templateArguments.size();
             for (int templateId = 0; templateId < templatesNumber; templateId++) {
-                StringBuilder templateText = new StringBuilder("");
-                IDataDrivenSetting template = templateArguments.get(templateId);
-                RobotToken keywordName = template.getKeywordName();
+                final StringBuilder templateText = new StringBuilder("");
+                final IDataDrivenSetting template = templateArguments.get(templateId);
+                final RobotToken keywordName = template.getKeywordName();
                 if (keywordName != null) {
                     templateText.append(keywordName.getRaw().toString());
                 }
 
-                List<RobotToken> unexpectedTrashArguments = template
+                final List<RobotToken> unexpectedTrashArguments = template
                         .getUnexpectedTrashArguments();
-                int numberOfTrashArgumentsLength = unexpectedTrashArguments
+                final int numberOfTrashArgumentsLength = unexpectedTrashArguments
                         .size();
 
                 for (int trashArgumentId = 0; trashArgumentId < numberOfTrashArgumentsLength; trashArgumentId++) {

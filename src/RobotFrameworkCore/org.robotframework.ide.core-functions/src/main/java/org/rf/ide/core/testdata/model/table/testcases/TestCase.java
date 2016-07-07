@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.testcases;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +24,9 @@ import org.rf.ide.core.testdata.model.table.setting.TestTemplate;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestCase extends AModelElement<TestCaseTable> implements IExecutableStepsHolder<TestCase> {
+public class TestCase extends AModelElement<TestCaseTable> implements IExecutableStepsHolder<TestCase>, Serializable {
+
+    private static final long serialVersionUID = -3132511868734109797L;
 
     private RobotToken testName;
 
@@ -42,8 +45,6 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     private final List<TestCaseUnknownSettings> unknownSettings = new ArrayList<>(0);
 
     private final List<RobotExecutableRow<TestCase>> testContext = new ArrayList<>();
-
-    private final DataDrivenKeywordName<TestCaseTemplate> templateKeywordGenerator = new DataDrivenKeywordName<>();
 
     public TestCase(final RobotToken testName) {
         this.testName = testName;
@@ -111,14 +112,14 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public TestDocumentation newDocumentation() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
                 .getRepresentation());
 
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
 
-        TestDocumentation testDoc = new TestDocumentation(dec);
+        final TestDocumentation testDoc = new TestDocumentation(dec);
         addDocumentation(testDoc);
 
         return testDoc;
@@ -134,14 +135,14 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public TestCaseTags newTags() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
                 .getRepresentation());
 
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION);
 
-        TestCaseTags testTags = new TestCaseTags(dec);
+        final TestCaseTags testTags = new TestCaseTags(dec);
         addTag(testTags);
 
         return testTags;
@@ -157,14 +158,14 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public TestCaseSetup newSetup() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.TEST_CASE_SETTING_SETUP
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
                 .getRepresentation());
 
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_SETUP);
 
-        TestCaseSetup testSetup = new TestCaseSetup(dec);
+        final TestCaseSetup testSetup = new TestCaseSetup(dec);
         addSetup(testSetup);
 
         return testSetup;
@@ -180,14 +181,14 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public TestCaseTeardown newTeardown() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.TEST_CASE_SETTING_TEARDOWN
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
                 .getRepresentation());
 
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TEARDOWN);
 
-        TestCaseTeardown testTeardown = new TestCaseTeardown(dec);
+        final TestCaseTeardown testTeardown = new TestCaseTeardown(dec);
         addTeardown(testTeardown);
 
         return testTeardown;
@@ -203,14 +204,14 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public TestCaseTemplate newTemplate() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.TEST_CASE_SETTING_TEMPLATE
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
                 .getRepresentation());
 
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TEMPLATE);
 
-        TestCaseTemplate testTemplate = new TestCaseTemplate(dec);
+        final TestCaseTemplate testTemplate = new TestCaseTemplate(dec);
         addTemplate(testTemplate);
 
         return testTemplate;
@@ -226,14 +227,14 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public TestCaseTimeout newTimeout() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.TEST_CASE_SETTING_TIMEOUT
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
                 .getRepresentation());
 
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TIMEOUT);
 
-        TestCaseTimeout testTimeout = new TestCaseTimeout(dec);
+        final TestCaseTimeout testTimeout = new TestCaseTimeout(dec);
         addTimeout(testTimeout);
 
         return testTimeout;
@@ -312,7 +313,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     public RobotToken getTemplateKeywordLocation() {
         RobotToken token = new RobotToken();
 
-        String templateKeyword = getRobotViewAboutTestTemplate();
+        final String templateKeyword = getRobotViewAboutTestTemplate();
         if (templateKeyword == null) {
             final SettingTable settingTable = getParent().getParent().getSettingTable();
             if (settingTable.isPresent()) {
@@ -357,7 +358,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public String getRobotViewAboutTestTemplate() {
-        return templateKeywordGenerator.createRepresentation(templates);
+        return DataDrivenKeywordName.createRepresentation(templates);
     }
 
     @Override
@@ -367,7 +368,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     @Override
     public List<AModelElement<TestCase>> getUnitSettings() {
-        List<AModelElement<TestCase>> settings = new ArrayList<>();
+        final List<AModelElement<TestCase>> settings = new ArrayList<>();
         settings.addAll(getDocumentation());
         settings.addAll(getTags());
         settings.addAll(getSetups());
@@ -380,7 +381,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("This operation is not allowed inside TestCase.");
     }
 }
