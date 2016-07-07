@@ -353,6 +353,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenVariableIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_REMOVED) final RobotSuiteFileSection section) {
         whenVariableIsAddedOrRemoved(section);
+        if (getSection() != null && section.getChildren().isEmpty()) {
+            selectionLayerAccessor.getSelectionLayer().clear();
+        }
     }
 
     @Inject
