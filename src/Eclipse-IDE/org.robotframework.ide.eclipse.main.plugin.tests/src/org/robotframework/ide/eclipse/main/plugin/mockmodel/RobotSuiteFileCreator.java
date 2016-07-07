@@ -39,4 +39,12 @@ public class RobotSuiteFileCreator {
         model.reparseEverything(content);
         return model;
     }
+
+    public RobotSuiteFile buildReadOnly() {
+        final String content = Joiner.on('\n').join(lines);
+        final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
+        final RobotSuiteStreamFile model = new RobotSuiteStreamFile("file.robot", stream, true);
+        model.reparseEverything(content);
+        return model;
+    }
 }
