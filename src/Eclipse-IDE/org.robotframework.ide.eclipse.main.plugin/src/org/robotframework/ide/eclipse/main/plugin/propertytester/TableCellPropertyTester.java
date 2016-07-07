@@ -64,15 +64,21 @@ public class TableCellPropertyTester extends PropertyTester {
     }
 
     private boolean testProperty(final RobotFormEditor editor, final String property, final int expected) {
-        final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
-        if (viewerAccessor == null) {
-            return false;
-        }
         if ("focusedCellHasIndex".equals(property)) {
+            final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
+            if (viewerAccessor == null) {
+                return false;
+            }
             final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
             final int positionIndex = Viewers.createOrderIndexToPositionIndex(viewerAccessor.getViewer(),
                     focusedCell.getColumnIndex());
             return focusedCell != null && positionIndex == expected;
+        } else if ("numberOfSelectedCellEquals".equals(property)) {
+            final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
+            if (selectionLayerAccessor == null) {
+                return false;
+            }
+            return selectionLayerAccessor.getSelectionLayer().getSelectedCellPositions().length == expected;
         }
         return false;
     }

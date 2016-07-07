@@ -15,7 +15,6 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -30,7 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommen
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.GeneralSettingsModel;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.PasteSettingsHandler.E4PasteSettingsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -47,16 +46,15 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
     public static class E4PasteSettingsHandler {
 
         @Execute
-        public Object pasteKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+        public void pasteKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
                 final RobotEditorCommandsStack commandsStack,
-                @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
-            final Object probablySettings = clipboard.getContents(KeywordCallsTransfer.getInstance());
-            if (probablySettings instanceof RobotKeywordCall[]) {
-                insertSettings(editor, fileModel, commandsStack, selection, (RobotKeywordCall[]) probablySettings);
+            final RobotKeywordCall[] probablySettings = clipboard.getKeywordCalls();
+            if (probablySettings != null) {
+                insertSettings(editor, fileModel, commandsStack, selection, probablySettings);
             }
-            return null;
         }
 
         private void insertSettings(final RobotFormEditor editor, final RobotSuiteFile fileModel,
@@ -119,7 +117,7 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
                         .fillSettingsMapping(section.get());
                 final String[] generalSettingsNames = settingsMappingBeforeAddition.keySet().toArray(new String[0]);
                 final List<Integer> createdRows = new ArrayList<>();
-                for (PositionCoordinate position : selectedCellPositions) {
+                for (final PositionCoordinate position : selectedCellPositions) {
                     final int selectedRowNumber = position.getRowPosition();
                     if (!createdRows.contains(selectedRowNumber) && selectedRowNumber >= 0
                             && selectedRowNumber < generalSettingsNames.length

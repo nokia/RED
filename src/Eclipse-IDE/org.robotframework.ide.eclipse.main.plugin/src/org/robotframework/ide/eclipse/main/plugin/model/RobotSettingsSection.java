@@ -111,6 +111,10 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return getSettingsFromGroup(SettingsGroup.METADATA);
     }
 
+    public List<RobotKeywordCall> getGeneralSettings() {
+        return getSettingsFromGroup(SettingsGroup.NO_GROUP);
+    }
+
     public List<RobotKeywordCall> getResourcesSettings() {
         return getSettingsFromGroup(SettingsGroup.RESOURCES);
     }

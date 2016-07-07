@@ -8,10 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 import org.eclipse.core.expressions.PropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
 
 public class RedXmlEditorPropertyTester extends PropertyTester {
+
+    @VisibleForTesting static final String RED_XML_IS_EDITABLE = "redXmlIsEditable";
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
@@ -26,7 +29,7 @@ public class RedXmlEditorPropertyTester extends PropertyTester {
     }
 
     private boolean testProperty(final RedProjectEditor editor, final String property, final boolean expected) {
-        if ("redXmlIsEditable".equals(property)) {
+        if (RED_XML_IS_EDITABLE.equals(property)) {
             return editor.getRedProjectEditorInput().isEditable() == expected;
         }
         return false;

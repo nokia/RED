@@ -12,21 +12,15 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
 
 public class RedXmlForNavigatorPropertyTester extends PropertyTester {
 
-    public static final String NAMESPACE = "org.robotframework.redxml.navigator";
-
-    public static final String IS_EXCLUDED = "isExcluded";
-    public static final String PROPERTY_IS_EXCLUDED = NAMESPACE + "." + IS_EXCLUDED;
-
-    public static final String IS_INCLUDED = "isIncluded";
-    public static final String PROPERTY_IS_INCLUDED = NAMESPACE + "." + IS_INCLUDED;
-
-    public static final String IS_INTERNAL_FOLDER = "isInternalFolder";
-    public static final String PROPERTY_IS_INTERNAL_FOLDER = NAMESPACE + "." + IS_INTERNAL_FOLDER;
+    @VisibleForTesting static final String IS_EXCLUDED = "isExcluded";
+    @VisibleForTesting static final String IS_INCLUDED = "isIncluded";
+    @VisibleForTesting static final String IS_INTERNAL_FOLDER = "isInternalFolder";
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
