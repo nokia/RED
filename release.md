@@ -1,4 +1,4 @@
-# RED - Robot Editor v0.6.4
+# RED - Robot Editor v0.6.5
 ## Introduction
 RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
 Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
@@ -13,7 +13,6 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 Product zip is ready to use RED installation bundled with Eclipse Mars. There is no need to install RED feature into it. Choose proper OS version from **Downloads** section.
 
 ### Feature
-Download RED eclipse feature zip: https://github.com/nokia/RED/releases/download/0.6.4/RED_0.6.4.201605051229.zip
 Please refer to First Steps doc under https://github.com/nokia/RED/blob/master/First_steps.md
 
 #### Install form Marketplace/Update Site
@@ -25,6 +24,7 @@ http://master.dl.sourceforge.net/project/red-robot-editor/repository
 
 
 #### Install on clean Eclipse 
+Download RED eclipse feature zip: https://github.com/nokia/RED/releases/download/0.6.5/RED_feature_0.6.5.201607071101.zip
 In short:
 - GUI: Help -> Install New software -> Add -> Archive and continue with prompts (unselect "Contact all update sites) 
 - CLI: by issuing command: 
@@ -37,14 +37,19 @@ Uninstall:
 Open Help -> Installation Details, select old RED feature and perform uninstall
 
 ## Updates
-- Corrected bug for Debug when Suite Setup was inside __init__ file for RobotFramework version greater than 3.0
-- Updated RED to support :For in Suite Setup in Debug for RobotFramework 2.9 
+- Variables and Settings Table sync with Source
+- It should be possible to add/remove RED project nature without editing project file
+- PREFERENCES - cell selection can stay in same cell after commiting editor
+- #21 - Editor do not open when separator is pipe and for-item text after \ is like ${a} s
+- #23 - RED run of of memory during debugging StackOverflowException happens 
+- #29 - Missing suite file for execution during debug caused by \_\_init\_\_.py file 
+- #11 - Source code release
 - Check **[changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)** for details
 
 ## What's in the package
 - Robot Perspective & Robot nature (Project,files and other file artefacts)
 - Text Source editor with syntax coloring, code assistance and real-time validation
-- Table editors (non persistent for trial usage)
+- Table editors - Variables&Settings synced with Source, Testcases&Keywords non persistent yet
 - Debug Perspective for test case debugging with breakpoints, stepping, variable watch
 - Remote debug
 - Support for dictionaries & lists
@@ -56,11 +61,11 @@ Open Help -> Installation Details, select old RED feature and perform uninstall
 - Cannot delete library by right click of mouse in red.xml under Ubuntu/Mint. Use Delete key as workaround
 - GTK3 seems to mess up with Eclipse under Linux. Force usage of GTK2 by executing command in terminal: export SWT_GTK3=0
 - Eclipse does not have UTF-8 support in editors by default. Check Preferences and RED help to get how to change it. 
-- Table editors edits are not persistent, changes done in Table editors will not be visible in source nor saved to file. Sync is done from Source -> Table only.
+- Keywords and Testcases Table editors are not persistent, changes done will not be visible in source nor saved to file. 
 - Due to difficult to comprehend and countless exceptions in RF syntax, validation can show false positive errors. In such case please provide us sample test case for us to have a look at.
 
 ## Short term plans
-- Table Editor persistency
+- Table Editor persistency in Keywords and Testcases Table editors
 
 
 
