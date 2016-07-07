@@ -33,6 +33,7 @@ public class TestTimeoutView extends TestTimeout implements ISingleElementViewer
         copyWithoutJoinIfNeededExecution(timeout);
     }
 
+    @Override
     public boolean isForceRebuild() {
         return changeForceRebuild;
     }
@@ -103,6 +104,7 @@ public class TestTimeoutView extends TestTimeout implements ISingleElementViewer
         super.setComment(rt);
     }
 
+    @Override
     public synchronized void joinIfNeeded() {
         if (timeouts.size() > 1) {
             TestTimeout joined = new TestTimeout(getDeclaration());

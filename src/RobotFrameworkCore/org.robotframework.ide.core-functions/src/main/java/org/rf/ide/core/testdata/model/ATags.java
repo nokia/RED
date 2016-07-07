@@ -62,6 +62,7 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
         updateOrCreateTokenInside(tags, index, tag, getTagType());
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
@@ -89,6 +90,7 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
         this.comment.clear();
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         this.fixComment(comment, rt);
         this.comment.add(rt);

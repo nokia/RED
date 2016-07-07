@@ -500,6 +500,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         return sep;
     }
 
+    @Override
     public void setContext(final DumpContext ctx) {
         this.dumpContext = ctx;
     }

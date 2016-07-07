@@ -33,6 +33,7 @@ public class DefaultTagsView extends DefaultTags implements ISingleElementViewer
         copyWithoutJoinIfNeededExecution(tags);
     }
 
+    @Override
     public boolean isForceRebuild() {
         return changeForceRebuild;
     }
@@ -89,6 +90,7 @@ public class DefaultTagsView extends DefaultTags implements ISingleElementViewer
         super.addCommentPart(rt);
     }
 
+    @Override
     public synchronized void joinIfNeeded() {
         if (defaultTags.size() > 1) {
             DefaultTags joined = new DefaultTags(getDeclaration());

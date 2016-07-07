@@ -32,6 +32,7 @@ public class ForceTagsView extends ForceTags implements ISingleElementViewer {
         copyWithoutJoinIfNeededExecution(tags);
     }
 
+    @Override
     public boolean isForceRebuild() {
         return changeForceRebuild;
     }
@@ -88,6 +89,7 @@ public class ForceTagsView extends ForceTags implements ISingleElementViewer {
         super.addCommentPart(rt);
     }
 
+    @Override
     public synchronized void joinIfNeeded() {
         if (forceTags.size() > 1) {
             ForceTags joined = new ForceTags(getDeclaration());

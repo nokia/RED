@@ -48,10 +48,12 @@ public class KeywordArguments extends AModelElement<UserKeyword> implements ICom
         arguments.add(argument);
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);

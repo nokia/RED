@@ -39,6 +39,7 @@ public class TestTimeout extends AModelElement<SettingTable> implements IComment
         return (declaration != null);
     }
 
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }
@@ -79,10 +80,12 @@ public class TestTimeout extends AModelElement<SettingTable> implements IComment
         updateOrCreateTokenInside(message, index, argument, RobotTokenType.SETTING_TEST_TIMEOUT_MESSAGE);
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return comment;
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);

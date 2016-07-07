@@ -36,10 +36,12 @@ public abstract class AImported extends AModelElement<SettingTable> implements I
         this.declaration = declaration;
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
+    @Override
     public void setComment(final String comment) {
         RobotToken token = new RobotToken();
         token.setText(comment);
@@ -47,11 +49,13 @@ public abstract class AImported extends AModelElement<SettingTable> implements I
         setComment(token);
     }
 
+    @Override
     public void setComment(final RobotToken rt) {
         this.comment.clear();
         addCommentPart(rt);
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);

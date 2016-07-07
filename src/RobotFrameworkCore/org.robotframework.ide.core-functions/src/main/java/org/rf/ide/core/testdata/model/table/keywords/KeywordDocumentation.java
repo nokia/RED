@@ -30,19 +30,23 @@ public class KeywordDocumentation extends AModelElement<UserKeyword> implements 
         this.declaration = declaration;
     }
 
+    @Override
     public void addDocumentationText(final RobotToken token) {
         fixForTheType(token, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT, true);
         text.add(token);
     }
 
+    @Override
     public List<RobotToken> getDocumentationText() {
         return Collections.unmodifiableList(text);
     }
 
+    @Override
     public void setDocumentationText(final int index, final String docText) {
         updateOrCreateTokenInside(text, index, docText, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT);
     }
 
+    @Override
     public void setDocumentationText(final int index, final RobotToken docText) {
         updateOrCreateTokenInside(text, index, docText, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT);
     }
@@ -57,10 +61,12 @@ public class KeywordDocumentation extends AModelElement<UserKeyword> implements 
         this.text.clear();
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);

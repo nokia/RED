@@ -104,11 +104,13 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         return argType;
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comments.add(rt);
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comments);
     }
