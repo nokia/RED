@@ -11,11 +11,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
-import org.eclipse.swt.dnd.Clipboard;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 
 public class PasteSettingsCellsCommandsCollectorTest {
 
@@ -92,7 +93,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         final int[] rowsToPaste = new int[] { 2, 3 };
 
         final List<RobotElement> selectedSettings = getSettingsByRowNumbers(metadataSettings, rowsToPaste);
-        SelectionLayer selectionLayer = createSelectionToPaste(columnsToPaste, rowsToPaste, 3);
+        final SelectionLayer selectionLayer = createSelectionToPaste(columnsToPaste, rowsToPaste, 3);
 
         final DummyPasteSettingsCellsCommandsCollector commandsCollector = createDummyCommandsCollector(
                 settingsFromClipboard, cellPositionsFromClipboard);
@@ -130,7 +131,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         final int[] rowsToPaste = new int[] { 2 };
 
         final List<RobotElement> selectedSettings = getSettingsByRowNumbers(metadataSettings, rowsToPaste);
-        SelectionLayer selectionLayer = createSelectionToPaste(columnsToPaste, rowsToPaste, 3);
+        final SelectionLayer selectionLayer = createSelectionToPaste(columnsToPaste, rowsToPaste, 3);
 
         final DummyPasteSettingsCellsCommandsCollector commandsCollector = createDummyCommandsCollector(
                 settingsFromClipboard, cellPositionsFromClipboard);
@@ -168,7 +169,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         final int[] rowsToPaste = new int[] { 1, 2 };
 
         final List<RobotElement> selectedSettings = getSettingsByRowNumbers(metadataSettings, rowsToPaste);
-        SelectionLayer selectionLayer = createSelectionToPaste(columnsToPaste, rowsToPaste, 3);
+        final SelectionLayer selectionLayer = createSelectionToPaste(columnsToPaste, rowsToPaste, 3);
 
         final DummyPasteSettingsCellsCommandsCollector commandsCollector = createDummyCommandsCollector(
                 settingsFromClipboard, cellPositionsFromClipboard);
@@ -206,7 +207,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         final int[] rowsToPaste = new int[] { 0, 1 };
 
         final List<RobotElement> selectedSettings = getSettingsByRowNumbers(metadataSettings, rowsToPaste);
-        SelectionLayer selectionLayer = createSelectionToPaste(columnsToPaste, rowsToPaste, 3);
+        final SelectionLayer selectionLayer = createSelectionToPaste(columnsToPaste, rowsToPaste, 3);
 
         final DummyPasteSettingsCellsCommandsCollector commandsCollector = createDummyCommandsCollector(
                 settingsFromClipboard, cellPositionsFromClipboard);
@@ -251,7 +252,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
     private void verifySelectedSettingsInPasteCommandsInput(final List<PasteCommandsInput> pasteCommandsInputs,
             final List<RobotElement> selectedSettings, final int[] columnsToPaste) {
         int pasteCommandInputsShift = 0;
-        for (RobotElement selectedSetting : selectedSettings) {
+        for (final RobotElement selectedSetting : selectedSettings) {
             verifySelectedSetting(pasteCommandsInputs.subList(pasteCommandInputsShift,
                     pasteCommandInputsShift + columnsToPaste.length), selectedSetting, columnsToPaste);
             pasteCommandInputsShift += columnsToPaste.length;
@@ -276,7 +277,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
     }
 
     private SelectionLayer createSelectionToPaste(final int[] columnsToPaste, final int[] rowsToPaste,
-            int columnsCount) {
+            final int columnsCount) {
         final SelectionLayer selectionLayer = mock(SelectionLayer.class);
         when(selectionLayer.getColumnCount()).thenReturn(columnsCount);
         final PositionCoordinate[] selectedPositions = new PositionCoordinate[columnsToPaste.length
@@ -294,7 +295,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
     }
 
     private PositionCoordinateSerializer[] createPositionsToCopy(final int[] columnsToCopy, final int[] rowsToCopy) {
-        PositionCoordinateSerializer[] cellPositionsToCopy = new PositionCoordinateSerializer[columnsToCopy.length
+        final PositionCoordinateSerializer[] cellPositionsToCopy = new PositionCoordinateSerializer[columnsToCopy.length
                 * rowsToCopy.length];
         int positionCounter = 0;
         for (int i = 0; i < columnsToCopy.length; i++) {
@@ -322,33 +323,33 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
         private PositionCoordinateSerializer[] cellPositionsFromClipboard;
 
-        private List<PasteCommandsInput> pasteCommandsInputs = newArrayList();
+        private final List<PasteCommandsInput> pasteCommandsInputs = newArrayList();
 
         @Override
-        protected boolean hasPositionsCoordinatesInClipboard(final Clipboard clipboard) {
+        protected boolean hasPositionsCoordinatesInClipboard(final RedClipboard clipboard) {
             return true;
         }
 
         @Override
-        protected PositionCoordinateSerializer[] getPositionsCoordinatesFromClipboard(final Clipboard clipboard) {
+        protected PositionCoordinateSerializer[] getPositionsCoordinatesFromClipboard(final RedClipboard clipboard) {
             return cellPositionsFromClipboard;
         }
 
         @Override
-        protected boolean hasRobotElementsInClipboard(final Clipboard clipboard) {
+        protected boolean hasRobotElementsInClipboard(final RedClipboard clipboard) {
             return true;
         }
 
         @Override
-        protected RobotElement[] getRobotElementsFromClipboard(final Clipboard clipboard) {
+        protected RobotElement[] getRobotElementsFromClipboard(final RedClipboard clipboard) {
             return settingsFromClipboard;
         }
 
         @Override
-        protected void collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
-                final int selectedElementColumnIndex, final List<String> valuesToPaste, final int tableColumnsCount,
-                List<EditorCommand> pasteCommands) {
+        protected List<EditorCommand> collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
+                final List<String> valuesToPaste, final int selectedElementColumnIndex, final int tableColumnsCount) {
             pasteCommandsInputs.add(new PasteCommandsInput(selectedElement, selectedElementColumnIndex, valuesToPaste));
+            return new ArrayList<>();
         }
 
         public void setSettingsFromClipboard(final RobotSetting[] settingsFromClipboard) {
@@ -367,14 +368,14 @@ public class PasteSettingsCellsCommandsCollectorTest {
 
     class PasteCommandsInput {
 
-        private RobotElement selectedElement;
+        private final RobotElement selectedElement;
 
-        private int selectedElementColumnIndex;
+        private final int selectedElementColumnIndex;
 
-        private List<String> valuesToPaste;
+        private final List<String> valuesToPaste;
 
         public PasteCommandsInput(final RobotElement selectedElement, final int selectedElementColumnIndex,
-                List<String> valuesToPaste) {
+                final List<String> valuesToPaste) {
             this.selectedElement = selectedElement;
             this.selectedElementColumnIndex = selectedElementColumnIndex;
             this.valuesToPaste = valuesToPaste;
