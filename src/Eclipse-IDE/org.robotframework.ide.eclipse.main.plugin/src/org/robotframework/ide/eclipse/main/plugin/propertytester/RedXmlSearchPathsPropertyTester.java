@@ -8,16 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 import org.eclipse.core.expressions.PropertyTester;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
 
 public class RedXmlSearchPathsPropertyTester extends PropertyTester {
 
-    public static final String NAMESPACE = "org.robotframework.redxml.libraries";
-
-    public static final String IS_SYSTEMPATH = "isSystemPath";
-
-    public static final String PROPERTY_IS_SYSTEMPATH = NAMESPACE + "." + IS_SYSTEMPATH;
+    @VisibleForTesting static final String IS_SYSTEM_PATH = "isSystemPath";
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
@@ -34,7 +31,7 @@ public class RedXmlSearchPathsPropertyTester extends PropertyTester {
     }
 
     private boolean testProperty(final SearchPath searchPath, final String property, final boolean expected) {
-        if (IS_SYSTEMPATH.equals(property)) {
+        if (IS_SYSTEM_PATH.equals(property)) {
             return searchPath.isSystem() == expected;
         }
         return false;

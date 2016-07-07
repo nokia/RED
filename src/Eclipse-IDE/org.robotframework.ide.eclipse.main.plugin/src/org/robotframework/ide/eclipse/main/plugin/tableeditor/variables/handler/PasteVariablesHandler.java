@@ -10,7 +10,6 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.dnd.Clipboard;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
@@ -18,7 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.InsertVari
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.VariablesTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.PasteVariablesHandler.E4PasteVariablesHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -39,12 +38,12 @@ public class PasteVariablesHandler extends DIParameterizedHandler<E4PasteVariabl
 
         @Execute
         public void pasteVariables(final RobotEditorCommandsStack commandsStack,
-                @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
-            final Object probablyVariables = clipboard.getContents(VariablesTransfer.getInstance());
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
-            if (probablyVariables instanceof RobotVariable[]) {
-                final Optional<? extends EditorCommand> command = getInsertingCommand(selection,
-                        (RobotVariable[]) probablyVariables);
+            final RobotVariable[] variables = clipboard.getVariables();
+
+            if (variables != null) {
+                final Optional<? extends EditorCommand> command = getInsertingCommand(selection, variables);
                 if (command.isPresent()) {
                     commandsStack.execute(command.get());
                 }

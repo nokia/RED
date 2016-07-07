@@ -6,19 +6,27 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.ui.IEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.CasesTransfer;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordDefinitionsTransfer;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.VariablesTransfer;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 
 public class RobotEditorPropertyTester extends PropertyTester {
+
+    public static final String NAMESPACE = "org.robotframework";
+
+    @VisibleForTesting static final String THERE_IS_TEXT_IN_CLIPBOARD = "thereIsTextInClipboard";
+    @VisibleForTesting static final String THERE_ARE_VARIABLES_IN_CLIPBOARD = "thereAreVariablesInClipboard";
+    @VisibleForTesting static final String THERE_ARE_IMPORT_SETTINGS_IN_CLIPBOARD = "thereAreImportSettingsInClipboard";
+    @VisibleForTesting static final String THERE_ARE_METADATA_SETTINGS_IN_CLIPBOARD = "thereAreMetadataSettingsInClipboard";
+    @VisibleForTesting static final String THERE_ARE_GENERAL_SETTINGS_IN_CLIPBOARD = "thereAreGeneralSettingsInClipboard";
+    @VisibleForTesting static final String THERE_ARE_CASES_ELEMENTS_IN_CLIPBOARD = "thereAreCasesElementsInClipboard";
+    @VisibleForTesting static final String THERE_ARE_KEYWORD_CALL_ELEMENTS_IN_CLIPBOARD = "thereAreKeywordCallElementsInClipboard";
+    @VisibleForTesting static final String THERE_ARE_KEYWORD_DEFINITION_ELEMENTS_IN_CLIPBOARD = "thereAreKeywordDefinitionElementsInClipboard";
+    @VisibleForTesting static final String ACTIVE_SECTION_EDITOR_HAS_SECTION = "activeSectionEditorHasSection";
+    @VisibleForTesting static final String EDITOR_MODEL_IS_EDITABLE = "editorModelIsEditable";
 
     @Override
     public boolean test(final Object receiver, final String property, final Object[] args, final Object expectedValue) {
@@ -33,9 +41,9 @@ public class RobotEditorPropertyTester extends PropertyTester {
     }
 
     private boolean testProperty(final RobotFormEditor editor, final String property, final boolean expected) {
-        if ("editorModelIsEditable".equals(property)) {
+        if (EDITOR_MODEL_IS_EDITABLE.equals(property)) {
             return editor.provideSuiteModel().isEditable() == expected;
-        } else if ("activeSectionEditorHasSection".equals(property)) {
+        } else if (ACTIVE_SECTION_EDITOR_HAS_SECTION.equals(property)) {
             final IEditorPart activeEditor = editor.getActiveEditor();
             final ISectionEditorPart activePage = activeEditor instanceof ISectionEditorPart ? (ISectionEditorPart) activeEditor
                     : null;
@@ -44,38 +52,29 @@ public class RobotEditorPropertyTester extends PropertyTester {
             } else {
                 return !expected;
             }
-        } else if ("thereAreKeywordDefinitionElementsInClipboard".equals(property)) {
-            final Clipboard clipboard = editor.getClipboard();
-            return KeywordDefinitionsTransfer.hasKeywordDefinitions(clipboard) == expected;
+        } else if (THERE_ARE_KEYWORD_DEFINITION_ELEMENTS_IN_CLIPBOARD.equals(property)) {
+            return editor.getClipboard().hasKeywordDefinitions() == expected;
 
-        } else if ("thereAreKeywordCallElementsInClipboard".equals(property)) {
-            final Clipboard clipboard = editor.getClipboard();
-            return KeywordCallsTransfer.hasKeywordCalls(clipboard) == expected;
+        } else if (THERE_ARE_CASES_ELEMENTS_IN_CLIPBOARD.equals(property)) {
+            return editor.getClipboard().hasCases() == expected;
 
-        } else if ("thereAreCasesElementsInClipboard".equals(property)) {
-            final Clipboard clipboard = editor.getClipboard();
-            return CasesTransfer.hasCases(clipboard) == expected;
+        } else if (THERE_ARE_KEYWORD_CALL_ELEMENTS_IN_CLIPBOARD.equals(property)) {
+            return editor.getClipboard().hasKeywordCalls() == expected;
 
-        } else if ("thereAreGeneralSettingsInClipboard".equals(property)) {
-            final Clipboard clipboard = editor.getClipboard();
-            return KeywordCallsTransfer.hasGeneralSettings(clipboard) == expected;
+        } else if (THERE_ARE_GENERAL_SETTINGS_IN_CLIPBOARD.equals(property)) {
+            return editor.getClipboard().hasGeneralSettings() == expected;
 
-        } else if ("thereAreMetadataSettingsInClipboard".equals(property)) {
-            final Clipboard clipboard = editor.getClipboard();
-            return KeywordCallsTransfer.hasMetadataSettings(clipboard) == expected;
+        } else if (THERE_ARE_METADATA_SETTINGS_IN_CLIPBOARD.equals(property)) {
+            return editor.getClipboard().hasMetadataSettings() == expected;
 
-        } else if ("thereAreImportSettingsInClipboard".equals(property)) {
-            final Clipboard clipboard = editor.getClipboard();
-            return KeywordCallsTransfer.hasImportSettings(clipboard) == expected;
+        } else if (THERE_ARE_IMPORT_SETTINGS_IN_CLIPBOARD.equals(property)) {
+            return editor.getClipboard().hasImportSettings() == expected;
 
-        } else if ("thereAreVariablesInClipboard".equals(property)) {
-            final Clipboard clipboard = editor.getClipboard();
-            return VariablesTransfer.hasVariables(clipboard) == expected;
+        } else if (THERE_ARE_VARIABLES_IN_CLIPBOARD.equals(property)) {
+            return editor.getClipboard().hasVariables() == expected;
 
-        } else if ("thereIsTextInClipboard".equals(property)) {
-            final Clipboard clipborad = editor.getClipboard();
-            return (clipborad.getContents(TextTransfer.getInstance()) != null) == expected;
-
+        } else if (THERE_IS_TEXT_IN_CLIPBOARD.equals(property)) {
+            return editor.getClipboard().hasText() == expected;
         }
         return false;
     }

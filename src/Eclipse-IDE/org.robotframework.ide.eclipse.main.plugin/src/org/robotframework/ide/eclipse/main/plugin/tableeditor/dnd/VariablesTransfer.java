@@ -14,7 +14,6 @@ import java.io.ObjectOutputStream;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -32,20 +31,6 @@ public class VariablesTransfer extends ByteArrayTransfer {
 
     public static VariablesTransfer getInstance() {
         return INSTANCE;
-    }
-
-    public static boolean hasVariables(final Clipboard clipboard) {
-        return clipboard != null && !clipboard.isDisposed() && clipboardContainVariables(clipboard);
-    }
-
-    private static boolean clipboardContainVariables(final Clipboard clipboard) {
-        final TransferData[] availableTypes = clipboard.getAvailableTypes();
-        for (final TransferData data : availableTypes) {
-            if (getInstance().isSupportedType(data)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

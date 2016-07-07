@@ -11,10 +11,8 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.Transfer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.VariablesTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.CopyVariablesHandler.E4CopyVariablesHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -30,14 +28,13 @@ public class CopyVariablesHandler extends DIParameterizedHandler<E4CopyVariables
 
         @Execute
         public void copyVariables(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final Clipboard clipboard) {
+                final RedClipboard clipboard) {
 
             final List<RobotVariable> variables = Selections.getElements(selection, RobotVariable.class);
             if (!variables.isEmpty()) {
-                final List<RobotVariable> variablesCopy = TableHandlersSupport.createVariablesCopy(variables);
-                clipboard.setContents(
-                        new RobotVariable[][] { variablesCopy.toArray(new RobotVariable[variablesCopy.size()]) },
-                        new Transfer[] { VariablesTransfer.getInstance() });
+                final Object variablesCopy = TableHandlersSupport.createVariablesCopy(variables);
+
+                clipboard.insertContent(variablesCopy);
             }
         }
     }

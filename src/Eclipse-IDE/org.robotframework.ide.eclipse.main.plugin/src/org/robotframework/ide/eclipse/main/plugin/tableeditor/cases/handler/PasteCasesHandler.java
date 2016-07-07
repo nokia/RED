@@ -11,7 +11,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.swt.dnd.Clipboard;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -21,8 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordCallsCo
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.PasteCasesHandler.E4PasteCasesHandler;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.CasesTransfer;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -41,20 +39,19 @@ public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandle
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public Object pasteKeywords(@Named(Selections.SELECTION) final ITreeSelection selection,
-                final Clipboard clipboard) {
-            final Object probablyCases = clipboard.getContents(CasesTransfer.getInstance());
+        public void pasteKeywords(@Named(Selections.SELECTION) final ITreeSelection selection,
+                final RedClipboard clipboard) {
 
-            if (probablyCases instanceof RobotCase[]) {
-                insertCases(selection, (RobotCase[]) probablyCases);
-                return null;
+            final RobotCase[] cases = clipboard.getCases();
+            if (cases != null) {
+                insertCases(selection, cases);
+                return;
             }
 
-            final Object probablyKeywordCalls = clipboard.getContents(KeywordCallsTransfer.getInstance());
-            if (probablyKeywordCalls instanceof RobotKeywordCall[]) {
-                insertCalls(selection, (RobotKeywordCall[]) probablyKeywordCalls);
+            final RobotKeywordCall[] calls = clipboard.getKeywordCalls();
+            if (calls != null) {
+                insertCalls(selection, calls);
             }
-            return null;
         }
 
         private void insertCases(final ITreeSelection selection, final RobotCase[] cases) {

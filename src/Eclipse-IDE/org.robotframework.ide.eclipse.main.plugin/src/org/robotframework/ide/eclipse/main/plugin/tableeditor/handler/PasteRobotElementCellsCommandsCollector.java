@@ -5,16 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
-import org.eclipse.swt.dnd.Clipboard;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 
 /**
  * @author mmarzec
@@ -23,15 +24,22 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordi
 public abstract class PasteRobotElementCellsCommandsCollector {
 
     public List<EditorCommand> collectPasteCommands(final SelectionLayer selectionLayer,
-            final List<RobotElement> selectedElements, final Clipboard clipboard) {
+            final List<RobotElement> selectedElements, final RedClipboard clipboard) {
 
         final List<EditorCommand> pasteCommands = new ArrayList<>();
 
-        if (!selectedElements.isEmpty() && hasRobotElementsInClipboard(clipboard)
+        if (selectionLayer.getSelectedCellPositions().length == 1 && clipboard.hasText()) {
+            final String textToPaste = clipboard.getText();
+            pasteCommands.addAll(collectPasteCommandsForSelectedElement(selectedElements.get(0),
+                    newArrayList(textToPaste), selectionLayer.getSelectedCellPositions()[0].getColumnPosition(),
+                    selectionLayer.getColumnCount()));
+
+        } else if (!selectedElements.isEmpty() && hasRobotElementsInClipboard(clipboard)
                 && hasPositionsCoordinatesInClipboard(clipboard)) {
 
             final RobotElement[] robotElementsFromClipboard = getRobotElementsFromClipboard(clipboard);
-            final PositionCoordinateSerializer[] cellPositionsFromClipboard = getPositionsCoordinatesFromClipboard(clipboard);
+            final PositionCoordinateSerializer[] cellPositionsFromClipboard = getPositionsCoordinatesFromClipboard(
+                    clipboard);
 
             if (robotElementsFromClipboard != null && robotElementsFromClipboard.length > 0
                     && cellPositionsFromClipboard != null && cellPositionsFromClipboard.length > 0) {
@@ -39,7 +47,7 @@ public abstract class PasteRobotElementCellsCommandsCollector {
                 int clipboardElementsIndex = 0;
                 int currentClipboardElementRowIndex = cellPositionsFromClipboard[0].getRowPosition();
                 for (final RobotElement selectedElement : selectedElements) {
-                    RobotElement elementFromClipboard = robotElementsFromClipboard[clipboardElementsIndex];
+                    final RobotElement elementFromClipboard = robotElementsFromClipboard[clipboardElementsIndex];
                     if (clipboardElementsIndex + 1 < robotElementsFromClipboard.length) {
                         clipboardElementsIndex++;
                     }
@@ -58,31 +66,27 @@ public abstract class PasteRobotElementCellsCommandsCollector {
                             }
                             final List<String> valuesToPaste = findValuesToPaste(elementFromClipboard,
                                     clipboardElementColumnIndex, tableColumnsCount);
-                            collectPasteCommandsForSelectedElement(selectedElement,
-                                    selectedElementColumnsIndexes.get(i), valuesToPaste, tableColumnsCount,
-                                    pasteCommands);
+                            pasteCommands.addAll(collectPasteCommandsForSelectedElement(selectedElement,
+                                    valuesToPaste, selectedElementColumnsIndexes.get(i), tableColumnsCount));
                         }
                     }
                 }
             }
-
         }
-
         return pasteCommands;
-
     }
 
-    protected boolean hasPositionsCoordinatesInClipboard(final Clipboard clipboard) {
-        return PositionCoordinateTransfer.hasPositionsCoordinates(clipboard);
-    }
-    
-    protected PositionCoordinateSerializer[] getPositionsCoordinatesFromClipboard(final Clipboard clipboard) {
-        return TableHandlersSupport.getPositionsCoordinatesFromClipboard(clipboard);
+    protected boolean hasPositionsCoordinatesInClipboard(final RedClipboard clipboard) {
+        return clipboard.hasPositionsCoordinates();
     }
 
-    protected abstract boolean hasRobotElementsInClipboard(final Clipboard clipboard);
+    protected PositionCoordinateSerializer[] getPositionsCoordinatesFromClipboard(final RedClipboard clipboard) {
+        return clipboard.getPositionsCoordinates();
+    }
 
-    protected abstract RobotElement[] getRobotElementsFromClipboard(final Clipboard clipboard);
+    protected abstract boolean hasRobotElementsInClipboard(final RedClipboard clipboard);
+
+    protected abstract RobotElement[] getRobotElementsFromClipboard(final RedClipboard clipboard);
 
     protected abstract int findSelectedElementTableIndex(final RobotElement section,
             final RobotElement selectedElement);
@@ -90,9 +94,8 @@ public abstract class PasteRobotElementCellsCommandsCollector {
     protected abstract List<String> findValuesToPaste(final RobotElement elementFromClipboard,
             final int clipboardElementColumnIndex, final int tableColumnsCount);
 
-    protected abstract void collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
-            final int selectedElementColumnIndex, final List<String> valuesToPaste, final int tableColumnsCount,
-            final List<EditorCommand> pasteCommands);
+    protected abstract List<EditorCommand> collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
+            final List<String> valuesToPaste, final int selectedElementColumnIndex, final int tableColumnsCount);
 
     private List<Integer> findSelectedColumnsIndexes(final int selectedElementTableIndex,
             final SelectionLayer selectionLayer) {
@@ -122,7 +125,7 @@ public abstract class PasteRobotElementCellsCommandsCollector {
     private int calculateNextClipboardElementRowIndex(final int currentRowIndex,
             final PositionCoordinateSerializer[] positionsCoordinates) {
 
-        int nextRowIndex = currentRowIndex;
+        final int nextRowIndex = currentRowIndex;
         for (int i = 0; i < positionsCoordinates.length; i++) {
             if (positionsCoordinates[i].getRowPosition() > currentRowIndex) {
                 return positionsCoordinates[i].getRowPosition();

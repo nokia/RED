@@ -7,9 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.dnd.Clipboard;
 import org.rf.ide.core.testdata.model.presenter.update.variables.VariablesValueConverter;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
@@ -23,7 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetScalarV
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.VariablesTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobotElementCellsCommandsCollector;
 
 /**
@@ -33,15 +33,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobot
 public class PasteVariablesCellsCommandsCollector extends PasteRobotElementCellsCommandsCollector {
 
     @Override
-    protected boolean hasRobotElementsInClipboard(final Clipboard clipboard) {
-        return VariablesTransfer.hasVariables(clipboard);
+    protected boolean hasRobotElementsInClipboard(final RedClipboard clipboard) {
+        return clipboard.hasVariables();
     }
 
     @Override
-    protected RobotElement[] getRobotElementsFromClipboard(final Clipboard clipboard) {
-        final Object probablyVariables = clipboard.getContents(VariablesTransfer.getInstance());
-        return probablyVariables != null && probablyVariables instanceof RobotVariable[]
-                ? (RobotVariable[]) probablyVariables : null;
+    protected RobotElement[] getRobotElementsFromClipboard(final RedClipboard clipboard) {
+        return clipboard.getVariables();
     }
 
     @Override
@@ -60,10 +58,10 @@ public class PasteVariablesCellsCommandsCollector extends PasteRobotElementCells
             if (variableFromClipboard.getType() == VariableType.SCALAR) {
                 return newArrayList(variableFromClipboard.getValue());
             } else if (variableFromClipboard.getType() == VariableType.LIST) {
-                ListVariable listVariable = (ListVariable) variableFromClipboard.getLinkedElement();
+                final ListVariable listVariable = (ListVariable) variableFromClipboard.getLinkedElement();
                 return VariablesValueConverter.convert(listVariable.getItems(), String.class);
             } else if (variableFromClipboard.getType() == VariableType.DICTIONARY) {
-                DictionaryVariable dictVariable = (DictionaryVariable) variableFromClipboard.getLinkedElement();
+                final DictionaryVariable dictVariable = (DictionaryVariable) variableFromClipboard.getLinkedElement();
                 return VariablesValueConverter.convert(dictVariable.getItems(), String.class);
             }
         } else {
@@ -74,10 +72,10 @@ public class PasteVariablesCellsCommandsCollector extends PasteRobotElementCells
     }
 
     @Override
-    protected void collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
-            final int selectedElementColumnIndex, final List<String> valuesToPaste, final int tableColumnsCount,
-            final List<EditorCommand> pasteCommands) {
+    protected List<EditorCommand> collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
+            final List<String> valuesToPaste, final int selectedElementColumnIndex, final int tableColumnsCount) {
 
+        final List<EditorCommand> pasteCommands = new ArrayList<>();
         if (selectedElement instanceof RobotVariable && !valuesToPaste.isEmpty()) {
             final RobotVariable selectedVariable = (RobotVariable) selectedElement;
             if (selectedElementColumnIndex == 0) {
@@ -94,6 +92,6 @@ public class PasteVariablesCellsCommandsCollector extends PasteRobotElementCells
                 pasteCommands.add(new SetVariableCommentCommand(selectedVariable, valuesToPaste.get(0)));
             }
         }
+        return pasteCommands;
     }
-
 }

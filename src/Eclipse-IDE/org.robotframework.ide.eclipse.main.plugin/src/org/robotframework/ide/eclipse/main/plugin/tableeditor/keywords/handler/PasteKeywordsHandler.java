@@ -11,7 +11,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.swt.dnd.Clipboard;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -20,8 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordCallsCo
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordDefinitionsCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordDefinitionsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.PasteKeywordsHandler.E4PasteKeywordsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -41,20 +39,19 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public Object pasteKeywords(@Named(Selections.SELECTION) final ITreeSelection selection,
-                final Clipboard clipboard) {
-            final Object probablyKeywordDefs = clipboard.getContents(KeywordDefinitionsTransfer.getInstance());
+        public void pasteKeywords(@Named(Selections.SELECTION) final ITreeSelection selection,
+                final RedClipboard clipboard) {
 
-            if (probablyKeywordDefs instanceof RobotKeywordDefinition[]) {
-                insertDefinitions(selection, (RobotKeywordDefinition[]) probablyKeywordDefs);
-                return null;
+            final RobotKeywordDefinition[] keywordDefs = clipboard.getKeywordDefinitions();
+            if (keywordDefs != null) {
+                insertDefinitions(selection, keywordDefs);
+                return;
             }
 
-            final Object probablyKeywordCalls = clipboard.getContents(KeywordCallsTransfer.getInstance());
-            if (probablyKeywordCalls instanceof RobotKeywordCall[]) {
-                insertCalls(selection, (RobotKeywordCall[]) probablyKeywordCalls);
+            final RobotKeywordCall[] keywordCalls = clipboard.getKeywordCalls();
+            if (keywordCalls != null) {
+                insertCalls(selection, keywordCalls);
             }
-            return null;
         }
 
         private void insertDefinitions(final ITreeSelection selection, final RobotKeywordDefinition[] definitions) {

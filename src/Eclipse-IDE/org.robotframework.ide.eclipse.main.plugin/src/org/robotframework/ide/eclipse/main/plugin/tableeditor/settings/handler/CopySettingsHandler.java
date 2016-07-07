@@ -11,11 +11,8 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.Transfer;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CopySettingsHandler.E4CopySettingsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -30,18 +27,14 @@ public class CopySettingsHandler extends DIParameterizedHandler<E4CopySettingsHa
     public static class E4CopySettingsHandler {
 
         @Execute
-        public Object copySettings(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final Clipboard clipboard) {
+        public void copySettings(@Named(Selections.SELECTION) final IStructuredSelection selection,
+                final RedClipboard clipboard) {
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
             if (!settings.isEmpty()) {
                 
-                final List<RobotSetting> settingsCopy = TableHandlersSupport.createSettingsCopy(settings);
-                
-                clipboard.setContents(
-                        new RobotKeywordCall[][] { settingsCopy.toArray(new RobotKeywordCall[settingsCopy.size()]) },
-                        new Transfer[] { KeywordCallsTransfer.getInstance() });
+                final Object settingsCopy = TableHandlersSupport.createSettingsCopy(settings);
+                clipboard.insertContent(settingsCopy);
             }
-            return null;
         }
     }
 }
