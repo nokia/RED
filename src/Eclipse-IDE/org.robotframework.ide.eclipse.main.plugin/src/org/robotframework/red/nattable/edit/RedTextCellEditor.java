@@ -27,7 +27,6 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
-import org.robotframework.ide.eclipse.main.plugin.assist.VariablesContentProposingSupport;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 
@@ -56,7 +55,7 @@ public class RedTextCellEditor extends TextCellEditor {
         this(0, 0, new DefaultRedCellEditorValueValidator(), null);
     }
 
-    public RedTextCellEditor(final VariablesContentProposingSupport support) {
+    public RedTextCellEditor(final IContentProposingSupport support) {
         this(0, 0, new DefaultRedCellEditorValueValidator(), support);
     }
 
