@@ -7,11 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.dnd.Clipboard;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -19,7 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgume
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobotElementCellsCommandsCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 
@@ -29,15 +28,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandl
 public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsCommandsCollector {
 
     @Override
-    protected boolean hasRobotElementsInClipboard(final Clipboard clipboard) {
-        return KeywordCallsTransfer.hasSettings(clipboard);
+    protected boolean hasRobotElementsInClipboard(final RedClipboard clipboard) {
+        return clipboard.hasSettings();
     }
 
     @Override
-    protected RobotElement[] getRobotElementsFromClipboard(final Clipboard clipboard) {
-        final Object probablySettings = clipboard.getContents(KeywordCallsTransfer.getInstance());
-        return probablySettings != null && probablySettings instanceof RobotKeywordCall[]
-                ? (RobotKeywordCall[]) probablySettings : null;
+    protected RobotElement[] getRobotElementsFromClipboard(final RedClipboard clipboard) {
+        return clipboard.getKeywordCalls();
     }
 
     @Override
@@ -67,7 +64,7 @@ public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsC
             if (clipboardSettingColumnIndex == 0) {
                 return newArrayList(settingFromClipboard.getName());
             } else {
-                int argIndex = clipboardSettingColumnIndex - 1;
+                final int argIndex = clipboardSettingColumnIndex - 1;
                 if (argIndex < arguments.size()) {
                     return newArrayList(arguments.get(argIndex));
                 } else if (clipboardSettingColumnIndex == tableColumnsCount - 1) {
@@ -79,10 +76,10 @@ public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsC
     }
 
     @Override
-    protected void collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
-            final int selectedElementColumnIndex, final List<String> valuesToPaste, final int tableColumnsCount,
-            final List<EditorCommand> pasteCommands) {
+    protected List<EditorCommand> collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
+            final List<String> valuesToPaste, final int selectedElementColumnIndex, final int tableColumnsCount) {
 
+        final List<EditorCommand> pasteCommands = new ArrayList<>();
         if (selectedElement instanceof RobotSetting && !valuesToPaste.isEmpty()) {
             final String valueToPaste = valuesToPaste.get(0);
             final RobotSetting selectedSetting = (RobotSetting) selectedElement;
@@ -107,6 +104,6 @@ public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsC
                 }
             }
         }
+        return pasteCommands;
     }
-
 }

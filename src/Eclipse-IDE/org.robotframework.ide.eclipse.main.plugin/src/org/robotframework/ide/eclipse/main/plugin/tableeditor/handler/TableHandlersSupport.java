@@ -10,14 +10,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.eclipse.swt.dnd.Clipboard;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.GeneralSettingsModel;
 
@@ -35,13 +33,7 @@ public class TableHandlersSupport {
         return serializablePositions;
     }
     
-    public static PositionCoordinateSerializer[] getPositionsCoordinatesFromClipboard(final Clipboard clipboard) {
-        final Object probablyPositions = clipboard.getContents(PositionCoordinateTransfer.getInstance());
-        return probablyPositions != null && probablyPositions instanceof PositionCoordinateSerializer[]
-                ? (PositionCoordinateSerializer[]) probablyPositions : null;
-    }
-
-    public static List<RobotSetting> createSettingsCopy(final List<RobotSetting> settings) {
+    public static RobotSetting[] createSettingsCopy(final List<RobotSetting> settings) {
         final List<RobotSetting> settingsCopy = new ArrayList<>();
         for (final RobotSetting robotSetting : settings) {
             if (robotSetting.getName() != null && robotSetting.getArguments() != null
@@ -50,10 +42,10 @@ public class TableHandlersSupport {
                         new ArrayList<>(robotSetting.getArguments()), new String(robotSetting.getComment())));
             }
         }
-        return settingsCopy;
+        return settingsCopy.toArray(new RobotSetting[0]);
     }
     
-    public static List<RobotVariable> createVariablesCopy(final List<RobotVariable> variables) {
+    public static RobotVariable[] createVariablesCopy(final List<RobotVariable> variables) {
         final List<RobotVariable> variablesCopy = new ArrayList<>();
         for (final RobotVariable robotVariable : variables) {
             final IVariableHolder variableHolderCopy = robotVariable.getLinkedElement().copy();
@@ -61,7 +53,7 @@ public class TableHandlersSupport {
                 variablesCopy.add(new RobotVariable(null, variableHolderCopy));
             }
         }
-        return variablesCopy;
+        return variablesCopy.toArray(new RobotVariable[0]);
     }
     
     public static int findTableIndexOfSelectedSetting(final RobotSettingsSection section,

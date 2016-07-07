@@ -12,15 +12,11 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.ui.ISources;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.KeywordCallsTransfer;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CopyInSettingsTableHandler.E4CopyInSettingsTableHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -35,8 +31,8 @@ public class CopyInSettingsTableHandler extends DIParameterizedHandler<E4CopyInS
     public static class E4CopyInSettingsTableHandler {
 
         @Execute
-        public Object copy(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
-                @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
+        public void copy(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
             final PositionCoordinate[] selectedCellPositions = editor.getSelectionLayerAccessor()
@@ -45,16 +41,10 @@ public class CopyInSettingsTableHandler extends DIParameterizedHandler<E4CopyInS
             if (selectedCellPositions.length > 0 && !settings.isEmpty()) {
                 final PositionCoordinateSerializer[] serializablePositions = TableHandlersSupport
                         .createSerializablePositionsCoordinates(selectedCellPositions);
-                final List<RobotSetting> settingsCopy = TableHandlersSupport.createSettingsCopy(settings);
+                final RobotSetting[] settingsCopy = TableHandlersSupport.createSettingsCopy(settings);
 
-                clipboard.setContents(
-                        new Object[] { serializablePositions,
-                                settingsCopy.toArray(new RobotKeywordCall[settingsCopy.size()]) },
-                        new Transfer[] { PositionCoordinateTransfer.getInstance(),
-                                KeywordCallsTransfer.getInstance() });
+                clipboard.insertContent(serializablePositions, settingsCopy);
             }
-
-            return null;
         }
 
     }

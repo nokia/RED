@@ -11,14 +11,12 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.VariablesTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.CutVariablesHandler.E4CutVariablesHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -35,14 +33,13 @@ public class CutVariablesHandler extends DIParameterizedHandler<E4CutVariablesHa
         @Execute
         public void cutVariables(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 final RobotEditorCommandsStack commandsStack,
-                @Named(Selections.SELECTION) final IStructuredSelection selection, final Clipboard clipboard) {
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
             final List<RobotVariable> variables = Selections.getElements(selection, RobotVariable.class);
             if (!variables.isEmpty()) {
-                final List<RobotVariable> variablesCopy = TableHandlersSupport.createVariablesCopy(variables);
-                clipboard.setContents(
-                        new RobotVariable[][] { variablesCopy.toArray(new RobotVariable[variablesCopy.size()]) },
-                        new Transfer[] { VariablesTransfer.getInstance() });
+                final Object variablesCopy = TableHandlersSupport.createVariablesCopy(variables);
+
+                clipboard.insertContent(variablesCopy);
                 commandsStack.execute(new RemoveVariableCommand(variables));
 
                 editor.getSelectionLayerAccessor().getSelectionLayer().clear();

@@ -27,7 +27,6 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorDescriptor;
@@ -65,6 +64,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.RobotSuiteFileDescribe
 import org.robotframework.ide.eclipse.main.plugin.project.TsvRobotSuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
@@ -81,13 +81,13 @@ public class RobotFormEditor extends FormEditor {
 
     private final List<IEditorPart> parts = newArrayList();
 
-    private Clipboard clipboard;
+    private RedClipboard clipboard;
 
     private RobotSuiteFile suiteModel;
 
     private boolean isEditable;
 
-    public Clipboard getClipboard() {
+    public RedClipboard getClipboard() {
         return clipboard;
     }
 
@@ -96,7 +96,7 @@ public class RobotFormEditor extends FormEditor {
         try {
             super.init(site, input);
 
-            clipboard = new Clipboard(site.getShell().getDisplay());
+            clipboard = new RedClipboard(site.getShell().getDisplay());
             prepareEclipseContext();
         } catch (final IllegalRobotEditorInputException e) {
             throw new PartInitException("Unable to open editor", e);
@@ -113,7 +113,7 @@ public class RobotFormEditor extends FormEditor {
                 return provideSuiteModel();
             }
         });
-        eclipseContext.set(Clipboard.class, clipboard);
+        eclipseContext.set(RedClipboard.class, clipboard);
         ContextInjectionFactory.inject(this, eclipseContext);
     }
 
