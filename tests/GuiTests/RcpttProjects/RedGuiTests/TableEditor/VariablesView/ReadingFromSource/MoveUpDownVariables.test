@@ -44,7 +44,7 @@ with [get-editor "TestFile.robot"] {
     get-canvas -after [get-label Variables] -index 1 | key-type "M1+ARROW_DOWN" -times 4
 }
 
-is-row-fully-selected -row 7
+is-row-fully-selected -file "TestFile.robot" -row 7
 
 
 //move var3 2 times up
@@ -52,7 +52,7 @@ with [get-editor "TestFile.robot"] {
     get-canvas -after [get-label Variables] -index 1 | key-type "M1+ARROW_UP" -times 2
 }
 
-is-row-fully-selected -row 5
+is-row-fully-selected -file "TestFile.robot" -row 5
 
 //select  value "8" and move down
 with [get-editor "TestFile.robot"] {
@@ -62,7 +62,7 @@ with [get-editor "TestFile.robot"] {
         key-type "M1+ARROW_DOWN" -times 2
     }
 }
-is-row-fully-selected -row 10
+is-row-fully-selected -file "TestFile.robot" -row 10
 
 //move commnet2 4 times (more then max)
 with [get-editor "TestFile.robot"] {
@@ -73,7 +73,7 @@ with [get-editor "TestFile.robot"] {
     }
 }
 
-is-row-fully-selected -row 0
+is-row-fully-selected -file "TestFile.robot" -row 0
 
 
 //check Source - last value should not be after 2 new lines - minor bug
