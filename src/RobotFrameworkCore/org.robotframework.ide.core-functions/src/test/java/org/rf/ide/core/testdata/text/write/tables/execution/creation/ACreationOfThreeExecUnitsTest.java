@@ -50,37 +50,36 @@ public abstract class ACreationOfThreeExecUnitsTest {
                 getCompareFilesStoreForExecutableWithTheFirstWithoutName());
     }
 
-    @SuppressWarnings("unchecked")
     private void assert_three_execUnits_noCommentedLines_template(
             final List<IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> execUnit,
             final TestFilesCompareStore fileStore) throws Exception {
         // prepare
         checkEnvironment();
-        RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitOneExecRowOne = (RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>>) execUnit
+        final RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitOneExecRowOne = execUnit
                 .get(0).getExecutionContext().get(0);
-        RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitTwoExecRowOne = (RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>>) execUnit
+        final RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitTwoExecRowOne = execUnit
                 .get(1).getExecutionContext().get(0);
-        RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitThreeExecRowOne = (RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>>) execUnit
+        final RobotExecutableRow<? extends AModelElement<? extends ARobotSectionTable>> execUnitThreeExecRowOne = execUnit
                 .get(2).getExecutionContext().get(0);
 
         // test data prepare
         //// exec unit 1
         ///// line 1
-        RobotToken action1 = new RobotToken();
+        final RobotToken action1 = new RobotToken();
         action1.setText("execAction1");
         execUnitOneExecRowOne.setAction(action1);
 
         //// exec unit 2
         ///// line 1
-        RobotToken action2 = new RobotToken();
+        final RobotToken action2 = new RobotToken();
         action2.setText("execAction2");
         execUnitTwoExecRowOne.setAction(action2);
 
-        RobotToken arg1_2 = new RobotToken();
+        final RobotToken arg1_2 = new RobotToken();
         arg1_2.setText("arg1");
-        RobotToken arg2_2 = new RobotToken();
+        final RobotToken arg2_2 = new RobotToken();
         arg2_2.setText("arg2");
-        RobotToken arg3_2 = new RobotToken();
+        final RobotToken arg3_2 = new RobotToken();
         arg3_2.setText("arg3");
 
         execUnitTwoExecRowOne.addArgument(arg1_2);
@@ -89,20 +88,20 @@ public abstract class ACreationOfThreeExecUnitsTest {
 
         //// exec unit 3
         ///// line 1
-        RobotToken action3 = new RobotToken();
+        final RobotToken action3 = new RobotToken();
         action3.setText("execAction3");
         execUnitThreeExecRowOne.setAction(action3);
 
-        RobotToken arg1_3 = new RobotToken();
+        final RobotToken arg1_3 = new RobotToken();
         arg1_3.setText("arg1a");
 
         execUnitThreeExecRowOne.addArgument(arg1_3);
 
-        RobotToken cm1 = new RobotToken();
+        final RobotToken cm1 = new RobotToken();
         cm1.setText("cm1");
-        RobotToken cm2 = new RobotToken();
+        final RobotToken cm2 = new RobotToken();
         cm2.setText("cm2");
-        RobotToken cm3 = new RobotToken();
+        final RobotToken cm3 = new RobotToken();
         cm3.setText("cm3");
 
         execUnitThreeExecRowOne.addCommentPart(cm1);
@@ -132,11 +131,11 @@ public abstract class ACreationOfThreeExecUnitsTest {
         }
 
         public void setThreeExecUnitsWithOneLineEachOtherInsideCmpFile(
-                String threeExecUnitsWithOneLineEachOtherInsideCmpFile) {
+                final String threeExecUnitsWithOneLineEachOtherInsideCmpFile) {
             this.threeExecUnitsWithOneLineEachOtherInsideCmpFile = threeExecUnitsWithOneLineEachOtherInsideCmpFile;
         }
 
-        private AtomicBoolean wasValidated = new AtomicBoolean(false);
+        private final AtomicBoolean wasValidated = new AtomicBoolean(false);
 
         public void validate() throws InvalidTestStoreException {
             final List<String> errors = new ArrayList<>(0);
@@ -153,7 +152,7 @@ public abstract class ACreationOfThreeExecUnitsTest {
             final Class<ValidateNotNull> ano = ValidateNotNull.class;
             final List<Method> publicMethodsAnnotatedWith = getPublicMethodsAnnotatedWith(ano);
             for (final Method method : publicMethodsAnnotatedWith) {
-                ValidateNotNull validError = method.getAnnotation(ano);
+                final ValidateNotNull validError = method.getAnnotation(ano);
                 try {
                     final Object invoke = method.invoke(this);
                     if (invoke == null || ((String) invoke).isEmpty()) {

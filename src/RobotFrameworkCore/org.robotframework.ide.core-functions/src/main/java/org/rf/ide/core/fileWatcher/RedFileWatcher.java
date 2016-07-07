@@ -40,16 +40,16 @@ public class RedFileWatcher {
 
     private WatchService watcher;
 
-    private List<String> registeredDirs = new ArrayList<>();
+    private final List<String> registeredDirs = new ArrayList<>();
 
-    private Map<String, Collection<IWatchEventHandler>> registeredFiles = Collections
+    private final Map<String, Collection<IWatchEventHandler>> registeredFiles = Collections
             .synchronizedMap(new HashMap<String, Collection<IWatchEventHandler>>());
 
-    private LinkedBlockingQueue<String> modifiedFilesQueue = new LinkedBlockingQueue<>(100);
+    private final LinkedBlockingQueue<String> modifiedFilesQueue = new LinkedBlockingQueue<>(100);
 
-    private AtomicBoolean isEventProducerThreadStarted = new AtomicBoolean(false);
+    private final AtomicBoolean isEventProducerThreadStarted = new AtomicBoolean(false);
 
-    private AtomicBoolean isEventConsumerThreadStarted = new AtomicBoolean(false);
+    private final AtomicBoolean isEventConsumerThreadStarted = new AtomicBoolean(false);
 
     private RedFileWatcher() {}
 
@@ -73,7 +73,7 @@ public class RedFileWatcher {
                         handlers.add(watchEventHandler);
                     }
                 }
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }
@@ -97,7 +97,7 @@ public class RedFileWatcher {
             if (watcher != null) {
                 watcher.close();
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             // nothing to do
         } finally {
             watcher = null;
@@ -110,7 +110,7 @@ public class RedFileWatcher {
             modifiedFilesQueue.clear();
             try {
                 watcher = FileSystems.getDefault().newWatchService();
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
         }
@@ -135,11 +135,9 @@ public class RedFileWatcher {
                         } catch (InterruptedException | ClosedWatchServiceException e) {
                             break;
                         }
-                        for (WatchEvent<?> eventFromKey : key.pollEvents()) {
-                            WatchEvent.Kind<?> kind = eventFromKey.kind();
-                            @SuppressWarnings("unchecked")
-                            WatchEvent<Path> event = (WatchEvent<Path>) eventFromKey;
-                            final Path eventContext = event.context();
+                        for (final WatchEvent<?> eventFromKey : key.pollEvents()) {
+                            final WatchEvent.Kind<?> kind = eventFromKey.kind();
+                            final Path eventContext = (Path) eventFromKey.context();
 
                             if (kind == StandardWatchEventKinds.OVERFLOW) {
                                 continue;
@@ -151,13 +149,13 @@ public class RedFileWatcher {
                                         if (!modifiedFilesQueue.contains(fileName)) {
                                             modifiedFilesQueue.put(fileName);
                                         }
-                                    } catch (InterruptedException e) {
+                                    } catch (final InterruptedException e) {
                                         break;
                                     }
                                 }
                             }
                         }
-                        boolean valid = key.reset();
+                        final boolean valid = key.reset();
                         if (!valid) {
                             break;
                         }
@@ -181,12 +179,12 @@ public class RedFileWatcher {
                             final String fileName = modifiedFilesQueue.take();
                             final Collection<IWatchEventHandler> eventHandlers = registeredFiles.get(fileName);
                             if (eventHandlers != null && !eventHandlers.isEmpty()) {
-                                for (IWatchEventHandler watchEventHandler : eventHandlers) {
+                                for (final IWatchEventHandler watchEventHandler : eventHandlers) {
                                     watchEventHandler.handleModifyEvent(fileName);
                                 }
                             }
                             waitForAndRemovePossibleDuplicatedEvents(fileName);
-                        } catch (InterruptedException e) {
+                        } catch (final InterruptedException e) {
                             break;
                         }
                     }
@@ -201,7 +199,7 @@ public class RedFileWatcher {
     private void waitForAndRemovePossibleDuplicatedEvents(final String fileName) {
         try {
             Thread.sleep(400);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             return;
         }
         String nextFileName = modifiedFilesQueue.peek();
@@ -209,7 +207,7 @@ public class RedFileWatcher {
             modifiedFilesQueue.remove();
             try {
                 Thread.sleep(200);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 return;
             }
             nextFileName = modifiedFilesQueue.peek();
