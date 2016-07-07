@@ -18,18 +18,17 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 public class ParsingStateHelper {
 
     public boolean isTypeForState(final ParsingState state, final RobotToken rt) {
-        final RobotTokenType robotType = RobotTokenType.UNKNOWN;
         boolean result = false;
 
         List<RobotTokenType> typesForState = new ArrayList<>();
         if (state == ParsingState.TEST_CASE_TABLE_INSIDE || state == ParsingState.TEST_CASE_DECLARATION) {
-            typesForState = robotType.getTypesForTestCasesTable();
+            typesForState = RobotTokenType.getTypesForTestCasesTable();
         } else if (state == ParsingState.SETTING_TABLE_INSIDE) {
-            typesForState = robotType.getTypesForSettingsTable();
+            typesForState = RobotTokenType.getTypesForSettingsTable();
         } else if (state == ParsingState.VARIABLE_TABLE_INSIDE) {
-            typesForState = robotType.getTypesForVariablesTable();
+            typesForState = RobotTokenType.getTypesForVariablesTable();
         } else if (state == ParsingState.KEYWORD_TABLE_INSIDE || state == ParsingState.KEYWORD_DECLARATION) {
-            typesForState = robotType.getTypesForKeywordsTable();
+            typesForState = RobotTokenType.getTypesForKeywordsTable();
         }
 
         final List<IRobotTokenType> types = rt.getTypes();
