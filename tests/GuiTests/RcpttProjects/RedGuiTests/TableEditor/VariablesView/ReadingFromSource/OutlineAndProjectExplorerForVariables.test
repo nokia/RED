@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/7/16 2:50 PM
+Save-Time: 7/7/16 3:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -284,8 +284,10 @@ with [get-editor "text_file.txt"] {
     with [get-text-viewer] {
         set-caret-pos 2 19
         key-type "M1+s"
+        wait 1000
     }
     get-tab-folder | get-tab-item Variables | click
+    wait 2000
 }
 
 //use Outline and see selection
@@ -305,13 +307,14 @@ with [get-editor "text_file.txt"] {
         type-text 79890778
     }
 }
-wait 2000
+try -times 5 -delay 1000 -command{
 //check if new item is in Outlie and PE
-with [get-view Outline | get-tree] {
-    get-item "text_file.txt/Variables" | get-property childCount | equals 2 | verify-true
-    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList | verify-true
-    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[1].getText()" | equals newScalar 
-        | verify-true
+	with [get-view Outline | get-tree] {
+	    get-item "text_file.txt/Variables" | get-property childCount | equals 2 | verify-true
+	    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList | verify-true
+	    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[1].getText()" | equals newScalar 
+	        | verify-true
+	}
 }
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/text_file.txt/Variables" | get-property childCount | equals 2 | verify-true
