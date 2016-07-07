@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/7/16 9:15 AM
+Save-Time: 7/7/16 2:50 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -146,7 +146,189 @@ with [get-view "Project Explorer" | get-tree] {
         | equals "very long param name with vary long value and commnet" | verify-true
 }
 
+//========================= pipes in file =========================================================================
+
+get-view "Project Explorer" | get-tree | select "RobotProject/pipes.robot" | double-click
+wait 1000
+
+with [get-editor "pipes.robot"] {
+    with [get-tab-folder] {
+        get-tab-item Variables | click
+    }
+}
+get-view Outline | get-tree | select "pipes.robot/Variables/var"
+is-row-fully-selected -file "pipes.robot" -row 0
+
+//set focus on folder
+get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder"
+get-view Outline | get-tree | select "pipes.robot/Variables/newDict"
+is-row-fully-selected -file "pipes.robot" -row 2
+
+get-view Outline | get-tree | select "pipes.robot/Variables/list"
+is-row-fully-selected -file "pipes.robot" -row 1
 
 
+//use Project explorer
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/pipes.robot/Variables/newDict" | double-click
+}
+
+is-row-fully-selected -file "pipes.robot" -row 2
+
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/pipes.robot/Variables/var" | double-click
+}
+is-row-fully-selected -file "pipes.robot" -row 0
+
+get-editor "pipes.robot" | get-canvas -after [get-label Variables] -index 1 | key-type Down -times 2
+get-view "Project Explorer" | get-tree | select "RobotProject/pipes.robot/Variables/list" | double-click
+
+get-view Outline | get-tree | select "pipes.robot/Variables/list"
+is-row-fully-selected -file "pipes.robot" -row 1
+
+//check outline
+with [get-view Outline | get-tree] {
+    get-item "pipes.robot/Variables" | get-property "getItems().TreeItem[0].getText()" | equals var | verify-true
+    get-item "pipes.robot/Variables" | get-property "getItems().TreeItem[1].getText()" | equals list | verify-true
+    get-item "pipes.robot/Variables" | get-property "getItems().TreeItem[2].getText()" | equals newDict | verify-true
+}
+
+//=========================== tsv =======================================================================
+
+get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv" | double-click
+get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Variables | click
+
+
+
+//use outline
+get-view Outline | get-tree | select "tsv_file.tsv/Variables/after keyword" | double-click
+is-row-fully-selected -file "tsv_file.tsv" -row 3
+
+//move selection to folder
+get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder"
+get-view Outline | get-tree | select "tsv_file.tsv/Variables/list from tsv"
+is-row-fully-selected -file "tsv_file.tsv" -row 2
+
+//click on Keywords in PE and than on Outline
+get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv/Keywords" | double-click
+get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals Keywords | verify-true
+get-view Outline | get-tree | select "tsv_file.tsv/Variables/tsv_arg1"
+is-row-fully-selected -file "tsv_file.tsv" -row 0
+
+//move selection by arrow
+get-editor "tsv_file.tsv" | get-canvas -after [get-label Variables] -index 1 | key-type Down
+get-view Outline | get-tree | select "tsv_file.tsv/Variables/NEW"
+is-row-fully-selected -file "tsv_file.tsv" -row 1
+
+//
+get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv/Variables/after keyword" | double-click
+is-row-fully-selected -file "tsv_file.tsv" -row 3
+
+//set focus on Ouline and select keyword (KW table is shown)
+get-view Outline | get-tree | select "tsv_file.tsv/Keywords/kw"
+get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals "Keywords" | verify-true
+
+//select var
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/tsv_file.tsv/Variables/NEW" | double-click
+}
+//check tah variable tab is shown
+get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals "Variables" | verify-true
+is-row-fully-selected -file "tsv_file.tsv" -row 1
+
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/tsv_file.tsv/Test Cases" | double-click
+}
+
+//select test case - test cases tab is shown
+get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals "Test Cases" | verify-true
+
+//select var and check if Variable tab is shown
+get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv/Variables/list from tsv" | double-click
+is-row-fully-selected -file "tsv_file.tsv" -row 2
+
+get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals Variables | verify-true
+
+
+//======================================new resource =================================================================
+//add new txt resource file
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Resource file" | click
+with [get-window "New Robot Resource file"] {
+    get-button "as .txt file" | click
+    get-editbox -after [get-label "File name:"] | set-text "text_file.txt"
+    get-button Finish | click
+}
+with [get-editor "text_file.txt" | get-text-viewer] {
+    key-type "M1+SPACE"
+    wait 300
+    key-type Down -times 2
+    key-type Enter
+    type-text "@{newList}    item"
+}
+
+//chec if after writing new list this list is in Outline and PE
+with [get-view Outline | get-tree] {
+    get-item "text_file.txt/Variables" | get-property childCount | equals 1 | verify-true
+    get-item "text_file.txt/Variables" | get-property "getText()" | equals Variables | verify-true
+    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList | verify-true
+}
+get-view "Project Explorer" | get-tree | select RobotProject
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/text_file.txt/Variables" | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList 
+        | verify-true
+}
+
+
+with [get-editor "text_file.txt"] {
+    with [get-text-viewer] {
+        set-caret-pos 2 19
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item Variables | click
+}
+
+//use Outline and see selection
+get-view Outline | get-tree | select "text_file.txt/Variables/newList" | double-click
+is-row-fully-selected -file "text_file.txt" -row 0
+
+//add variable
+with [get-editor "text_file.txt"] {
+    get-tab-folder | get-tab-item Source | click
+    with [get-text-viewer] {
+    	set-caret-pos 2 19
+    	key-type Enter
+        key-type "M1+SPACE"
+        wait 300
+        key-type Enter
+        key-type Tab
+        type-text 79890778
+    }
+}
+wait 2000
+//check if new item is in Outlie and PE
+with [get-view Outline | get-tree] {
+    get-item "text_file.txt/Variables" | get-property childCount | equals 2 | verify-true
+    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList | verify-true
+    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[1].getText()" | equals newScalar 
+        | verify-true
+}
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/text_file.txt/Variables" | get-property childCount | equals 2 | verify-true
+    get-item "RobotProject/text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList 
+        | verify-true
+    get-item "RobotProject/text_file.txt/Variables" | get-property "getItems().TreeItem[1].getText()" 
+        | equals newScalar | verify-true
+}
+//see if still first line is selected
+get-editor "text_file.txt" | get-tab-folder | get-tab-item Variables | click
+is-row-fully-selected -file "text_file.txt" -row 0
+
+//click on Ouline nad PE
+get-view Outline | get-tree | select "text_file.txt/Variables/newScalar" | double-click
+is-row-fully-selected -file "text_file.txt" -row 1
+
+get-view "Project Explorer" | get-tree | select "RobotProject/pipes.robot/Variables/newList" | double-click
+is-row-fully-selected -file "text_file.txt" -row 0
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
