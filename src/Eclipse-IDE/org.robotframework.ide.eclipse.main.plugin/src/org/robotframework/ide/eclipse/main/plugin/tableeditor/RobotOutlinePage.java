@@ -5,6 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,6 +24,8 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -30,9 +36,12 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotContainer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
@@ -44,12 +53,14 @@ import com.google.common.base.Optional;
 class RobotOutlinePage extends ContentOutlinePage {
 
     private final RobotFormEditor editor;
-
     private final RobotSuiteFile suiteModel;
 
-    private ISelectionChangedListener selectionListener;
+    private RobotOutlineContentProvider contentProvider;
 
-    AtomicBoolean shouldUpdateEditorSelection = new AtomicBoolean(true);
+    private ISelectionChangedListener outlineSelectionListener;
+    private ISelectionChangedListener editorSelectionListener;
+
+    private final AtomicBoolean shouldUpdateEditorSelection = new AtomicBoolean(true);
 
     private Job modelQueryJob;
 
@@ -62,7 +73,8 @@ class RobotOutlinePage extends ContentOutlinePage {
     public void createControl(final Composite parent) {
         super.createControl(parent);
 
-        getTreeViewer().setContentProvider(new RobotOutlineContentProvider());
+        contentProvider = new RobotOutlineContentProvider();
+        getTreeViewer().setContentProvider(contentProvider);
         final NavigatorLabelProvider labelProvider = new NavigatorLabelProvider();
         ViewerColumnsFactory.newColumn("")
             .withWidth(400)
@@ -72,12 +84,15 @@ class RobotOutlinePage extends ContentOutlinePage {
         getTreeViewer().setInput(new Object[] { suiteModel });
         getTreeViewer().expandToLevel(3);
 
-        selectionListener = createSelectionListener();
-        getTreeViewer().addSelectionChangedListener(selectionListener);
+        editorSelectionListener = createEditorSelectionListener();
+        editor.getSite().getSelectionProvider().addSelectionChangedListener(editorSelectionListener);
 
-        getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
+        outlineSelectionListener = createOutlineSelectionListener();
+        getTreeViewer().addSelectionChangedListener(outlineSelectionListener);
 
         editor.getSourceEditor().getViewer().getTextWidget().addCaretListener(createCaretListener());
+
+        getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
     }
 
     private CaretListener createCaretListener() {
@@ -104,8 +119,7 @@ class RobotOutlinePage extends ContentOutlinePage {
                         @Override
                         public void run() {
                             shouldUpdateEditorSelection.set(false);
-                            final ISelection selection = new StructuredSelection(new Object[] { element.get() });
-                            getTreeViewer().setSelection(selection);
+                            setSelectionInOutline(element);
                         }
                     });
                 }
@@ -116,7 +130,24 @@ class RobotOutlinePage extends ContentOutlinePage {
         return job;
     }
 
-    private ISelectionChangedListener createSelectionListener() {
+    private ISelectionChangedListener createEditorSelectionListener() {
+        return new ISelectionChangedListener() {
+
+            @Override
+            public void selectionChanged(final SelectionChangedEvent event) {
+                if (event.getSelection() instanceof IStructuredSelection) {
+                    final Optional<RobotElement> element = Selections
+                            .getOptionalFirstElement((IStructuredSelection) event.getSelection(), RobotElement.class);
+                    if (element.isPresent()) {
+                        shouldUpdateEditorSelection.set(false);
+                        setSelectionInOutline(element);
+                    }
+                }
+            }
+        };
+    }
+
+    private ISelectionChangedListener createOutlineSelectionListener() {
         return new ISelectionChangedListener() {
 
             @Override
@@ -155,9 +186,32 @@ class RobotOutlinePage extends ContentOutlinePage {
         };
     }
 
+    private void setSelectionInOutline(final Optional<? extends RobotElement> element) {
+        if (element.get() instanceof RobotSetting
+                && ((RobotSetting) element.get()).getGroup() != SettingsGroup.NO_GROUP) {
+            getTreeViewer().setSelection(createSelectionForGroupedSetting((RobotSetting) element.get()));
+        } else {
+            getTreeViewer().setSelection(new StructuredSelection(new Object[] { element.get() }));
+        }
+    }
+
+    private ISelection createSelectionForGroupedSetting(final RobotSetting setting) {
+        final List<Object> pathElements = newArrayList((Object) setting);
+        pathElements.add(contentProvider.getGroupingElement(setting.getGroup()));
+
+        RobotElement current = setting.getParent();
+        while (current != null && !(current instanceof RobotContainer)) {
+            pathElements.add(current);
+            current = current.getParent();
+        }
+        Collections.reverse(pathElements);
+        return new TreeSelection(new TreePath(pathElements.toArray()));
+    }
+
     @Override
     public void dispose() {
-        getTreeViewer().removeSelectionChangedListener(selectionListener);
+        editor.getSite().getSelectionProvider().removeSelectionChangedListener(editorSelectionListener);
+        getTreeViewer().removeSelectionChangedListener(outlineSelectionListener);
 
         super.dispose();
     }
