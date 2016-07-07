@@ -2159,14 +2159,19 @@
                    definitionId="org.robotframework.table.onlyFullRowsAreSelected">
              </reference>
           </and-->
-          <or>
+          <and>
              <reference
-             	definitionId="org.robotframework.table.noFullRowIsSelected">
+                   definitionId="org.robotframework.atLeastOneVariableIsSelected">
              </reference>
-             <reference
-             	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
-             </reference>
-          </or>
+             <or>
+                <reference
+                      definitionId="org.robotframework.table.noFullRowIsSelected">
+                </reference>
+                <reference
+                      definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+                </reference>
+             </or>
+          </and>
        </enabledWhen>
     </handler>
     <handler
@@ -2183,14 +2188,19 @@
                    definitionId="org.robotframework.table.onlyFullRowsAreSelected">
              </reference>
           </and-->
-          <or>
+          <and>
              <reference
-             	definitionId="org.robotframework.table.noFullRowIsSelected">
+                   definitionId="org.robotframework.atLeastOneVariableIsSelected">
              </reference>
-             <reference
-             	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
-             </reference>
-          </or>
+             <or>
+                <reference
+                      definitionId="org.robotframework.table.noFullRowIsSelected">
+                </reference>
+                <reference
+                      definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+                </reference>
+             </or>
+          </and>
        </enabledWhen>
     </handler>
     <handler
@@ -3697,7 +3707,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.TableCellPropertyTester"
           id="org.robotframework.focusedCellPropertyTester"
           namespace="org.robotframework.table.cell"
-          properties="onlyFullRowsAreSelected,noFullRowIsSelected,focusedCellHasIndex,thereIsAFocusedCell,focusedCellHasContent"
+          properties="onlyFullRowsAreSelected,noFullRowIsSelected,numberOfSelectedCellEquals,focusedCellHasIndex,thereIsAFocusedCell,focusedCellHasContent"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
  </extension>
@@ -4100,6 +4110,16 @@
                    </count>
                 </with>
              </and>
+             <and>
+                <test
+                      property="org.robotframework.thereIsTextInClipboard"
+                      value="true">
+                </test>
+                <test
+                      property="org.robotframework.table.cell.numberOfSelectedCellEquals"
+                      value="1">
+                </test>
+             </and>
           </or>
        </with>
     </definition>
@@ -4124,6 +4144,16 @@
                   </count>
                </with>
             </and>
+            <and>
+               <test
+                     property="org.robotframework.thereIsTextInClipboard"
+                     value="true">
+               </test>
+               <test
+                     property="org.robotframework.table.cell.numberOfSelectedCellEquals"
+                     value="1">
+               </test>
+            </and>
          </or>
        </with>
     </definition>
@@ -4132,10 +4162,22 @@
        <and>
           <with
                 variable="activeEditor">
-             <test
-                   property="org.robotframework.thereAreGeneralSettingsInClipboard"
-                   value="true">
-             </test>
+             <or>
+                <test
+                      property="org.robotframework.thereAreGeneralSettingsInClipboard"
+                      value="true">
+                </test>
+                <and>
+                   <test
+                         property="org.robotframework.thereIsTextInClipboard"
+                         value="true">
+                   </test>
+                   <test
+                         property="org.robotframework.table.cell.numberOfSelectedCellEquals"
+                         value="1">
+                   </test>
+                </and>
+             </or>
           </with>
           <with
                 variable="activeContexts">
@@ -4154,10 +4196,22 @@
        <and>
           <with
                 variable="activeEditor">
-             <test
-                   property="org.robotframework.thereAreMetadataSettingsInClipboard"
-                   value="true">
-             </test>
+             <or>
+                <test
+                      property="org.robotframework.thereAreMetadataSettingsInClipboard"
+                      value="true">
+                </test>
+                <and>
+                   <test
+                         property="org.robotframework.thereIsTextInClipboard"
+                         value="true">
+                   </test>
+                   <test
+                         property="org.robotframework.table.cell.numberOfSelectedCellEquals"
+                         value="1">
+                   </test>
+                </and>
+             </or>
           </with>
           <with
                 variable="activeContexts">
@@ -4176,10 +4230,22 @@
        <and>
           <with
                 variable="activeEditor">
-             <test
-                   property="org.robotframework.thereAreImportSettingsInClipboard"
-                   value="true">
-             </test>
+             <or>
+                <test
+                      property="org.robotframework.thereAreImportSettingsInClipboard"
+                      value="true">
+                </test>
+                <and>
+                   <test
+                         property="org.robotframework.thereIsTextInClipboard"
+                         value="true">
+                   </test>
+                   <test
+                         property="org.robotframework.table.cell.numberOfSelectedCellEquals"
+                         value="1">
+                   </test>
+                </and>
+             </or>
           </with>
           <with
                 variable="activeContexts">
@@ -4197,10 +4263,22 @@
           id="org.robotframework.canPasteToVariablesSectionEditorTable">
        <with
              variable="activeEditor">
-         <test
-               property="org.robotframework.thereAreVariablesInClipboard"
-               value="true">
-         </test>
+         <or>
+            <test
+                  property="org.robotframework.thereAreVariablesInClipboard"
+                  value="true">
+            </test>
+            <and>
+               <test
+                     property="org.robotframework.thereIsTextInClipboard"
+                     value="true">
+               </test>
+               <test
+                     property="org.robotframework.table.cell.numberOfSelectedCellEquals"
+                     value="1">
+               </test>
+            </and>
+         </or>
        </with>
     </definition>
     <definition

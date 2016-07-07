@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd;
 
-import static com.google.common.collect.Sets.newHashSet;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -16,13 +14,10 @@ import java.io.ObjectOutputStream;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.swt.dnd.ByteArrayTransfer;
-import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 
 public class KeywordCallsTransfer extends ByteArrayTransfer {
 
@@ -36,76 +31,6 @@ public class KeywordCallsTransfer extends ByteArrayTransfer {
 
     public static KeywordCallsTransfer getInstance() {
         return INSTANCE;
-    }
-
-    public static boolean hasKeywordCalls(final Clipboard clipboard) {
-        return clipboard != null && !clipboard.isDisposed() && clipboardContainKeywordCalls(clipboard)
-                && hasKeywordCallsOnly(clipboard.getContents(getInstance()));
-    }
-    
-    public static boolean hasSettings(final Clipboard clipboard) {
-        return clipboard != null && !clipboard.isDisposed() && clipboardContainKeywordCalls(clipboard)
-                && hasAllGroupSettingsOnly(clipboard.getContents(getInstance()));
-    }
-
-    public static boolean hasGeneralSettings(final Clipboard clipboard) {
-        return clipboard != null && !clipboard.isDisposed() && clipboardContainKeywordCalls(clipboard)
-                && hasSettingsOnly(clipboard.getContents(getInstance()), SettingsGroup.NO_GROUP);
-    }
-
-    public static boolean hasMetadataSettings(final Clipboard clipboard) {
-        return clipboard != null && !clipboard.isDisposed() && clipboardContainKeywordCalls(clipboard)
-                && hasSettingsOnly(clipboard.getContents(getInstance()), SettingsGroup.METADATA);
-    }
-
-    public static boolean hasImportSettings(final Clipboard clipboard) {
-        return clipboard != null && !clipboard.isDisposed() && clipboardContainKeywordCalls(clipboard)
-                && hasSettingsOnly(clipboard.getContents(getInstance()), SettingsGroup.LIBRARIES,
-                        SettingsGroup.RESOURCES, SettingsGroup.VARIABLES);
-    }
-
-    private static boolean hasSettingsOnly(final Object content, final SettingsGroup... groups) {
-        if (content instanceof Object[]) {
-            for (final Object item : ((Object[])content)) {
-                if (item.getClass() != RobotSetting.class
-                        || !newHashSet(groups).contains(((RobotSetting) item).getGroup())) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    
-    private static boolean hasAllGroupSettingsOnly(final Object content) {
-        if (content instanceof Object[]) {
-            for (final Object item : ((Object[]) content)) {
-                if (item.getClass() != RobotSetting.class) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private static boolean hasKeywordCallsOnly(final Object content) {
-        if (content instanceof Object[]) {
-            for (final Object item : ((Object[]) content)) {
-                if (item.getClass() != RobotKeywordCall.class) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private static boolean clipboardContainKeywordCalls(final Clipboard clipboard) {
-        final TransferData[] availableTypes = clipboard.getAvailableTypes();
-        for (final TransferData data : availableTypes) {
-            if (getInstance().isSupportedType(data)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     @Override

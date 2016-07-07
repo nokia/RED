@@ -13,15 +13,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.viewers.Selections;
 import org.robotframework.red.viewers.Viewers;
 
@@ -30,13 +28,14 @@ import com.google.common.base.Optional;
 public abstract class E4CutCellContentHandler {
 
     @Execute
-    public Object cutCellContent(@Named(Selections.SELECTION) final IStructuredSelection selection,
-            @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor, final RobotEditorCommandsStack commandsStack,
-            final Clipboard clipboard) {
+    public void cutCellContent(@Named(Selections.SELECTION) final IStructuredSelection selection,
+            @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor, final RobotEditorCommandsStack commandsStack,
+            final RedClipboard clipboard) {
         final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
         final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
         final String cellContent = focusedCell.getText();
-        clipboard.setContents(new String[] { cellContent }, new Transfer[] { TextTransfer.getInstance() });
+
+        clipboard.insertContent(cellContent);
 
         final RobotElement element = Selections.getSingleElement(selection, RobotElement.class);
         final ColumnViewer viewer = viewerAccessor.getViewer();
@@ -47,8 +46,6 @@ public abstract class E4CutCellContentHandler {
         if (command.isPresent()) {
             commandsStack.execute(command.get());
         }
-
-        return null;
     }
 
     protected abstract Optional<? extends EditorCommand> provideCommandForAttributeChange(RobotElement element,
