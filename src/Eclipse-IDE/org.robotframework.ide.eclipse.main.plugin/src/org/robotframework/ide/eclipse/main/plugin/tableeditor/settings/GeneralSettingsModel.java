@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -22,6 +23,15 @@ import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
 
 public class GeneralSettingsModel {
+
+    private static final String DEFAULT_TAGS = "Default Tags";
+    private static final String FORCE_TAGS = "Force Tags";
+    private static final String TEST_TIMEOUT = "Test Timeout";
+    private static final String TEST_TEMPLATE = "Test Template";
+    private static final String TEST_TEARDOWN = "Test Teardown";
+    private static final String TEST_SETUP = "Test Setup";
+    private static final String SUITE_TEARDOWN = "Suite Teardown";
+    private static final String SUITE_SETUP = "Suite Setup";
     
     public static List<RobotElement> findGeneralSettingsList(final RobotSettingsSection section) {
         if (section == null) {
@@ -47,18 +57,26 @@ public class GeneralSettingsModel {
         return initialMapping;
     }
 
+    static boolean isKeywordBased(final Entry<String, RobotElement> entry) {
+        return newArrayList(SUITE_SETUP, SUITE_TEARDOWN, TEST_SETUP, TEST_TEARDOWN).contains(entry.getKey());
+    }
+
+    static boolean isTemplate(final Entry<String, RobotElement> entry) {
+        return TEST_TEMPLATE.equals(entry.getKey());
+    }
+
     static enum AccessibleSettings {
         OF_INIT_FILE {
             @Override
             Map<String, RobotElement> createInitialMapping() {
                 final Map<String, RobotElement> settings = new LinkedHashMap<>();
-                settings.put("Suite Setup", null);
-                settings.put("Suite Teardown", null);
-                settings.put("Test Setup", null);
-                settings.put("Test Teardown", null);
+                settings.put(SUITE_SETUP, null);
+                settings.put(SUITE_TEARDOWN, null);
+                settings.put(TEST_SETUP, null);
+                settings.put(TEST_TEARDOWN, null);
                 // there are no templates in __init__ files
-                settings.put("Test Timeout", null);
-                settings.put("Force Tags", null);
+                settings.put(TEST_TIMEOUT, null);
+                settings.put(FORCE_TAGS, null);
                 // there are no default tags in __init__ files
                 return settings;
             }
@@ -67,14 +85,14 @@ public class GeneralSettingsModel {
             @Override
             Map<String, RobotElement> createInitialMapping() {
                 final Map<String, RobotElement> settings = new LinkedHashMap<>();
-                settings.put("Suite Setup", null);
-                settings.put("Suite Teardown", null);
-                settings.put("Test Setup", null);
-                settings.put("Test Teardown", null);
-                settings.put("Test Template", null);
-                settings.put("Test Timeout", null);
-                settings.put("Force Tags", null);
-                settings.put("Default Tags", null);
+                settings.put(SUITE_SETUP, null);
+                settings.put(SUITE_TEARDOWN, null);
+                settings.put(TEST_SETUP, null);
+                settings.put(TEST_TEARDOWN, null);
+                settings.put(TEST_TEMPLATE, null);
+                settings.put(TEST_TIMEOUT, null);
+                settings.put(FORCE_TAGS, null);
+                settings.put(DEFAULT_TAGS, null);
                 return settings;
             }
         },
