@@ -38,19 +38,23 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
         addDocumentationText(rt);
     }
 
+    @Override
     public void addDocumentationText(final RobotToken token) {
         fixForTheType(token, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
         text.add(token);
     }
 
+    @Override
     public List<RobotToken> getDocumentationText() {
         return Collections.unmodifiableList(text);
     }
 
+    @Override
     public void setDocumentationText(final int index, final String docText) {
         updateOrCreateTokenInside(text, index, docText, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
     }
 
+    @Override
     public void setDocumentationText(final int index, final RobotToken docText) {
         updateOrCreateTokenInside(text, index, docText, RobotTokenType.SETTING_DOCUMENTATION_TEXT);
     }
@@ -65,10 +69,12 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
         this.text.clear();
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);
@@ -97,6 +103,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
         this.comment.clear();
     }
 
+    @Override
     public RobotToken getDeclaration() {
         return declaration;
     }

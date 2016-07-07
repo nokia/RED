@@ -48,10 +48,12 @@ public class KeywordReturn extends AModelElement<UserKeyword> implements ICommen
         values.add(returnValue);
     }
 
+    @Override
     public List<RobotToken> getComment() {
         return Collections.unmodifiableList(comment);
     }
 
+    @Override
     public void addCommentPart(final RobotToken rt) {
         fixComment(getComment(), rt);
         this.comment.add(rt);

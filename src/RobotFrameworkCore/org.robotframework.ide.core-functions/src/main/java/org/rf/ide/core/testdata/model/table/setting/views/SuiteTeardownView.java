@@ -33,6 +33,7 @@ public class SuiteTeardownView extends SuiteTeardown implements ISingleElementVi
         copyWithoutJoinIfNeededExecution(teardown);
     }
 
+    @Override
     public boolean isForceRebuild() {
         return changeForceRebuild;
     }
@@ -102,6 +103,7 @@ public class SuiteTeardownView extends SuiteTeardown implements ISingleElementVi
         super.addCommentPart(rt);
     }
 
+    @Override
     public synchronized void joinIfNeeded() {
         if (teardowns.size() > 1) {
             SuiteTeardown joined = new SuiteTeardown(getDeclaration());

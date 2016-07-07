@@ -32,6 +32,7 @@ public class TestSetupView extends TestSetup implements ISingleElementViewer {
         copyWithoutJoinIfNeededExecution(setup);
     }
 
+    @Override
     public boolean isForceRebuild() {
         return changeForceRebuild;
     }
@@ -101,6 +102,7 @@ public class TestSetupView extends TestSetup implements ISingleElementViewer {
         super.addCommentPart(rt);
     }
 
+    @Override
     public synchronized void joinIfNeeded() {
         if (setups.size() > 1) {
             TestSetup joined = new TestSetup(getDeclaration());
