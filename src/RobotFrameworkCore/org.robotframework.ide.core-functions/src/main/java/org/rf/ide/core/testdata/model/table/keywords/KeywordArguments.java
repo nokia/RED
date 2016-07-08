@@ -50,6 +50,10 @@ public class KeywordArguments extends AModelElement<UserKeyword> implements ICom
         fixForTheType(argument, RobotTokenType.KEYWORD_SETTING_ARGUMENT);
         arguments.add(argument);
     }
+    
+    public void addArgument(final int index, final String arg) {
+        updateOrCreateTokenInside(arguments, index, arg, RobotTokenType.KEYWORD_SETTING_ARGUMENT);
+    }
 
     @Override
     public List<RobotToken> getComment() {

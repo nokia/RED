@@ -51,6 +51,10 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
         fixForTheType(timeout, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE, true);
         this.timeout = timeout;
     }
+    
+    public void setTimeout(final String timeout) {
+        this.timeout = updateOrCreate(this.timeout, timeout, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE);
+    }
 
     public List<RobotToken> getMessage() {
         return Collections.unmodifiableList(message);
@@ -59,6 +63,10 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
     public void addMessagePart(final RobotToken messagePart) {
         fixForTheType(messagePart, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE, true);
         this.message.add(messagePart);
+    }
+    
+    public void addMessagePart(final int index, final String value) {
+        updateOrCreateTokenInside(message, index, value, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE);
     }
 
     @Override
