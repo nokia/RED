@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _9iuJED04EeaUDrMBSMf5Ag
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/7/16 2:02 PM
+Save-Time: 7/8/16 1:09 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -33,4 +33,11 @@ proc "is-row-fully-selected" [val file]  [val row]{
 	}
 } 
 
+//wait for items in view (add 1 because button "..add" counts too)
+proc "wait-for-var-in-table" [val file ] [val count 1]{
+	try -times 5 -delay 1000 -command{
+		get-editor $file | get-canvas -after [get-label Variables] -index 1 
+	    	| get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()" | equals $count | verify-true
+	}
+}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
