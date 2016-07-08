@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Z5QR0P4LEeSvjNrJkS7N6Q
 Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/4/16 12:29 PM
+Save-Time: 7/8/16 2:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -20,59 +20,61 @@ with [get-editor "TestFile.robot"] {
     wait 2000
     
     with [get-section General | get-editbox -index 1] {
-        //set-text-offset 0 0
-        click
-        key-type "Enter"
-        type-text "This is "
-        wait 1000
-        type-text "documentation." 
+ 		click
+ 		set-focus
+        type-text "This is documentation."
     }
 }
 get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text 
     | equals "This is documentation." | verify-true
 
 
-//with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] {
-//    key-type "M1+s"
-//}
-////save changes and close editor
-//get-editor "TestFile.robot" | close
-//
-////open editor and check text
-//get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-//get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text 
-//    | equals "This is documentation."| verify-true
-//get-editor "TestFile.robot" | get-tab-folder |    get-tab-item Source | click
-//
-////go to Source and check if Documenation was added
-//get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-//get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
-//    + "Documentation    This is documentation.\n"
-//    + "*** Test Cases ***" | verify-true
-//
-////tsv
-//get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
-//with [get-window "New Robot Test Suite"] {
-//    get-editbox -after [get-label "File name:"] | set-text tab
-//    get-button "as .tsv file" | click
-//    get-button Finish | click
-//}
-//with [get-editor "tab.tsv"] {
-//    get-tab-folder | get-tab-item Settings | click
-//    get-link "Section is not yet defined, do you want to create it?" | click
-//    with [get-section General | get-editbox -index 1] {
-//        set-text-offset 0 0
-//        type-text "T"
-//        wait 1000
-//        type-text "SV documentation"
-//        key-type "M1+s"
-//    }
-//    get-tab-folder | get-tab-item Source | click
-//}
-//get-editor "tab.tsv" | get-text-viewer | get-property text | equals "*** Setting ***\n"
-//    + "Documentation\tTSV documentation\n"
-//    + "*** Test Cases ***" | verify-true
-//    
-//    
-//    
+with [get-editor "TestFile.robot" | get-section General | get-editbox -index 1] {
+    key-type "M1+s"
+}
+//save changes and close editor
+get-editor "TestFile.robot" | close
+
+//open editor and check text
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text 
+    | equals "This is documentation."| verify-true
+get-editor "TestFile.robot" | get-tab-folder |    get-tab-item Source | click
+
+//go to Source and check if Documenation was added
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+    + "Documentation    This is documentation.\n"
+    + "*** Test Cases ***" | verify-true
+
+
+//---------------------------------------------------------------------------
+//tsv
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text tab
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+
+//add one letter and than rest checking bug with carte position
+with [get-editor "tab.tsv"] {
+    get-tab-folder | get-tab-item Settings | click
+    get-link "Section is not yet defined, do you want to create it?" | click
+    with [get-section General | get-editbox -index 1] {
+        click
+        set-focus
+        type-text "T"
+        wait 1000
+        type-text "SV documentation"
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "tab.tsv" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+    + "Documentation\tTSV documentation\n"
+    + "*** Test Cases ***" | verify-true
+    
+    
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
