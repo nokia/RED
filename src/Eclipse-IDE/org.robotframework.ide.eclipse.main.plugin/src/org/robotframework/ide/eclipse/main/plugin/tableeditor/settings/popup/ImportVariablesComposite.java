@@ -56,7 +56,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile.ImportedVariablesFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
@@ -303,7 +303,7 @@ public class ImportVariablesComposite {
             final List<String> args = setting.getArguments();
             if (!args.isEmpty() && args.equals(variablesFile.getArgs())) {
                 args.set(0, newPath);
-                commandsStack.execute(new SetSettingKeywordCallCommand(setting, args));
+                commandsStack.execute(new SetKeywordCallArgumentCommand(setting, 0, newPath));
                 variablesFile.setArgs(args);
                 break;
             }
@@ -320,7 +320,9 @@ public class ImportVariablesComposite {
             if (!args.isEmpty() && args.equals(variablesFile.getArgs())) {
                 final List<String> newVariablesArguments = newArrayList(args.get(0));
                 newVariablesArguments.addAll(newArgs);
-                commandsStack.execute(new SetSettingKeywordCallCommand(setting, newVariablesArguments));
+                for (int i = 0; i < newArgs.size(); i++) {
+                    commandsStack.execute(new SetKeywordCallArgumentCommand(setting, i + 1, newArgs.get(i))); // set arg after variable file path
+                }
                 variablesFile.setArgs(newVariablesArguments);
                 break;
             }
