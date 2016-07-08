@@ -17,6 +17,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommen
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsDataProvider.RobotKeywordCallAdder;
 
@@ -84,12 +85,18 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
         if (rowObject instanceof RobotKeywordCall) {
             RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
-            if (columnIndex == 0) {
-                commandsStack.execute(new SetKeywordCallNameCommand(keywordCall, value));
-            } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                commandsStack.execute(new SetKeywordCallArgumentCommand(keywordCall, columnIndex - 1, value));
-            } else if (columnIndex == (numberOfColumns - 1)) {
-                commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
+            if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+                if (columnIndex == 0) {
+                    commandsStack.execute(new SetKeywordCallNameCommand(keywordCall, value));
+                } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
+                    commandsStack.execute(new SetKeywordCallArgumentCommand(keywordCall, columnIndex - 1, value));
+                } else if (columnIndex == (numberOfColumns - 1)) {
+                    commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
+                }
+            } else {
+                if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
+                    commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
+                }
             }
         } else if (rowObject instanceof RobotKeywordDefinition) {
             RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
