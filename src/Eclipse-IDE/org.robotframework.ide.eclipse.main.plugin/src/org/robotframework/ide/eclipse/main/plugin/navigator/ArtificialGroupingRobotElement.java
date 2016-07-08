@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
-public final class ArtificialGroupingRobotElement implements RobotFileInternalElement {
+public class ArtificialGroupingRobotElement implements RobotFileInternalElement {
 
     private final SettingsGroup group;
 
