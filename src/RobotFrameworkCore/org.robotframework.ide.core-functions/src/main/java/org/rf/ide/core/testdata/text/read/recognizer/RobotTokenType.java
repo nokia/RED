@@ -611,7 +611,7 @@ public enum RobotTokenType implements IRobotTokenType {
             final String textSettingDeclaration) {
         RobotTokenType found = RobotTokenType.UNKNOWN;
 
-        for (final RobotTokenType type : getTypesForSettingsTable()) {
+        for (final RobotTokenType type : availableTypes) {
             if (type.isSettingDeclaration()) {
                 for (final String representation : type.getRepresentation()) {
                     if (representation.equalsIgnoreCase(textSettingDeclaration.trim())) {
