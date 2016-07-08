@@ -467,8 +467,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 120, 150,
-                new GeneralSettingsAssistanceLabelAccumulator(dataProvider),
-                new AlternatingRowConfigLabelAccumulator(), new EmptyGeneralSettingLabelAcumulator(dataProvider));
+                new GeneralSettingsAssistanceLabelAccumulator(dataProvider), new AlternatingRowConfigLabelAccumulator(),
+                new EmptyGeneralSettingLabelAcumulator(dataProvider));
         final GlazedListsEventLayer<Entry<String, RobotElement>> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -844,7 +844,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // end in order to proceed with saving
         if (documenationChangeJob != null && isDocumentationModified) {
             try {
-                documenationChangeJob.join(3000, null);
+                documenationChangeJob.join();
             } catch (final InterruptedException e) {
                 RedPlugin.logError("Documentation change job was interrupted", e);
             }
