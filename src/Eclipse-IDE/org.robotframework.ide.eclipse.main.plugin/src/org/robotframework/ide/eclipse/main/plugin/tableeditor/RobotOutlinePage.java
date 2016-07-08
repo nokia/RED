@@ -44,6 +44,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.navigator.ArtificialGroupingRobotElement;
 import org.robotframework.ide.eclipse.main.plugin.navigator.NavigatorLabelProvider;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.red.viewers.Selections;
@@ -197,7 +198,10 @@ class RobotOutlinePage extends ContentOutlinePage {
 
     private ISelection createSelectionForGroupedSetting(final RobotSetting setting) {
         final List<Object> pathElements = newArrayList((Object) setting);
-        pathElements.add(contentProvider.getGroupingElement(setting.getGroup()));
+        final ArtificialGroupingRobotElement groupingElement = contentProvider.getGroupingElement(setting.getGroup());
+        if (groupingElement != null) {
+            pathElements.add(groupingElement);
+        }
 
         RobotElement current = setting.getParent();
         while (current != null && !(current instanceof RobotContainer)) {
