@@ -45,7 +45,9 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.RobotFileDumper;
+import org.rf.ide.core.testdata.mapping.FileOutputsMatchUpdater;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
@@ -414,15 +416,20 @@ public class RobotFormEditor extends FormEditor {
         if (!getDirtyEditors().isEmpty()) {
             final IDocument document = editor.getDocumentProvider().getDocument(editor.getEditorInput());
             final RobotFile model = provideSuiteModel().getLinkedElement();
+            final RobotFileOutput currentRobotOutputFile = model.getParent();
             final String separatorFromPreference = RedPlugin.getDefault()
                     .getPreferences()
-                    .getSeparatorToUse(model.getParent().getFileFormat() == FileFormat.TSV);
+                    .getSeparatorToUse(currentRobotOutputFile.getFileFormat() == FileFormat.TSV);
             final DumpContext ctx = new DumpContext();
             ctx.setPreferedSeparator(separatorFromPreference);
 
             final RobotFileDumper dumper = new RobotFileDumper();
             dumper.setContext(ctx);
-            final String content = dumper.dump(model.getParent());
+            final String content = dumper.dump(currentRobotOutputFile);
+            final RobotFileOutput alreadyDumpedContent = suiteModel.getProject()
+                    .getRobotParser()
+                    .parseEditorContent(content, currentRobotOutputFile.getProcessedFile());
+            new FileOutputsMatchUpdater().update(currentRobotOutputFile, alreadyDumpedContent);
             document.set(content);
         }
     }
