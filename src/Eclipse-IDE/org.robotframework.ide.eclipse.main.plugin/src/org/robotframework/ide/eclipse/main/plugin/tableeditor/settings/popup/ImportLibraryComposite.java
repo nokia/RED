@@ -61,7 +61,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -431,7 +431,7 @@ public class ImportLibraryComposite {
                     final ImportSettingFileArgumentsDialog dialog = new ImportSettingFileArgumentsDialog(newShell,
                             libArgs);
                     if (dialog.open() == Window.OK) {
-                        handleEditLibraryArgs(spec, setting, dialog.getArguments());
+                        handleEditLibraryArgs(setting, dialog.getArguments());
                     }
                     newShell.dispose();
                 }
@@ -476,11 +476,10 @@ public class ImportLibraryComposite {
         rightViewer.refresh();
     }
 
-    private void handleEditLibraryArgs(final LibrarySpecification spec, final RobotSetting setting,
-            final List<String> newArgs) {
-        final List<String> newLibraryArguments = newArrayList(spec.getName());
-        newLibraryArguments.addAll(newArgs);
-        commandsStack.execute(new SetSettingKeywordCallCommand(setting, newLibraryArguments));
+    private void handleEditLibraryArgs(final RobotSetting setting, final List<String> newArgs) {
+        for (int i = 0; i < newArgs.size(); i++) {
+            commandsStack.execute(new SetKeywordCallArgumentCommand(setting, i + 1, newArgs.get(i))); // set arg after keyword name
+        }
     }
 
     private List<RobotSetting> getSettingsToRemove(final RobotSettingsSection settingsSection,
