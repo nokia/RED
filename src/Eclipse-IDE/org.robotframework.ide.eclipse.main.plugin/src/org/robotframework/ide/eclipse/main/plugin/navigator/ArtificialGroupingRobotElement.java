@@ -17,9 +17,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
-public class ArtificialGroupingRobotElement implements RobotFileInternalElement {
+public final class ArtificialGroupingRobotElement implements RobotFileInternalElement {
 
     private final SettingsGroup group;
 
@@ -83,5 +84,21 @@ public class ArtificialGroupingRobotElement implements RobotFileInternalElement 
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return groupedElements.get(0).getOpenRobotEditorStrategy(page);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (obj == null) {
+            return false;
+        } else if (obj.getClass() == ArtificialGroupingRobotElement.class) {
+            final ArtificialGroupingRobotElement that = (ArtificialGroupingRobotElement) obj;
+            return Objects.equal(this.group, that.group) && Objects.equal(this.getSuiteFile(), that.getSuiteFile());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(group, getSuiteFile());
     }
 }
