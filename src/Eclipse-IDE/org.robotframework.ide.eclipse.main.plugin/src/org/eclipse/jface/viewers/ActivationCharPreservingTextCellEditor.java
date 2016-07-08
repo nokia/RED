@@ -91,7 +91,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
         @Override
         public void beforeEditorDeactivated(final ColumnViewerEditorDeactivationEvent event) {
-            final IContextService service = PlatformUI.getWorkbench()
+            final IContextService service = (IContextService) PlatformUI.getWorkbench()
                     .getService(
                     IContextService.class);
             service.deactivateContext(contextActivation);
@@ -99,7 +99,7 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
         @Override
         public void beforeEditorActivated(final ColumnViewerEditorActivationEvent event) {
-            final IContextService service = PlatformUI.getWorkbench()
+            final IContextService service = (IContextService) PlatformUI.getWorkbench()
                     .getService(
                     IContextService.class);
             contextActivation = service.activateContext(contextToDeactivate);

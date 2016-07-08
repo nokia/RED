@@ -121,7 +121,7 @@ public class RedTextCellEditor extends TextCellEditor {
         }
         ((InlineFocusListener) focusListener).handleFocusChanges = true;
 
-        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
         contextActivation = service.activateContext(DETAILS_EDITING_CONTEXT_ID);
         
         return text;
@@ -141,7 +141,7 @@ public class RedTextCellEditor extends TextCellEditor {
     public void close() {
         super.close();
 
-        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
         service.deactivateContext(contextActivation);
     }
 
