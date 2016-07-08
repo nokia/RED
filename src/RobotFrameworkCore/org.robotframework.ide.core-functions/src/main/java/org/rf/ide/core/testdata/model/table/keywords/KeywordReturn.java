@@ -50,6 +50,10 @@ public class KeywordReturn extends AModelElement<UserKeyword> implements ICommen
         fixForTheType(returnValue, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE, true);
         values.add(returnValue);
     }
+    
+    public void addReturnValue(final int index, final String value) {
+        updateOrCreateTokenInside(values, index, value, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE);
+    }
 
     @Override
     public List<RobotToken> getComment() {

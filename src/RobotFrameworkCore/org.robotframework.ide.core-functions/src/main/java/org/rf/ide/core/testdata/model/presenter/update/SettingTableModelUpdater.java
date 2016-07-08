@@ -32,7 +32,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class SettingTableModelUpdater {
 
-    private static final List<ISettingTableElementOperation> elementUpdaters = Arrays.asList(
+    private static final List<ISettingTableElementOperation> elementOperations = Arrays.asList(
             new SuiteSetupModelOperation(), new SuiteTeardownModelOperation(), new TestSetupModelOperation(),
             new TestTeardownModelOperation(), new TestTemplateModelOperation(), new TestTimeoutModelOperation(),
             new ForceTagsModelOperation(), new DefaultTagsModelOperation(), new DocumentationModelOperation(),
@@ -84,7 +84,7 @@ public class SettingTableModelUpdater {
     private ISettingTableElementOperation getOperationHandler(final AModelElement<?> elem) {
         ISettingTableElementOperation oper = null;
 
-        for (final ISettingTableElementOperation cOper : elementUpdaters) {
+        for (final ISettingTableElementOperation cOper : elementOperations) {
             if (cOper.isApplicable(elem.getModelType())) {
                 oper = cOper;
                 break;
@@ -97,7 +97,7 @@ public class SettingTableModelUpdater {
     private ISettingTableElementOperation getOperationHandler(final IRobotTokenType type) {
         ISettingTableElementOperation oper = null;
 
-        for (final ISettingTableElementOperation cOper : elementUpdaters) {
+        for (final ISettingTableElementOperation cOper : elementOperations) {
             if (cOper.isApplicable(type)) {
                 oper = cOper;
                 break;
