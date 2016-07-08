@@ -19,6 +19,7 @@ import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 
 public abstract class RobotSuiteFileSection implements RobotFileInternalElement {
@@ -50,14 +51,14 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
             return false;
         } else if (obj.getClass() == getClass()) {
             final RobotSuiteFileSection other = (RobotSuiteFileSection) obj;
-            return name.equals(other.name);
+            return name.equals(other.name) && this.parent == other.parent;
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hashCode(name, parent);
     }
 
     @Override
