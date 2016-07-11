@@ -66,6 +66,10 @@ public class RobotLine implements IChildElement<RobotFile> {
         this.lineElements.add(position, lineElement);
     }
 
+    public void setLineElementAt(final int position, final IRobotLineElement lineElement) {
+        this.lineElements.set(position, lineElement);
+    }
+
     public Optional<Integer> getElementPositionInLine(final int offset, final PositionCheck posCheckStrategy) {
         Optional<Integer> pos = Optional.absent();
         final int size = lineElements.size();
