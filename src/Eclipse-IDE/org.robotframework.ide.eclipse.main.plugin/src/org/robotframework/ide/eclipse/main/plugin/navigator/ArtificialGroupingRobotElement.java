@@ -101,4 +101,9 @@ public class ArtificialGroupingRobotElement implements RobotFileInternalElement 
     public int hashCode() {
         return Objects.hashCode(group, getSuiteFile());
     }
+
+    @Override
+    public Object getLinkedElement() {
+        return null;
+    }
 }

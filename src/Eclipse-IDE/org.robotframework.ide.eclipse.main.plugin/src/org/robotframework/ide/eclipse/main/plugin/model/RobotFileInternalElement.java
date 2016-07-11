@@ -57,6 +57,8 @@ public interface RobotFileInternalElement extends RobotElement {
      */
     String getComment();
 
+    public Object getLinkedElement();
+
     public static final class DefinitionPosition {
 
         private final int line;
