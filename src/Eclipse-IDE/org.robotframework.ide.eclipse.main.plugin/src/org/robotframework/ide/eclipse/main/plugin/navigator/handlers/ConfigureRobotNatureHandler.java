@@ -37,7 +37,7 @@ public class ConfigureRobotNatureHandler extends DIParameterizedHandler<E4Config
             } else if ("disable".equalsIgnoreCase(enablement)) {
 
                 for (final IProject project : projects) {
-                    RobotProjectNature.removeRobotNature(project, new NullProgressMonitor());
+                    RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(), true);
                 }
             }
         }
