@@ -5,13 +5,14 @@ Element-Name: ProceduresForSettingsView
 Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/6/16 2:09 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/11/16 3:12 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
+//rowst starts from 1
 proc "check-row-for-test-setup-default" [val file] [val row] [val setting] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""]  [val c5 ""]  [val c6 ""]
 {
 	get-editor $file | get-section General | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $setting |verify-true
