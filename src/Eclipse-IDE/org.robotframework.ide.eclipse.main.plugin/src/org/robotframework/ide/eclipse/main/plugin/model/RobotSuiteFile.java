@@ -321,6 +321,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return file.getFileExtension();
     }
 
+    @Override
     public RobotFile getLinkedElement() {
         return fileOutput == null ? null : fileOutput.getFileModel();
     }

@@ -41,6 +41,7 @@ public class RobotCase extends RobotCodeHoldingElement {
         super(parent, name, comment);
     }
 
+    @Override
     public TestCase getLinkedElement() {
         return testCase;
     }
