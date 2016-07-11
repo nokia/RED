@@ -426,10 +426,10 @@ public class RobotFormEditor extends FormEditor {
             final RobotFileDumper dumper = new RobotFileDumper();
             dumper.setContext(ctx);
             final String content = dumper.dump(currentRobotOutputFile);
-            final RobotFileOutput alreadyDumpedContent = suiteModel.getProject()
-                    .getRobotParser()
-                    .parseEditorContent(content, currentRobotOutputFile.getProcessedFile());
+            RobotFileOutput alreadyDumpedContent = suiteModel.getProject().getRobotParser().parseEditorContent(content,
+                    currentRobotOutputFile.getProcessedFile());
             new FileOutputsMatchUpdater().update(currentRobotOutputFile, alreadyDumpedContent);
+            alreadyDumpedContent = null;
             document.set(content);
         }
     }
