@@ -19,6 +19,8 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class RobotProjectNature implements IProjectNature {
@@ -41,7 +43,8 @@ public class RobotProjectNature implements IProjectNature {
         project.setDescription(desc, monitor);
     }
 
-    public static void removeRobotNature(final IProject project, final IProgressMonitor monitor) throws CoreException {
+    public static void removeRobotNature(final IProject project, final IProgressMonitor monitor,
+            final boolean askForRedXmlRemoval) throws CoreException {
         final IProjectDescription desc = project.getDescription();
 
         final ArrayList<String> natures = newArrayList(desc.getNatureIds());
@@ -49,6 +52,20 @@ public class RobotProjectNature implements IProjectNature {
         desc.setNatureIds(natures.toArray(new String[0]));
 
         project.setDescription(desc, monitor);
+
+        final boolean shouldRemove = askForRedXmlRemoval ? shouldRedXmlBeRemoved(project.getName()) : true;
+        if (shouldRemove) {
+            final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
+            if (cfgFile.exists()) {
+                cfgFile.delete(true, null);
+            }
+        }
+    }
+
+    private static boolean shouldRedXmlBeRemoved(final String projectName) {
+        return MessageDialog.openQuestion(Display.getCurrent().getActiveShell(), "Confirm configuration file removal",
+                "You have deconfigured the project '" + projectName
+                        + "' as a Robot project. Do you want to remove project configuration file 'red.xml' too?");
     }
 
     public static IFile createRobotInitializationFile(final IFolder folder, final String extension)
@@ -88,10 +105,6 @@ public class RobotProjectNature implements IProjectNature {
 	@Override
 	public void deconfigure() throws CoreException {
         removeFromBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-        final IFile cfgFile = project.getFile(RobotProjectConfig.FILENAME);
-        if (cfgFile.exists()) {
-            cfgFile.delete(true, null);
-        }
 	}
 
     @Override
