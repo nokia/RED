@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/8/16 11:37 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/11/16 3:02 PM
 Testcase-Type: ecl
 Verifications: _h9dwwETtEeaEVfxTnoQ14g
 
@@ -332,13 +332,38 @@ with [get-view "Project Explorer" | get-tree] {
 get-editor "text_file.txt" | get-tab-folder | get-tab-item Variables | click
 is-row-fully-selected -file "text_file.txt" -row 0
 
-//click on Ouline nad PE
+//click on Ouline and PE
 get-view Outline | get-tree | select "text_file.txt/Variables/newScalar" | double-click
 is-row-fully-selected -file "text_file.txt" -row 1
 
-get-view "Project Explorer" | get-tree | select "RobotProject/pipes.robot/Variables/newList" | double-click
-is-row-fully-selected -file "text_file.txt" -row 0
 
 
+get-view "Project Explorer" | get-tree | select "RobotProject/pipes.robot/Variables/list" | double-click
+is-row-fully-selected -file "pipes.robot" -row 1
 
+//check if after selecting var outline selection is updated
+get-view Outline | get-tree | get-item "pipes.robot/Variables/list" |get-property selected | equals true | verify-true
+
+
+with [get-editor "pipes.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Up
+    }
+}
+
+get-view Outline | get-tree | get-item "pipes.robot/Variables/var" |get-property selected | equals true | verify-true
+
+with [get-editor "pipes.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+    }
+}
+
+get-view Outline | get-tree | get-item "pipes.robot/Variables/list" |get-property selected | equals true | verify-true
+with [get-editor "pipes.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+    }
+}
+get-view Outline | get-tree |  get-item "pipes.robot/Variables/newDict" |get-property selected | equals true | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
