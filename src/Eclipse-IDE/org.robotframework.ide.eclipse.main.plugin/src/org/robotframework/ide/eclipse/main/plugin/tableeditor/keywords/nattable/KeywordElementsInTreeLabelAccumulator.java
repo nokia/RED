@@ -35,11 +35,16 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
                 configLabels.addLabel(KeywordDefinitionElementStyleConfiguration.KEYWORD_DEFINITION_SETTING_CONFIG_LABEL);
             } else if (rowObject instanceof RobotKeywordCallAdder) {
                 configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
+                configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL);
             } else if (rowObject instanceof RobotKeywordDefinition) {
                 configLabels.addLabel(KeywordDefinitionElementStyleConfiguration.KEYWORD_DEFINITION_CONFIG_LABEL);
             }
-        } else if (columnPosition > 0 && rowObject instanceof RobotKeywordDefinition) {
-            configLabels.addLabel(KeywordDefinitionElementStyleConfiguration.KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
+        } else if (columnPosition > 0) {
+            if (rowObject instanceof RobotKeywordDefinition) {
+                configLabels.addLabel(KeywordDefinitionElementStyleConfiguration.KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
+            } else if (rowObject instanceof RobotKeywordCallAdder) {
+                configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL);
+            }
         }
 
     }

@@ -13,7 +13,9 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult;
@@ -57,15 +59,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
     public void link(final UserKeyword keyword) {
         this.keyword = keyword;
-        // body
-        for (final RobotExecutableRow<UserKeyword> execRow : keyword.getKeywordExecutionRows()) {
-            final String callName = execRow.getAction().getText().toString();
-            final List<String> args = newArrayList(
-                    Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
-            final RobotKeywordCall call = new RobotKeywordCall(this, callName, args, "");
-            getChildren().add(call);
-            call.link(execRow);
-        }
+        
         // settings
         for (final KeywordArguments argument : keyword.getArguments()) {
             final String name = argument.getDeclaration().getText().toString();
@@ -111,11 +105,34 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         for (final KeywordReturn returnSetting : keyword.getReturns()) {
             final String name = returnSetting.getDeclaration().getText().toString();
             final List<String> args = returnSetting.getReturnValues() == null ? new ArrayList<String>()
-                    : Lists.transform(returnSetting.getReturnValues(), TokenFunctions.tokenToString());
+                    : newArrayList(Lists.transform(returnSetting.getReturnValues(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(returnSetting);
             getChildren().add(setting);
         }
+        
+        // body
+        for (final RobotExecutableRow<UserKeyword> execRow : keyword.getKeywordExecutionRows()) {
+            final String callName = execRow.getAction().getText().toString();
+            final List<String> args = newArrayList(
+                    Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
+            final RobotKeywordCall call = new RobotKeywordCall(this, callName, args, "");
+            getChildren().add(call);
+            call.link(execRow);
+        }
+    }
+    
+    public RobotDefinitionSetting createKeywordDefinitionSetting(final int index, final String name,
+            final List<String> args, final String comment) {
+        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args,
+                comment);
+
+        final AModelElement<?> newModelElement = new KeywordTableModelUpdater().create(getLinkedElement(), name,
+                comment, args);
+        setting.link(newModelElement);
+
+        getChildren().add(index, setting);
+        return setting;
     }
 
     private static String omitSquareBrackets(final String nameInBrackets) {
@@ -252,6 +269,10 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         final FilePosition begin = keyword.getBeginPosition();
         final FilePosition end = keyword.getEndPosition();
 
+        if(begin.isNotSet() || end.isNotSet()) {
+            return new Position(0, 0);
+        }
+        
         return new Position(begin.getOffset(), end.getOffset() - begin.getOffset());
     }
 

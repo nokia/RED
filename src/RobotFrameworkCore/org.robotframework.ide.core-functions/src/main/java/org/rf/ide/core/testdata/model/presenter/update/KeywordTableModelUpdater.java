@@ -16,10 +16,12 @@ import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordReturnMod
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordTagsModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordTeardownModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordTimeoutModelOperation;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 /**
  * @author mmarzec
- *
  */
 public class KeywordTableModelUpdater {
 
@@ -27,6 +29,18 @@ public class KeywordTableModelUpdater {
             new KeywordArgumentsModelOperation(), new KeywordDocumentationModelOperation(),
             new KeywordTagsModelOperation(), new KeywordReturnModelOperation(), new KeywordTeardownModelOperation(),
             new KeywordTimeoutModelOperation());
+
+    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final String comment,
+            final List<String> args) {
+
+        if (userKeyword != null) {
+            final IKeywordTableElementOperation operationHandler = getOperationHandler(settingName);
+            if (operationHandler != null) {
+                return operationHandler.create(userKeyword, args, comment);
+            }
+        }
+        return null;
+    }
 
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
 
@@ -41,6 +55,20 @@ public class KeywordTableModelUpdater {
     private IKeywordTableElementOperation getOperationHandler(final ModelType elementModelType) {
         for (final IKeywordTableElementOperation operation : elementOparations) {
             if (operation.isApplicable(elementModelType)) {
+                return operation;
+            }
+        }
+
+        return null;
+    }
+
+    private IKeywordTableElementOperation getOperationHandler(final String settingName) {
+        return getOperationHandler(RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(settingName));
+    }
+
+    private IKeywordTableElementOperation getOperationHandler(final IRobotTokenType type) {
+        for (final IKeywordTableElementOperation operation : elementOparations) {
+            if (operation.isApplicable(type)) {
                 return operation;
             }
         }
