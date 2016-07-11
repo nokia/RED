@@ -11,7 +11,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-
 public class CreateFreshKeywordSettingCommand extends EditorCommand {
 
     private final RobotKeywordDefinition definition;
@@ -23,8 +22,7 @@ public class CreateFreshKeywordSettingCommand extends EditorCommand {
     private final int index;
 
     public CreateFreshKeywordSettingCommand(final RobotKeywordDefinition definition, final int index,
-            final String settingName,
-            final List<String> args) {
+            final String settingName, final List<String> args) {
         this.definition = definition;
         this.index = index;
         this.settingName = settingName;
@@ -33,7 +31,7 @@ public class CreateFreshKeywordSettingCommand extends EditorCommand {
 
     @Override
     protected void execute() throws CommandExecutionException {
-        definition.createDefinitionSetting(index, settingName, args, "");
+        definition.createKeywordDefinitionSetting(index, settingName, args, "");
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
     }

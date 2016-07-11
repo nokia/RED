@@ -41,6 +41,8 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
     public static final String ELEMENT_IN_TREE_ADDER_CONFIG_LABEL = "ELEMENT_ADDER_IN_TREE";
 
     public static final String ELEMENT_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW";
+    
+    public static final String ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW_IN_TREE";
 
     private final Font font;
 

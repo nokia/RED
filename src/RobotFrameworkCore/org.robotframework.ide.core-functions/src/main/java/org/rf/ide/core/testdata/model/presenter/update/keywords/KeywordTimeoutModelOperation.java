@@ -5,16 +5,41 @@
  */
 package org.rf.ide.core.testdata.model.presenter.update.keywords;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.IKeywordTableElementOperation;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordTimeoutModelOperation implements IKeywordTableElementOperation {
 
     @Override
     public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.USER_KEYWORD_TIMEOUT;
+    }
+    
+    @Override
+    public boolean isApplicable(final IRobotTokenType elementType) {
+        return elementType == RobotTokenType.KEYWORD_SETTING_TIMEOUT;
+    }
+
+    @Override
+    public AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment) {
+        final KeywordTimeout keywordTimeout = userKeyword.newTimeout();
+        if (!args.isEmpty()) {
+            keywordTimeout.setTimeout(args.get(0));
+            for (int i = 1; i < args.size(); i++) {
+                keywordTimeout.addMessagePart(i - 1, args.get(i));
+            }
+        }
+        if (comment != null && !comment.isEmpty()) {
+            keywordTimeout.setComment(comment);
+        }
+        return keywordTimeout;
     }
 
     @Override
