@@ -1,0 +1,55 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _nfYG4EduEeaRB_Xz0tiYpg
+Element-Name: ProjectExplorerForVariableWithNoSaving
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _TKC3YEdsEeaRB_Xz0tiYpg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/11/16 3:58 PM
+Testcase-Type: ecl
+Verifications: _3QE_gEduEeaRB_Xz0tiYpg
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add var to file1
+get-view "Project Explorer" | get-tree | select "RobotProject/file1.robot" | double-click
+with [get-editor "file1.robot" | get-text-viewer] {
+    set-caret-pos 7 11
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "${new}"
+    key-type Tab
+    type-text 5
+}
+
+//open file2 and add variable
+get-view "Project Explorer" | get-tree | select "RobotProject/file2.robot" | double-click
+with [get-editor "file2.robot" | get-text-viewer] {
+    set-caret-pos 10 17
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "${second}"
+    key-type Tab
+    type-text lol
+}
+
+//add onemore variabe to file1
+with [get-editor "file1.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 8 12
+        key-type "NUMPAD_ENTER" "\\u000D"
+        type-text "${from file1}  8"
+    }
+}
+//switch to file 2
+get-editor "file2.robot" | click
+wait 1000
+get-editor "file1.robot" | click
+
+
+
+//check if outile dosn't switch variables and other setting when files are not saved
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
