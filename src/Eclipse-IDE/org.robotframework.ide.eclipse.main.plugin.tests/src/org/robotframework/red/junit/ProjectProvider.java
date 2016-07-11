@@ -62,7 +62,7 @@ public class ProjectProvider implements TestRule {
     }
 
     public void removeRobotNature() throws CoreException {
-        RobotProjectNature.removeRobotNature(project, null, false);
+        RobotProjectNature.removeRobotNature(project, null, true);
     }
 
     public void configure() throws IOException, CoreException {
