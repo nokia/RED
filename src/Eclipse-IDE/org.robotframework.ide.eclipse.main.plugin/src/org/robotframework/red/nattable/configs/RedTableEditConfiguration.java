@@ -48,7 +48,7 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
                 AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
-                AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
+                AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(),
                 DisplayMode.NORMAL, GridRegion.BODY);
         configRegistry.registerConfigAttribute(EditConfigAttributes.DATA_VALIDATOR, new DefaultDataValidator());
