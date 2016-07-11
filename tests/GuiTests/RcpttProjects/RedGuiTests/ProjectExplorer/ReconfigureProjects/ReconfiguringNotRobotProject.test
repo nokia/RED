@@ -1,0 +1,216 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ReconfiguringNotRobotProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _sSLVQEdzEeaRB_Xz0tiYpg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/11/16 5:11 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//delet default project
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu Delete | click
+with [get-window "Delete Resources"] {
+    get-button "Delete project contents on disk (cannot be undone)" | check
+    get-button OK | click
+}
+
+//add non-red project
+get-view "Project Explorer" | get-tree | get-menu "New/Project..." | click
+with [get-window "New Project"] {
+    get-tree | select "General/Project"
+    get-button "Next >" | click
+    get-editbox -after [get-label "Project name:"] | set-text new
+    get-button Finish | click
+}
+
+//select preference to set .project and non-red projects
+get-button "View Menu" | click
+get-view "Project Explorer" | get-menu "Customize View..." | click
+with [get-window "Available Customizations"] {
+    get-tab-folder | get-tab-item Filters | click
+    with [get-table] {
+        get-item ".\\* resources" | uncheck
+        select "Non-Robot projects"
+        get-item "Non-Robot projects" | uncheck
+    }
+    get-button OK | click
+}
+
+//check default .project
+get-view "Project Explorer" | get-tree | select "new/.project" | double-click
+get-editor ".project" | get-text-viewer | get-property text | equals "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    + "<projectDescription>\n"
+    + "\t<name>new</name>\n"
+    + "\t<comment></comment>\n"
+    + "\t<projects>\n"
+    + "\t</projects>\n"
+    + "\t<buildSpec>\n"
+    + "\t</buildSpec>\n"
+    + "\t<natures>\n"
+    + "\t</natures>\n"
+    + "</projectDescription>" | verify-true
+    
+//configure file as robot    
+get-view "Project Explorer" | get-tree | select new | select new 
+    | get-menu "Robot Framework/Configure as Robot project" | click
+    
+//check that Standard libs and red.xml are added    
+with [get-view "Project Explorer" | get-tree] {
+    get-item new | get-property childCount | equals 3 | verify-true
+    get-item new | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Robot Standard libraries [Robot Framework 3.0 (Python 2.7.8 on win32)]" | verify-true
+    get-item new | get-property "getItems().TreeItem[1].getText()" | equals ".project" | verify-true
+    get-item new | get-property "getItems().TreeItem[2].getText()" | equals "red.xml" | verify-true
+}
+
+//check if red.xml is default
+get-view "Project Explorer" | get-tree | select "new/red.xml" | select "new/red.xml" | get-menu "Open With/Text Editor" 
+    | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+
+//check if .project was changed
+get-editor ".project" | get-text-viewer | get-property text | equals "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    + "<projectDescription>\n"
+    + "\t<name>new</name>\n"
+    + "\t<comment></comment>\n"
+    + "\t<projects>\n"
+    + "\t</projects>\n"
+    + "\t<buildSpec>\n"
+    + "\t\t<buildCommand>\n"
+    + "\t\t\t<name>org.robotframework.ide.eclipse.main.plugin.robotLibrariesBuilder</name>\n"
+    + "\t\t\t<arguments>\n"
+    + "\t\t\t</arguments>\n"
+    + "\t\t</buildCommand>\n"
+    + "\t</buildSpec>\n"
+    + "\t<natures>\n"
+    + "\t\t<nature>org.robotframework.ide.eclipse.main.plugin.robotNature</nature>\n"
+    + "\t</natures>\n"
+    + "</projectDescription>" | verify-true
+    
+//check that Configure menu is not available on red.xml file
+get-view "Project Explorer" | get-tree | select "new/red.xml"
+
+verify-error {get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Configure as Robot project" | get-property caption 
+    | equals "Configure as Robot project" | verify-true}
+  
+  
+//--------------------------------------------- deconfigure ---------------------------------------------------
+//deconfigure window
+get-view "Project Explorer" | get-tree | select new | get-menu "Robot Framework/Deconfigure as Robot project" | click
+with [get-window "Confirm configuration file removal"] {
+    get-label "You have deconfigured the project 'new' as a Robot project. Do you want to remove project configuration file 'red.xml' too?" 
+        | get-property caption 
+        | equals "You have deconfigured the project 'new' as a Robot project. Do you want to remove project configuration file 'red.xml' too?" 
+        | verify-true
+    get-button Yes | get-property enablement | equals true | verify-true
+    get-button No | get-property enablement | equals true | verify-true
+}
+//set to not remove red.xml
+get-window "Confirm configuration file removal" | get-button No | click
+
+//check if red.xml was not deleted
+with [get-view "Project Explorer" | get-tree] {
+    get-item new | get-property childCount | equals 2 | verify-true
+    get-item new | get-property "getItems().TreeItem[0].getText()" | equals ".project" | verify-true
+    get-item new | get-property "getItems().TreeItem[1].getText()" | equals "red.xml" | verify-true
+}
+  
+//check .project
+get-editor ".project" | get-text-viewer | get-property text | equals "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    + "<projectDescription>\n"
+    + "\t<name>new</name>\n"
+    + "\t<comment></comment>\n"
+    + "\t<projects>\n"
+    + "\t</projects>\n"
+    + "\t<buildSpec>\n"
+    + "\t</buildSpec>\n"
+    + "\t<natures>\n"
+    + "\t</natures>\n"
+    + "</projectDescription>" | verify-true
+
+//check red.xml
+get-editor "red.xml" | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+
+//-----------------  configure -------------------------------------
+
+//configure (red.xml exists and will be not added)
+get-view "Project Explorer" | get-tree | select new | get-menu "Robot Framework/Configure as Robot project" | click
+
+with [get-view "Project Explorer" | get-tree] {
+    get-item new | get-property childCount | equals 3 | verify-true
+    get-item new | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Robot Standard libraries [Robot Framework 3.0 (Python 2.7.8 on win32)]" | verify-true
+    get-item new | get-property "getItems().TreeItem[1].getText()" | equals ".project" | verify-true
+    get-item new | get-property "getItems().TreeItem[2].getText()" | equals "red.xml" | verify-true
+}
+
+//check .project
+get-editor ".project" | get-text-viewer | get-property text | equals "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+    + "<projectDescription>\n"
+    + "\t<name>new</name>\n"
+    + "\t<comment></comment>\n"
+    + "\t<projects>\n"
+    + "\t</projects>\n"
+    + "\t<buildSpec>\n"
+    + "\t\t<buildCommand>\n"
+    + "\t\t\t<name>org.robotframework.ide.eclipse.main.plugin.robotLibrariesBuilder</name>\n"
+    + "\t\t\t<arguments>\n"
+    + "\t\t\t</arguments>\n"
+    + "\t\t</buildCommand>\n"
+    + "\t</buildSpec>\n"
+    + "\t<natures>\n"
+    + "\t\t<nature>org.robotframework.ide.eclipse.main.plugin.robotNature</nature>\n"
+    + "\t</natures>\n"
+    + "</projectDescription>" | verify-true
+    
+    
+//check red.xml if was not changed
+get-editor "red.xml" | click
+get-editor "red.xml" | get-text-viewer | get-property text 
+    | equals "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+    + "<projectConfiguration>\n"
+    + "    <configVersion>1.0</configVersion>\n"
+    + "    <relativeTo>WORKSPACE</relativeTo>\n"
+    + "    <pythonpath/>\n"
+    + "    <classpath/>\n"
+    + "    <excludedForValidation/>\n"
+    + "    <isValidatedFileSizeCheckingEnabled>true</isValidatedFileSizeCheckingEnabled>\n"
+    + "    <validatedFileMaxSize>1024</validatedFileMaxSize>\n"
+    + "    <isReferencedLibrariesAutoReloadEnabled>true</isReferencedLibrariesAutoReloadEnabled>\n"
+    + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
+    + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
+    + "</projectConfiguration>" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
