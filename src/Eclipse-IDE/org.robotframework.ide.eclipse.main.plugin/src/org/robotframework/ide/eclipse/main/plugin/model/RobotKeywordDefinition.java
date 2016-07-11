@@ -53,6 +53,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         super(parent, name, comment);
     }
 
+    @Override
     public UserKeyword getLinkedElement() {
         return keyword;
     }

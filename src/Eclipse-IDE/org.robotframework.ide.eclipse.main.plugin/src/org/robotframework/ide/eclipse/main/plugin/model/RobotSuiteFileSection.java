@@ -41,6 +41,7 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
         this.sectionTable = table;
     }
 
+    @Override
     public ARobotSectionTable getLinkedElement() {
         return sectionTable;
     }
