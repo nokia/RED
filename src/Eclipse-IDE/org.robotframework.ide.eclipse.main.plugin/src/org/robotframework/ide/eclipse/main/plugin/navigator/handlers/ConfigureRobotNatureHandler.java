@@ -8,7 +8,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.e4.core.di.annotations.Execute;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.ConfigureRobotNatureHandler.E4ConfigureRobotNatureHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -37,9 +39,16 @@ public class ConfigureRobotNatureHandler extends DIParameterizedHandler<E4Config
             } else if ("disable".equalsIgnoreCase(enablement)) {
 
                 for (final IProject project : projects) {
-                    RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(), true);
+                    RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(),
+                            shouldRedXmlBeRemoved(project.getName()));
                 }
             }
+        }
+
+        private static boolean shouldRedXmlBeRemoved(final String projectName) {
+            return MessageDialog.openQuestion(Display.getCurrent().getActiveShell(),
+                    "Confirm configuration file removal", "You have deconfigured the project '" + projectName
+                            + "' as a Robot project. Do you want to remove project configuration file 'red.xml' too?");
         }
     }
 }
