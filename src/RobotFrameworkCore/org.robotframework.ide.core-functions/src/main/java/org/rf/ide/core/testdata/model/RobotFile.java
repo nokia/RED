@@ -15,6 +15,7 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -50,6 +51,13 @@ public class RobotFile implements IChildElement<RobotFileOutput> {
     }
 
     public void removeLines() {
+        for (RobotLine line : fileContent) {
+            for (IRobotLineElement e : line.getLineElements()) {
+                e = null;
+            }
+            line.getLineElements().clear();
+            line = null;
+        }
         fileContent.clear();
     }
 

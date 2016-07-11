@@ -100,6 +100,9 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
 
     protected void updateOrCreateTokenInside(final List<RobotToken> toModify, final int index, final RobotToken token,
             final IRobotTokenType expectedType) {
+        if (expectedType != null) {
+            fixForTheType(token, expectedType);
+        }
         int size = toModify.size();
         if (size > index) {
             toModify.get(index).setText(token.getText());
