@@ -42,6 +42,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         this.linkedElement = executableRow;
     }
 
+    @Override
     public AModelElement<?> getLinkedElement() {
         return linkedElement;
     }
