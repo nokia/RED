@@ -9,9 +9,13 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
@@ -62,10 +66,10 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 return keywordDef.getName();
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                 RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
-                if(argumentsSetting != null) {
+                if (argumentsSetting != null) {
                     List<String> arguments = argumentsSetting.getArguments();
-                    if((columnIndex-1) < arguments.size()) {
-                        return arguments.get(columnIndex-1);
+                    if ((columnIndex - 1) < arguments.size()) {
+                        return arguments.get(columnIndex - 1);
                     }
                 }
             } else if (columnIndex == (numberOfColumns - 1)) {
@@ -85,6 +89,13 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
         if (rowObject instanceof RobotKeywordCall) {
             RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
+
+            if (value.startsWith("[") && value.endsWith("]")
+                    && keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+                createNewKeywordSettingAndRemoveOldExeRow(value, keywordCall);
+                return;
+            }
+
             if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
                 if (columnIndex == 0) {
                     commandsStack.execute(new SetKeywordCallNameCommand(keywordCall, value));
@@ -94,6 +105,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                     commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
                 }
             } else {
+
                 if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
                 }
@@ -131,4 +143,20 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         this.numberOfColumns = numberOfColumns;
     }
 
+    private void createNewKeywordSettingAndRemoveOldExeRow(final String value, final RobotKeywordCall keywordCall) {
+        final RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(value);
+        if (tokenType != RobotTokenType.UNKNOWN && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS
+                && tokenType != RobotTokenType.KEYWORD_SETTING_DOCUMENTATION) {
+            final RobotKeywordDefinition keywordDefinition = (RobotKeywordDefinition) keywordCall.getParent();
+            keywordDefinition.getLinkedElement()
+                    .removeExecutableRow((RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement());
+
+            final List<RobotKeywordCall> children = keywordDefinition.getChildren();
+            final int index = children.indexOf(keywordCall);
+            children.remove(keywordCall);
+
+            commandsStack.execute(
+                    new CreateFreshKeywordSettingCommand(keywordDefinition, index, value, keywordCall.getArguments()));
+        }
+    }
 }
