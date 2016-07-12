@@ -130,7 +130,7 @@ public class GeneralSettingsDataProvider
     }
 
     boolean isPassingThroughFilter(final RobotSetting rowObject) {
-        return filter == null || filter.select(null, null, rowObject);
+        return filter == null || filter.isMatching(rowObject);
     }
 
     void setMatches(final HeaderFilterMatchesCollection matches) {

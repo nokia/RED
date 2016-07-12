@@ -354,7 +354,7 @@ public abstract class CodeSettingsFormFragment implements ISectionFormFragment {
                 viewer.setFilters(new ViewerFilter[0]);
             } else {
                 setDocumentationMatches(matches);
-                viewer.setFilters(new ViewerFilter[] { new SettingsMatchesFilter(matches) });
+                //viewer.setFilters(new ViewerFilter[] { new SettingsMatchesFilter(matches) });
             }
         } finally {
             viewer.getTable().setRedraw(true);

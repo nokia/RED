@@ -104,18 +104,13 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 } else if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
                 }
-            } else {
-
-                if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
-                }
+            } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
+                commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
             }
-        } else if (rowObject instanceof RobotKeywordDefinition) {
+        } else if (rowObject instanceof RobotKeywordDefinition && !value.isEmpty()) {
             RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
             if (columnIndex == 0) {
-                if (!value.isEmpty()) {
-                    commandsStack.execute(new SetKeywordDefinitionNameCommand(keywordDef, value));
-                }
+                commandsStack.execute(new SetKeywordDefinitionNameCommand(keywordDef, value));
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                 commandsStack.execute(new SetKeywordDefinitionArgumentCommand(keywordDef, columnIndex - 1, value));
             }
