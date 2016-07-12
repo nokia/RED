@@ -120,7 +120,9 @@ class RobotOutlinePage extends ContentOutlinePage {
                         @Override
                         public void run() {
                             shouldUpdateEditorSelection.set(false);
-                            setSelectionInOutline(element);
+                            setSelectionInOutline(
+                                    element.isPresent() && element.get() == suiteModel
+                                            ? Optional.<RobotElement> absent() : element);
                         }
                     });
                 }
@@ -188,6 +190,9 @@ class RobotOutlinePage extends ContentOutlinePage {
     }
 
     private void setSelectionInOutline(final Optional<? extends RobotElement> element) {
+        if (!element.isPresent()) {
+            return;
+        }
         if (element.get() instanceof RobotSetting
                 && ((RobotSetting) element.get()).getGroup() != SettingsGroup.NO_GROUP) {
             getTreeViewer().setSelection(createSelectionForGroupedSetting((RobotSetting) element.get()));
