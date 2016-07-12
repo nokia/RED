@@ -36,7 +36,7 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
 
         private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.keywords.context";
 
-        private KeywordsEditorFormFragment keywordsFragment;
+        private org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment keywordsFragment;
         private KeywordSettingsFormFragment detailsFragment;
 
         @Override
@@ -76,24 +76,28 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
-            keywordsFragment = new KeywordsEditorFormFragment();
+            keywordsFragment = new org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment();
+//            org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment k2 = 
+//                    new org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment();
             detailsFragment = new KeywordSettingsFormFragment();
             return newArrayList(keywordsFragment, detailsFragment);
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return keywordsFragment.getViewer();
+            //return keywordsFragment.getViewer();
+            return keywordsFragment.getSelectionProvider();
         }
 
         @Override
         public FocusedViewerAccessor getFocusedViewerAccessor() {
-            return keywordsFragment.getFocusedViewerAccessor();
+            //return keywordsFragment.getFocusedViewerAccessor();
+            return null;
         }
 
         @Override
         public SelectionLayerAccessor getSelectionLayerAccessor() {
-            return null;
+            return keywordsFragment.getSelectionLayerAccessor();
         }
 
         @Override
