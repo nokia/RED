@@ -1763,9 +1763,17 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <reference
+          <!--reference
                 definitionId="org.robotframework.exactlyOneElementIsSelected">
-          </reference>
+          </reference-->
+          <or>
+             <reference
+             	definitionId="org.robotframework.table.noFullRowIsSelected">
+             </reference>
+             <reference
+             	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+             </reference>
+          </or>
        </enabledWhen>
     </handler>
     <handler
