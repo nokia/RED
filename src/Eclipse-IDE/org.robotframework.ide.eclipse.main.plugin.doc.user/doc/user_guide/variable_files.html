@@ -4,9 +4,20 @@
 	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
 	rel="stylesheet" type="text/css" />
 </head>
-<body>
-<h2>local Python variable files to deal with missing variables</h2>
-In some test environments, Robot specific enviroments variables are used in test cases or injected as arguments to Robot test runner. <br>
+<body>+
+<h2>General info about python variable files used in Robot Test Suites</h2>
+RobotFramework allows to use python variable files in Robot Test Suites in two distinctive ways.<br>
+<b>Direct usage</b> is done by using python file declaration in Settings section as follows:<br>
+<i>variables  &ltpath_to_python_var_file&gt</i><br>
+Variable file content will be visible across Test Suite.<br>
+<b>Global usage</b> is a way to use common variable file across any Test Suite.<br>
+In RED, this can be achieved by including variable files in RED.xml under Variable Files tab. <br>
+From Robot perspective this is done by using -V switch in pybot execution<br>
+<h2>Reloading variable file content</h2>
+Since version 0.6.6, RED can automativcly invoke refresh of variable files being changed.<br>
+This can be done manually by clicking on Project by RMB and selecting <b>Robot Framework -> Reset Robot Environment</b> <br>
+<h2>Local Python variable files to deal with missing variables</h2>
+In some test environments, Robot specific environments variables are used in test cases or injected as arguments to Robot test runner. <br>
 RED is not aware of such usage thus those variables will be marked as unknown, error marker will be placed.<br>
 In order to include variable name validation without changing test suites, user can create local Python file with list of variable names inside.<br>
 Such file can be included in RED.xml under Variable files section thus making RED aware of previously unknown variables. <br>
