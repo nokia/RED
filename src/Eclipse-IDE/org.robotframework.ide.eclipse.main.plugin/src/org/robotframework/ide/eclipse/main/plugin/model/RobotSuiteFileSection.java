@@ -21,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Optional;
+import com.google.common.collect.Range;
 
 public abstract class RobotSuiteFileSection implements RobotFileInternalElement {
 
@@ -111,7 +112,12 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
                 return candidate;
             }
         }
-        // TODO : check if offset is within this section
+        for (final TableHeader<? extends ARobotSectionTable> header : sectionTable.getHeaders()) {
+            if (Range.closed(header.getBeginPosition().getOffset(), header.getEndPosition().getOffset())
+                    .contains(offset)) {
+                return Optional.of(this);
+            }
+        }
         return Optional.absent();
     }
 
