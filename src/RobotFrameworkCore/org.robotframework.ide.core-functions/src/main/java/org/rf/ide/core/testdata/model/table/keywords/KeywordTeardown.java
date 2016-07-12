@@ -44,4 +44,9 @@ public class KeywordTeardown extends AKeywordBaseSetting<UserKeyword> {
     public IRobotTokenType getArgumentType() {
         return RobotTokenType.KEYWORD_SETTING_TEARDOWN_KEYWORD_ARGUMENT;
     }
+
+    @Override
+    protected RobotTokenType getDeclarationType() {
+        return RobotTokenType.KEYWORD_SETTING_TEARDOWN;
+    }
 }

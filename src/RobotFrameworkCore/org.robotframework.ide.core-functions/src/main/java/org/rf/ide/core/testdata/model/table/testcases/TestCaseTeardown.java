@@ -44,4 +44,9 @@ public class TestCaseTeardown extends AKeywordBaseSetting<TestCase> {
     public IRobotTokenType getArgumentType() {
         return RobotTokenType.TEST_CASE_SETTING_TEARDOWN_KEYWORD_ARGUMENT;
     }
+
+    @Override
+    protected RobotTokenType getDeclarationType() {
+        return RobotTokenType.TEST_CASE_SETTING_TEARDOWN;
+    }
 }
