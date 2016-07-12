@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _3FhY0D68EeaMlbNjowJCaw
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/5/16 10:32 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/12/16 3:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -45,12 +45,12 @@ with [get-editor "TestFile.robot"] {
         key-type Up -times 4
         key-type Del
         
-        //remove valu in secod row
+        //remove value in second row
         key-type Down
         key-type Right
         key-type Del
         
-        //remove commnet in 4th line
+        //remove comment in 4th line
         key-type Down -times 2
         key-type Right
         key-type Del
