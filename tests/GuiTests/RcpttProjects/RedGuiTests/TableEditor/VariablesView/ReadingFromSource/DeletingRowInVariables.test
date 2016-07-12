@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _Mx0E8D6jEeaMlbNjowJCaw
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/8/16 1:07 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/12/16 3:17 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -29,7 +29,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variable ***\n"
     + "${var10}    10        #text10\n" 
     + "*** Test Cases ***"
 
-//go to first variable and presss F4 (this is only method to set focus on variable)
+//go to first variable and press F4 (this is only method to set focus on variable)
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
         set-caret-pos 2 6
