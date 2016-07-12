@@ -27,7 +27,16 @@ import com.google.common.collect.ListMultimap;
  */
 public class FileOutputsMatchUpdater {
 
-    private static final RobotTokensCollector tokenCollector = new RobotTokensCollector();
+    private final RobotTokensCollector tokenCollector;
+
+    public FileOutputsMatchUpdater() {
+        this(new RobotTokensCollector());
+    }
+
+    @VisibleForTesting
+    protected FileOutputsMatchUpdater(final RobotTokensCollector tokenCollector) {
+        this.tokenCollector = tokenCollector;
+    }
 
     public void update(final RobotFileOutput oldModifiedOutput, final RobotFileOutput alreadyDumpedContent) {
         update(oldModifiedOutput, alreadyDumpedContent, true);
