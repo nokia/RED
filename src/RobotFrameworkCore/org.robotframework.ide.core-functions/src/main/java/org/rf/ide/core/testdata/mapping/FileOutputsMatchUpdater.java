@@ -59,7 +59,8 @@ public class FileOutputsMatchUpdater {
                 newViewAboutTokens);
     }
 
-    private void replaceNewReferenceByCorrespondingOld(final RobotFileOutput oldModifiedOutput,
+    @VisibleForTesting
+    protected void replaceNewReferenceByCorrespondingOld(final RobotFileOutput oldModifiedOutput,
             final ListMultimap<RobotTokenType, RobotToken> oldViewAboutTokens,
             final RobotFileOutput alreadyDumpedContent,
             final ListMultimap<RobotTokenType, RobotToken> newViewAboutTokens) {
@@ -74,7 +75,7 @@ public class FileOutputsMatchUpdater {
             final List<RobotToken> oldToUpdate = oldViewAboutTokens.get(type);
             final List<RobotToken> newToCopy = newViewAboutTokens.get(type);
 
-            int tokSize = oldToUpdate.size();
+            int tokSize = Math.min(oldToUpdate.size(), newToCopy.size());
             for (int index = 0; index < tokSize; index++) {
                 final RobotToken oldToken = oldToUpdate.get(index);
                 final RobotToken newToken = newToCopy.get(index);
@@ -115,31 +116,48 @@ public class FileOutputsMatchUpdater {
     @VisibleForTesting
     protected void validateThatTheSameTokensInView(final ListMultimap<RobotTokenType, RobotToken> oldViewAboutTokens,
             final ListMultimap<RobotTokenType, RobotToken> newViewAboutTokens) {
-        final Set<RobotTokenType> oldKeySet = oldViewAboutTokens.keySet();
         final Set<RobotTokenType> newKeySet = newViewAboutTokens.keySet();
-        if (oldKeySet.size() == newKeySet.size() && newKeySet.containsAll(oldKeySet)) {
-            for (final RobotTokenType t : oldKeySet) {
-                List<RobotToken> oldToks = oldViewAboutTokens.get(t);
-                List<RobotToken> newToks = newViewAboutTokens.get(t);
+        for (final RobotTokenType t : newKeySet) {
+            List<RobotToken> oldToks = oldViewAboutTokens.get(t);
+            List<RobotToken> newToks = newViewAboutTokens.get(t);
 
-                if (oldToks.size() == newToks.size()) {
-                    int toksSize = oldToks.size();
-                    for (int i = 0; i < toksSize; i++) {
-                        final RobotToken rtOld = oldToks.get(i);
-                        final RobotToken rtNew = newToks.get(i);
-                        if (!rtOld.getText().equals(rtNew.getText())) {
-                            throw new NotSameOutputFiles("Token type " + t + " with index " + i
-                                    + " doesn't contain the same content as old. Expected " + rtOld.getText() + " got "
-                                    + rtNew.getText());
-                        }
-                    }
+            int toksSize = -1;
+            if (oldToks.size() == newToks.size()) {
+                toksSize = oldToks.size();
+            } else {
+                int oldNotEmpty = findTheFirstNotEmpty(oldToks);
+                int newNotEmpty = findTheFirstNotEmpty(newToks);
+                if (oldNotEmpty == newNotEmpty) {
+                    toksSize = oldNotEmpty;
                 } else {
                     throw new NotSameOutputFiles("Type " + t + " has not the same number of elements in outputs.");
                 }
             }
-        } else {
-            throw new NotSameOutputFiles("Contains not the same types.");
+
+            for (int i = 0; i < toksSize; i++) {
+                final RobotToken rtOld = oldToks.get(i);
+                final RobotToken rtNew = newToks.get(i);
+                if (!rtOld.getText().equals(rtNew.getText())) {
+                    if (!(rtOld.getText().trim().isEmpty() && rtNew.getText().trim().equals("\\"))) {
+                        throw new NotSameOutputFiles("Token type " + t + " with index " + i
+                                + " doesn't contain the same content as old. Expected " + rtOld.getText() + " got "
+                                + rtNew.getText());
+                    }
+                }
+            }
         }
+
+    }
+
+    private int findTheFirstNotEmpty(final List<RobotToken> t) {
+        int index = -1;
+        for (int i = t.size() - 1; i >= 0; i--) {
+            if (!t.get(i).getText().isEmpty()) {
+                return i;
+            }
+        }
+
+        return index;
     }
 
     public static class NotSameOutputFiles extends RuntimeException {
