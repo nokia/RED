@@ -324,6 +324,33 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     @Override
+    public boolean removeUnitSettings(final AModelElement<UserKeyword> setting) {
+        if (setting != null) {
+            final ModelType settingType = setting.getModelType();
+            switch (settingType) {
+                case USER_KEYWORD_DOCUMENTATION:
+                    return this.documentation.remove(setting);
+                case USER_KEYWORD_TAGS:
+                    return this.tags.remove(setting);
+                case USER_KEYWORD_ARGUMENTS:
+                    return this.keywordArguments.remove(setting);
+                case USER_KEYWORD_RETURN:
+                    return this.keywordReturns.remove(setting);
+                case USER_KEYWORD_TEARDOWN:
+                    return this.teardowns.remove(setting);
+                case USER_KEYWORD_TIMEOUT:
+                    return this.timeouts.remove(setting);
+                case USER_KEYWORD_SETTING_UNKNOWN:
+                    return this.unknownSettings.remove(setting);
+                default:
+                    return false;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("This operation is not allowed inside UserKeyword.");
     }

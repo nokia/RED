@@ -381,6 +381,33 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     @Override
+    public boolean removeUnitSettings(final AModelElement<TestCase> setting) {
+        if (setting != null) {
+            final ModelType settingType = setting.getModelType();
+            switch (settingType) {
+                case TEST_CASE_DOCUMENTATION:
+                    return this.documentation.remove(setting);
+                case TEST_CASE_TAGS:
+                    return this.tags.remove(setting);
+                case TEST_CASE_SETUP:
+                    return this.setups.remove(setting);
+                case TEST_CASE_TEARDOWN:
+                    return this.teardowns.remove(setting);
+                case TEST_CASE_TEMPLATE:
+                    return this.templates.remove(setting);
+                case TEST_CASE_TIMEOUT:
+                    return this.timeouts.remove(setting);
+                case TEST_CASE_SETTING_UNKNOWN:
+                    return this.unknownSettings.remove(setting);
+                default:
+                    return false;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
     public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("This operation is not allowed inside TestCase.");
     }
