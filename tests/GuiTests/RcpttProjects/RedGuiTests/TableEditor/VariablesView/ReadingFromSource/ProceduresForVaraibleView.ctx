@@ -5,8 +5,8 @@ Element-Name: ProceduresForVaraibleView
 Element-Type: context
 Element-Version: 2.0
 Id: _9iuJED04EeaUDrMBSMf5Ag
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/8/16 1:09 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/12/16 3:08 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -39,5 +39,23 @@ proc "wait-for-var-in-table" [val file ] [val count 1]{
 		get-editor $file | get-canvas -after [get-label Variables] -index 1 
 	    	| get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()" | equals $count | verify-true
 	}
+}
+
+proc "save-ref-data" [val row] [val file]
+{
+	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 1 $row | invoke getDataValue| let [val in1 -input] {
+		get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 2 $row | invoke getDataValue| let [val in2 -input] {
+			get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 3 $row | invoke getDataValue| let [val in3 -input] {
+			
+			if [$in3 | eq ""]{
+				concat "check-variable-row -file \"" $file "\" -row \"" $row  "\" -var \"" $in1 "\" -value \"" $in2 "\"" | write-lines  -uri "file:/c:/aaa/aa.txt" -append
+			
+			}-else{
+				concat "check-variable-row -file \"" $file "\" -row \"" $row  "\" -var \"" $in1 "\" -value \"" $in2 "\"" " -comment \"" $in3 "\"" | write-lines  -uri "file:/c:/aaa/aa.txt" -append
+				}
+			}
+		}
+	}
+
 }
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
