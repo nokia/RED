@@ -497,6 +497,25 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
             sep = getSeparatorDefault();
         }
 
+        if (sep != null) {
+            Optional<SeparatorType> sepInLine = line.getSeparatorForLine();
+            if (sepInLine.isPresent()) {
+                if (sepInLine.get() != sep.getTypes().get(0)) {
+                    if (sepInLine.get() == SeparatorType.PIPE) {
+                        sep = new Separator();
+                        sep.setRaw(" | ");
+                        sep.setText(" | ");
+                        sep.setType(SeparatorType.PIPE);
+                    } else {
+                        sep = new Separator();
+                        sep.setRaw("\t");
+                        sep.setText("\t");
+                        sep.setType(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
+                    }
+                }
+            }
+        }
+
         return sep;
     }
 
