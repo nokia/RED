@@ -14,11 +14,13 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
+import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
@@ -44,9 +46,13 @@ import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.tree.ITreeRowModel;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.TreeRowModel;
+import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -64,6 +70,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsMatchesCollection;
@@ -114,9 +121,15 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private KeywordsDataProvider dataProvider;
 
     private RowSelectionProvider<Object> selectionProvider;
+    
+    private SelectionLayerAccessor selectionLayerAccessor;
 
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
+    }
+    
+    public SelectionLayerAccessor getSelectionLayerAccessor() {
+        return selectionLayerAccessor;
     }
 
     public NatTable getTable() {
@@ -188,7 +201,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
         sortModel = columnHeaderSortingLayer.getSortModel();
-        selectionProvider = new RowSelectionProvider<>(selectionLayer, dataProvider);
+        selectionProvider = new RowSelectionProvider<>(selectionLayer, dataProvider, false);
+        selectionLayerAccessor = new SelectionLayerAccessor(selectionLayer);
 
         new NatTableContentTooltip(table);
 
@@ -209,6 +223,9 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
         table.addConfiguration(new KeywordsTableSortingConfiguration(dataProvider));
+        
+        // popup menus
+        table.addConfiguration(new KeywordsTableMenuConfiguration(site, table, selectionProvider));
 
         table.configure();
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
@@ -367,6 +384,28 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             this.treeSortModel = treeSortModel;
         }
 
+    }
+    
+    class KeywordsTableMenuConfiguration extends AbstractUiBindingConfiguration {
+
+        private final Menu menu;
+
+        public KeywordsTableMenuConfiguration(final IEditorSite site, final NatTable table,
+                final ISelectionProvider selectionProvider) {
+            final String menuId = "org.robotframework.ide.eclipse.editor.page.keywords.contextMenu";
+
+            final MenuManager manager = new MenuManager("Robot suite editor keywords context menu", menuId);
+            this.menu = manager.createContextMenu(table);
+            table.setMenu(menu);
+
+            site.registerContextMenu(menuId, manager, selectionProvider, false);
+        }
+
+        @Override
+        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+            uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
+                    new PopupMenuAction(menu));
+        }
     }
 
     // @Override

@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.Collections;
 
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -44,6 +46,11 @@ public class MoveKeywordCallUpCommand extends EditorCommand {
             return;
         }
         Collections.swap(codeElement.getChildren(), index, index - 1);
+        
+        final Object linkedElement = codeElement.getLinkedElement();
+        if(linkedElement != null && linkedElement instanceof UserKeyword) {
+            ((UserKeyword)linkedElement).moveUpExecutableRow((RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement());
+        }
 
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, codeElement);
     }

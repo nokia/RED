@@ -22,6 +22,4 @@ public interface IKeywordTableElementOperation {
 
     void update(final AModelElement<?> modelElement, final int index, final String value);
 
-    // void remove(final KeywordTable settingsTable, final AModelElement<?> modelElements);
-
 }
