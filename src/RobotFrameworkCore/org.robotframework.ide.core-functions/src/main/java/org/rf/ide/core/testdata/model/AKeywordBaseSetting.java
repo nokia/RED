@@ -13,6 +13,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements ICommentHolder, Serializable {
 
@@ -28,7 +29,10 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
 
     protected AKeywordBaseSetting(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(this.declaration, getDeclarationType());
     }
+
+    protected abstract RobotTokenType getDeclarationType();
 
     @Override
     public boolean isPresent() {
