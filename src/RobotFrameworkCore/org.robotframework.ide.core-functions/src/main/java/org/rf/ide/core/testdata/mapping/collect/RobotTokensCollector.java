@@ -22,8 +22,17 @@ import com.google.common.collect.ListMultimap;
  */
 public class RobotTokensCollector {
 
-    private static final List<ITableTokensCollector> tokenCollectors = Arrays.asList(new SettingsTokenCollector(),
-            new VariablesTokenCollector(), new KeywordsTokenCollector(), new TestCasesTokenCollector());
+    private final List<ITableTokensCollector> tokenCollectors;
+
+    @VisibleForTesting
+    protected RobotTokensCollector(final List<ITableTokensCollector> tokenCollectors) {
+        this.tokenCollectors = tokenCollectors;
+    }
+
+    public RobotTokensCollector() {
+        this(Arrays.asList(new SettingsTokenCollector(), new VariablesTokenCollector(), new KeywordsTokenCollector(),
+                new TestCasesTokenCollector()));
+    }
 
     public ListMultimap<RobotTokenType, RobotToken> extractRobotTokens(final RobotFileOutput tokensHolder) {
         final ListMultimap<RobotTokenType, RobotToken> tokensPerType = ArrayListMultimap.create();
