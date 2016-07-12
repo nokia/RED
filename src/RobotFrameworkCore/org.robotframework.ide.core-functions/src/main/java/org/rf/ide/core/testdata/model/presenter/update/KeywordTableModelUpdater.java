@@ -51,6 +51,16 @@ public class KeywordTableModelUpdater {
             }
         }
     }
+    
+    public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
+
+        if (modelElement != null) {
+            final IKeywordTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+            if (operationHandler != null) {
+                userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
+            }
+        }
+    }
 
     private IKeywordTableElementOperation getOperationHandler(final ModelType elementModelType) {
         for (final IKeywordTableElementOperation operation : elementOparations) {

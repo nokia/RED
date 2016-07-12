@@ -7,7 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -25,9 +30,22 @@ public class DeleteKeywordCallCommand extends EditorCommand {
         if (callsToDelete.isEmpty()) {
             return;
         }
-        final RobotElement parent = callsToDelete.get(0).getParent();
+        IRobotCodeHoldingElement parent = callsToDelete.get(0).getParent();
 
         parent.getChildren().removeAll(callsToDelete);
+
+        final Object linkedElement = parent.getLinkedElement();
+        if (linkedElement != null && linkedElement instanceof UserKeyword) {
+            final UserKeyword userKeyword = (UserKeyword) linkedElement;
+            for (RobotKeywordCall robotKeywordCall : callsToDelete) {
+                final AModelElement<?> modelElement = robotKeywordCall.getLinkedElement();
+                if (modelElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+                    userKeyword.removeExecutableRow((RobotExecutableRow<UserKeyword>) modelElement);
+                } else {
+                    new KeywordTableModelUpdater().remove(userKeyword, modelElement);
+                }
+            }
+        }
 
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, parent);
     }
