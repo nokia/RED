@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _sSLVQEdzEeaRB_Xz0tiYpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/12/16 10:16 AM
+Save-Time: 7/12/16 11:30 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -55,18 +55,43 @@ get-editor ".project" | get-text-viewer | get-property text | equals "<?xml vers
     + "\t<natures>\n"
     + "\t</natures>\n"
     + "</projectDescription>" | verify-true
-    
+
+
+//add robot suite
+get-view "Project Explorer" | get-tree | select new  | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text test
+    get-button Finish | click
+}
+
+// add incorrect test
+with [get-editor "test.robot" | get-text-viewer] {
+    key-type End
+    set-caret-pos 1 19
+    key-type Enter
+    type-text test
+    key-type Enter
+    type-text "log error"
+    key-type "M1+s"
+} 
+  
+//check that no problems are shown
+get-view Problems | click
+get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
+
+ 
 //configure file as robot    
 get-view "Project Explorer" | get-tree | select new | select new 
     | get-menu "Robot Framework/Configure as Robot project" | click
     
 //check that Standard libs and red.xml are added    
 with [get-view "Project Explorer" | get-tree] {
-    get-item new | get-property childCount | equals 3 | verify-true
+    get-item new | get-property childCount | equals 4 | verify-true
     get-item new | get-property "getItems().TreeItem[0].getText()" 
         | equals "Robot Standard libraries \[Robot Framework .* \(Python .*\)\]" | verify-true
     get-item new | get-property "getItems().TreeItem[1].getText()" | equals ".project" | verify-true
     get-item new | get-property "getItems().TreeItem[2].getText()" | equals "red.xml" | verify-true
+    get-item new | get-property "getItems().TreeItem[3].getText()" | equals "test.robot" | verify-true
 }
 
 //check if red.xml is default
@@ -111,6 +136,10 @@ get-view "Project Explorer" | get-tree | select "new/red.xml"
 
 verify-error {get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Configure as Robot project" | get-property caption 
     | equals "Configure as Robot project" | verify-true}
+
+//check that one problem is shown
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)/Unknown keyword 'log error'" | get-property index 
+    | equals 0 | verify-true
   
   
 //--------------------------------------------- deconfigure ---------------------------------------------------
@@ -129,9 +158,10 @@ get-window "Confirm configuration file removal" | get-button No | click
 
 //check if red.xml was not deleted
 with [get-view "Project Explorer" | get-tree] {
-    get-item new | get-property childCount | equals 2 | verify-true
+    get-item new | get-property childCount | equals 3 | verify-true
     get-item new | get-property "getItems().TreeItem[0].getText()" | equals ".project" | verify-true
     get-item new | get-property "getItems().TreeItem[1].getText()" | equals "red.xml" | verify-true
+    get-item new | get-property "getItems().TreeItem[2].getText()" | equals "test.robot" | verify-true
 }
   
 //check .project
@@ -164,17 +194,36 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
 
+
+//check that one problem is still shown
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)/Unknown keyword 'log error'" | get-property index 
+    | equals 0 | verify-true
+
+//correct error
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 3 9
+    hover-text 3 9
+    type-text " "
+    key-type "M1+s"
+}
+
+//check that one problem is still shown (no building was performed)
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)/Unknown keyword 'log error'" | get-property index 
+    | equals 0 | verify-true
+    
+    
 //-----------------  configure -------------------------------------
 
 //configure (red.xml exists and will be not added)
 get-view "Project Explorer" | get-tree | select new | get-menu "Robot Framework/Configure as Robot project" | click
 
 with [get-view "Project Explorer" | get-tree] {
-    get-item new | get-property childCount | equals 3 | verify-true
+    get-item new | get-property childCount | equals 4 | verify-true
     get-item new | get-property "getItems().TreeItem[0].getText()" 
         | equals "Robot Standard libraries \[Robot Framework .* \(Python .*\)\]" | verify-true
     get-item new | get-property "getItems().TreeItem[1].getText()" | equals ".project" | verify-true
     get-item new | get-property "getItems().TreeItem[2].getText()" | equals "red.xml" | verify-true
+    get-item new | get-property "getItems().TreeItem[3].getText()" | equals "test.robot" | verify-true
 }
 
 //check .project
@@ -213,4 +262,8 @@ get-editor "red.xml" | get-text-viewer | get-property text
     + "    <isReferencedLibrariesAutoDiscoveringEnabled>true</isReferencedLibrariesAutoDiscoveringEnabled>\n"
     + "    <isLibrariesAutoDiscoveringSummaryWindowEnabled>false</isLibrariesAutoDiscoveringSummaryWindowEnabled>\n"
     + "</projectConfiguration>" | verify-true
+  
+try -times 5 -delay 1000 -command{
+	get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true    
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
