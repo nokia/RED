@@ -7,12 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
 import java.util.List;
 
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
-public class MetadataMatchesFilter extends ViewerFilter {
+public class MetadataMatchesFilter {
 
     private final HeaderFilterMatchesCollection matches;
 
@@ -20,8 +18,7 @@ public class MetadataMatchesFilter extends ViewerFilter {
         this.matches = matches;
     }
 
-    @Override
-    public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+    public boolean isMatching(final Object element) {
         if (element instanceof RobotSetting) {
             return metadataSettingMatches((RobotSetting) element);
         }
