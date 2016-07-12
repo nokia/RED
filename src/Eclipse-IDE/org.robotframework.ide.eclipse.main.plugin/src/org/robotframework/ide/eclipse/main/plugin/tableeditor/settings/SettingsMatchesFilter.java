@@ -8,14 +8,12 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
-public class SettingsMatchesFilter extends ViewerFilter {
+public class SettingsMatchesFilter {
 
     private final HeaderFilterMatchesCollection matches;
 
@@ -23,8 +21,7 @@ public class SettingsMatchesFilter extends ViewerFilter {
         this.matches = matches;
     }
 
-    @Override
-    public boolean select(final Viewer viewer, final Object parentElement, final Object element) {
+    public boolean isMatching(final Object element) {
         if (element instanceof RobotSetting) {
             return settingMatches((RobotSetting) element);
         } else if (element instanceof Entry<?, ?>) {
