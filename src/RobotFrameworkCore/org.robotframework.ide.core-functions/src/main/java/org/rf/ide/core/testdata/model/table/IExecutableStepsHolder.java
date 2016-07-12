@@ -15,5 +15,7 @@ public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobot
 
     List<AModelElement<T>> getUnitSettings();
 
+    boolean removeUnitSettings(final AModelElement<T> setting);
+
     T getHolder();
 }
