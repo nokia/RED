@@ -35,9 +35,7 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
 
         private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.cases.context";
 
-        private org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.nattable.CasesEditorFormFragment casesFragment;
-
-        private CaseSettingsFormFragment caseSettingFragment;
+        private CasesEditorFormFragment casesFragment;
 
         @Override
         protected String getContextId() {
@@ -76,9 +74,8 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
-            casesFragment = new org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.nattable.CasesEditorFormFragment();
-            caseSettingFragment = new CaseSettingsFormFragment();
-            return newArrayList(casesFragment, caseSettingFragment);
+            casesFragment = new CasesEditorFormFragment();
+            return newArrayList(casesFragment);
         }
 
         @Override

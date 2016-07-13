@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.nattable;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken.TokenState;
 
