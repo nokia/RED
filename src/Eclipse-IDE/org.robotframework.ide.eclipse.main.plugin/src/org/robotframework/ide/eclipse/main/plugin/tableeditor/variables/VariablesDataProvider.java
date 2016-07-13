@@ -23,7 +23,7 @@ import ca.odell.glazedlists.SortedList;
  */
 public class VariablesDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
 
-    private final AddingToken addingToken = new AddingToken(VariablesAdderState.SCALAR, VariablesAdderState.LIST,
+    private final AddingToken addingToken = new AddingToken(null, VariablesAdderState.SCALAR, VariablesAdderState.LIST,
             VariablesAdderState.DICTIONARY);
 
     private RobotVariablesSection section;

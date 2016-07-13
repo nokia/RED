@@ -13,14 +13,21 @@ import com.google.common.base.Preconditions;
  */
 public class AddingToken {
 
+    private final Object parent;
+
     private final TokenState[] states;
 
     private int current;
 
-    public AddingToken(final TokenState... states) {
+    public AddingToken(final Object parent, final TokenState... states) {
         Preconditions.checkArgument(states.length > 0);
+        this.parent = parent;
         this.states = states;
         this.current = 0;
+    }
+
+    public Object getParent() {
+        return parent;
     }
 
     public TokenState getState() {
@@ -32,7 +39,11 @@ public class AddingToken {
     }
 
     public String getLabel() {
-        return "...add new " + states[current].getNewObjectTypeName();
+        return isNested() ? "..." : "...add new " + states[current].getNewObjectTypeName();
+    }
+
+    public boolean isNested() {
+        return parent != null;
     }
 
     public static interface TokenState {
