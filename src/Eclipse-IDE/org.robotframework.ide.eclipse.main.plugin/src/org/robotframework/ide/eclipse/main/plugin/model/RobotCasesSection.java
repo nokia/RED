@@ -25,6 +25,10 @@ public class RobotCasesSection extends RobotSuiteFileSection {
 
     public RobotCase createTestCase(final int index, final String name, final String comment) {
         final RobotCase testCase = new RobotCase(this, name, comment);
+
+        final TestCaseTable casesTable = (TestCaseTable) this.getLinkedElement();
+        testCase.link(casesTable.createTestCase(name));
+
         elements.add(index, testCase);
         return testCase;
     }

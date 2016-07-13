@@ -295,7 +295,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                             commandsStack.execute(new CreateFreshKeywordDefinitionCommand(dataProvider.getInput(), true));
                         } else if (rowObject instanceof RobotKeywordCallAdder) {
                             commandsStack.execute(new CreateFreshKeywordCallCommand(
-                                    ((RobotKeywordCallAdder) rowObject).getParent(), true));
+                                    ((RobotKeywordCallAdder) rowObject).getParent()));
                         }
                     }
                 }

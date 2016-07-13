@@ -501,8 +501,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, null,
-                SettingsTableEditableRule.createEditableRule(fileModel)));
+        gridLayer.addConfiguration(
+                new RedTableEditConfiguration<>(null, SettingsTableEditableRule.createEditableRule(fileModel)));
         gridLayer.addConfiguration(new GeneralSettingsEditConfiguration(fileModel));
 
         addGeneralSettingsConfigAttributes(configRegistry);
