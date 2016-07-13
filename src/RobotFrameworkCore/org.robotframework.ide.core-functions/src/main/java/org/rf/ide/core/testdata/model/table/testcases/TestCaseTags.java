@@ -28,4 +28,9 @@ public class TestCaseTags extends ATags<TestCase> {
     public IRobotTokenType getTagType() {
         return RobotTokenType.TEST_CASE_SETTING_TAGS;
     }
+
+    @Override
+    public IRobotTokenType getDeclarationTagType() {
+        return RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION;
+    }
 }

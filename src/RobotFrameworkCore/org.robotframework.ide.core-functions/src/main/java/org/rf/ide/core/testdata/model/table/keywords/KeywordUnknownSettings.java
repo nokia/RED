@@ -16,6 +16,7 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordUnknownSettings extends AModelElement<UserKeyword> implements ICommentHolder, Serializable {
 
@@ -29,9 +30,11 @@ public class KeywordUnknownSettings extends AModelElement<UserKeyword> implement
 
     public KeywordUnknownSettings(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION);
     }
 
     public void addArgument(final RobotToken arg) {
+        fixForTheType(arg, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS);
         this.arguments.add(arg);
     }
 

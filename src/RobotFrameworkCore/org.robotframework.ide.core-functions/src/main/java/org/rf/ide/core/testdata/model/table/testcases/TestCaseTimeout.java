@@ -31,6 +31,7 @@ public class TestCaseTimeout extends AModelElement<TestCase> implements IComment
 
     public TestCaseTimeout(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.TEST_CASE_SETTING_TIMEOUT);
     }
 
     @Override

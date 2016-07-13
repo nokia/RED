@@ -32,6 +32,7 @@ public class TestDocumentation extends AModelElement<TestCase>
 
     public TestDocumentation(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
     }
 
     @Override

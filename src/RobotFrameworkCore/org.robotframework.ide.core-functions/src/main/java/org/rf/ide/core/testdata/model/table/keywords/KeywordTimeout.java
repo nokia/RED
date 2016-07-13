@@ -31,6 +31,7 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
 
     public KeywordTimeout(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.KEYWORD_SETTING_TIMEOUT);
     }
 
     @Override

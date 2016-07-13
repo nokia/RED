@@ -30,6 +30,7 @@ public class TableHeader<T> extends AModelElement<T> implements ICommentHolder {
     }
 
     public void addColumnName(final RobotToken columnName) {
+        fixForTheType(columnName, RobotTokenType.TABLE_HEADER_COLUMN);
         columnNames.add(columnName);
     }
 

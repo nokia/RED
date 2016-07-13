@@ -48,6 +48,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     public TestCase(final RobotToken testName) {
         this.testName = testName;
+        fixForTheType(testName, RobotTokenType.TEST_CASE_NAME, true);
     }
 
     public RobotToken getTestName() {

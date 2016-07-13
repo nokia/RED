@@ -41,6 +41,7 @@ public abstract class AVariable extends AModelElement<VariableTable>
         this.name = name;
         this.declaration = declaration;
         this.scope = scope;
+        fixForTheType(declaration, (type != null && type.getType() != null) ? type.getType() : null, true);
     }
 
     @Override

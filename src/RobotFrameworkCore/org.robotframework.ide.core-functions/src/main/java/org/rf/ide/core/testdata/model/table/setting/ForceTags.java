@@ -29,4 +29,9 @@ public class ForceTags extends ATags<SettingTable> {
     public IRobotTokenType getTagType() {
         return RobotTokenType.SETTING_FORCE_TAG;
     }
+
+    @Override
+    public IRobotTokenType getDeclarationTagType() {
+        return RobotTokenType.SETTING_FORCE_TAGS_DECLARATION;
+    }
 }
