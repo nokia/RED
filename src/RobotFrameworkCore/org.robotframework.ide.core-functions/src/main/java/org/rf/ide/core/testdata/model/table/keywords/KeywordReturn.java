@@ -30,6 +30,7 @@ public class KeywordReturn extends AModelElement<UserKeyword> implements ICommen
 
     public KeywordReturn(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.KEYWORD_SETTING_RETURN);
     }
 
     @Override

@@ -33,6 +33,7 @@ public class TestCaseTemplate extends AModelElement<TestCase>
 
     public TestCaseTemplate(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.TEST_CASE_SETTING_TEMPLATE);
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class UnknownSetting extends AModelElement<SettingTable> {
 
@@ -23,6 +24,7 @@ public class UnknownSetting extends AModelElement<SettingTable> {
 
     public UnknownSetting(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION);
     }
 
     @Override

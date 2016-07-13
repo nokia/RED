@@ -32,6 +32,7 @@ public class Metadata extends AModelElement<SettingTable> implements ICommentHol
 
     public Metadata(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.SETTING_METADATA_DECLARATION);
     }
 
     public void setKey(final RobotToken key) {

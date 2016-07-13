@@ -32,6 +32,7 @@ public class KeywordDocumentation extends AModelElement<UserKeyword>
 
     public KeywordDocumentation(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
     }
 
     @Override
