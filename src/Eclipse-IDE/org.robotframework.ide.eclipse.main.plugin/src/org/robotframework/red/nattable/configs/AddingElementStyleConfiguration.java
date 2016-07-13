@@ -35,13 +35,12 @@ import org.robotframework.red.graphics.ImagesManager;
 public class AddingElementStyleConfiguration extends AbstractRegistryConfiguration {
 
     public static final String ELEMENT_ADDER_CONFIG_LABEL = "ELEMENT_ADDER";
-    
     public static final String ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL = "ELEMENT_ADDER_MULTISTATE";
-    
+    public static final String ELEMENT_ADDER_NESTED_CONFIG_LABEL = "ELEMENT_ADDER_NESTED";
     public static final String ELEMENT_IN_TREE_ADDER_CONFIG_LABEL = "ELEMENT_ADDER_IN_TREE";
 
     public static final String ELEMENT_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW";
-    
+    public static final String ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL = "ELEMENT_ADDER_ROW_NESTED";
     public static final String ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW_IN_TREE";
 
     private final Font font;
@@ -72,6 +71,11 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
                 ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
                 ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
+
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
+                ELEMENT_ADDER_NESTED_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
+                ELEMENT_ADDER_NESTED_CONFIG_LABEL);
         
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
                 ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
@@ -81,13 +85,16 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
         final ImageDescriptor addImage = RedImages.getAddImage();
         final Image imageToUse = ImagesManager.getImage(isEditable ? addImage : RedImages.getGreyedImage(addImage));
 
-        final ICellPainter cellPainter = new CellPainterDecorator(new TextPainter(false, true, 2), CellEdgeEnum.LEFT,
+        final TextPainter textPainter = new TextPainter(false, true, 2);
+        final ICellPainter cellPainter = new CellPainterDecorator(textPainter, CellEdgeEnum.LEFT,
                 new ImagePainter(imageToUse));
 
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
                 ELEMENT_ADDER_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new DropdownPainter(cellPainter),
                 DisplayMode.NORMAL, ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, textPainter, DisplayMode.NORMAL,
+                ELEMENT_ADDER_NESTED_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
                 ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
     }

@@ -121,6 +121,7 @@ import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
@@ -853,34 +854,21 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         return com.google.common.base.Optional.<RobotFileInternalElement> absent();
     }
 
-    private class GeneralSettingsColumnHeaderDataProvider implements IDataProvider {
+    private class GeneralSettingsColumnHeaderDataProvider extends RedColumnHeaderDataProvider {
+
+        public GeneralSettingsColumnHeaderDataProvider() {
+            super(dataProvider);
+        }
 
         @Override
         public Object getDataValue(final int columnIndex, final int rowIndex) {
-            String columnName = "";
             if (columnIndex == 0) {
-                columnName = "Setting";
-            } else if (columnIndex == dataProvider.getColumnCount() - 1) {
-                columnName = "Comment";
+                return "Setting";
+            } else if (isLastColumn(columnIndex)) {
+                return "Comment";
             }
-            return columnName;
+            return "";
         }
-
-        @Override
-        public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return dataProvider.getColumnCount();
-        }
-
-        @Override
-        public int getRowCount() {
-            return 1;
-        }
-
     }
 
     private static class EmptyGeneralSettingLabelAcumulator implements IConfigLabelAccumulator {

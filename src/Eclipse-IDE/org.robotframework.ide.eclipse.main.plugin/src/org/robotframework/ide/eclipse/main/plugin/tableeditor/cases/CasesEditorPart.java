@@ -16,7 +16,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
@@ -36,7 +35,7 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
 
         private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.cases.context";
 
-        private CasesEditorFormFragment casesFragment;
+        private org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.nattable.CasesEditorFormFragment casesFragment;
 
         private CaseSettingsFormFragment caseSettingFragment;
 
@@ -77,24 +76,19 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
-            casesFragment = new CasesEditorFormFragment();
+            casesFragment = new org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.nattable.CasesEditorFormFragment();
             caseSettingFragment = new CaseSettingsFormFragment();
             return newArrayList(casesFragment, caseSettingFragment);
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            return casesFragment.getViewer();
-        }
-
-        @Override
-        public FocusedViewerAccessor getFocusedViewerAccessor() {
-            return casesFragment.getFocusedViewerAccessor();
+            return casesFragment.getSelectionProvider();
         }
 
         @Override
         public SelectionLayerAccessor getSelectionLayerAccessor() {
-            return null;
+            return casesFragment.getSelectionLayerAccessor();
         }
         
         @Override
