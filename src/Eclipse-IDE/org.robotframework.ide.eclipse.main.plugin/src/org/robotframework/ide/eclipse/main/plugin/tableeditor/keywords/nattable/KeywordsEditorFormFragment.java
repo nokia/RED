@@ -40,7 +40,6 @@ import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
-import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.tree.ITreeRowModel;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.TreeRowModel;
@@ -61,10 +60,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCa
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RedNatTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsMatchesCollection;
@@ -101,6 +104,9 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
     private RobotSuiteFile fileModel;
+
+    @Inject
+    private SuiteFileMarkersContainer markersContainer;
 
     @Inject
     private RobotEditorCommandsStack commandsStack;
@@ -162,15 +168,15 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         final ITreeRowModel<Object> treeRowModel = new TreeRowModel<>(treeData);
 
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(glazedListsEventLayer);
-        final SelectionLayer selectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
+        final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
 
-        final TreeLayer treeLayer = new TreeLayer(selectionLayer, treeRowModel);
-        final ViewportLayer viewportLayer = new ViewportLayer(treeLayer);
+        final TreeLayer treeLayer = new TreeLayer(bodySelectionLayer, treeRowModel);
+        final ViewportLayer bodyViewportLayer = new ViewportLayer(treeLayer);
 
         // column header layers
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider);
-        final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer, selectionLayer,
-                viewportLayer);
+        final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer, bodySelectionLayer,
+                bodyViewportLayer);
         
         // FIXME: tree sorting
         final SortHeaderLayer<Object> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
@@ -178,29 +184,30 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new SortedList<>(GlazedLists.<Object> eventListOf(), null));
 
         // row header layers
-        final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(selectionLayer, viewportLayer,
-                rowHeaderDataProvider);
+        final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
+                rowHeaderDataProvider, new MarkersSelectionLayerPainter(),
+                new MarkersLabelAccumulator(markersContainer, dataProvider));
 
         // corner layer
         final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
                 rowHeaderDataProvider, rowHeaderLayer);
 
         // combined grid layer
-        final GridLayer gridLayer = factory.createGridLayer(viewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
+        final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(new RedTableEditConfiguration(fileModel, newElementsCreator(selectionLayer)));
+        gridLayer.addConfiguration(new RedTableEditConfiguration(fileModel, newElementsCreator(bodySelectionLayer)));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 
-        viewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(selectionLayer,
+        bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
         sortModel = columnHeaderSortingLayer.getSortModel();
-        selectionProvider = new RowSelectionProvider<>(selectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(selectionLayer);
+        selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
+        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
 
-        new NatTableContentTooltip(table);
+        new RedNatTableContentTooltip(table, markersContainer, dataProvider);
 
     }
 
@@ -429,6 +436,15 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
             dataProvider.setInput(getSection());
+            table.refresh();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenMarkersContainerWasReloaded(
+            @UIEventTopic(RobotModelEvents.MARKERS_CACHE_RELOADED) final RobotSuiteFile fileModel) {
+        if (fileModel == this.fileModel) {
             table.refresh();
         }
     }
