@@ -16,7 +16,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPart;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
@@ -87,12 +86,6 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         protected ISelectionProvider getSelectionProvider() {
             //return keywordsFragment.getViewer();
             return keywordsFragment.getSelectionProvider();
-        }
-
-        @Override
-        public FocusedViewerAccessor getFocusedViewerAccessor() {
-            //return keywordsFragment.getFocusedViewerAccessor();
-            return null;
         }
 
         @Override
