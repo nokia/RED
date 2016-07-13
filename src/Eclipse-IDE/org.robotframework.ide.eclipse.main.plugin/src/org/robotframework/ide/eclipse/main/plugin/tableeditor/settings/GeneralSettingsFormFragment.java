@@ -25,17 +25,16 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
@@ -60,10 +59,6 @@ import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.Style;
-import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
-import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
@@ -99,6 +94,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
@@ -111,10 +107,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgume
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RedNatTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.forms.RedFormToolkit;
@@ -132,6 +132,7 @@ import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 import org.robotframework.red.swt.SwtThread;
 
@@ -153,6 +154,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
     private RobotSuiteFile fileModel;
+
+    @Inject
+    private SuiteFileMarkersContainer markersContainer;
 
     @Inject
     private RobotEditorCommandsStack commandsStack;
@@ -298,10 +302,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     }
                 } else if (e.stateMask == SWT.NONE && e.character == SWT.TAB) {
                     if (documentation.isEnabled()) {
-                        int caretOffset = documentation.getCaretOffset();
-                        int lengthBefore = documentation.getCharCount();
+                        final int caretOffset = documentation.getCaretOffset();
+                        final int lengthBefore = documentation.getCharCount();
                         documentation.setText(documentation.getText().replaceAll("\\t", "\\\\t"));
-                        int lengthAfter = documentation.getCharCount();
+                        final int lengthAfter = documentation.getCharCount();
                         documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
                     }
                 }
@@ -486,7 +490,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
-                rowHeaderDataProvider);
+                rowHeaderDataProvider, new MarkersSelectionLayerPainter(),
+                new GeneralSettingsMarkersLabelAccumulator(markersContainer, dataProvider));
 
         // corner layer
         final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
@@ -512,7 +517,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
 
         // tooltips support
-        new GeneralSettingsTableContentTooltip(table.get());
+        new GeneralSettingsTableContentTooltip(table.get(), markersContainer, dataProvider);
     }
 
     public void addGeneralSettingsConfigAttributes(final ConfigRegistry configRegistry) {
@@ -628,121 +633,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     public void clearSettingsSelection() {
         if (selectionProvider != null) {
             selectionProvider.setSelection(StructuredSelection.EMPTY);
-        }
-    }
-
-    class GeneralSettingsColumnHeaderDataProvider implements IDataProvider {
-
-        @Override
-        public Object getDataValue(final int columnIndex, final int rowIndex) {
-            String columnName = "";
-            if (columnIndex == 0) {
-                columnName = "Setting";
-            } else if (columnIndex == dataProvider.getColumnCount() - 1) {
-                columnName = "Comment";
-            }
-            return columnName;
-        }
-
-        @Override
-        public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return dataProvider.getColumnCount();
-        }
-
-        @Override
-        public int getRowCount() {
-            return 1;
-        }
-
-    }
-
-    class EmptyGeneralSettingLabelAcumulator implements IConfigLabelAccumulator {
-
-        public static final String EMPTY_GENERAL_SETTING_LABEL = "EMPTY_GENERAL_SETTING";
-
-        private final GeneralSettingsDataProvider dataProvider;
-
-        public EmptyGeneralSettingLabelAcumulator(final GeneralSettingsDataProvider dataProvider) {
-            this.dataProvider = dataProvider;
-        }
-
-        @Override
-        public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition,
-                final int rowPosition) {
-            final Entry<String, RobotElement> rowObject = dataProvider.getRowObject(rowPosition);
-            if (rowObject != null && rowObject.getValue() == null && columnPosition == 0) {
-                configLabels.addLabel(EMPTY_GENERAL_SETTING_LABEL);
-            }
-        }
-
-    }
-
-    class GeneralSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
-
-        private final Menu menu;
-
-        public GeneralSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
-                final ISelectionProvider selectionProvider) {
-            final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.general.contextMenu";
-
-            final MenuManager manager = new MenuManager("Robot suite editor general settings context menu", menuId);
-            this.menu = manager.createContextMenu(table);
-            table.setMenu(menu);
-
-            site.registerContextMenu(menuId, manager, selectionProvider, false);
-        }
-
-        @Override
-        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-            uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
-                    new PopupMenuAction(menu));
-        }
-    }
-
-    private class GeneralSettingsTableContentTooltip extends NatTableContentTooltip {
-
-        private final Map<String, String> tooltips = new HashMap<>();
-
-        {
-            tooltips.put("Suite Setup",
-                    "The keyword %s is executed before executing any of the test cases or lower level suites");
-            tooltips.put("Suite Teardown",
-                    "The keyword %s is executed after all test cases and lower level suites have been executed");
-            tooltips.put("Test Setup",
-                    "The keyword %s is executed before every test cases in this suite unless test cases override it");
-            tooltips.put("Test Teardown",
-                    "The keyword %s is executed after every test cases in this suite unless test cases override it");
-            tooltips.put("Test Template", "The keyword %s is used as default template keyword in this suite");
-            tooltips.put("Test Timeout",
-                    "Specifies default timeout for each test case in this suite, which can be overridden by test case settings.\n"
-                            + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
-            tooltips.put("Force Tags", "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
-            tooltips.put("Default Tags",
-                    "Sets tags to all tests cases in this suite, unless test case specifies own tags");
-        }
-
-        public GeneralSettingsTableContentTooltip(final NatTable natTable, final String... tooltipRegions) {
-            super(natTable, tooltipRegions);
-        }
-
-        @Override
-        protected String getText(final Event event) {
-            String text = super.getText(event);
-            final int col = this.natTable.getColumnPositionByX(event.x);
-            if (col == 1 && text != null && tooltips.containsKey(text)) {
-                final int row = this.natTable.getRowPositionByY(event.y);
-                final ILayerCell cell = this.natTable.getCellByPosition(col + 1, row);
-                final String keyword = cell != null && cell.getDataValue() != null
-                        && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue()
-                                : "given in first argument";
-                text = String.format(tooltips.get(text), keyword);
-            }
-            return text;
         }
     }
 
@@ -932,6 +822,15 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
     }
 
+    @Inject
+    @Optional
+    private void whenMarkersContainerWasReloaded(
+            @UIEventTopic(RobotModelEvents.MARKERS_CACHE_RELOADED) final RobotSuiteFile fileModel) {
+        if (fileModel == this.fileModel) {
+            refreshTable();
+        }
+    }
+
     private void refreshTable() {
         if (table.isPresent()) {
             table.get().refresh();
@@ -941,5 +840,137 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private void refreshEverything() {
         setInput();
         refreshTable();
+    }
+
+    private static com.google.common.base.Optional<RobotFileInternalElement> toOptionalModelElement(
+            final Object rowObject) {
+        if (rowObject instanceof Entry<?, ?>) {
+            final Entry<?, ?> entry = (Entry<?, ?>) rowObject;
+            return entry.getValue() instanceof RobotFileInternalElement
+                    ? com.google.common.base.Optional.of((RobotFileInternalElement) entry.getValue())
+                    : com.google.common.base.Optional.<RobotFileInternalElement> absent();
+        }
+        return com.google.common.base.Optional.<RobotFileInternalElement> absent();
+    }
+
+    private class GeneralSettingsColumnHeaderDataProvider implements IDataProvider {
+
+        @Override
+        public Object getDataValue(final int columnIndex, final int rowIndex) {
+            String columnName = "";
+            if (columnIndex == 0) {
+                columnName = "Setting";
+            } else if (columnIndex == dataProvider.getColumnCount() - 1) {
+                columnName = "Comment";
+            }
+            return columnName;
+        }
+
+        @Override
+        public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return dataProvider.getColumnCount();
+        }
+
+        @Override
+        public int getRowCount() {
+            return 1;
+        }
+
+    }
+
+    private static class EmptyGeneralSettingLabelAcumulator implements IConfigLabelAccumulator {
+
+        public static final String EMPTY_GENERAL_SETTING_LABEL = "EMPTY_GENERAL_SETTING";
+
+        private final GeneralSettingsDataProvider dataProvider;
+
+        public EmptyGeneralSettingLabelAcumulator(final GeneralSettingsDataProvider dataProvider) {
+            this.dataProvider = dataProvider;
+        }
+
+        @Override
+        public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition,
+                final int rowPosition) {
+            final Entry<String, RobotElement> rowObject = dataProvider.getRowObject(rowPosition);
+            if (rowObject != null && rowObject.getValue() == null && columnPosition == 0) {
+                configLabels.addLabel(EMPTY_GENERAL_SETTING_LABEL);
+            }
+        }
+
+    }
+
+    private static class GeneralSettingsTableMenuConfiguration extends TableMenuConfiguration {
+
+        public GeneralSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
+                final ISelectionProvider selectionProvider) {
+            super(site, table, selectionProvider,
+                    "org.robotframework.ide.eclipse.editor.page.settings.general.contextMenu",
+                    "Robot suite editor general settings context menu");
+        }
+    }
+
+    private static class GeneralSettingsMarkersLabelAccumulator extends MarkersLabelAccumulator {
+
+        public GeneralSettingsMarkersLabelAccumulator(final SuiteFileMarkersContainer markersContainer,
+                final IRowDataProvider<?> dataProvider) {
+            super(markersContainer, dataProvider);
+        }
+
+        @Override
+        protected com.google.common.base.Optional<RobotFileInternalElement> getRowModelObject(final int rowPosition) {
+            return toOptionalModelElement(dataProvider.getRowObject(rowPosition));
+        }
+    }
+
+    private static class GeneralSettingsTableContentTooltip extends RedNatTableContentTooltip {
+
+        private final Map<String, String> tooltips = new HashMap<>();
+        {
+            tooltips.put("Suite Setup",
+                    "The keyword %s is executed before executing any of the test cases or lower level suites");
+            tooltips.put("Suite Teardown",
+                    "The keyword %s is executed after all test cases and lower level suites have been executed");
+            tooltips.put("Test Setup",
+                    "The keyword %s is executed before every test cases in this suite unless test cases override it");
+            tooltips.put("Test Teardown",
+                    "The keyword %s is executed after every test cases in this suite unless test cases override it");
+            tooltips.put("Test Template", "The keyword %s is used as default template keyword in this suite");
+            tooltips.put("Test Timeout",
+                    "Specifies default timeout for each test case in this suite, which can be overridden by test case settings.\n"
+                            + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+            tooltips.put("Force Tags", "Sets tags to all test cases in this suite. Inherited tags are not shown here.");
+            tooltips.put("Default Tags",
+                    "Sets tags to all tests cases in this suite, unless test case specifies own tags");
+        }
+
+        public GeneralSettingsTableContentTooltip(final NatTable natTable,
+                final SuiteFileMarkersContainer markersContainer, final IRowDataProvider<?> dataProvider) {
+            super(natTable, markersContainer, dataProvider);
+        }
+
+        @Override
+        protected String getText(final Event event) {
+            String text = super.getText(event);
+            final int col = this.natTable.getColumnPositionByX(event.x);
+            if (col == 1 && text != null && tooltips.containsKey(text)) {
+                final int row = this.natTable.getRowPositionByY(event.y);
+                final ILayerCell cell = this.natTable.getCellByPosition(col + 1, row);
+                final String keyword = cell != null && cell.getDataValue() != null
+                        && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue()
+                                : "given in first argument";
+                text = String.format(tooltips.get(text), keyword);
+            }
+            return text;
+        }
+
+        @Override
+        protected com.google.common.base.Optional<RobotFileInternalElement> getRowModelObject(final int rowPosition) {
+            return toOptionalModelElement(dataProvider.getRowObject(rowPosition));
+        }
     }
 }
