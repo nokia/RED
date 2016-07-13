@@ -14,13 +14,11 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
@@ -46,13 +44,9 @@ import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.tree.ITreeRowModel;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.tree.TreeRowModel;
-import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -88,6 +82,7 @@ import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 import org.robotframework.red.swt.SwtThread;
 
@@ -157,23 +152,23 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
-        DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 270, 150,
+        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 270, 150,
                 new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider),
                 new KeywordElementsInTreeLabelAccumulator(dataProvider));
-        GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<Object>(bodyDataLayer,
+        final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
                 dataProvider.getTreeList());
-        GlazedListTreeData<Object> treeData = new GlazedListTreeData<Object>(dataProvider.getTreeList());
-        ITreeRowModel<Object> treeRowModel = new TreeRowModel<Object>(treeData);
+        final GlazedListTreeData<Object> treeData = new GlazedListTreeData<>(dataProvider.getTreeList());
+        final ITreeRowModel<Object> treeRowModel = new TreeRowModel<>(treeData);
 
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(glazedListsEventLayer);
-        SelectionLayer selectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
+        final SelectionLayer selectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
 
-        TreeLayer treeLayer = new TreeLayer(selectionLayer, treeRowModel);
-        ViewportLayer viewportLayer = new ViewportLayer(treeLayer);
+        final TreeLayer treeLayer = new TreeLayer(selectionLayer, treeRowModel);
+        final ViewportLayer viewportLayer = new ViewportLayer(treeLayer);
 
         // column header layers
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider);
-        ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer, selectionLayer,
+        final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer, selectionLayer,
                 viewportLayer);
         
         // FIXME: tree sorting
@@ -343,7 +338,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         private ISortModel treeSortModel;
 
         @Override
-        public void getPath(List<Object> path, Object element) {
+        public void getPath(final List<Object> path, final Object element) {
 
             if (element instanceof RobotKeywordCall) {
                 path.add(((RobotKeywordCall) element).getParent());
@@ -356,12 +351,12 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         }
 
         @Override
-        public boolean allowsChildren(Object element) {
+        public boolean allowsChildren(final Object element) {
             return true;
         }
 
         @Override
-        public Comparator<? super Object> getComparator(int depth) {
+        public Comparator<? super Object> getComparator(final int depth) {
 //            if (treeSortModel != null && depth == 0) {
 //                Comparator<Object> comparator = new Comparator<Object>() {
 //
@@ -380,31 +375,17 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             return null;
         }
 
-        public void setTreeSortModel(ISortModel treeSortModel) {
+        public void setTreeSortModel(final ISortModel treeSortModel) {
             this.treeSortModel = treeSortModel;
         }
 
     }
     
-    class KeywordsTableMenuConfiguration extends AbstractUiBindingConfiguration {
-
-        private final Menu menu;
-
+    private static class KeywordsTableMenuConfiguration extends TableMenuConfiguration {
         public KeywordsTableMenuConfiguration(final IEditorSite site, final NatTable table,
                 final ISelectionProvider selectionProvider) {
-            final String menuId = "org.robotframework.ide.eclipse.editor.page.keywords.contextMenu";
-
-            final MenuManager manager = new MenuManager("Robot suite editor keywords context menu", menuId);
-            this.menu = manager.createContextMenu(table);
-            table.setMenu(menu);
-
-            site.registerContextMenu(menuId, manager, selectionProvider, false);
-        }
-
-        @Override
-        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-            uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
-                    new PopupMenuAction(menu));
+            super(site, table, selectionProvider, "org.robotframework.ide.eclipse.editor.page.keywords.contextMenu",
+                    "Robot suite editor keywords context menu");
         }
     }
 
@@ -421,7 +402,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final KeywordsMatchesCollection keywordMatches = new KeywordsMatchesCollection();
-        keywordMatches.collect((RobotElement) dataProvider.getInput(), filter);
+        keywordMatches.collect(dataProvider.getInput(), filter);
         return keywordMatches;
     }
 
