@@ -59,12 +59,40 @@ public class CasesMatchesCollection extends HeaderFilterMatchesCollection {
             this.matches = matches;
         }
 
+        public boolean isMatching(final Object rowObject) {
+            if (rowObject instanceof RobotCase) {
+                return isMatching((RobotCase) rowObject);
+            } else if (rowObject instanceof RobotKeywordCall) {
+                return isMatching((RobotKeywordCall) rowObject);
+            }
+            return true;
+        }
+
         boolean isMatching(final RobotCase testCase) {
-            return true; /*
-                          * matches.contains(constructNameToSearch(variable))
-                          * || matches.contains(constructValueToSearch(variable))
-                          * || matches.contains(constructCommentToSearch(variable));
-                          */
+            return matches.contains(testCase.getName()) || matches.contains(testCase.getComment())
+                    || hasMatchingCall(testCase);
+        }
+
+        private boolean hasMatchingCall(final RobotCase testCase) {
+            for (final RobotKeywordCall call : testCase.getChildren()) {
+                if (isMatching(call)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        boolean isMatching(final RobotKeywordCall call) {
+            return matches.contains(call.getName()) || matches.contains(call.getComment()) || hasMatchingArgument(call);
+        }
+
+        private boolean hasMatchingArgument(final RobotKeywordCall call) {
+            for (final String arg : call.getArguments()) {
+                if (matches.contains(arg)) {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

@@ -202,7 +202,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer),
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(bodySelectionLayer),
                 SettingsTableEditableRule.createEditableRule(fileModel)));
 
         table = createTable(parent, theme, gridLayer, configRegistry);

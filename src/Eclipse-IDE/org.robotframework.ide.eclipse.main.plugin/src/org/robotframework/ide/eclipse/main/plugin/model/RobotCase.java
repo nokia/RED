@@ -30,6 +30,8 @@ import com.google.common.collect.Lists;
 
 public class RobotCase extends RobotCodeHoldingElement {
 
+    private static final long serialVersionUID = 1L;
+
     public static final String DOCUMENTATION = "Documentation";
     public static final String SETUP = "Setup";
     public static final String TEARDOWN = "Teardown";
@@ -46,6 +48,18 @@ public class RobotCase extends RobotCodeHoldingElement {
     @Override
     public TestCase getLinkedElement() {
         return testCase;
+    }
+
+    @Override
+    public RobotKeywordCall createKeywordCall(final int index) {
+        final RobotKeywordCall call = new RobotKeywordCall(this, "", new ArrayList<String>(), "");
+
+        final RobotExecutableRow<TestCase> robotExecutableRow = new RobotExecutableRow<>();
+        getLinkedElement().addTestExecutionRow(robotExecutableRow);
+        call.link(robotExecutableRow);
+
+        getChildren().add(index, call);
+        return call;
     }
 
     public void link(final TestCase testCase) {
