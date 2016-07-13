@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.nattable;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
 import java.util.List;
 
@@ -16,7 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.nattable.CasesMatchesCollection.CasesFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatchesCollection.CasesFilter;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
 import ca.odell.glazedlists.GlazedLists;
