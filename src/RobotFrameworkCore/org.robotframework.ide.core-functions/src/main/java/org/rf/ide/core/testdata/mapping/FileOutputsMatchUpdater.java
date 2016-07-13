@@ -80,6 +80,8 @@ public class FileOutputsMatchUpdater {
                 final RobotToken oldToken = oldToUpdate.get(index);
                 final RobotToken newToken = newToCopy.get(index);
 
+                oldToken.setText(newToken.getText());
+                oldToken.setRaw(newToken.getRaw());
                 oldToken.setLineNumber(newToken.getLineNumber());
                 oldToken.setStartColumn(newToken.getStartColumn());
                 oldToken.setStartOffset(newToken.getStartOffset());
