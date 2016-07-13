@@ -39,7 +39,6 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
-import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -55,10 +54,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CreateFres
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RedNatTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
@@ -90,6 +93,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
     private RobotSuiteFile fileModel;
+
+    @Inject
+    private SuiteFileMarkersContainer markersContainer;
 
     @Inject
     private RobotEditorCommandsStack commandsStack;
@@ -152,7 +158,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
-                rowHeaderDataProvider);
+                rowHeaderDataProvider, new MarkersSelectionLayerPainter(),
+                new MarkersLabelAccumulator(markersContainer, dataProvider));
 
         // corner layer
         final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
@@ -176,7 +183,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
 
         // tooltips support
-        new NatTableContentTooltip(table);
+        new RedNatTableContentTooltip(table, markersContainer, dataProvider);
     }
 
     private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
@@ -395,6 +402,15 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void whenReconcilationWasDone(
             @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
+        if (fileModel == this.fileModel) {
+            refreshEverything();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenMarkersContainerWasReloaded(
+            @UIEventTopic(RobotModelEvents.MARKERS_CACHE_RELOADED) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
             refreshEverything();
         }

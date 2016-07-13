@@ -14,7 +14,9 @@ import java.util.List;
 import javax.inject.Inject;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IStorage;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.content.IContentDescriber;
@@ -89,6 +91,8 @@ public class RobotFormEditor extends FormEditor {
 
     private boolean isEditable;
 
+    private SuiteFileValidationListener validationListener;
+
     public RedClipboard getClipboard() {
         return clipboard;
     }
@@ -99,7 +103,13 @@ public class RobotFormEditor extends FormEditor {
             super.init(site, input);
 
             clipboard = new RedClipboard(site.getShell().getDisplay());
+            validationListener = new SuiteFileValidationListener();
+            
             prepareEclipseContext();
+
+            validationListener.init();
+            ResourcesPlugin.getWorkspace().addResourceChangeListener(validationListener,
+                    IResourceChangeEvent.POST_CHANGE);
         } catch (final IllegalRobotEditorInputException e) {
             throw new PartInitException("Unable to open editor", e);
         }
@@ -116,7 +126,9 @@ public class RobotFormEditor extends FormEditor {
             }
         });
         eclipseContext.set(RedClipboard.class, clipboard);
+        eclipseContext.set(SuiteFileMarkersContainer.class, validationListener);
         ContextInjectionFactory.inject(this, eclipseContext);
+        ContextInjectionFactory.inject(validationListener, eclipseContext);
     }
 
     @Override
@@ -314,11 +326,14 @@ public class RobotFormEditor extends FormEditor {
         final IEclipseContext parentContext = (IEclipseContext) getSite().getService(IEclipseContext.class);
         final IEclipseContext context = parentContext.getActiveLeaf();
         ContextInjectionFactory.uninject(this, context);
+        ContextInjectionFactory.uninject(validationListener, context);
         for (final IEditorPart part : parts) {
             ContextInjectionFactory.uninject(part, context);
         }
 
         super.dispose();
+
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(validationListener);
 
         clipboard.dispose();
         suiteModel.dispose();

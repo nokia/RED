@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 
-public class RobotModelEvents {
+public interface RobotModelEvents {
 
     public static final String ROBOT_SUITE_FILE_ALL = "robot/model/editor/file/structural/*";
 
@@ -116,4 +116,6 @@ public class RobotModelEvents {
     public static final String RECONCILE = "robot/model/reconsilation";
 
     public static final String REPARSING_DONE = "robot/model/reparsing_done";
+
+    public static final String MARKERS_CACHE_RELOADED = "robot/model/markers_cache_reloaded";
 }

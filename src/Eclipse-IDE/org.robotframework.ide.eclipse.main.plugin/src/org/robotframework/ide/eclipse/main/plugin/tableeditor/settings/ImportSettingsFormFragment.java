@@ -16,14 +16,12 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
-import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
@@ -43,14 +41,9 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
-import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
-import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -66,10 +59,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RedNatTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportSettingsPopup;
@@ -87,6 +84,7 @@ import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 import org.robotframework.red.swt.SwtThread;
 
@@ -103,6 +101,9 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
     private RobotSuiteFile fileModel;
+
+    @Inject
+    private SuiteFileMarkersContainer markersContainer;
 
     @Inject
     private RobotEditorCommandsStack commandsStack;
@@ -190,7 +191,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
-                rowHeaderDataProvider);
+                rowHeaderDataProvider, new MarkersSelectionLayerPainter(),
+                new MarkersLabelAccumulator(markersContainer, dataProvider));
 
         // corner layer
         final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
@@ -213,7 +215,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
 
         // tooltips support
-        new NatTableContentTooltip(table);
+        new RedNatTableContentTooltip(table, markersContainer, dataProvider);
 
         importSettingsSection.setClient(table);
 
@@ -335,60 +337,6 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         };
     }
 
-    class ImportSettingsColumnHeaderDataProvider implements IDataProvider {
-
-        @Override
-        public Object getDataValue(final int columnIndex, final int rowIndex) {
-            String columnName = "";
-            if (columnIndex == 0) {
-                columnName = "Import";
-            } else if (columnIndex == 1) {
-                columnName = "Name / Path";
-            } else if (columnIndex == dataProvider.getColumnCount() - 1) {
-                columnName = "Comment";
-            }
-            return columnName;
-        }
-
-        @Override
-        public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return dataProvider.getColumnCount();
-        }
-
-        @Override
-        public int getRowCount() {
-            return 1;
-        }
-
-    }
-
-    class ImportSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
-
-        private final Menu menu;
-
-        public ImportSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
-                final ISelectionProvider selectionProvider) {
-            final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu";
-
-            final MenuManager manager = new MenuManager("Robot suite editor imports settings context menu", menuId);
-            this.menu = manager.createContextMenu(table);
-            table.setMenu(menu);
-
-            site.registerContextMenu(menuId, manager, selectionProvider, false);
-        }
-
-        @Override
-        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-            uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
-                    new PopupMenuAction(menu));
-        }
-    }
-
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final SettingsMatchesCollection settingsMatches = new SettingsMatchesCollection();
@@ -504,6 +452,15 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
     @Inject
     @Optional
+    private void whenMarkersContainerWasReloaded(
+            @UIEventTopic(RobotModelEvents.MARKERS_CACHE_RELOADED) final RobotSuiteFile fileModel) {
+        if (fileModel == this.fileModel) {
+            table.refresh();
+        }
+    }
+
+    @Inject
+    @Optional
     private void whenSettingIsEdited(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_IMPORTS_EDIT) final RobotSetting setting) {
         SwtThread.asyncExec(new Runnable() {
@@ -518,5 +475,46 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private void refreshTable() {
         dataProvider.setInput(getSection());
         table.refresh();
+    }
+
+    private class ImportSettingsColumnHeaderDataProvider implements IDataProvider {
+
+        @Override
+        public Object getDataValue(final int columnIndex, final int rowIndex) {
+            String columnName = "";
+            if (columnIndex == 0) {
+                columnName = "Import";
+            } else if (columnIndex == 1) {
+                columnName = "Name / Path";
+            } else if (columnIndex == dataProvider.getColumnCount() - 1) {
+                columnName = "Comment";
+            }
+            return columnName;
+        }
+
+        @Override
+        public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return dataProvider.getColumnCount();
+        }
+
+        @Override
+        public int getRowCount() {
+            return 1;
+        }
+    }
+
+    private static class ImportSettingsTableMenuConfiguration extends TableMenuConfiguration {
+
+        public ImportSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
+                final ISelectionProvider selectionProvider) {
+            super(site, table, selectionProvider,
+                    "org.robotframework.ide.eclipse.editor.page.settings.imports.contextMenu",
+                    "Robot suite editor imports settings context menu");
+        }
     }
 }
