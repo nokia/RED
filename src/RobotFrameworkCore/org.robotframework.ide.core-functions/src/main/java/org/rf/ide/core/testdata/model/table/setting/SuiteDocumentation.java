@@ -29,6 +29,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
 
     public SuiteDocumentation(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.SETTING_DOCUMENTATION_DECLARATION);
     }
 
     public void addDocumentationText(final String text) {
