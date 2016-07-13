@@ -4,7 +4,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken.TokenS
 
 public enum CasesAdderState implements TokenState {
     CASE("case"),
-    CALL("");
+    CALL("call");
 
     private final String name;
 
