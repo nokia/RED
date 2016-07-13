@@ -71,6 +71,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsM
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsDataProvider.RobotKeywordCallAdder;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
+import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
@@ -305,90 +306,6 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         };
     }
 
-    class KeywordsColumnHeaderDataProvider implements IDataProvider {
-
-        @Override
-        public Object getDataValue(final int columnIndex, final int rowIndex) {
-            String columnName = "";
-            if (columnIndex == dataProvider.getColumnCount() - 1) {
-                columnName = "Comment";
-            }
-            return columnName;
-        }
-
-        @Override
-        public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return dataProvider.getColumnCount();
-        }
-
-        @Override
-        public int getRowCount() {
-            return 1;
-        }
-
-    }
-
-    static class KeywordsTreeFormat implements TreeList.Format<Object> {
-        
-        private ISortModel treeSortModel;
-
-        @Override
-        public void getPath(final List<Object> path, final Object element) {
-
-            if (element instanceof RobotKeywordCall) {
-                path.add(((RobotKeywordCall) element).getParent());
-            } else if (element instanceof RobotKeywordCallAdder) {
-                path.add(((RobotKeywordCallAdder) element).getParent());
-            }
-
-            path.add(element);
-
-        }
-
-        @Override
-        public boolean allowsChildren(final Object element) {
-            return true;
-        }
-
-        @Override
-        public Comparator<? super Object> getComparator(final int depth) {
-//            if (treeSortModel != null && depth == 0) {
-//                Comparator<Object> comparator = new Comparator<Object>() {
-//
-//                    @Override
-//                    public int compare(Object o1, Object o2) {
-//                        if (o1 instanceof RobotKeywordDefinition && o2 instanceof RobotKeywordDefinition) {
-//                            RobotKeywordDefinition d1 = (RobotKeywordDefinition) o1;
-//                            RobotKeywordDefinition d2 = (RobotKeywordDefinition) o2;
-//                            return d1.getName().compareToIgnoreCase(d2.getName());
-//                        }
-//                        return 0;
-//                    }
-//                };
-//                return new SortableTreeComparator<Object>(comparator, treeSortModel);
-//            }
-            return null;
-        }
-
-        public void setTreeSortModel(final ISortModel treeSortModel) {
-            this.treeSortModel = treeSortModel;
-        }
-
-    }
-    
-    private static class KeywordsTableMenuConfiguration extends TableMenuConfiguration {
-        public KeywordsTableMenuConfiguration(final IEditorSite site, final NatTable table,
-                final ISelectionProvider selectionProvider) {
-            super(site, table, selectionProvider, "org.robotframework.ide.eclipse.editor.page.keywords.contextMenu",
-                    "Robot suite editor keywords context menu");
-        }
-    }
-
     // @Override
     // protected Supplier<HeaderFilterMatchesCollection> getMatchesProvider() {
     // return new Supplier<HeaderFilterMatchesCollection>() {
@@ -516,4 +433,72 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         }
     }
 
+    private class KeywordsColumnHeaderDataProvider extends RedColumnHeaderDataProvider {
+
+        public KeywordsColumnHeaderDataProvider() {
+            super(dataProvider);
+        }
+
+        @Override
+        public Object getDataValue(final int columnIndex, final int rowIndex) {
+            return isLastColumn(columnIndex) ? "Comment" : "";
+        }
+    }
+
+    static class KeywordsTreeFormat implements TreeList.Format<Object> {
+
+        private ISortModel treeSortModel;
+
+        @Override
+        public void getPath(final List<Object> path, final Object element) {
+
+            if (element instanceof RobotKeywordCall) {
+                path.add(((RobotKeywordCall) element).getParent());
+            } else if (element instanceof RobotKeywordCallAdder) {
+                path.add(((RobotKeywordCallAdder) element).getParent());
+            }
+
+            path.add(element);
+
+        }
+
+        @Override
+        public boolean allowsChildren(final Object element) {
+            return true;
+        }
+
+        @Override
+        public Comparator<? super Object> getComparator(final int depth) {
+            // if (treeSortModel != null && depth == 0) {
+            // Comparator<Object> comparator = new Comparator<Object>() {
+            //
+            // @Override
+            // public int compare(Object o1, Object o2) {
+            // if (o1 instanceof RobotKeywordDefinition && o2 instanceof RobotKeywordDefinition) {
+            // RobotKeywordDefinition d1 = (RobotKeywordDefinition) o1;
+            // RobotKeywordDefinition d2 = (RobotKeywordDefinition) o2;
+            // return d1.getName().compareToIgnoreCase(d2.getName());
+            // }
+            // return 0;
+            // }
+            // };
+            // return new SortableTreeComparator<Object>(comparator, treeSortModel);
+            // }
+            return null;
+        }
+
+        public void setTreeSortModel(final ISortModel treeSortModel) {
+            this.treeSortModel = treeSortModel;
+        }
+
+    }
+
+    private static class KeywordsTableMenuConfiguration extends TableMenuConfiguration {
+
+        public KeywordsTableMenuConfiguration(final IEditorSite site, final NatTable table,
+                final ISelectionProvider selectionProvider) {
+            super(site, table, selectionProvider, "org.robotframework.ide.eclipse.editor.page.keywords.contextMenu",
+                    "Robot suite editor keywords context menu");
+        }
+    }
 }
