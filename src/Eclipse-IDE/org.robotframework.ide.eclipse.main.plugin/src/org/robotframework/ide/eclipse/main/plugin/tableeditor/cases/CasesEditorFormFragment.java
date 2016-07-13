@@ -63,7 +63,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatche
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RedNatTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
@@ -203,7 +202,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
 
-        new RedNatTableContentTooltip(table, markersContainer, dataProvider);
+        new CasesTableContentTooltip(table, markersContainer, dataProvider);
     }
 
     private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
