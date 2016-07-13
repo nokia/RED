@@ -13,16 +13,14 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
 
     private final RobotCodeHoldingElement parent;
     private final int index;
-    private final boolean notifySync;
 
-    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent, final boolean notifySync) {
-        this(parent, -1, notifySync);
+    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent) {
+        this(parent, -1);
     }
 
-    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent, final int index, final boolean notifySync) {
+    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent, final int index) {
         this.parent = parent;
         this.index = index;
-        this.notifySync = notifySync;
     }
 
     @Override
@@ -32,11 +30,6 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
         } else {
             parent.createKeywordCall(index);
         }
-
-        if (notifySync) {
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
-        } else {
-            eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
-        }
+        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
 }

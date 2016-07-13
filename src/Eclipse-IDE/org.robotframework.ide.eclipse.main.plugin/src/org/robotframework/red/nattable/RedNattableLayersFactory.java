@@ -29,6 +29,7 @@ import org.eclipse.nebula.widgets.nattable.painter.layer.ILayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionModel;
+import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
@@ -134,6 +135,11 @@ public class RedNattableLayersFactory {
     public ColumnHeaderLayer createColumnHeaderLayer(final IUniqueIndexLayer headerDataLayer,
             final SelectionLayer selectionLayer, final IUniqueIndexLayer viewportLayer) {
         return new ColumnHeaderLayer(headerDataLayer, viewportLayer, selectionLayer, false);
+    }
+
+    public <T> SortHeaderLayer<T> createSortingColumnHeaderLayer(final ColumnHeaderLayer columnHeaderLayer,
+            final ISortModel sortModel) {
+        return new SortHeaderLayer<>(columnHeaderLayer, sortModel);
     }
 
     public <T> SortHeaderLayer<T> createSortingColumnHeaderLayer(final IUniqueIndexLayer headerDataLayer,

@@ -16,6 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.nattable.CasesMatchesCollection.CasesFilter;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
 import ca.odell.glazedlists.GlazedLists;
@@ -35,6 +36,8 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     private final CasesColumnsPropertyAccessor propertyAccessor;
     
     private final CasesElementsTreeFormat casesTreeFormat;
+
+    private CasesFilter filter;
     
     public CasesDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotCasesSection section) {
@@ -47,7 +50,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     private void createFrom(final RobotCasesSection section) {
         if (cases == null) {
             casesSortedList = new SortedList<>(GlazedLists.<Object> eventListOf(), null);
-            cases = new TreeList<>(casesSortedList, casesTreeFormat, TreeList.NODES_START_EXPANDED);
+            cases = new TreeList<>(casesSortedList, casesTreeFormat, TreeList.nodesStartExpanded());
         }
         if (section != null) {
             casesSortedList.clear();
@@ -79,28 +82,66 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         return cases;
     }
 
-    public CasesElementsTreeFormat getKeywordsTreeFormat() {
+    public CasesElementsTreeFormat getCasesTreeFormat() {
         return casesTreeFormat;
     }
 
     @Override
     public Object getRowObject(final int rowIndex) {
-        if (rowIndex < cases.size()) {
-            return cases.get(rowIndex);
+        if (section != null && rowIndex < cases.size()) {
+            Object rowObject = null;
+
+            int count = 0;
+            int realRowIndex = 0;
+            while (count <= rowIndex && realRowIndex < cases.size()) {
+                rowObject = cases.get(realRowIndex);
+                if (isPassingThroughFilter(rowObject)) {
+                    count++;
+                } else {
+                    rowObject = null;
+                }
+                realRowIndex++;
+            }
+
+            return (rowObject == null) ? casesAddingToken : rowObject;
         } else if (rowIndex == cases.size()) {
             return casesAddingToken;
         }
         return null;
+        //
+        // if (rowIndex < cases.size()) {
+        // return cases.get(rowIndex);
+        // } else if (rowIndex == cases.size()) {
+        // return casesAddingToken;
+        // }
+        // return null;
     }
     
     @Override
     public int indexOfRowObject(final Object rowObject) {
+        // if (section != null) {
+        // final int realRowIndex = cases.indexOf(rowObject);
+        // final int filteredIndex = realRowIndex;
+        //
+        // //TODO: handle filtering
+        //
+        // return filteredIndex;
+        // } else if (rowObject == casesAddingToken) {
+        // return cases.size();
+        // }
+        // return -1;
+
         if (section != null) {
             final int realRowIndex = cases.indexOf(rowObject);
-            final int filteredIndex = realRowIndex;
-            
-            //TODO: handle filtering
+            int filteredIndex = realRowIndex;
 
+            Object currentRowElement = null;
+            for (int i = 0; i <= realRowIndex; i++) {
+                currentRowElement = cases.get(i);
+                if (!isPassingThroughFilter(currentRowElement)) {
+                    filteredIndex--;
+                }
+            }
             return filteredIndex;
         } else if (rowObject == casesAddingToken) {
             return cases.size();
@@ -114,7 +155,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
             final Object element = getRowObject(row);
             if (element instanceof RobotElement) {
                 return propertyAccessor.getDataValue(element, column);
-            } else if (element instanceof AddingToken && column == 0 /* && !isFilterSet() */) {
+            } else if (element instanceof AddingToken && column == 0) {
                 return ((AddingToken) element).getLabel();
             }
         }
@@ -133,9 +174,20 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     @Override
     public int getRowCount() {
         if (section != null) {
-            return cases.size() + 1; // + cases adder
+            final int addingTokens = isFilterSet() ? 1 : 0;
+            return cases.size() - countInvisible() + 1 - addingTokens;
         }
         return 0;
+    }
+
+    private int countInvisible() {
+        int numberOfInvisible = 0;
+        for (final Object object : cases) {
+            if (!isPassingThroughFilter(object)) {
+                numberOfInvisible++;
+            }
+        }
+        return numberOfInvisible;
     }
     
     @Override
@@ -149,16 +201,15 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
 
     @Override
     public boolean isFilterSet() {
-        return false;// filter != null;
+        return filter != null;
     }
 
-    boolean isPassingThroughFilter(final RobotCase rowObject) {
-        // return filter == null || filter.isMatching(rowObject);
-        return true;
+    boolean isPassingThroughFilter(final Object rowObject) {
+        return filter == null || filter.isMatching(rowObject);
     }
 
     void setMatches(final HeaderFilterMatchesCollection matches) {
-        // this.filter = matches == null ? null : new VariableFilter(matches);
+        this.filter = matches == null ? null : new CasesFilter(matches);
     }
 
     private int countColumnsNumber() {

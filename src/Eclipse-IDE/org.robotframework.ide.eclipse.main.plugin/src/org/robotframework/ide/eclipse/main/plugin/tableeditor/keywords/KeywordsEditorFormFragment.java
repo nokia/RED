@@ -73,7 +73,7 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
                     return section.getChildren().get(section.getChildren().size() - 1);
                 } else if (parent instanceof RobotKeywordDefinition) {
                     final RobotKeywordDefinition definition = (RobotKeywordDefinition) parent;
-                    commandsStack.execute(new CreateFreshKeywordCallCommand(definition, true));
+                    commandsStack.execute(new CreateFreshKeywordCallCommand(definition));
                     return definition.getChildren().get(definition.getChildren().size() - 1);
                 }
                 return null;
