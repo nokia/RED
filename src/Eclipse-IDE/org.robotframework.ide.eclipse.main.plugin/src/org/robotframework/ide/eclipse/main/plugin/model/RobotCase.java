@@ -8,6 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -108,6 +110,15 @@ public class RobotCase extends RobotCodeHoldingElement {
             setting.link(teardown);
             getChildren().add(setting);
         }
+
+        Collections.sort(getChildren(), new Comparator<RobotKeywordCall>() {
+            @Override
+            public int compare(final RobotKeywordCall call1, final RobotKeywordCall call2) {
+                final int offset1 = call1.getLinkedElement().getDeclaration().getStartOffset();
+                final int offset2 = call2.getLinkedElement().getDeclaration().getStartOffset();
+                return offset1 - offset2;
+            }
+        });
     }
 
     private static String omitSquareBrackets(final String nameInBrackets) {
