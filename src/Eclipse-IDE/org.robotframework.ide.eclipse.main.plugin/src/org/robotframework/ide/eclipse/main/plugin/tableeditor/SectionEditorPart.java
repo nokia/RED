@@ -172,6 +172,11 @@ public abstract class SectionEditorPart implements ISectionEditorPart {
 
     protected abstract ISelectionProvider getSelectionProvider();
 
+    @Override
+    public FocusedViewerAccessor getFocusedViewerAccessor() {
+        return null;
+    }
+
     private void prepareCommandsContext(final IWorkbenchPartSite site) {
         final IContextService service = (IContextService) site.getService(IContextService.class);
         service.activateContext(SECTION_EDITOR_PART_CONTEXT_ID);
