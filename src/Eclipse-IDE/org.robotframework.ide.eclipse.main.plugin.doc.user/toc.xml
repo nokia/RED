@@ -19,7 +19,7 @@
     </topic>
     <topic href="doc/user_guide/general.html" label="General usage hints - running selected test,validation, code assist, clean&amp;build,Quick Fix">
     </topic>
-	<topic href="doc/user_guide/table-general.html" label="Table Editors - general usage hints">
+	<topic href="doc/user_guide/table_general.html" label="Table Editors - general usage hints">
     </topic>
     <topic href="doc/user_guide/libs.html" label="Recognizing external libraries and variable files in RED">
     </topic>
