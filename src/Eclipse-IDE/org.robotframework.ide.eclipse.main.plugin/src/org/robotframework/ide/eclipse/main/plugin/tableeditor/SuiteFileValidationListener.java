@@ -42,6 +42,9 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
     private final Map<Long, IMarker> markers = new HashMap<>();
 
     public void init() {
+        if (suiteModel.getFile() == null) {
+            return;
+        }
         try {
             final IMarker[] initialMarkers = suiteModel.getFile().findMarkers(RobotProblem.TYPE_ID, true, 1);
             for (final IMarker marker : initialMarkers) {
@@ -55,6 +58,9 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
 
     @Override
     public void resourceChanged(final IResourceChangeEvent event) {
+        if (suiteModel.getFile() == null) {
+            return;
+        }
         try {
             event.getDelta().accept(new IResourceDeltaVisitor() {
 
