@@ -25,6 +25,7 @@ import org.eclipse.nebula.widgets.nattable.layer.IUniqueIndexLayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.AggregateConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
+import org.eclipse.nebula.widgets.nattable.painter.layer.ILayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionModel;
@@ -69,7 +70,7 @@ public class RedNattableLayersFactory {
 
     public <T> GlazedListsEventLayer<T> createGlazedListEventsLayer(final IUniqueIndexLayer dataLayer,
             final SortedList<T> sortedList) {
-        return new GlazedListsEventLayer<T>(dataLayer, sortedList);
+        return new GlazedListsEventLayer<>(dataLayer, sortedList);
     }
 
     private static IConfigLabelAccumulator aggregatedFrom(final IConfigLabelAccumulator... accumulators) {
@@ -144,9 +145,17 @@ public class RedNattableLayersFactory {
 
     public RowHeaderLayer createRowsHeaderLayer(final SelectionLayer selectionLayer,
             final IUniqueIndexLayer viewportLayer, final IDataProvider rowHeaderDataProvider) {
+        return createRowsHeaderLayer(selectionLayer, viewportLayer, rowHeaderDataProvider,
+                new SelectionLayerPainter(ColorsManager.getColor(250, 250, 250)));
+    }
+
+    public RowHeaderLayer createRowsHeaderLayer(final SelectionLayer selectionLayer,
+            final IUniqueIndexLayer viewportLayer, final IDataProvider rowHeaderDataProvider,
+            final ILayerPainter painter, final IConfigLabelAccumulator... accumulators) {
         final DataLayer rowHeaderDataLayer = new DefaultRowHeaderDataLayer(rowHeaderDataProvider);
         rowHeaderDataLayer.setColumnWidthByPosition(0, 15);
-        rowHeaderDataLayer.setLayerPainter(new SelectionLayerPainter(ColorsManager.getColor(250, 250, 250)));
+        rowHeaderDataLayer.setLayerPainter(painter);
+        rowHeaderDataLayer.setConfigLabelAccumulator(aggregatedFrom(accumulators));
         return new RowHeaderLayer(rowHeaderDataLayer, viewportLayer, selectionLayer, false);
     }
 

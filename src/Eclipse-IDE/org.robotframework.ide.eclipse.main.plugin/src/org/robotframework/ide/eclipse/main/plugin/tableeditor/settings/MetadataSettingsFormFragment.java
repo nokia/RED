@@ -18,7 +18,6 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -26,7 +25,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.AbstractRegistryConfiguration;
-import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
@@ -53,14 +51,9 @@ import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
-import org.eclipse.nebula.widgets.nattable.tooltip.NatTableContentTooltip;
-import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
-import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
-import org.eclipse.nebula.widgets.nattable.ui.menu.PopupMenuAction;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
@@ -77,10 +70,14 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSe
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RedNatTableContentTooltip;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.forms.RedFormToolkit;
@@ -97,6 +94,7 @@ import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 import org.robotframework.red.swt.SwtThread;
 
@@ -113,6 +111,9 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
     private RobotSuiteFile fileModel;
+
+    @Inject
+    private SuiteFileMarkersContainer markersContainer;
 
     @Inject
     private RobotEditorCommandsStack commandsStack;
@@ -197,7 +198,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
-                rowHeaderDataProvider);
+                rowHeaderDataProvider, new MarkersSelectionLayerPainter(),
+                new MarkersLabelAccumulator(markersContainer, dataProvider));
 
         // corner layer
         final ILayer cornerLayer = factory.createCornerLayer(columnHeaderDataProvider, columnHeaderSortingLayer,
@@ -219,7 +221,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
 
         // tooltips support
-        new NatTableContentTooltip(table);
+        new RedNatTableContentTooltip(table, markersContainer, dataProvider);
 
         metadataSection.setClient(table);
     }
@@ -342,44 +344,6 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         };
     }
 
-    class MetadataSettingsTableSortingConfiguration extends AbstractRegistryConfiguration {
-
-        @Override
-        public void configureRegistry(final IConfigRegistry configRegistry) {
-            configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR,
-                    DefaultComparator.getInstance(), DisplayMode.NORMAL,
-                    ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 0);
-            configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR,
-                    DefaultComparator.getInstance(), DisplayMode.NORMAL,
-                    ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 1);
-            configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new NullComparator(),
-                    DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 2);
-        }
-
-    }
-
-    class MetadataSettingsTableMenuConfiguration extends AbstractUiBindingConfiguration {
-
-        private final Menu menu;
-
-        public MetadataSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
-                final ISelectionProvider selectionProvider) {
-            final String menuId = "org.robotframework.ide.eclipse.editor.page.settings.metadata.contextMenu";
-
-            final MenuManager manager = new MenuManager("Robot suite editor metadata settings context menu", menuId);
-            this.menu = manager.createContextMenu(table);
-            table.setMenu(menu);
-
-            site.registerContextMenu(menuId, manager, selectionProvider, false);
-        }
-
-        @Override
-        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
-            uiBindingRegistry.registerMouseDownBinding(new MouseEventMatcher(SWT.NONE, null, 3),
-                    new PopupMenuAction(menu));
-        }
-    }
-
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final MetadataSettingsMatchesCollection settingsMatches = new MetadataSettingsMatchesCollection();
@@ -494,8 +458,43 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         }
     }
 
+    @Inject
+    @Optional
+    private void whenMarkersContainerWasReloaded(
+            @UIEventTopic(RobotModelEvents.MARKERS_CACHE_RELOADED) final RobotSuiteFile fileModel) {
+        if (fileModel == this.fileModel) {
+            table.refresh();
+        }
+    }
+
     private void refreshTable() {
         dataProvider.setInput(getSection());
         table.refresh();
+    }
+
+    private static class MetadataSettingsTableSortingConfiguration extends AbstractRegistryConfiguration {
+
+        @Override
+        public void configureRegistry(final IConfigRegistry configRegistry) {
+            configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR,
+                    DefaultComparator.getInstance(), DisplayMode.NORMAL,
+                    ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 0);
+            configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR,
+                    DefaultComparator.getInstance(), DisplayMode.NORMAL,
+                    ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 1);
+            configRegistry.registerConfigAttribute(SortConfigAttributes.SORT_COMPARATOR, new NullComparator(),
+                    DisplayMode.NORMAL, ColumnLabelAccumulator.COLUMN_LABEL_PREFIX + 2);
+        }
+
+    }
+
+    private static class MetadataSettingsTableMenuConfiguration extends TableMenuConfiguration {
+
+        public MetadataSettingsTableMenuConfiguration(final IEditorSite site, final NatTable table,
+                final ISelectionProvider selectionProvider) {
+            super(site, table, selectionProvider,
+                    "org.robotframework.ide.eclipse.editor.page.settings.metadata.contextMenu",
+                    "Robot suite editor metadata settings context menu");
+        }
     }
 }
