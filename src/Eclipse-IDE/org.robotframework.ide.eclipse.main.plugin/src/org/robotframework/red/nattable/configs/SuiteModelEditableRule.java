@@ -10,7 +10,7 @@ import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
-class SuiteModelEditableRule implements IEditableRule {
+public class SuiteModelEditableRule implements IEditableRule {
 
     private final boolean isEditable;
 
@@ -18,7 +18,7 @@ class SuiteModelEditableRule implements IEditableRule {
         return new SuiteModelEditableRule(fileModel.isEditable());
     }
 
-    private SuiteModelEditableRule(final boolean isEditable) {
+    protected SuiteModelEditableRule(final boolean isEditable) {
         this.isEditable = isEditable;
     }
 
