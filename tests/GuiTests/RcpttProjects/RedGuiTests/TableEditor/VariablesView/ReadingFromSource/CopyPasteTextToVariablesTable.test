@@ -1,0 +1,121 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9iuJED04EeaUDrMBSMf5Ag
+Element-Name: CopyPasteTextToVariablesTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _x6jyoEg6EeaRB_Xz0tiYpg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/13/16 4:45 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add text to file
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variable ***\n"
+    + "${var}    0r    #abc\n"
+    + "${var1}    1r    #cde\n"
+    + "${var2}    2r    #fgh\n"
+    + "${var3}    3r    #hij\n"
+    + "${var4}    4r    #klm\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7"
+    
+    
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 4 5
+        key-type F4
+    }
+    with [get-canvas -after [get-label Variables] -index 1] {
+    	//copy value 3r
+        key-type Right
+        key-type Down
+        key-type "M1+c"
+        
+        //paste to 1r->3r
+        key-type Up -times 2
+        key-type "M1+v"
+        
+        //paste to comment for var1
+        key-type Right
+        key-type "M1+v"
+        
+        //copy comment #hij
+        key-type Down -times 2
+        key-type "M1+c"
+        
+        //paste in line 1 #abc->#hij
+        key-type Up -times 3
+        key-type "M1+v"
+        
+        //copy 0r
+        key-type Left
+        key-type "M1+c"
+        
+        //paste to $var
+        key-type Down
+        key-type Left
+        key-type "M1+v"
+       // key-type "M1+s"
+    }
+}
+
+check-variable-row -file "TestFile.robot" -row "1" -var "${var}" -value "0r" -comment "#hij"
+check-variable-row -file "TestFile.robot" -row "2" -var "0r" -value "[3r]" -comment "#3r"
+check-variable-row -file "TestFile.robot" -row "3" -var "${var2}" -value "2r" -comment "#fgh"
+check-variable-row -file "TestFile.robot" -row "4" -var "${var3}" -value "3r" -comment "#hij"
+check-variable-row -file "TestFile.robot" -row "5" -var "${var4}" -value "4r" -comment "#klm"
+
+
+//check Source
+with [get-editor "TestFile.robot"] {
+    get-canvas -after [get-label Variables] -index 1 | key-type "M1+s"
+    get-tab-folder | get-tab-item Source | click
+}
+
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variable ***\n"
+    + "${var}    0r    #hij\n"
+    + "0r    3r    #3r\n"
+    + "${var2}    2r    #fgh\n"
+    + "${var3}    3r    #hij\n"
+    + "${var4}    4r    #klm\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+
+//copy text from source and paste to variable
+
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        hover-text 9 6
+        set-caret-pos 9 6
+        select-range 9 5 9 8
+        key-type "M1+c"
+    }
+    with [get-text-viewer] {
+        set-caret-pos 5 5
+        key-type F4
+    }
+    wait 2000
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type "M1+v"
+    }
+}
+
+
+check-variable-row -file "TestFile.robot" -row "1" -var "${var}" -value "0r" -comment "#hij"
+check-variable-row -file "TestFile.robot" -row "2" -var "0r" -value "[3r]" -comment "#3r"
+check-variable-row -file "TestFile.robot" -row "3" -var "${var2}" -value "2r" -comment "#fgh"
+check-variable-row -file "TestFile.robot" -row "4" -var "${var3}" -value "log" -comment "#hij"
+check-variable-row -file "TestFile.robot" -row "5" -var "${var4}" -value "4r" -comment "#klm"
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
