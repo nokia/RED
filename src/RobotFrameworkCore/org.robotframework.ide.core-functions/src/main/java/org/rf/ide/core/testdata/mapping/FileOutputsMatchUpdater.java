@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.mapping;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -120,13 +121,14 @@ public class FileOutputsMatchUpdater {
             final ListMultimap<RobotTokenType, RobotToken> newViewAboutTokens) {
         final Set<RobotTokenType> newKeySet = newViewAboutTokens.keySet();
         for (final RobotTokenType t : newKeySet) {
-            List<RobotToken> oldToks = oldViewAboutTokens.get(t);
+            List<RobotToken> oldToks = new ArrayList<>(oldViewAboutTokens.get(t));
             List<RobotToken> newToks = newViewAboutTokens.get(t);
 
             int toksSize = -1;
             if (oldToks.size() == newToks.size()) {
                 toksSize = oldToks.size();
             } else {
+                removePreviousLineContinue(oldToks);
                 int oldNotEmpty = findTheFirstNotEmpty(oldToks);
                 int newNotEmpty = findTheFirstNotEmpty(newToks);
                 if (oldNotEmpty == newNotEmpty) {
@@ -149,6 +151,17 @@ public class FileOutputsMatchUpdater {
             }
         }
 
+    }
+
+    private void removePreviousLineContinue(final List<RobotToken> toks) {
+        for (int index = 0; index < toks.size(); index++) {
+            final RobotToken rTokCurrent = toks.get(index);
+            final String tokCurrent = rTokCurrent.getText();
+            if (tokCurrent.equals("\n...") || tokCurrent.equals("\r\n...") || tokCurrent.equals("\r...")) {
+                toks.remove(index);
+                index--;
+            }
+        }
     }
 
     private int findTheFirstNotEmpty(final List<RobotToken> t) {
