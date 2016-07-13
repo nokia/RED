@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _9iuJED04EeaUDrMBSMf5Ag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/12/16 3:08 PM
+Save-Time: 7/13/16 11:31 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -58,4 +58,11 @@ proc "save-ref-data" [val row] [val file]
 	}
 
 }
+
+//running proc
+//write-lines  -uri "file:/c:/aaa/aa.txt" 
+//repeat [val index] -times 15 -command {
+//
+//	save-ref-data -row $index -file  "TestFile.robot"
+//}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
