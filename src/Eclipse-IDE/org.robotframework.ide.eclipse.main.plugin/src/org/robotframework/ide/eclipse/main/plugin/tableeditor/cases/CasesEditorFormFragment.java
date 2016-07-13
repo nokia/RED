@@ -73,7 +73,7 @@ class CasesEditorFormFragment extends CodeEditorFormFragment {
                     return section.getChildren().get(section.getChildren().size() - 1);
                 } else if (parent instanceof RobotCase) {
                     final RobotCase testCase = (RobotCase) parent;
-                    commandsStack.execute(new CreateFreshKeywordCallCommand(testCase, true));
+                    commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
                     return testCase.getChildren().get(testCase.getChildren().size() - 1);
                 }
                 return null;

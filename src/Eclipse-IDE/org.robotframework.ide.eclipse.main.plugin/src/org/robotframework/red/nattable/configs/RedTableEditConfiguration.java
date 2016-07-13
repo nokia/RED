@@ -30,11 +30,10 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
     private final NewElementsCreator<T> creator;
 
     public RedTableEditConfiguration(final RobotSuiteFile fileModel, final NewElementsCreator<T> creator) {
-        this(fileModel, creator, SuiteModelEditableRule.createEditableRule(fileModel));
+        this(creator, SuiteModelEditableRule.createEditableRule(fileModel));
     }
     
-    public RedTableEditConfiguration(final RobotSuiteFile fileModel, final NewElementsCreator<T> creator,
-            final IEditableRule editableRule) {
+    public RedTableEditConfiguration(final NewElementsCreator<T> creator, final IEditableRule editableRule) {
         this.editableRule = editableRule;
         this.creator = creator;
     }
@@ -46,6 +45,9 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
                 AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
+                AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
                 AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL);

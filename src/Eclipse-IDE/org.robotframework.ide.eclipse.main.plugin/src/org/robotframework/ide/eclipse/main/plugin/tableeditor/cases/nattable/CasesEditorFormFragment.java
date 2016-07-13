@@ -21,6 +21,7 @@ import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeData;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -46,6 +47,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -54,6 +56,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCaseCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
@@ -85,9 +90,6 @@ import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
-
-import ca.odell.glazedlists.GlazedLists;
-import ca.odell.glazedlists.SortedList;
 
 public class CasesEditorFormFragment implements ISectionFormFragment {
 
@@ -172,9 +174,11 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 bodySelectionLayer, bodyViewportLayer);
         
         // FIXME: tree sorting
+        sortModel = new GlazedListsSortModel<>(dataProvider.getSortedList(), dataProvider.getPropertyAccessor(),
+                configRegistry, columnHeaderDataLayer);
+        dataProvider.getCasesTreeFormat().setSortModel(sortModel);
         final SortHeaderLayer<Object> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
-                columnHeaderDataLayer, columnHeaderLayer, dataProvider.getPropertyAccessor(), configRegistry,
-                new SortedList<>(GlazedLists.<Object> eventListOf(), null));
+                columnHeaderLayer, sortModel);
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
@@ -196,12 +200,10 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
-        sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
 
         new RedNatTableContentTooltip(table, markersContainer, dataProvider);
-
     }
 
     private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
@@ -278,19 +280,20 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             public Object createNew() {
                 dataProvider.setMatches(null);
                 
+                final RobotElement createdElement;
                 final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
-                if (selectedCellPositions.length == 1) {
-                    final int selectedRow = selectedCellPositions[0].getRowPosition();
-                    final Object rowObject = dataProvider.getRowObject(selectedRow);
-                    if (rowObject != null) {
-                        // if (rowObject == CasesDataProvider.ADDING_TOKEN) {
-                        // commandsStack.execute(new
-                        // CreateFreshKeywordDefinitionCommand(dataProvider.getInput(), true));
-                        // } else if (rowObject instanceof RobotKeywordCallAdder) {
-                        // commandsStack.execute(new CreateFreshKeywordCallCommand(
-                        // ((RobotKeywordCallAdder) rowObject).getParent(), true));
-                        // }
-                    }
+                final int selectedRow = selectedCellPositions[0].getRowPosition();
+                final Object rowObject = dataProvider.getRowObject(selectedRow);
+                final AddingToken token = (AddingToken) rowObject;
+                if (token.isNested()) {
+                    final RobotCodeHoldingElement testCase = (RobotCodeHoldingElement) token.getParent();
+                    commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
+                    createdElement = testCase.getChildren().get(testCase.getChildren().size() - 1);
+
+                } else {
+                    final RobotCasesSection section = dataProvider.getInput();
+                    commandsStack.execute(new CreateFreshCaseCommand(section, true));
+                    createdElement = section.getChildren().get(section.getChildren().size() - 1);
                 }
                 SwtThread.asyncExec(new Runnable() {
                     @Override
@@ -298,7 +301,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                         table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
                     }
                 });
-                return null;
+                return createdElement;
             }
         };
     }
@@ -322,8 +325,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotCasesSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
+    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC
+            + "/Test_Cases") final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
         dataProvider.setMatches(matches);
         table.refresh();
