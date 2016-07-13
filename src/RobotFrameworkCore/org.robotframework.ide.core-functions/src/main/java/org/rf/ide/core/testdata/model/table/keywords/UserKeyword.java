@@ -46,6 +46,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
 
     public UserKeyword(final RobotToken keywordName) {
         this.keywordName = keywordName;
+        fixForTheType(keywordName, RobotTokenType.KEYWORD_NAME);
     }
 
     public RobotToken getKeywordName() {

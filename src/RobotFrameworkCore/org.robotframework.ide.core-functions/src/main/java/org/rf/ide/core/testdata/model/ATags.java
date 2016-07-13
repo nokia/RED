@@ -25,6 +25,7 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
 
     protected ATags(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, getDeclarationTagType());
     }
 
     @Override
@@ -119,4 +120,6 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
     }
 
     public abstract IRobotTokenType getTagType();
+
+    public abstract IRobotTokenType getDeclarationTagType();
 }

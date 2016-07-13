@@ -34,6 +34,7 @@ public abstract class AImported extends AModelElement<SettingTable> implements I
     protected AImported(final Type type, final RobotToken declaration) {
         this.type = type;
         this.declaration = declaration;
+        fixForTheType(declaration, type.getDeclarationType());
     }
 
     @Override
@@ -95,12 +96,22 @@ public abstract class AImported extends AModelElement<SettingTable> implements I
             public IRobotTokenType getPathOrFileNameType() {
                 return RobotTokenType.SETTING_LIBRARY_NAME;
             }
+
+            @Override
+            public IRobotTokenType getDeclarationType() {
+                return RobotTokenType.SETTING_LIBRARY_DECLARATION;
+            }
         },
         RESOURCE {
 
             @Override
             public IRobotTokenType getPathOrFileNameType() {
                 return RobotTokenType.SETTING_RESOURCE_FILE_NAME;
+            }
+
+            @Override
+            public IRobotTokenType getDeclarationType() {
+                return RobotTokenType.SETTING_RESOURCE_DECLARATION;
             }
         },
         VARIABLES {
@@ -109,9 +120,16 @@ public abstract class AImported extends AModelElement<SettingTable> implements I
             public IRobotTokenType getPathOrFileNameType() {
                 return RobotTokenType.SETTING_VARIABLES_FILE_NAME;
             }
+
+            @Override
+            public IRobotTokenType getDeclarationType() {
+                return RobotTokenType.SETTING_VARIABLES_DECLARATION;
+            }
         };
 
         public abstract IRobotTokenType getPathOrFileNameType();
+
+        public abstract IRobotTokenType getDeclarationType();
     }
 
     public Type getType() {

@@ -34,6 +34,7 @@ public class TestTemplate extends AModelElement<SettingTable>
 
     public TestTemplate(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION);
     }
 
     @Override

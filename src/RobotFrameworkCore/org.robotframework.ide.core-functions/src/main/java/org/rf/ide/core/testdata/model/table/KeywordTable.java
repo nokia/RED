@@ -32,6 +32,7 @@ public class KeywordTable extends ARobotSectionTable {
         keyName.setText(keywordName);
 
         UserKeyword uk = new UserKeyword(keyName);
+
         addKeyword(uk);
 
         return uk;

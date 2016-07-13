@@ -28,4 +28,9 @@ public class KeywordTags extends ATags<UserKeyword> {
     public IRobotTokenType getTagType() {
         return RobotTokenType.KEYWORD_SETTING_TAGS_TAG_NAME;
     }
+
+    @Override
+    public IRobotTokenType getDeclarationTagType() {
+        return RobotTokenType.KEYWORD_SETTING_TAGS;
+    }
 }

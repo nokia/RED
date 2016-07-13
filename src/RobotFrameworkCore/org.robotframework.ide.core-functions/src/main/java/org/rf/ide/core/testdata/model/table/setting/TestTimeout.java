@@ -32,6 +32,7 @@ public class TestTimeout extends AModelElement<SettingTable> implements IComment
 
     public TestTimeout(final RobotToken declaration) {
         this.declaration = declaration;
+        fixForTheType(declaration, RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION);
     }
 
     @Override

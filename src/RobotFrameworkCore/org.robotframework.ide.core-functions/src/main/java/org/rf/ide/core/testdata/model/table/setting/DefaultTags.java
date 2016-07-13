@@ -29,4 +29,9 @@ public class DefaultTags extends ATags<SettingTable> {
     public IRobotTokenType getTagType() {
         return RobotTokenType.SETTING_DEFAULT_TAG;
     }
+
+    @Override
+    public IRobotTokenType getDeclarationTagType() {
+        return RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION;
+    }
 }
