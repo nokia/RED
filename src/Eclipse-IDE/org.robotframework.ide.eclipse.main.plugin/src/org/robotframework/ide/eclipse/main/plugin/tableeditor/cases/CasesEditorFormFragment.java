@@ -15,7 +15,6 @@ import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
@@ -237,21 +236,21 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
+        final Supplier<HeaderFilterMatchesCollection> matchesSupplier = new Supplier<HeaderFilterMatchesCollection>() {
+            @Override
+            public HeaderFilterMatchesCollection get() {
+                return matches;
+            }
+        };
         final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
-                new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
-
-                    @Override
-                    public HeaderFilterMatchesCollection get() {
-                        return matches;
-                    }
-                }, Stylers.Common.MATCH_STYLER));
+                new SearchMatchesTextPainter(matchesSupplier));
 
         table.addConfiguration(tableStyle);
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
         table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
         table.addConfiguration(new RowHeaderStyleConfiguration(theme));
         table.addConfiguration(new AlternatingRowsStyleConfiguration(theme));
-        table.addConfiguration(new CasesElementsStyleConfiguration(theme, fileModel.isEditable()));
+        table.addConfiguration(new CasesElementsStyleConfiguration(theme, fileModel.isEditable(), matchesSupplier));
         table.addConfiguration(new SelectionStyleConfiguration(theme, table.getFont()));
         table.addConfiguration(new AddingElementStyleConfiguration(theme, fileModel.isEditable()));
     }

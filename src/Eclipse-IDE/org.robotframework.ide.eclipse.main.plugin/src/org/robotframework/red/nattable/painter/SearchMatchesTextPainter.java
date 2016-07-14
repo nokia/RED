@@ -5,8 +5,6 @@
  */
 package org.robotframework.red.nattable.painter;
 
-import java.util.Collection;
-
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
@@ -19,9 +17,11 @@ import org.eclipse.nebula.widgets.nattable.style.CellStyleUtil;
 import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.TextLayout;
+import org.eclipse.swt.graphics.TextStyle;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 
 import com.google.common.base.Supplier;
@@ -42,11 +42,16 @@ public class SearchMatchesTextPainter extends TextPainter {
     private final Styler matchStyler;
 
     public SearchMatchesTextPainter(final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
-        this(matchesSupplier, Stylers.Common.MATCH_STYLER);
+        this(matchesSupplier, 0);
+    }
+
+    public SearchMatchesTextPainter(final Supplier<HeaderFilterMatchesCollection> matchesSupplier, final int spacing) {
+        this(matchesSupplier, Stylers.Common.MATCH_STYLER, spacing);
     }
 
     public SearchMatchesTextPainter(final Supplier<HeaderFilterMatchesCollection> matchesSupplier,
-            final Styler matchStyler) {
+            final Styler matchStyler, final int spacing) {
+        super(false, true, spacing);
         this.matchesSupplier = matchesSupplier;
         this.matchStyler = matchStyler;
     }
@@ -89,8 +94,7 @@ public class SearchMatchesTextPainter extends TextPainter {
 
             final int contentWidth = Math.min(getLengthFromCache(gc, text), rectangle.width);
 
-            final StyledString styledString = highlightMatches(text);
-
+            final StyledString styledString = highlightMatches(text, gc.getFont());
             final TextLayout layout = new TextLayout(gc.getDevice());
             layout.setText(text);
             for (final StyleRange range : styledString.getStyleRanges()) {
@@ -129,25 +133,59 @@ public class SearchMatchesTextPainter extends TextPainter {
         }
     }
 
-    private final StyledString highlightMatches(final String label) {
-        return highlightMatches(new StyledString(label), 0, label);
+    private final StyledString highlightMatches(final String label, final Font font) {
+        return highlightMatches(new StyledString(label), 0, label, font);
     }
 
-    private final StyledString highlightMatches(final StyledString label, final int shift, final String modelContent) {
-        if (label == null) {
+    private final StyledString highlightMatches(final StyledString label, final int shift, final String modelContent,
+            final Font font) {
+        if (label == null || label.length() == 0) {
             return new StyledString();
         }
         final HeaderFilterMatchesCollection matches = matchesSupplier.get();
+        final Styler fontStyler = createFontStyler(font);
         if (matches == null) {
+            label.setStyle(0, label.length(), fontStyler);
             return label;
         }
-        final Collection<Range<Integer>> ranges = matches.getRanges(modelContent);
-        if (ranges == null) {
+        @SuppressWarnings("unchecked")
+        final Range<Integer>[] ranges = matches.getRanges(modelContent).toArray(new Range[0]);
+        if (ranges == null || ranges.length == 0) {
+            label.setStyle(0, label.length(), fontStyler);
             return label;
         }
-        for (final Range<Integer> range : ranges) {
-            label.setStyle(range.lowerEndpoint() + shift, range.upperEndpoint() - range.lowerEndpoint(), matchStyler);
+
+        final int previousIndex = 0;
+        int i = 0;
+        int rangeIndex = 0;
+        while (i < label.length()) {
+            if (rangeIndex < ranges.length) {
+                final Range<Integer> range = ranges[rangeIndex];
+
+                if (range.contains(i)) {
+                    label.setStyle(range.lowerEndpoint() + shift, range.upperEndpoint() - range.lowerEndpoint(),
+                            Stylers.mixingStyler(matchStyler, fontStyler));
+                    i = range.upperEndpoint();
+                    rangeIndex++;
+                } else {
+                    label.setStyle(previousIndex, range.lowerEndpoint() - previousIndex, fontStyler);
+                    i = range.lowerEndpoint();
+                }
+            } else {
+                label.setStyle(i, label.length() - i, fontStyler);
+                i = label.length();
+            }
         }
+        
         return label;
+    }
+
+    private static Styler createFontStyler(final Font font) {
+        return new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.font = font;
+            }
+        };
     }
 }
