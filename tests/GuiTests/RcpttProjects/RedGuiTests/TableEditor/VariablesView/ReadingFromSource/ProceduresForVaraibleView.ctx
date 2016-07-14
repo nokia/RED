@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _9iuJED04EeaUDrMBSMf5Ag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/13/16 11:31 AM
+Save-Time: 7/14/16 11:00 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -17,9 +17,12 @@ Entry-Name: .ecl.context
 //rows starts from 1
 proc "check-variable-row" [val file] [val row] [val var] [val value] [val comment "" ] 
 {
-	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $var |verify-true
-	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $value |verify-true
-	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $comment |verify-true
+	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
+		| eq $var |assert-true -message [format "Variable name in row %s should be %s " $row $var]
+	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue 
+	    | eq $value |assert-true -message [format "Value in row %s should be %s " $row $value]
+	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue 
+	    | eq $comment | assert-true -message [format "Comment in row %s should be %s " $row $comment]
 }
 
 //rows starts from 0
