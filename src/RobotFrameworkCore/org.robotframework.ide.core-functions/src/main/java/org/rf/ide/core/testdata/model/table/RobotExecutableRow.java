@@ -197,8 +197,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         if (action != null && !action.getFilePosition().isNotSet()) {
             if (getParent() instanceof IExecutableStepsHolder) {
                 @SuppressWarnings("unchecked")
-                final
-                IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
+                final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
                 final FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
 
                 if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
@@ -243,5 +242,19 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     @Override
     public boolean removeElementToken(final int index) {
         return super.removeElementFromList(arguments, index);
+    }
+
+    public <P> RobotExecutableRow<P> copy() {
+        RobotExecutableRow<P> execRow = new RobotExecutableRow<>();
+        execRow.setAction(getAction().copy());
+        for (final RobotToken arg : getArguments()) {
+            execRow.addArgument(arg.copy());
+        }
+
+        for (final RobotToken cmPart : getComment()) {
+            execRow.addCommentPart(cmPart.copy());
+        }
+
+        return execRow;
     }
 }

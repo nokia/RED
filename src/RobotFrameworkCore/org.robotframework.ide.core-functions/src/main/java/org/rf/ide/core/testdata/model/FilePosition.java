@@ -113,4 +113,8 @@ public class FilePosition implements Serializable {
 
         return result;
     }
+
+    public FilePosition copy() {
+        return new FilePosition(getLine(), getColumn(), getOffset());
+    }
 }
