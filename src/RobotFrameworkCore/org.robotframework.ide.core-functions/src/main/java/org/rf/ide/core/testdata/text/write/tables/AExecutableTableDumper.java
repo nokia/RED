@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TableHeader;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
@@ -179,4 +180,21 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
 
     public abstract List<AModelElement<? extends IExecutableStepsHolder<?>>> getSortedUnits(
             final IExecutableStepsHolder<?> execHolder);
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    public void revertExecutableRowToCorrectPlace(
+            final List<AModelElement<? extends IExecutableStepsHolder<?>>> sortedUnits,
+            final IExecutableStepsHolder<?> execHolder) {
+        if (execHolder.getExecutionContext().isEmpty()) {
+            return;
+        }
+        int size = sortedUnits.size();
+        int indexInExec = 0;
+        for (int i = 0; i < size; i++) {
+            AModelElement<? extends IExecutableStepsHolder<?>> elem = sortedUnits.get(i);
+            if (elem instanceof RobotExecutableRow) {
+                sortedUnits.set(i, (RobotExecutableRow) execHolder.getExecutionContext().get(indexInExec++));
+            }
+        }
+    }
 }
