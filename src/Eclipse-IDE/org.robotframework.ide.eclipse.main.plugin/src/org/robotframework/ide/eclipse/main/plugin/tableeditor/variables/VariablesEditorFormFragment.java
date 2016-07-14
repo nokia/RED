@@ -5,7 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesMatchesCollection.VariableFilter;
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -54,6 +55,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CreateFreshVariableCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
@@ -65,6 +67,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesMatchesCollection.VariableFilter;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
@@ -299,11 +302,25 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotVariablesSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
-        this.matches = matches;
-        dataProvider.setFilter(matches == null ? null : new VariableFilter(matches));
-        table.refresh();
+    private void whenUserRequestedFilteringEnabled(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_ENABLED_TOPIC
+            + "/" + RobotVariablesSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
+        if (matches.getCollectors().contains(this)) {
+            this.matches = matches;
+            dataProvider.setFilter(new VariableFilter(matches));
+            table.refresh();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenUserRequestedFilteringDisabled(
+            @UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_DISABLED_TOPIC + "/"
+                    + RobotVariablesSection.SECTION_NAME) final Collection<HeaderFilterMatchesCollector> collectors) {
+        if (collectors.contains(this)) {
+            this.matches = null;
+            dataProvider.setFilter(null);
+            table.refresh();
+        }
     }
 
     @Inject

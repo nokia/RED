@@ -14,6 +14,7 @@ public interface RobotSuiteEditorEvents {
     String FORM_FILTER_SWITCH_REQUEST_TOPIC = "red/suite_editor/section/filter/switch/request";
     String FORM_FILTER_SWITCH_REQUEST = "red/suite_editor/section/filter/switch/request/*";
 
-    String SECTION_FILTERING_TOPIC = "red/suite_editor/section/filter/changed";
+    String SECTION_FILTERING_ENABLED_TOPIC = "red/suite_editor/section/filter/enabled";
+    String SECTION_FILTERING_DISABLED_TOPIC = "red/suite_editor/section/filter/disabled";
 
 }
