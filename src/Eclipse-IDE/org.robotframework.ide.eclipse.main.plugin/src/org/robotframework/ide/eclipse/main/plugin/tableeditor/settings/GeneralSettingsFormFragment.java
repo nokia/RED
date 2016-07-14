@@ -944,10 +944,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         @Override
         protected String getText(final Event event) {
             String text = super.getText(event);
-            final int col = this.natTable.getColumnPositionByX(event.x);
+            final int col = natTable.getColumnPositionByX(event.x);
             if (col == 1 && text != null && tooltips.containsKey(text)) {
-                final int row = this.natTable.getRowPositionByY(event.y);
-                final ILayerCell cell = this.natTable.getCellByPosition(col + 1, row);
+                final int row = natTable.getRowPositionByY(event.y);
+                final ILayerCell cell = natTable.getCellByPosition(col + 1, row);
                 final String keyword = cell != null && cell.getDataValue() != null
                         && !((String) cell.getDataValue()).isEmpty() ? (String) cell.getDataValue()
                                 : "given in first argument";

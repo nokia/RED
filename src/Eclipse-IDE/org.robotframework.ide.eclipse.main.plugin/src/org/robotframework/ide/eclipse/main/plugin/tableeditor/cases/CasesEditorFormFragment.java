@@ -191,7 +191,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(new RedTableEditConfiguration(fileModel, newElementsCreator(bodySelectionLayer)));
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 
@@ -272,11 +272,11 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         selectionProvider.setSelection(StructuredSelection.EMPTY);
     }
 
-    private NewElementsCreator<Object> newElementsCreator(final SelectionLayer selectionLayer) {
-        return new NewElementsCreator<Object>() {
+    private NewElementsCreator<RobotElement> newElementsCreator(final SelectionLayer selectionLayer) {
+        return new NewElementsCreator<RobotElement>() {
 
             @Override
-            public Object createNew() {
+            public RobotElement createNew() {
                 dataProvider.setMatches(null);
                 
                 final RobotElement createdElement;

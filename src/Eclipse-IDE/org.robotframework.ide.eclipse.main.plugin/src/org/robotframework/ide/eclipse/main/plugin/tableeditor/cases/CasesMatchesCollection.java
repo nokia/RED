@@ -65,7 +65,7 @@ public class CasesMatchesCollection extends HeaderFilterMatchesCollection {
             } else if (rowObject instanceof RobotKeywordCall) {
                 return isMatching((RobotKeywordCall) rowObject);
             }
-            return true;
+            return false;
         }
 
         boolean isMatching(final RobotCase testCase) {
