@@ -42,9 +42,9 @@ get-editor "Script.robot" | get-section Metadata | click
 
 
 
-check-metadata-single-row -file "Script.robot" -row 1 -metadata "data" -val "" -comment ""
-check-metadata-single-row -file "Script.robot" -row 2 -metadata "line1" -val "line2" -comment ""
-check-metadata-single-row -file "Script.robot" -row 3 -metadata "I like" -val "pancake!" -comment "# Johnny | Bravo"
+check-metadata-row -file "Script.robot" -row 1 -metadata "data" -val "" -comment ""
+check-metadata-row -file "Script.robot" -row 2 -metadata "line1" -val "line2" -comment ""
+check-metadata-row -file "Script.robot" -row 3 -metadata "I like" -val "pancake!" -comment "# Johnny | Bravo"
 
 
 with [get-editor "Script.robot"] {
@@ -77,8 +77,8 @@ with [get-editor "Test.tsv"] {
     get-section Metadata | click
 }
 
-check-metadata-single-row -file "Test.tsv" -row 1 -metadata "\\" -val "${EMPTY}" -comment ""
-check-metadata-single-row -file "Test.tsv" -row 2 -metadata "tsv" -val "multiline" -comment ""
+check-metadata-row -file "Test.tsv" -row 1 -metadata "\\" -val "${EMPTY}" -comment ""
+check-metadata-row -file "Test.tsv" -row 2 -metadata "tsv" -val "multiline" -comment ""
 
 with [get-editor "Test.tsv"] {
     get-section Metadata | click
