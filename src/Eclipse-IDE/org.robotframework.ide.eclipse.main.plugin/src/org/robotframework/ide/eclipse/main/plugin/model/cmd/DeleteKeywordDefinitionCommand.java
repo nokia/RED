@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
@@ -27,7 +29,19 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
         }
         final RobotSuiteFileSection keywordsSection = definitionsToDelete.get(0).getParent();
         keywordsSection.getChildren().removeAll(definitionsToDelete);
+        
+        removeModelElements(keywordsSection);
 
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, keywordsSection);
+    }
+
+    private void removeModelElements(final RobotSuiteFileSection keywordsSection) {
+        final ARobotSectionTable table = keywordsSection.getLinkedElement();
+        if(table != null && table instanceof KeywordTable) {
+            final KeywordTable keywordsTable = (KeywordTable) table;
+            for (final RobotKeywordDefinition robotKeywordDefinition : definitionsToDelete) {
+                keywordsTable.removeKeyword(robotKeywordDefinition.getLinkedElement());
+            }
+        }
     }
 }
