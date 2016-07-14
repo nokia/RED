@@ -10,7 +10,6 @@ import javax.inject.Inject;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -21,9 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeMatchesFilter;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;
 
 import com.google.common.base.Supplier;
@@ -116,25 +113,6 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
         final KeywordsMatchesCollection keywordMatches = new KeywordsMatchesCollection();
         keywordMatches.collect((RobotElement) viewer.getInput(), filter);
         return keywordMatches;
-    }
-
-    @Inject
-    @Optional
-    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotKeywordsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
-        this.matches = matches;
-        try {
-            viewer.getTree().setRedraw(false);
-            if (matches == null) {
-                viewer.collapseAll();
-                viewer.setFilters(new ViewerFilter[0]);
-            } else {
-                viewer.expandAll();
-                viewer.setFilters(new ViewerFilter[] { new CodeMatchesFilter(matches) });
-            }
-        } finally {
-            viewer.getTree().setRedraw(true);
-        }
     }
 
     @Inject

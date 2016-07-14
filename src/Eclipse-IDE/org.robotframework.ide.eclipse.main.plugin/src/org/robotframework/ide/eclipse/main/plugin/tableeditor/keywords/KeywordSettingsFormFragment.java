@@ -24,8 +24,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotSuiteEditorEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeSettingsFormFragment;
 
@@ -81,13 +79,6 @@ public class KeywordSettingsFormFragment extends CodeSettingsFormFragment {
             }
         }
         return settings;
-    }
-
-    @Inject
-    @Optional
-    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotKeywordsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
-        handleFilteringRequest(matches);
     }
 
     @Inject

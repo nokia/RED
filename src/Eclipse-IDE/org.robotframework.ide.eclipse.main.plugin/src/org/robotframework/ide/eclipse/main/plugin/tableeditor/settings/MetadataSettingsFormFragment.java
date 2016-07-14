@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -68,6 +69,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
@@ -353,11 +355,25 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
     @Inject
     @Optional
-    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
-        this.matches = matches;
-        dataProvider.setFilter(matches == null ? null : new MetadataMatchesFilter(matches));
-        table.refresh();
+    private void whenUserRequestedFilteringEnabled(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_ENABLED_TOPIC
+            + "/" + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
+        if (matches.getCollectors().contains(this)) {
+            this.matches = matches;
+            dataProvider.setFilter(new MetadataMatchesFilter(matches));
+            table.refresh();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenUserRequestedFilteringDisabled(
+            @UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_DISABLED_TOPIC + "/"
+                    + RobotSettingsSection.SECTION_NAME) final Collection<HeaderFilterMatchesCollector> collectors) {
+        if (collectors.contains(this)) {
+            this.matches = null;
+            dataProvider.setFilter(null);
+            table.refresh();
+        }
     }
 
     @Inject

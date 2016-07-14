@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -58,6 +59,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
@@ -331,11 +333,25 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotKeywordsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
-        this.matches = matches;
-        dataProvider.setMatches(matches);
-        table.refresh();
+    private void whenUserRequestedFilteringEnabled(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_ENABLED_TOPIC
+            + "/" + RobotKeywordsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
+        if (matches.getCollectors().contains(this)) {
+            this.matches = matches;
+            dataProvider.setMatches(matches);
+            table.refresh();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenUserRequestedFilteringDisabled(
+            @UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_DISABLED_TOPIC + "/"
+                    + RobotKeywordsSection.SECTION_NAME) final Collection<HeaderFilterMatchesCollector> collectors) {
+        if (collectors.contains(this)) {
+            this.matches = null;
+            dataProvider.setMatches(null);
+            table.refresh();
+        }
     }
 
     @Inject
