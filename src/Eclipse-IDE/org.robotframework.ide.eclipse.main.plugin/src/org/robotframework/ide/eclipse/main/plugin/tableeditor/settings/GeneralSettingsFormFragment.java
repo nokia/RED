@@ -140,8 +140,6 @@ import org.robotframework.red.swt.SwtThread;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 
-import ca.odell.glazedlists.SortedList;
-
 public class GeneralSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
 
     public static final String GENERAL_SETTINGS_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.settings.general.context";
@@ -603,32 +601,15 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             documentation.selectAll();
             clearSettingsSelection();
         } else if (table.isPresent()) {
-            final Object entry = getEntryForSetting(setting);
-            if (entry != null) {
-                if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(setting)) {
-                    final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
-                            + RobotSettingsSection.SECTION_NAME;
-                    eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
-                }
-                selectionProvider.setSelection(new StructuredSelection(new Object[] { entry }));
+            final Entry<String, RobotElement> entry = dataProvider.getEntryForSetting(setting);
+            if (dataProvider.isFilterSet() && !dataProvider.isProvided(entry)) {
+                final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+                        + RobotSettingsSection.SECTION_NAME;
+                eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
             }
+            selectionProvider.setSelection(new StructuredSelection(new Object[] { entry }));
             setFocus();
         }
-    }
-
-    private Object getEntryForSetting(final RobotSetting setting) {
-        final SortedList<Entry<String, RobotElement>> list = dataProvider.getSortedList();
-        for (final Entry<String, RobotElement> entry : list) {
-            final RobotElement robotElement = entry.getValue();
-            if (robotElement != null) {
-                final RobotSetting entrySetting = (RobotSetting) robotElement;
-                if (setting == entrySetting) {
-                    return entry;
-                }
-            }
-        }
-
-        return null;
     }
 
     public void clearSettingsSelection() {
@@ -683,7 +664,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         }
 
         if (table.isPresent()) {
-            dataProvider.setMatches(matches);
+            dataProvider.setFilter(matches == null ? null : new SettingsMatchesFilter(matches));
             table.get().refresh();
         }
     }

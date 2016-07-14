@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -59,6 +60,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
@@ -70,6 +72,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatchesCollection.CasesFilter;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
@@ -91,6 +94,9 @@ import org.robotframework.red.swt.SwtThread;
 import com.google.common.base.Supplier;
 
 public class CasesEditorFormFragment implements ISectionFormFragment {
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private IEditorSite site;
@@ -264,6 +270,11 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     }
 
     public void revealElement(final RobotElement element) {
+        if (dataProvider.isFilterSet() && !dataProvider.isProvided(element)) {
+            final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+                    + RobotCasesSection.SECTION_NAME.replaceAll(" ", "_");
+            eventBroker.send(topic, new FilterSwitchRequest(RobotCasesSection.SECTION_NAME.replaceAll(" ", "_"), ""));
+        }
         selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
         setFocus();
     }
@@ -277,8 +288,6 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
             @Override
             public RobotElement createNew() {
-                dataProvider.setMatches(null);
-                
                 final RobotElement createdElement;
                 final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
                 final int selectedRow = selectedCellPositions[0].getRowPosition();
@@ -327,7 +336,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC
             + "/Test_Cases") final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
-        dataProvider.setMatches(matches);
+        dataProvider.setFilter(matches == null ? null : new CasesFilter(matches));
         table.refresh();
     }
 

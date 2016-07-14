@@ -8,87 +8,88 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.matchers.Matcher;
 
 class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
 
-    private static final Object ADDING_TOKEN = new Object();
+    private final AddingToken addingToken = new AddingToken(null, SettingsAdderState.METADATA);
 
     private RobotSettingsSection section;
 
-    private SortedList<RobotKeywordCall> metadataSettings;
-
-    private final MetadataSettingsColumnsPropertyAccessor propertyAccessor;
+    private SortedList<RobotKeywordCall> metadata;
+    private FilterList<RobotKeywordCall> filteredMetadata;
 
     private MetadataMatchesFilter filter;
 
+    private final MetadataSettingsColumnsPropertyAccessor propertyAccessor;
+
+
     MetadataSettingsDataProvider(final RobotEditorCommandsStack commandsStack, final RobotSettingsSection section) {
-        this.section = section;
-        this.metadataSettings = createFrom(section);
         this.propertyAccessor = new MetadataSettingsColumnsPropertyAccessor(commandsStack);
+        setInput(section);
     }
 
-    private SortedList<RobotKeywordCall> createFrom(final RobotSettingsSection section) {
-        if (metadataSettings == null) {
-            metadataSettings = new SortedList<>(GlazedLists.<RobotKeywordCall> eventListOf(), null);
+    void setInput(final RobotSettingsSection section) {
+        this.section = section;
+        createLists(section);
+    }
+
+    private void createLists(final RobotSettingsSection section) {
+        if (metadata == null) {
+            metadata = new SortedList<>(GlazedLists.<RobotKeywordCall> eventListOf(), null);
+            filteredMetadata = new FilterList<>(metadata);
         }
         if (section != null) {
-            metadataSettings.clear();
-            metadataSettings.addAll(section.getMetadataSettings());
+            filteredMetadata.setMatcher(null);
+            metadata.clear();
+            metadata.addAll(section.getMetadataSettings());
         }
-        return metadataSettings;
     }
 
-    public void setInput(final RobotSettingsSection section) {
-        this.section = section;
-        this.metadataSettings = createFrom(section);
+    SortedList<RobotKeywordCall> getSortedList() {
+        return metadata;
     }
 
-    public RobotSettingsSection getInput() {
+    RobotSettingsSection getInput() {
         return section;
+    }
+
+    MetadataSettingsColumnsPropertyAccessor getPropertyAccessor() {
+        return propertyAccessor;
     }
 
     @Override
     public int getColumnCount() {
-        return 3;
-    }
-
-    @Override
-    public Object getDataValue(final int columnIndex, final int rowIndex) {
-        if (section != null) {
-            if (rowIndex == metadataSettings.size() - countInvisible() && !isFilterSet()) {
-                return columnIndex == 0 ? "...add new metadata" : "";
-            }
-            final Object metadataSetting = getRowObject(rowIndex);
-            if (metadataSetting instanceof RobotKeywordCall) {
-                return propertyAccessor.getDataValue((RobotKeywordCall) metadataSetting, columnIndex);
-            }
-        }
-        return "";
+        return propertyAccessor.getColumnCount();
     }
 
     @Override
     public int getRowCount() {
         if (section != null) {
-            final int addingTokens = isFilterSet() ? 1 : 0;
-            return metadataSettings.size() - countInvisible() + 1 - addingTokens;
+            final int addingTokens = isFilterSet() ? 0 : 1;
+            return filteredMetadata.size() + addingTokens;
         }
         return 0;
     }
 
-    private int countInvisible() {
-        int numberOfInvisible = 0;
-        for (final RobotKeywordCall setting : metadataSettings) {
-            if (!isPassingThroughFilter(setting)) {
-                numberOfInvisible++;
+    @Override
+    public Object getDataValue(final int columnIndex, final int rowIndex) {
+        if (section != null) {
+            final Object element = getRowObject(rowIndex);
+            if (element instanceof RobotKeywordCall) {
+                return propertyAccessor.getDataValue((RobotKeywordCall) element, columnIndex);
+            } else if (element instanceof AddingToken && columnIndex == 0 && !isFilterSet()) {
+                return ((AddingToken) element).getLabel();
             }
         }
-        return numberOfInvisible;
+        return "";
     }
 
     @Override
@@ -104,51 +105,21 @@ class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataPr
 
     @Override
     public Object getRowObject(final int rowIndex) {
-        if (section != null && rowIndex < metadataSettings.size()) {
-            RobotKeywordCall rowObject = null;
-
-            int count = 0;
-            int realRowIndex = 0;
-            while (count <= rowIndex && realRowIndex < metadataSettings.size()) {
-                rowObject = metadataSettings.get(realRowIndex);
-                if (isPassingThroughFilter(rowObject)) {
-                    count++;
-                }
-                realRowIndex++;
-            }
-            return rowObject;
-        } else if (rowIndex == metadataSettings.size()) {
-            return ADDING_TOKEN;
+        if (section != null && rowIndex < filteredMetadata.size()) {
+            return filteredMetadata.get(rowIndex);
+        } else if (rowIndex == filteredMetadata.size()) {
+            return addingToken;
         }
         return null;
     }
 
     @Override
     public int indexOfRowObject(final Object rowObject) {
-        if (section != null) {
-            final int realRowIndex = metadataSettings.indexOf(rowObject);
-            int filteredIndex = realRowIndex;
-
-            RobotKeywordCall currentRowElement = null;
-            for (int i = 0; i <= realRowIndex; i++) {
-                currentRowElement = metadataSettings.get(i);
-                if (!isPassingThroughFilter(currentRowElement)) {
-                    filteredIndex--;
-                }
-            }
-            return filteredIndex;
-        } else if (rowObject == ADDING_TOKEN) {
-            return metadataSettings.size();
+        if (rowObject == addingToken) {
+            return filteredMetadata.size();
+        } else {
+            return filteredMetadata.indexOf(rowObject);
         }
-        return -1;
-    }
-
-    boolean isPassingThroughFilter(final RobotKeywordCall rowObject) {
-        return filter == null || filter.isMatching(rowObject);
-    }
-
-    void setMatches(final HeaderFilterMatchesCollection matches) {
-        this.filter = matches == null ? null : new MetadataMatchesFilter(matches);
     }
 
     @Override
@@ -156,12 +127,21 @@ class MetadataSettingsDataProvider implements IFilteringDataProvider, IRowDataPr
         return filter != null;
     }
 
-    public MetadataSettingsColumnsPropertyAccessor getPropertyAccessor() {
-        return propertyAccessor;
+    void setFilter(final MetadataMatchesFilter filter) {
+        this.filter = filter;
+        if (filter == null) {
+            filteredMetadata.setMatcher(null);
+        } else {
+            filteredMetadata.setMatcher(new Matcher<RobotKeywordCall>() {
+                @Override
+                public boolean matches(final RobotKeywordCall item) {
+                    return filter.isMatching(item);
+                }
+            });
+        }
     }
 
-    public SortedList<RobotKeywordCall> getSortedList() {
-        return metadataSettings;
+    boolean isProvided(final RobotKeywordCall setting) {
+        return filteredMetadata.contains(setting);
     }
-
 }

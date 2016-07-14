@@ -5,62 +5,85 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
-import java.util.List;
-
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.matchers.Matcher;
 
 public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
 
-    private static final Object ADDING_TOKEN = new Object();
+    private final AddingToken addingToken = new AddingToken(null, SettingsAdderState.IMPORT);
 
     private RobotSettingsSection section;
 
-    private SettingsMatchesFilter filter;
+    private SortedList<RobotKeywordCall> imports;
+    private FilterList<RobotKeywordCall> filteredImports;
 
-    private SortedList<RobotKeywordCall> importSettings;
+    private SettingsMatchesFilter filter;
 
     private final ImportSettingsColumnsPropertyAccessor propertyAccessor;
 
+
     public ImportSettingsDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotSettingsSection section) {
-        this.section = section;
-        this.importSettings = createFrom(section);
         this.propertyAccessor = new ImportSettingsColumnsPropertyAccessor(commandsStack, countImportSettingsTableColumnsNumber());
+        setInput(section);
     }
 
-    private SortedList<RobotKeywordCall> createFrom(final RobotSettingsSection section) {
-        if (importSettings == null) {
-            importSettings = new SortedList<>(GlazedLists.<RobotKeywordCall> eventListOf(), null);
+    void setInput(final RobotSettingsSection section) {
+        this.propertyAccessor.setNumberOfColumns(countImportSettingsTableColumnsNumber());
+        this.section = section;
+        createLists(section);
+    }
+
+    private int countImportSettingsTableColumnsNumber() {
+        return calculateLongestArgumentsLength() + 2; // setting name + args + comment
+    }
+
+    private int calculateLongestArgumentsLength() {
+        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        if (filteredImports != null) {
+            for (final Object element : filteredImports) {
+                final RobotSetting setting = (RobotSetting) element;
+                if (setting != null) {
+                    max = Math.max(max, setting.getArguments().size());
+                }
+            }
+        }
+        return max;
+    }
+
+    private void createLists(final RobotSettingsSection section) {
+        if (imports == null) {
+            imports = new SortedList<>(GlazedLists.<RobotKeywordCall> eventListOf(), null);
+            filteredImports = new FilterList<>(imports);
         }
         if (section != null) {
-            importSettings.clear();
-            importSettings.addAll(section.getImportSettings());
+            filteredImports.setMatcher(null);
+            imports.clear();
+            imports.addAll(section.getImportSettings());
         }
-        return importSettings;
-    }
-
-    public void setInput(final RobotSettingsSection section) {
-        this.section = section;
-        this.importSettings = createFrom(section);
-        propertyAccessor.setNumberOfColumns(countImportSettingsTableColumnsNumber());
-    }
-
-    public RobotSettingsSection getInput() {
-        return section;
     }
 
     SortedList<RobotKeywordCall> getSortedList() {
-        return importSettings;
+        return imports;
+    }
+
+    RobotSettingsSection getInput() {
+        return section;
+    }
+
+    ImportSettingsColumnsPropertyAccessor getPropertyAccessor() {
+        return propertyAccessor;
     }
 
     @Override
@@ -69,15 +92,22 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
     }
 
     @Override
+    public int getRowCount() {
+        if (section != null) {
+            final int addingTokens = isFilterSet() ? 0 : 1;
+            return filteredImports.size() + addingTokens;
+        }
+        return 0;
+    }
+
+    @Override
     public Object getDataValue(final int columnIndex, final int rowIndex) {
         if (section != null) {
-            if (rowIndex == importSettings.size() - countInvisible() && !isFilterSet()) {
-                return columnIndex == 0 ? "...add new import" : "";
-            }
-
-            final Object importSetting = getRowObject(rowIndex);
-            if (importSetting instanceof RobotKeywordCall) {
-                return propertyAccessor.getDataValue((RobotKeywordCall) importSetting, columnIndex);
+            final Object element = getRowObject(rowIndex);
+            if (element instanceof RobotKeywordCall) {
+                return propertyAccessor.getDataValue((RobotKeywordCall) element, columnIndex);
+            } else if (element instanceof AddingToken && columnIndex == 0 && !isFilterSet()) {
+                return ((AddingToken) element).getLabel();
             }
         }
         return "";
@@ -88,69 +118,30 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
         if (newValue instanceof RobotKeywordCall) {
             return;
         }
-        final String newStringValue = newValue != null ? (String) newValue : "";
-        final Object importSetting = getRowObject(rowIndex);
-        if (importSetting != null && importSetting instanceof RobotKeywordCall) {
-            propertyAccessor.setDataValue((RobotKeywordCall) importSetting, columnIndex, newStringValue);
+        final Object element = getRowObject(rowIndex);
+        if (element instanceof RobotKeywordCall) {
+            final String newStringValue = newValue != null ? (String) newValue : "";
+            propertyAccessor.setDataValue((RobotKeywordCall) element, columnIndex, newStringValue);
         }
-    }
-
-    @Override
-    public int getRowCount() {
-        if (section != null) {
-            final int addingTokens = isFilterSet() ? 1 : 0;
-            return importSettings.size() - countInvisible() + 1 - addingTokens;
-        }
-        return 0;
     }
 
     @Override
     public Object getRowObject(final int rowIndex) {
-        if (section != null && rowIndex < importSettings.size()) {
-            RobotKeywordCall rowObject = null;
-
-            int count = 0;
-            int realRowIndex = 0;
-            while (count <= rowIndex && realRowIndex < importSettings.size()) {
-                rowObject = importSettings.get(realRowIndex);
-                if (isPassingThroughFilter(rowObject)) {
-                    count++;
-                }
-                realRowIndex++;
-            }
-            return rowObject;
-        } else if (rowIndex == importSettings.size()) {
-            return ADDING_TOKEN;
+        if (section != null && rowIndex < filteredImports.size()) {
+            return filteredImports.get(rowIndex);
+        } else if (rowIndex == filteredImports.size()) {
+            return addingToken;
         }
         return null;
     }
 
     @Override
     public int indexOfRowObject(final Object rowObject) {
-        if (section != null) {
-            final int realRowIndex = importSettings.indexOf(rowObject);
-            int filteredIndex = realRowIndex;
-
-            RobotKeywordCall currentRowElement = null;
-            for (int i = 0; i <= realRowIndex; i++) {
-                currentRowElement = importSettings.get(i);
-                if (!isPassingThroughFilter(currentRowElement)) {
-                    filteredIndex--;
-                }
-            }
-            return filteredIndex;
-        } else if (rowObject == ADDING_TOKEN) {
-            return importSettings.size();
+        if (rowObject == addingToken) {
+            return filteredImports.size();
+        } else {
+            return filteredImports.indexOf(rowObject);
         }
-        return -1;
-    }
-
-    boolean isPassingThroughFilter(final RobotKeywordCall rowObject) {
-        return filter == null || filter.isMatching(rowObject);
-    }
-
-    void setMatches(final HeaderFilterMatchesCollection matches) {
-        this.filter = matches == null ? null : new SettingsMatchesFilter(matches);
     }
 
     @Override
@@ -158,36 +149,21 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
         return filter != null;
     }
 
-    private int countInvisible() {
-        int numberOfInvisible = 0;
-        for (final RobotKeywordCall importSetting : importSettings) {
-            if (!isPassingThroughFilter(importSetting)) {
-                numberOfInvisible++;
-            }
-        }
-        return numberOfInvisible;
-    }
-
-    private int countImportSettingsTableColumnsNumber() {
-        return calculateLongestArgumentsLength() + 2; // setting name + args + comment
-    }
-
-    private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
-        final List<?> elements = importSettings;
-        if (elements != null) {
-            for (final Object element : elements) {
-                final RobotSetting setting = (RobotSetting) element;
-                if (setting != null) {
-                    max = Math.max(max, setting.getArguments().size());
+    void setFilter(final SettingsMatchesFilter filter) {
+        this.filter = filter;
+        if (filter == null) {
+            filteredImports.setMatcher(null);
+        } else {
+            filteredImports.setMatcher(new Matcher<RobotKeywordCall>() {
+                @Override
+                public boolean matches(final RobotKeywordCall item) {
+                    return filter.isMatching(item);
                 }
-            }
+            });
         }
-        return max;
     }
 
-    public ImportSettingsColumnsPropertyAccessor getPropertyAccessor() {
-        return propertyAccessor;
+    boolean isProvided(final RobotKeywordCall setting) {
+        return filteredImports.contains(setting);
     }
-
 }
