@@ -9,7 +9,6 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesMatchesCollection.VariableFilter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesTableAdderStatesConfiguration.VariablesAdderState;
@@ -136,16 +135,15 @@ class VariablesDataProvider implements IFilteringDataProvider, IRowDataProvider<
         return filter != null;
     }
 
-    void setMatches(final HeaderFilterMatchesCollection matches) {
-        if (matches == null) {
-            filter = null;
+    void setFilter(final VariableFilter filter) {
+        this.filter = filter;
+        if (filter == null) {
             filteredVariables.setMatcher(null);
         } else {
-            filter = new VariableFilter(matches);
             filteredVariables.setMatcher(new Matcher<RobotVariable>() {
                 @Override
                 public boolean matches(final RobotVariable item) {
-                    return filter == null || filter.isMatching(item);
+                    return filter.isMatching(item);
                 }
             });
         }

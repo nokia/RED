@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
@@ -27,9 +28,9 @@ class VariablesMatchesCollection extends HeaderFilterMatchesCollection {
 
     private void collectMatches(final RobotVariable variable, final String filter) {
         // or has to be greedy, since we want to find all matches
-        final boolean isMatching = 
+        final boolean isMatching =
                 collectMatches(filter, constructNameToSearch(variable))
-                | collectMatches(filter, constructValueToSearch(variable)) 
+                | collectMatches(filter, constructValueToSearch(variable))
                 | collectMatches(filter, constructCommentToSearch(variable));
         if (isMatching) {
             rowsMatching++;
@@ -37,6 +38,9 @@ class VariablesMatchesCollection extends HeaderFilterMatchesCollection {
     }
 
     private static String constructNameToSearch(final RobotVariable variable) {
+        if (variable.getType() == VariableType.INVALID) {
+            return variable.getName();
+        }
         return variable.getPrefix() + variable.getName() + variable.getSuffix();
     }
 
