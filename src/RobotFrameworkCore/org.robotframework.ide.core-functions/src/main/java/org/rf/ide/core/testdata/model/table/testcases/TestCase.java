@@ -80,7 +80,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     public void addTestExecutionRow(final RobotExecutableRow<TestCase> executionRow, final int position) {
         executionRow.setParent(this);
-        this.testContext.set(position, executionRow);
+        this.testContext.add(position, executionRow);
     }
 
     public void removeExecutableRow(final RobotExecutableRow<TestCase> executionRow) {
