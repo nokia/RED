@@ -234,7 +234,6 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
             @Override
             public RobotVariable createNew() {
-                dataProvider.setMatches(null);
                 final RobotVariablesSection section = dataProvider.getInput();
                 commandsStack.execute(
                         new CreateFreshVariableCommand(section, dataProvider.getAdderState().getVariableType()));
@@ -255,7 +254,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     }
 
     void revealVariable(final RobotVariable robotVariable) {
-        if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(robotVariable)) {
+        if (dataProvider.isFilterSet() && !dataProvider.isProvided(robotVariable)) {
             final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
                     + RobotVariablesSection.SECTION_NAME;
             eventBroker.send(topic, new FilterSwitchRequest(RobotVariablesSection.SECTION_NAME, ""));
