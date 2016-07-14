@@ -279,9 +279,11 @@ public class UserKeyword extends AModelElement<KeywordTable>
                 tokens.addAll(arguments.getElementTokens());
             }
 
+            final List<RobotToken> keywordContextInModel = new ArrayList<>(0);
             for (final RobotExecutableRow<UserKeyword> row : keywordContext) {
-                tokens.addAll(row.getElementTokens());
+                keywordContextInModel.addAll(row.getElementTokens());
             }
+            tokens.addAll(keywordContextInModel);
 
             for (final KeywordReturn returns : keywordReturns) {
                 tokens.addAll(returns.getElementTokens());
@@ -300,6 +302,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
             }
 
             Collections.sort(tokens, new RobotTokenPositionComparator());
+            positionRevertToExpectedOrder(tokens, keywordContextInModel);
         }
 
         return tokens;
