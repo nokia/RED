@@ -174,4 +174,15 @@ public class RobotToken implements IRobotLineElement, Serializable {
         }
         return vai;
     }
+
+    public RobotToken copy() {
+        RobotToken t = new RobotToken();
+        t.setText(getText());
+        t.setRaw(getRaw());
+        t.types.addAll(getTypes());
+        t.fp = this.fp.copy();
+        t.clearDirtyFlag();
+
+        return t;
+    }
 }
