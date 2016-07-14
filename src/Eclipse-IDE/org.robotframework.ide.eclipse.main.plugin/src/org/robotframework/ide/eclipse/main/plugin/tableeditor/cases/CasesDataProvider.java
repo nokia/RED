@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
-import java.util.List;
-
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -88,13 +86,13 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
 
     @Override
     public Object getRowObject(final int rowIndex) {
-        if (section != null && rowIndex < cases.size()) {
+        if (section != null && rowIndex < casesSortedList.size()) {
             Object rowObject = null;
 
             int count = 0;
             int realRowIndex = 0;
-            while (count <= rowIndex && realRowIndex < cases.size()) {
-                rowObject = cases.get(realRowIndex);
+            while (count <= rowIndex && realRowIndex < casesSortedList.size()) {
+                rowObject = casesSortedList.get(realRowIndex);
                 if (isPassingThroughFilter(rowObject)) {
                     count++;
                 } else {
@@ -104,7 +102,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
             }
 
             return (rowObject == null) ? casesAddingToken : rowObject;
-        } else if (rowIndex == cases.size()) {
+        } else if (rowIndex == casesSortedList.size()) {
             return casesAddingToken;
         }
         return null;
@@ -132,19 +130,19 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         // return -1;
 
         if (section != null) {
-            final int realRowIndex = cases.indexOf(rowObject);
+            final int realRowIndex = casesSortedList.indexOf(rowObject);
             int filteredIndex = realRowIndex;
 
             Object currentRowElement = null;
             for (int i = 0; i <= realRowIndex; i++) {
-                currentRowElement = cases.get(i);
+                currentRowElement = casesSortedList.get(i);
                 if (!isPassingThroughFilter(currentRowElement)) {
                     filteredIndex--;
                 }
             }
             return filteredIndex;
         } else if (rowObject == casesAddingToken) {
-            return cases.size();
+            return casesSortedList.size();
         }
         return -1;
     }
@@ -175,14 +173,14 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     public int getRowCount() {
         if (section != null) {
             final int addingTokens = isFilterSet() ? 1 : 0;
-            return cases.size() - countInvisible() + 1 - addingTokens;
+            return casesSortedList.size() - countInvisible() + 1 - addingTokens;
         }
         return 0;
     }
 
     private int countInvisible() {
         int numberOfInvisible = 0;
-        for (final Object object : cases) {
+        for (final Object object : casesSortedList) {
             if (!isPassingThroughFilter(object)) {
                 numberOfInvisible++;
             }
@@ -213,14 +211,13 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     }
 
     private int countColumnsNumber() {
-        return calculateLongestArgumentsLength() + 2; // keyword name + args + comment
+        return calculateLongestArgumentsLength() + 2; // case name + args + comment
     }
 
     private int calculateLongestArgumentsLength() {
         int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
-        final List<?> elements = cases;
-        if (elements != null) {
-            for (final Object element : elements) {
+        if (casesSortedList != null) {
+            for (final Object element : casesSortedList) {
                 if (element instanceof RobotKeywordCall) {
                     max = Math.max(max, ((RobotKeywordCall) element).getArguments().size());
                 }
