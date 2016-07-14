@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
 
+import static org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesMatchesCollection.VariableFilter;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -301,7 +302,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
             + RobotVariablesSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
-        dataProvider.setMatches(matches);
+        dataProvider.setFilter(matches == null ? null : new VariableFilter(matches));
         table.refresh();
     }
 
