@@ -29,7 +29,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
@@ -560,7 +559,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     public HeaderFilterMatchesCollection get() {
                         return matches;
                     }
-                }, Stylers.Common.MATCH_STYLER));
+                }));
 
         table.addConfiguration(tableStyle);
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
