@@ -77,7 +77,7 @@ public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandle
                 final RobotKeywordCall targetCall = getElementOfClass(selectedPath, RobotKeywordCall.class);
                 if (targetCall != null) {
                     final int index = targetCall.getParent().getChildren().indexOf(targetCall);
-                    commandsStack.execute(new InsertKeywordCallsCommand(targetCall.getParent(), index, calls));
+                    commandsStack.execute(new InsertKeywordCallsCommand(targetCall.getParent(), -1, index, calls));
                 } else {
                     final RobotCase targetCase = getElementOfClass(selectedPath, RobotCase.class);
                     if (targetCase != null) {
