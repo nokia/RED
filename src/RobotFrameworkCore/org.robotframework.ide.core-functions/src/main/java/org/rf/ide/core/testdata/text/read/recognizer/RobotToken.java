@@ -175,12 +175,24 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return vai;
     }
 
+    public RobotToken copyWithoutPosition() {
+        return copy(false);
+    }
+
     public RobotToken copy() {
+        return copy(true);
+    }
+
+    private RobotToken copy(final boolean posInclude) {
         RobotToken t = new RobotToken();
         t.setText(getText());
         t.setRaw(getRaw());
         t.types.addAll(getTypes());
-        t.fp = this.fp.copy();
+        if (posInclude) {
+            t.fp = this.fp.copy();
+        } else {
+            t.fp = FilePosition.createNotSet();
+        }
         t.clearDirtyFlag();
 
         return t;
