@@ -78,6 +78,8 @@ public class KeywordsSectionTableDumper extends AExecutableTableDumper {
         Collections.sort(sortedTemp, new UserKeywordTableElementsComparator());
         sorted.addAll(sortedTemp);
 
+        revertExecutableRowToCorrectPlace(sorted, execHolder);
+
         return sorted;
     }
 }
