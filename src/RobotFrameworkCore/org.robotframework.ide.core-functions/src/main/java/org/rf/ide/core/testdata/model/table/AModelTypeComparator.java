@@ -26,7 +26,7 @@ public abstract class AModelTypeComparator<T extends AModelElement<?>> implement
         FilePosition filePos1 = modelElement1.getBeginPosition();
         FilePosition filePos2 = modelElement2.getBeginPosition();
 
-        if (filePos1.isNotSet() && filePos1.isNotSet()) {
+        if (filePos1.isNotSet() && filePos2.isNotSet()) {
             result = Integer.compare(position.get(modelElement1.getModelType()),
                     position.get(modelElement2.getModelType()));
         } else if (filePos1.isNotSet()) {
