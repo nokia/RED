@@ -41,7 +41,7 @@ public class CasesMatchesCollection extends HeaderFilterMatchesCollection {
 
     private void collectMatches(final RobotKeywordCall call, final String filter) {
         boolean isMatching = false;
-        isMatching |= collectMatches(filter, call.getName());
+        isMatching |= collectMatches(filter, call.getLabel());
         for (final String arg : call.getArguments()) {
             isMatching |= collectMatches(filter, arg);
         }
@@ -83,7 +83,8 @@ public class CasesMatchesCollection extends HeaderFilterMatchesCollection {
         }
 
         boolean isMatching(final RobotKeywordCall call) {
-            return matches.contains(call.getName()) || matches.contains(call.getComment()) || hasMatchingArgument(call);
+            return matches.contains(call.getLabel()) || matches.contains(call.getComment())
+                    || hasMatchingArgument(call);
         }
 
         private boolean hasMatchingArgument(final RobotKeywordCall call) {
