@@ -177,7 +177,6 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
                 bodySelectionLayer, bodyViewportLayer);
         
-        // FIXME: tree sorting
         sortModel = new GlazedListsSortModel<>(dataProvider.getSortedList(), dataProvider.getPropertyAccessor(),
                 configRegistry, columnHeaderDataLayer);
         dataProvider.getCasesTreeFormat().setSortModel(sortModel);
