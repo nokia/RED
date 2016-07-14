@@ -15,13 +15,15 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.Variable
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesTableAdderStatesConfiguration.VariablesAdderState;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.matchers.Matcher;
 
 /**
  * @author Michal Anglart
  */
-public class VariablesDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
+class VariablesDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
 
     private final AddingToken addingToken = new AddingToken(null, VariablesAdderState.SCALAR, VariablesAdderState.LIST,
             VariablesAdderState.DICTIONARY);
@@ -30,37 +32,41 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
 
     private SortedList<RobotVariable> variables;
 
+    private FilterList<RobotVariable> filteredVariables;
+
     private VariableFilter filter;
 
     private final VariableColumnsPropertyAccessor propertyAccessor;
 
+
     VariablesDataProvider(final RobotEditorCommandsStack commandsStack, final RobotVariablesSection section) {
+        this.propertyAccessor = new VariableColumnsPropertyAccessor(commandsStack);
+        setInput(section);
+    }
+
+    void setInput(final RobotVariablesSection section) {
         this.section = section;
         this.variables = createFrom(section);
-        this.propertyAccessor = new VariableColumnsPropertyAccessor(commandsStack);
     }
 
     private SortedList<RobotVariable> createFrom(final RobotVariablesSection section) {
         if (variables == null) {
             variables = new SortedList<>(GlazedLists.<RobotVariable> eventListOf(), null);
+            filteredVariables = new FilterList<>(variables);
         }
         if (section != null) {
+            filteredVariables.setMatcher(null);
             variables.clear();
             variables.addAll(section.getChildren());
         }
         return variables;
     }
 
-    public void setInput(final RobotVariablesSection section) {
-        this.section = section;
-        this.variables = createFrom(section);
-    }
-
     SortedList<RobotVariable> getSortedList() {
         return variables;
     }
 
-    public RobotVariablesSection getInput() {
+    RobotVariablesSection getInput() {
         return section;
     }
 
@@ -71,6 +77,15 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
     @Override
     public int getColumnCount() {
         return propertyAccessor.getColumnCount();
+    }
+
+    @Override
+    public int getRowCount() {
+        if (section != null) {
+            final int addingTokens = isFilterSet() ? 0 : 1;
+            return filteredVariables.size() + addingTokens;
+        }
+        return 0;
     }
 
     @Override
@@ -87,25 +102,6 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
     }
 
     @Override
-    public int getRowCount() {
-        if (section != null) {
-            final int addingTokens = isFilterSet() ? 1 : 0;
-            return variables.size() - countInvisible() + 1 - addingTokens;
-        }
-        return 0;
-    }
-
-    private int countInvisible() {
-        int numberOfInvisible = 0;
-        for (final RobotVariable variable : variables) {
-            if (!isPassingThroughFilter(variable)) {
-                numberOfInvisible++;
-            }
-        }
-        return numberOfInvisible;
-    }
-
-    @Override
     public void setDataValue(final int column, final int row, final Object value) {
         if (value instanceof RobotVariable) {
             return;
@@ -118,23 +114,9 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
 
     @Override
     public Object getRowObject(final int rowIndex) {
-        if (section != null && rowIndex < variables.size()) {
-            RobotVariable rowObject = null;
-
-            int count = 0;
-            int realRowIndex = 0;
-            while (count <= rowIndex && realRowIndex < variables.size()) {
-                rowObject = variables.get(realRowIndex);
-                if (isPassingThroughFilter(rowObject)) {
-                    count++;
-                } else {
-                    rowObject = null;
-                }
-                realRowIndex++;
-            }
-
-            return (rowObject == null) ? addingToken : rowObject;
-        } else if (rowIndex == variables.size()) {
+        if (section != null && rowIndex < filteredVariables.size()) {
+            return filteredVariables.get(rowIndex);
+        } else if (rowIndex == filteredVariables.size()) {
             return addingToken;
         }
         return null;
@@ -142,22 +124,11 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
 
     @Override
     public int indexOfRowObject(final Object rowObject) {
-        if (section != null) {
-            final int realRowIndex = variables.indexOf(rowObject);
-            int filteredIndex = realRowIndex;
-
-            RobotVariable currentRowElement = null;
-            for (int i = 0; i <= realRowIndex; i++) {
-                currentRowElement = variables.get(i);
-                if (!isPassingThroughFilter(currentRowElement)) {
-                    filteredIndex--;
-                }
-            }
-            return filteredIndex;
-        } else if (rowObject == addingToken) {
-            return variables.size();
+        if (rowObject == addingToken) {
+            return filteredVariables.size();
+        } else {
+            return filteredVariables.indexOf(rowObject);
         }
-        return -1;
     }
 
     @Override
@@ -165,19 +136,30 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
         return filter != null;
     }
 
-    boolean isPassingThroughFilter(final RobotVariable rowObject) {
-        return filter == null || filter.isMatching(rowObject);
+    void setMatches(final HeaderFilterMatchesCollection matches) {
+        if (matches == null) {
+            filter = null;
+            filteredVariables.setMatcher(null);
+        } else {
+            filter = new VariableFilter(matches);
+            filteredVariables.setMatcher(new Matcher<RobotVariable>() {
+                @Override
+                public boolean matches(final RobotVariable item) {
+                    return filter == null || filter.isMatching(item);
+                }
+            });
+        }
     }
 
-    void setMatches(final HeaderFilterMatchesCollection matches) {
-        this.filter = matches == null ? null : new VariableFilter(matches);
+    boolean isProvided(final RobotVariable robotVariable) {
+        return filteredVariables.contains(robotVariable);
     }
 
     void switchAddderToNextState() {
         addingToken.switchToNext();
     }
 
-    public VariablesAdderState getAdderState() {
+    VariablesAdderState getAdderState() {
         return (VariablesAdderState) addingToken.getState();
     }
 }
