@@ -93,10 +93,10 @@ with [get-editor "TestFile.robot"] {
 
 
 //check if added in Source is shown in table
-check-metadata-single-row -file "TestFile.robot" -row 1 -metadata  "new" -val "text"
+check-metadata-row -file "TestFile.robot" -row 1 -metadata  "new" -val "text"
 
 try -times 5 -delay 1000 -command{
-	check-metadata-single-row -file "TestFile.robot" -row 2 -metadata "Second line" -val "is here" -comment "#with comment"
+	check-metadata-row -file "TestFile.robot" -row 2 -metadata "Second line" -val "is here" -comment "#with comment"
 }
 
 //add new line
@@ -179,9 +179,9 @@ with [get-editor "TestFile.robot"] {
 
 //check if added in Source is shown in table
 
-check-metadata-single-row -file "TestFile.robot" -row 1 -metadata "Second line" -val "is here" -comment "#with comment" 
-check-metadata-single-row -file "TestFile.robot" -row 2 -metadata "new" -val "text" 
-check-metadata-single-row -file "TestFile.robot" -row 3 -metadata "Second line" -val "is here" -comment "#with comment" 
+check-metadata-row -file "TestFile.robot" -row 1 -metadata "Second line" -val "is here" -comment "#with comment" 
+check-metadata-row -file "TestFile.robot" -row 2 -metadata "new" -val "text" 
+check-metadata-row -file "TestFile.robot" -row 3 -metadata "Second line" -val "is here" -comment "#with comment" 
 
 
 //check focus after saving
@@ -239,9 +239,9 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
 }
 
 
-check-metadata-single-row -file "TestFile.robot" -row 1 -metadata "Second line" -val "new value" -comment "#with comment" 
-check-metadata-single-row -file "TestFile.robot" -row 2 -metadata "new" -val "text"  -comment "#second line comment"
-check-metadata-single-row -file "TestFile.robot" -row 3 -metadata "last line" -val "is here" -comment "#with comment" 
+check-metadata-row -file "TestFile.robot" -row 1 -metadata "Second line" -val "new value" -comment "#with comment" 
+check-metadata-row -file "TestFile.robot" -row 2 -metadata "new" -val "text"  -comment "#second line comment"
+check-metadata-row -file "TestFile.robot" -row 3 -metadata "last line" -val "is here" -comment "#with comment" 
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
