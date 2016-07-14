@@ -9,8 +9,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -21,10 +21,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.PasteKeywordsHandler.E4PasteKeywordsHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsDataProvider.RobotKeywordCallAdder;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
+import com.google.common.base.Optional;
+
 public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywordsHandler> {
+
     public PasteKeywordsHandler() {
         super(E4PasteKeywordsHandler.class);
     }
@@ -39,7 +43,7 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public void pasteKeywords(@Named(Selections.SELECTION) final ITreeSelection selection,
+        public void pasteKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedClipboard clipboard) {
 
             final RobotKeywordDefinition[] keywordDefs = clipboard.getKeywordDefinitions();
@@ -54,52 +58,41 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
             }
         }
 
-        private void insertDefinitions(final ITreeSelection selection, final RobotKeywordDefinition[] definitions) {
-            final TreePath selectedPath = Selections.getFirstElementPath(selection);
-            final RobotKeywordDefinition targetDef = getElementOfClass(selectedPath, RobotKeywordDefinition.class);
+        private void insertDefinitions(final IStructuredSelection selection,
+                final RobotKeywordDefinition[] definitions) {
+            final Optional<RobotKeywordDefinition> firstSelected = Selections.getOptionalFirstElement(selection,
+                    RobotKeywordDefinition.class);
 
-            if (targetDef != null) {
-                final int index = targetDef.getParent().getChildren().indexOf(targetDef);
-                commandsStack.execute(new InsertKeywordDefinitionsCommand(targetDef.getParent(),
-                        index, definitions));
+            if (firstSelected.isPresent()) {
+                final int index = firstSelected.get().getParent().getChildren().indexOf(firstSelected.get());
+                commandsStack.execute(
+                        new InsertKeywordDefinitionsCommand(firstSelected.get().getParent(), index, definitions));
             } else {
-                final RobotKeywordsSection section = fileModel.findSection(
-                        RobotKeywordsSection.class).orNull();
+                final RobotKeywordsSection section = fileModel.findSection(RobotKeywordsSection.class).orNull();
                 if (section != null) {
                     commandsStack.execute(new InsertKeywordDefinitionsCommand(section, definitions));
                 }
             }
         }
 
-        private void insertCalls(final ITreeSelection selection, final RobotKeywordCall[] calls) {
-            final TreePath selectedPath = Selections.getFirstElementPath(selection);
+        private void insertCalls(final IStructuredSelection selection, final RobotKeywordCall[] calls) {
+            final Optional<RobotKeywordCall> firstSelected = Selections.getOptionalFirstElement(selection,
+                    RobotKeywordCall.class);
 
-            if (selectedPath.getSegmentCount() > 0) {
-                final RobotKeywordCall targetCall = getElementOfClass(selectedPath, RobotKeywordCall.class);
-                if (targetCall != null) {
-                    final int index = targetCall.getParent().getChildren().indexOf(targetCall);
-                    commandsStack.execute(new InsertKeywordCallsCommand(targetCall.getParent(), index, calls));
-                } else {
-                    final RobotKeywordDefinition targetDef = getElementOfClass(selectedPath,
-                            RobotKeywordDefinition.class);
-                    if (targetDef != null) {
-                        commandsStack.execute(new InsertKeywordCallsCommand(targetDef, calls));
-                    }
+            if (firstSelected.isPresent()) {
+                final int index = firstSelected.get().getParent().getChildren().indexOf(firstSelected.get());
+                final int modelTableIndex = ((RobotCodeHoldingElement) firstSelected.get().getParent())
+                        .findExecutableRowIndex(firstSelected.get());
+                commandsStack.execute(
+                        new InsertKeywordCallsCommand(firstSelected.get().getParent(), modelTableIndex, index, calls));
+            } else {
+                final Optional<RobotKeywordCallAdder> selected = Selections.getOptionalFirstElement(selection,
+                        RobotKeywordCallAdder.class);
+                if (selected.isPresent()) {
+                    commandsStack.execute(new InsertKeywordCallsCommand(selected.get().getParent(), calls));
                 }
             }
-        }
 
-        private static <T> T getElementOfClass(final TreePath path, final Class<? extends T> clazz) {
-            if (path.getSegmentCount() == 0) {
-                return null;
-            }
-            for (int i = path.getSegmentCount() - 1; i >= 0; i--) {
-                final Object current = path.getSegment(i);
-                if (clazz.isInstance(current)) {
-                    return clazz.cast(current);
-                }
-            }
-            return null;
         }
     }
 }

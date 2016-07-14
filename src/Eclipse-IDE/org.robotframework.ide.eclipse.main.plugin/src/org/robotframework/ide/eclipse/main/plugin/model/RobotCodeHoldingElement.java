@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.Serializable;
@@ -12,10 +13,14 @@ import java.util.List;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.rf.ide.core.testdata.model.ModelType;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 
 public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElement, Serializable {
+
+    private static final long serialVersionUID = -3138118535388297030L;
 
     private transient RobotSuiteFileSection parent;
 
@@ -35,6 +40,8 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     }
 
     public abstract RobotKeywordCall createKeywordCall(final int index);
+    
+    public abstract void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex, final RobotKeywordCall keywordCall);
 
     public RobotDefinitionSetting createDefinitionSetting(final String name, final List<String> args,
             final String comment) {
@@ -112,5 +119,16 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getParent(), this);
+    }
+    
+    public int findExecutableRowIndex(final RobotKeywordCall keywordCallWithExeRow) {
+        final List<RobotKeywordCall> callsWithExeRow = newArrayList(filter(getChildren(), new Predicate<RobotKeywordCall>() {
+
+            @Override
+            public boolean apply(final RobotKeywordCall call) {
+                return call.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+            }
+        }));
+        return callsWithExeRow.indexOf(keywordCallWithExeRow);
     }
 }

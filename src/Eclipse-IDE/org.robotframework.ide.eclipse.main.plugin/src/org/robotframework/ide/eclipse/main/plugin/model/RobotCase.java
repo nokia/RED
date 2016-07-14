@@ -61,6 +61,11 @@ public class RobotCase extends RobotCodeHoldingElement {
         getChildren().add(index, call);
         return call;
     }
+    
+    @Override
+    public void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex, RobotKeywordCall keywordCall) {
+        
+    }
 
     public void link(final TestCase testCase) {
         this.testCase = testCase;
@@ -226,4 +231,5 @@ public class RobotCase extends RobotCodeHoldingElement {
     public Optional<String> getTemplateInUse() {
         return Optional.fromNullable(testCase.getTemplateKeywordName());
     }
+
 }
