@@ -22,7 +22,7 @@ import ca.odell.glazedlists.matchers.Matcher;
 /**
  * @author Michal Anglart
  */
-class VariablesDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
+public class VariablesDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
 
     private final AddingToken addingToken = new AddingToken(null, VariablesAdderState.SCALAR, VariablesAdderState.LIST,
             VariablesAdderState.DICTIONARY);
