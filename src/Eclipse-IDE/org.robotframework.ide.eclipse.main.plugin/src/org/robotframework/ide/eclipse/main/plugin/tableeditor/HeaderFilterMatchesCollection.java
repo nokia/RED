@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,6 +20,16 @@ public class HeaderFilterMatchesCollection {
     private final Multimap<String, Range<Integer>> matches = ArrayListMultimap.create();
     private int allMatches = 0;
     protected int rowsMatching = 0;
+
+    private final Collection<HeaderFilterMatchesCollector> sourceCollectors;
+
+    public HeaderFilterMatchesCollection() {
+        this(new ArrayList<HeaderFilterMatchesCollector>());
+    }
+
+    public HeaderFilterMatchesCollection(final Collection<HeaderFilterMatchesCollector> sourceCollectors) {
+        this.sourceCollectors = sourceCollectors;
+    }
 
     @SuppressWarnings("unused")
     public void collect(final RobotElement element, final String filter) {
@@ -64,5 +75,9 @@ public class HeaderFilterMatchesCollection {
             index = label.indexOf(filter, index + 1);
         }
         return result;
+    }
+
+    public Collection<HeaderFilterMatchesCollector> getCollectors() {
+        return sourceCollectors;
     }
 }

@@ -105,6 +105,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeyword
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
@@ -652,19 +653,32 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     @Inject
     @Optional
-    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
-            + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
-        this.matches = matches;
-
-        if (matches == null) {
-            clearDocumentationMatches();
-        } else {
+    private void whenUserRequestedFilteringEnabled(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_ENABLED_TOPIC
+            + "/" + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
+        if (matches.getCollectors().contains(this)) {
+            this.matches = matches;
             setDocumentationMatches(matches);
-        }
 
-        if (table.isPresent()) {
-            dataProvider.setFilter(matches == null ? null : new SettingsMatchesFilter(matches));
-            table.get().refresh();
+            if (table.isPresent()) {
+                dataProvider.setFilter(new SettingsMatchesFilter(matches));
+                table.get().refresh();
+            }
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenUserRequestedFilteringDisabled(
+            @UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_DISABLED_TOPIC + "/"
+                    + RobotSettingsSection.SECTION_NAME) final Collection<HeaderFilterMatchesCollector> collectors) {
+        if (collectors.contains(this)) {
+            this.matches = null;
+            clearDocumentationMatches();
+
+            if (table.isPresent()) {
+                dataProvider.setFilter(null);
+                table.get().refresh();
+            }
         }
     }
 

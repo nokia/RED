@@ -99,13 +99,21 @@ class HeaderFilterSupport {
                             public void run() {
                                 HeaderFilterMatchesCollection matches = null;
                                 if (!filter.getText().isEmpty()) {
-                                    matches = new HeaderFilterMatchesCollection();
+                                    matches = new HeaderFilterMatchesCollection(collectors);
                                     for (final HeaderFilterMatchesCollector collector : collectors) {
                                         matches.addAll(collector.collectMatches(filter.getText()));
                                     }
                                 }
                                 showProperTooltip(matches);
-                                broker.send(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/" + sectionId, matches);
+                                if (matches == null) {
+                                    broker.send(
+                                            RobotSuiteEditorEvents.SECTION_FILTERING_DISABLED_TOPIC + "/" + sectionId,
+                                            collectors);
+                                } else {
+                                    broker.send(
+                                            RobotSuiteEditorEvents.SECTION_FILTERING_ENABLED_TOPIC + "/" + sectionId,
+                                            matches);
+                                }
                             }
                         });
                         monitor.done();
@@ -152,7 +160,7 @@ class HeaderFilterSupport {
         filter.dispose();
         filter = null;
         form.setHeadClient(null);
-        broker.send(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/" + sectionId, null);
+        broker.send(RobotSuiteEditorEvents.SECTION_FILTERING_DISABLED_TOPIC + "/" + sectionId, collectors);
     }
 
     void addFormMessageIfNeeded() {

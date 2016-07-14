@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
+import java.util.Collection;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -61,6 +63,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCa
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.MarkersSelectionLayerPainter;
@@ -321,11 +324,25 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC
+    private void whenUserRequestedFilteringEnabled(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_ENABLED_TOPIC
             + "/Test_Cases") final HeaderFilterMatchesCollection matches) {
-        this.matches = matches;
-        dataProvider.setFilter(matches == null ? null : new CasesFilter(matches));
-        table.refresh();
+        if (matches.getCollectors().contains(this)) {
+            this.matches = matches;
+            dataProvider.setFilter(new CasesFilter(matches));
+            table.refresh();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenUserRequestedFilteringDisabled(
+            @UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_DISABLED_TOPIC
+                    + "/Test_Cases") final Collection<HeaderFilterMatchesCollector> collectors) {
+        if (collectors.contains(this)) {
+            this.matches = null;
+            dataProvider.setFilter(null);
+            table.refresh();
+        }
     }
 
     @Inject
