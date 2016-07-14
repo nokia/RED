@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
+import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
@@ -12,7 +13,7 @@ import ca.odell.glazedlists.TreeList;
 
 class CasesElementsTreeFormat implements TreeList.Format<Object> {
 
-    private static class CallsComparator implements Comparator<Object> {
+    private static class CallsFileOrderComparator implements Comparator<Object> {
 
         @Override
         public int compare(final Object o1, final Object o2) {
@@ -33,19 +34,6 @@ class CasesElementsTreeFormat implements TreeList.Format<Object> {
 
     }
 
-    private static class CasesNaturalOrderComparator implements Comparator<Object> {
-
-        @Override
-        public int compare(final Object o1, final Object o2) {
-            final RobotCase case1 = (RobotCase) o1;
-            final RobotCase case2 = (RobotCase) o2;
-            final int index1 = case1.getParent().getChildren().indexOf(case1);
-            final int index2 = case2.getParent().getChildren().indexOf(case2);
-            return index1 - index2;
-        }
-
-    }
-
     private static class CasesAlphabeticalComparator implements Comparator<Object> {
 
         @Override
@@ -54,7 +42,20 @@ class CasesElementsTreeFormat implements TreeList.Format<Object> {
             final RobotCase case2 = (RobotCase) o2;
             return case1.getName().compareToIgnoreCase(case2.getName());
         }
+    }
 
+    private static class ReverseComparator<T> implements Comparator<T> {
+
+        private final Comparator<T> comparator;
+
+        public ReverseComparator(final Comparator<T> comparator) {
+            this.comparator = comparator;
+        }
+
+        @Override
+        public int compare(final T o1, final T o2) {
+            return comparator.compare(o2, o1);
+        }
     }
 
     private ISortModel sortModel;
@@ -76,12 +77,14 @@ class CasesElementsTreeFormat implements TreeList.Format<Object> {
 
     @Override
     public Comparator<? super Object> getComparator(final int depth) {
-        // if (depth == 0) {
-        // return sortModel == null ? null
-        // : new SortableTreeComparator<>(new CasesAlphabeticalComparator(), this.sortModel);
-        // }
+        if (sortModel == null || sortModel.getSortDirection(0) == SortDirectionEnum.NONE) {
+            return null;
+        } else if (sortModel.getSortDirection(0) == SortDirectionEnum.ASC) {
+            return depth == 0 ? new CasesAlphabeticalComparator() : new CallsFileOrderComparator();
+        } else if (sortModel.getSortDirection(0) == SortDirectionEnum.DESC) {
+            return depth == 0 ? new ReverseComparator<>(new CasesAlphabeticalComparator()) : new CallsFileOrderComparator();
+        }
         return null;
-
     }
 
     public void setSortModel(final ISortModel treeSortModel) {
