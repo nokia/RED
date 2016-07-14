@@ -1,47 +1,18 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _2rVvIENaEeaEVfxTnoQ14g
 Element-Name: MoveUpDownImports
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _C_3tUDyAEeaUDrMBSMf5Ag
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/4/16 2:19 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/14/16 3:28 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
-
-proc "check-if-one-line-is-selected"{
-	with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
-	    get-property "getLayer().getBodyLayer().getScrollableLayer().hasRowSelection()" | equals true | verify-true
-	    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedRowCount()" | equals 1 | verify-true
-	}
-}	
-	
-
-//rows starts from 0
-proc "is-row-fully-selected" [val row]{
-	get-editor "TestFile.robot" | get-section Imports | get-canvas| get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
-		| invoke isRowPositionFullySelected $row | eq true | verify-true
-	check-if-one-line-is-selected	
-} 
-
-proc "check-imports-row" [val file] [val row] [val import] [val name] [val c1 ""] [val c2 ""] [val c3 ""] [val c4 ""] [val c5 ""] [val c6 ""]
-{
-	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue| eq $import |verify-true
-	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue| eq $name |verify-true
-	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue| eq $c1 |verify-true
-	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 4 $row|  invoke getDataValue| eq $c2 |verify-true
-	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 5 $row|  invoke getDataValue| eq $c3 |verify-true
-	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue| eq $c4 |verify-true
-	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue| eq $c5 |verify-true
-	get-editor $file | get-section Imports | get-canvas | get-object | invoke getCellByPosition 8 $row|  invoke getDataValue| eq $c6 |verify-true
-	
-}    
-
-// test ------------------------------------------------------------
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 
@@ -85,7 +56,7 @@ with [get-editor "TestFile.robot"] {
     }
 }  
 
-is-row-fully-selected -row 4
+is-row-fully-selected -row 4 -table "Imports"
 
 with [get-editor "TestFile.robot" | get-section Imports | get-canvas]  {
     //3. line up (Library XML): arg3 selected
@@ -96,7 +67,7 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas]  {
     get-menu "Row/Move up" | click
 }
 
-is-row-fully-selected -row 1
+is-row-fully-selected -row 1 -table "Imports"
 
 with [get-editor "TestFile.robot" | get-section Imports | get-canvas]  {    
 	//8. line down (Variables    ${a}/\ folder/file.py): comment selected
@@ -107,7 +78,7 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas]  {
     mouse-release 948 189 button3 2097152
 	get-menu "Row/Move down" | click
 }
-is-row-fully-selected -row 8
+is-row-fully-selected -row 8 -table "Imports"
 
 with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
     // 3. line up (Telenet): Telnet selected (by shortcut)
@@ -116,7 +87,7 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
     mouse-release 187 78 button1 524288
     key-type "M1+ARROW_UP"
 }
-is-row-fully-selected -row 1
+is-row-fully-selected -row 1 -table "Imports"
     
 with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {		    
 	//6. line down (Variables    libs/lib1.py): "3" seleced (by shortcut)
@@ -125,7 +96,7 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
     mouse-release 570 145 button1 524288
     key-type "M1+ARROW_DOWN"
 }
-is-row-fully-selected -row 6
+is-row-fully-selected -row 6 -table "Imports"
 
 with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {	    
     //last line moved down 
@@ -136,17 +107,17 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
 }    
 
 
-check-imports-row -file "TestFile.robot" -row 1 -import "Resource" -name "res3.robot" -c6 "#here is param"
-check-imports-row -file "TestFile.robot" -row 2 -import "Library" -name "Telnet" 
-check-imports-row -file "TestFile.robot" -row 3 -import "Library" -name "XML" -c1 "arg1" -c2 "arg2" -c3 "arg3" -c4 "arg4" -c5 "arg5" 
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 1 -import "Resource" -name "res3.robot" -c6 "#here is param"
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 2 -import "Library" -name "Telnet" 
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 3 -import "Library" -name "XML" -c1 "arg1" -c2 "arg2" -c3 "arg3" -c4 "arg4" -c5 "arg5" 
 
-check-imports-row -file "TestFile.robot" -row 4 -import "Resource" -name "folder/inside/res2.tsv" 
-check-imports-row -file "TestFile.robot" -row 5 -import "Library" -name "MyLibrary"  -c1 "my1" -c2 "\\" -c3 "my2" -c4 "\\\\" -c5 "my3"
-check-imports-row -file "TestFile.robot" -row 6 -import "Library" -name "${LIBRARY}" 
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 4 -import "Resource" -name "folder/inside/res2.tsv" 
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 5 -import "Library" -name "MyLibrary"  -c1 "my1" -c2 "\\" -c3 "my2" -c4 "\\\\" -c5 "my3"
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 6 -import "Library" -name "${LIBRARY}" 
 
-check-imports-row -file "TestFile.robot" -row 7 -import "Variables" -name "libs/lib1.py" -c1 "1" -c2 "2" -c3 "3" -c4 "4"
-check-imports-row -file "TestFile.robot" -row 8 -import "Variables" -name "libs/lib1.py" -c1 "val1" -c2 "val2" -c6 "#my value | # no more vals"
-check-imports-row -file "TestFile.robot" -row 9 -import "Variables" -name "${a}/\ folder/file.py"
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 7 -import "Variables" -name "libs/lib1.py" -c1 "1" -c2 "2" -c3 "3" -c4 "4"
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 8 -import "Variables" -name "libs/lib1.py" -c1 "val1" -c2 "val2" -c6 "#my value | # no more vals"
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 9 -import "Variables" -name "${a}/\ folder/file.py"
 
 
 //check Source
@@ -185,17 +156,17 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
     key-type "M1+ARROW_DOWN" -times 3
 }
 
-check-imports-row -file "TestFile.robot" -row 9 -import "Library" -name "${LIBRARY}" 
-is-row-fully-selected -row 8
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 9 -import "Library" -name "${LIBRARY}" 
+is-row-fully-selected -row 8 -table "Imports"
 
 
 //move up 6 times
 with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
-    key-type "M1+ARROW_UP" -times 6
+    key-type "M1+ARROW_UP" -times 6 
 }
 
-is-row-fully-selected -row 2
-check-imports-row -file "TestFile.robot" -row 3 -import "Library" -name "${LIBRARY}" 
+is-row-fully-selected -row 2 -table "Imports"
+check-imports-row-for-default-or_11_columns -file "TestFile.robot" -row 3 -import "Library" -name "${LIBRARY}" 
 
 //save and go to Source
 get-button "Save (M1+S)" | click
