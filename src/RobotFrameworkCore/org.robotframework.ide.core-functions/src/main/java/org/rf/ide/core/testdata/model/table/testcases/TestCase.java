@@ -293,15 +293,18 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
                 tokens.addAll(template.getElementTokens());
             }
 
+            final List<RobotToken> testCaseContextInModel = new ArrayList<>(0);
             for (final RobotExecutableRow<TestCase> row : testContext) {
-                tokens.addAll(row.getElementTokens());
+                testCaseContextInModel.addAll(row.getElementTokens());
             }
+            tokens.addAll(testCaseContextInModel);
 
             for (final TestCaseTimeout timeout : timeouts) {
                 tokens.addAll(timeout.getElementTokens());
             }
 
             Collections.sort(tokens, new RobotTokenPositionComparator());
+            positionRevertToExpectedOrder(tokens, testCaseContextInModel);
         }
 
         return tokens;

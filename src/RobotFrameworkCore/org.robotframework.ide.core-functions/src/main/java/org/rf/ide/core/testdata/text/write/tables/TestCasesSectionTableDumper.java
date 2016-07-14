@@ -78,6 +78,7 @@ public class TestCasesSectionTableDumper extends AExecutableTableDumper {
         Collections.sort(sortedTemp, new TestCaseTableElementsComparator());
         sorted.addAll(sortedTemp);
 
+        revertExecutableRowToCorrectPlace(sorted, execHolder);
         return sorted;
     }
 }
