@@ -311,7 +311,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     public void revealSetting(final RobotKeywordCall setting) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(metadataSection);
 
-        if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(setting)) {
+        if (dataProvider.isFilterSet() && !dataProvider.isProvided(setting)) {
             final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
                     + RobotSettingsSection.SECTION_NAME;
             eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
@@ -329,7 +329,6 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
             @Override
             public RobotElement createNew() {
-                dataProvider.setMatches(null);
                 final RobotSettingsSection section = dataProvider.getInput();
                 commandsStack.execute(new CreateFreshGeneralSettingCommand(section, "Metadata", newArrayList("data")));
                 SwtThread.asyncExec(new Runnable() {
@@ -358,7 +357,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
             + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
-        dataProvider.setMatches(matches);
+        dataProvider.setFilter(matches == null ? null : new MetadataMatchesFilter(matches));
         table.refresh();
     }
 

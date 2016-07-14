@@ -31,6 +31,7 @@ public class SettingsMatchesFilter {
             } else if (elem instanceof RobotDefinitionSetting) {
                 return settingMatches((RobotDefinitionSetting) elem);
             }
+            return false;
         }
         return true;
     }

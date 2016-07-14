@@ -306,7 +306,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
     public void revealSetting(final RobotSetting setting) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(importSettingsSection);
-        if (dataProvider.isFilterSet() && !dataProvider.isPassingThroughFilter(setting)) {
+        if (dataProvider.isFilterSet() && !dataProvider.isProvided(setting)) {
             final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
                     + RobotSettingsSection.SECTION_NAME;
             eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
@@ -324,9 +324,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
             @Override
             public RobotElement createNew() {
-                dataProvider.setMatches(null);
                 SwtThread.asyncExec(new Runnable() {
-
                     @Override
                     public void run() {
                         new ImportSettingsPopup(site.getShell(), commandsStack, fileModel, null).open();
@@ -352,7 +350,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private void whenUserRequestedFiltering(@UIEventTopic(RobotSuiteEditorEvents.SECTION_FILTERING_TOPIC + "/"
             + RobotSettingsSection.SECTION_NAME) final HeaderFilterMatchesCollection matches) {
         this.matches = matches;
-        dataProvider.setMatches(matches);
+        dataProvider.setFilter(matches == null ? null : new SettingsMatchesFilter(matches));
         table.refresh();
     }
 
