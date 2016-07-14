@@ -71,6 +71,40 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         getChildren().add(index, call);
         return call;
     }
+    
+    public RobotDefinitionSetting createKeywordDefinitionSetting(final int index, final String name,
+            final List<String> args, final String comment) {
+        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args,
+                comment);
+
+        final AModelElement<?> newModelElement = new KeywordTableModelUpdater().create(getLinkedElement(), name,
+                comment, args);
+        setting.link(newModelElement);
+
+        getChildren().add(index, setting);
+        return setting;
+    }
+    
+    @Override
+    public void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex, final RobotKeywordCall keywordCall) {
+
+        final RobotKeywordCall newCall = new RobotKeywordCall(this, keywordCall.getName(), keywordCall.getArguments(),
+                keywordCall.getComment());
+
+        final RobotExecutableRow<UserKeyword> robotExecutableRow = ((RobotExecutableRow<UserKeyword>)keywordCall.getLinkedElement()).copy();
+        if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
+            keyword.addKeywordExecutionRow(robotExecutableRow, modelTableIndex);
+        } else {
+            keyword.addKeywordExecutionRow(robotExecutableRow);
+        }
+        
+        newCall.link(robotExecutableRow);
+        if (codeHoldingElementIndex >= 0 && codeHoldingElementIndex < getChildren().size()) {
+            getChildren().add(codeHoldingElementIndex, newCall);
+        } else {
+            getChildren().add(newCall);
+        }
+    }
 
     public void link(final UserKeyword keyword) {
         this.keyword = keyword;
@@ -135,19 +169,6 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             getChildren().add(call);
             call.link(execRow);
         }
-    }
-    
-    public RobotDefinitionSetting createKeywordDefinitionSetting(final int index, final String name,
-            final List<String> args, final String comment) {
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args,
-                comment);
-
-        final AModelElement<?> newModelElement = new KeywordTableModelUpdater().create(getLinkedElement(), name,
-                comment, args);
-        setting.link(newModelElement);
-
-        getChildren().add(index, setting);
-        return setting;
     }
 
     private static String omitSquareBrackets(final String nameInBrackets) {

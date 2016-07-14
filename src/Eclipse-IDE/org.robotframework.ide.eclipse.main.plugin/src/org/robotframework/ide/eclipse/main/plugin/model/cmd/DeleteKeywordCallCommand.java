@@ -34,6 +34,12 @@ public class DeleteKeywordCallCommand extends EditorCommand {
 
         parent.getChildren().removeAll(callsToDelete);
 
+        removeModelElements(parent);
+
+        eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, parent);
+    }
+
+    private void removeModelElements(IRobotCodeHoldingElement parent) {
         final Object linkedElement = parent.getLinkedElement();
         if (linkedElement != null && linkedElement instanceof UserKeyword) {
             final UserKeyword userKeyword = (UserKeyword) linkedElement;
@@ -46,7 +52,5 @@ public class DeleteKeywordCallCommand extends EditorCommand {
                 }
             }
         }
-
-        eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, parent);
     }
 }
