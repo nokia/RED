@@ -187,6 +187,7 @@ public class RobotToken implements IRobotLineElement, Serializable {
         RobotToken t = new RobotToken();
         t.setText(getText());
         t.setRaw(getRaw());
+        t.types.clear();
         t.types.addAll(getTypes());
         if (posInclude) {
             t.fp = this.fp.copy();
