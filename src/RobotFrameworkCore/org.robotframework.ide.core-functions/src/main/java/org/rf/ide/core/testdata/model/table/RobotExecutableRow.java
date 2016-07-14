@@ -246,13 +246,13 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     public <P> RobotExecutableRow<P> copy() {
         RobotExecutableRow<P> execRow = new RobotExecutableRow<>();
-        execRow.setAction(getAction().copy());
+        execRow.setAction(getAction().copyWithoutPosition());
         for (final RobotToken arg : getArguments()) {
-            execRow.addArgument(arg.copy());
+            execRow.addArgument(arg.copyWithoutPosition());
         }
 
         for (final RobotToken cmPart : getComment()) {
-            execRow.addCommentPart(cmPart.copy());
+            execRow.addCommentPart(cmPart.copyWithoutPosition());
         }
 
         return execRow;
