@@ -12,7 +12,6 @@ import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ICellPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.ImagePainter;
-import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.CellPainterDecorator;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
@@ -25,9 +24,13 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+
+import com.google.common.base.Supplier;
 
 public class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
 
@@ -35,9 +38,13 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
 
     private final boolean isEditable;
 
-    public CasesElementsStyleConfiguration(final TableTheme theme, final boolean isEditable) {
+    private final Supplier<HeaderFilterMatchesCollection> matchesSupplier;
+
+    public CasesElementsStyleConfiguration(final TableTheme theme, final boolean isEditable,
+            final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
         this.font = theme.getFont();
         this.isEditable = isEditable;
+        this.matchesSupplier = matchesSupplier;
     }
 
     @Override
@@ -66,7 +73,10 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
         // CasesElementsInTreeLabelAccumulator.CASE_CALL_CONFIG_LABEL);
 
         final ImageDescriptor caseImage = RedImages.getTestCaseImage();
-        final ICellPainter cellPainter = new CellPainterDecorator(new TextPainter(false, true, 2), CellEdgeEnum.LEFT,
+        final ICellPainter cellPainter = new CellPainterDecorator(
+                new SearchMatchesTextPainter(matchesSupplier, 2),
+                // new TextPainter(),
+                CellEdgeEnum.LEFT,
                 new ImagePainter(ImagesManager.getImage(isEditable ? caseImage : RedImages.getGreyedImage(caseImage))));
 
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
