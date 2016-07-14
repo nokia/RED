@@ -314,16 +314,6 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         };
     }
 
-    // @Override
-    // protected Supplier<HeaderFilterMatchesCollection> getMatchesProvider() {
-    // return new Supplier<HeaderFilterMatchesCollection>() {
-    // @Override
-    // public HeaderFilterMatchesCollection get() {
-    // return matches;
-    // }
-    // };
-    // }
-
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
         final CasesMatchesCollection casesMatches = new CasesMatchesCollection();
