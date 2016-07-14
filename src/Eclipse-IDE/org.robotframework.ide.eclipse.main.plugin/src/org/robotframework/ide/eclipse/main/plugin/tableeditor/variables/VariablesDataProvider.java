@@ -30,7 +30,6 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
     private RobotVariablesSection section;
 
     private SortedList<RobotVariable> variables;
-
     private FilterList<RobotVariable> filteredVariables;
 
     private VariableFilter filter;
@@ -45,10 +44,10 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
 
     void setInput(final RobotVariablesSection section) {
         this.section = section;
-        this.variables = createFrom(section);
+        createLists(section);
     }
 
-    private SortedList<RobotVariable> createFrom(final RobotVariablesSection section) {
+    private void createLists(final RobotVariablesSection section) {
         if (variables == null) {
             variables = new SortedList<>(GlazedLists.<RobotVariable> eventListOf(), null);
             filteredVariables = new FilterList<>(variables);
@@ -58,7 +57,6 @@ public class VariablesDataProvider implements IFilteringDataProvider, IRowDataPr
             variables.clear();
             variables.addAll(section.getChildren());
         }
-        return variables;
     }
 
     SortedList<RobotVariable> getSortedList() {

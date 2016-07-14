@@ -12,14 +12,15 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatchesCollection.CasesFilter;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
 import ca.odell.glazedlists.TreeList;
+import ca.odell.glazedlists.matchers.Matcher;
 
 public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvider<Object> {
 
@@ -28,7 +29,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     private RobotCasesSection section;
 
     private SortedList<Object> casesSortedList;
-    
+    private FilterList<Object> filterList;
     private TreeList<Object> cases;
     
     private final CasesColumnsPropertyAccessor propertyAccessor;
@@ -37,7 +38,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
 
     private CasesFilter filter;
     
-    public CasesDataProvider(final RobotEditorCommandsStack commandsStack,
+    CasesDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotCasesSection section) {
         this.section = section;
         this.propertyAccessor = new CasesColumnsPropertyAccessor(commandsStack, countColumnsNumber());
@@ -45,10 +46,33 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         createFrom(section);
     }
     
+    void setInput(final RobotCasesSection section) {
+        propertyAccessor.setColumnCount(countColumnsNumber());
+        this.section = section;
+        createFrom(section);
+    }
+
+    private int countColumnsNumber() {
+        return calculateLongestArgumentsLength() + 2; // case name + args + comment
+    }
+
+    private int calculateLongestArgumentsLength() {
+        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        if (cases != null) {
+            for (final Object element : cases) {
+                if (element instanceof RobotKeywordCall) {
+                    max = Math.max(max, ((RobotKeywordCall) element).getArguments().size());
+                }
+            }
+        }
+        return max;
+    }
+
     private void createFrom(final RobotCasesSection section) {
         if (cases == null) {
             casesSortedList = new SortedList<>(GlazedLists.<Object> eventListOf(), null);
-            cases = new TreeList<>(casesSortedList, casesTreeFormat, TreeList.nodesStartExpanded());
+            filterList = new FilterList<>(casesSortedList);
+            cases = new TreeList<>(filterList, casesTreeFormat, TreeList.nodesStartExpanded());
         }
         if (section != null) {
             casesSortedList.clear();
@@ -61,16 +85,6 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         }
 
     }
-     
-    public void setInput(final RobotCasesSection section) {
-        this.section = section;
-        createFrom(section);
-        propertyAccessor.setColumnCount(countColumnsNumber());
-    }
-
-    public RobotCasesSection getInput() {
-        return section;
-    }
     
     SortedList<Object> getSortedList() {
         return casesSortedList;
@@ -80,73 +94,32 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         return cases;
     }
 
-    public CasesElementsTreeFormat getCasesTreeFormat() {
+    RobotCasesSection getInput() {
+        return section;
+    }
+
+    CasesElementsTreeFormat getCasesTreeFormat() {
         return casesTreeFormat;
     }
 
-    @Override
-    public Object getRowObject(final int rowIndex) {
-        if (section != null && rowIndex < casesSortedList.size()) {
-            Object rowObject = null;
-
-            int count = 0;
-            int realRowIndex = 0;
-            while (count <= rowIndex && realRowIndex < casesSortedList.size()) {
-                rowObject = casesSortedList.get(realRowIndex);
-                if (isPassingThroughFilter(rowObject)) {
-                    count++;
-                } else {
-                    rowObject = null;
-                }
-                realRowIndex++;
-            }
-
-            return (rowObject == null) ? casesAddingToken : rowObject;
-        } else if (rowIndex == casesSortedList.size()) {
-            return casesAddingToken;
-        }
-        return null;
-        //
-        // if (rowIndex < cases.size()) {
-        // return cases.get(rowIndex);
-        // } else if (rowIndex == cases.size()) {
-        // return casesAddingToken;
-        // }
-        // return null;
+    CasesColumnsPropertyAccessor getPropertyAccessor() {
+        return propertyAccessor;
     }
     
     @Override
-    public int indexOfRowObject(final Object rowObject) {
-        // if (section != null) {
-        // final int realRowIndex = cases.indexOf(rowObject);
-        // final int filteredIndex = realRowIndex;
-        //
-        // //TODO: handle filtering
-        //
-        // return filteredIndex;
-        // } else if (rowObject == casesAddingToken) {
-        // return cases.size();
-        // }
-        // return -1;
+    public int getColumnCount() {
+        return propertyAccessor.getColumnCount();
+    }
 
+    @Override
+    public int getRowCount() {
         if (section != null) {
-            final int realRowIndex = casesSortedList.indexOf(rowObject);
-            int filteredIndex = realRowIndex;
-
-            Object currentRowElement = null;
-            for (int i = 0; i <= realRowIndex; i++) {
-                currentRowElement = casesSortedList.get(i);
-                if (!isPassingThroughFilter(currentRowElement)) {
-                    filteredIndex--;
-                }
-            }
-            return filteredIndex;
-        } else if (rowObject == casesAddingToken) {
-            return casesSortedList.size();
+            final int addingTokens = isFilterSet() ? 0 : 1;
+            return cases.size() + addingTokens;
         }
-        return -1;
+        return 0;
     }
-    
+
     @Override
     public Object getDataValue(final int column, final int row) {
         if (section != null) {
@@ -165,36 +138,30 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         if (newValue instanceof RobotElement) {
             return;
         }
-        final Object keyword = getRowObject(rowIndex);
-        propertyAccessor.setDataValue(keyword, columnIndex, newValue);
+        final Object element = getRowObject(rowIndex);
+        if (element instanceof RobotElement) {
+            propertyAccessor.setDataValue(element, columnIndex, newValue);
+        }
     }
-    
+
     @Override
-    public int getRowCount() {
+    public Object getRowObject(final int rowIndex) {
+        if (rowIndex < cases.size()) {
+            return cases.get(rowIndex);
+        } else if (rowIndex == cases.size()) {
+            return casesAddingToken;
+        }
+        return null;
+    }
+
+    @Override
+    public int indexOfRowObject(final Object rowObject) {
         if (section != null) {
-            final int addingTokens = isFilterSet() ? 1 : 0;
-            return casesSortedList.size() - countInvisible() + 1 - addingTokens;
+            return cases.indexOf(rowObject);
+        } else if (rowObject == casesAddingToken) {
+            return cases.size();
         }
-        return 0;
-    }
-
-    private int countInvisible() {
-        int numberOfInvisible = 0;
-        for (final Object object : casesSortedList) {
-            if (!isPassingThroughFilter(object)) {
-                numberOfInvisible++;
-            }
-        }
-        return numberOfInvisible;
-    }
-    
-    @Override
-    public int getColumnCount() {
-        return propertyAccessor.getColumnCount();
-    }
-
-    public CasesColumnsPropertyAccessor getPropertyAccessor() {
-        return propertyAccessor;
+        return -1;
     }
 
     @Override
@@ -202,27 +169,22 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         return filter != null;
     }
 
-    boolean isPassingThroughFilter(final Object rowObject) {
-        return filter == null || filter.isMatching(rowObject);
-    }
+    void setFilter(final CasesFilter filter) {
+        this.filter = filter;
 
-    void setMatches(final HeaderFilterMatchesCollection matches) {
-        this.filter = matches == null ? null : new CasesFilter(matches);
-    }
-
-    private int countColumnsNumber() {
-        return calculateLongestArgumentsLength() + 2; // case name + args + comment
-    }
-
-    private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
-        if (casesSortedList != null) {
-            for (final Object element : casesSortedList) {
-                if (element instanceof RobotKeywordCall) {
-                    max = Math.max(max, ((RobotKeywordCall) element).getArguments().size());
+        if (filter == null) {
+            filterList.setMatcher(null);
+        } else {
+            filterList.setMatcher(new Matcher<Object>() {
+                @Override
+                public boolean matches(final Object item) {
+                    return filter.isMatching(item);
                 }
-            }
+            });
         }
-        return max;
+    }
+
+    boolean isProvided(final RobotElement element) {
+        return cases.contains(element);
     }
 }

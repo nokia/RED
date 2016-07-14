@@ -12,57 +12,98 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
+import ca.odell.glazedlists.EventList;
+import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.SortedList;
+import ca.odell.glazedlists.matchers.Matcher;
 
 public class GeneralSettingsDataProvider
         implements IFilteringDataProvider, IRowDataProvider<Entry<String, RobotElement>> {
 
     private RobotSettingsSection section;
 
+    private SortedList<Entry<String, RobotElement>> generalSettings;
+    private FilterList<Entry<String, RobotElement>> filteredGeneralSettings;
+    
     private SettingsMatchesFilter filter;
 
-    private SortedList<Entry<String, RobotElement>> generalSettings;
-
     private final GeneralSettingsColumnsPropertyAccessor propertyAccessor;
+    
 
     public GeneralSettingsDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotSettingsSection section) {
-        this.section = section;
-        this.generalSettings = createFrom(section);
         this.propertyAccessor = new GeneralSettingsColumnsPropertyAccessor(section, commandsStack,
                 countGeneralSettingsTableColumnsNumber());
-    }
-
-    private SortedList<Entry<String, RobotElement>> createFrom(final RobotSettingsSection section) {
-        if (generalSettings == null) {
-            generalSettings = new SortedList<>(GlazedLists.<Entry<String, RobotElement>> eventListOf(), null);
-        }
-        if (section != null) {
-            generalSettings.clear();
-            generalSettings.addAll(GeneralSettingsModel.fillSettingsMapping(section).entrySet());
-        }
-        return generalSettings;
+        setInput(section);
     }
 
     public void setInput(final RobotSettingsSection section) {
-        this.section = section;
-        this.generalSettings = createFrom(section);
         propertyAccessor.setSection(section);
         propertyAccessor.setNumberOfColumns(countGeneralSettingsTableColumnsNumber());
+        this.section = section;
+        createLists(section);
     }
 
-    public RobotSettingsSection getInput() {
+    private int countGeneralSettingsTableColumnsNumber() {
+        return calculateLongestArgumentsLength() + 2; // setting name + args + comment
+    }
+
+    private int calculateLongestArgumentsLength() {
+        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        if (generalSettings != null) {
+            for (final Entry<String, RobotElement> element : generalSettings) {
+                final RobotSetting setting = (RobotSetting) element.getValue();
+                if (setting != null) {
+                    max = Math.max(max, setting.getArguments().size());
+                }
+            }
+        }
+        return max;
+    }
+
+    private void createLists(final RobotSettingsSection section) {
+        if (generalSettings == null) {
+            @SuppressWarnings("unchecked")
+            final EventList<Entry<String, RobotElement>> eventList = GlazedLists
+                    .<Entry<String, RobotElement>> eventListOf();
+            generalSettings = new SortedList<>(eventList, null);
+            filteredGeneralSettings = new FilterList<>(generalSettings);
+        }
+        if (section != null) {
+            filteredGeneralSettings.setMatcher(null);
+            generalSettings.clear();
+            generalSettings.addAll(GeneralSettingsModel.fillSettingsMapping(section).entrySet());
+        }
+    }
+
+    SortedList<Entry<String, RobotElement>> getSortedList() {
+        return generalSettings;
+    }
+
+    RobotSettingsSection getInput() {
         return section;
+    }
+
+    GeneralSettingsColumnsPropertyAccessor getPropertyAccessor() {
+        return propertyAccessor;
     }
 
     @Override
     public int getColumnCount() {
         return propertyAccessor.getColumnCount();
+    }
+
+    @Override
+    public int getRowCount() {
+        if (section != null) {
+            // no need to add one more row count for element adder row
+            return filteredGeneralSettings.size();
+        }
+        return 0;
     }
 
     @Override
@@ -84,29 +125,9 @@ public class GeneralSettingsDataProvider
     }
 
     @Override
-    public int getRowCount() {
-        if (section != null) {
-            return generalSettings.size() - countInvisible(); //no need to add one more row count for element adder row
-        }
-        return 0;
-    }
-
-    @Override
     public Entry<String, RobotElement> getRowObject(final int rowIndex) {
-        if (section != null && rowIndex < generalSettings.size()) {
-            Entry<String, RobotElement> rowObject = null;
-
-            int count = 0;
-            int realRowIndex = 0;
-            while (count <= rowIndex) {
-                rowObject = generalSettings.get(realRowIndex);
-                final RobotSetting setting = (RobotSetting) rowObject.getValue();
-                if (isPassingThroughFilter(setting)) {
-                    count++;
-                }
-                realRowIndex++;
-            }
-            return rowObject;
+        if (section != null && rowIndex < filteredGeneralSettings.size()) {
+            return filteredGeneralSettings.get(rowIndex);
         }
         return null;
     }
@@ -114,27 +135,22 @@ public class GeneralSettingsDataProvider
     @Override
     public int indexOfRowObject(final Entry<String, RobotElement> settingEntry) {
         if (section != null) {
-            final int realRowIndex = generalSettings.indexOf(settingEntry);
-            int filteredIndex = realRowIndex;
-
-            RobotSetting currentRowElement = null;
-            for (int i = 0; i <= realRowIndex; i++) {
-                currentRowElement = (RobotSetting) generalSettings.get(i).getValue();
-                if (!isPassingThroughFilter(currentRowElement)) {
-                    filteredIndex--;
-                }
-            }
-            return filteredIndex;
+            return filteredGeneralSettings.indexOf(settingEntry);
         }
         return -1;
     }
 
-    boolean isPassingThroughFilter(final RobotSetting rowObject) {
-        return filter == null || filter.isMatching(rowObject);
-    }
-
-    void setMatches(final HeaderFilterMatchesCollection matches) {
-        this.filter = matches == null ? null : new SettingsMatchesFilter(matches);
+    Entry<String, RobotElement> getEntryForSetting(final RobotSetting setting) {
+        for (final Entry<String, RobotElement> entry : generalSettings) {
+            final RobotElement robotElement = entry.getValue();
+            if (robotElement != null) {
+                final RobotSetting entrySetting = (RobotSetting) robotElement;
+                if (setting == entrySetting) {
+                    return entry;
+                }
+            }
+        }
+        throw new IllegalStateException("There has to be the setting provided by data provider");
     }
 
     @Override
@@ -142,40 +158,21 @@ public class GeneralSettingsDataProvider
         return filter != null;
     }
 
-    private int countInvisible() {
-        int numberOfInvisible = 0;
-        for (final Entry<String, RobotElement> settingEntry : generalSettings) {
-            final RobotSetting setting = (RobotSetting) settingEntry.getValue();
-            if (!isPassingThroughFilter(setting)) {
-                numberOfInvisible++;
-            }
-        }
-        return numberOfInvisible;
-    }
-
-    private int countGeneralSettingsTableColumnsNumber() {
-        return calculateLongestArgumentsLength() + 2; // setting name + args + comment
-    }
-
-    private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
-        if (generalSettings != null) {
-            for (final Entry<String, RobotElement> element : generalSettings) {
-                final RobotSetting setting = (RobotSetting) element.getValue();
-                if (setting != null) {
-                    max = Math.max(max, setting.getArguments().size());
+    void setFilter(final SettingsMatchesFilter filter) {
+        this.filter = filter;
+        if (filter == null) {
+            filteredGeneralSettings.setMatcher(null);
+        } else {
+            filteredGeneralSettings.setMatcher(new Matcher<Entry<String, RobotElement>>() {
+                @Override
+                public boolean matches(final Entry<String, RobotElement> item) {
+                    return filter.isMatching(item);
                 }
-            }
+            });
         }
-        return max;
     }
 
-    public GeneralSettingsColumnsPropertyAccessor getPropertyAccessor() {
-        return propertyAccessor;
-    }
-
-
-    public SortedList<Entry<String, RobotElement>> getSortedList() {
-        return generalSettings;
+    boolean isProvided(final Entry<String, RobotElement> setting) {
+        return filteredGeneralSettings.contains(setting);
     }
 }
