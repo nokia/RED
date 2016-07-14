@@ -73,7 +73,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
 
     public void addKeywordExecutionRow(final RobotExecutableRow<UserKeyword> executionRow, final int position) {
         executionRow.setParent(this);
-        this.keywordContext.set(position, executionRow);
+        this.keywordContext.add(position, executionRow);
     }
 
     public void removeExecutableRow(final RobotExecutableRow<UserKeyword> executionRow) {
