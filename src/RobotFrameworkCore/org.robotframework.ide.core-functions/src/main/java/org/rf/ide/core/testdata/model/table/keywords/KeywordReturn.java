@@ -51,7 +51,7 @@ public class KeywordReturn extends AModelElement<UserKeyword> implements ICommen
         fixForTheType(returnValue, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE, true);
         values.add(returnValue);
     }
-    
+
     public void addReturnValue(final int index, final String value) {
         updateOrCreateTokenInside(values, index, value, RobotTokenType.KEYWORD_SETTING_RETURN_VALUE);
     }
@@ -115,12 +115,12 @@ public class KeywordReturn extends AModelElement<UserKeyword> implements ICommen
     public RobotExecutableRow<UserKeyword> asExecutableRow() {
         final RobotExecutableRow<UserKeyword> execRow = new RobotExecutableRow<>();
         execRow.setParent(getParent());
-        execRow.setAction(getDeclaration());
+        execRow.setAction(getDeclaration().copy());
         for (final RobotToken returns : values) {
-            execRow.addArgument(returns);
+            execRow.addArgument(returns.copy());
         }
         for (final RobotToken commentPart : comment) {
-            execRow.addCommentPart(commentPart);
+            execRow.addCommentPart(commentPart.copy());
         }
 
         return execRow;
