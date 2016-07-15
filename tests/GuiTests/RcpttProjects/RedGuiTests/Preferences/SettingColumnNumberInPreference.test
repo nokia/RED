@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XxFF4JQgEeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/14/16 1:20 PM
+Save-Time: 7/14/16 1:24 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -32,6 +32,15 @@ proc "check-column-amount-in-settings" [val tab_label] [val col_nr]
 	}
 }
 
+
+proc "set-correct-column-number-in-preference" [val col_nr]{
+	get-window Preferences | get-group Tables | get-editbox 
+    -after [get-label "Default number of columns for arguments in table editors"] | set-text $col_nr
+    
+    //check if error is not shown
+    get-window Preferences | get-label Editor | get-property "getText()" | equals Editor | verify-true
+}
+
 proc "set-incorrect-column-number-in-preference" [val col_nr]{
 	get-window Preferences | get-group Tables | get-editbox 
     -after [get-label "Default number of columns for arguments in table editors"] | set-text $col_nr
@@ -39,12 +48,9 @@ proc "set-incorrect-column-number-in-preference" [val col_nr]{
 	get-window Preferences | get-editbox -index 1 | get-property text | equals "Value must be an Integer between 1 and 20" 
 	    | verify-true
 	//set correct value    
-	get-window Preferences | get-group Tables | get-editbox 
-    -after [get-label "Default number of columns for arguments in table editors"] | set-text 8
-    
-    //check if erro is not shown
-    get-window Preferences | get-label Editor | get-property "getText()" | equals Editor | verify-true
+	set-correct-column-number-in-preference -col_nr "8"
 }
+
 
 //---------------------------------------------------------------------------------------------------------------------
 //check default preference
@@ -67,7 +73,7 @@ with [get-window Preferences | get-group Tables] {
 }
 get-window Preferences | get-button Cancel | click
 
-//open editor and check how mwny columns are in views
+//open editor and check how many columns are in views
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 
 //variables
@@ -105,6 +111,13 @@ set-incorrect-column-number-in-preference -col_nr "-1"
 set-incorrect-column-number-in-preference -col_nr "-150"
 set-incorrect-column-number-in-preference -col_nr "te"
 set-incorrect-column-number-in-preference -col_nr ",."
+
+
+//set correct number of column
+set-correct-column-number-in-preference -col_nr 1
+set-correct-column-number-in-preference -col_nr 5
+set-correct-column-number-in-preference -col_nr 12
+set-correct-column-number-in-preference -col_nr 20
 
 //set to default
 get-window Preferences | get-button "Restore Defaults" | click
