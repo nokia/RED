@@ -35,18 +35,12 @@ public class InsertKeywordCallsCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-//        for (final RobotKeywordCall call : callsToInsert) {
-//            call.setParent(parent);
-//        }
-//        if (index == -1) {
-//            parent.getChildren().addAll(callsToInsert);
-//        } else {
-//            parent.getChildren().addAll(index, callsToInsert);
-//        }
 
         final RobotCodeHoldingElement parentElement = (RobotCodeHoldingElement) parent;
+        int shift = 0;
         for (final RobotKeywordCall call : callsToInsert) {
-            parentElement.insertKeywordCall(modelTableIndex, codeHoldingElementIndex, call);
+            parentElement.insertKeywordCall(modelTableIndex + shift, codeHoldingElementIndex + shift, call);
+            shift++;
         }
  
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);

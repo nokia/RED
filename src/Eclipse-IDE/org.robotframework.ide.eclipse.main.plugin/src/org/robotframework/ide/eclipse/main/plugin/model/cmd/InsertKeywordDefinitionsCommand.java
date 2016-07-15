@@ -33,13 +33,11 @@ public class InsertKeywordDefinitionsCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        for (final RobotKeywordDefinition def : definitionsToInsert) {
-            def.setParent(keywordsSection);
-        }
-        if (index == -1) {
-            keywordsSection.getChildren().addAll(definitionsToInsert);
-        } else {
-            keywordsSection.getChildren().addAll(index, definitionsToInsert);
+
+        int shift = 0;
+        for (final RobotKeywordDefinition robotKeywordDefinition : definitionsToInsert) {
+            keywordsSection.insertKeywordDefinitionCopy(index + shift, robotKeywordDefinition);
+            shift++;
         }
 
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);
