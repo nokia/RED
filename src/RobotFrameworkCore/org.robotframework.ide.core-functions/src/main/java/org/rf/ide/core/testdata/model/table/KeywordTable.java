@@ -40,7 +40,7 @@ public class KeywordTable extends ARobotSectionTable {
 
     public void addKeyword(final UserKeyword keyword, final int position) {
         keyword.setParent(this);
-        userKeywords.set(position, keyword);
+        userKeywords.add(position, keyword);
     }
 
     public void removeKeyword(final UserKeyword keyword) {
