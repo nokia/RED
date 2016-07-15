@@ -13,6 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.presenter.MoveElementHelper;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -89,9 +90,9 @@ public class DictionaryVariable extends AVariable {
         private RobotToken value;
 
         public DictionaryKeyValuePair(final RobotToken raw, final RobotToken key, final RobotToken value) {
-            this.raw = raw;
-            this.key = key;
-            this.value = value;
+            setRaw(raw);
+            setKey(key);
+            setValue(value);
         }
 
         public RobotToken getKey() {
@@ -99,6 +100,7 @@ public class DictionaryVariable extends AVariable {
         }
 
         public void setKey(final RobotToken key) {
+            fixForTheType(key, RobotTokenType.VARIABLES_DICTIONARY_KEY, true);
             this.key = key;
         }
 
@@ -107,6 +109,7 @@ public class DictionaryVariable extends AVariable {
         }
 
         public void setValue(final RobotToken value) {
+            fixForTheType(value, RobotTokenType.VARIABLES_DICTIONARY_VALUE, true);
             this.value = value;
         }
 
@@ -115,9 +118,29 @@ public class DictionaryVariable extends AVariable {
         }
 
         public void setRaw(final RobotToken raw) {
+            fixForTheType(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE, true);
             this.raw = raw;
         }
 
+        protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType) {
+            final List<IRobotTokenType> tagTypes = token.getTypes();
+            if (!tagTypes.contains(expectedMainType)) {
+                if (tagTypes.isEmpty()) {
+                    tagTypes.add(expectedMainType);
+                } else {
+                    tagTypes.add(0, expectedMainType);
+                }
+            }
+        }
+
+        protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType,
+                boolean shouldNullCheck) {
+            if (shouldNullCheck && token == null) {
+                return;
+            }
+
+            fixForTheType(token, expectedMainType);
+        }
     }
 
     @Override
