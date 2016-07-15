@@ -10,13 +10,19 @@ import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
-import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 
 /**
  * @author Michal Anglart
  *
  */
 public class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
+
+    public static final String ELEMENT_ADDER_CONFIG_LABEL = "ELEMENT_ADDER";
+    public static final String ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL = "ELEMENT_ADDER_MULTISTATE";
+    public static final String ELEMENT_ADDER_NESTED_CONFIG_LABEL = "ELEMENT_ADDER_NESTED";
+
+    public static final String ELEMENT_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW";
+    public static final String ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL = "ELEMENT_ADDER_ROW_NESTED";
 
     private final IDataProvider dataProvider;
 
@@ -41,18 +47,17 @@ public class AddingElementLabelAccumulator implements IConfigLabelAccumulator {
             final Object rowObject = rowDataProvider.getRowObject(rowPosition);
             if (rowObject instanceof AddingToken && ((AddingToken) rowObject).isNested()) {
                 if (columnPosition == 0) {
-                    configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_ADDER_NESTED_CONFIG_LABEL);
+                    configLabels.addLabel(ELEMENT_ADDER_NESTED_CONFIG_LABEL);
                 }
-                configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL);
+                configLabels.addLabel(ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL);
             }
         }
 
         if (columnPosition == 0 && dataProvider.getRowCount() - 1 == rowPosition) {
-            configLabels.addLabel(multistate ? AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL
-                    : AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL);
+            configLabels.addLabel(multistate ? ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL : ELEMENT_ADDER_CONFIG_LABEL);
         }
         if (dataProvider.getRowCount() - 1 == rowPosition) {
-            configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+            configLabels.addLabel(ELEMENT_ADDER_ROW_CONFIG_LABEL);
         }
     }
 }

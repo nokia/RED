@@ -9,7 +9,7 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.IEditableRule;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
+import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.configs.SuiteModelEditableRule;
 
 class SettingsTableEditableRule extends SuiteModelEditableRule {
@@ -25,6 +25,6 @@ class SettingsTableEditableRule extends SuiteModelEditableRule {
     @Override
     public boolean isEditable(final ILayerCell cell, final IConfigRegistry configRegistry) {
         return super.isEditable(cell, configRegistry) && (cell.getColumnIndex() > 0
-                || cell.getConfigLabels().hasLabel(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                || cell.getConfigLabels().hasLabel(AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL));
     }
 }

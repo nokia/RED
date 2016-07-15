@@ -28,20 +28,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 
 /**
  * @author Michal Anglart
  */
 public class AddingElementStyleConfiguration extends AbstractRegistryConfiguration {
-
-    public static final String ELEMENT_ADDER_CONFIG_LABEL = "ELEMENT_ADDER";
-    public static final String ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL = "ELEMENT_ADDER_MULTISTATE";
-    public static final String ELEMENT_ADDER_NESTED_CONFIG_LABEL = "ELEMENT_ADDER_NESTED";
-    public static final String ELEMENT_IN_TREE_ADDER_CONFIG_LABEL = "ELEMENT_ADDER_IN_TREE";
-
-    public static final String ELEMENT_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW";
-    public static final String ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL = "ELEMENT_ADDER_ROW_NESTED";
-    public static final String ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL = "ELEMENT_ADDER_ROW_IN_TREE";
 
     private final Font font;
 
@@ -63,25 +55,20 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
         style.setAttributeValue(CellStyleAttributes.FONT, getFont(font, SWT.ITALIC));
 
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
-                ELEMENT_ADDER_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
-                ELEMENT_ADDER_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL);
 
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
-                ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
-                ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
 
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
-                ELEMENT_ADDER_NESTED_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_ADDER_NESTED_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
-                ELEMENT_ADDER_NESTED_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_ADDER_NESTED_CONFIG_LABEL);
         
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.NORMAL,
-                ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, style, DisplayMode.SELECT,
-                ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
-
         final ImageDescriptor addImage = RedImages.getAddImage();
         final Image imageToUse = ImagesManager.getImage(isEditable ? addImage : RedImages.getGreyedImage(addImage));
 
@@ -90,13 +77,11 @@ public class AddingElementStyleConfiguration extends AbstractRegistryConfigurati
                 new ImagePainter(imageToUse));
 
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
-                ELEMENT_ADDER_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new DropdownPainter(cellPainter),
-                DisplayMode.NORMAL, ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
+                DisplayMode.NORMAL, AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, textPainter, DisplayMode.NORMAL,
-                ELEMENT_ADDER_NESTED_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
-                ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_ADDER_NESTED_CONFIG_LABEL);
     }
 
     private Font getFont(final Font fontToReuse, final int style) {
