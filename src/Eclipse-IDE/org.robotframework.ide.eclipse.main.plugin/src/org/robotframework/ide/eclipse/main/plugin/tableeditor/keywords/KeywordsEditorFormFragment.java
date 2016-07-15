@@ -110,9 +110,7 @@ public class KeywordsEditorFormFragment extends CodeEditorFormFragment {
 
     @Override
     public HeaderFilterMatchesCollection collectMatches(final String filter) {
-        final KeywordsMatchesCollection keywordMatches = new KeywordsMatchesCollection();
-        keywordMatches.collect((RobotElement) viewer.getInput(), filter);
-        return keywordMatches;
+        return null;
     }
 
     @Inject

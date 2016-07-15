@@ -23,7 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinition
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsDataProvider.RobotKeywordCallAdder;
 
 import com.google.common.collect.ImmutableBiMap;
 
@@ -48,12 +47,12 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
     public Object getDataValue(final Object rowObject, final int columnIndex) {
 
         if (rowObject instanceof RobotKeywordCall) {
-            RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
+            final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
             if (columnIndex == 0) {
                 return keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW
                         ? keywordCall.getName() : "[" + keywordCall.getName() + "]";
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                List<String> arguments = keywordCall.getArguments();
+                final List<String> arguments = keywordCall.getArguments();
                 if (columnIndex - 1 < arguments.size()) {
                     return arguments.get(columnIndex - 1);
                 }
@@ -61,13 +60,13 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 return keywordCall.getComment();
             }
         } else if (rowObject instanceof RobotKeywordDefinition) {
-            RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
+            final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
             if (columnIndex == 0) {
                 return keywordDef.getName();
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
+                final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
                 if (argumentsSetting != null) {
-                    List<String> arguments = argumentsSetting.getArguments();
+                    final List<String> arguments = argumentsSetting.getArguments();
                     if ((columnIndex - 1) < arguments.size()) {
                         return arguments.get(columnIndex - 1);
                     }
@@ -75,20 +74,18 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
             } else if (columnIndex == (numberOfColumns - 1)) {
                 return keywordDef.getComment();
             }
-        } else if (columnIndex == 0 && rowObject instanceof RobotKeywordCallAdder) {
-            return "...";
         }
 
         return "";
     }
 
     @Override
-    public void setDataValue(Object rowObject, int columnIndex, Object newValue) {
+    public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
 
         final String value = newValue != null ? (String) newValue : "";
 
         if (rowObject instanceof RobotKeywordCall) {
-            RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
+            final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
 
             if (value.startsWith("[") && value.endsWith("]")
                     && keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
@@ -108,7 +105,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
             }
         } else if (rowObject instanceof RobotKeywordDefinition && !value.isEmpty()) {
-            RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
+            final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
             if (columnIndex == 0) {
                 commandsStack.execute(new SetKeywordDefinitionNameCommand(keywordDef, value));
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
@@ -124,17 +121,17 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
     }
 
     @Override
-    public String getColumnProperty(int columnIndex) {
-        String property = properties.get(columnIndex);
+    public String getColumnProperty(final int columnIndex) {
+        final String property = properties.get(columnIndex);
         return property;
     }
 
     @Override
-    public int getColumnIndex(String propertyName) {
+    public int getColumnIndex(final String propertyName) {
         return properties.inverse().get(propertyName);
     }
 
-    public void setNumberOfColumns(int numberOfColumns) {
+    public void setNumberOfColumns(final int numberOfColumns) {
         this.numberOfColumns = numberOfColumns;
     }
 
