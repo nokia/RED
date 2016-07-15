@@ -10,11 +10,13 @@ import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsDataProvider.RobotKeywordCallAdder;
-import org.robotframework.red.nattable.IFilteringDataProvider;
-import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 
 public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumulator {
+
+    public static final String KEYWORD_DEFINITION_CONFIG_LABEL = "KEYWORD_DEFINITION";
+    public static final String KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL = "KEYWORD_DEFINITION_ARGUMENT";
+    public static final String KEYWORD_DEFINITION_SETTING_CONFIG_LABEL = "KEYWORD_DEFINITION_SETTING";
+    
 
     private final IRowDataProvider<Object> dataProvider;
 
@@ -24,27 +26,16 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
 
     @Override
     public void accumulateConfigLabels(final LabelStack configLabels, final int columnPosition, final int rowPosition) {
-        if (dataProvider instanceof IFilteringDataProvider && ((IFilteringDataProvider) dataProvider).isFilterSet()) {
-            return;
-        }
-
-        Object rowObject = dataProvider.getRowObject(rowPosition);
+        final Object rowObject = dataProvider.getRowObject(rowPosition);
 
         if (columnPosition == 0) {
             if (rowObject instanceof RobotDefinitionSetting) {
-                configLabels.addLabel(KeywordDefinitionElementStyleConfiguration.KEYWORD_DEFINITION_SETTING_CONFIG_LABEL);
-            } else if (rowObject instanceof RobotKeywordCallAdder) {
-                configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_CONFIG_LABEL);
-                configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL);
+                configLabels.addLabel(KEYWORD_DEFINITION_SETTING_CONFIG_LABEL);
             } else if (rowObject instanceof RobotKeywordDefinition) {
-                configLabels.addLabel(KeywordDefinitionElementStyleConfiguration.KEYWORD_DEFINITION_CONFIG_LABEL);
+                configLabels.addLabel(KEYWORD_DEFINITION_CONFIG_LABEL);
             }
-        } else if (columnPosition > 0) {
-            if (rowObject instanceof RobotKeywordDefinition) {
-                configLabels.addLabel(KeywordDefinitionElementStyleConfiguration.KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
-            } else if (rowObject instanceof RobotKeywordCallAdder) {
-                configLabels.addLabel(AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL);
-            }
+        } else if (columnPosition > 0 && rowObject instanceof RobotKeywordDefinition) {
+            configLabels.addLabel(KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
         }
 
     }

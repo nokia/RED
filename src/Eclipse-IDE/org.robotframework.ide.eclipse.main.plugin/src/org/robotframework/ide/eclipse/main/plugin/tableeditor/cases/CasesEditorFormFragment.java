@@ -182,7 +182,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         
         sortModel = new GlazedListsSortModel<>(dataProvider.getSortedList(), dataProvider.getPropertyAccessor(),
                 configRegistry, columnHeaderDataLayer);
-        dataProvider.getCasesTreeFormat().setSortModel(sortModel);
+        dataProvider.getTreeFormat().setSortModel(sortModel);
         final SortHeaderLayer<Object> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
                 columnHeaderLayer, sortModel);
 
@@ -292,8 +292,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 final RobotElement createdElement;
                 final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
                 final int selectedRow = selectedCellPositions[0].getRowPosition();
-                final Object rowObject = dataProvider.getRowObject(selectedRow);
-                final AddingToken token = (AddingToken) rowObject;
+                final AddingToken token = (AddingToken) dataProvider.getRowObject(selectedRow);
                 if (token.isNested()) {
                     final RobotCodeHoldingElement testCase = (RobotCodeHoldingElement) token.getParent();
                     commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
