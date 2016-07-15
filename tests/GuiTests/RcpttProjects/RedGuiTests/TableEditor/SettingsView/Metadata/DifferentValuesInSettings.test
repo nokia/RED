@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _RBRS8DlIEeaMk_UgyvYHpA
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/6/16 2:18 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/15/16 10:09 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -53,18 +53,18 @@ with [get-editor "Script.robot"] {
 }
 
 
-check-imports-row-for_11_columns -file "Script.robot" -row 1 -import "Resource" -name "res3.robot" -c11 "#here is param" -default_length false
-check-imports-row-for_11_columns -file "Script.robot" -row 2 -import "Library" -name "String" -default_length false
-check-imports-row-for_11_columns -file "Script.robot" -row 3 -import "Library" -name "Collections" -default_length false
-check-imports-row-for_11_columns -file "Script.robot" -row 4 -import "Library" -name "Telnet" -default_length false
-check-imports-row-for_11_columns -file "Script.robot" -row 5 -import "Library" -name "XML"  -c1 "arg1" -c2 "arg2" -c3 "arg3" -c4 "arg4" -c5 "arg5" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 1 -import "Resource" -name "res3.robot" -c11 "#here is param" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 2 -import "Library" -name "String" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 3 -import "Library" -name "Collections" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 4 -import "Library" -name "Telnet" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 5 -import "Library" -name "XML"  -c1 "arg1" -c2 "arg2" -c3 "arg3" -c4 "arg4" -c5 "arg5" -default_length false
 
-check-imports-row-for_11_columns -file "Script.robot" -row 6 -import "Resource" -name "folder/inside/res2.tsv" -default_length false
-check-imports-row-for_11_columns -file "Script.robot" -row 7 -import "Variables" -name "libs/lib1.py"  -c1 "1" -c2 "2" -c3 "3" -c4 "4" -c5 "5" -c6 "6" -c7 "7" -c8 "8" -c9 "9" -c10 "10" -default_length false
-check-imports-row-for_11_columns -file "Script.robot" -row 8 -import "Library" -name "MyLibrary"  -c1 "my1" -c2 "\\" -c3 "my2" -c4 "\\\\" -c5 "my3" -default_length false
-check-imports-row-for_11_columns -file "Script.robot" -row 9 -import "Library" -name "${LIBRARY}" -default_length false
-check-imports-row-for_11_columns -file "Script.robot" -row 10 -import "Variables" -name "${a}/\ folder/file.py"  -default_length false
-check-imports-row-for_11_columns -file "Script.robot" -row 11 -import  "Variables" -name "libs/lib1.py" -c1 "val1" -c2 "val2" -c11 "#my value | # no more vals" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 6 -import "Resource" -name "folder/inside/res2.tsv" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 7 -import "Variables" -name "libs/lib1.py"  -c1 "1" -c2 "2" -c3 "3" -c4 "4" -c5 "5" -c6 "6" -c7 "7" -c8 "8" -c9 "9" -c10 "10" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 8 -import "Library" -name "MyLibrary"  -c1 "my1" -c2 "\\" -c3 "my2" -c4 "\\\\" -c5 "my3" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 9 -import "Library" -name "${LIBRARY}" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 10 -import "Variables" -name "${a}/\ folder/file.py"  -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 11 -import  "Variables" -name "libs/lib1.py" -c1 "val1" -c2 "val2" -c11 "#my value | # no more vals" -default_length false
 
 
 
@@ -85,12 +85,12 @@ with [get-editor "Test.tsv"] {
     get-section Imports | click
 }
 
-check-imports-row-for_11_columns -file "Test.tsv" -row 1 -import "Variables" -name "../../no lib/libs/lib1.py" -c1 "this is arg to variables"
-check-imports-row-for_11_columns -file "Test.tsv" -row 2 -import "Library" -name "${CURDIR}${/}..${/}resource${/}throughput_check.py" -c5 "# here is error"
-check-imports-row-for_11_columns -file "Test.tsv" -row 3 -import "Library" -name "Collections" -c1 "collect1" -c2 "collect2"
-check-imports-row-for_11_columns -file "Test.tsv" -row 4 -import "Library" -name "XML"
-check-imports-row-for_11_columns -file "Test.tsv" -row 5 -import "Resource" -name "folder\\inside\\res2.tsv"
-check-imports-row-for_11_columns -file "Test.tsv" -row 6 -import "Library" -name "${EXECDIR}${/}testsuite${/}DCM${/}libraries${/}log_analyzer${/}mmt${/}common${/}MMTCommonMessageAnalyse.py"
+check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 1 -import "Variables" -name "../../no lib/libs/lib1.py" -c1 "this is arg to variables"
+check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 2 -import "Library" -name "${CURDIR}${/}..${/}resource${/}throughput_check.py" -c5 "# here is error"
+check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 3 -import "Library" -name "Collections" -c1 "collect1" -c2 "collect2"
+check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 4 -import "Library" -name "XML"
+check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 5 -import "Resource" -name "folder\\inside\\res2.tsv"
+check-imports-row-for-default-or_11_columns -file "Test.tsv" -row 6 -import "Library" -name "${EXECDIR}${/}testsuite${/}DCM${/}libraries${/}log_analyzer${/}mmt${/}common${/}MMTCommonMessageAnalyse.py"
 
 
 
@@ -113,8 +113,8 @@ get-editor "res3.tsv" | get-tab-folder | get-tab-item Settings | click
 get-editor "res3.tsv" | get-section General | get-editbox -index 1 | get-property text | equals "Resoure doc\n"
     + "with 2 lines..." | verify-true
 
-check-imports-row-for_11_columns -file "res3.tsv" -row 1 -import "Library" -name "OperatingSystem" 
-check-imports-row-for_11_columns -file "res3.tsv" -row 2 -import "Variables" -name "libs/lib1.py" 
+check-imports-row-for-default-or_11_columns -file "res3.tsv" -row 1 -import "Library" -name "OperatingSystem" 
+check-imports-row-for-default-or_11_columns -file "res3.tsv" -row 2 -import "Variables" -name "libs/lib1.py" 
 
 
 
