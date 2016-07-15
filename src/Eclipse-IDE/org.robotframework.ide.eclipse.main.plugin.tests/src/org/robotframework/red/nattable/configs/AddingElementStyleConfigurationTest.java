@@ -20,6 +20,7 @@ import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.swt.widgets.Display;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 
 public class AddingElementStyleConfigurationTest {
 
@@ -35,17 +36,17 @@ public class AddingElementStyleConfigurationTest {
         configuration.configureRegistry(configRegistry);
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
-                eq(DisplayMode.NORMAL), eq(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                eq(DisplayMode.NORMAL), eq(AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL));
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
-                eq(DisplayMode.SELECT), eq(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                eq(DisplayMode.SELECT), eq(AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL));
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(ICellPainter.class),
-                eq(DisplayMode.NORMAL), eq(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                eq(DisplayMode.NORMAL), eq(AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL));
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
-                eq(DisplayMode.NORMAL), eq(AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL));
+                eq(DisplayMode.NORMAL), eq(AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL));
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
-                eq(DisplayMode.SELECT), eq(AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL));
+                eq(DisplayMode.SELECT), eq(AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL));
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(ICellPainter.class),
-                eq(DisplayMode.NORMAL), eq(AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL));
+                eq(DisplayMode.NORMAL), eq(AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL));
     }
 }
