@@ -14,6 +14,7 @@ import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.edit.AlwaysDeactivatingCellEditor;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
@@ -44,13 +45,10 @@ public class RedTableEditConfiguration<T extends RobotElement> extends DefaultEd
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITABLE_RULE, editableRule);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
-                AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
-                AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL);
-        configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new AlwaysDeactivatingCellEditor(creator), DisplayMode.NORMAL,
-                AddingElementStyleConfiguration.ELEMENT_IN_TREE_ADDER_ROW_CONFIG_LABEL);
+                AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_NESTED_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR, new RedTextCellEditor(),
                 DisplayMode.NORMAL, GridRegion.BODY);
         configRegistry.registerConfigAttribute(EditConfigAttributes.DATA_VALIDATOR, new DefaultDataValidator());

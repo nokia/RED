@@ -10,6 +10,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -17,11 +18,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordCallsCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordDefinitionsCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.PasteKeywordsHandler.E4PasteKeywordsHandler;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsDataProvider.RobotKeywordCallAdder;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -86,10 +87,10 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
                 commandsStack.execute(
                         new InsertKeywordCallsCommand(firstSelected.get().getParent(), modelTableIndex, index, calls));
             } else {
-                final Optional<RobotKeywordCallAdder> selected = Selections.getOptionalFirstElement(selection,
-                        RobotKeywordCallAdder.class);
-                if (selected.isPresent()) {
-                    commandsStack.execute(new InsertKeywordCallsCommand(selected.get().getParent(), calls));
+                final Optional<AddingToken> selected = Selections.getOptionalFirstElement(selection, AddingToken.class);
+                if (selected.isPresent() && selected.get().getParent() != null) {
+                    commandsStack.execute(new InsertKeywordCallsCommand(
+                            (IRobotCodeHoldingElement) selected.get().getParent(), calls));
                 }
             }
 

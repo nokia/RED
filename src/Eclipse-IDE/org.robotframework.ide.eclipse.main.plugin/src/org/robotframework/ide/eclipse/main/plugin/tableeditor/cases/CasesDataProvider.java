@@ -14,6 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatchesCollection.CasesFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.nattable.CodeElementsTreeFormat;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
 import ca.odell.glazedlists.FilterList;
@@ -34,7 +35,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     
     private final CasesColumnsPropertyAccessor propertyAccessor;
     
-    private final CasesElementsTreeFormat casesTreeFormat;
+    private final CodeElementsTreeFormat casesTreeFormat;
 
     private CasesFilter filter;
     
@@ -42,14 +43,14 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
             final RobotCasesSection section) {
         this.section = section;
         this.propertyAccessor = new CasesColumnsPropertyAccessor(commandsStack, countColumnsNumber());
-        this.casesTreeFormat = new CasesElementsTreeFormat();
-        createFrom(section);
+        this.casesTreeFormat = new CodeElementsTreeFormat();
+        createLists(section);
     }
     
     void setInput(final RobotCasesSection section) {
         propertyAccessor.setColumnCount(countColumnsNumber());
         this.section = section;
-        createFrom(section);
+        createLists(section);
     }
 
     private int countColumnsNumber() {
@@ -68,7 +69,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         return max;
     }
 
-    private void createFrom(final RobotCasesSection section) {
+    private void createLists(final RobotCasesSection section) {
         if (cases == null) {
             casesSortedList = new SortedList<>(GlazedLists.<Object> eventListOf(), null);
             filterList = new FilterList<>(casesSortedList);
@@ -98,7 +99,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         return section;
     }
 
-    CasesElementsTreeFormat getCasesTreeFormat() {
+    CodeElementsTreeFormat getTreeFormat() {
         return casesTreeFormat;
     }
 

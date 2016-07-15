@@ -73,9 +73,7 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
         // CasesElementsInTreeLabelAccumulator.CASE_CALL_CONFIG_LABEL);
 
         final ImageDescriptor caseImage = RedImages.getTestCaseImage();
-        final ICellPainter cellPainter = new CellPainterDecorator(
-                new SearchMatchesTextPainter(matchesSupplier, 2),
-                // new TextPainter(),
+        final ICellPainter cellPainter = new CellPainterDecorator(new SearchMatchesTextPainter(matchesSupplier, 2),
                 CellEdgeEnum.LEFT,
                 new ImagePainter(ImagesManager.getImage(isEditable ? caseImage : RedImages.getGreyedImage(caseImage))));
 

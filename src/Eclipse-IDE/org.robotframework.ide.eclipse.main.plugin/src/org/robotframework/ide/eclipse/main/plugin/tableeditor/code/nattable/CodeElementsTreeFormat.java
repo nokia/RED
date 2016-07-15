@@ -1,17 +1,51 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.code.nattable;
 
 import java.util.Comparator;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 
 import ca.odell.glazedlists.TreeList;
 
-class CasesElementsTreeFormat implements TreeList.Format<Object> {
+public class CodeElementsTreeFormat implements TreeList.Format<Object> {
+
+    private ISortModel sortModel;
+
+    public void setSortModel(final ISortModel treeSortModel) {
+        this.sortModel = treeSortModel;
+    }
+
+    @Override
+    public void getPath(final List<Object> path, final Object element) {
+        if (element instanceof RobotKeywordCall) {
+            path.add(((RobotKeywordCall) element).getParent());
+        } else if (element instanceof AddingToken) {
+            path.add(((AddingToken) element).getParent());
+        }
+        path.add(element);
+    }
+
+    @Override
+    public boolean allowsChildren(final Object element) {
+        return true;
+    }
+
+    @Override
+    public Comparator<? super Object> getComparator(final int depth) {
+        if (sortModel == null || sortModel.getSortDirection(0) == SortDirectionEnum.NONE) {
+            return null;
+        } else if (sortModel.getSortDirection(0) == SortDirectionEnum.ASC) {
+            return depth == 0 ? new CodeAlphabeticalComparator() : new CallsFileOrderComparator();
+        } else if (sortModel.getSortDirection(0) == SortDirectionEnum.DESC) {
+            return depth == 0 ? new ReverseComparator<>(new CodeAlphabeticalComparator())
+                    : new CallsFileOrderComparator();
+        }
+        return null;
+    }
 
     private static class CallsFileOrderComparator implements Comparator<Object> {
 
@@ -34,12 +68,12 @@ class CasesElementsTreeFormat implements TreeList.Format<Object> {
 
     }
 
-    private static class CasesAlphabeticalComparator implements Comparator<Object> {
+    private static class CodeAlphabeticalComparator implements Comparator<Object> {
 
         @Override
         public int compare(final Object o1, final Object o2) {
-            final RobotCase case1 = (RobotCase) o1;
-            final RobotCase case2 = (RobotCase) o2;
+            final RobotCodeHoldingElement case1 = (RobotCodeHoldingElement) o1;
+            final RobotCodeHoldingElement case2 = (RobotCodeHoldingElement) o2;
             return case1.getName().compareToIgnoreCase(case2.getName());
         }
     }
@@ -56,38 +90,5 @@ class CasesElementsTreeFormat implements TreeList.Format<Object> {
         public int compare(final T o1, final T o2) {
             return comparator.compare(o2, o1);
         }
-    }
-
-    private ISortModel sortModel;
-
-    @Override
-    public void getPath(final List<Object> path, final Object element) {
-        if (element instanceof RobotKeywordCall) {
-            path.add(((RobotKeywordCall) element).getParent());
-        } else if (element instanceof AddingToken) {
-            path.add(((AddingToken) element).getParent());
-        }
-        path.add(element);
-    }
-
-    @Override
-    public boolean allowsChildren(final Object element) {
-        return true;
-    }
-
-    @Override
-    public Comparator<? super Object> getComparator(final int depth) {
-        if (sortModel == null || sortModel.getSortDirection(0) == SortDirectionEnum.NONE) {
-            return null;
-        } else if (sortModel.getSortDirection(0) == SortDirectionEnum.ASC) {
-            return depth == 0 ? new CasesAlphabeticalComparator() : new CallsFileOrderComparator();
-        } else if (sortModel.getSortDirection(0) == SortDirectionEnum.DESC) {
-            return depth == 0 ? new ReverseComparator<>(new CasesAlphabeticalComparator()) : new CallsFileOrderComparator();
-        }
-        return null;
-    }
-
-    public void setSortModel(final ISortModel treeSortModel) {
-        this.sortModel = treeSortModel;
     }
 }
