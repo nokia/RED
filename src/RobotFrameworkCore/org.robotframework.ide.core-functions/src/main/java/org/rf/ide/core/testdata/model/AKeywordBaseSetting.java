@@ -145,17 +145,17 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
         for (final AKeywordBaseSetting<T> baseSetting : allThisKindSettings) {
             if (baseSetting.getKeywordName() != null && !baseSetting.getKeywordName().getFilePosition().isNotSet()) {
                 if (!wasAction) {
-                    execRow.setAction(baseSetting.getKeywordName());
+                    execRow.setAction(baseSetting.getKeywordName().copy());
                     wasAction = true;
                 } else {
-                    execRow.addArgument(baseSetting.getKeywordName());
+                    execRow.addArgument(baseSetting.getKeywordName().copy());
                 }
             }
             for (final RobotToken arg : baseSetting.getArguments()) {
-                execRow.addArgument(arg);
+                execRow.addArgument(arg.copy());
             }
             for (final RobotToken c : baseSetting.getComment()) {
-                execRow.addCommentPart(c);
+                execRow.addCommentPart(c.copy());
             }
         }
 
