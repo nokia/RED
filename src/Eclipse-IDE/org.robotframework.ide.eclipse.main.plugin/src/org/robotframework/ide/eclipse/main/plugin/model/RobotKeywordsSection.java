@@ -12,6 +12,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class RobotKeywordsSection extends RobotSuiteFileSection {
 
@@ -33,6 +34,25 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
         
         elements.add(index, keywordDefinition);
         return keywordDefinition;
+    }
+    
+    public void insertKeywordDefinitionCopy(final int index, final RobotKeywordDefinition definition) {
+        final String newKeywordDefinitionName = definition.getName() + " - Copy";
+        final RobotKeywordDefinition newKeywordDefinition = new RobotKeywordDefinition(this, newKeywordDefinitionName,
+                definition.getComment());
+
+        final KeywordTable keywordsTable = (KeywordTable) this.getLinkedElement();
+        final RobotToken nameToken = new RobotToken();
+        nameToken.setText(newKeywordDefinitionName);
+        final UserKeyword userKeyword = new UserKeyword(nameToken);
+        newKeywordDefinition.link(userKeyword);
+        if (index >= 0 && index < keywordsTable.getKeywords().size()) {
+            keywordsTable.addKeyword(userKeyword, index);
+            elements.add(index, newKeywordDefinition);
+        } else {
+            keywordsTable.addKeyword(userKeyword);
+            elements.add(newKeywordDefinition);
+        }
     }
 
     List<RobotKeywordDefinition> getUserDefinedKeywords() {
