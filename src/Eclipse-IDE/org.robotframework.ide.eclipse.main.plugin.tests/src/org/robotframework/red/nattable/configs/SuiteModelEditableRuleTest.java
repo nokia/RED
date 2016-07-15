@@ -17,8 +17,7 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
-import org.robotframework.red.nattable.configs.SuiteModelEditableRule;
+import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 
 public class SuiteModelEditableRuleTest {
 
@@ -40,10 +39,10 @@ public class SuiteModelEditableRuleTest {
 
         when(cell1.getConfigLabels()).thenReturn(new LabelStack("BODY"));
         when(cell2.getConfigLabels())
-                .thenReturn(new LabelStack("BODY", AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL));
+                .thenReturn(new LabelStack("BODY", AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL));
         when(cell3.getConfigLabels())
-                .thenReturn(new LabelStack("BODY", AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL,
-                        AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                .thenReturn(new LabelStack("BODY", AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL,
+                        AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL));
 
         final IEditableRule rule = SuiteModelEditableRule.createEditableRule(model);
 
@@ -63,10 +62,10 @@ public class SuiteModelEditableRuleTest {
 
         when(cell1.getConfigLabels()).thenReturn(new LabelStack("BODY"));
         when(cell2.getConfigLabels())
-                .thenReturn(new LabelStack("BODY", AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL));
+                .thenReturn(new LabelStack("BODY", AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL));
         when(cell3.getConfigLabels())
-                .thenReturn(new LabelStack("BODY", AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL,
-                        AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL));
+                .thenReturn(new LabelStack("BODY", AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL,
+                        AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL));
 
         final IEditableRule rule = SuiteModelEditableRule.createEditableRule(model);
 

@@ -11,12 +11,11 @@ import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsTableEditableRule;
-import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
+import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 
 public class SettingsTableEditableRuleTest {
 
-    private IEditableRule editableRule = SettingsTableEditableRule
+    private final IEditableRule editableRule = SettingsTableEditableRule
             .createEditableRule(new RobotSuiteFileCreator().build());
 
     @Test
@@ -30,7 +29,7 @@ public class SettingsTableEditableRuleTest {
 
     private ILayerCell createCell(final int columnIndex, final boolean hasElementAdderLabel) {
         final LabelStack labelStack = mock(LabelStack.class);
-        when(labelStack.hasLabel(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL))
+        when(labelStack.hasLabel(AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL))
                 .thenReturn(hasElementAdderLabel);
         final ILayerCell cell = mock(ILayerCell.class);
         when(cell.getColumnIndex()).thenReturn(columnIndex);

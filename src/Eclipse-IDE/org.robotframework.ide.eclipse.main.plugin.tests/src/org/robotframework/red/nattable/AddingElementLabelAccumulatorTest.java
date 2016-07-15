@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.junit.Test;
-import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 
 public class AddingElementLabelAccumulatorTest {
 
@@ -31,11 +30,11 @@ public class AddingElementLabelAccumulatorTest {
 
                 if (isInLeftBottomCorner) {
                     assertThat(configLabels.getLabels()).containsOnly(
-                            AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL,
-                            AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                            AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL,
+                            AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else if (isInBottomRow) {
                     assertThat(configLabels.getLabels())
-                            .containsOnly(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                            .containsOnly(AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else {
                     assertThat(configLabels.getLabels()).isEmpty();
                 }
@@ -76,11 +75,11 @@ public class AddingElementLabelAccumulatorTest {
 
                 if (isInLeftBottomCorner) {
                     assertThat(configLabels.getLabels())
-                            .containsOnly(AddingElementStyleConfiguration.ELEMENT_ADDER_CONFIG_LABEL,
-                                    AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                            .containsOnly(AddingElementLabelAccumulator.ELEMENT_ADDER_CONFIG_LABEL,
+                                    AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else if (isInBottomRow) {
                     assertThat(configLabels.getLabels())
-                            .containsOnly(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                            .containsOnly(AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else {
                     assertThat(configLabels.getLabels()).isEmpty();
                 }
@@ -105,11 +104,11 @@ public class AddingElementLabelAccumulatorTest {
 
                 if (isInLeftBottomCorner) {
                     assertThat(configLabels.getLabels()).containsOnly(
-                            AddingElementStyleConfiguration.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL,
-                            AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                            AddingElementLabelAccumulator.ELEMENT_MULTISTATE_ADDER_CONFIG_LABEL,
+                            AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else if (isInBottomRow) {
                     assertThat(configLabels.getLabels())
-                            .containsOnly(AddingElementStyleConfiguration.ELEMENT_ADDER_ROW_CONFIG_LABEL);
+                            .containsOnly(AddingElementLabelAccumulator.ELEMENT_ADDER_ROW_CONFIG_LABEL);
                 } else {
                     assertThat(configLabels.getLabels()).isEmpty();
                 }
