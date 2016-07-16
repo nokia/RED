@@ -16,9 +16,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
  */
 public class AModelElementElementsHelper {
 
-    public static List<RobotToken> collect(final List<? extends AModelElement<?>> es) {
+    public static List<RobotToken> collect(final List<? extends AModelElement<?>> anyModelElements) {
         final List<RobotToken> toks = new ArrayList<RobotToken>(0);
-        for (final AModelElement<?> e : es) {
+        for (final AModelElement<?> e : anyModelElements) {
             toks.addAll(collectFromAModel(e));
         }
 
