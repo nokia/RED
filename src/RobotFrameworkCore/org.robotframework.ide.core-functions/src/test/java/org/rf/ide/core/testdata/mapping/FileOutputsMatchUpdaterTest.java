@@ -19,7 +19,7 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.mapping.FileOutputsMatchUpdater.NotSameOutputFiles;
+import org.rf.ide.core.testdata.mapping.FileOutputsMatchUpdater.DifferentOutputFile;
 import org.rf.ide.core.testdata.mapping.collect.RobotTokensCollector;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
@@ -126,7 +126,7 @@ public class FileOutputsMatchUpdaterTest {
         return found;
     }
 
-    @Test(expected = NotSameOutputFiles.class)
+    @Test(expected = DifferentOutputFile.class)
     public void test_validateThatTheSameTokensInView_areNotTheSame_oneType_differentSize_butLastIsNotEmptyInOldAndMissingInNew() {
         // prepare
         final ListMultimap<RobotTokenType, RobotToken> oldViewAboutTokens = ArrayListMultimap.create();
@@ -216,7 +216,7 @@ public class FileOutputsMatchUpdaterTest {
         new FileOutputsMatchUpdater().validateBasicThatOutputFromSameFile(oldModifiedOutput, newOutput);
     }
 
-    @Test(expected = NotSameOutputFiles.class)
+    @Test(expected = DifferentOutputFile.class)
     public void test_validateBasicThatOutputFromSameFile_notTheSameFiles() {
         // prepare
         final RobotFileOutput oldModifiedOutput = mock(RobotFileOutput.class);

@@ -108,11 +108,11 @@ public class FileOutputsMatchUpdater {
             final Path oldPathNormalized = oldModifiedOutput.getProcessedFile().toPath().normalize();
             final Path newContentFileNormalized = alreadyDumpedContent.getProcessedFile().toPath().normalize();
             if (!Files.isSameFile(oldPathNormalized, newContentFileNormalized)) {
-                throw new NotSameOutputFiles(
-                        "File " + newContentFileNormalized + " is not expected " + oldPathNormalized);
+                throw new DifferentOutputFile(
+                        "File " + newContentFileNormalized + " is not expected, old path: " + oldPathNormalized);
             }
         } catch (final IOException e) {
-            throw new NotSameOutputFiles(e);
+            throw new DifferentOutputFile(e);
         }
     }
 
@@ -134,7 +134,7 @@ public class FileOutputsMatchUpdater {
                 if (oldNotEmpty == newNotEmpty) {
                     toksSize = oldNotEmpty;
                 } else {
-                    throw new NotSameOutputFiles("Type " + t + " has not the same number of elements in outputs.");
+                    throw new DifferentOutputFile("Type " + t + " has not the same number of elements in outputs.");
                 }
             }
 
@@ -143,7 +143,7 @@ public class FileOutputsMatchUpdater {
                 final RobotToken rtNew = newToks.get(i);
                 if (!rtOld.getText().equals(rtNew.getText())) {
                     if (!(rtOld.getText().trim().isEmpty() && rtNew.getText().trim().equals("\\"))) {
-                        throw new NotSameOutputFiles("Token type " + t + " with index " + i
+                        throw new DifferentOutputFile("Token type " + t + " with index " + i
                                 + " doesn't contain the same content as old. Expected " + rtOld.getText() + " got "
                                 + rtNew.getText());
                     }
@@ -175,15 +175,15 @@ public class FileOutputsMatchUpdater {
         return index;
     }
 
-    public static class NotSameOutputFiles extends RuntimeException {
+    public static class DifferentOutputFile extends RuntimeException {
 
         private static final long serialVersionUID = -4734971783082313050L;
 
-        public NotSameOutputFiles(final String errorMsg) {
+        public DifferentOutputFile(final String errorMsg) {
             super(errorMsg);
         }
 
-        public NotSameOutputFiles(final Exception e) {
+        public DifferentOutputFile(final Exception e) {
             super(e);
         }
     }
