@@ -298,28 +298,43 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
             AModelElement<SettingTable> currentCorrector = correctors.get(hitCorrectors);
             for (int i = 0; i < src.size(); i++) {
-                final AModelElement<SettingTable> m = src.get(i);
+                AModelElement<SettingTable> m = src.get(i);
                 if (correctors.contains(m)) {
                     if (currentCorrector == m) {
                         hitCorrectors++;
                         if (hitCorrectors < correctors.size()) {
                             currentCorrector = correctors.get(hitCorrectors);
+                        } else {
+                            if (isNextTheSameAsCurrent(src, m, i)) {
+                                src.remove(i);
+                                i--;
+                            }
                         }
                     } else {
-                        if (currentCorrector.getBeginPosition().isNotSet()) {
-                            src.add(i, currentCorrector);
+                        if (hitCorrectors < correctors.size()) {
+                            if (currentCorrector.getBeginPosition().isNotSet()) {
+                                src.add(i, currentCorrector);
+                            } else {
+                                src.set(i, currentCorrector);
+                            }
                         } else {
-                            src.set(i, currentCorrector);
+                            src.remove(i);
                         }
+
                         i--;
                     }
                 }
             }
 
-            if (hitCorrectors != correctors.size()) {
+            if (hitCorrectors < correctors.size()) {
                 throw new IllegalStateException("Not all elements included in output before.");
             }
         }
+    }
+
+    private boolean isNextTheSameAsCurrent(final List<AModelElement<SettingTable>> src,
+            final AModelElement<SettingTable> m, int currentIndex) {
+        return (currentIndex + 1 < src.size() && m == src.get(currentIndex + 1));
     }
 
     private List<AModelElement<VariableTable>> sortVariables(final VariableTable variableTable) {
