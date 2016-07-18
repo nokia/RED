@@ -6,23 +6,10 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _KeFc8P4OEeSvjNrJkS7N6Q
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 7/6/16 2:59 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/18/16 11:00 AM
 Testcase-Type: ecl
 
-------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
-Content-Type: text/plain
-Entry-Name: .description
-
-Testcase:
- Creates 'Settings' section
- Adds one metadata line 
- Check if it visible in Text editor
- Add 2 more & check
- delete middle one by removing each row & check
- delete whole row & check
-
-------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
@@ -81,7 +68,9 @@ with [get-editor "TestFile.robot"] {
         set-caret-pos 2 24
         key-type "NUMPAD_ENTER" "\\u000D"
         key-type "M1+SPACE"
+        wait 300
         type-text me
+        wait 200
         key-type Enter
         type-text "Second line  is here  #with comment"
         key-type "M1+s"
