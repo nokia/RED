@@ -1,0 +1,30 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>PyDev and PyLint with RED - Robot Editor</h2>
+PyDev and PyLint can be used together with RED - Robot Editor,those components needs to be installed and properly configured first.<br>
+Remember that PyDev has its own perspective, to open python files in RED with PyDev editor, use <i>right-click menu Open With Python Editor</i>
+<h3>PyDev installation</h3>
+We recommend to install PyDev from Eclipse Marketplace:<br>
+<ul>
+<li>Open Eclipse Marketplace: <i>Help -&gt Eclipse Marketplace </i></li>
+<li>In Find field enter PyDev and proceed with installation instructions</li>
+<li>When prompted, restart Eclipse/RED Product</li>
+<li>Check PyDev preferences for python interpreters under <i>Windows -&gt Preferences -&gt PyDev</i></li>
+</ul>
+<h3>PyLint installation</h3>
+We recommend to install PyLint with pip:<br>
+<ul>
+<li>Install PyLint with pip from console/command line: <i>pip install pylint</i></li>
+<li>Restart Eclipse/RED Product</li>
+<li>Enable PyLint,enable redirect PyLint output to console,provide proper PyLint executable paths in PyDev preferences: <i>Windows -&gt Preferences -&gt PyDev -&gt PyLint</i></li>
+<li>Sometimes it is necessary to set folder with sources for PyDev in Project properties: <i>right click on Project -&gt Properites -&gt PyDev - PYTHONPATH -&gt Add source folder</i></li>
+<li>Restart Eclipse/RED Product</li>
+</ul>
+
+</body>
+</html>
