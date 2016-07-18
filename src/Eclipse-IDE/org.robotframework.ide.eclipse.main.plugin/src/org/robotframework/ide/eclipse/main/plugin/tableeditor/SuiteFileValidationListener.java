@@ -2,8 +2,10 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -158,6 +160,7 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
     private void browseMatchingMarkers(final MarkerVisitor visitor, final List<RobotToken> tokens) {
         // TODO : consider using e.g. segment tree for searching using segments (ranges), when
         // performance becomes the issue
+        final Set<IMarker> alreadyVisitedMarkers = new HashSet<>();
         for (final RobotToken token : tokens) {
             for (final IMarker marker : markers.values()) {
                 final FilePosition tokenPosition = token.getFilePosition();
@@ -166,7 +169,9 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
                         tokenPosition.getOffset() + token.getRaw().length());
                 final Range<Integer> markerRange = getMarkerRange(marker);
 
-                if (markerRange != null && tokenRange.isConnected(markerRange)) {
+                if (markerRange != null && tokenRange.isConnected(markerRange)
+                        && !alreadyVisitedMarkers.contains(marker)) {
+                    alreadyVisitedMarkers.add(marker);
                     final boolean shallContinue = visitor.visit(marker);
                     if (!shallContinue) {
                         return;
