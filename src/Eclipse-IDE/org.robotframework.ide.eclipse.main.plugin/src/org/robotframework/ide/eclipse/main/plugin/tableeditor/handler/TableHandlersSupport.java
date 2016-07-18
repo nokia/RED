@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
@@ -16,15 +15,11 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.GeneralSettingsModel;
 
 /**
  * @author mmarzec
@@ -96,25 +91,6 @@ public class TableHandlersSupport {
             keywordDefsCopy.add(newDef);
         }
         return keywordDefsCopy;
-    }
-    
-    public static int findTableIndexOfSelectedSetting(final RobotSettingsSection section,
-            final RobotSetting selectedSetting) {
-        if (selectedSetting.getGroup() == SettingsGroup.METADATA) {
-            return section.getMetadataSettings().indexOf(selectedSetting);
-        } else if (selectedSetting.getGroup() == SettingsGroup.NO_GROUP) {
-            final Iterator<RobotElement> generalSettingsIterator = GeneralSettingsModel.fillSettingsMapping(section)
-                    .values()
-                    .iterator();
-            int i = 0;
-            while (generalSettingsIterator.hasNext()) {
-                if (selectedSetting.equals(generalSettingsIterator.next())) {
-                    return i;
-                }
-                i++;
-            }
-        }
-        return section.getImportSettings().indexOf(selectedSetting);
     }
 
     public static int findNextSelectedElementRowIndex(final int initialIndex, final SelectionLayer selectionLayer) {

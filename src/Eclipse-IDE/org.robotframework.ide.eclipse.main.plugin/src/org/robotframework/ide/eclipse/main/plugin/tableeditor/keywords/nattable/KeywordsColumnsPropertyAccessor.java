@@ -22,6 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCo
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -87,7 +88,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
 
-            if (value.startsWith("[") && value.endsWith("]")
+            if (value.startsWith("[") && value.endsWith("]") && columnIndex == 0
                     && keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
                 final boolean isKeywordSettingCreated = createNewKeywordSettingAndRemoveOldExeRow(value, keywordCall);
                 if (isKeywordSettingCreated) {
@@ -103,8 +104,12 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 } else if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
                 }
-            } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
+            } else {
+                if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
+                    commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
+                } else if (columnIndex == (numberOfColumns - 1)) {
+                    commandsStack.execute(new SetKeywordSettingCommentCommand(keywordCall, value));
+                }
             }
         } else if (rowObject instanceof RobotKeywordDefinition && !value.isEmpty()) {
             final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
