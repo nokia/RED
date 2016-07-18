@@ -45,7 +45,9 @@
     </topic>
 	<topic href="doc/user_guide/headless.html" label="Headless - running validation in command line">
     </topic>
-
+	<topic href="doc/user_guide/red_pylint.html" label="PyDev with PyLint together with RED">
+    </topic>
+	
 
  </topic>
 </toc>
