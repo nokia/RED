@@ -39,7 +39,9 @@ public class InsertKeywordCallsCommand extends EditorCommand {
         final RobotCodeHoldingElement parentElement = (RobotCodeHoldingElement) parent;
         int shift = 0;
         for (final RobotKeywordCall call : callsToInsert) {
-            parentElement.insertKeywordCall(modelTableIndex + shift, codeHoldingElementIndex + shift, call);
+            if(call.getLinkedElement() != null) {
+                parentElement.insertKeywordCall(modelTableIndex + shift, codeHoldingElementIndex + shift, call);
+            }
             shift++;
         }
  

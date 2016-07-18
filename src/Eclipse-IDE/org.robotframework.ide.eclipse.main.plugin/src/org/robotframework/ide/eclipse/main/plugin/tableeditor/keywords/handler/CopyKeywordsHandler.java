@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyKeywordsHandler.E4CopyKeywordsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -34,11 +35,11 @@ public class CopyKeywordsHandler extends DIParameterizedHandler<E4CopyKeywordsHa
             final List<RobotKeywordCall> calls = Selections.getElements(selection, RobotKeywordCall.class);
 
             if (!defs.isEmpty()) {
-                final Object data = defs.toArray(new RobotKeywordDefinition[0]);
+                final Object data = TableHandlersSupport.createKeywordDefsCopy(defs).toArray(new RobotKeywordDefinition[0]);
                 clipboard.insertContent(data);
 
             } else if (!calls.isEmpty()) {
-                final Object data = calls.toArray(new RobotKeywordCall[0]);
+                final Object data = TableHandlersSupport.createKeywordCallsCopy(calls).toArray(new RobotKeywordCall[0]);
                 clipboard.insertContent(data);
             }
         }

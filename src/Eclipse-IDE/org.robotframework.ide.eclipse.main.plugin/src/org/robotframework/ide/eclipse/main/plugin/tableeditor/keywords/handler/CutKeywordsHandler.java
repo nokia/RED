@@ -18,6 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCom
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutKeywordsHandler.E4CutKeywordsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -40,12 +41,12 @@ public class CutKeywordsHandler extends DIParameterizedHandler<E4CutKeywordsHand
             final List<RobotKeywordCall> calls = Selections.getElements(selection, RobotKeywordCall.class);
 
             if (!defs.isEmpty()) {
-                final Object data = defs.toArray(new RobotKeywordDefinition[0]);
+                final Object data = TableHandlersSupport.createKeywordDefsCopy(defs).toArray(new RobotKeywordDefinition[0]);
                 clipboard.insertContent(data);
                 commandsStack.execute(new DeleteKeywordDefinitionCommand(defs));
 
             } else if (!calls.isEmpty()) {
-                final Object data = calls.toArray(new RobotKeywordCall[0]);
+                final Object data = TableHandlersSupport.createKeywordCallsCopy(calls).toArray(new RobotKeywordCall[0]);
                 clipboard.insertContent(data);
                 commandsStack.execute(new DeleteKeywordCallCommand(calls));
             }

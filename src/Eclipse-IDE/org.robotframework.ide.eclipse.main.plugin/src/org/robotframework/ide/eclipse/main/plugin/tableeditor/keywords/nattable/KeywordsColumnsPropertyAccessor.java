@@ -89,8 +89,10 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
             if (value.startsWith("[") && value.endsWith("]")
                     && keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
-                createNewKeywordSettingAndRemoveOldExeRow(value, keywordCall);
-                return;
+                final boolean isKeywordSettingCreated = createNewKeywordSettingAndRemoveOldExeRow(value, keywordCall);
+                if (isKeywordSettingCreated) {
+                    return;
+                }
             }
 
             if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
@@ -135,7 +137,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         this.numberOfColumns = numberOfColumns;
     }
 
-    private void createNewKeywordSettingAndRemoveOldExeRow(final String value, final RobotKeywordCall keywordCall) {
+    private boolean createNewKeywordSettingAndRemoveOldExeRow(final String value, final RobotKeywordCall keywordCall) {
         final RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(value);
         if (tokenType != RobotTokenType.UNKNOWN && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS
                 && tokenType != RobotTokenType.KEYWORD_SETTING_DOCUMENTATION) {
@@ -149,6 +151,8 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
             commandsStack.execute(
                     new CreateFreshKeywordSettingCommand(keywordDefinition, index, value, keywordCall.getArguments()));
+            return true;
         }
+        return false;
     }
 }

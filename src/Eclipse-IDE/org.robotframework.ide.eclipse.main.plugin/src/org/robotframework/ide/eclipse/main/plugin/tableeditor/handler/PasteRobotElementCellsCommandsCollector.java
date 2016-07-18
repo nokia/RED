@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -44,25 +43,32 @@ public abstract class PasteRobotElementCellsCommandsCollector {
             if (robotElementsFromClipboard != null && robotElementsFromClipboard.length > 0
                     && cellPositionsFromClipboard != null && cellPositionsFromClipboard.length > 0) {
                 final int tableColumnsCount = selectionLayer.getColumnCount();
-                int clipboardElementsIndex = 0;
+                int clipboardElementsCounter = 0;
                 int currentClipboardElementRowIndex = cellPositionsFromClipboard[0].getRowPosition();
+                int currentSelectedElementRowIndex = 0;
                 for (final RobotElement selectedElement : selectedElements) {
-                    final RobotElement elementFromClipboard = robotElementsFromClipboard[clipboardElementsIndex];
-                    if (clipboardElementsIndex + 1 < robotElementsFromClipboard.length) {
-                        clipboardElementsIndex++;
+                    final RobotElement elementFromClipboard = robotElementsFromClipboard[clipboardElementsCounter];
+                    if (clipboardElementsCounter + 1 < robotElementsFromClipboard.length) {
+                        clipboardElementsCounter++;
+                    } else {
+                        clipboardElementsCounter = 0;
                     }
-                    final List<Integer> selectedElementColumnsIndexes = findSelectedColumnsIndexes(
-                            findSelectedElementTableIndex(selectedElement.getParent(), selectedElement),
-                            selectionLayer);
+                    currentSelectedElementRowIndex = TableHandlersSupport
+                            .findNextSelectedElementRowIndex(currentSelectedElementRowIndex, selectionLayer);
+                    final List<Integer> selectedElementColumnsIndexes = TableHandlersSupport
+                            .findSelectedColumnsIndexesByRowIndex(currentSelectedElementRowIndex, selectionLayer);
                     final List<Integer> clipboardElementColumnsIndexes = findCurrentClipboardElementColumnsIndexes(
                             currentClipboardElementRowIndex, cellPositionsFromClipboard);
                     currentClipboardElementRowIndex = calculateNextClipboardElementRowIndex(
                             currentClipboardElementRowIndex, cellPositionsFromClipboard);
                     if (!clipboardElementColumnsIndexes.isEmpty()) {
+                        int clipboardElementColumnsCounter = 0;
                         for (int i = 0; i < selectedElementColumnsIndexes.size(); i++) {
-                            int clipboardElementColumnIndex = clipboardElementColumnsIndexes.get(0);
-                            if (i > 0 && i < clipboardElementColumnsIndexes.size()) {
-                                clipboardElementColumnIndex = clipboardElementColumnsIndexes.get(i);
+                            int clipboardElementColumnIndex = clipboardElementColumnsIndexes.get(clipboardElementColumnsCounter);
+                            if (clipboardElementColumnsCounter + 1 < clipboardElementColumnsIndexes.size()) {
+                                clipboardElementColumnsCounter++;
+                            } else {
+                                clipboardElementColumnsCounter = 0;
                             }
                             final List<String> valuesToPaste = findValuesToPaste(elementFromClipboard,
                                     clipboardElementColumnIndex, tableColumnsCount);
@@ -88,27 +94,11 @@ public abstract class PasteRobotElementCellsCommandsCollector {
 
     protected abstract RobotElement[] getRobotElementsFromClipboard(final RedClipboard clipboard);
 
-    protected abstract int findSelectedElementTableIndex(final RobotElement section,
-            final RobotElement selectedElement);
-
     protected abstract List<String> findValuesToPaste(final RobotElement elementFromClipboard,
             final int clipboardElementColumnIndex, final int tableColumnsCount);
 
     protected abstract List<EditorCommand> collectPasteCommandsForSelectedElement(final RobotElement selectedElement,
             final List<String> valuesToPaste, final int selectedElementColumnIndex, final int tableColumnsCount);
-
-    private List<Integer> findSelectedColumnsIndexes(final int selectedElementTableIndex,
-            final SelectionLayer selectionLayer) {
-
-        final List<Integer> columnsIndexes = new ArrayList<>();
-        final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
-        for (int i = 0; i < selectedCellPositions.length; i++) {
-            if (selectedCellPositions[i].rowPosition == selectedElementTableIndex) {
-                columnsIndexes.add(selectedCellPositions[i].columnPosition);
-            }
-        }
-        return columnsIndexes;
-    }
 
     private List<Integer> findCurrentClipboardElementColumnsIndexes(final int currentClipboardElementRowIndex,
             final PositionCoordinateSerializer[] positionsCoordinates) {

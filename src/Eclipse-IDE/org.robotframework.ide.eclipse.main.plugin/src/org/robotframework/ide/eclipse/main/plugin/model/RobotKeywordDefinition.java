@@ -51,7 +51,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
     private UserKeyword keyword;
     
-    RobotKeywordDefinition(final RobotKeywordsSection parent, final String name, final String comment) {
+    public RobotKeywordDefinition(final RobotKeywordsSection parent, final String name, final String comment) {
         super(parent, name, comment);
     }
 
