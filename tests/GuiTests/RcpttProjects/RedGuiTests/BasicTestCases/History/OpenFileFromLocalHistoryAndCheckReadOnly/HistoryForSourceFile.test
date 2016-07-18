@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _pFLdEISMEeWImNPXuPy_LQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/18/16 12:42 PM
+Save-Time: 7/18/16 2:25 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -100,6 +100,9 @@ get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-sectio
     | click
     
 get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-section General | get-editbox -index 1 
+    | set-focus
+    
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 1 | get-section General | get-editbox -index 1 
     | get-property "getEditable()" | equals false | verify-true
     
 //check Keywords - empty
@@ -167,6 +170,8 @@ with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-section I
 //check if doc is not editable
 get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-section General | get-editbox 
     | click
+get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-section General | get-editbox 
+    | set-focus    
     
 get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | get-section General | get-editbox 
     | get-property "getEditable()" | equals false | verify-true
@@ -248,6 +253,7 @@ with [get-editor "TestFile.robot" | get-section General| get-canvas] {
 
 //check if doc is not editable
 get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | click
+get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | set-focus
 get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property "getEditable()" | equals false 
     | verify-true
 
