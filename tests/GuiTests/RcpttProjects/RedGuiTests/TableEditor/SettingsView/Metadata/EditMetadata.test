@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KeFc8P4OEeSvjNrJkS7N6Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/18/16 11:00 AM
+Save-Time: 7/18/16 5:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -84,7 +84,7 @@ with [get-editor "TestFile.robot"] {
 //check if added in Source is shown in table
 check-metadata-row -file "TestFile.robot" -row 1 -metadata  "new" -val "text"
 
-try -times 5 -delay 1000 -command{
+try -times 10 -delay 1000 -command{
 	check-metadata-row -file "TestFile.robot" -row 2 -metadata "Second line" -val "is here" -comment "#with comment"
 }
 
