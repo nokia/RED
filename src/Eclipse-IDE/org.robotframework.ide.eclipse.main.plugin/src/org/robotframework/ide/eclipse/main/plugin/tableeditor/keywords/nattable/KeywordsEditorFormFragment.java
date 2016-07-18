@@ -14,6 +14,7 @@ import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -335,11 +336,50 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             table.refresh();
         }
     }
+    
+    @Inject
+    @Optional
+    private void whenKeywordDefinitionIsAdded(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            sortModel.clear();
+        }
+        whenKeywordDefinitionIsAddedOrRemoved(section);
+    }
 
     @Inject
     @Optional
-    private void whenKeywordIsAddedOrRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+    private void whenKeywordDefinitionIsRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED) final RobotSuiteFileSection section) {
+        whenKeywordDefinitionIsAddedOrRemoved(section);
+        if (getSection() != null && section.getChildren().isEmpty()) {
+            selectionLayerAccessor.getSelectionLayer().clear();
+        }
+    }
+
+    @Inject
+    @Optional
+    private void whenKeywordDefinitionIsMoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_MOVED) final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            sortModel.clear();
+        }
+        final ISelection oldSelection = selectionProvider.getSelection();
+        whenKeywordDefinitionIsAddedOrRemoved(section);
+        selectionProvider.setSelection(oldSelection);
+    }
+    
+    @Inject
+    @Optional
+    private void whenKeywordDefinitionArgumentChanged(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE) final RobotKeywordDefinition parent) {
+        if (parent.getSuiteFile() == fileModel) {
+            sortModel.clear();
+        }
+        whenKeywordDefinitionIsAddedOrRemoved(parent.getParent());
+    }
+
+    private void whenKeywordDefinitionIsAddedOrRemoved(RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
             dataProvider.setInput(getSection());
@@ -350,17 +390,37 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenKeywordIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED) final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
+    private void whenKeywordCallIsAdded(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final RobotKeywordDefinition parent) {
+        if (parent.getSuiteFile() == fileModel) {
             sortModel.clear();
+        }
+        whenKeywordCallIsAddedOrRemoved(parent);
+    }
+
+    @Inject
+    @Optional
+    private void whenKeywordCallIsRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED) final RobotKeywordDefinition parent) {
+        whenKeywordCallIsAddedOrRemoved(parent);
+        if (getSection() != null && parent.getChildren().isEmpty()) {
+            selectionLayerAccessor.getSelectionLayer().clear();
         }
     }
 
     @Inject
     @Optional
-    private void whenKeywordCallIsAddedOrRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_STRUCTURAL_ALL) final RobotKeywordDefinition definition) {
+    private void whenKeywordCallIsMoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED) final RobotKeywordDefinition parent) {
+        if (parent.getSuiteFile() == fileModel) {
+            sortModel.clear();
+        }
+        final ISelection oldSelection = selectionProvider.getSelection();
+        whenKeywordCallIsAddedOrRemoved(parent);
+        selectionProvider.setSelection(oldSelection);
+    }
+
+    private void whenKeywordCallIsAddedOrRemoved(final RobotKeywordDefinition definition) {
         if (definition.getSuiteFile() == fileModel) {
             sortModel.clear();
             dataProvider.setInput(getSection());
@@ -374,7 +434,6 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private void whenKeywordDetailIsChanged(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_CHANGE_ALL) final RobotKeywordDefinition definition) {
         if (definition.getSuiteFile() == fileModel) {
-            table.update();
             table.refresh();
             setDirty();
         }
@@ -385,7 +444,6 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private void whenKeywordCallDetailIsChanged(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL) final RobotKeywordCall keywordCall) {
         if (keywordCall.getParent() instanceof RobotKeywordDefinition && keywordCall.getSuiteFile() == fileModel) {
-            table.update();
             table.refresh();
             setDirty();
         }

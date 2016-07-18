@@ -59,7 +59,11 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
         ModelType modelType = linkedElement.getModelType();
         if(modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
-            ((RobotExecutableRow<?>) linkedElement).setArgument(index, value);
+            if(value != null) {
+                ((RobotExecutableRow<?>) linkedElement).setArgument(index, value);
+            } else if (index < ((RobotExecutableRow<?>) linkedElement).getArguments().size()) {
+                ((RobotExecutableRow<?>) linkedElement).removeElementToken(index);
+            }
         } else {
             new SettingTableModelUpdater().update(linkedElement, index, value);
         }
