@@ -33,6 +33,9 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
         }
         
         updateModelElement();
+        
+        keywordCall.setComment(CommentServiceHandler.consolidate((ICommentHolder) keywordCall.getLinkedElement(),
+                ETokenSeparator.PIPE_WRAPPED_WITH_SPACE));
 
         // it has to be send, not posted
         // otherwise it is not possible to traverse between cells, because the
@@ -55,7 +58,14 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
         } else {
             new SettingTableModelUpdater().updateComment(keywordCall.getLinkedElement(), newComment);
         }
-        keywordCall.setComment(CommentServiceHandler.consolidate((ICommentHolder) keywordCall.getLinkedElement(),
-                ETokenSeparator.PIPE_WRAPPED_WITH_SPACE));
     }
+
+    protected RobotKeywordCall getKeywordCall() {
+        return keywordCall;
+    }
+
+    protected String getNewComment() {
+        return newComment;
+    }
+
 }

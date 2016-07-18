@@ -15,6 +15,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
@@ -114,7 +116,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             final String name = argument.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(argument.getArguments(), TokenFunctions.tokenToString()));
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            final String comment = CommentServiceHandler.consolidate(argument, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
             setting.link(argument);
             getChildren().add(setting);
         }
@@ -122,14 +125,16 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             final String name = documentation.getDeclaration().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(documentation.getDocumentationText(), TokenFunctions.tokenToString()));
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            final String comment = CommentServiceHandler.consolidate(documentation, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
             setting.link(documentation);
             getChildren().add(setting);
         }
         for (final KeywordTags tags : keyword.getTags()) {
             final String name = tags.getDeclaration().getText().toString();
             final List<String> args = newArrayList(Lists.transform(tags.getTags(), TokenFunctions.tokenToString()));
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            final String comment = CommentServiceHandler.consolidate(tags, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
             setting.link(tags);
             getChildren().add(setting);
         }
@@ -138,7 +143,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             final List<String> args = timeout.getTimeout() == null ? new ArrayList<String>()
                     : newArrayList(timeout.getTimeout().getText().toString());
             args.addAll(Lists.transform(timeout.getMessage(), TokenFunctions.tokenToString()));
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            final String comment = CommentServiceHandler.consolidate(timeout, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
             setting.link(timeout);
             getChildren().add(setting);
         }
@@ -147,7 +153,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             final List<String> args = teardown.getKeywordName() == null ? new ArrayList<String>()
                     : newArrayList(teardown.getKeywordName().getText().toString());
             args.addAll(Lists.transform(teardown.getArguments(), TokenFunctions.tokenToString()));
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            final String comment = CommentServiceHandler.consolidate(teardown, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
             setting.link(teardown);
             getChildren().add(setting);
         }
@@ -155,7 +162,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             final String name = returnSetting.getDeclaration().getText().toString();
             final List<String> args = returnSetting.getReturnValues() == null ? new ArrayList<String>()
                     : newArrayList(Lists.transform(returnSetting.getReturnValues(), TokenFunctions.tokenToString()));
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            final String comment = CommentServiceHandler.consolidate(returnSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
             setting.link(returnSetting);
             getChildren().add(setting);
         }
@@ -165,7 +173,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             final String callName = execRow.getAction().getText().toString();
             final List<String> args = newArrayList(
                     Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
-            final RobotKeywordCall call = new RobotKeywordCall(this, callName, args, "");
+            final String comment = CommentServiceHandler.consolidate(execRow, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+            final RobotKeywordCall call = new RobotKeywordCall(this, callName, args, comment);
             getChildren().add(call);
             call.link(execRow);
         }
