@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/11/16 3:02 PM
+Save-Time: 7/18/16 4:39 PM
 Testcase-Type: ecl
 Verifications: _h9dwwETtEeaEVfxTnoQ14g
 
@@ -263,17 +263,26 @@ with [get-window "New Robot Resource file"] {
 }
 with [get-editor "text_file.txt" | get-text-viewer] {
     key-type "M1+SPACE"
-    wait 300
+    wait 200
     key-type Down -times 2
     key-type Enter
-    type-text "@{newList}    item"
+    //add list
+    key-type "M1+SPACE"
+    wait 200
+    key-type Down
+    key-type Enter
+    type-text newList
+    key-type Enter
+  
 }
 
+try -times 10 -delay 1000 -command{
 //check if after writing new list this list is in Outline and PE
 with [get-view Outline | get-tree] {
     get-item "text_file.txt/Variables" | get-property childCount | equals 1 | verify-true
     get-item "text_file.txt/Variables" | get-property "getText()" | equals Variables | verify-true
     get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList | verify-true
+}
 }
 get-view "Project Explorer" | get-tree | select RobotProject
 with [get-view "Project Explorer" | get-tree] {
@@ -281,6 +290,7 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList 
         | verify-true
 }
+
 
 
 with [get-editor "text_file.txt"] {
@@ -312,7 +322,7 @@ with [get-editor "text_file.txt"] {
         type-text 79890778
     }
 }
-try -times 5 -delay 1000 -command{
+try -times 10 -delay 1000 -command{
 //check if new item is in Outlie and PE
 	with [get-view Outline | get-tree] {
 	    get-item "text_file.txt/Variables" | get-property childCount | equals 2 | verify-true
@@ -330,7 +340,7 @@ with [get-view "Project Explorer" | get-tree] {
 }
 //see if still first line is selected
 get-editor "text_file.txt" | get-tab-folder | get-tab-item Variables | click
-is-row-fully-selected -file "text_file.txt" -row 0
+
 
 //click on Ouline and PE
 get-view Outline | get-tree | select "text_file.txt/Variables/newScalar" | double-click
