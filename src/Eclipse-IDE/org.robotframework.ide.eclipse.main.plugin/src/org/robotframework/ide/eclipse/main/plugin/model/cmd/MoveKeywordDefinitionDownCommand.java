@@ -7,8 +7,10 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.Collections;
 
+import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
@@ -29,6 +31,11 @@ public class MoveKeywordDefinitionDownCommand extends EditorCommand {
             return;
         }
         Collections.swap(section.getChildren(), index, index + 1);
+        
+        final Object linkedElement = ((RobotKeywordsSection)section).getLinkedElement();
+        if(linkedElement != null && linkedElement instanceof KeywordTable) {
+            ((KeywordTable)linkedElement).moveDownKeyword(keywordDef.getLinkedElement());
+        }
 
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_MOVED, section);
     }
