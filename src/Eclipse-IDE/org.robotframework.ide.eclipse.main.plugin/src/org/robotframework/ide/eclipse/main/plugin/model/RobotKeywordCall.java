@@ -30,7 +30,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     // TODO : fix this stuff for serialization
     private AModelElement<?> linkedElement;
 
-    RobotKeywordCall(final IRobotCodeHoldingElement parent, final String name, final List<String> args,
+    public RobotKeywordCall(final IRobotCodeHoldingElement parent, final String name, final List<String> args,
             final String comment) {
         this.parent = parent;
         this.name = name;

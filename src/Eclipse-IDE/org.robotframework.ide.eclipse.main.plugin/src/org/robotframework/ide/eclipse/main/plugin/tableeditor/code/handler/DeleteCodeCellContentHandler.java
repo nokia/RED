@@ -20,7 +20,6 @@ public class DeleteCodeCellContentHandler extends DIParameterizedHandler<E4Delet
     }
 
     public static class E4DeleteCodeCellContentHandler extends E4DeleteCellContentHandler {
-        @Override
         protected Optional<? extends EditorCommand> provideCommandForAttributeChange(final RobotElement element,
                 final int index, final int noOfColumns) {
             return new CodeAttributesCommandsProvider().provideChangeAttributeCommand(element, index, noOfColumns, "");

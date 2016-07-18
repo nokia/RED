@@ -45,7 +45,7 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
             if (selectedElement.isPresent()) {
                 if (selectedElement.get() instanceof RobotKeywordCall) {
                     definition = (RobotKeywordDefinition) selectedElement.get().getParent();
-                    final int index = definition.getChildren().indexOf(selectedElement);
+                    final int index = definition.getChildren().indexOf(selectedElement.get());
                     if (index >= 0 && index < definition.getChildren().size()) {
                         newKeywordCommand = new CreateFreshKeywordCallCommand(definition, index);
                     }

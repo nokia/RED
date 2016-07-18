@@ -80,6 +80,8 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
             final Optional<RobotKeywordCall> firstSelected = Selections.getOptionalFirstElement(selection,
                     RobotKeywordCall.class);
 
+            //TODO: insert keyword settings
+            
             if (firstSelected.isPresent()) {
                 final int index = firstSelected.get().getParent().getChildren().indexOf(firstSelected.get());
                 final int modelTableIndex = ((RobotCodeHoldingElement) firstSelected.get().getParent())
