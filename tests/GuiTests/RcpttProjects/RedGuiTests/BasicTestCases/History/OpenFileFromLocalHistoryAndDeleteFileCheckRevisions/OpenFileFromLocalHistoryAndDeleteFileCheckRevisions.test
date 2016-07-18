@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _RrouQPooEeSBeM10W7Y1ng
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/23/15 11:31 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/18/16 12:46 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -58,9 +58,12 @@ get-window "Delete Resources" | get-button OK | click
 // open deleted file revisions
 get-view History | get-tree | select [get-item ".*" -index 0] | get-menu "Open With/Robot Table Editor" | click
 get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 2 | get-tab-folder | get-tab-item Variables | click
-get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 2 | get-table | get-property itemCount | equals 3 
-    | verify-true
 
+with [get-editor "TestFile.robot [/RobotProject/TestFile.robot]" -index 2 | get-canvas 
+    -after [get-label "The file is read-only!"]] {
+    get-property "getLayer().getBodyLayer().getColumnCount()" | equals 3 | verify-true
+    get-property "getLayer().getBodyLayer().getRowCount()" | equals 3 | verify-true
+}
 // close revisions tabs
 get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | close
 get-editor "TestFile.robot [/RobotProject/TestFile.robot]" | close
