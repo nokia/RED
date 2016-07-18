@@ -13,14 +13,12 @@ import java.util.List;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobotElementCellsCommandsCollector;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 
 /**
  * @author mmarzec
@@ -35,12 +33,6 @@ public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsC
     @Override
     protected RobotElement[] getRobotElementsFromClipboard(final RedClipboard clipboard) {
         return clipboard.getKeywordCalls();
-    }
-
-    @Override
-    protected int findSelectedElementTableIndex(final RobotElement section, final RobotElement selectedElement) {
-        return section instanceof RobotSettingsSection && selectedElement instanceof RobotSetting ? TableHandlersSupport
-                .findTableIndexOfSelectedSetting((RobotSettingsSection) section, (RobotSetting) selectedElement) : -1;
     }
 
     @Override

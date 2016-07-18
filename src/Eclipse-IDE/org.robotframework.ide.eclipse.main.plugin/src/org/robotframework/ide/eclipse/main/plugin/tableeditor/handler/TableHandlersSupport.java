@@ -10,8 +10,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
+import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -19,6 +26,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.GeneralSettingsModel;
 
+/**
+ * @author mmarzec
+ *
+ */
 public class TableHandlersSupport {
 
     private TableHandlersSupport() {
@@ -56,6 +67,37 @@ public class TableHandlersSupport {
         return variablesCopy.toArray(new RobotVariable[0]);
     }
     
+    @SuppressWarnings("unchecked")
+    public static List<RobotKeywordCall>  createKeywordCallsCopy(final List<RobotKeywordCall> keywordCalls) {
+        final List<RobotKeywordCall> keywordCallsCopy = new ArrayList<>();
+        for (final RobotKeywordCall keywordCall : keywordCalls) {
+            final RobotKeywordCall keywordCallCopy = new RobotKeywordCall(null, new String(keywordCall.getName()),
+                    new ArrayList<>(keywordCall.getArguments()), new String(keywordCall.getComment()));
+            if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+                final RobotExecutableRow<UserKeyword> robotExecutableRow = ((RobotExecutableRow<UserKeyword>) keywordCall
+                        .getLinkedElement()).copy();
+                keywordCallCopy.link(robotExecutableRow);
+            }
+            keywordCallsCopy.add(keywordCallCopy);
+        }
+        return keywordCallsCopy;
+    }
+    
+    public static List<RobotKeywordDefinition> createKeywordDefsCopy(final List<RobotKeywordDefinition> keywordDefs) {
+        final List<RobotKeywordDefinition> keywordDefsCopy = new ArrayList<>();
+        for (final RobotKeywordDefinition keywordDef : keywordDefs) {
+            final RobotKeywordDefinition newDef = new RobotKeywordDefinition(null, new String(keywordDef.getName()),
+                    new String(keywordDef.getComment()));
+            final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
+            if (argumentsSetting != null) {
+                newDef.createDefinitionSetting(new String(argumentsSetting.getName()),
+                        new ArrayList<>(argumentsSetting.getArguments()), new String(argumentsSetting.getComment()));
+            }
+            keywordDefsCopy.add(newDef);
+        }
+        return keywordDefsCopy;
+    }
+    
     public static int findTableIndexOfSelectedSetting(final RobotSettingsSection section,
             final RobotSetting selectedSetting) {
         if (selectedSetting.getGroup() == SettingsGroup.METADATA) {
@@ -75,4 +117,26 @@ public class TableHandlersSupport {
         return section.getImportSettings().indexOf(selectedSetting);
     }
 
+    public static int findNextSelectedElementRowIndex(final int initialIndex, final SelectionLayer selectionLayer) {
+        final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
+        for (int i = 0; i < selectedCellPositions.length; i++) {
+            if(selectedCellPositions[i].rowPosition > initialIndex) {
+                return selectedCellPositions[i].rowPosition;
+            }
+        }
+        return initialIndex;
+    }
+    
+    public static List<Integer> findSelectedColumnsIndexesByRowIndex(final int selectedElementRowIndex,
+            final SelectionLayer selectionLayer) {
+
+        final List<Integer> columnsIndexes = new ArrayList<>();
+        final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
+        for (int i = 0; i < selectedCellPositions.length; i++) {
+            if (selectedCellPositions[i].rowPosition == selectedElementRowIndex) {
+                columnsIndexes.add(selectedCellPositions[i].columnPosition);
+            }
+        }
+        return columnsIndexes;
+    }
 }

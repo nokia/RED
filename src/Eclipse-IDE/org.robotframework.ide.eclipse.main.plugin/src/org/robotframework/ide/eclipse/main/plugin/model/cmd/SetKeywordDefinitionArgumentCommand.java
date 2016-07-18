@@ -51,7 +51,9 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         }
         if (!arguments.get(index).equals(value)) {
             arguments.remove(index);
-            arguments.add(index, value);
+            if (value != null) {
+                arguments.add(index, value);
+            }
             changed = true;
         }
         if (changed) {

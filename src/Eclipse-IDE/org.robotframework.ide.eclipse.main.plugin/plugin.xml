@@ -1518,7 +1518,7 @@
           </or>
        </activeWhen>
        <enabledWhen>
-          <and>
+          <!--and>
              <reference
                    definitionId="org.robotframework.singleElementHasFocusedCell">
              </reference>
@@ -1528,7 +1528,15 @@
              <reference
                    definitionId="org.robotframework.focusedCellHasContent">
              </reference>
-          </and>
+          </and-->
+          <or>
+            <reference
+                  definitionId="org.robotframework.table.noFullRowIsSelected">
+            </reference>
+            <reference
+                  definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+            </reference>
+          </or>
        </enabledWhen>
     </handler>
     <handler
@@ -1545,14 +1553,22 @@
           </or>
        </activeWhen>
        <enabledWhen>
-          <and>
+          <!--and>
              <reference
                    definitionId="org.robotframework.singleElementHasFocusedCell">
              </reference>
              <reference
                    definitionId="org.robotframework.focusedCellHasContent">
              </reference>
-          </and>
+          </and-->
+          <or>
+            <reference
+                  definitionId="org.robotframework.table.noFullRowIsSelected">
+            </reference>
+            <reference
+                  definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+            </reference>
+          </or>
        </enabledWhen>
     </handler>
     <handler
@@ -1571,18 +1587,14 @@
        <enabledWhen>
           <with
                 variable="activeEditor">
-             <and>
+             <or>
                 <reference
-                      definitionId="org.robotframework.exactlyOneElementIsSelected">
+                      definitionId="org.robotframework.canPasteToKeywordSectionEditorTable">
                 </reference>
                 <reference
-                      definitionId="org.robotframework.singleElementHasFocusedCell">
+                      definitionId="org.robotframework.canPasteToCasesSectionEditorTable">
                 </reference>
-                <test
-                      property="org.robotframework.thereIsTextInClipboard"
-                      value="true">
-                </test>
-             </and>
+             </or>
           </with>
        </enabledWhen>
     </handler>
@@ -1600,14 +1612,22 @@
           </or>
        </activeWhen>
        <enabledWhen>
-          <and>
+          <!--and>
              <reference
                    definitionId="org.robotframework.singleElementHasFocusedCell">
              </reference>
              <reference
                    definitionId="org.robotframework.exactlyOneElementIsSelected">
              </reference>
-          </and>
+          </and-->
+          <or>
+            <reference
+                  definitionId="org.robotframework.table.noFullRowIsSelected">
+            </reference>
+            <reference
+                  definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+            </reference>
+          </or>
        </enabledWhen>
     </handler>
     <handler
@@ -1763,17 +1783,9 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <!--reference
+          <reference
                 definitionId="org.robotframework.exactlyOneElementIsSelected">
-          </reference-->
-          <or>
-             <reference
-             	definitionId="org.robotframework.table.noFullRowIsSelected">
-             </reference>
-             <reference
-             	definitionId="org.robotframework.table.onlyFullRowsAreSelected">
-             </reference>
-          </or>
+          </reference>
        </enabledWhen>
     </handler>
     <handler

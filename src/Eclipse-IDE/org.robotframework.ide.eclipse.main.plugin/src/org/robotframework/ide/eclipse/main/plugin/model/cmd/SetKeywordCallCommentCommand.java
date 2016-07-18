@@ -5,10 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ICommentHolder;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -29,9 +32,7 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
             return;
         }
         
-        new SettingTableModelUpdater().updateComment(keywordCall.getLinkedElement(), newComment);
-        keywordCall.setComment(CommentServiceHandler.consolidate((ICommentHolder) keywordCall.getLinkedElement(),
-                ETokenSeparator.PIPE_WRAPPED_WITH_SPACE));
+        updateModelElement();
 
         // it has to be send, not posted
         // otherwise it is not possible to traverse between cells, because the
@@ -40,5 +41,21 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
         // which
         // closes currently active cell editor
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordCall);
+    }
+    
+    protected void updateModelElement() {
+        final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
+        ModelType modelType = linkedElement.getModelType();
+        if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+            if (newComment != null) {
+                ((RobotExecutableRow<?>) linkedElement).setComment(newComment);
+            } else {
+                ((RobotExecutableRow<?>) linkedElement).clearComment();
+            }
+        } else {
+            new SettingTableModelUpdater().updateComment(keywordCall.getLinkedElement(), newComment);
+        }
+        keywordCall.setComment(CommentServiceHandler.consolidate((ICommentHolder) keywordCall.getLinkedElement(),
+                ETokenSeparator.PIPE_WRAPPED_WITH_SPACE));
     }
 }

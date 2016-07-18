@@ -16,7 +16,6 @@ import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetDictItemsCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetListItemsCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetScalarValueCommand;
@@ -40,12 +39,6 @@ public class PasteVariablesCellsCommandsCollector extends PasteRobotElementCells
     @Override
     protected RobotElement[] getRobotElementsFromClipboard(final RedClipboard clipboard) {
         return clipboard.getVariables();
-    }
-
-    @Override
-    protected int findSelectedElementTableIndex(final RobotElement section, final RobotElement selectedElement) {
-        return section instanceof RobotVariablesSection
-                ? ((RobotVariablesSection) section).getChildren().indexOf(selectedElement) : -1;
     }
 
     @Override
