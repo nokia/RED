@@ -46,7 +46,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         boolean changed = false;
 
         for (int i = arguments.size(); i <= index; i++) {
-            arguments.add("");
+            arguments.add("\\");
             changed = true;
         }
         if (!arguments.get(index).equals(value)) {
