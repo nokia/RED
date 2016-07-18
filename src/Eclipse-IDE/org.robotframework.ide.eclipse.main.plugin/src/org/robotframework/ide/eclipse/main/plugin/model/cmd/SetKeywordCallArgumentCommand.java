@@ -40,9 +40,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             arguments.remove(index);
             if (value != null) {
                 arguments.add(index, value);
-            } else {
-                arguments.add(index, "");
-            }
+            } 
             changed = true;
         }
         if (changed) {

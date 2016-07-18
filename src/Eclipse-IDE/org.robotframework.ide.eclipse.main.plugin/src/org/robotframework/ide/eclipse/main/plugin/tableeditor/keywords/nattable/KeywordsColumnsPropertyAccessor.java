@@ -88,8 +88,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
 
-            if (value.startsWith("[") && value.endsWith("]") && columnIndex == 0
-                    && keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+            if (isCandidateForNewKeywordSetting(keywordCall, value, columnIndex)) {
                 final boolean isKeywordSettingCreated = createNewKeywordSettingAndRemoveOldExeRow(value, keywordCall);
                 if (isKeywordSettingCreated) {
                     return;
@@ -120,6 +119,12 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
             }
         }
 
+    }
+
+    private boolean isCandidateForNewKeywordSetting(final RobotKeywordCall keywordCall, final String value,
+            final int columnIndex) {
+        return value.startsWith("[") && value.endsWith("]") && columnIndex == 0
+                && keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
     }
 
     @Override
