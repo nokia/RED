@@ -12,7 +12,6 @@ import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
-import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 
 import com.google.common.collect.Lists;
 
@@ -39,7 +38,7 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
     public void link(final ARobotSectionTable table) {
         super.link(table);
 
-        for (final IVariableHolder variableHolder : getLinkedElement().getVariables()) {
+        for (final AVariable variableHolder : getLinkedElement().getVariables()) {
             final RobotVariable variable = new RobotVariable(this, variableHolder);
             elements.add(variable);
         }
@@ -50,7 +49,7 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
     }
 
     public RobotVariable createVariable(final int index, final VariableType variableType, final String name) {
-        IVariableHolder var;
+        AVariable var;
         if (variableType == VariableType.SCALAR) {
             var = getLinkedElement().createScalarVariable(index, name, Lists.<String> newArrayList());
         } else if (variableType == VariableType.LIST) {
@@ -67,16 +66,13 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
         return robotVariable;
     }
 
-    public RobotVariable createVariableFrom(final RobotVariable source) {
-        return createVariableFrom(getChildren().size(), source);
+    public void addVariable(final RobotVariable variable) {
+        addVariable(elements.size(), variable);
     }
 
-    public RobotVariable createVariableFrom(final int index, final RobotVariable source) {
-        final AVariable holderCopy = ((AVariable) source.getLinkedElement()).copy();
-        getLinkedElement().addVariable(index, holderCopy);
-
-        final RobotVariable robotVariable = new RobotVariable(this, holderCopy);
-        elements.add(index, robotVariable);
-        return robotVariable;
+    public void addVariable(final int index, final RobotVariable variable) {
+        variable.setParent(this);
+        elements.add(index, variable);
+        getLinkedElement().addVariable(index, variable.getLinkedElement());
     }
 }

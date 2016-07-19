@@ -14,14 +14,12 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
-import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
-import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
@@ -34,15 +32,15 @@ import com.google.common.base.Strings;
 
 public class RobotVariable implements RobotFileInternalElement, Serializable {
 
-    private static final long serialVersionUID = -8529873490503814703L;
+    private static final long serialVersionUID = 1L;
 
     // this has to be transient in order not to try serializing whole model instead of simply
     // its small part
     private transient RobotVariablesSection parent;
 
-    private IVariableHolder holder;
+    private AVariable holder;
 
-    public RobotVariable(final RobotVariablesSection parent, final IVariableHolder variableHolder) {
+    public RobotVariable(final RobotVariablesSection parent, final AVariable variableHolder) {
         this.parent = parent;
         this.holder = variableHolder;
     }
@@ -57,11 +55,11 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
     }
 
     @Override
-    public IVariableHolder getLinkedElement() {
+    public AVariable getLinkedElement() {
         return holder;
     }
 
-    public void setLinkedElement(final IVariableHolder holder) {
+    public void setLinkedElement(final AVariable holder) {
         this.holder = holder;
     }
 
@@ -113,12 +111,12 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
             final List<RobotToken> values = variable.getItems();
             return "[" + Joiner.on(", ").join(transform(values, TokenFunctions.tokenToString())) + "]";
         }
-        return "";
+        throw new IllegalStateException("Variable defined in variables table cannot have type " + getType().name());
     }
 
     @Override
     public String getComment() {
-        return CommentServiceHandler.consolidate((ICommentHolder) holder, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+        return CommentServiceHandler.consolidate(holder, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
     }
 
     @Override
@@ -155,7 +153,7 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
 
         int maxStart = -1;
         int end = -1;
-        for (final RobotToken token : ((AVariable) holder).getElementTokens()) {
+        for (final RobotToken token : holder.getElementTokens()) {
             if (token.getStartOffset() > maxStart) {
                 maxStart = token.getStartOffset();
                 end = maxStart + token.getText().length();
@@ -172,7 +170,7 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
 
     @Override
     public Optional<? extends RobotElement> findElement(final int offset) {
-        final AVariable linkedElement = (AVariable) holder;
+        final AVariable linkedElement = holder;
         if (!linkedElement.getBeginPosition().isNotSet() && linkedElement.getBeginPosition().getOffset() <= offset
                 && offset <= linkedElement.getEndPosition().getOffset()) {
             return Optional.of(this);
