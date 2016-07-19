@@ -15,12 +15,10 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 
 /**
@@ -51,17 +49,6 @@ public class TableHandlersSupport {
             }
         }
         return settingsCopy.toArray(new RobotSetting[0]);
-    }
-    
-    public static RobotVariable[] createVariablesCopy(final List<RobotVariable> variables) {
-        final List<RobotVariable> variablesCopy = new ArrayList<>();
-        for (final RobotVariable robotVariable : variables) {
-            final IVariableHolder variableHolderCopy = robotVariable.getLinkedElement().copy();
-            if (variableHolderCopy != null) {
-                variablesCopy.add(new RobotVariable(null, variableHolderCopy));
-            }
-        }
-        return variablesCopy.toArray(new RobotVariable[0]);
     }
     
     @SuppressWarnings("unchecked")
