@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.VariableTable;
-import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
@@ -35,7 +34,7 @@ public class MoveVariableDownCommand extends EditorCommand {
         Collections.swap(children, index, index + 1);
 
         final VariableTable table = variablesSection.getLinkedElement();
-        table.moveDownVariable((AVariable) variable.getLinkedElement());
+        table.moveDownVariable(variable.getLinkedElement());
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_MOVED, variablesSection);
     }

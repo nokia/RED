@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.presenter.update.VariableTableModelUpdater;
-import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -31,7 +30,7 @@ public class SetListItemsCommand extends EditorCommand {
         if (variable.getType() != VariableType.LIST) {
             throw new CommandExecutionException("Invalid type of variable: " + variable.getType());
         }
-        new VariableTableModelUpdater().addOrSet((AVariable) variable.getLinkedElement(), 0, newValue);
+        new VariableTableModelUpdater().addOrSet(variable.getLinkedElement(), 0, newValue);
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
 }

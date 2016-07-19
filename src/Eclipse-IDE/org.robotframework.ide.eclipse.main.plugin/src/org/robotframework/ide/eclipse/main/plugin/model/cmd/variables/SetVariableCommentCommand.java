@@ -28,7 +28,7 @@ public class SetVariableCommentCommand extends EditorCommand {
             return;
         }
 
-        final AVariable holder = (AVariable) variable.getLinkedElement();
+        final AVariable holder = variable.getLinkedElement();
         if (newComment.isEmpty()) {
             holder.clearComment();
         } else {
