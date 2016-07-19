@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model;
 
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 
 import org.rf.ide.core.testdata.model.table.ECompareResult;
@@ -112,6 +113,11 @@ public class FilePosition implements Serializable {
         }
 
         return result;
+    }
+
+    private Object readResolve() throws ObjectStreamException {
+        // we wan't file position object to be NOT_SET when deserializing
+        return createNotSet();
     }
 
     public FilePosition copy() {
