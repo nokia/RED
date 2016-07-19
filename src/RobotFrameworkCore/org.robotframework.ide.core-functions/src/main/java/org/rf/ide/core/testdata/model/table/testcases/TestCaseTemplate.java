@@ -56,6 +56,11 @@ public class TestCaseTemplate extends AModelElement<TestCase>
         this.keywordName = keywordName;
     }
 
+    public void setKeywordName(final String keywordName) {
+        this.keywordName = updateOrCreate(this.keywordName, keywordName,
+                RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_NAME);
+    }
+
     @Override
     public List<RobotToken> getUnexpectedTrashArguments() {
         return Collections.unmodifiableList(unexpectedTrashArguments);
@@ -64,6 +69,15 @@ public class TestCaseTemplate extends AModelElement<TestCase>
     public void addUnexpectedTrashArgument(final RobotToken trashArgument) {
         fixForTheType(trashArgument, RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT, true);
         this.unexpectedTrashArguments.add(trashArgument);
+    }
+
+    public void addUnexpectedTrashArgument(final String trashArgument) {
+        addUnexpectedTrashArgument(RobotToken.create(trashArgument));
+    }
+
+    public void setUnexpectedTrashArguments(final int index, final String trashArgument) {
+        updateOrCreateTokenInside(unexpectedTrashArguments, index, trashArgument,
+                RobotTokenType.TEST_CASE_SETTING_TEMPLATE_KEYWORD_UNWANTED_ARGUMENT);
     }
 
     @Override

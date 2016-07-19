@@ -53,6 +53,10 @@ public class TestCaseTimeout extends AModelElement<TestCase> implements IComment
         this.timeout = timeout;
     }
 
+    public void setTimeout(final String timeout) {
+        this.timeout = updateOrCreate(this.timeout, timeout, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_VALUE);
+    }
+
     public List<RobotToken> getMessage() {
         return Collections.unmodifiableList(message);
     }
@@ -60,6 +64,10 @@ public class TestCaseTimeout extends AModelElement<TestCase> implements IComment
     public void addMessagePart(final RobotToken messagePart) {
         fixForTheType(messagePart, RobotTokenType.TEST_CASE_SETTING_TIMEOUT_MESSAGE, true);
         this.message.add(messagePart);
+    }
+
+    public void addMessagePart(final int index, final String value) {
+        updateOrCreateTokenInside(message, index, value, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE);
     }
 
     @Override
