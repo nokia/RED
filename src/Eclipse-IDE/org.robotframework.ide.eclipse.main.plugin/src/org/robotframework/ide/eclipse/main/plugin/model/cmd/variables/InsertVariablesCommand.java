@@ -34,12 +34,10 @@ public class InsertVariablesCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         int shift = 0;
         for (final RobotVariable variable : variablesToInsert) {
-            variable.setParent(variablesSection);
-
             if (index == -1) {
-                variablesSection.createVariableFrom(variable);
+                variablesSection.addVariable(variable);
             } else {
-                variablesSection.createVariableFrom(index + shift, variable);
+                variablesSection.addVariable(index + shift, variable);
             }
             shift++;
         }
