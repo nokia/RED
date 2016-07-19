@@ -77,24 +77,7 @@ public class ScalarVariable extends AVariable {
     }
 
     @Override
-    public ScalarVariable copy() {
-        final RobotToken dec = RobotToken.create(VariableType.SCALAR.getIdentificator() + "{" + getName() + "}",
-                getDeclaration().getTypes());
-
-        final ScalarVariable scalar = new ScalarVariable(getName(), dec, getScope());
-        for (final RobotToken valueToken : getValues()) {
-            final RobotToken token = RobotToken.create(valueToken.getText(), valueToken.getTypes());
-            scalar.addValue(token);
-        }
-        for (final RobotToken commentToken : getComment()) {
-            final RobotToken token = RobotToken.create(commentToken.getText(), commentToken.getTypes());
-            scalar.addCommentPart(token);
-        }
-        return scalar;
-    }
-
-    @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(values, index);
     }
 }

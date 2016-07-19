@@ -134,7 +134,7 @@ public class DictionaryVariable extends AVariable {
         }
 
         protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType,
-                boolean shouldNullCheck) {
+                final boolean shouldNullCheck) {
             if (shouldNullCheck && token == null) {
                 return;
             }
@@ -160,30 +160,7 @@ public class DictionaryVariable extends AVariable {
     }
 
     @Override
-    public DictionaryVariable copy() {
-        final RobotToken dec = RobotToken.create(VariableType.DICTIONARY.getIdentificator() + "{" + getName() + "}",
-                getDeclaration().getTypes());
-
-        final DictionaryVariable dict = new DictionaryVariable(getName(), dec, getScope());
-        for (final DictionaryKeyValuePair keyValuePair : getItems()) {
-            final RobotToken rawToken = RobotToken.create(keyValuePair.getRaw().getText(),
-                    keyValuePair.getRaw().getTypes());
-            final RobotToken keyToken = RobotToken.create(keyValuePair.getKey().getText(),
-                    keyValuePair.getKey().getTypes());
-            final RobotToken valueToken = RobotToken.create(keyValuePair.getValue().getText(),
-                    keyValuePair.getValue().getTypes());
-
-            dict.put(rawToken, keyToken, valueToken);
-        }
-        for (final RobotToken commentToken : getComment()) {
-            final RobotToken token = RobotToken.create(commentToken.getText(), commentToken.getTypes());
-            dict.addCommentPart(token);
-        }
-        return dict;
-    }
-
-    @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         // TODO Auto-generated method stub
         return false;
     }
