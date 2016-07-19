@@ -36,7 +36,7 @@ public class InsertKeywordDefinitionsCommand extends EditorCommand {
 
         int shift = 0;
         for (final RobotKeywordDefinition robotKeywordDefinition : definitionsToInsert) {
-            keywordsSection.insertKeywordDefinitionCopy(index + shift, robotKeywordDefinition);
+            keywordsSection.insertKeywordDefinitionCopy(index < 0 ? -1 : index + shift, robotKeywordDefinition);
             shift++;
         }
 

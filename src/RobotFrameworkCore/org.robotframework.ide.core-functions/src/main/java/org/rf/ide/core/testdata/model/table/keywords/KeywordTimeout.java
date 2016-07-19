@@ -130,4 +130,16 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
     public boolean removeElementToken(final int index) {
         return super.removeElementFromList(message, index);
     }
+    
+    public KeywordTimeout copy() {
+        final KeywordTimeout keywordTimeout = new KeywordTimeout(this.getDeclaration().copyWithoutPosition());
+        keywordTimeout.setTimeout(this.getTimeout().copyWithoutPosition());
+        for (final RobotToken message : getMessage()) {
+            keywordTimeout.addMessagePart(message.copyWithoutPosition());
+        }
+        for (final RobotToken commentToken : getComment()) {
+            keywordTimeout.addCommentPart(commentToken.copyWithoutPosition());
+        }
+        return keywordTimeout;
+    }
 }

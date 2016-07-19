@@ -49,4 +49,16 @@ public class KeywordTeardown extends AKeywordBaseSetting<UserKeyword> {
     protected RobotTokenType getDeclarationType() {
         return RobotTokenType.KEYWORD_SETTING_TEARDOWN;
     }
+    
+    public KeywordTeardown copy() {
+        final KeywordTeardown keywordTeardown = new KeywordTeardown(this.getDeclaration().copyWithoutPosition());
+        keywordTeardown.setKeywordName(this.getKeywordName().copyWithoutPosition());
+        for (final RobotToken arg : getArguments()) {
+            keywordTeardown.addArgument(arg.copyWithoutPosition());
+        }
+        for (final RobotToken commentToken : getComment()) {
+            keywordTeardown.addCommentPart(commentToken.copyWithoutPosition());
+        }
+        return keywordTeardown;
+    }
 }

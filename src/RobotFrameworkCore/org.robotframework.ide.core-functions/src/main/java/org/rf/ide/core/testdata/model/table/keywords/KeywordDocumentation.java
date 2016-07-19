@@ -136,4 +136,15 @@ public class KeywordDocumentation extends AModelElement<UserKeyword>
     public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("Please see " + DocumentationServiceHandler.class);
     }
+    
+    public KeywordDocumentation copy() {
+        final KeywordDocumentation keywordDoc = new KeywordDocumentation(this.getDeclaration().copyWithoutPosition());
+        for (final RobotToken txt : getDocumentationText()) {
+            keywordDoc.addDocumentationText(txt.copyWithoutPosition());
+        }
+        for (final RobotToken commentToken : getComment()) {
+            keywordDoc.addCommentPart(commentToken.copyWithoutPosition());
+        }
+        return keywordDoc;
+    }
 }

@@ -10,7 +10,9 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
@@ -66,12 +68,20 @@ public class TableHandlersSupport {
     public static List<RobotKeywordCall>  createKeywordCallsCopy(final List<RobotKeywordCall> keywordCalls) {
         final List<RobotKeywordCall> keywordCallsCopy = new ArrayList<>();
         for (final RobotKeywordCall keywordCall : keywordCalls) {
-            final RobotKeywordCall keywordCallCopy = new RobotKeywordCall(null, new String(keywordCall.getName()),
-                    new ArrayList<>(keywordCall.getArguments()), new String(keywordCall.getComment()));
+            RobotKeywordCall keywordCallCopy = null;
             if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
-                final RobotExecutableRow<UserKeyword> robotExecutableRow = ((RobotExecutableRow<UserKeyword>) keywordCall
+                keywordCallCopy = new RobotKeywordCall(null, new String(keywordCall.getName()),
+                        new ArrayList<>(keywordCall.getArguments()), new String(keywordCall.getComment()));
+                final RobotExecutableRow<UserKeyword> executableRowCopy = ((RobotExecutableRow<UserKeyword>) keywordCall
                         .getLinkedElement()).copy();
-                keywordCallCopy.link(robotExecutableRow);
+                keywordCallCopy.link(executableRowCopy);
+            } else {
+                keywordCallCopy = new RobotDefinitionSetting(null, new String(keywordCall.getName()),
+                        new ArrayList<>(keywordCall.getArguments()), new String(keywordCall.getComment()));
+                final AModelElement<?> keywordSettingCopy = new KeywordTableModelUpdater().createCopy(keywordCall.getLinkedElement());
+                if (keywordSettingCopy != null) {
+                    keywordCallCopy.link(keywordSettingCopy);
+                }
             }
             keywordCallsCopy.add(keywordCallCopy);
         }
@@ -83,11 +93,7 @@ public class TableHandlersSupport {
         for (final RobotKeywordDefinition keywordDef : keywordDefs) {
             final RobotKeywordDefinition newDef = new RobotKeywordDefinition(null, new String(keywordDef.getName()),
                     new String(keywordDef.getComment()));
-            final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
-            if (argumentsSetting != null) {
-                newDef.createDefinitionSetting(new String(argumentsSetting.getName()),
-                        new ArrayList<>(argumentsSetting.getArguments()), new String(argumentsSetting.getComment()));
-            }
+            newDef.getChildren().addAll(createKeywordCallsCopy(keywordDef.getChildren()));
             keywordDefsCopy.add(newDef);
         }
         return keywordDefsCopy;

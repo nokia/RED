@@ -12,11 +12,13 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutKeywordsHandler.E4CutKeywordsHandler;
@@ -35,8 +37,8 @@ public class CutKeywordsHandler extends DIParameterizedHandler<E4CutKeywordsHand
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public void cutKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final RedClipboard clipboard) {
+        public void cutKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
             final List<RobotKeywordDefinition> defs = Selections.getElements(selection, RobotKeywordDefinition.class);
             final List<RobotKeywordCall> calls = Selections.getElements(selection, RobotKeywordCall.class);
 
@@ -50,6 +52,9 @@ public class CutKeywordsHandler extends DIParameterizedHandler<E4CutKeywordsHand
                 clipboard.insertContent(data);
                 commandsStack.execute(new DeleteKeywordCallCommand(calls));
             }
+            
+            // needed when keyword is cut/paste and selection remains on the same position, pasting is performed on old, not existing keyword
+            editor.getSelectionLayerAccessor().getSelectionLayer().clear();
         }
     }
 }
