@@ -34,14 +34,14 @@
          id="org.eclipse.e4.tools.compat"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="4.5.0.v20150430-0712"
          unpack="false"/>
 
    <plugin
          id="org.eclipse.e4.tools.services"
          download-size="0"
          install-size="0"
-         version="0.0.0"
+         version="4.5.0.v20150430-0712"
          unpack="false"/>
 
    <plugin
