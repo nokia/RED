@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 import static com.google.common.collect.Lists.newArrayList;
 
 import org.rf.ide.core.testdata.model.presenter.update.VariableTableModelUpdater;
-import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -31,7 +30,7 @@ public class SetScalarValueCommand extends EditorCommand {
             throw new CommandExecutionException("Invalid type of variable: " + variable.getType());
         }
 
-        new VariableTableModelUpdater().addOrSet((AVariable) variable.getLinkedElement(), 0, newArrayList(newValue));
+        new VariableTableModelUpdater().addOrSet(variable.getLinkedElement(), 0, newArrayList(newValue));
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
