@@ -57,7 +57,11 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             changed = true;
         }
         if (changed) {
-            new KeywordTableModelUpdater().update(argumentsSetting.getLinkedElement(), index, value);
+            if(argumentsSetting.getArguments().isEmpty()) {
+                new KeywordTableModelUpdater().remove(definition.getLinkedElement(), argumentsSetting.getLinkedElement());
+            } else {
+                new KeywordTableModelUpdater().update(argumentsSetting.getLinkedElement(), index, value);
+            }
             
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
         }
