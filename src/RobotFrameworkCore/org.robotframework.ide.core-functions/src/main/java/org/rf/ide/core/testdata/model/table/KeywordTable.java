@@ -21,23 +21,26 @@ public class KeywordTable extends ARobotSectionTable {
     public KeywordTable(final RobotFile parent) {
         super(parent);
     }
-
-    public void addKeyword(final UserKeyword keyword) {
-        keyword.setParent(this);
-        userKeywords.add(keyword);
+    
+    public UserKeyword createUserKeyword(final String keywordName) {
+        return createUserKeyword(keywordName, userKeywords.size());
     }
 
-    public UserKeyword createUserKeyword(final String keywordName) {
+    public UserKeyword createUserKeyword(final String keywordName, final int position) {
         RobotToken keyName = new RobotToken();
         keyName.setText(keywordName);
 
         UserKeyword uk = new UserKeyword(keyName);
 
-        addKeyword(uk);
+        addKeyword(uk, position);
 
         return uk;
     }
 
+    public void addKeyword(final UserKeyword keyword) {
+        addKeyword(keyword, userKeywords.size());
+    }
+    
     public void addKeyword(final UserKeyword keyword, final int position) {
         keyword.setParent(this);
         userKeywords.add(position, keyword);

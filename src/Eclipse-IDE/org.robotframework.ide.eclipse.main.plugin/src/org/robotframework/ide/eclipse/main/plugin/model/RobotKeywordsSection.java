@@ -41,9 +41,14 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
         final RobotKeywordDefinition keywordDefinition = new RobotKeywordDefinition(this, name, "");
         
         KeywordTable keywordsTable = (KeywordTable) this.getLinkedElement();
-        keywordDefinition.link(keywordsTable.createUserKeyword(name));
+        if(index >= 0 && index < keywordsTable.getKeywords().size() && index < getChildren().size()) {
+            keywordDefinition.link(keywordsTable.createUserKeyword(name, index));
+            elements.add(index, keywordDefinition);
+        } else {
+            keywordDefinition.link(keywordsTable.createUserKeyword(name));
+            elements.add(keywordDefinition);
+        }
         
-        elements.add(index, keywordDefinition);
         return keywordDefinition;
     }
     
