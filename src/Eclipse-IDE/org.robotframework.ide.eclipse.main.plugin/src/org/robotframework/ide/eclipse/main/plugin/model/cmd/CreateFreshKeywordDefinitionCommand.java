@@ -36,11 +36,7 @@ public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         final String name = NamesGenerator.generateUniqueName(keywordsSection, DEFAULT_NAME);
 
-        if (index == -1) {
-            keywordsSection.createKeywordDefinition(name);
-        } else {
-            keywordsSection.createKeywordDefinition(index, name);
-        }
+        keywordsSection.createKeywordDefinition(index, name);
 
         if (notifySync) {
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);

@@ -12,24 +12,27 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class CreateFreshKeywordCallCommand extends EditorCommand {
 
     private final RobotCodeHoldingElement parent;
-    private final int index;
+
+    private final int modelTableIndex;
+
+    private final int codeHoldingElementIndex;
 
     public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent) {
-        this(parent, -1);
+        this(parent, -1, -1);
     }
 
-    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent, final int index) {
+    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent, final int modelTableIndex,
+            final int codeHoldingElementIndex) {
         this.parent = parent;
-        this.index = index;
+        this.modelTableIndex = modelTableIndex;
+        this.codeHoldingElementIndex = codeHoldingElementIndex;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (index == -1) {
-            parent.createKeywordCall();
-        } else {
-            parent.createKeywordCall(index);
-        }
+
+        parent.createKeywordCall(modelTableIndex, codeHoldingElementIndex);
+
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
 }
