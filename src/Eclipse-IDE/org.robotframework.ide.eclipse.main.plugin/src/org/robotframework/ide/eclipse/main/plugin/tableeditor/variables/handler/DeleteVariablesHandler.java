@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -27,11 +26,9 @@ public class DeleteVariablesHandler extends DIParameterizedHandler<E4DeleteVaria
 
     public static class E4DeleteVariableHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
-        public void deleteVariables(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void deleteVariables(final RobotEditorCommandsStack commandsStack,
+                @Named(Selections.SELECTION) final IStructuredSelection selection) {
             final List<RobotVariable> variables = Selections.getElements(selection, RobotVariable.class);
             commandsStack.execute(new RemoveVariableCommand(variables));
         }
