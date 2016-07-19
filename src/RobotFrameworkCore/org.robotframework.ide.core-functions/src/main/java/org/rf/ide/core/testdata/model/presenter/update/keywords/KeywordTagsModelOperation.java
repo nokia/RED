@@ -48,5 +48,15 @@ public class KeywordTagsModelOperation implements IKeywordTableElementOperation 
             keywordTags.removeElementToken(index);
         }
     }
+    
+    @Override
+    public AModelElement<?> createCopy(final AModelElement<?> modelElement) {
+        return ((KeywordTags) modelElement).copy();
+    }
+    
+    @Override
+    public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
+        userKeyword.addTag((KeywordTags) modelElement);
+    }
 
 }

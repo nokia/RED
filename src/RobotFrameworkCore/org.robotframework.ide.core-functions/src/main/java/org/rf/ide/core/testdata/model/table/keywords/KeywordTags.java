@@ -33,4 +33,15 @@ public class KeywordTags extends ATags<UserKeyword> {
     public IRobotTokenType getDeclarationTagType() {
         return RobotTokenType.KEYWORD_SETTING_TAGS;
     }
+    
+    public KeywordTags copy() {
+        final KeywordTags keywordTags = new KeywordTags(this.getDeclaration().copyWithoutPosition());
+        for (final RobotToken tag : getTags()) {
+            keywordTags.addTag(tag.copyWithoutPosition());
+        }
+        for (final RobotToken commentToken : getComment()) {
+            keywordTags.addCommentPart(commentToken.copyWithoutPosition());
+        }
+        return keywordTags;
+    }
 }
