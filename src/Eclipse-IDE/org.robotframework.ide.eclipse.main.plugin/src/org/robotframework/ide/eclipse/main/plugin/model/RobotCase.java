@@ -51,7 +51,7 @@ public class RobotCase extends RobotCodeHoldingElement {
     }
 
     @Override
-    public RobotKeywordCall createKeywordCall(final int index) {
+    public RobotKeywordCall createKeywordCall(final int modelTableIndex, final int index) {
         final RobotKeywordCall call = new RobotKeywordCall(this, "", new ArrayList<String>(), "");
 
         final RobotExecutableRow<TestCase> robotExecutableRow = new RobotExecutableRow<>();

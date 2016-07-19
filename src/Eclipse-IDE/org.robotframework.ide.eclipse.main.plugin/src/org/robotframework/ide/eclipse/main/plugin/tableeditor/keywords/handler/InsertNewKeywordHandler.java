@@ -38,26 +38,26 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
 
         @Execute
         public Object addNewUserDefinedKeyword(@Named(Selections.SELECTION) final IStructuredSelection selection) {
-            final Optional<RobotElement> selectedElement = Selections.getOptionalFirstElement(selection, RobotElement.class);
+            final Optional<RobotElement> selectedElement = Selections.getOptionalFirstElement(selection,
+                    RobotElement.class);
 
             EditorCommand newKeywordCommand = null;
             RobotKeywordDefinition definition = null;
             if (selectedElement.isPresent()) {
                 if (selectedElement.get() instanceof RobotKeywordCall) {
                     definition = (RobotKeywordDefinition) selectedElement.get().getParent();
-                    final int index = definition.getChildren().indexOf(selectedElement.get());
-                    if (index >= 0 && index < definition.getChildren().size()) {
-                        newKeywordCommand = new CreateFreshKeywordCallCommand(definition, index);
-                    }
+                    final int codeHoldingElementIndex = definition.getChildren().indexOf(selectedElement.get());
+                    final int modelTableIndex = ((RobotKeywordDefinition) selectedElement.get().getParent())
+                            .findExecutableRowIndex((RobotKeywordCall) selectedElement.get());
+                    newKeywordCommand = new CreateFreshKeywordCallCommand(definition, modelTableIndex,
+                            codeHoldingElementIndex);
                 } else if (selectedElement.get() instanceof RobotKeywordDefinition) {
                     definition = (RobotKeywordDefinition) selectedElement.get();
                     final RobotSuiteFileSection section = definition.getParent();
                     if (section != null) {
                         final int index = section.getChildren().indexOf(definition);
-                        if (index >= 0 && index < section.getChildren().size()) {
-                            newKeywordCommand = new CreateFreshKeywordDefinitionCommand((RobotKeywordsSection) section,
-                                    index);
-                        }
+                        newKeywordCommand = new CreateFreshKeywordDefinitionCommand((RobotKeywordsSection) section,
+                                index);
                     }
                 }
             }
@@ -67,7 +67,7 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
             }
 
             stack.execute(newKeywordCommand);
-            
+
             return null;
         }
     }
