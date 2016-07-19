@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.Serializable;
@@ -13,10 +12,8 @@ import java.util.List;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
-import org.rf.ide.core.testdata.model.ModelType;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElement, Serializable {
 
@@ -120,15 +117,5 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getParent(), this);
     }
-    
-    public int findExecutableRowIndex(final RobotKeywordCall keywordCallWithExeRow) {
-        final List<RobotKeywordCall> callsWithExeRow = newArrayList(filter(getChildren(), new Predicate<RobotKeywordCall>() {
 
-            @Override
-            public boolean apply(final RobotKeywordCall call) {
-                return call.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
-            }
-        }));
-        return callsWithExeRow.indexOf(keywordCallWithExeRow);
-    }
 }

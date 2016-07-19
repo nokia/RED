@@ -11,7 +11,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -80,11 +79,9 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
             final Optional<RobotKeywordCall> firstSelected = Selections.getOptionalFirstElement(selection,
                     RobotKeywordCall.class);
 
-            //TODO: insert keyword settings
-            
             if (firstSelected.isPresent()) {
                 final int index = firstSelected.get().getParent().getChildren().indexOf(firstSelected.get());
-                final int modelTableIndex = ((RobotCodeHoldingElement) firstSelected.get().getParent())
+                final int modelTableIndex = ((RobotKeywordDefinition) firstSelected.get().getParent())
                         .findExecutableRowIndex(firstSelected.get());
                 commandsStack.execute(
                         new InsertKeywordCallsCommand(firstSelected.get().getParent(), modelTableIndex, index, calls));

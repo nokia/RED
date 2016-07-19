@@ -130,4 +130,15 @@ public class KeywordReturn extends AModelElement<UserKeyword> implements ICommen
     public boolean removeElementToken(final int index) {
         return super.removeElementFromList(values, index);
     }
+    
+    public KeywordReturn copy() {
+        final KeywordReturn keywordReturn = new KeywordReturn(this.getDeclaration().copyWithoutPosition());
+        for (final RobotToken value : getReturnValues()) {
+            keywordReturn.addReturnValue(value.copyWithoutPosition());
+        }
+        for (final RobotToken commentToken : getComment()) {
+            keywordReturn.addCommentPart(commentToken.copyWithoutPosition());
+        }
+        return keywordReturn;
+    }
 }
