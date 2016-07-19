@@ -53,14 +53,14 @@ public class SetVariableNameCommand extends EditorCommand {
             final AVariable newHolder = createProjectedVariable(modifiedToken);
 
             final int index = table.getVariables().indexOf(variable.getLinkedElement());
-            table.removeVariable((AVariable) variable.getLinkedElement());
+            table.removeVariable(variable.getLinkedElement());
             table.addVariable(index, newHolder);
 
             variable.setLinkedElement(newHolder);
         }
 
-        ((AVariable) variable.getLinkedElement()).getType(); // in order to fix scalar to scalar as list
-        ((AVariable) variable.getLinkedElement()).setName(getNewHolderName());
+        variable.getLinkedElement().getType(); // in order to fix scalar to scalar as list
+        variable.getLinkedElement().setName(getNewHolderName());
 
         if (typeHasChanged) {
             eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_TYPE_CHANGE, variable);
@@ -69,7 +69,7 @@ public class SetVariableNameCommand extends EditorCommand {
     }
 
     private AVariable createProjectedVariable(final Optional<RobotToken> modifiedToken) {
-        final List<RobotToken> elementTokens = ((AVariable) variable.getLinkedElement()).getElementTokens();
+        final List<RobotToken> elementTokens = variable.getLinkedElement().getElementTokens();
         final Iterable<RobotToken> valueTokens = filter(elementTokens,
                 containingOneOf(RobotTokenType.VARIABLES_VARIABLE_VALUE));
 
