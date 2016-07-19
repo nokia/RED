@@ -61,6 +61,11 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.SELECT,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
 
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.NORMAL,
+                CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.SELECT,
+                CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
+
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.SELECT,
@@ -72,13 +77,22 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
         // DisplayMode.SELECT,
         // CasesElementsInTreeLabelAccumulator.CASE_CALL_CONFIG_LABEL);
 
-        final ImageDescriptor caseImage = RedImages.getTestCaseImage();
-        final ICellPainter cellPainter = new CellPainterDecorator(new SearchMatchesTextPainter(matchesSupplier, 2),
-                CellEdgeEnum.LEFT,
-                new ImagePainter(ImagesManager.getImage(isEditable ? caseImage : RedImages.getGreyedImage(caseImage))));
+        final ImageDescriptor caseImage = isEditable ? RedImages.getTestCaseImage()
+                : RedImages.getGreyedImage(RedImages.getTestCaseImage());
+        final ImageDescriptor templatedCaseImage = isEditable ? RedImages.getTemplatedTestCaseImage()
+                : RedImages.getGreyedImage(RedImages.getTemplatedTestCaseImage());
+        final ICellPainter caseCellPainter = new CellPainterDecorator(new SearchMatchesTextPainter(matchesSupplier, 2),
+                CellEdgeEnum.LEFT, new ImagePainter(ImagesManager.getImage(caseImage)));
+        final ICellPainter templatedCaseCellPainter = new CellPainterDecorator(
+                new SearchMatchesTextPainter(matchesSupplier, 2), CellEdgeEnum.LEFT,
+                new ImagePainter(ImagesManager.getImage(templatedCaseImage)));
 
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, caseCellPainter,
+                DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, templatedCaseCellPainter,
+                DisplayMode.NORMAL,
+                CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
     }
 
     private Style createStyle(final RedPreferences preferences, final SyntaxHighlightingCategory category) {
