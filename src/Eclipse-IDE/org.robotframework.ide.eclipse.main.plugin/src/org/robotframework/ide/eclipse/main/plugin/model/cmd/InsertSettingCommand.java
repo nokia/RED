@@ -48,8 +48,8 @@ public class InsertSettingCommand extends EditorCommand {
 
         int shift = 0;
         for (final RobotKeywordCall call : settingsToInsert) {
-            section.insertSetting(call.getName(), call.getComment(), call.getArguments(), tableIndex + shift,
-                    settingsElementsIndex + shift);
+            section.insertSetting(call.getName(), call.getComment(), call.getArguments(),
+                    tableIndex < 0 ? -1 : tableIndex + shift, settingsElementsIndex + shift);
             shift++;
         }
 

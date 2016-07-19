@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
@@ -37,6 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
@@ -87,20 +90,30 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         return setting;
     }
     
+    @SuppressWarnings("unchecked")
     @Override
     public void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex, final RobotKeywordCall keywordCall) {
 
-        final RobotKeywordCall newCall = new RobotKeywordCall(this, keywordCall.getName(), keywordCall.getArguments(),
-                keywordCall.getComment());
+        RobotKeywordCall newCall = null;
 
-        final RobotExecutableRow<UserKeyword> robotExecutableRow = ((RobotExecutableRow<UserKeyword>)keywordCall.getLinkedElement()).copy();
-        if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
-            keyword.addKeywordExecutionRow(robotExecutableRow, modelTableIndex);
+        if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+            newCall = new RobotKeywordCall(this, keywordCall.getName(), keywordCall.getArguments(),
+                    keywordCall.getComment());
+            final RobotExecutableRow<UserKeyword> robotExecutableRow = (RobotExecutableRow<UserKeyword>) keywordCall
+                    .getLinkedElement();
+            if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
+                keyword.addKeywordExecutionRow(robotExecutableRow, modelTableIndex);
+            } else {
+                keyword.addKeywordExecutionRow(robotExecutableRow);
+            }
+            newCall.link(robotExecutableRow);
         } else {
-            keyword.addKeywordExecutionRow(robotExecutableRow);
+            newCall = new RobotDefinitionSetting(this, keywordCall.getName(), keywordCall.getArguments(),
+                    keywordCall.getComment());
+            new KeywordTableModelUpdater().updateParent(keyword, keywordCall.getLinkedElement());
+            newCall.link(keywordCall.getLinkedElement());
         }
-        
-        newCall.link(robotExecutableRow);
+
         if (codeHoldingElementIndex >= 0 && codeHoldingElementIndex < getChildren().size()) {
             getChildren().add(codeHoldingElementIndex, newCall);
         } else {
@@ -344,5 +357,19 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         keywordSpecification.setFormat("ROBOT");
         keywordSpecification.setDocumentation(getDocumentation());
         return keywordSpecification;
+    }
+    
+    public int findExecutableRowIndex(final RobotKeywordCall keywordCallWithExeRow) {
+        return getExecutableRows().indexOf(keywordCallWithExeRow);
+    }
+
+    public List<RobotKeywordCall> getExecutableRows() {
+        return newArrayList(filter(getChildren(), new Predicate<RobotKeywordCall>() {
+
+            @Override
+            public boolean apply(final RobotKeywordCall call) {
+                return call.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+            }
+        }));
     }
 }

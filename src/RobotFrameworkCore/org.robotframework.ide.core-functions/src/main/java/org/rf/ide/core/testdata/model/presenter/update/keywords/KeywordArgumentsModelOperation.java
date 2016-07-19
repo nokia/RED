@@ -42,4 +42,14 @@ public class KeywordArgumentsModelOperation implements IKeywordTableElementOpera
         }
     }
 
+    @Override
+    public AModelElement<?> createCopy(final AModelElement<?> modelElement) {
+        return ((KeywordArguments) modelElement).copy();
+    }
+
+    @Override
+    public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
+        userKeyword.addArguments((KeywordArguments) modelElement);
+    }
+
 }

@@ -48,5 +48,15 @@ public class KeywordReturnModelOperation implements IKeywordTableElementOperatio
             keywordReturn.removeElementToken(index);
         }
     }
+    
+    @Override
+    public AModelElement<?> createCopy(final AModelElement<?> modelElement) {
+        return ((KeywordReturn) modelElement).copy();
+    }
+    
+    @Override
+    public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
+        userKeyword.addReturn((KeywordReturn) modelElement);
+    }
 
 }

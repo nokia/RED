@@ -115,4 +115,15 @@ public class KeywordArguments extends AModelElement<UserKeyword> implements ICom
     public boolean removeElementToken(final int index) {
         return super.removeElementFromList(arguments, index);
     }
+    
+    public KeywordArguments copy() {
+        final KeywordArguments keywordArgs = new KeywordArguments(this.getDeclaration().copyWithoutPosition());
+        for (final RobotToken arg : getArguments()) {
+            keywordArgs.addArgument(arg.copyWithoutPosition());
+        }
+        for (final RobotToken commentToken : getComment()) {
+            keywordArgs.addCommentPart(commentToken.copyWithoutPosition());
+        }
+        return keywordArgs;
+    }
 }
