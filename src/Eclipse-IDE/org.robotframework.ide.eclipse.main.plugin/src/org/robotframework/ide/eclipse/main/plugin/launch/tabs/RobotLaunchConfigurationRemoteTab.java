@@ -88,7 +88,7 @@ public class RobotLaunchConfigurationRemoteTab extends AbstractLaunchConfigurati
         });
         
         final Label timeoutLbl = new Label(remoteGroup, SWT.NONE);
-        timeoutLbl.setText("Connection timeout [s]:");
+        timeoutLbl.setText("Connection timeout [ms]:");
 
         timeoutTxt = new Text(remoteGroup, SWT.BORDER);
         GridDataFactory.fillDefaults().hint(100, SWT.DEFAULT).applyTo(timeoutTxt);
