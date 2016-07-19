@@ -31,10 +31,11 @@ public class VariableTableModelUpdaterTest {
     @Test
     public void test_findHandler_scalarVariable() {
         // prepare
-        AVariable var = new ScalarVariable("", new RobotToken(), VariableScope.LOCAL);
+        final AVariable var = new ScalarVariable("", new RobotToken(), VariableScope.LOCAL);
 
         // execute
         @SuppressWarnings("rawtypes")
+        final
         IVariableTableElementOperation handler = new VariableTableModelUpdater().findHandler(var);
 
         // verify
@@ -44,10 +45,11 @@ public class VariableTableModelUpdaterTest {
     @Test
     public void test_findHandler_listVariable() {
         // prepare
-        AVariable var = new ListVariable("", new RobotToken(), VariableScope.LOCAL);
+        final AVariable var = new ListVariable("", new RobotToken(), VariableScope.LOCAL);
 
         // execute
         @SuppressWarnings("rawtypes")
+        final
         IVariableTableElementOperation handler = new VariableTableModelUpdater().findHandler(var);
 
         // verify
@@ -57,10 +59,11 @@ public class VariableTableModelUpdaterTest {
     @Test
     public void test_findHandler_dictionaryVariable() {
         // prepare
-        AVariable var = new DictionaryVariable("", new RobotToken(), VariableScope.LOCAL);
+        final AVariable var = new DictionaryVariable("", new RobotToken(), VariableScope.LOCAL);
 
         // execute
         @SuppressWarnings("rawtypes")
+        final
         IVariableTableElementOperation handler = new VariableTableModelUpdater().findHandler(var);
 
         // verify
@@ -70,10 +73,11 @@ public class VariableTableModelUpdaterTest {
     @Test
     public void test_findHandler_null() {
         // prepare
-        AVariable var = null;
+        final AVariable var = null;
 
         // execute
         @SuppressWarnings("rawtypes")
+        final
         IVariableTableElementOperation handler = new VariableTableModelUpdater().findHandler(var);
 
         // verify
@@ -84,6 +88,7 @@ public class VariableTableModelUpdaterTest {
     public void test_findHandler_unknownType() {
         // prepare
         @SuppressWarnings("serial")
+        final
         AVariable var = new AVariable(null, null, null, null) {
 
             @Override
@@ -93,19 +98,13 @@ public class VariableTableModelUpdaterTest {
             }
 
             @Override
-            public AVariable copy() {
-                // TODO Auto-generated method stub
-                return null;
-            }
-
-            @Override
             public List<RobotToken> getElementTokens() {
                 // TODO Auto-generated method stub
                 return null;
             }
 
             @Override
-            public boolean removeElementToken(int index) {
+            public boolean removeElementToken(final int index) {
                 // TODO Auto-generated method stub
                 return false;
             }
@@ -114,6 +113,7 @@ public class VariableTableModelUpdaterTest {
 
         // execute
         @SuppressWarnings("rawtypes")
+        final
         IVariableTableElementOperation handler = new VariableTableModelUpdater().findHandler(var);
 
         // verify
@@ -127,7 +127,7 @@ public class VariableTableModelUpdaterTest {
         @SuppressWarnings("unchecked")
         final IVariableTableElementOperation<Object> mocked = mock(IVariableTableElementOperation.class);
         final AVariable var = mock(AVariable.class);
-        final List<Object> toAdd = new ArrayList<Object>();
+        final List<Object> toAdd = new ArrayList<>();
         when(mocked.ableToHandle(var)).thenReturn(true);
         when(mocked.convert(toAdd)).thenReturn(toAdd);
 
@@ -137,7 +137,7 @@ public class VariableTableModelUpdaterTest {
         varUpdater.addOrSet(var, 0, toAdd);
 
         // verify
-        InOrder order = inOrder(mocked);
+        final InOrder order = inOrder(mocked);
         order.verify(mocked, times(1)).ableToHandle(var);
         order.verify(mocked, times(1)).convert(toAdd);
         order.verify(mocked, times(1)).addOrSet(var, 0, toAdd);
