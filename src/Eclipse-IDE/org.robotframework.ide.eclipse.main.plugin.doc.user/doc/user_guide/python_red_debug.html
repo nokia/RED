@@ -1,0 +1,74 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>Debug Robot&Python scripts</h2>
+This article provides tutorial how to setup debugging of Python scripts while running Robot testcases.<br>
+For basic Robot testcase/keyword debugging, please refer to Debug topic in Help.<br>
+<h3>Requirements</h3>
+Installed PyDev with RED - Robot Editor.<br>
+This is necessary to be able to run and debug Python scripts within Eclipse.<br>
+<h3>Debug Python scripts while running Robot testcase</h3>
+In general, to allow debugging Python scripts while running Robot testcases, you need to setup Python debug execution in such way that Python interpreter will execute Robot runner with suite with enabled Python debugger.<br>
+This will trigger any Python script's break point during Robot runtime.<br>
+Instructions:<br><br>
+<ul>
+<li>Include project path in PYTHONPATH environment variable</li>
+This can be done by editing variable on OS level or using PyDev Preferences:<br>
+<i>Windows -&gt Preferences -&gt PyDev -&gt Interpreters -&gt Python under Libraries</i><br><br>
+
+<li>Open Debug Configurations:</li>
+<img src="python_red_debug/go_to_debug_conf.png"><br><br>
+<li>Edit or create new Python Run configuration:</li>
+<img src="python_red_debug/edit_pyt_deb_conf.png"><br><br>
+<li>Provide Project to be debugged,together with path to Robot runner run.py:</li>
+<img src="python_red_debug/pyt_deb_main.png"><br><br>
+<li>In Arguments tab, provide arguments passed to run.py for Robot execution.</li>
+This is the list of testcases/whole project to be included during Debug<br>
+<img src="python_red_debug/pyt_deb_arg.png"><br><br>
+If you are uncertain what should be included, try to run Robot testcase and check console:<br>
+<img src="python_red_debug/sample_suite_arg.png"><br><br>
+<li>Apply and Close/Debug</li>
+Running such Debug configuration will start Python debugger.<br>
+Remember to place at least one breakpoint inside Python script.
+</ul>
+<h3>Simultaneously debug Python scripts and Robot testcases</h3>
+This is combination of running Python Debug with Remote Debug of Robot testcases.<br>
+In essence, there needs to be two RED/Eclipse instances - one instance is running Python Debug with modification which allows to connect RED as Remote Debug.<br>
+This way in one instance(in this case it does not need to be Eclipse, any Python env with proper debug&Robot remote arguments) Python debug can be provided, remote RED instance is providing Robot debug functionalities.<br>
+Using 2 Eclipse instances:<br>
+<h4>Eclipse with Python Debug</h4>
+<ul>
+
+<li>Open Debug Configuration</li>
+<li>Cerate or edit any of Robot Debug Configuration to export TestRunner.py script</li>
+TestRunner.py is a script to allow remote RED instance to connect to running Robot.<br>
+<img src="python_red_debug/robot_python_export_deb_scrt.png">
+<li>Edit Python Debug Configuration,in Arguments include remote listener</li>
+Remote listener allows to connect RED instance to running Robot execution which will be provided on this Eclipse instance:<br>
+<i>--listener &ltPATH_TO_TESTRUNNER.PY&gt:&ltLOCAL_PORT&gt:TRUE:&ltLOCAL_IP&gt</i><br>
+<img src="python_red_debug/pyth_rob_listener.png"><br><br>
+<li>Apply&Close</li>
+</ul>
+<h4>RED/Eclipse with Robot Debug</h4>
+<ul>
+<li>Create/open different Workspace than in first Eclipse</li>
+<li>Import Project for Debug</li>
+<i>Right click on Workspace -&gt Import -&gt General -&gt Existing Projects into Workspace</i><br>
+<img src="python_red_debug/import_project.png"><br><br>
+
+Remember to select "Copy projects into workspace"<br>
+<img src="python_red_debug/import_project_copy_into.png"><br><br>
+<li>Edit Debug Configuration for Robot</li>
+In Main tab provide imported Project and testsuites:<br>
+<img src="python_red_debug/robot_debug_main.png"><br><br>
+<li>Configure Remote tab with LOCAL_IP and LOCAL_PORT from former Eclipse</li>
+<img src="python_red_debug/robot_debug_remote.png"><br><br>
+</ul>
+<h4>Running Python&Robot debug</h4>
+Start debug of Python Debug instance first than start debug of Robot Debug instance. 
+</body>
+</html>
