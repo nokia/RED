@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Optional;
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -60,6 +61,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
@@ -95,6 +97,9 @@ import org.robotframework.red.swt.SwtThread;
 import com.google.common.base.Supplier;
 
 public class KeywordsEditorFormFragment implements ISectionFormFragment {
+
+    @Inject
+    private IEventBroker eventBroker;
 
     @Inject
     private IEditorSite site;
@@ -268,8 +273,13 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         return fileModel.findSection(RobotKeywordsSection.class).orNull();
     }
 
-    public void revealElement(final RobotElement setting) {
-        selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
+    public void revealElement(final RobotElement element) {
+        if (dataProvider.isFilterSet() && !dataProvider.isProvided(element)) {
+            final String topic = RobotSuiteEditorEvents.FORM_FILTER_SWITCH_REQUEST_TOPIC + "/"
+                    + RobotKeywordsSection.SECTION_NAME;
+            eventBroker.send(topic, new FilterSwitchRequest(RobotKeywordsSection.SECTION_NAME, ""));
+        }
+        selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
         setFocus();
     }
 
@@ -379,7 +389,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         whenKeywordDefinitionIsAddedOrRemoved(parent.getParent());
     }
 
-    private void whenKeywordDefinitionIsAddedOrRemoved(RobotSuiteFileSection section) {
+    private void whenKeywordDefinitionIsAddedOrRemoved(final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
             dataProvider.setInput(getSection());
