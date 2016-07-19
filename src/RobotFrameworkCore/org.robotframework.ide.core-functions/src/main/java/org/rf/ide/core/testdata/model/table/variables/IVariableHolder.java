@@ -28,8 +28,5 @@ public interface IVariableHolder {
 
     void addCommentPart(final RobotToken rt);
 
-
     RobotToken getDeclaration();
-    
-    IVariableHolder copy();
 }

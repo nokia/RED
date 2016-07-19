@@ -80,20 +80,20 @@ public abstract class AVariable extends AModelElement<VariableTable>
     }
 
     @Override
-    public void setComment(String comment) {
-        RobotToken tok = new RobotToken();
+    public void setComment(final String comment) {
+        final RobotToken tok = new RobotToken();
         tok.setText(comment);
         setComment(tok);
     }
 
     @Override
-    public void setComment(RobotToken comment) {
+    public void setComment(final RobotToken comment) {
         this.comment.clear();
         addCommentPart(comment);
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -114,9 +114,6 @@ public abstract class AVariable extends AModelElement<VariableTable>
     public RobotToken getDeclaration() {
         return declaration;
     }
-
-    @Override
-    public abstract AVariable copy();
 
     public enum VariableScope {
         /**
