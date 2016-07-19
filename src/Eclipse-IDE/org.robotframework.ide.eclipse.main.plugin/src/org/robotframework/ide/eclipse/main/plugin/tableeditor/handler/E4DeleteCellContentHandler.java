@@ -17,6 +17,7 @@ import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.ui.ISources;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -96,9 +97,11 @@ public class E4DeleteCellContentHandler {
             RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) selectedElement;
             if (columnIndex == 0) {
                 return new SetKeywordDefinitionNameCommand(keywordDef, "");
-            } else if (columnIndex > 0 && columnIndex < tableColumnCount - 1
-                    && columnIndex - 1 < keywordDef.getArgumentsSetting().getArguments().size()) {
-                return new SetKeywordDefinitionArgumentCommand(keywordDef, columnIndex - 1, null);
+            } else if (columnIndex > 0 && columnIndex < tableColumnCount - 1) {
+                final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
+                if (argumentsSetting != null && columnIndex - 1 < argumentsSetting.getArguments().size()) {
+                    return new SetKeywordDefinitionArgumentCommand(keywordDef, columnIndex - 1, null);
+                }
             }
         }
         return null;
