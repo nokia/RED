@@ -45,7 +45,8 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
 
             if (columnIndex == 0) {
-                return keywordCall.getLabel();
+                return keywordCall.getLinkedElement().getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW
+                        ? keywordCall.getName() : "[" + keywordCall.getName() + "]";
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                 final List<String> arguments = keywordCall.getArguments();
                 if (columnIndex - 1 < arguments.size()) {
