@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
@@ -32,13 +33,6 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     private static final long serialVersionUID = 1L;
 
-    public static final String DOCUMENTATION = "Documentation";
-    public static final String SETUP = "Setup";
-    public static final String TEARDOWN = "Teardown";
-    public static final String TIMEOUT = "Timeout";
-    public static final String TEMPLATE = "Template";
-    public static final String TAGS = "Tags";
-
     private TestCase testCase;
 
     RobotCase(final RobotCasesSection parent, final String name, final String comment) {
@@ -51,20 +45,8 @@ public class RobotCase extends RobotCodeHoldingElement {
     }
 
     @Override
-    public RobotKeywordCall createKeywordCall(final int modelTableIndex, final int index) {
-        final RobotKeywordCall call = new RobotKeywordCall(this, "", new ArrayList<String>(), "");
-
-        final RobotExecutableRow<TestCase> robotExecutableRow = new RobotExecutableRow<>();
-        getLinkedElement().addTestExecutionRow(robotExecutableRow);
-        call.link(robotExecutableRow);
-
-        getChildren().add(index, call);
-        return call;
-    }
-    
-    @Override
-    public void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex, RobotKeywordCall keywordCall) {
-        
+    public String getName() {
+        return testCase.getDeclaration().getText();
     }
 
     public void link(final TestCase testCase) {
@@ -140,6 +122,24 @@ public class RobotCase extends RobotCodeHoldingElement {
         });
     }
 
+    @Override
+    public RobotKeywordCall createKeywordCall(final int modelTableIndex, final int index) {
+        final RobotKeywordCall call = new RobotKeywordCall(this, "", new ArrayList<String>(), "");
+
+        final RobotExecutableRow<TestCase> robotExecutableRow = new RobotExecutableRow<>();
+        getLinkedElement().addTestExecutionRow(robotExecutableRow);
+        call.link(robotExecutableRow);
+
+        getChildren().add(index, call);
+        return call;
+    }
+
+    @Override
+    public void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex,
+            final RobotKeywordCall keywordCall) {
+
+    }
+
     private static String omitSquareBrackets(final String nameInBrackets) {
         return nameInBrackets.substring(1, nameInBrackets.length() - 1);
     }
@@ -155,61 +155,28 @@ public class RobotCase extends RobotCodeHoldingElement {
                 : RedImages.getTestCaseImage();
     }
 
-    public boolean hasDocumentation() {
-        return getDocumentationSetting() != null;
+    public List<RobotDefinitionSetting> getTagsSetting() {
+        return findSettings(ModelType.TEST_CASE_TAGS);
     }
 
-    public RobotDefinitionSetting getDocumentationSetting() {
-        return findSetting(DOCUMENTATION);
-    }
-
-    public boolean hasSetup() {
-        return getSetupSetting() != null;
-    }
-
-    public RobotDefinitionSetting getSetupSetting() {
-        return findSetting(SETUP);
-    }
-
-    public boolean hasTeardownValue() {
-        return getTeardownSetting() != null;
-    }
-
-    public RobotDefinitionSetting getTeardownSetting() {
-        return findSetting(TEARDOWN);
-    }
-
-    public boolean hasTimeoutValue() {
-        return getTimeoutSetting() != null;
-    }
-
-    public RobotDefinitionSetting getTimeoutSetting() {
-        return findSetting(TIMEOUT);
-    }
-
-    public boolean hasTemplate() {
-        return getTemplateSetting() != null;
-    }
-
-    public RobotDefinitionSetting getTemplateSetting() {
-        return findSetting(TEMPLATE);
-    }
-
-    public boolean hasTags() {
-        return getTagsSetting() != null;
-    }
-
-    public RobotDefinitionSetting getTagsSetting() {
-        return findSetting(TAGS);
-    }
-
-    private RobotDefinitionSetting findSetting(final String name) {
+    private List<RobotDefinitionSetting> findSettings(final ModelType modelType) {
+        final List<RobotDefinitionSetting> matchingSettings = new ArrayList<>();
         for (final RobotKeywordCall call : getChildren()) {
-            if (call instanceof RobotDefinitionSetting && call.getName().equals(name)) {
-                return (RobotDefinitionSetting) call;
+            if (call instanceof RobotDefinitionSetting && call.getLinkedElement().getModelType() == modelType) {
+                matchingSettings.add((RobotDefinitionSetting) call);
             }
         }
-        return null;
+        return matchingSettings;
+    }
+
+    public Optional<String> getTemplateInUse() {
+        return Optional.fromNullable(testCase.getTemplateKeywordName());
+    }
+
+    @Override
+    public DefinitionPosition getDefinitionPosition() {
+        return new DefinitionPosition(testCase.getTestName().getFilePosition(),
+                testCase.getTestName().getText().length());
     }
 
     @Override
@@ -223,13 +190,8 @@ public class RobotCase extends RobotCodeHoldingElement {
     }
 
     @Override
-    public DefinitionPosition getDefinitionPosition() {
-        return new DefinitionPosition(testCase.getTestName().getFilePosition(),
-                testCase.getTestName().getText().length());
+    public String toString() {
+        // for debugging purposes only
+        return getName();
     }
-
-    public Optional<String> getTemplateInUse() {
-        return Optional.fromNullable(testCase.getTemplateKeywordName());
-    }
-
 }
