@@ -19,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPar
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart.CasesEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -86,6 +87,11 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
         @Override
         public SelectionLayerAccessor getSelectionLayerAccessor() {
             return casesFragment.getSelectionLayerAccessor();
+        }
+        
+        @Override
+        public Optional<TreeLayerAccessor> getTreeLayerAccessor() {
+            return Optional.absent();
         }
         
         @Override

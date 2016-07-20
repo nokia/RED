@@ -59,7 +59,13 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     }
     
     @Override
+    public Optional<TreeLayerAccessor> getTreeLayerAccessor() {
+        return getComponent().getTreeLayerAccessor();
+    }
+    
+    @Override
     public void waitForPendingJobs() {
         getComponent().waitForPendingJobs();
     }
+
 }

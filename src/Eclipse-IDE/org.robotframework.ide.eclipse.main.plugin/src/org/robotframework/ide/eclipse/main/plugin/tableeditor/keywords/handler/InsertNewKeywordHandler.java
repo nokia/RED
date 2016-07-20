@@ -42,17 +42,17 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
                     RobotElement.class);
 
             EditorCommand newKeywordCommand = null;
-            RobotKeywordDefinition definition = null;
             if (selectedElement.isPresent()) {
                 if (selectedElement.get() instanceof RobotKeywordCall) {
-                    definition = (RobotKeywordDefinition) selectedElement.get().getParent();
+                    final RobotKeywordDefinition definition = (RobotKeywordDefinition) selectedElement.get()
+                            .getParent();
                     final int codeHoldingElementIndex = definition.getChildren().indexOf(selectedElement.get());
                     final int modelTableIndex = ((RobotKeywordDefinition) selectedElement.get().getParent())
                             .findExecutableRowIndex((RobotKeywordCall) selectedElement.get());
                     newKeywordCommand = new CreateFreshKeywordCallCommand(definition, modelTableIndex,
                             codeHoldingElementIndex);
                 } else if (selectedElement.get() instanceof RobotKeywordDefinition) {
-                    definition = (RobotKeywordDefinition) selectedElement.get();
+                    final RobotKeywordDefinition definition = (RobotKeywordDefinition) selectedElement.get();
                     final RobotSuiteFileSection section = definition.getParent();
                     if (section != null) {
                         final int index = section.getChildren().indexOf(definition);
@@ -62,11 +62,9 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
                 }
             }
 
-            if (newKeywordCommand == null || definition == null) {
-                return null;
+            if (newKeywordCommand != null) {
+                stack.execute(newKeywordCommand);
             }
-
-            stack.execute(newKeywordCommand);
 
             return null;
         }
