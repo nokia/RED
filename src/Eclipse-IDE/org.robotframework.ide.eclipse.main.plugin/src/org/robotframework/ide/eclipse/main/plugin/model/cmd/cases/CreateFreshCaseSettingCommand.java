@@ -3,11 +3,13 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
@@ -33,7 +35,11 @@ public class CreateFreshCaseSettingCommand extends EditorCommand {
 
     @Override
     protected void execute() throws CommandExecutionException {
-        testCase.createDefinitionSetting(index, settingName, args, "");
+        final RobotDefinitionSetting setting = testCase.createCaseSetting(index, settingName, args, "");
+
+        if (setting.getLinkedElement().getModelType() == ModelType.TEST_CASE_SETTING_UNKNOWN) {
+            setting.getLinkedElement().getDeclaration().setText(settingName);
+        }
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, testCase);
     }

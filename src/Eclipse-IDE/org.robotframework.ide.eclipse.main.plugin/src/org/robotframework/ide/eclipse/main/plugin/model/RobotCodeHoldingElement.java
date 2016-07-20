@@ -31,12 +31,14 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     }
 
     public RobotKeywordCall createKeywordCall() {
-        return createKeywordCall(-1, -1);
+        return createKeywordCall("", -1, -1);
     }
 
-    public abstract RobotKeywordCall createKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex);
-    
-    public abstract void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex, final RobotKeywordCall keywordCall);
+    public abstract RobotKeywordCall createKeywordCall(String callName, int modelTableIndex,
+            final int codeHoldingElementIndex);
+
+    public abstract void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex,
+            final RobotKeywordCall keywordCall);
 
     public RobotDefinitionSetting createDefinitionSetting(final String name, final List<String> args,
             final String comment) {

@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ObjectStreamException;
@@ -18,6 +19,7 @@ import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
@@ -25,11 +27,14 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
+import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
 
 public class RobotCase extends RobotCodeHoldingElement {
 
@@ -54,7 +59,7 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     public void link() {
         for (final RobotExecutableRow<TestCase> execRow : testCase.getTestExecutionRows()) {
-            final String callName = execRow.getAction().getText().toString();
+            final String callName = execRow.getAction().getText();
             final List<String> args = newArrayList(
                     Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
             final RobotKeywordCall call = new RobotKeywordCall(this, callName, args, "");
@@ -63,7 +68,7 @@ public class RobotCase extends RobotCodeHoldingElement {
         }
         // settings
         for (final TestDocumentation documentation : testCase.getDocumentation()) {
-            final String name = documentation.getDeclaration().getText().toString();
+            final String name = documentation.getDeclaration().getText();
             final List<String> args = newArrayList(
                     Lists.transform(documentation.getDocumentationText(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
@@ -71,45 +76,53 @@ public class RobotCase extends RobotCodeHoldingElement {
             getChildren().add(setting);
         }
         for (final TestCaseTags tags : testCase.getTags()) {
-            final String name = tags.getDeclaration().getText().toString();
+            final String name = tags.getDeclaration().getText();
             final List<String> args = newArrayList(Lists.transform(tags.getTags(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(tags);
             getChildren().add(setting);
         }
         for (final TestCaseSetup setup : testCase.getSetups()) {
-            final String name = setup.getDeclaration().getText().toString();
+            final String name = setup.getDeclaration().getText();
             final List<String> args = setup.getKeywordName() == null ? new ArrayList<String>()
-                    : newArrayList(setup.getKeywordName().getText().toString());
+                    : newArrayList(setup.getKeywordName().getText());
             args.addAll(Lists.transform(setup.getArguments(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(setup);
             getChildren().add(setting);
         }
         for (final TestCaseTemplate template : testCase.getTemplates()) {
-            final String name = template.getDeclaration().getText().toString();
+            final String name = template.getDeclaration().getText();
             final List<String> args = template.getKeywordName() == null ? new ArrayList<String>()
-                    : newArrayList(template.getKeywordName().getText().toString());
+                    : newArrayList(template.getKeywordName().getText());
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(template);
             getChildren().add(setting);
         }
         for (final TestCaseTimeout timeout : testCase.getTimeouts()) {
-            final String name = timeout.getDeclaration().getText().toString();
+            final String name = timeout.getDeclaration().getText();
             final List<String> args = timeout.getTimeout() == null ? new ArrayList<String>()
-                    : newArrayList(timeout.getTimeout().getText().toString());
+                    : newArrayList(timeout.getTimeout().getText());
             args.addAll(Lists.transform(timeout.getMessage(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(timeout);
             getChildren().add(setting);
         }
         for (final TestCaseTeardown teardown : testCase.getTeardowns()) {
-            final String name = teardown.getDeclaration().getText().toString();
+            final String name = teardown.getDeclaration().getText();
             final List<String> args = teardown.getKeywordName() == null ? new ArrayList<String>()
-                    : newArrayList(teardown.getKeywordName().getText().toString());
+                    : newArrayList(teardown.getKeywordName().getText());
             args.addAll(Lists.transform(teardown.getArguments(), TokenFunctions.tokenToString()));
             final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
             setting.link(teardown);
+            getChildren().add(setting);
+        }
+        for (final TestCaseUnknownSettings unknown : testCase.getUnknownSettings()) {
+            final String name = unknown.getDeclaration().getText();
+            final List<String> args = newArrayList(
+                    Lists.transform(unknown.getArguments(), TokenFunctions.tokenToString()));
+            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, "");
+            setting.link(unknown);
             getChildren().add(setting);
         }
 
@@ -124,15 +137,35 @@ public class RobotCase extends RobotCodeHoldingElement {
     }
 
     @Override
-    public RobotKeywordCall createKeywordCall(final int modelTableIndex, final int index) {
-        final RobotKeywordCall call = new RobotKeywordCall(this, "", new ArrayList<String>(), "");
+    public RobotKeywordCall createKeywordCall(final String callName, final int modelTableIndex,
+            final int codeHoldingElementIndex) {
+        final RobotKeywordCall call = new RobotKeywordCall(this, callName, new ArrayList<String>(), "");
 
         final RobotExecutableRow<TestCase> robotExecutableRow = new RobotExecutableRow<>();
-        getLinkedElement().addTestExecutionRow(robotExecutableRow);
+        robotExecutableRow.getAction().setText(callName);
+        final int realModelTableIndex = Range.closed(0, testCase.getExecutionContext().size()).contains(modelTableIndex)
+                ? modelTableIndex : testCase.getExecutionContext().size();
+        getLinkedElement().addTestExecutionRow(robotExecutableRow, realModelTableIndex);
+
         call.link(robotExecutableRow);
 
-        getChildren().add(index, call);
+        final int realCodeHoldingElementIndex = Range.closed(0, getChildren().size()).contains(codeHoldingElementIndex)
+                ? codeHoldingElementIndex : getChildren().size();
+        getChildren().add(realCodeHoldingElementIndex, call);
         return call;
+    }
+
+    public RobotDefinitionSetting createCaseSetting(final int index, final String settingName, final List<String> args,
+            final String comment) {
+        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(settingName), args,
+                comment);
+
+        final AModelElement<?> newModelElement = new TestCaseTableModelUpdater().create(getLinkedElement(), settingName,
+                comment, args);
+        setting.link(newModelElement);
+
+        getChildren().add(index, setting);
+        return setting;
     }
 
     @Override
@@ -188,6 +221,19 @@ public class RobotCase extends RobotCodeHoldingElement {
             return new Position(begin.getOffset(), end.getOffset() - begin.getOffset());
         }
         return new Position(0);
+    }
+
+    public int findExecutableRowIndex(final RobotKeywordCall call) {
+        return getExecutableRows(0, getChildren().size()).indexOf(call);
+    }
+
+    public List<RobotKeywordCall> getExecutableRows(final int from, final int to) {
+        return newArrayList(filter(getChildren().subList(from, to), new Predicate<RobotKeywordCall>() {
+            @Override
+            public boolean apply(final RobotKeywordCall call) {
+                return call.getLinkedElement().getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW;
+            }
+        }));
     }
 
     @SuppressWarnings("unchecked")
