@@ -47,7 +47,7 @@
     </topic>
 	<topic href="doc/user_guide/red_pylint.html" label="PyDev with PyLint together with RED">
     </topic>
-	<topic href="doc/user_guide/debug.html" label="Debug Robot testcase/keyword">
+	<topic href="doc/user_guide/debug.html" label="Debug Robot">
     </topic>
 	<topic href="doc/user_guide/python_red_debug.html" label="Debug Robot&Python scripts">
     </topic>
