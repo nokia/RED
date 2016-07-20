@@ -8,12 +8,13 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.ISources;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.CollapseAllHandler.E4CollapseAllHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
+
+import com.google.common.base.Optional;
 
 public class CollapseAllHandler extends DIParameterizedHandler<E4CollapseAllHandler> {
 
@@ -25,11 +26,13 @@ public class CollapseAllHandler extends DIParameterizedHandler<E4CollapseAllHand
 
         @Execute
         public Object collapseAll(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
-            final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
-            final TreeViewer viewer = (TreeViewer) viewerAccessor.getViewer();
-            viewer.getTree().setRedraw(false);
-            viewer.collapseAll();
-            viewer.getTree().setRedraw(true);
+
+            final Optional<TreeLayerAccessor> treeLayerAccessor = editor.getTreeLayerAccessor();
+
+            if (treeLayerAccessor.isPresent()) {
+                treeLayerAccessor.get().collapseAll();
+            }
+
             return null;
         }
     }
