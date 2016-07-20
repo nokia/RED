@@ -17,10 +17,6 @@
  <topic href="doc/user_guide/user_guide.html" label="User guide">
      <topic href="doc/user_guide/quick_start.html" label="Quick start with RED - Robot Editor">
     </topic>
-    <topic href="doc/user_guide/general.html" label="General usage hints - running selected test,validation, code assist, clean&amp;build,Quick Fix">
-    </topic>
-	<topic href="doc/user_guide/table_general.html" label="Table Editors - general usage hints">
-    </topic>
     <topic href="doc/user_guide/libs.html" label="Recognizing external libraries and variable files in RED">
     </topic>
     <topic href="doc/user_guide/variable_mapping.html" label="Variable mapping - dealing with parametrized paths to libraries and resources">
@@ -32,6 +28,8 @@
     <topic href="doc/user_guide/remote.html" label="Remote debug">
     </topic>
     <topic href="doc/user_guide/importing.html" label="Importing files and projects to workspace.">
+    </topic>
+    <topic href="doc/user_guide/general.html" label="General usage hints - running selected test,validation, code assist, clean&amp;build,Quick Fix">
     </topic>
     <topic href="doc/user_guide/keys.html" label="RED key shortcuts">
     </topic>
@@ -45,13 +43,6 @@
     </topic>
 	<topic href="doc/user_guide/headless.html" label="Headless - running validation in command line">
     </topic>
-	<topic href="doc/user_guide/red_pylint.html" label="PyDev with PyLint together with RED">
-    </topic>
-	<topic href="doc/user_guide/debug.html" label="Debug Robot">
-    </topic>
-	<topic href="doc/user_guide/python_red_debug.html" label="Debug Robot&Python scripts">
-    </topic>
-	
 
  </topic>
 </toc>
