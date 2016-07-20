@@ -8,13 +8,14 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 
 public class SetCaseSettingArgumentCommand extends SetKeywordCallArgumentCommand {
 
-    public SetCaseSettingArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value) {
-        super(keywordCall, index, value);
+    public SetCaseSettingArgumentCommand(final RobotDefinitionSetting setting, final int index,
+            final String value) {
+        super(setting, index, value);
     }
 
     @Override

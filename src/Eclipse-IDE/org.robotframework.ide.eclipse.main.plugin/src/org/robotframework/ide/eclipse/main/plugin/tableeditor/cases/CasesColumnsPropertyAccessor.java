@@ -8,20 +8,23 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateFreshCaseSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseSettingCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseSettingNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -79,15 +82,10 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
         } else if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall call = (RobotKeywordCall) rowObject;
 
-            if (isCandidateForNewKeywordSetting(call, value, columnIndex)) {
-                final boolean isKeywordSettingCreated = createNewKeywordSettingAndRemoveOldExeRow(value, call);
-                if (isKeywordSettingCreated) {
-                    return;
-                }
-            }
-
-            if (call.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
-                if (columnIndex == 0) {
+            if (isExecutable(call)) {
+                if (columnIndex == 0 && looksLikeSetting(value)) {
+                    changeToSetting(value, call);
+                } else if (columnIndex == 0) {
                     commandsStack.execute(new SetKeywordCallNameCommand(call, value));
                 } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordCallArgumentCommand(call, columnIndex - 1, value));
@@ -95,38 +93,65 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
                     commandsStack.execute(new SetKeywordCallCommentCommand(call, value));
                 }
             } else {
-                if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetCaseSettingArgumentCommand(call, columnIndex - 1, value));
+                final RobotDefinitionSetting setting = (RobotDefinitionSetting) call;
+                if (columnIndex == 0 && !looksLikeSetting(value)) {
+                    changeToCall(value, setting);
+                } else if (columnIndex == 0) {
+                    commandsStack.execute(new SetCaseSettingNameCommand(setting, value));
+                } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
+                    commandsStack.execute(new SetCaseSettingArgumentCommand(setting, columnIndex - 1, value));
                 } else if (columnIndex == (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetCaseSettingCommentCommand(call, value));
+                    commandsStack.execute(new SetCaseSettingCommentCommand(setting, value));
                 }
             }
         }
     }
 
-    private boolean isCandidateForNewKeywordSetting(final RobotKeywordCall keywordCall, final String value,
-            final int columnIndex) {
-        return value.startsWith("[") && value.endsWith("]") && columnIndex == 0
-                && keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+    private boolean isExecutable(final RobotKeywordCall call) {
+        return call.getLinkedElement().getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW;
     }
 
-    private boolean createNewKeywordSettingAndRemoveOldExeRow(final String value, final RobotKeywordCall keywordCall) {
-        final RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(value);
-        if (tokenType != RobotTokenType.UNKNOWN && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS
-                && tokenType != RobotTokenType.KEYWORD_SETTING_DOCUMENTATION) {
-            final RobotKeywordDefinition keywordDefinition = (RobotKeywordDefinition) keywordCall.getParent();
-            keywordDefinition.getLinkedElement()
-                    .removeExecutableRow((RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement());
+    private boolean looksLikeSetting(final String value) {
+        return value.startsWith("[") && value.endsWith("]");
+    }
 
-            final List<RobotKeywordCall> children = keywordDefinition.getChildren();
-            final int index = children.indexOf(keywordCall);
-            children.remove(keywordCall);
+    @SuppressWarnings("unchecked")
+    private void changeToSetting(final String value, final RobotKeywordCall call) {
+        RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForTestCaseSettingTable(value);
+        tokenType = tokenType == RobotTokenType.UNKNOWN ? RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION
+                : tokenType;
 
-            commandsStack.execute(
-                    new CreateFreshKeywordSettingCommand(keywordDefinition, index, value, keywordCall.getArguments()));
-            return true;
+        final RobotCase testCase = (RobotCase) call.getParent();
+        testCase.getLinkedElement().removeExecutableRow((RobotExecutableRow<TestCase>) call.getLinkedElement());
+
+        final List<RobotKeywordCall> children = testCase.getChildren();
+        final int index = children.indexOf(call);
+        children.remove(call);
+
+        commandsStack.execute(new CreateFreshCaseSettingCommand(testCase, index, value, call.getArguments()));
+    }
+
+    @SuppressWarnings("unchecked")
+    private void changeToCall(final String value, final RobotDefinitionSetting setting) {
+        final RobotCase testCase = (RobotCase) setting.getParent();
+
+        final List<RobotKeywordCall> children = testCase.getChildren();
+        final int index = children.indexOf(setting);
+        children.remove(setting);
+
+        final List<RobotKeywordCall> executablesBeforeSetting = testCase.getExecutableRows(0, index);
+        int modelIndex;
+        if (executablesBeforeSetting.isEmpty()) {
+            modelIndex = 0;
+        } else {
+            final AModelElement<?> lastExecutable = executablesBeforeSetting.get(executablesBeforeSetting.size() - 1)
+                    .getLinkedElement();
+            modelIndex = testCase.getLinkedElement().getExecutionContext().indexOf(lastExecutable) + 1;
         }
-        return false;
+        final TestCase modelCase = (TestCase) setting.getLinkedElement().getParent();
+        modelCase.removeUnitSettings((AModelElement<TestCase>) setting.getLinkedElement());
+
+        commandsStack.execute(new CreateFreshKeywordCallCommand(testCase, value, modelIndex, index));
     }
 
     @Override

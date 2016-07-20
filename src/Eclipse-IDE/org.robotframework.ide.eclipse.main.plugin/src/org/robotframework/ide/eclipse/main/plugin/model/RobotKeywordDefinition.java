@@ -67,8 +67,9 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     }
 
     @Override
-    public RobotKeywordCall createKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex) {
-        final RobotKeywordCall call = new RobotKeywordCall(this, "", new ArrayList<String>(), "");
+    public RobotKeywordCall createKeywordCall(final String callName, final int modelTableIndex,
+            final int codeHoldingElementIndex) {
+        final RobotKeywordCall call = new RobotKeywordCall(this, callName, new ArrayList<String>(), "");
 
         final RobotExecutableRow<UserKeyword> robotExecutableRow = new RobotExecutableRow<>();
         if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
