@@ -27,30 +27,34 @@ public class MoveKeywordCallDownCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
             final IRobotCodeHoldingElement codeElement = keywordCall.getParent();
-            final int size = codeElement.getChildren().size();
+//            final int size = codeElement.getChildren().size();
             final int index = codeElement.getChildren().indexOf(keywordCall);
-            if (index == size - 1) {
-                // lets try to move the element down from here
-                final int defsSize = codeElement.getParent().getChildren().size();
-                final int indexOfElement = codeElement.getParent().getChildren().indexOf(codeElement);
-                if (indexOfElement == defsSize - 1) {
-                    return;
-                }
-                final IRobotCodeHoldingElement targetElement = (IRobotCodeHoldingElement) codeElement.getParent()
-                        .getChildren()
-                        .get(indexOfElement + 1);
-
-                codeElement.getChildren().remove(index);
-                targetElement.getChildren().add(0, keywordCall);
-                keywordCall.setParent(targetElement);
-
-                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, targetElement);
-                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeElement);
-
-                return;
+            
+         // TODO: will be support for parent changes in model?
+//            if (index == size - 1) {
+//                // lets try to move the element down from here
+//                final int defsSize = codeElement.getParent().getChildren().size();
+//                final int indexOfElement = codeElement.getParent().getChildren().indexOf(codeElement);
+//                if (indexOfElement == defsSize - 1) {
+//                    return;
+//                }
+//                final IRobotCodeHoldingElement targetElement = (IRobotCodeHoldingElement) codeElement.getParent()
+//                        .getChildren()
+//                        .get(indexOfElement + 1);
+//
+//                codeElement.getChildren().remove(index);
+//                targetElement.getChildren().add(0, keywordCall);
+//                keywordCall.setParent(targetElement);
+//
+//                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, targetElement);
+//                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeElement);
+//
+//                return;
+//            }
+            if(index < codeElement.getChildren().size()-1) {
+                Collections.swap(codeElement.getChildren(), index, index + 1);
             }
-            Collections.swap(codeElement.getChildren(), index, index + 1);
-
+            
             final Object linkedElement = codeElement.getLinkedElement();
             if (linkedElement != null && linkedElement instanceof UserKeyword) {
                 ((UserKeyword) linkedElement)
