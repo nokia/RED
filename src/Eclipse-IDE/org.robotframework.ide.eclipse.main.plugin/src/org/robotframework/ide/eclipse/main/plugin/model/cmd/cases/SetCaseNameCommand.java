@@ -3,8 +3,9 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -24,8 +25,9 @@ public class SetCaseNameCommand extends EditorCommand {
         if (newName.equals(testCase.getName())) {
             return;
         }
-        
-        testCase.setName(newName);
+        final RobotToken nameToken = RobotToken.create(newName);
+        testCase.getLinkedElement().setTestName(nameToken);
+
         eventBroker.send(RobotModelEvents.ROBOT_CASE_NAME_CHANGE, testCase);
     }
 }

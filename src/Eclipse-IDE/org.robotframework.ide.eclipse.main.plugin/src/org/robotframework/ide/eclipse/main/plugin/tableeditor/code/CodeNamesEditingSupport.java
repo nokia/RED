@@ -19,9 +19,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 

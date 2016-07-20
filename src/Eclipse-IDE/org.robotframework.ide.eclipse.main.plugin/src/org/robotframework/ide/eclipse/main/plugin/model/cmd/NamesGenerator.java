@@ -31,7 +31,7 @@ public class NamesGenerator {
         }
     }
 
-    static String generateUniqueName(final RobotElement parent, final String prefix) {
+    public static String generateUniqueName(final RobotElement parent, final String prefix) {
         return generateUniqueName(parent, prefix, true);
     }
 
