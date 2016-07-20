@@ -33,10 +33,6 @@ public class TestCaseUnknownSettings extends AModelElement<TestCase> implements 
         fixForTheType(declaration, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION);
     }
 
-    public void addArgument(final RobotToken arg) {
-        this.arguments.add(arg);
-    }
-
     public List<RobotToken> getArguments() {
         return Collections.unmodifiableList(arguments);
     }
@@ -49,6 +45,19 @@ public class TestCaseUnknownSettings extends AModelElement<TestCase> implements 
     @Override
     public ModelType getModelType() {
         return ModelType.TEST_CASE_SETTING_UNKNOWN;
+    }
+
+    public void addArgument(final String argument) {
+        addArgument(arguments.size(), argument);
+    }
+
+    public void addArgument(final int index, final String argument) {
+        updateOrCreateTokenInside(arguments, index, argument, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS);
+    }
+
+    public void addArgument(final RobotToken argument) {
+        fixForTheType(argument, RobotTokenType.TEST_CASE_SETTING_UNKNOWN_ARGUMENTS, true);
+        this.arguments.add(argument);
     }
 
     @Override

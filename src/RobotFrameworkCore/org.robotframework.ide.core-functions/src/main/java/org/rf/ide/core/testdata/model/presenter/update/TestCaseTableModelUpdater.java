@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTagsMod
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTeardownModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTemplateModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseTimeoutModelOperation;
+import org.rf.ide.core.testdata.model.presenter.update.testcases.TestCaseUnkownModelOperation;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -23,7 +24,8 @@ public class TestCaseTableModelUpdater {
     private static final List<ITestCaseTableElementOperation> elementOparations = Arrays.asList(
             new TestCaseDocumentationModelOperation(), new TestCaseSetupModelOperation(),
             new TestCaseTagsModelOperation(), new TestCaseTeardownModelOperation(),
-            new TestCaseTemplateModelOperation(), new TestCaseTimeoutModelOperation());
+            new TestCaseTemplateModelOperation(), new TestCaseTimeoutModelOperation(),
+            new TestCaseUnkownModelOperation());
 
     public AModelElement<TestCase> create(final TestCase testCase, final String settingName, final String comment,
             final List<String> args) {
@@ -70,7 +72,9 @@ public class TestCaseTableModelUpdater {
     }
 
     private ITestCaseTableElementOperation getOperationHandler(final String settingName) {
-        return getOperationHandler(RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(settingName));
+        final RobotTokenType type = RobotTokenType.findTypeOfDeclarationForTestCaseSettingTable(settingName);
+        return getOperationHandler(
+                type == RobotTokenType.UNKNOWN ? RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION : type);
     }
 
     private ITestCaseTableElementOperation getOperationHandler(final IRobotTokenType type) {

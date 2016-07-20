@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.model.table.testcases;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -65,7 +67,18 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         return getTestName();
     }
 
+    public TestCaseUnknownSettings newUnknownSettings() {
+        final RobotToken dec = RobotToken.create("[]",
+                newArrayList(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION));
+
+        final TestCaseUnknownSettings unknown = new TestCaseUnknownSettings(dec);
+        addUnknownSettings(unknown);
+
+        return unknown;
+    }
+
     public void addUnknownSettings(final TestCaseUnknownSettings unknownSetting) {
+        unknownSetting.setParent(this);
         this.unknownSettings.add(unknownSetting);
     }
 
