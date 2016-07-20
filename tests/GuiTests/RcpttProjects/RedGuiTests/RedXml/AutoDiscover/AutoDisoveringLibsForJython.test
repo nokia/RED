@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _dOy-EAJFEea9vai2oGByIg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/20/16 10:42 AM
+Save-Time: 7/20/16 10:51 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -124,7 +124,7 @@ try -times 10 -delay 2500 -command{
 }
 //check that window was not shown adnd lib was added to red.xml    
 verify-error {get-window "Discovering libraries summary"}
-
+wait 500
 get-editor "jython_simple_project/red.xml" | click
 
 with [get-tab-folder -index 1] {
