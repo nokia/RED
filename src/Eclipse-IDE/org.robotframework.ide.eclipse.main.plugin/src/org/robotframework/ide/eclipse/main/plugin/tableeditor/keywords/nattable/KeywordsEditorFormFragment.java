@@ -75,6 +75,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsMatchesCollection.KeywordsFilter;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
@@ -128,6 +129,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private RowSelectionProvider<Object> selectionProvider;
     
     private SelectionLayerAccessor selectionLayerAccessor;
+    
+    private TreeLayerAccessor treeLayerAccessor;
 
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
@@ -135,6 +138,10 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         return selectionLayerAccessor;
+    }
+    
+    public TreeLayerAccessor getTreeLayerAccessor() {
+        return treeLayerAccessor;
     }
 
     public NatTable getTable() {
@@ -209,6 +216,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
+        treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
         new RedNatTableContentTooltip(table, markersContainer, dataProvider);
     }

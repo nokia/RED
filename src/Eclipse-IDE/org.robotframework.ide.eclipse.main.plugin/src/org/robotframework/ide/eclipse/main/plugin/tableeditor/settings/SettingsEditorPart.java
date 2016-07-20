@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragme
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.SettingsEditorPart.SettingsEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -144,6 +145,12 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             }
             return settingsEditorPageSelectionProvider.getSelectionLayerAccessor();
         }
+        
+
+        @Override
+        public Optional<TreeLayerAccessor> getTreeLayerAccessor() {
+            return Optional.absent();
+        }
 
         @Override
         public void waitForPendingJobs() {
@@ -174,5 +181,6 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
             final IDirtyProviderService dirtyProviderService = getContext().getActive(IDirtyProviderService.class);
             dirtyProviderService.setDirtyState(false);
         }
+
     }
 }
