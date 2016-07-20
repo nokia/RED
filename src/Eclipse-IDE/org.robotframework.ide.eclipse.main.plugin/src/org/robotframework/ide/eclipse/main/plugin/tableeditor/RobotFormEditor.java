@@ -358,6 +358,14 @@ public class RobotFormEditor extends FormEditor {
         }
         return null;
     }
+    
+    public com.google.common.base.Optional<TreeLayerAccessor> getTreeLayerAccessor() {
+        final IEditorPart activeEditor = getActiveEditor();
+        if (activeEditor instanceof ISectionEditorPart) {
+            return ((ISectionEditorPart) activeEditor).getTreeLayerAccessor();
+        }
+        return com.google.common.base.Optional.absent();
+    }
 
     public RobotSuiteFile provideSuiteModel() {
         if (suiteModel != null) {

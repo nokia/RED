@@ -28,6 +28,8 @@ public interface ISectionEditorPart {
     FocusedViewerAccessor getFocusedViewerAccessor();
 
     SelectionLayerAccessor getSelectionLayerAccessor();
+    
+    com.google.common.base.Optional<TreeLayerAccessor> getTreeLayerAccessor();
 
     void waitForPendingJobs();
 }

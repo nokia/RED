@@ -19,6 +19,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.DISectionEditorPar
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart.KeywordsEditor;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -76,15 +77,12 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
             keywordsFragment = new org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment();
-//            org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment k2 = 
-//                    new org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment();
             detailsFragment = new KeywordSettingsFormFragment();
             return newArrayList(keywordsFragment, detailsFragment);
         }
 
         @Override
         protected ISelectionProvider getSelectionProvider() {
-            //return keywordsFragment.getViewer();
             return keywordsFragment.getSelectionProvider();
         }
 
@@ -92,10 +90,16 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         public SelectionLayerAccessor getSelectionLayerAccessor() {
             return keywordsFragment.getSelectionLayerAccessor();
         }
+        
+        @Override
+        public Optional<TreeLayerAccessor> getTreeLayerAccessor() {
+            return Optional.of(keywordsFragment.getTreeLayerAccessor());
+        }
 
         @Override
         public void waitForPendingJobs() {
             return;
         }
+        
     }
 }
