@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/18/16 4:39 PM
+Save-Time: 7/20/16 10:57 AM
 Testcase-Type: ecl
 Verifications: _h9dwwETtEeaEVfxTnoQ14g
 
@@ -322,15 +322,17 @@ with [get-editor "text_file.txt"] {
         type-text 79890778
     }
 }
-try -times 10 -delay 1000 -command{
-//check if new item is in Outlie and PE
-	with [get-view Outline | get-tree] {
-	    get-item "text_file.txt/Variables" | get-property childCount | equals 2 | verify-true
-	    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList | verify-true
-	    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[1].getText()" | equals newScalar 
-	        | verify-true
-	}
+wait 500
+
+//this is workaround - closing Oultine for faster refresh
+get-view Outline | close
+get-menu "Window/Show View/Other..." | click
+with [get-window "Show View"] {
+    get-editbox | set-text out
+    get-tree | select "General/Outline" | double-click
 }
+get-view "Project Explorer" | get-tree | select RobotProject | key-type F5
+
 with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/text_file.txt/Variables" | get-property childCount | equals 2 | verify-true
     get-item "RobotProject/text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList 
