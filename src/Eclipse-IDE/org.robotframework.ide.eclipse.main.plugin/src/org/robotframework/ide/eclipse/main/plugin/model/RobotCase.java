@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -14,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -187,6 +189,16 @@ public class RobotCase extends RobotCodeHoldingElement {
             return new Position(begin.getOffset(), end.getOffset() - begin.getOffset());
         }
         return new Position(0);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object readResolve() throws ObjectStreamException {
+        // after deserialization we fix parent relationship in direct children
+        for (final RobotKeywordCall call : getChildren()) {
+            ((AModelElement<TestCase>) call.getLinkedElement()).setParent(testCase);
+            call.setParent(this);
+        }
+        return this;
     }
 
     @Override
