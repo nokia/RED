@@ -1,7 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.filePositionsSet;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.filePositions;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.noFilePositions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.nullParent;
 
 import java.util.List;
@@ -14,16 +15,15 @@ public class RobotKeywordDefinitionTest {
     @Test
     public void copyBySerializationTest() {
         for (final RobotKeywordDefinition keyword : createKeywordsForTest()) {
-            assertThat(keyword).has(RobotKeywordDefinitionConditions.properlySetParent()).has(filePositionsSet());
             
+            assertThat(keyword).has(RobotKeywordDefinitionConditions.properlySetParent()).has(filePositions());
             for (final RobotKeywordCall call : keyword.getChildren()) {
-                assertThat(call).has(RobotKeywordCallConditions.properlySetParent());
-                assertThat(call).has(filePositionsSet());
+                assertThat(call).has(RobotKeywordCallConditions.properlySetParent()).has(filePositions());
             }
 
             final RobotKeywordDefinition keywordCopy = ModelElementsSerDe.copy(keyword);
-            assertThat(keywordCopy).isNotSameAs(keyword).has(nullParent()).doesNotHave(filePositionsSet());
 
+            assertThat(keywordCopy).isNotSameAs(keyword).has(nullParent()).has(noFilePositions());
             assertThat(keywordCopy.getChildren().size()).isEqualTo(keyword.getChildren().size());
             for (int i = 0; i < keywordCopy.getChildren().size(); i++) {
                 final RobotKeywordCall call = keyword.getChildren().get(i);
@@ -31,7 +31,7 @@ public class RobotKeywordDefinitionTest {
 
                 assertThat(callCopy).isNotSameAs(call)
                         .has(RobotKeywordCallConditions.properlySetParent())
-                        .doesNotHave(filePositionsSet());
+                        .has(noFilePositions());
 
                 assertThat(callCopy.getName()).isEqualTo(call.getName());
                 assertThat(callCopy.getArguments()).containsExactlyElementsOf(call.getArguments());

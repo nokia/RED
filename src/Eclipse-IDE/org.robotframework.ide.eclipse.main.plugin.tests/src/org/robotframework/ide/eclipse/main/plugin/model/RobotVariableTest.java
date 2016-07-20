@@ -1,7 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.filePositionsSet;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.filePositions;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.noFilePositions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.nullParent;
 import static org.robotframework.ide.eclipse.main.plugin.model.RobotVariableConditions.properlySetParent;
 
@@ -15,10 +16,10 @@ public class RobotVariableTest {
     @Test
     public void copyBySerializationTest() {
         for (final RobotVariable variable : createVariablesForTest()) {
-            assertThat(variable).has(properlySetParent()).has(filePositionsSet());
+            assertThat(variable).has(properlySetParent()).has(filePositions());
 
             final RobotVariable variableCopy = ModelElementsSerDe.copy(variable);
-            assertThat(variableCopy).isNotSameAs(variable).has(nullParent()).doesNotHave(filePositionsSet());
+            assertThat(variableCopy).isNotSameAs(variable).has(nullParent()).has(noFilePositions());
             assertThat(variableCopy.getLinkedElement()).isNotSameAs(variable.getLinkedElement());
 
             assertThat(variableCopy.getName()).isEqualTo(variable.getName());
