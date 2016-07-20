@@ -29,27 +29,31 @@ public class MoveKeywordCallUpCommand extends EditorCommand {
         if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
             final IRobotCodeHoldingElement codeElement = keywordCall.getParent();
             final int index = codeElement.getChildren().indexOf(keywordCall);
-            if (index == 0) {
-                // lets try to the element up from here
-                final int indexOfElement = codeElement.getParent().getChildren().indexOf(codeElement);
-                if (indexOfElement == 0) {
-                    return;
-                }
-                final IRobotCodeHoldingElement targetElement = (IRobotCodeHoldingElement) codeElement.getParent()
-                        .getChildren()
-                        .get(indexOfElement - 1);
-
-                codeElement.getChildren().remove(index);
-                targetElement.getChildren().add(keywordCall);
-                keywordCall.setParent(targetElement);
-
-                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, targetElement);
-                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeElement);
-
-                return;
+            
+            // TODO: will be support for parent changes in model?
+//            if (index == 0) {
+//                // lets try to the element up from here
+//                final int indexOfElement = codeElement.getParent().getChildren().indexOf(codeElement);
+//                if (indexOfElement == 0) {
+//                    return;
+//                }
+//                final IRobotCodeHoldingElement targetElement = (IRobotCodeHoldingElement) codeElement.getParent()
+//                        .getChildren()
+//                        .get(indexOfElement - 1);
+//
+//                codeElement.getChildren().remove(index);
+//                targetElement.getChildren().add(keywordCall);
+//                keywordCall.setParent(targetElement);
+//
+//                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, targetElement);
+//                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeElement);
+//
+//                return;
+//            }
+            if(index > 0) {
+                Collections.swap(codeElement.getChildren(), index, index - 1);
             }
-            Collections.swap(codeElement.getChildren(), index, index - 1);
-
+            
             final Object linkedElement = codeElement.getLinkedElement();
             if (linkedElement != null && linkedElement instanceof UserKeyword) {
                 ((UserKeyword) linkedElement)
