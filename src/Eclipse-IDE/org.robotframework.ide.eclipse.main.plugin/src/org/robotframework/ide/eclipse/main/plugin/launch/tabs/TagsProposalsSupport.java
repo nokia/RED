@@ -209,15 +209,16 @@ class TagsProposalsSupport {
         }
 
         private Collection<SourcedTag> extractTagProposalsFromTestCase(final RobotCase testCases) {
-            final RobotDefinitionSetting tagsSetting = testCases.getTagsSetting();
-            if (tagsSetting != null && tagsSetting.getArguments() != null) {
-                final List<SourcedTag> tags = new ArrayList<>();
-                for (final String tag : tagsSetting.getArguments()) {
-                    tags.add(new SourcedTag(testCases.getName().toLowerCase(), tag));
+            final List<RobotDefinitionSetting> tagsSettings = testCases.getTagsSetting();
+            final List<SourcedTag> tags = new ArrayList<>();
+            for (final RobotDefinitionSetting tagsSetting : tagsSettings) {
+                if (tagsSetting.getArguments() != null) {
+                    for (final String tag : tagsSetting.getArguments()) {
+                        tags.add(new SourcedTag(testCases.getName().toLowerCase(), tag));
+                    }
                 }
-                return tags;
             }
-            return new ArrayList<>();
+            return tags;
         }
     }
 
