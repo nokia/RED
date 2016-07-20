@@ -59,6 +59,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     public void addUnknownSettings(final KeywordUnknownSettings unknownSetting) {
+        unknownSetting.setParent(this);
         this.unknownSettings.add(unknownSetting);
     }
 
