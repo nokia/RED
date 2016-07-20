@@ -24,14 +24,9 @@ public class SetCaseCommentCommand extends EditorCommand {
         if (testCase.getComment().equals(newComment)) {
             return;
         }
-        testCase.setComment(newComment);
+        // testCase.setComment(newComment);
 
-        // it has to be send, not posted
-        // otherwise it is not possible to traverse between cells, because the
-        // cell
-        // is traversed and then main thread has to handle incoming posted event
-        // which
-        // closes currently active cell editor
+        // FIXME: don't need this command at all, since Test Case has no comment inside
         eventBroker.send(RobotModelEvents.ROBOT_CASE_COMMENT_CHANGE, testCase);
     }
 }
