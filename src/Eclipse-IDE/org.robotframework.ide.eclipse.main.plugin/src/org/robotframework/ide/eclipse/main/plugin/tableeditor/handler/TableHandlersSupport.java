@@ -78,8 +78,7 @@ public class TableHandlersSupport {
     public static List<RobotKeywordDefinition> createKeywordDefsCopy(final List<RobotKeywordDefinition> keywordDefs) {
         final List<RobotKeywordDefinition> keywordDefsCopy = new ArrayList<>();
         for (final RobotKeywordDefinition keywordDef : keywordDefs) {
-            final RobotKeywordDefinition newDef = new RobotKeywordDefinition(null, new String(keywordDef.getName()),
-                    new String(keywordDef.getComment()));
+            final RobotKeywordDefinition newDef = new RobotKeywordDefinition(null, new String(keywordDef.getName()));
             newDef.getChildren().addAll(createKeywordCallsCopy(keywordDef.getChildren()));
             keywordDefsCopy.add(newDef);
         }

@@ -5,8 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Iterables.any;
+import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
@@ -38,9 +38,9 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
     }
 
     public RobotKeywordDefinition createKeywordDefinition(final int index, final String name) {
-        final RobotKeywordDefinition keywordDefinition = new RobotKeywordDefinition(this, name, "");
+        final RobotKeywordDefinition keywordDefinition = new RobotKeywordDefinition(this, name);
         
-        KeywordTable keywordsTable = (KeywordTable) this.getLinkedElement();
+        final KeywordTable keywordsTable = (KeywordTable) this.getLinkedElement();
         if(index >= 0 && index < keywordsTable.getKeywords().size() && index < getChildren().size()) {
             keywordDefinition.link(keywordsTable.createUserKeyword(name, index));
             elements.add(index, keywordDefinition);
@@ -64,8 +64,7 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
         });
         final String newKeywordDefinitionName = hasKeywordDefinitionNameAlreadyInTable
                 ? NamesGenerator.generateUniqueName(this, definition.getName(), true) : definition.getName();
-        final RobotKeywordDefinition newKeywordDefinition = new RobotKeywordDefinition(this, newKeywordDefinitionName,
-                definition.getComment());
+        final RobotKeywordDefinition newKeywordDefinition = new RobotKeywordDefinition(this, newKeywordDefinitionName);
 
         final RobotToken nameToken = new RobotToken();
         nameToken.setText(newKeywordDefinitionName);
@@ -132,7 +131,7 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
         final KeywordTable keywordsTable = (KeywordTable) sectionTable;
         for (final UserKeyword keyword : keywordsTable.getKeywords()) {
             final RobotKeywordDefinition definition = new RobotKeywordDefinition(this,
-                    keyword.getKeywordName().getText().toString(), "");
+                    keyword.getKeywordName().getText().toString());
             definition.link(keyword);
             elements.add(definition);
         }

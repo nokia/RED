@@ -35,10 +35,11 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     private static final long serialVersionUID = 1L;
 
-    private TestCase testCase;
+    private final TestCase testCase;
 
-    RobotCase(final RobotCasesSection parent, final String name, final String comment) {
-        super(parent, name, comment);
+    RobotCase(final RobotCasesSection parent, final TestCase testCase) {
+        super(parent, "");
+        this.testCase = testCase;
     }
 
     @Override
@@ -51,9 +52,7 @@ public class RobotCase extends RobotCodeHoldingElement {
         return testCase.getDeclaration().getText();
     }
 
-    public void link(final TestCase testCase) {
-        this.testCase = testCase;
-
+    public void link() {
         for (final RobotExecutableRow<TestCase> execRow : testCase.getTestExecutionRows()) {
             final String callName = execRow.getAction().getText().toString();
             final List<String> args = newArrayList(
