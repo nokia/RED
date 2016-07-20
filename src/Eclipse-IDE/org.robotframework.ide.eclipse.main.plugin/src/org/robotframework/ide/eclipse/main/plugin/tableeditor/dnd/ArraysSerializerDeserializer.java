@@ -9,6 +9,14 @@ import java.lang.reflect.Array;
 
 public class ArraysSerializerDeserializer {
 
+    public static <T> T[] copy(final Class<T> clazz, final T[] toCopy) {
+        try {
+            return deserialize(clazz, serialize(toCopy));
+        } catch (ClassNotFoundException | IOException e) {
+            throw new IllegalStateException("Unable to copy array", e);
+        }
+    }
+
     public static <T> byte[] serialize(final T[] toSerialize) throws IOException {
         try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
                 ObjectOutputStream stream = new ObjectOutputStream(bos)) {

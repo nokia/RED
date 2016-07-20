@@ -7,6 +7,7 @@ package org.robotframework.red.viewers;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -19,6 +20,12 @@ import com.google.common.collect.Iterables;
 public class Selections {
 
     public static final String SELECTION = "selection";
+
+    @SuppressWarnings("unchecked")
+    public static <T> T[] getElementsArray(final IStructuredSelection selection, final Class<T> elementsClass) {
+        return newArrayList(Iterables.filter(selection.toList(), elementsClass))
+                .toArray((T[]) Array.newInstance(elementsClass, 0));
+    }
 
     public static <T> List<T> getElements(final IStructuredSelection selection, final Class<T> elementsClass) {
         return newArrayList(Iterables.filter(selection.toList(), elementsClass));
