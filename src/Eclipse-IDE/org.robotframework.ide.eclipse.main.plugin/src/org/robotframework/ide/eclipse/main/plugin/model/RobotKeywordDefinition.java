@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.ObjectStreamException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -379,5 +380,21 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
                 return call.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
             }
         }));
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object readResolve() throws ObjectStreamException {
+        // after deserialization we fix parent relationship in direct children
+        for (final RobotKeywordCall call : getChildren()) {
+            call.setParent(this);
+            ((AModelElement<UserKeyword>) call.getLinkedElement()).setParent(keyword);
+        }
+        return this;
+    }
+
+    @Override
+    public String toString() {
+        // for debugging purposes only
+        return getName();
     }
 }
