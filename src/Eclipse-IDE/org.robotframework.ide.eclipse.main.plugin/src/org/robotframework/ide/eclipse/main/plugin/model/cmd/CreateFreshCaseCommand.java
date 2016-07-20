@@ -35,9 +35,9 @@ public class CreateFreshCaseCommand extends EditorCommand {
         final String name = NamesGenerator.generateUniqueName(casesSection, DEFAULT_NAME);
 
         if (index == -1) {
-            casesSection.createTestCase(name, "");
+            casesSection.createTestCase(name);
         } else {
-            casesSection.createTestCase(index, name, "");
+            casesSection.createTestCase(index, name);
         }
 
         if (notifySync) {
