@@ -49,7 +49,7 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
                     final int codeHoldingElementIndex = definition.getChildren().indexOf(selectedElement.get());
                     final int modelTableIndex = ((RobotKeywordDefinition) selectedElement.get().getParent())
                             .findExecutableRowIndex((RobotKeywordCall) selectedElement.get());
-                    newKeywordCommand = new CreateFreshKeywordCallCommand(definition, modelTableIndex,
+                    newKeywordCommand = new CreateFreshKeywordCallCommand(definition, "", modelTableIndex,
                             codeHoldingElementIndex);
                 } else if (selectedElement.get() instanceof RobotKeywordDefinition) {
                     final RobotKeywordDefinition definition = (RobotKeywordDefinition) selectedElement.get();
