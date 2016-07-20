@@ -1,7 +1,8 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.filePositionsSet;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.filePositions;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.noFilePositions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.nullParent;
 
 import java.util.List;
@@ -14,16 +15,15 @@ public class RobotCaseTest {
     @Test
     public void copyBySerializationTest() {
         for (final RobotCase testCase : createCasesForTest()) {
-            assertThat(testCase).has(RobotCaseConditions.properlySetParent()).has(filePositionsSet());
             
+            assertThat(testCase).has(RobotCaseConditions.properlySetParent()).has(filePositions());
             for (final RobotKeywordCall call : testCase.getChildren()) {
-                assertThat(call).has(RobotKeywordCallConditions.properlySetParent());
-                assertThat(call).has(filePositionsSet());
+                assertThat(call).has(RobotKeywordCallConditions.properlySetParent()).has(filePositions());
             }
 
             final RobotCase testCaseCopy = ModelElementsSerDe.copy(testCase);
-            assertThat(testCaseCopy).isNotSameAs(testCase).has(nullParent()).doesNotHave(filePositionsSet());
 
+            assertThat(testCaseCopy).isNotSameAs(testCase).has(nullParent()).has(noFilePositions());
             assertThat(testCaseCopy.getChildren().size()).isEqualTo(testCase.getChildren().size());
             for (int i = 0; i < testCaseCopy.getChildren().size(); i++) {
                 final RobotKeywordCall call = testCase.getChildren().get(i);
@@ -31,7 +31,7 @@ public class RobotCaseTest {
 
                 assertThat(callCopy).isNotSameAs(call)
                         .has(RobotKeywordCallConditions.properlySetParent())
-                        .doesNotHave(filePositionsSet());
+                        .has(noFilePositions());
 
                 assertThat(callCopy.getName()).isEqualTo(call.getName());
                 assertThat(callCopy.getArguments()).containsExactlyElementsOf(call.getArguments());
