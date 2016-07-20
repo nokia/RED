@@ -19,16 +19,14 @@ public class RobotCasesSection extends RobotSuiteFileSection {
         super(parent, SECTION_NAME);
     }
 
-    public RobotCase createTestCase(final String name, final String comment) {
-        return createTestCase(getChildren().size(), name, comment);
+    public RobotCase createTestCase(final String name) {
+        return createTestCase(getChildren().size(), name);
     }
 
-    public RobotCase createTestCase(final int index, final String name, final String comment) {
-        final RobotCase testCase = new RobotCase(this, name, comment);
-
+    public RobotCase createTestCase(final int index, final String name) {
         final TestCaseTable casesTable = (TestCaseTable) this.getLinkedElement();
-        testCase.link(casesTable.createTestCase(name));
-
+        final TestCase userTestCase = casesTable.createTestCase(name);
+        final RobotCase testCase = new RobotCase(this, userTestCase);
         elements.add(index, testCase);
         return testCase;
     }
@@ -45,8 +43,8 @@ public class RobotCasesSection extends RobotSuiteFileSection {
 
         final TestCaseTable testCaseTable = (TestCaseTable) sectionTable;
         for (final TestCase testCase : testCaseTable.getTestCases()) {
-            final RobotCase newTestCase = new RobotCase(this, testCase.getTestName().getText().toString(), "");
-            newTestCase.link(testCase);
+            final RobotCase newTestCase = new RobotCase(this, testCase);
+            newTestCase.link();
             elements.add(newTestCase);
         }
     }

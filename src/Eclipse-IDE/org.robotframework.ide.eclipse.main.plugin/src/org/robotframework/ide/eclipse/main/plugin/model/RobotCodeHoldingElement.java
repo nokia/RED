@@ -22,14 +22,12 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     private transient RobotSuiteFileSection parent;
 
     private String name;
-    private String comment;
 
     private final List<RobotKeywordCall> calls = newArrayList();
 
-    RobotCodeHoldingElement(final RobotSuiteFileSection parent, final String name, final String comment) {
+    RobotCodeHoldingElement(final RobotSuiteFileSection parent, final String name) {
         this.parent = parent;
         this.name = name;
-        this.comment = comment;
     }
 
     public RobotKeywordCall createKeywordCall() {
@@ -63,11 +61,7 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
 
     @Override
     public String getComment() {
-        return comment;
-    }
-
-    public void setComment(final String comment) {
-        this.comment = comment;
+        return "";
     }
 
     @Override
