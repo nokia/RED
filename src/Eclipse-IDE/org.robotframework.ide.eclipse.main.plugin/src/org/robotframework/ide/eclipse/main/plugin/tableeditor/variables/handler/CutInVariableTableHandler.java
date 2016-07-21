@@ -37,8 +37,7 @@ public class CutInVariableTableHandler extends DIParameterizedHandler<E4CutInVar
 
             final boolean copiedToClipboard = new E4CopyInVariableTableHandler().copy(editor, selection, clipboard);
             if (copiedToClipboard) {
-                final E4DeleteInVariableTableHandler deleteHandler = new E4DeleteInVariableTableHandler();
-                deleteHandler.delete(commandsStack, editor, selection);
+                new E4DeleteInVariableTableHandler().delete(commandsStack, editor, selection);
             }
         }
     }
