@@ -324,7 +324,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         return new NewElementsCreator<RobotElement>() {
 
             @Override
-            public RobotElement createNew() {
+            public RobotElement createNew(final int addingTokenRowIndex) {
                 SwtThread.asyncExec(new Runnable() {
                     @Override
                     public void run() {
