@@ -87,14 +87,19 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         return call;
     }
     
-    public RobotDefinitionSetting createKeywordDefinitionSetting(final int index, final String name,
-            final List<String> args, final String comment) {
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args,
+    @Override
+    public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
+            final String comment) {
+        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(settingName), args,
                 comment);
 
-        final AModelElement<?> newModelElement = new KeywordTableModelUpdater().create(getLinkedElement(), name,
+        final AModelElement<?> newModelElement = new KeywordTableModelUpdater().create(getLinkedElement(), settingName,
                 comment, args);
         setting.link(newModelElement);
+
+        if (newModelElement.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN) {
+            newModelElement.getDeclaration().setText(settingName);
+        }
 
         getChildren().add(index, setting);
         return setting;
