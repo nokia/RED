@@ -22,7 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCodeHolderSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeEditorFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeSettingsFormFragment;
@@ -41,8 +41,7 @@ public class KeywordSettingsFormFragment extends CodeSettingsFormFragment {
     @Override
     protected EditorCommand createCommandForDocumentationCreation(
             final RobotCodeHoldingElement codeElement, final String newDocumentation) {
-        return new CreateFreshKeywordSettingCommand((RobotKeywordDefinition) codeElement, 0, "Documentation",
-                newArrayList(newDocumentation));
+        return new CreateFreshCodeHolderSettingCommand(codeElement, 0, "Documentation", newArrayList(newDocumentation));
     }
 
     @Override

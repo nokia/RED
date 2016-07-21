@@ -40,10 +40,8 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     public abstract void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex,
             final RobotKeywordCall keywordCall);
 
-    public RobotDefinitionSetting createDefinitionSetting(final String name, final List<String> args,
-            final String comment) {
-        return createDefinitionSetting(getChildren().size(), name, args, comment);
-    }
+    public abstract RobotDefinitionSetting createSetting(final int index, final String name, final List<String> args,
+            final String comment);
 
     public RobotDefinitionSetting createDefinitionSetting(final int index, final String name, final List<String> args,
             final String comment) {

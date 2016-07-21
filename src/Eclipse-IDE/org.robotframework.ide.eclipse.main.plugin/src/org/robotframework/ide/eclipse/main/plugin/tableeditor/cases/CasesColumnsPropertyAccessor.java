@@ -16,11 +16,11 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCodeHolderSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateFreshCaseSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseSettingCommentCommand;
@@ -128,7 +128,7 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
         final int index = children.indexOf(call);
         children.remove(call);
 
-        commandsStack.execute(new CreateFreshCaseSettingCommand(testCase, index, value, call.getArguments()));
+        commandsStack.execute(new CreateFreshCodeHolderSettingCommand(testCase, index, value, call.getArguments()));
     }
 
     @SuppressWarnings("unchecked")
