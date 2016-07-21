@@ -9,26 +9,27 @@
 
 <h3>External libraries installed by pip or included in testcase by file path</h3>
 
-In order to provide validation and keyword assistance of external libraries ( any library not bundled with RobotFramework), external library <b>needs</b> to be included in <b> red.xml </b> file in the Referenced libraries part. </br>
+In order to provide validation and keyword assistance of external libraries (any library not bundled with RobotFramework), external library <b>needs</b> to be included in <b> red.xml </b> file in the Referenced libraries part. </br>
 <br>
 There are few ways to include library into red.xml
 <h3>Library autodiscovery</h3>
 Main mechanism to include libraries' keywords in RED is done by autodiscovery mechanism. Mechanism works on two levels - during test edition and executed in Project Explorer on group of files and folders. </br>
 Every time when user edits test suite which has error markers on library declaration, autodiscovery is executed together with save action.<br>
-When there is a need to run autodiscovery on list of files,folders or whole project, this can be achieved by using right click menu in Project Explorer from Robot Framework option.  
+When there is a need to run autodiscovery on list of files, folders or whole project, this can be achieved by using right click menu in Project Explorer from Robot Framework option.  
 <br><br><img src="libs/autodiscovery_menu.png"> <br><br>
 
-Autodiscovery mechanism is configured per project, its preferences are stored in red.xml file under Referenced Libraries tab.
+Autodiscovery mechanism is configured per project. Its preferences are stored in red.xml file under Referenced Libraries tab.
 <h3>Add library from Project Explorer</h3>
-External libraries as python files can be directly included to red.xml file by right clicking on file and using option <br>
-<i>Robot Framework -> Add Library to red.xml </i>
+External libraries as python files can be directly included to red.xml file by right clicking on file and using option:<br>
+<i>Robot Framework -> Add Library to red.xml.</i>
 <h3>Quick Fix - shortcut CTRL+1</h3>
 Lets focus on following example:
 <br><br><img src="libs/libs_1.png"> <br><br>
 
 In sample testcase, there are two libraries included. CalculatorLibrary.py is custom user local library placed in the same folder as testcase, Selenium2Library was installed by pip.<br>
-Both libraries are not recognized by RED as libraries names are underlined and error markers are placed next to line numbers. <br>Note the light bulb in error marker - it indicates that there is Quick Fix action available.  
-<br>Click on the library name in test editor, open right click menu and choose Quick Fix or use CTRL+1
+Both libraries are not recognized by RED as libraries names are underlined and error markers are placed next to line numbers. <br>
+Note the light bulb in error marker - it indicates that there is Quick Fix action available.  
+<br>Click on the library name in test editor, open right click menu and choose Quick Fix or use CTRL+1.
 <br><br><img src="libs/libs_2.png"> <br><br>
 Double click on Discover option, RED will search either PythonPath or library file path, if successful library will be added to Referenced libraries in red.xml 
 <br><br><img src="libs/libs_3.png"> <br><br>
@@ -37,7 +38,7 @@ All changes are stored in red.xml, if you need to modify them, open red.xml usin
 
 <h3>Using libspec file when external library is not present locally</h3>
 
-In some scenarios,testware edit happens on different host than test runtime thus it is undesirable/unnecessary to install/import all libraries as on remote host. RobotFramework provides possibility to generate an xml file with list of keywords, this also provides agile test development where libraries are developed in parallel to test cases.<br>
+In some scenarios, testware edit happens on different host than test runtime thus it is undesirable/unnecessary to install/import all libraries as on remote host. RobotFramework provides possibility to generate an xml file with list of keywords, this also provides agile test development where libraries are developed in parallel to test cases.<br>
 Libspec file can be included instead of link to external library by using red.xml editor.<br><br>
 For more information about LibDoc please refer to <a href="https://robot-framework.readthedocs.org/en/2.9/_modules/robot/libdoc.html">https://robot-framework.readthedocs.org/en/2.9/_modules/robot/libdoc.html</a> <br>
 <h3>Errors while importing Referenced Libraries </h3>
