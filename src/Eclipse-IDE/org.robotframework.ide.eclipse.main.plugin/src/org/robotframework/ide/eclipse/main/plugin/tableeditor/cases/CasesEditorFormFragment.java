@@ -15,6 +15,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -300,7 +301,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
                 } else {
                     final RobotCasesSection section = dataProvider.getInput();
-                    commandsStack.execute(new CreateFreshCaseCommand(section, true));
+                    commandsStack.execute(new CreateFreshCaseCommand(section));
                     createdElement = section.getChildren().get(section.getChildren().size() - 1);
                 }
                 SwtThread.asyncExec(new Runnable() {
@@ -346,21 +347,41 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenCaseIsAddedOrRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_CASE_STRUCTURAL_ALL) final RobotSuiteFileSection section) {
+    private void whenCaseIsAdded(
+            @UIEventTopic(RobotModelEvents.ROBOT_CASE_ADDED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
-            dataProvider.setInput(getSection());
-            table.refresh();
-            setDirty();
+        }
+        whenCaseIsAddedOrRemoved(section);
+    }
+
+    @Inject
+    @Optional
+    private void whenCaseIsRemoved(
+            @UIEventTopic(RobotModelEvents.ROBOT_CASE_REMOVED) final RobotSuiteFileSection section) {
+        whenCaseIsAddedOrRemoved(section);
+        if (getSection() != null && section.getChildren().isEmpty()) {
+            selectionLayerAccessor.getSelectionLayer().clear();
         }
     }
 
     @Inject
     @Optional
-    private void whenCaseIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_CASE_ADDED) final RobotSuiteFileSection section) {
+    private void whenCaseIsMoved(@UIEventTopic(RobotModelEvents.ROBOT_CASE_MOVED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+        }
+        final ISelection oldSelection = selectionProvider.getSelection();
+        whenCaseIsAddedOrRemoved(section);
+        selectionProvider.setSelection(oldSelection);
+    }
+
+    private void whenCaseIsAddedOrRemoved(final RobotSuiteFileSection section) {
+        if (section.getSuiteFile() == fileModel) {
+            sortModel.clear();
+            dataProvider.setInput(getSection());
+            table.refresh();
+            setDirty();
         }
     }
 

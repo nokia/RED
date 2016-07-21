@@ -75,12 +75,6 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
         this.parent = parent;
     }
 
-    public void fixParents() {
-        for (final RobotKeywordCall call : calls) {
-            call.fixParents(this);
-        }
-    }
-
     @Override
     public List<RobotKeywordCall> getChildren() {
         return calls;
