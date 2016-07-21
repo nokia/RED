@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
@@ -11,7 +11,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
-public class CreateFreshCaseSettingCommandTest {
+public class CreateFreshCodeHolderSettingCommandTest {
 
     @Test
     public void test() {
