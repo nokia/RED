@@ -16,7 +16,7 @@ In general, to allow debugging Python scripts while running Robot testcases, you
 This will trigger any Python script's break point during Robot runtime.<br>
 Instructions:<br><br>
 <ul>
-<li>Include project path in PYTHONPATH environment variable</li>
+<li>Include project path in PYTHONPATH environment variable.</li>
 This can be done by editing variable on OS level or using PyDev Preferences:<br>
 <i>Windows -&gt Preferences -&gt PyDev -&gt Interpreters -&gt Python under Libraries</i><br><br>
 
@@ -24,21 +24,21 @@ This can be done by editing variable on OS level or using PyDev Preferences:<br>
 <img src="python_red_debug/go_to_debug_conf.png"><br><br>
 <li>Edit or create new Python Run configuration:</li>
 <img src="python_red_debug/edit_pyt_deb_conf.png"><br><br>
-<li>Provide Project to be debugged,together with path to Robot runner run.py:</li>
+<li>Provide Project to be debugged, together with path to Robot runner run.py:</li>
 <img src="python_red_debug/pyt_deb_main.png"><br><br>
 <li>In Arguments tab, provide arguments passed to run.py for Robot execution.</li>
-This is the list of testcases/whole project to be included during Debug<br>
+This is the list of testcases/whole project to be included during Debug.<br>
 <img src="python_red_debug/pyt_deb_arg.png"><br><br>
 If you are uncertain what should be included, try to run Robot testcase and check console:<br>
 <img src="python_red_debug/sample_suite_arg.png"><br><br>
-<li>Apply and Close/Debug</li>
+<li>Apply and Close/Debug.</li>
 Running such Debug configuration will start Python debugger.<br>
 Remember to place at least one breakpoint inside Python script.
 </ul>
 <h3>Simultaneously debug Python scripts and Robot testcases</h3>
 This is combination of running Python Debug with Remote Debug of Robot testcases.<br>
 In essence, there needs to be two RED/Eclipse instances - one instance is running Python Debug with modification which allows to connect RED as Remote Debug.<br>
-This way in one instance(in this case it does not need to be Eclipse, any Python env with proper debug&Robot remote arguments) Python debug can be provided, remote RED instance is providing Robot debug functionalities.<br>
+This way in one instance (in this case it does not need to be Eclipse, any Python env with proper debug&Robot remote arguments) Python debug can be provided, remote RED instance is providing Robot debug functionalities.<br>
 Using 2 Eclipse instances:<br>
 <h4>Eclipse with Python Debug</h4>
 <ul>
@@ -47,7 +47,7 @@ Using 2 Eclipse instances:<br>
 <li>Cerate or edit any of Robot Debug Configuration to export TestRunner.py script</li>
 TestRunner.py is a script to allow remote RED instance to connect to running Robot.<br>
 <img src="python_red_debug/robot_python_export_deb_scrt.png">
-<li>Edit Python Debug Configuration,in Arguments include remote listener</li>
+<li>Edit Python Debug Configuration: in Arguments include remote listener</li>
 Remote listener allows to connect RED instance to running Robot execution which will be provided on this Eclipse instance:<br>
 <i>--listener &ltPATH_TO_TESTRUNNER.PY&gt:&ltLOCAL_PORT&gt:TRUE:&ltLOCAL_IP&gt</i><br>
 <b>Note: arguments are position sensitive!</b></br>
@@ -61,7 +61,7 @@ Remote listener allows to connect RED instance to running Robot execution which 
 <i>Right click on Workspace -&gt Import -&gt General -&gt Existing Projects into Workspace</i><br>
 <img src="python_red_debug/import_project.png"><br><br>
 
-Remember to select "Copy projects into workspace"<br>
+Remember to select "Copy projects into workspace".<br>
 <img src="python_red_debug/import_project_copy_into.png"><br><br>
 <li>Edit Debug Configuration for Robot</li>
 In Main tab provide imported Project and testsuites:<br>
