@@ -3,10 +3,11 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
@@ -27,6 +28,11 @@ public class DeleteCasesCommand extends EditorCommand {
         }
         final RobotSuiteFileSection casesSection = casesToDelete.get(0).getParent();
         casesSection.getChildren().removeAll(casesToDelete);
+        
+        final TestCaseTable linkedElement = (TestCaseTable) casesSection.getLinkedElement();
+        for (final RobotCase caseToDelete : casesToDelete) {
+            linkedElement.removeTest(caseToDelete.getLinkedElement());
+        }
 
         eventBroker.post(RobotModelEvents.ROBOT_CASE_REMOVED, casesSection);
     }
