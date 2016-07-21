@@ -1681,9 +1681,26 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <reference
+          <or>
+            <reference
                 definitionId="org.robotframework.exactlyOneElementIsSelected">
-          </reference>
+            </reference>
+            <with
+                  variable="selection">
+               <and>
+                  <count
+                        value="1">
+                  </count>
+                  <iterate
+                        ifEmpty="false"
+                        operator="and">
+                     <instanceof
+                           value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
+                     </instanceof>
+                  </iterate>
+               </and>
+            </with>
+          </or>
        </enabledWhen>
     </handler>
     <handler
@@ -1765,9 +1782,12 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <reference
-                definitionId="org.robotframework.selectedElementsHaveSameType">
-          </reference>
+          <with
+                variable="selection">
+             <count
+                   value="+">
+             </count>
+          </with>
        </enabledWhen>
     </handler>
  </extension>

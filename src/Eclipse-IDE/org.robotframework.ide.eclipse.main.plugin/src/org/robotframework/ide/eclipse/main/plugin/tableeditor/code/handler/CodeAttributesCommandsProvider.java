@@ -18,13 +18,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordCallArg
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.RemoveKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.RemoveKeywordDefinitionArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetCaseCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 

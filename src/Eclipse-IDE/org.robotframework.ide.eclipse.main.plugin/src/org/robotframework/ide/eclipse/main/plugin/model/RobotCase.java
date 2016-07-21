@@ -155,7 +155,7 @@ public class RobotCase extends RobotCodeHoldingElement {
         return call;
     }
 
-    public RobotDefinitionSetting createCaseSetting(final int index, final String settingName, final List<String> args,
+    public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
             final String comment) {
         final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(settingName), args,
                 comment);

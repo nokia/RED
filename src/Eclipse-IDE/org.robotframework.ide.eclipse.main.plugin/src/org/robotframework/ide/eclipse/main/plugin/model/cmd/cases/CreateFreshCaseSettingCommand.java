@@ -24,8 +24,7 @@ public class CreateFreshCaseSettingCommand extends EditorCommand {
 
     private final int index;
 
-    public CreateFreshCaseSettingCommand(final RobotCase testCase, final int index,
-            final String settingName,
+    public CreateFreshCaseSettingCommand(final RobotCase testCase, final int index, final String settingName,
             final List<String> args) {
         this.testCase = testCase;
         this.index = index;
@@ -35,7 +34,7 @@ public class CreateFreshCaseSettingCommand extends EditorCommand {
 
     @Override
     protected void execute() throws CommandExecutionException {
-        final RobotDefinitionSetting setting = testCase.createCaseSetting(index, settingName, args, "");
+        final RobotDefinitionSetting setting = testCase.createSetting(index, settingName, args, "");
 
         if (setting.getLinkedElement().getModelType() == ModelType.TEST_CASE_SETTING_UNKNOWN) {
             setting.getLinkedElement().getDeclaration().setText(settingName);

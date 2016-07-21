@@ -12,8 +12,8 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveCaseUpCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveKeywordCallUpCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.MoveCaseUpCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseUpHandler.E4MoveCaseUpHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -33,7 +33,7 @@ public class MoveCaseUpHandler extends DIParameterizedHandler<E4MoveCaseUpHandle
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public Object moveCaseUp(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void moveCaseUp(@Named(Selections.SELECTION) final IStructuredSelection selection) {
             final Optional<RobotKeywordCall> maybeKeywordCall = Selections.getOptionalFirstElement(selection,
                     RobotKeywordCall.class);
             final Optional<RobotCase> maybeTestCase = Selections.getOptionalFirstElement(selection, RobotCase.class);
@@ -43,7 +43,6 @@ public class MoveCaseUpHandler extends DIParameterizedHandler<E4MoveCaseUpHandle
             } else if (maybeTestCase.isPresent()) {
                 commandsStack.execute(new MoveCaseUpCommand(maybeTestCase.get()));
             }
-            return null;
         }
     }
 }

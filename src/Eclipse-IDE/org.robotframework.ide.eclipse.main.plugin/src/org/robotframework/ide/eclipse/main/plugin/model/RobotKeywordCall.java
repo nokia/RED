@@ -76,10 +76,6 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         this.parent = parent;
     }
 
-    void fixParents(final IRobotCodeHoldingElement parent) {
-        this.parent = parent;
-    }
-
     @Override
     public RobotSuiteFile getSuiteFile() {
         return parent.getSuiteFile();
