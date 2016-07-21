@@ -76,7 +76,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
                     @Override
                     public boolean apply(final RobotKeywordCall call) {
                         final ModelType modelType = call.getLinkedElement().getModelType();
-                        return modelType != ModelType.USER_KEYWORD_DOCUMENTATION && modelType != ModelType.USER_KEYWORD_ARGUMENTS;
+                        return modelType != ModelType.USER_KEYWORD_ARGUMENTS;
                     }
                 })));
                 keywordsSortedList.add(new AddingToken(robotKeywordDefinition, KeywordsAdderState.CALL));
@@ -99,7 +99,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
                     }
                 } else if (element instanceof RobotKeywordCall) {
                     final RobotKeywordCall keyword = (RobotKeywordCall) element;
-                    if (keyword != null) {
+                    if (keyword != null && keyword.getLinkedElement().getModelType() != ModelType.USER_KEYWORD_DOCUMENTATION) {
                         max = Math.max(max, keyword.getArguments().size());
                     }
                 }

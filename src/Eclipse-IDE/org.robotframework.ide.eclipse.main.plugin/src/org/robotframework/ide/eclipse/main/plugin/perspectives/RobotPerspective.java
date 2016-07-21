@@ -10,6 +10,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
+import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.MessageLogView;
 
@@ -30,6 +31,7 @@ public class RobotPerspective implements IPerspectiveFactory {
         final IFolderLayout bottomLog = layout.createFolder("bottomRight", IPageLayout.RIGHT, 0.50f, "bottom");
         bottomLog.addView(MessageLogView.ID);
         bottomLog.addView(ExecutionView.ID);
+        bottomLog.addView(DocumentationView.ID);
 
         final IFolderLayout topRight = layout.createFolder("topRight", IPageLayout.RIGHT, 0.75f, editorArea);
         topRight.addView(IPageLayout.ID_OUTLINE);
