@@ -220,7 +220,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         
         selectionProvider.addSelectionChangedListener(new DocumentationElementsSelectionChangedListener(eventBroker));
 
-        new RedNatTableContentTooltip(table, markersContainer, dataProvider);
+        new KeywordsTableContentTooltip(table, markersContainer, dataProvider);
     }
 
     private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
