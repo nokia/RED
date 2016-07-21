@@ -14,8 +14,8 @@ public class SetKeywordSettingArgumentCommand extends SetKeywordCallArgumentComm
         super(keywordCall, index, value);
     }
 
+    @Override
     protected void updateModelElement() {
         new KeywordTableModelUpdater().update(getKeywordCall().getLinkedElement(), getIndex(), getValue());
     }
-
 }

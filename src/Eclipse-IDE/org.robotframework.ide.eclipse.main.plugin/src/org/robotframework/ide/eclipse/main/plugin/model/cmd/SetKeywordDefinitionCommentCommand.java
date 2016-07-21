@@ -26,8 +26,6 @@ public class SetKeywordDefinitionCommentCommand extends EditorCommand {
         }
         
         //User Keyword has no comment inside
-        
-        //keyword.setComment(newComment);
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_COMMENT_CHANGE, keyword);
     }
 }
