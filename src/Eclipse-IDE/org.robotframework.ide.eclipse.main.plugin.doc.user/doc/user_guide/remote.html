@@ -20,12 +20,12 @@ First choose testcase which will be remotely debugged. If there is no debug conf
 <ul>
  <br><li>Open Debug Configurations by Run -> Debug Configurations ...
 <br><br><img src="remote/remote_1.png"> <br><br>
-<li>go to testcase debug configuration under Robot tree, open tab Remote and click Export Debug Script to get TestRunnerAgent.py<br>
+<li>Go to testcase debug configuration under Robot tree, open tab Remote and click Export Debug Script to get TestRunnerAgent.py<br>
 <br><br><img src="remote/remote_2.png"> <br><br>
 <li>Copy TestRunnerAgent.py file to remote host.
 </li>
 </ul>
-<h3>Configure ip/port to accept connection from TestRunnerAgent.py </h3>
+<h3>Configure IP/port to accept connection from TestRunnerAgent.py </h3>
 Remote tab of Debug Configurations consists Local IP and Local port. This fields needs to be populated with local IP/port where RED is run.<br>
 <b>Do not use <i>localhost</i> in IP field as it is not supported.</b><br>
  
@@ -34,13 +34,13 @@ Remote tab of Debug Configurations consists Local IP and Local port. This fields
 After pressing Debug in Debug Configurations or starting Debug manually, following Console entry should be visible:
   <br><br><img src="remote/remote_3.png"> <br><br>
 On remote host, testcase with custom listener (TestRunnerAgent.py) needs to be started. <br>
-Exact command depends on testing environment and testname, it can be derived from local debug run and from RobotFramework robot.run implementation ( see <a href="https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html">https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html</a> ). <br> Generally syntax with additional listener is following: <br>
+Exact command depends on testing environment and testname, it can be derived from local debug run and from RobotFramework robot.run implementation (see <a href="https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html">https://robot-framework.readthedocs.org/en/2.9/_modules/robot/run.html</a>). <br> Generally syntax with additional listener is following: <br>
 <i>python -m robot.run --listener REMOTE_PATH\TestRunnerAgent.py:PORT:True:IP ADDITONAL_PARAMETERS</i> <br><br>
 For instance: <i>python -m robot.run --listener C:\RED\TestRunnerAgent.py:6060:True:192.168.81.1 -s robot_test.Keyword_driven</i> <br><br>
 
 <h3>Possible issues</h3>  
 When having problem with Remote Debug, please double check following:
-<li> check if remote host can connect to local host (routing,firewalls)
+<li> check if remote host can connect to local host (routing, firewalls)
 <li> check network settings in Debug Configurations (Port/IP) and in TestRunnerAgent command line parameters 
 <li> check if you have the same test material locally and remotely (exact same testcases, test names)
 </body>
