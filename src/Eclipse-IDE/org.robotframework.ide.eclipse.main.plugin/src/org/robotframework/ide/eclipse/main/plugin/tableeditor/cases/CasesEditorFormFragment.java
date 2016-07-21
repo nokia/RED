@@ -20,7 +20,6 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
-import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
@@ -199,7 +198,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator(bodySelectionLayer)));
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator()));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 
@@ -285,15 +284,13 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         selectionProvider.setSelection(StructuredSelection.EMPTY);
     }
 
-    private NewElementsCreator<RobotElement> newElementsCreator(final SelectionLayer selectionLayer) {
+    private NewElementsCreator<RobotElement> newElementsCreator() {
         return new NewElementsCreator<RobotElement>() {
 
             @Override
-            public RobotElement createNew() {
+            public RobotElement createNew(final int addingTokenRowIndex) {
                 final RobotElement createdElement;
-                final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
-                final int selectedRow = selectedCellPositions[0].getRowPosition();
-                final AddingToken token = (AddingToken) dataProvider.getRowObject(selectedRow);
+                final AddingToken token = (AddingToken) dataProvider.getRowObject(addingTokenRowIndex);
                 if (token.isNested()) {
                     final RobotCodeHoldingElement testCase = (RobotCodeHoldingElement) token.getParent();
                     commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
