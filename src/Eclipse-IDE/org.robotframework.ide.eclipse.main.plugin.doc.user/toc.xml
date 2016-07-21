@@ -3,11 +3,11 @@
 	<topic href="doc/red_overview.html" label="RED Overview" >	</topic>
 	<topic href="doc/legal.html" label="Legal">	</topic>
 	<topic href="doc/first_steps/first_steps.html" label="First steps with RED">
-    <topic href="doc/first_steps/download_install.html" label="Download&amp;install">
+    <topic href="doc/first_steps/download_install.html" label="Download &amp; install">
     </topic>
     <topic href="doc/first_steps/eclipse_principles.html" label="Eclipse principles">
     </topic>
-    <topic href="doc/first_steps/create_run.html" label="Create project,add test,run">
+    <topic href="doc/first_steps/create_run.html" label="Create project, add test and run">
     </topic>
     <topic href="doc/first_steps/debug.html" label="Debug">
     </topic>
@@ -17,7 +17,7 @@
  <topic href="doc/user_guide/user_guide.html" label="User guide">
      <topic href="doc/user_guide/quick_start.html" label="Quick start with RED - Robot Editor">
     </topic>
-    <topic href="doc/user_guide/general.html" label="General usage hints - running selected test,validation, code assist, clean&amp;build,Quick Fix">
+    <topic href="doc/user_guide/general.html" label="General usage hints - running selected test, validation, code assist, clean&amp;build, Quick Fix">
     </topic>
 	<topic href="doc/user_guide/table_general.html" label="Table Editors - general usage hints">
     </topic>
