@@ -364,6 +364,14 @@
             name="Execution View"
             restorable="true">
       </view>
+      <view
+            category="org.robotframework.ide.eclipse.views"
+            class="org.robotframework.ide.eclipse.main.plugin.views.DocumentationViewWrapper"
+            icon="resources/robot.png"
+            id="org.robotframework.ide.DocumentationView"
+            name="Documentation View"
+            restorable="true">
+      </view>
  </extension>
  <extension point="org.eclipse.core.runtime.adapters">
       <factory class="org.eclipse.core.runtime.IAdaptable"
