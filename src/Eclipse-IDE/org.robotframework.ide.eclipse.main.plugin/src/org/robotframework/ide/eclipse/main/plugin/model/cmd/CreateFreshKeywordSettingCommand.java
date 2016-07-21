@@ -31,7 +31,7 @@ public class CreateFreshKeywordSettingCommand extends EditorCommand {
 
     @Override
     protected void execute() throws CommandExecutionException {
-        definition.createKeywordDefinitionSetting(index, settingName, args, "");
+        definition.createSetting(index, settingName, args, "");
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
     }
