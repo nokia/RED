@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _LJw90Jm3EeWwXrMNKVDTwg
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/4/16 12:52 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/21/16 5:38 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -21,7 +21,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test cases ***\n"
     + "test 1\n"
     + "    Log  5" 
 
-get-button "Save (.*)" | click    
+get-button "Save \((Ctrl|M1)\+S\)" | click  
 //run in debug to create run configuration
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | get-menu "Debug As/1 Robot Test" | click
 
