@@ -122,7 +122,7 @@ public class RedTextCellEditor extends TextCellEditor {
         ((InlineFocusListener) focusListener).handleFocusChanges = true;
 
         final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
-        contextActivation = service.activateContext(DETAILS_EDITING_CONTEXT_ID);
+        contextActivation = service.activateContext(RedPlugin.DETAILS_EDITING_CONTEXT_ID);
         
         return text;
     }
