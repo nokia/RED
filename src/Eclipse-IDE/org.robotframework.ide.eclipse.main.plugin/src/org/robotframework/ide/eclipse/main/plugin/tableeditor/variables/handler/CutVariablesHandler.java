@@ -34,9 +34,7 @@ public class CutVariablesHandler extends DIParameterizedHandler<E4CutVariablesHa
 
             final boolean copiedToClipboard = new E4CopyVariablesHandler().copyVariables(selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteVariableHandler().deleteVariables(commandsStack, selection);
-
-                editor.getSelectionLayerAccessor().getSelectionLayer().clear();
+                new E4DeleteVariableHandler().deleteVariables(editor, commandsStack, selection);
             }
         }
     }
