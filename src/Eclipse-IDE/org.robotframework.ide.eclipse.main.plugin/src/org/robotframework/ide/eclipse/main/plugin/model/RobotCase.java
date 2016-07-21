@@ -155,6 +155,7 @@ public class RobotCase extends RobotCodeHoldingElement {
         return call;
     }
 
+    @Override
     public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
             final String comment) {
         final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(settingName), args,
@@ -163,6 +164,10 @@ public class RobotCase extends RobotCodeHoldingElement {
         final AModelElement<?> newModelElement = new TestCaseTableModelUpdater().create(getLinkedElement(), settingName,
                 comment, args);
         setting.link(newModelElement);
+
+        if (newModelElement.getModelType() == ModelType.TEST_CASE_SETTING_UNKNOWN) {
+            newModelElement.getDeclaration().setText(settingName);
+        }
 
         getChildren().add(index, setting);
         return setting;

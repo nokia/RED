@@ -15,7 +15,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCodeHolderSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
@@ -160,8 +160,8 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
             final int index = children.indexOf(keywordCall);
             children.remove(keywordCall);
 
-            commandsStack.execute(
-                    new CreateFreshKeywordSettingCommand(keywordDefinition, index, value, keywordCall.getArguments()));
+            commandsStack.execute(new CreateFreshCodeHolderSettingCommand(keywordDefinition, index, value,
+                    keywordCall.getArguments()));
             return true;
         }
         return false;
