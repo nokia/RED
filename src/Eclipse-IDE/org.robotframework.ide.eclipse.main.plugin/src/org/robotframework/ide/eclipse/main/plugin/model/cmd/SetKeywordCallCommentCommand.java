@@ -37,18 +37,12 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
         keywordCall.setComment(CommentServiceHandler.consolidate((ICommentHolder) keywordCall.getLinkedElement(),
                 ETokenSeparator.PIPE_WRAPPED_WITH_SPACE));
 
-        // it has to be send, not posted
-        // otherwise it is not possible to traverse between cells, because the
-        // cell
-        // is traversed and then main thread has to handle incoming posted event
-        // which
-        // closes currently active cell editor
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordCall);
     }
     
     protected void updateModelElement() {
         final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
-        ModelType modelType = linkedElement.getModelType();
+        final ModelType modelType = linkedElement.getModelType();
         if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
             if (newComment != null) {
                 ((RobotExecutableRow<?>) linkedElement).setComment(newComment);

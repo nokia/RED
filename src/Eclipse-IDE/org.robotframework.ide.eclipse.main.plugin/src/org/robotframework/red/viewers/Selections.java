@@ -21,6 +21,13 @@ public class Selections {
 
     public static final String SELECTION = "selection";
 
+    public static void assureSingleElementIsSelected(final IStructuredSelection selection) {
+        if (selection.size() != 1) {
+            throw new IllegalArgumentException(
+                    "Given selection should contain only one element, but have " + selection.size() + " instead");
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> T[] getElementsArray(final IStructuredSelection selection, final Class<T> elementsClass) {
         return newArrayList(Iterables.filter(selection.toList(), elementsClass))
