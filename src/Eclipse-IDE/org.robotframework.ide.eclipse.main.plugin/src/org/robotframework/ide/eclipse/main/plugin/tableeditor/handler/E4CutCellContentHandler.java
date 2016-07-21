@@ -14,17 +14,13 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.ui.ISources;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.viewers.Selections;
-
-import com.google.common.base.Optional;
 
 public abstract class E4CutCellContentHandler {
 
@@ -71,8 +67,4 @@ public abstract class E4CutCellContentHandler {
         final E4DeleteCellContentHandler deleteHandler = new E4DeleteCellContentHandler();
         deleteHandler.deleteCellContent(selection, editor, commandsStack);
     }
-
-    protected abstract Optional<? extends EditorCommand> provideCommandForAttributeChange(RobotElement element,
-            int index, int noOfColumns);
-
 }
