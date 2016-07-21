@@ -11,12 +11,12 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.swt.widgets.Composite;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 
 
 /**
@@ -46,7 +46,7 @@ class ReferencedLibrariesEditingSupport extends EditingSupport {
         if (element instanceof RemoteLocation) {
             final Composite parent = (Composite) getViewer().getControl();
             return new ActivationCharPreservingTextCellEditor(getViewer().getColumnViewerEditor(), parent,
-                    RobotElementEditingSupport.DETAILS_EDITING_CONTEXT_ID);
+                    RedPlugin.DETAILS_EDITING_CONTEXT_ID);
         }
         return null;
     }

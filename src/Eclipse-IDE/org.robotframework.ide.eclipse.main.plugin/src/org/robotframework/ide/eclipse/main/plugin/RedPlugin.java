@@ -26,6 +26,8 @@ import org.robotframework.red.graphics.ImagesManager;
 
 public class RedPlugin extends AbstractUIPlugin {
 
+    public static final String DETAILS_EDITING_CONTEXT_ID = "org.robotframework.ide.eclipse.details.context";
+
 	public static final String PLUGIN_ID = "org.robotframework.ide.eclipse.main.plugin";
 
     private static RedPlugin plugin;

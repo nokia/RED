@@ -12,11 +12,11 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersCo
 
 class CasesTableContentTooltip extends RedNatTableContentTooltip {
 
-    private static final String SETUP = "Setup";
-    private static final String TEARDOWN = "Teardown";
-    private static final String TIMEOUT = "Timeout";
-    private static final String TEMPLATE = "Template";
-    private static final String TAGS = "Tags";
+    private static final String SETUP = "[setup]";
+    private static final String TEARDOWN = "[teardown]";
+    private static final String TIMEOUT = "[timeout]";
+    private static final String TEMPLATE = "[template]";
+    private static final String TAGS = "[tags]";
 
     private final Map<String, String> tooltips = new HashMap<>();
 
@@ -24,17 +24,13 @@ class CasesTableContentTooltip extends RedNatTableContentTooltip {
             final IRowDataProvider<?> dataProvider) {
         super(natTable, markersContainer, dataProvider);
 
-        tooltips.put("[" + TAGS.toLowerCase() + "]",
-                "These tags are set to this test case and they possibly override Default Tags");
-        tooltips.put("[" + SETUP.toLowerCase() + "]",
-                "The keyword $s is executed before other keywords inside the definition");
-        tooltips.put("[" + TEMPLATE.toLowerCase() + "]", "The keyword %s is used as a template");
-        tooltips.put("[" + TIMEOUT.toLowerCase() + "]",
-                "Specifies maximum time this test case is allowed to execute before being aborted.\n"
-                        + "This setting overrides Test Timeout setting set on suite level\n"
-                        + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
-        tooltips.put("[" + TEARDOWN.toLowerCase() + "]",
-                "The keyword %s is executed after every other keyword inside the definition");
+        tooltips.put(TAGS, "These tags are set to this test case and they possibly override Default Tags");
+        tooltips.put(SETUP, "The keyword $s is executed before other keywords inside the definition");
+        tooltips.put(TEMPLATE, "The keyword %s is used as a template");
+        tooltips.put(TIMEOUT, "Specifies maximum time this test case is allowed to execute before being aborted.\n"
+                + "This setting overrides Test Timeout setting set on suite level\n"
+                + "Numerical values are intepreted as seconds but special syntax like '1min 15s' or '2 hours' can be used.");
+        tooltips.put(TEARDOWN, "The keyword %s is executed after every other keyword inside the definition");
     }
 
 
