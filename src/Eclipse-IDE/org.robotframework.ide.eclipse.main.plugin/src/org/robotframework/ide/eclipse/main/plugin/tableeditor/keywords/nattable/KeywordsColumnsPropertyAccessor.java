@@ -50,7 +50,8 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
             if (columnIndex == 0) {
-                return keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW
+                final ModelType modelType = keywordCall.getLinkedElement().getModelType();
+                return modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW || modelType == ModelType.UNKNOWN
                         ? keywordCall.getName() : "[" + keywordCall.getName() + "]";
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                 final List<String> arguments = keywordCall.getArguments();
