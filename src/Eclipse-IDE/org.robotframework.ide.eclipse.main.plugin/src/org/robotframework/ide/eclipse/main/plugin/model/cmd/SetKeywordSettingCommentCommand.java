@@ -15,6 +15,7 @@ public class SetKeywordSettingCommentCommand extends SetKeywordCallCommentComman
         super(keywordCall, comment);
     }
 
+    @Override
     protected void updateModelElement() {
         final AModelElement<?> linkedElement = getKeywordCall().getLinkedElement();
         new KeywordTableModelUpdater().updateComment(linkedElement, getNewComment());
