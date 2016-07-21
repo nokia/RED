@@ -29,17 +29,16 @@ public class DeleteSettingsHandler extends DIParameterizedHandler<E4DeleteSettin
     public static class E4DeleteSettingsHandler {
 
         @Execute
-        public Object deleteSettings(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+        public void deleteSettings(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
             
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
             commandsStack.execute(new DeleteSettingKeywordCallCommand(settings));
-            
-            // needed for the same reason as in the cut handler
-            editor.getSelectionLayerAccessor().getSelectionLayer().clear();
 
-            return null;
+            // needed when setting is cut/paste and selection remains on the same position,
+            // pasting is performed on old, not existing setting
+            editor.getSelectionLayerAccessor().getSelectionLayer().clear();
         }
     }
 }
