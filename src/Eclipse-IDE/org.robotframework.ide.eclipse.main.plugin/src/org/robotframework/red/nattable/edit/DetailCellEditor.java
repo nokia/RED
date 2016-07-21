@@ -76,7 +76,7 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
         parent.redraw();
 
         final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
-        contextActivation = service.activateContext(RedTextCellEditor.DETAILS_EDITING_CONTEXT_ID);
+        contextActivation = service.activateContext(RedPlugin.DETAILS_EDITING_CONTEXT_ID);
         return composite;
     }
 

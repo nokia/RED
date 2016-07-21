@@ -11,9 +11,9 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotElementEditingSupport;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 
 
@@ -33,7 +33,7 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
         if (element instanceof VariableMapping) {
             final Composite parent = (Composite) getViewer().getControl();
             return new ActivationCharPreservingTextCellEditor(
-                    getViewer().getColumnViewerEditor(), parent, RobotElementEditingSupport.DETAILS_EDITING_CONTEXT_ID);
+                    getViewer().getColumnViewerEditor(), parent, RedPlugin.DETAILS_EDITING_CONTEXT_ID);
         }
         return super.getCellEditor(element);
     }
@@ -64,7 +64,7 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
     protected abstract void setMappingValue(VariableMapping mapping, String value);
 
     private IEventBroker getEventBroker() {
-        return (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        return PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     static class VariableMappingNameEditingSupport extends VariableMappingsDetailsEditingSupport {
