@@ -21,8 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.PasteKeywordsCellsCommandsCollector;
 import org.robotframework.red.viewers.Selections;
 
-import com.google.common.base.Optional;
-
 public abstract class E4PasteCellContentHandler {
 
     @Execute
@@ -40,8 +38,4 @@ public abstract class E4PasteCellContentHandler {
             commandsStack.execute(command);
         }
     }
-
-    protected abstract Optional<? extends EditorCommand> provideCommandForAttributeChange(RobotElement element,
-            int index, int noOfColumns, String newAttribute);
-
 }
