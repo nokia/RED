@@ -7,7 +7,8 @@
 <body>
 	<h2>Debug</h2>
 	
-	Debug functionality is unique way of checking what is happening during TestCase and TestSuite execution.It works similiary as debug functionality in most of programming languages - it allows track execution of program for checking unwanted behaviour either on TestCase side or in tested software.</br></br>
+Debug functionality is unique way of checking what is happening during TestCase and TestSuite execution. 
+It works similar as debug functionality in most of programming languages - it allows track execution of program for checking unwanted behaviour either on TestCase side or in tested software.</br></br>
 
 It is important to note that Debug functionality works only with text editor (debug actions can be set only there) therefore it is crucial to active it before switching to Debug perspective.  </br>
 
@@ -16,13 +17,17 @@ Try to not make changes in script in Debug mode as Eclipse have a problem with f
 
 <h3>Basics</h3>
 
-In order to work with Debug, save the file beforehand. If you made any changes in Table editors, close and reopen file so changes will be visible in Source tab (this will be non issue in close future). Activate Source view and change to Debug perspective:</br></br>
+In order to work with Debug, save the file beforehand. 
+If you made any changes in Table editors, close and reopen file so changes will be visible in Source tab (this will be non issue in close future). 
+Activate Source view and change to Debug perspective:</br></br>
 <img src="debug/debug_1.png"></br></br>
 Debug perspective looks as follows:</br></br>
 <img src="debug/debug_2.png"></br></br>
+
 First thing with working with Debug is to place at least one breakpoint. This allows RED to pause Debug execution and activate Stepping options.<br>
 
-To place breakpoint in Source view click on line in script and under right click menu choose Add breakpoint. You can also add breakpoint directly by clicking on line number in Source editor view.<br>
+To place breakpoint in Source view click on line in script and under right click menu choose <i>Add breakpoint</i>. 
+You can also add breakpoint directly by clicking on line number in Source editor view.<br>
 
 When successful, blue ball icon will appear next to it, new breakpoint entry will be visible in Breakpoint lists.<br>
 <h4> Start Debug </h4>
@@ -38,11 +43,11 @@ In order to limit which TC will be executed in Debug, open <i>Debug Configuratio
 <h3>Working with Debug</h3>
 <h4>Breakpoints and execution stepping</h4>
 
-Breakpoints are essential item, each pause execution and allows to initiate Debug actions. <br>
+Breakpoints are essential items, each pauses execution and allows to initiate Debug actions. <br>
 
 When breakpoint line is activated during execution, following icons are active:
 </br></br><img src="debug/debug_5.png"></br></br>
-moving from left to right:
+Moving from left to right:
 <ul>
     <li>Blue circle - Skip All Breakpoints - allow to continue testcase execution onwards without stopping on defined breakpoints</li>
     <li>Green Play - Resume - resumes test execution</li>
@@ -55,11 +60,12 @@ moving from left to right:
 </ul>
 List of breakpoints can be seen in upper right side of the Debug perspective.
 </br></br><img src="debug/break_1.png"></br></br>
+Breakpoints actions:
 <ul>
     <li>each breakpoint can be enabled/disabled</li>
     <li>each breakpoint can be removed</li>
     <li>for each breakpoint, action condition can be set</li>
-	<ul><li>    Hit count: breakpoint pause execution only after selected number of previous hits. Useful to activate breakpoint inside a loop statement on certain iteration</li>
+	<ul><li>Hit count: breakpoint pause execution only after selected number of previous hits. Useful to activate breakpoint inside a loop statement on certain iteration</li>
     <li>Conditional: expression when pass will activate breakpoint. Expression should be in RobotFramework syntax, for instance:  Should be Equal ${variable} 10  </li></ul>
 </ul>
 <h4>Variables watch</h4>
