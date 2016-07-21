@@ -237,7 +237,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         return new NewElementsCreator<RobotVariable>() {
 
             @Override
-            public RobotVariable createNew() {
+            public RobotVariable createNew(final int addingTokenRowIndex) {
                 final RobotVariablesSection section = dataProvider.getInput();
                 commandsStack.execute(
                         new CreateFreshVariableCommand(section, dataProvider.getAdderState().getVariableType()));

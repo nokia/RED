@@ -43,7 +43,7 @@ public class AlwaysDeactivatingCellEditor extends AbstractCellEditor {
 
     @Override
     public Object getEditorValue() {
-        return creator.createNew();
+        return creator.createNew(getRowIndex());
     }
 
     @Override

@@ -7,5 +7,5 @@ package org.robotframework.red.nattable;
 
 public interface NewElementsCreator<T> {
 
-    T createNew();
+    T createNew(int addingTokenRowIndex);
 }
