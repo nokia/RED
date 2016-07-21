@@ -131,7 +131,6 @@ public class RobotPerspectiveTest {
         verify(folders.get(2), times(3)).addView(anyString());
         verify(folders.get(2)).addView(MessageLogView.ID);
         verify(folders.get(2)).addView(ExecutionView.ID);
-        verify(folders.get(2)).addView(ExecutionView.ID);
         verify(folders.get(2)).addView(DocumentationView.ID);
     }
 
