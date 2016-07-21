@@ -49,13 +49,17 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
+            final ModelType modelType = keywordCall.getLinkedElement().getModelType();
             if (columnIndex == 0) {
-                final ModelType modelType = keywordCall.getLinkedElement().getModelType();
                 return modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW || modelType == ModelType.UNKNOWN
                         ? keywordCall.getName() : "[" + keywordCall.getName() + "]";
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                 final List<String> arguments = keywordCall.getArguments();
-                if (columnIndex - 1 < arguments.size()) {
+                if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
+                    if (columnIndex == 1 && !arguments.isEmpty()) {
+                        return getDocumentationTxt(arguments.get(0));
+                    }
+                } else if (columnIndex - 1 < arguments.size()) {
                     return arguments.get(columnIndex - 1);
                 }
             } else if (columnIndex == (numberOfColumns - 1)) {
@@ -105,7 +109,8 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                     commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
                 }
             } else {
-                if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
+                if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)
+                        && keywordCall.getLinkedElement().getModelType() != ModelType.USER_KEYWORD_DOCUMENTATION) {
                     commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
                 } else if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordSettingCommentCommand(keywordCall, value));
@@ -165,5 +170,12 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
             return true;
         }
         return false;
+    }
+    
+    private String getDocumentationTxt(final String txt) {
+        if(txt.length() > 100) {
+            return txt.substring(0, 100) + "...";
+        }
+        return txt;
     }
 }

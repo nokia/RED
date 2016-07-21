@@ -241,10 +241,10 @@ public class ExecutionView {
     
     private Menu createContextMenu() {
         final Menu menu = new Menu(executionViewer.getTree());
-        final MenuItem cutItem = new MenuItem(menu, SWT.PUSH);
-        cutItem.setText("Go to File");
-        cutItem.setImage(ImagesManager.getImage(RedImages.getGoToImage()));
-        cutItem.addSelectionListener(new SelectionAdapter() {
+        final MenuItem gotoItem = new MenuItem(menu, SWT.PUSH);
+        gotoItem.setText("Go to File");
+        gotoItem.setImage(ImagesManager.getImage(RedImages.getGoToImage()));
+        gotoItem.addSelectionListener(new SelectionAdapter() {
 
             @Override
             public void widgetSelected(final SelectionEvent event) {
