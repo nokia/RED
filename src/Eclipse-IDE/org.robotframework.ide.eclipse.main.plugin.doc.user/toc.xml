@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<toc label="RED Robot Editor User Guide" topic="user_guide.html">
+<toc label="RED - Robot Editor User Guide" topic="user_guide.html">
 	<topic href="doc/red_overview.html" label="RED Overview" >	</topic>
 	<topic href="doc/legal.html" label="Legal">	</topic>
 	<topic href="doc/first_steps/first_steps.html" label="First steps with RED">
-    <topic href="doc/first_steps/download_install.html" label="Download &amp; install">
+    <topic href="doc/first_steps/download_install.html" label="Download and install">
     </topic>
     <topic href="doc/first_steps/eclipse_principles.html" label="Eclipse principles">
     </topic>
@@ -11,13 +11,13 @@
     </topic>
     <topic href="doc/first_steps/debug.html" label="Debug">
     </topic>
-    <topic href="doc/first_steps/preferences_misc.html" label="Preferences &amp; red.xml">
+    <topic href="doc/first_steps/preferences_misc.html" label="Preferences and red.xml">
     </topic>
 	</topic>
  <topic href="doc/user_guide/user_guide.html" label="User guide">
      <topic href="doc/user_guide/quick_start.html" label="Quick start with RED - Robot Editor">
     </topic>
-    <topic href="doc/user_guide/general.html" label="General usage hints - running selected test, validation, code assist, clean&amp;build, Quick Fix">
+    <topic href="doc/user_guide/general.html" label="General usage hints">
     </topic>
 	<topic href="doc/user_guide/table_general.html" label="Table Editors - general usage hints">
     </topic>
@@ -49,7 +49,7 @@
     </topic>
 	<topic href="doc/user_guide/debug.html" label="Debug Robot">
     </topic>
-	<topic href="doc/user_guide/python_red_debug.html" label="Debug Robot&amp;Python scripts">
+	<topic href="doc/user_guide/python_red_debug.html" label="Debug Robot and Python scripts">
     </topic>
 	
 
