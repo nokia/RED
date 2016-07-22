@@ -29,7 +29,7 @@ public class SelectWholeRowHandler extends DIParameterizedHandler<E4SelectWholeR
     public static class E4SelectWholeRowHandler {
 
         @Execute
-        public Object selectWholeRows(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
+        public void selectWholeRows(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
             final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
             final SelectionLayer selectionLayer = selectionLayerAccessor.getSelectionLayer();
 
@@ -39,14 +39,11 @@ public class SelectWholeRowHandler extends DIParameterizedHandler<E4SelectWholeR
             }
 
             selectionLayer.clear();
-            for (final Integer rowToSelect : rowsToSelect) {
+            for (final int rowToSelect : rowsToSelect) {
                 for (int i = 0; i < selectionLayer.getColumnCount(); i++) {
                     selectionLayer.selectRow(0, rowToSelect, false, true);
-                    // selectionLayer.getSelectionModel().addSelection(i, rowToSelect);
                 }
             }
-
-            return null;
         }
     }
 }

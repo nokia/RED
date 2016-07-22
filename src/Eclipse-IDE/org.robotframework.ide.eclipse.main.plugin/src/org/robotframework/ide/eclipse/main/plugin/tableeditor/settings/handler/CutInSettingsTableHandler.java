@@ -37,7 +37,7 @@ public class CutInSettingsTableHandler extends DIParameterizedHandler<E4CutInSet
 
             final boolean copiedToClipboard = new E4CopyInSettingsTableHandler().copy(editor, selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteInSettingsTableHandler().delete(commandsStack, editor, selection);
+                new E4DeleteInSettingsTableHandler().delete(selection, editor, commandsStack);
             }
         }
     }
