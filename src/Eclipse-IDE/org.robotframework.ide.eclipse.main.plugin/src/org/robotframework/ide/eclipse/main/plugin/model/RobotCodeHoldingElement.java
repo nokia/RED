@@ -21,13 +21,10 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
 
     private transient RobotSuiteFileSection parent;
 
-    private String name;
-
     private final List<RobotKeywordCall> calls = newArrayList();
 
-    RobotCodeHoldingElement(final RobotSuiteFileSection parent, final String name) {
+    RobotCodeHoldingElement(final RobotSuiteFileSection parent) {
         this.parent = parent;
-        this.name = name;
     }
 
     public RobotKeywordCall createKeywordCall() {
@@ -48,15 +45,6 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
         final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, name, args, comment);
         getChildren().add(index, setting);
         return setting;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String newName) {
-        this.name = newName;
     }
 
     @Override

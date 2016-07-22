@@ -43,7 +43,7 @@ public class RobotCase extends RobotCodeHoldingElement {
     private final TestCase testCase;
 
     RobotCase(final RobotCasesSection parent, final TestCase testCase) {
-        super(parent, "");
+        super(parent);
         this.testCase = testCase;
     }
 

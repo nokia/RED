@@ -11,8 +11,6 @@ import java.lang.reflect.Array;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.TreePath;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Iterables;
@@ -54,11 +52,5 @@ public class Selections {
             return Optional.of(elements.get(0));
         }
         return Optional.absent();
-    }
-
-    public static TreePath getFirstElementPath(final ITreeSelection selection) {
-        final Object firstElement = selection.getFirstElement();
-        final TreePath[] paths = firstElement == null ? new TreePath[0] : selection.getPathsFor(firstElement);
-        return paths.length == 0 ? TreePath.EMPTY : paths[0];
     }
 }

@@ -9,20 +9,22 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.jface.viewers.ITreeSelection;
-import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordCallsCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.InsertCasesCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.PasteCasesHandler.E4PasteCasesHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
+
+import com.google.common.base.Optional;
 
 public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandler> {
     public PasteCasesHandler() {
@@ -39,7 +41,7 @@ public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandle
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public void pasteKeywords(@Named(Selections.SELECTION) final ITreeSelection selection,
+        public void pasteCases(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedClipboard clipboard) {
 
             final RobotCase[] cases = clipboard.getCases();
@@ -54,50 +56,80 @@ public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandle
             }
         }
 
-        private void insertCases(final ITreeSelection selection, final RobotCase[] cases) {
-            final TreePath selectedPath = Selections.getFirstElementPath(selection);
-            final RobotCase targetCase = getElementOfClass(selectedPath, RobotCase.class);
+        private void insertCases(final IStructuredSelection selection, final RobotCase[] cases) {
+            if (selection.isEmpty()) {
+                insertCasesAtSectionEnd(cases);
+                return;
+            }
+            
+            final Optional<Object> firstSelected = Selections.getOptionalFirstElement(selection, Object.class);
 
-            if (targetCase != null) {
+            if (firstSelected.get() instanceof AddingToken && ((AddingToken) firstSelected.get()).getParent() == null) {
+                insertCasesAtSectionEnd(cases);
+
+            } else if (firstSelected.get() instanceof AddingToken) {
+                final AddingToken token = (AddingToken) firstSelected.get();
+                final RobotCase targetCase = (RobotCase) token.getParent();
                 final int index = targetCase.getParent().getChildren().indexOf(targetCase);
-                commandsStack.execute(new InsertCasesCommand(targetCase.getParent(), index, cases));
+                insertCaseAt(index, cases);
+
+            } else if (firstSelected.get() instanceof RobotCase) {
+                final RobotCase targetCase = (RobotCase) firstSelected.get();
+                final int index = targetCase.getParent().getChildren().indexOf(targetCase);
+                insertCaseAt(index, cases);
+
             } else {
-                final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class)
-                        .orNull();
-                if (section != null) {
-                    commandsStack.execute(new InsertCasesCommand(section, cases));
-                }
+                final RobotKeywordCall call = (RobotKeywordCall) firstSelected.get();
+                final RobotCase targetCase = (RobotCase) call.getParent();
+                final int index = targetCase.getParent().getChildren().indexOf(targetCase);
+                insertCaseAt(index, cases);
             }
         }
 
-        private void insertCalls(final ITreeSelection selection, final RobotKeywordCall[] calls) {
-            final TreePath selectedPath = Selections.getFirstElementPath(selection);
+        private void insertCasesAtSectionEnd(final RobotCase[] cases) {
+            final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class).get();
+            commandsStack.execute(new InsertCasesCommand(section, cases));
+        }
 
-            if (selectedPath.getSegmentCount() > 0) {
-                final RobotKeywordCall targetCall = getElementOfClass(selectedPath, RobotKeywordCall.class);
-                if (targetCall != null) {
-                    final int index = targetCall.getParent().getChildren().indexOf(targetCall);
-                    commandsStack.execute(new InsertKeywordCallsCommand(targetCall.getParent(), -1, index, calls));
-                } else {
-                    final RobotCase targetCase = getElementOfClass(selectedPath, RobotCase.class);
-                    if (targetCase != null) {
-                        commandsStack.execute(new InsertKeywordCallsCommand(targetCase, calls));
-                    }
-                }
+        private void insertCaseAt(final int index, final RobotCase[] cases) {
+            final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class).get();
+            commandsStack.execute(new InsertCasesCommand(section, index, cases));
+        }
+
+        private void insertCalls(final IStructuredSelection selection, final RobotKeywordCall[] calls) {
+            if (selection.isEmpty()) {
+                return;
+            }
+
+            final Optional<Object> firstSelected = Selections.getOptionalFirstElement(selection, Object.class);
+
+            if (firstSelected.get() instanceof AddingToken && ((AddingToken) firstSelected.get()).getParent() == null) {
+                return;
+
+            } else if (firstSelected.get() instanceof AddingToken) {
+                final AddingToken token = (AddingToken) firstSelected.get();
+                final RobotCase targetCase = (RobotCase) token.getParent();
+                insertCallsAtCaseEnd(targetCase, calls);
+
+            } else if (firstSelected.get() instanceof RobotCase) {
+                final RobotCase targetCase = (RobotCase) firstSelected.get();
+                final int index = targetCase.getParent().getChildren().indexOf(targetCase);
+                insertCallsAt(index, targetCase, calls);
+
+            } else {
+                final RobotKeywordCall call = (RobotKeywordCall) firstSelected.get();
+                final RobotCase targetCase = (RobotCase) call.getParent();
+                final int index = targetCase.getChildren().indexOf(targetCase);
+                insertCallsAt(index, targetCase, calls);
             }
         }
 
-        private static <T> T getElementOfClass(final TreePath path, final Class<? extends T> clazz) {
-            if (path.getSegmentCount() == 0) {
-                return null;
-            }
-            for (int i = path.getSegmentCount() - 1; i >= 0; i--) {
-                final Object current = path.getSegment(i);
-                if (clazz.isInstance(current)) {
-                    return clazz.cast(current);
-                }
-            }
-            return null;
+        private void insertCallsAtCaseEnd(final RobotCase targetCase, final RobotKeywordCall[] calls) {
+            commandsStack.execute(new InsertKeywordCallsCommand(targetCase, calls));
+        }
+
+        private void insertCallsAt(final int index, final RobotCase targetCase, final RobotKeywordCall[] calls) {
+            commandsStack.execute(new InsertKeywordCallsCommand(targetCase, index, index, calls));
         }
     }
 }
