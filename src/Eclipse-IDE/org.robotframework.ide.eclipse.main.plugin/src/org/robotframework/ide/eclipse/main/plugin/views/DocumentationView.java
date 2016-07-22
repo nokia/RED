@@ -95,7 +95,7 @@ public class DocumentationView {
             currentlyDisplayedElement = element;
             docLoadingJob.schedule();
         }
-        
+
     }
 
     private void createToolbarActions(final IToolBarManager toolBarManager) {
@@ -127,10 +127,10 @@ public class DocumentationView {
             if (currentlyDisplayedElement != null
                     && currentlyDisplayedElement.getLinkedElement() instanceof IDocumentationHolder) {
 
-                String documentationText = DocumentationServiceHandler
+                final String documentationText = DocumentationServiceHandler
                         .toShowConsolidated((IDocumentationHolder) currentlyDisplayedElement.getLinkedElement());
-                String parentName = currentlyDisplayedElement.getParent().getName();
-                String fileName = currentlyDisplayedElement.getSuiteFile().getName();
+                final String parentName = currentlyDisplayedElement.getParent().getName();
+                final String fileName = currentlyDisplayedElement.getSuiteFile().getName();
 
                 SwtThread.asyncExec(new DocTextSetter(documentationText, parentName, fileName));
             }
@@ -199,7 +199,7 @@ public class DocumentationView {
         public void dispose() {
         }
     }
-    
+
     class ToggleWordWrapAction extends Action implements IWorkbenchAction {
 
         private static final String ID = "org.robotframework.action.documentationView.ToggleWordWrapAction";
@@ -217,10 +217,10 @@ public class DocumentationView {
         public void dispose() {
         }
     }
-    
+
     class RefreshDocAction extends Action implements IWorkbenchAction {
 
-        private static final String ID = "org.robotframework.action.documentationView.ReloadDocAction";
+        private static final String ID = "org.robotframework.action.documentationView.RefreshDocAction";
 
         public RefreshDocAction() {
             setId(ID);
