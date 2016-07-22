@@ -9,7 +9,11 @@ import java.lang.reflect.Array;
 
 public class ArraysSerializerDeserializer {
 
+    @SuppressWarnings("unchecked")
     public static <T> T[] copy(final Class<T> clazz, final T[] toCopy) {
+        if (toCopy.length == 0) {
+            return (T[]) Array.newInstance(clazz, 0);
+        }
         try {
             return deserialize(clazz, serialize(toCopy));
         } catch (ClassNotFoundException | IOException e) {
