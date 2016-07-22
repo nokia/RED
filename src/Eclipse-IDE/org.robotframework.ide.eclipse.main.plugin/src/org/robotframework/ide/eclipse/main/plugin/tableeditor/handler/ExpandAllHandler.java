@@ -25,14 +25,11 @@ public class ExpandAllHandler extends DIParameterizedHandler<E4ExpandAllHandler>
     public static class E4ExpandAllHandler {
 
         @Execute
-        public Object expandAll(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
+        public void expandAll(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final Optional<TreeLayerAccessor> treeLayerAccessor = editor.getTreeLayerAccessor();
-
             if (treeLayerAccessor.isPresent()) {
                 treeLayerAccessor.get().expandAll();
             }
-
-            return null;
         }
     }
 }

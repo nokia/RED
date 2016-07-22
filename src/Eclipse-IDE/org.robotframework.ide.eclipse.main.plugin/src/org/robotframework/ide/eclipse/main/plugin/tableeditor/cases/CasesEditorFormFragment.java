@@ -74,6 +74,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatchesCollection.CasesFilter;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
@@ -127,6 +128,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private RowSelectionProvider<Object> selectionProvider;
     
     private SelectionLayerAccessor selectionLayerAccessor;
+    private TreeLayerAccessor treeLayerAccessor;
+
 
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
@@ -134,6 +137,10 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         return selectionLayerAccessor;
+    }
+
+    public TreeLayerAccessor getTreeLayerAccessor() {
+        return treeLayerAccessor;
     }
 
     public NatTable getTable() {
@@ -208,6 +215,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
+        treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
         new CasesTableContentTooltip(table, markersContainer, dataProvider);
     }
