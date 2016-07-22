@@ -23,7 +23,6 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.console.IConsoleConstants;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.MessageLogView;
 
@@ -128,10 +127,9 @@ public class RobotPerspectiveTest {
         final RobotPerspective perspective = new RobotPerspective();
         perspective.createInitialLayout(layout);
 
-        verify(folders.get(2), times(3)).addView(anyString());
+        verify(folders.get(2), times(2)).addView(anyString());
         verify(folders.get(2)).addView(MessageLogView.ID);
         verify(folders.get(2)).addView(ExecutionView.ID);
-        verify(folders.get(2)).addView(DocumentationView.ID);
     }
 
     protected IPageLayout createMockPageLayout(final List<IFolderLayout> folderLayouts) {
