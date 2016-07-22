@@ -343,14 +343,6 @@ public class RobotFormEditor extends FormEditor {
         RobotArtifactsValidator.revalidate(suiteModel);
     }
 
-    public FocusedViewerAccessor getFocusedViewerAccessor() {
-        final IEditorPart activeEditor = getActiveEditor();
-        if (activeEditor instanceof ISectionEditorPart) {
-            return ((ISectionEditorPart) activeEditor).getFocusedViewerAccessor();
-        }
-        return null;
-    }
-
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         final IEditorPart activeEditor = getActiveEditor();
         if (activeEditor instanceof ISectionEditorPart) {
