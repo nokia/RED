@@ -25,15 +25,11 @@ public class CollapseAllHandler extends DIParameterizedHandler<E4CollapseAllHand
     public static class E4CollapseAllHandler {
 
         @Execute
-        public Object collapseAll(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
-
+        public void collapseAll(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final Optional<TreeLayerAccessor> treeLayerAccessor = editor.getTreeLayerAccessor();
-
             if (treeLayerAccessor.isPresent()) {
                 treeLayerAccessor.get().collapseAll();
             }
-
-            return null;
         }
     }
 }

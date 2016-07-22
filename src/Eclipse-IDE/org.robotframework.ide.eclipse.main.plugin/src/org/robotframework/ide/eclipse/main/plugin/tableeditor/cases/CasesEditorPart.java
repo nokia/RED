@@ -91,7 +91,7 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
         
         @Override
         public Optional<TreeLayerAccessor> getTreeLayerAccessor() {
-            return Optional.absent();
+            return Optional.of(casesFragment.getTreeLayerAccessor());
         }
         
         @Override
