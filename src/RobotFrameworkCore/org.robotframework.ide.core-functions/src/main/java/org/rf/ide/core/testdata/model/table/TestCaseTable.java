@@ -23,10 +23,10 @@ public class TestCaseTable extends ARobotSectionTable {
     }
 
     public TestCase createTestCase(final String testName) {
-        RobotToken testCaseName = new RobotToken();
+        final RobotToken testCaseName = new RobotToken();
         testCaseName.setText(testName);
 
-        TestCase test = new TestCase(testCaseName);
+        final TestCase test = new TestCase(testCaseName);
         addTest(test);
 
         return test;
@@ -39,7 +39,7 @@ public class TestCaseTable extends ARobotSectionTable {
 
     public void addTest(final TestCase testCase, final int position) {
         testCase.setParent(this);
-        testCases.set(position, testCase);
+        testCases.add(position, testCase);
     }
 
     public void removeTest(final TestCase testCase) {
