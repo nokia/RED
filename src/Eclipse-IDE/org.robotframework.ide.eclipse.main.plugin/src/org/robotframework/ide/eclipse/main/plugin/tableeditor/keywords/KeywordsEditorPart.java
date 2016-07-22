@@ -21,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart.KeywordsEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;
@@ -36,7 +37,7 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
 
         private static final String CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.keywords.context";
 
-        private org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment keywordsFragment;
+        private KeywordsEditorFormFragment keywordsFragment;
 
         @Override
         protected String getContextId() {
@@ -75,7 +76,7 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
 
         @Override
         protected List<? extends ISectionFormFragment> createFormFragments() {
-            keywordsFragment = new org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment();
+            keywordsFragment = new KeywordsEditorFormFragment();
             return newArrayList(keywordsFragment);
         }
 

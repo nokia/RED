@@ -32,7 +32,6 @@ import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.hover.HoverLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
-import org.eclipse.nebula.widgets.nattable.painter.layer.NatGridLayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.EditTraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
@@ -196,7 +195,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final NatTable table = new NatTable(parent, style, gridLayer, false);
         table.setConfigRegistry(configRegistry);
         table.setLayerPainter(
-                new NatGridLayerPainter(table, theme.getGridBorderColor(), RedNattableLayersFactory.ROW_HEIGHT));
+                new RedNatGridLayerPainter(table, theme.getGridBorderColor(), RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
 
