@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -33,11 +31,8 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         RobotDefinitionSetting argumentsSetting = definition.getArgumentsSetting();
         if (argumentsSetting == null) {
-            argumentsSetting = definition.createDefinitionSetting(0, RobotKeywordDefinition.ARGUMENTS,
+            argumentsSetting = definition.createSetting(0, "[" + RobotKeywordDefinition.ARGUMENTS + "]",
                    new ArrayList<String>(), "");
-            
-            KeywordArguments newArguments = definition.getLinkedElement().newArguments();
-            ((RobotKeywordCall)argumentsSetting).link(newArguments);
             
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
         }

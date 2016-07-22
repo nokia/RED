@@ -40,13 +40,6 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     public abstract RobotDefinitionSetting createSetting(final int index, final String name, final List<String> args,
             final String comment);
 
-    public RobotDefinitionSetting createDefinitionSetting(final int index, final String name, final List<String> args,
-            final String comment) {
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, name, args, comment);
-        getChildren().add(index, setting);
-        return setting;
-    }
-
     @Override
     public String getComment() {
         return "";
