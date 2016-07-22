@@ -55,15 +55,21 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     public static final String TEARDOWN = "Teardown";
     public static final String RETURN = "Return";
 
-    private UserKeyword keyword;
+    private final UserKeyword keyword;
     
-    public RobotKeywordDefinition(final RobotKeywordsSection parent, final String name) {
-        super(parent, name);
+    public RobotKeywordDefinition(final RobotKeywordsSection parent, final UserKeyword keyword) {
+        super(parent);
+        this.keyword = keyword;
     }
 
     @Override
     public UserKeyword getLinkedElement() {
         return keyword;
+    }
+
+    @Override
+    public String getName() {
+        return keyword.getDeclaration().getText();
     }
 
     @Override
@@ -136,9 +142,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         }
     }
 
-    public void link(final UserKeyword keyword) {
-        this.keyword = keyword;
-        
+    public void link() {
         // settings
         for (final KeywordArguments argument : keyword.getArguments()) {
             final String name = argument.getDeclaration().getText().toString();
