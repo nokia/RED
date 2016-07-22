@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -31,11 +30,9 @@ public class DeleteKeywordsHandler extends DIParameterizedHandler<E4DeleteKeywor
 
     public static class E4DeleteKeywordsHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
-        public Object deleteKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+        public void deleteKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+                final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
             
             final List<RobotKeywordCall> keywordCalls = Selections.getElements(selection, RobotKeywordCall.class);
@@ -52,8 +49,6 @@ public class DeleteKeywordsHandler extends DIParameterizedHandler<E4DeleteKeywor
             
             // needed for the same reason as in the cut handler
             editor.getSelectionLayerAccessor().getSelectionLayer().clear();
-
-            return null;
         }
     }
 }

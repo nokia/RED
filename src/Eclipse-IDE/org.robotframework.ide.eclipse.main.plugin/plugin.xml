@@ -1407,13 +1407,9 @@
        <enabledWhen>
           <with
                 variable="selection">
-            <iterate
-                  ifEmpty="false"
-                  operator="and">
-               <instanceof
-                     value="org.robotframework.ide.eclipse.main.plugin.model.RobotElement">
-               </instanceof>
-            </iterate>
+             <count
+                   value="+">
+             </count>
           </with></enabledWhen>
        <activeWhen>
           <reference
@@ -1468,132 +1464,6 @@
           <reference
                 definitionId="org.robotframework.exactlyOneElementIsSelected">
           </reference>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.CutCodeCellContentHandler"
-          commandId="org.eclipse.ui.edit.cut">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActive">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActive">
-             </reference>
-          </or>
-       </activeWhen>
-       <enabledWhen>
-          <!--and>
-             <reference
-                   definitionId="org.robotframework.singleElementHasFocusedCell">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.exactlyOneElementIsSelected">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.focusedCellHasContent">
-             </reference>
-          </and-->
-          <or>
-            <reference
-                  definitionId="org.robotframework.table.noFullRowIsSelected">
-            </reference>
-            <reference
-                  definitionId="org.robotframework.table.onlyFullRowsAreSelected">
-            </reference>
-          </or>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.CopyCellContentHandler"
-          commandId="org.eclipse.ui.edit.copy">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActive">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActive">
-             </reference>
-          </or>
-       </activeWhen>
-       <enabledWhen>
-          <!--and>
-             <reference
-                   definitionId="org.robotframework.singleElementHasFocusedCell">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.focusedCellHasContent">
-             </reference>
-          </and-->
-          <or>
-            <reference
-                  definitionId="org.robotframework.table.noFullRowIsSelected">
-            </reference>
-            <reference
-                  definitionId="org.robotframework.table.onlyFullRowsAreSelected">
-            </reference>
-          </or>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.PasteCodeCellContentHandler"
-          commandId="org.eclipse.ui.edit.paste">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActive">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActive">
-             </reference>
-          </or>
-       </activeWhen>
-       <enabledWhen>
-          <with
-                variable="activeEditor">
-             <or>
-                <reference
-                      definitionId="org.robotframework.canPasteToKeywordSectionEditorTable">
-                </reference>
-                <reference
-                      definitionId="org.robotframework.canPasteToCasesSectionEditorTable">
-                </reference>
-             </or>
-          </with>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCodeCellContentHandler"
-          commandId="org.eclipse.ui.edit.delete">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActive">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActive">
-             </reference>
-          </or>
-       </activeWhen>
-       <enabledWhen>
-          <!--and>
-             <reference
-                   definitionId="org.robotframework.singleElementHasFocusedCell">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.exactlyOneElementIsSelected">
-             </reference>
-          </and-->
-          <or>
-            <reference
-                  definitionId="org.robotframework.table.noFullRowIsSelected">
-            </reference>
-            <reference
-                  definitionId="org.robotframework.table.onlyFullRowsAreSelected">
-            </reference>
-          </or>
        </enabledWhen>
     </handler>
     <handler
@@ -1858,6 +1728,85 @@
           </reference>
        </enabledWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutInKeywordTableHandler"
+          commandId="org.eclipse.ui.edit.cut">
+       <activeWhen>
+         <reference
+               definitionId="org.robotframework.keywordsPartIsActive">
+         </reference>
+       </activeWhen>
+       <enabledWhen>
+          <or>
+            <reference
+                  definitionId="org.robotframework.table.noFullRowIsSelected">
+            </reference>
+            <reference
+                  definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+            </reference>
+          </or>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyInKeywordTableHandler"
+          commandId="org.eclipse.ui.edit.copy">
+       <activeWhen>
+         <reference
+               definitionId="org.robotframework.keywordsPartIsActive">
+         </reference>
+       </activeWhen>
+       <enabledWhen>
+          <or>
+            <reference
+                  definitionId="org.robotframework.table.noFullRowIsSelected">
+            </reference>
+            <reference
+                  definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+            </reference>
+          </or>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.PasteInKeywordTableHandler"
+          commandId="org.eclipse.ui.edit.paste">
+       <activeWhen>
+         <reference
+               definitionId="org.robotframework.keywordsPartIsActive">
+         </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="activeEditor">
+             <or>
+                <reference
+                      definitionId="org.robotframework.canPasteToKeywordSectionEditorTable">
+                </reference>
+                <reference
+                      definitionId="org.robotframework.canPasteToCasesSectionEditorTable">
+                </reference>
+             </or>
+          </with>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteInKeywordTableHandler"
+          commandId="org.eclipse.ui.edit.delete">
+       <activeWhen>
+         <reference
+               definitionId="org.robotframework.keywordsPartIsActive">
+         </reference>
+       </activeWhen>
+       <enabledWhen>
+          <or>
+            <reference
+                  definitionId="org.robotframework.table.noFullRowIsSelected">
+            </reference>
+            <reference
+                  definitionId="org.robotframework.table.onlyFullRowsAreSelected">
+            </reference>
+          </or>
+       </enabledWhen>
+    </handler>
  </extension>
  <extension
        name="Settings part handlers"
@@ -1871,17 +1820,6 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <!--and>
-             <reference
-                   definitionId="org.robotframework.singleElementHasFocusedCell">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.exactlyOneElementIsSelected">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.focusedCellHasContent">
-             </reference>
-          </and-->
           <or>
              <reference
              	definitionId="org.robotframework.table.noFullRowIsSelected">
@@ -1901,14 +1839,6 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <!--and>
-             <reference
-                   definitionId="org.robotframework.singleElementHasFocusedCell">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.focusedCellHasContent">
-             </reference>
-          </and-->
           <or>
              <reference
              	definitionId="org.robotframework.table.noFullRowIsSelected">
@@ -1930,18 +1860,6 @@
        <enabledWhen>
           <with
                 variable="activeEditor">
-             <!--and>
-                <reference
-                      definitionId="org.robotframework.exactlyOneElementIsSelected">
-                </reference>
-                <reference
-                      definitionId="org.robotframework.singleElementHasFocusedCell">
-                </reference>
-                <test
-                      property="org.robotframework.thereIsTextInClipboard"
-                      value="true">
-                </test>
-             </and-->
            <or>
              <reference
                    definitionId="org.robotframework.canPasteToGeneralSettingsSectionEditorTable">
@@ -1966,12 +1884,6 @@
        </activeWhen>
        <enabledWhen>
           <and>
-             <!--reference
-                   definitionId="org.robotframework.singleElementHasFocusedCell">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.exactlyOneElementIsSelected">
-             </reference-->
             <reference
             	definitionId="org.robotframework.atLeastOneSettingIsSelected">
      		</reference>
@@ -2102,7 +2014,7 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteCellHandler"
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellHandler"
           commandId="org.robotframework.ide.eclipse.deleteCell">
        <activeWhen>
           <and>
@@ -2800,6 +2712,15 @@
              name="navigation"
              visible="true">
        </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInSource"
+             icon="resources/source.png"
+             label="Show in source"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
        <separator
              name="globals"
              visible="true">
@@ -2891,6 +2812,15 @@
           <command
                 commandId="org.robotframework.ide.eclipse.deleteRow"
                 label="Delete row"
+                style="push">
+          </command>
+          <separator
+                name="row.additions"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.selectWholeRow"
+                label="Select whole row(s)"
                 style="push">
           </command>
        </menu>
@@ -2951,6 +2881,15 @@
              name="navigation"
              visible="true">
        </separator>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInSource"
+             icon="resources/source.png"
+             label="Show in source"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
        <separator
              name="globals"
              visible="true">
@@ -3042,6 +2981,15 @@
           <command
                 commandId="org.robotframework.ide.eclipse.deleteRow"
                 label="Delete row"
+                style="push">
+          </command>
+          <separator
+                name="row.additions"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.selectWholeRow"
+                label="Select whole row(s)"
                 style="push">
           </command>
        </menu>
@@ -3314,6 +3262,15 @@
                 label="Delete row"
                 style="push">
           </command>
+          <separator
+                name="row.additions"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.selectWholeRow"
+                label="Select whole row(s)"
+                style="push">
+          </command>
        </menu>
     </menuContribution>
     <menuContribution
@@ -3397,6 +3354,15 @@
           <command
                 commandId="org.robotframework.ide.eclipse.deleteRow"
                 label="Delete row"
+                style="push">
+          </command>
+          <separator
+                name="row.additions"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.selectWholeRow"
+                label="Select whole row(s)"
                 style="push">
           </command>
        </menu>
@@ -3498,6 +3464,15 @@
           <command
                 commandId="org.robotframework.ide.eclipse.deleteRow"
                 label="Delete row"
+                style="push">
+          </command>
+          <separator
+                name="row.additions"
+                visible="true">
+          </separator>
+          <command
+                commandId="org.robotframework.ide.eclipse.selectWholeRow"
+                label="Select whole row(s)"
                 style="push">
           </command>
        </menu>

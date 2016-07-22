@@ -29,7 +29,7 @@ public class ShowInSourceHandler extends DIParameterizedHandler<E4ShowInSourceHa
     public static class E4ShowInSourceHandler {
 
         @Execute
-        public Object showInSource(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void showInSource(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
 
             final RobotFileInternalElement element = Selections.getSingleElement(selection, RobotFileInternalElement.class);
@@ -39,8 +39,6 @@ public class ShowInSourceHandler extends DIParameterizedHandler<E4ShowInSourceHa
 
             final DefinitionPosition position = element.getDefinitionPosition();
             selectionProvider.setSelection(new TextSelection(position.getOffset(), position.getLength()));
-
-            return null;
         }
     }
 }

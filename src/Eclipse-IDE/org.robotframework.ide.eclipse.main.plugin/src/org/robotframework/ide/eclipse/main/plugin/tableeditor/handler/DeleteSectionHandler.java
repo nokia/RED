@@ -32,7 +32,7 @@ public class DeleteSectionHandler extends DIParameterizedHandler<E4DeleteSection
     public static class E4DeleteSection {
 
         @Execute
-        public Object deleteSectionFromActivePage(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+        public void deleteSectionFromActivePage(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 final RobotEditorCommandsStack stack) {
             final IEditorPart activeEditor = editor.getActiveEditor();
 
@@ -46,7 +46,6 @@ public class DeleteSectionHandler extends DIParameterizedHandler<E4DeleteSection
                     stack.execute(new DeleteSectionCommand(sectionsToRemove));
                 }
             }
-            return null;
         }
     }
 }

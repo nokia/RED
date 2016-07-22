@@ -5,16 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
 
-import java.util.List;
-
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.ArraysSerializerDeserializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyKeywordsHandler.E4CopyKeywordsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -28,20 +26,23 @@ public class CopyKeywordsHandler extends DIParameterizedHandler<E4CopyKeywordsHa
     public static class E4CopyKeywordsHandler {
 
         @Execute
-        public void copyKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public boolean copyKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedClipboard clipboard) {
 
-            final List<RobotKeywordDefinition> defs = Selections.getElements(selection, RobotKeywordDefinition.class);
-            final List<RobotKeywordCall> calls = Selections.getElements(selection, RobotKeywordCall.class);
+            final RobotKeywordDefinition[] defs = Selections.getElementsArray(selection, RobotKeywordDefinition.class);
+            final RobotKeywordCall[] calls = Selections.getElementsArray(selection, RobotKeywordCall.class);
 
-            if (!defs.isEmpty()) {
-                final Object data = TableHandlersSupport.createKeywordDefsCopy(defs).toArray(new RobotKeywordDefinition[0]);
+            if (defs.length > 0) {
+                final Object data = ArraysSerializerDeserializer.copy(RobotKeywordDefinition.class, defs);
                 clipboard.insertContent(data);
+                return true;
 
-            } else if (!calls.isEmpty()) {
-                final Object data = TableHandlersSupport.createKeywordCallsCopy(calls).toArray(new RobotKeywordCall[0]);
+            } else if (calls.length > 0) {
+                final Object data = ArraysSerializerDeserializer.copy(RobotKeywordCall.class, calls);
                 clipboard.insertContent(data);
+                return true;
             }
+            return false;
         }
     }
 }

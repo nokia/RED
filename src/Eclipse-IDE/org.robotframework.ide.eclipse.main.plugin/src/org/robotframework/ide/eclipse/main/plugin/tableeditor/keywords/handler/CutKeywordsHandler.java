@@ -5,23 +5,18 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
 
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyKeywordsHandler.E4CopyKeywordsHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutKeywordsHandler.E4CutKeywordsHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.DeleteKeywordsHandler.E4DeleteKeywordsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -39,22 +34,11 @@ public class CutKeywordsHandler extends DIParameterizedHandler<E4CutKeywordsHand
         @Execute
         public void cutKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
-            final List<RobotKeywordDefinition> defs = Selections.getElements(selection, RobotKeywordDefinition.class);
-            final List<RobotKeywordCall> calls = Selections.getElements(selection, RobotKeywordCall.class);
 
-            if (!defs.isEmpty()) {
-                final Object data = TableHandlersSupport.createKeywordDefsCopy(defs).toArray(new RobotKeywordDefinition[0]);
-                clipboard.insertContent(data);
-                commandsStack.execute(new DeleteKeywordDefinitionCommand(defs));
-
-            } else if (!calls.isEmpty()) {
-                final Object data = TableHandlersSupport.createKeywordCallsCopy(calls).toArray(new RobotKeywordCall[0]);
-                clipboard.insertContent(data);
-                commandsStack.execute(new DeleteKeywordCallCommand(calls));
+            final boolean copiedToClipboard = new E4CopyKeywordsHandler().copyKeywords(selection, clipboard);
+            if (copiedToClipboard) {
+                new E4DeleteKeywordsHandler().deleteKeywords(editor, commandsStack, selection);
             }
-            
-            // needed when keyword is cut/paste and selection remains on the same position, pasting is performed on old, not existing keyword
-            editor.getSelectionLayerAccessor().getSelectionLayer().clear();
         }
     }
 }
