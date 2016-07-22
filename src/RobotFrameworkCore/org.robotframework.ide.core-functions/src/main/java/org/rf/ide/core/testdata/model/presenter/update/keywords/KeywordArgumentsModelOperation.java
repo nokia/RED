@@ -29,7 +29,14 @@ public class KeywordArgumentsModelOperation implements IKeywordTableElementOpera
     
     @Override
     public AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment) {
-        return null;
+        final KeywordArguments keywordArgs = userKeyword.newArguments();
+        for (int i = 0; i < args.size(); i++) {
+            keywordArgs.addArgument(i, args.get(i));
+        }
+        if (comment != null && !comment.isEmpty()) {
+            keywordArgs.setComment(comment);
+        }
+        return keywordArgs;
     }
 
     @Override
