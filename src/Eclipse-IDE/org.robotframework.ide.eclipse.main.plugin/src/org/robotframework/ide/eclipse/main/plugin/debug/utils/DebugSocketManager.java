@@ -41,7 +41,7 @@ public class DebugSocketManager implements Runnable {
     }
 
     private int getTimeout(final Optional<Integer> connectionTimeout) {
-        if (connectionTimeout.isPresent() && connectionTimeout.get() > 1) {
+        if (connectionTimeout.isPresent() && connectionTimeout.get() > 0) {
             return connectionTimeout.get();
         }
         return DEBUG_SERVER_DEFAULT_CONNECTION_TIMEOUT;
