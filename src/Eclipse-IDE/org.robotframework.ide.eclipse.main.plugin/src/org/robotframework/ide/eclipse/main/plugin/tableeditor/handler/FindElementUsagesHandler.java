@@ -37,7 +37,7 @@ public class FindElementUsagesHandler extends DIParameterizedHandler<E4FindUsage
     public static class E4FindUsagesHandler {
 
         @Execute
-        public Object findUsages(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void findUsages(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 @Named("org.robotframework.ide.eclipse.findElementUsages.place") final String place) {
             final RobotFileInternalElement element = Selections.getSingleElement(selection,
                     RobotFileInternalElement.class);
@@ -54,7 +54,7 @@ public class FindElementUsagesHandler extends DIParameterizedHandler<E4FindUsage
                 }
 
                 if (place == null) {
-                    return null;
+                    return;
                 }
                 final ISearchQuery query = TextSearchQueryProvider.getPreferred().createQuery(name,
                         resourcesToLookInto.toArray(new IResource[0]));
@@ -62,7 +62,6 @@ public class FindElementUsagesHandler extends DIParameterizedHandler<E4FindUsage
             } catch (final CoreException e) {
                 RedPlugin.logError("Unable to find usages of '" + name + "' in " + place, e);
             }
-            return null;
         }
 
         private List<IResource> getResourcesToQuery(final IWorkspaceRoot workspaceRoot) throws CoreException {

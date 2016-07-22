@@ -33,7 +33,7 @@ public class MoveKeywordsDownHandler extends DIParameterizedHandler<E4MoveKeywor
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public Object moveDown(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void moveDown(@Named(Selections.SELECTION) final IStructuredSelection selection) {
             final Optional<RobotKeywordCall> maybeKeywordCall = Selections.getOptionalFirstElement(selection,
                     RobotKeywordCall.class);
             final Optional<RobotKeywordDefinition> maybeKeywordDef = Selections.getOptionalFirstElement(selection,
@@ -44,7 +44,6 @@ public class MoveKeywordsDownHandler extends DIParameterizedHandler<E4MoveKeywor
             } else if (maybeKeywordDef.isPresent()) {
                 commandsStack.execute(new MoveKeywordDefinitionDownCommand(maybeKeywordDef.get()));
             }
-            return null;
         }
     }
 }

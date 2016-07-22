@@ -37,7 +37,7 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
         private RobotEditorCommandsStack stack;
 
         @Execute
-        public Object addNewUserDefinedKeyword(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void addNewUserDefinedKeyword(@Named(Selections.SELECTION) final IStructuredSelection selection) {
             final Optional<RobotElement> selectedElement = Selections.getOptionalFirstElement(selection,
                     RobotElement.class);
 
@@ -65,8 +65,6 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
             if (newKeywordCommand != null) {
                 stack.execute(newKeywordCommand);
             }
-
-            return null;
         }
     }
 }

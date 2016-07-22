@@ -16,6 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.DeleteCasesCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.DeleteKeywordCallFromCasesCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCasesHandler.E4DeleteCasesHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -29,7 +30,7 @@ public class DeleteCasesHandler extends DIParameterizedHandler<E4DeleteCasesHand
     public static class E4DeleteCasesHandler {
 
         @Execute
-        public void deleteCasesAndCalls(final RobotEditorCommandsStack commandsStack,
+        public void deleteCasesAndCalls(final RobotFormEditor editor, final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
             final List<RobotKeywordCall> keywordCalls = Selections.getElements(selection, RobotKeywordCall.class);
             final List<RobotCase> cases = Selections.getElements(selection, RobotCase.class);
@@ -40,6 +41,7 @@ public class DeleteCasesHandler extends DIParameterizedHandler<E4DeleteCasesHand
             if (!cases.isEmpty()) {
                 commandsStack.execute(new DeleteCasesCommand(cases));
             }
+            editor.getSelectionLayerAccessor().getSelectionLayer().clear();
         }
     }
 }

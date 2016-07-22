@@ -30,9 +30,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.base.Optional;
 
-class CodeAttributesCommandsProvider {
+public class CodeAttributesCommandsProvider {
 
-    Optional<? extends EditorCommand> provideChangeAttributeCommand(final RobotElement element, final int index,
+    public Optional<? extends EditorCommand> provideChangeAttributeCommand(final RobotElement element, final int index,
             final int noOfColumns, final String attribute) {
         if (element instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition definition = (RobotKeywordDefinition) element;
