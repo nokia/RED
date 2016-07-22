@@ -25,7 +25,6 @@ public class SetKeywordDefinitionNameCommand extends EditorCommand {
         if (definition.getName().equals(name)) {
             return;
         }
-        definition.setName(name);
         
         final RobotToken nameToken = new RobotToken();
         nameToken.setText(name);
