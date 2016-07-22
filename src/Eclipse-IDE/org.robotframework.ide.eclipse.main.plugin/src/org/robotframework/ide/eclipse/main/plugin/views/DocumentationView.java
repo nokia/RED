@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views;
 
+import static com.google.common.collect.Iterables.find;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -32,12 +34,17 @@ import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.swt.SwtThread;
+
+import com.google.common.base.Predicate;
 
 /**
  * @author mmarzec
@@ -85,10 +92,10 @@ public class DocumentationView {
         }
 
         if (currentlyDisplayedElement == null || currentlyDisplayedElement != element) {
-            docLoadingJob.setSelectedElement(element);
+            currentlyDisplayedElement = element;
             docLoadingJob.schedule();
         }
-        currentlyDisplayedElement = element;
+        
     }
 
     private void createToolbarActions(final IToolBarManager toolBarManager) {
@@ -101,11 +108,13 @@ public class DocumentationView {
         toggleWordWrapAction.setText("Word Wrap");
         toggleWordWrapAction.setImageDescriptor(RedImages.getWordwrapImage());
         toolBarManager.add(toggleWordWrapAction);
+        final RefreshDocAction refreshDocAction = new RefreshDocAction();
+        refreshDocAction.setText("Refresh");
+        refreshDocAction.setImageDescriptor(RedImages.getRefreshImage());
+        toolBarManager.add(refreshDocAction);
     }
 
     class DocLoadingJob extends Job {
-
-        private RobotFileInternalElement selectedElement;
 
         public DocLoadingJob(final String name) {
             super(name);
@@ -115,21 +124,18 @@ public class DocumentationView {
         @Override
         protected IStatus run(final IProgressMonitor monitor) {
 
-            if (selectedElement.getLinkedElement() instanceof IDocumentationHolder) {
+            if (currentlyDisplayedElement != null
+                    && currentlyDisplayedElement.getLinkedElement() instanceof IDocumentationHolder) {
 
                 String documentationText = DocumentationServiceHandler
-                        .toShowConsolidated((IDocumentationHolder) selectedElement.getLinkedElement());
-                String parentName = selectedElement.getParent().getName();
-                String fileName = selectedElement.getSuiteFile().getName();
+                        .toShowConsolidated((IDocumentationHolder) currentlyDisplayedElement.getLinkedElement());
+                String parentName = currentlyDisplayedElement.getParent().getName();
+                String fileName = currentlyDisplayedElement.getSuiteFile().getName();
 
                 SwtThread.asyncExec(new DocTextSetter(documentationText, parentName, fileName));
             }
 
             return Status.OK_STATUS;
-        }
-
-        public void setSelectedElement(final RobotFileInternalElement selectedElement) {
-            this.selectedElement = selectedElement;
         }
     }
 
@@ -205,6 +211,40 @@ public class DocumentationView {
         @Override
         public void run() {
             styledText.setWordWrap(!styledText.getWordWrap());
+        }
+
+        @Override
+        public void dispose() {
+        }
+    }
+    
+    class RefreshDocAction extends Action implements IWorkbenchAction {
+
+        private static final String ID = "org.robotframework.action.documentationView.ReloadDocAction";
+
+        public RefreshDocAction() {
+            setId(ID);
+        }
+
+        @Override
+        public void run() {
+            if (currentlyDisplayedElement != null) {
+                final RobotSuiteFile suiteFile = currentlyDisplayedElement.getSuiteFile();
+                final RobotElement parent = currentlyDisplayedElement.getParent();
+                if (suiteFile != null && parent != null) {
+                    final RobotKeywordDefinition keywordDefinition = find(suiteFile.getUserDefinedKeywords(),
+                            new Predicate<RobotKeywordDefinition>() {
+
+                                @Override
+                                public boolean apply(final RobotKeywordDefinition def) {
+                                    return parent.getName().equals(def.getName());
+                                }
+                            }, null);
+                    if (keywordDefinition != null) {
+                        showEvent(keywordDefinition.getDocumentationSetting());
+                    }
+                }
+            }
         }
 
         @Override
