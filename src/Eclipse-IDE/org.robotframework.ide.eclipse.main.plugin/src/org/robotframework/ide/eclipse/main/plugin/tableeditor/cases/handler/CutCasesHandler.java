@@ -38,9 +38,7 @@ public class CutCasesHandler extends DIParameterizedHandler<E4CutCasesHandler> {
             
             final boolean copiedToClipboard = new E4CopyCasesHandler().copyCases(selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteCasesHandler().deleteCasesAndCalls(commandsStack, selection);
-
-                editor.getSelectionLayerAccessor().getSelectionLayer().clear();
+                new E4DeleteCasesHandler().deleteCasesAndCalls(editor, commandsStack, selection);
             }
         }
     }

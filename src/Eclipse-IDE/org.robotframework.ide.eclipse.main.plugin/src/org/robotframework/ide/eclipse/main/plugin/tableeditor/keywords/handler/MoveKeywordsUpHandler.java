@@ -33,7 +33,7 @@ public class MoveKeywordsUpHandler extends DIParameterizedHandler<E4MoveKeywordU
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public Object moveUp(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void moveUp(@Named(Selections.SELECTION) final IStructuredSelection selection) {
             final Optional<RobotKeywordCall> maybeKeywordCall = Selections.getOptionalFirstElement(selection,
                     RobotKeywordCall.class);
             final Optional<RobotKeywordDefinition> maybeKeywordDef = Selections.getOptionalFirstElement(selection,
@@ -44,7 +44,6 @@ public class MoveKeywordsUpHandler extends DIParameterizedHandler<E4MoveKeywordU
             } else if (maybeKeywordDef.isPresent()) {
                 commandsStack.execute(new MoveKeywordDefinitionUpCommand(maybeKeywordDef.get()));
             }
-            return null;
         }
     }
 }
