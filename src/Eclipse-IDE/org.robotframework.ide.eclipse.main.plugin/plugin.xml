@@ -1443,6 +1443,50 @@
           </reference>
        </activeWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.InsertCellHandler"
+          commandId="org.robotframework.ide.eclipse.insertCell">
+       <activeWhen>
+         <reference
+               definitionId="org.robotframework.editorContextIsActive">
+         </reference>
+       </activeWhen>
+       <enabledWhen>
+          <with
+                variable="selection">
+             <and>
+                <count
+                      value="0">
+                </count>
+                <count
+                      value="1">
+                </count>
+             </and>
+          </with>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.DeleteCellHandler"
+          commandId="org.robotframework.ide.eclipse.deleteCell">
+       <enabledWhen>
+          <with
+                variable="selection">
+             <and>
+                <count
+                      value="0">
+                </count>
+                <count
+                      value="1">
+                </count>
+             </and>
+          </with>
+       </enabledWhen>
+       <activeWhen>
+         <reference
+               definitionId="org.robotframework.editorContextIsActive">
+         </reference>
+       </activeWhen>
+    </handler>
  </extension>
  <extension
        name="Code commons handlers"
@@ -1463,44 +1507,6 @@
        <enabledWhen>
           <reference
                 definitionId="org.robotframework.exactlyOneElementIsSelected">
-          </reference>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertCellHandler"
-          commandId="org.robotframework.ide.eclipse.insertCell">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActiveAndEditable">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
-             </reference>
-          </or>
-       </activeWhen>
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.singleElementHasFocusedCell">
-          </reference>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellHandler"
-          commandId="org.robotframework.ide.eclipse.deleteCell">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActiveAndEditable">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
-             </reference>
-          </or>
-       </activeWhen>
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.singleElementHasFocusedCell">
           </reference>
        </enabledWhen>
     </handler>
@@ -1981,68 +1987,6 @@
              </reference>
           </and>
        </activeWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.InsertCellHandler"
-          commandId="org.robotframework.ide.eclipse.insertCell">
-       <activeWhen>
-          <and>
-             <reference
-                   definitionId="org.robotframework.settingsPartIsActiveAndEditable">
-             </reference>
-             <with
-                   variable="activeContexts">
-                <iterate
-                      ifEmpty="false"
-                      operator="or">
-                   <or>
-                      <equals
-                            value="org.robotframework.ide.eclipse.tableeditor.settings.import.context">
-                      </equals>
-                      <equals
-                            value="org.robotframework.ide.eclipse.tableeditor.settings.general.context">
-                      </equals>
-                   </or>
-                </iterate>
-             </with>
-          </and>
-       </activeWhen>
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.singleElementHasFocusedCell">
-          </reference>
-       </enabledWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.DeleteCellHandler"
-          commandId="org.robotframework.ide.eclipse.deleteCell">
-       <activeWhen>
-          <and>
-             <reference
-                   definitionId="org.robotframework.settingsPartIsActiveAndEditable">
-             </reference>
-             <with
-                   variable="activeContexts">
-                <iterate
-                      ifEmpty="false"
-                      operator="or">
-                   <or>
-                      <equals
-                            value="org.robotframework.ide.eclipse.tableeditor.settings.import.context">
-                      </equals>
-                      <equals
-                            value="org.robotframework.ide.eclipse.tableeditor.settings.general.context">
-                      </equals>
-                   </or>
-                </iterate>
-             </with>
-          </and>
-       </activeWhen>
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.singleElementHasFocusedCell">
-          </reference>
-       </enabledWhen>
     </handler>
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.EditSettingsHandler"
@@ -3652,7 +3596,7 @@
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.TableCellPropertyTester"
           id="org.robotframework.focusedCellPropertyTester"
           namespace="org.robotframework.table.cell"
-          properties="onlyFullRowsAreSelected,noFullRowIsSelected,numberOfSelectedCellEquals,focusedCellHasIndex,thereIsAFocusedCell,focusedCellHasContent"
+          properties="onlyFullRowsAreSelected,noFullRowIsSelected,numberOfSelectedCellEquals"
           type="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
     </propertyTester>
  </extension>
@@ -4224,34 +4168,6 @@
                </test>
             </and>
          </or>
-       </with>
-    </definition>
-    <definition
-          id="org.robotframework.singleElementHasFocusedCell">
-       <and>
-          <with
-                variable="selection">
-             <count
-                   value="1">
-             </count>
-          </with>
-          <with
-                variable="activeEditor">
-             <test
-                   property="org.robotframework.table.cell.thereIsAFocusedCell"
-                   value="true">
-             </test>
-          </with>
-       </and>
-    </definition>
-    <definition
-          id="org.robotframework.focusedCellHasContent">
-       <with
-             variable="activeEditor">
-          <test
-                property="org.robotframework.table.cell.focusedCellHasContent"
-                value="true">
-          </test>
        </with>
     </definition>
     <definition

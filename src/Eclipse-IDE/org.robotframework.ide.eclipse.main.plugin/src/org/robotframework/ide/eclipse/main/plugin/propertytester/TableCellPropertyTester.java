@@ -6,11 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.jface.viewers.ViewerCell;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.FocusedViewerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
-import org.robotframework.red.viewers.Viewers;
 
 import com.google.common.base.Preconditions;
 
@@ -31,22 +28,7 @@ public class TableCellPropertyTester extends PropertyTester {
     }
 
     private boolean testProperty(final RobotFormEditor editor, final String property, final boolean expected) {
-        if ("thereIsAFocusedCell".equals(property)) {
-            final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
-            if (viewerAccessor == null) {
-                return false;
-            }
-            return viewerAccessor.getFocusedCell() != null == expected;
-
-        } else if ("focusedCellHasContent".equals(property)) {
-            final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
-            if (viewerAccessor == null) {
-                return false;
-            }
-            final ViewerCell cell = viewerAccessor.getFocusedCell();
-
-            return (cell != null && !cell.getText().isEmpty()) == expected;
-        } else if ("onlyFullRowsAreSelected".equals(property)) {
+        if ("onlyFullRowsAreSelected".equals(property)) {
             final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
             if (selectionLayerAccessor == null) {
                 return false;
@@ -64,16 +46,7 @@ public class TableCellPropertyTester extends PropertyTester {
     }
 
     private boolean testProperty(final RobotFormEditor editor, final String property, final int expected) {
-        if ("focusedCellHasIndex".equals(property)) {
-            final FocusedViewerAccessor viewerAccessor = editor.getFocusedViewerAccessor();
-            if (viewerAccessor == null) {
-                return false;
-            }
-            final ViewerCell focusedCell = viewerAccessor.getFocusedCell();
-            final int positionIndex = Viewers.createOrderIndexToPositionIndex(viewerAccessor.getViewer(),
-                    focusedCell.getColumnIndex());
-            return focusedCell != null && positionIndex == expected;
-        } else if ("numberOfSelectedCellEquals".equals(property)) {
+        if ("numberOfSelectedCellEquals".equals(property)) {
             final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
             if (selectionLayerAccessor == null) {
                 return false;

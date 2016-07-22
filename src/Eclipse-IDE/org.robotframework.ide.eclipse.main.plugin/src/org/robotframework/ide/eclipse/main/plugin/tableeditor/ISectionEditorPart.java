@@ -25,8 +25,6 @@ public interface ISectionEditorPart {
 
     void setFocus();
 
-    FocusedViewerAccessor getFocusedViewerAccessor();
-
     SelectionLayerAccessor getSelectionLayerAccessor();
     
     com.google.common.base.Optional<TreeLayerAccessor> getTreeLayerAccessor();
