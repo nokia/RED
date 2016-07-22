@@ -1471,48 +1471,6 @@
        </enabledWhen>
     </handler>
     <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.ExtractKeywordHandler"
-          commandId="org.robotframework.ide.eclipse.extractKeyword">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActive">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActive">
-             </reference>
-          </or>
-       </activeWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.AssignToVariableHandler"
-          commandId="org.robotframework.ide.eclipse.assignToVariable">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActive">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActive">
-             </reference>
-          </or>
-       </activeWhen>
-    </handler>
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.RenameKeywordsHandler"
-          commandId="org.robotframework.ide.eclipse.renameKeyword">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActive">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActive">
-             </reference>
-          </or>
-       </activeWhen>
-    </handler>
-    <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.CutCodeCellContentHandler"
           commandId="org.eclipse.ui.edit.cut">
        <activeWhen>
@@ -2959,24 +2917,6 @@
           </visibleWhen>
        </command>
        <menu
-             label="Refactor">
-          <command
-                commandId="org.robotframework.ide.eclipse.renameKeyword"
-                label="Rename"
-                style="push">
-          </command>
-          <command
-                commandId="org.robotframework.ide.eclipse.extractKeyword"
-                label="Extract to new keyword"
-                style="push">
-          </command>
-          <command
-                commandId="org.robotframework.ide.eclipse.assignToVariable"
-                label="Assign to variable"
-                style="push">
-          </command>
-       </menu>
-       <menu
              label="References">
           <command
                 commandId="org.robotframework.ide.eclipse.findElementUsages"
@@ -3127,24 +3067,6 @@
              </with>
           </visibleWhen>
        </command>
-       <menu
-             label="Refactor">
-          <command
-                commandId="org.robotframework.ide.eclipse.renameKeyword"
-                label="Rename"
-                style="push">
-          </command>
-          <command
-                commandId="org.robotframework.ide.eclipse.extractKeyword"
-                label="Extract to new keyword"
-                style="push">
-          </command>
-          <command
-                commandId="org.robotframework.ide.eclipse.assignToVariable"
-                label="Assign to variable"
-                style="push">
-          </command>
-       </menu>
        <menu
              label="References">
           <command
