@@ -11,10 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.TreePath;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.junit.Test;
 
 import com.google.common.base.Optional;
@@ -113,24 +110,6 @@ public class SelectionsTest {
         final Optional<String> optionalFirst = Selections.getOptionalFirstElement(selection, String.class);
         assertThat(optionalFirst.isPresent()).isTrue();
         assertThat(optionalFirst.get()).isEqualTo("1");
-    }
-
-    @Test
-    public void emptyPathIsReturned_whenSelectionIsEmpty() {
-        final ITreeSelection selection = TreeSelection.EMPTY;
-        final TreePath path = Selections.getFirstElementPath(selection);
-
-        assertThat(path).isEqualTo(TreePath.EMPTY);
-    }
-
-    @Test
-    public void pathIsReturned_forFirstObjectInSelection() {
-        final ITreeSelection selection = new TreeSelection(createArray(
-                new TreePath(createArray(1, 2, 3))
-            ));
-        
-        final TreePath path = Selections.getFirstElementPath(selection);
-        assertThat(path).isEqualTo(new TreePath(createArray(1, 2, 3)));
     }
 
     @SafeVarargs
