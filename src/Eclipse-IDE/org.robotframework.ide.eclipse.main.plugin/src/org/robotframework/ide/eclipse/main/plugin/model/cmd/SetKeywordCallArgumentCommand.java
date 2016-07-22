@@ -52,7 +52,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     protected void updateModelElement() {
         final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
         final ModelType modelType = linkedElement.getModelType();
-        if(modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+        if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW || modelType == ModelType.TEST_CASE_EXECUTABLE_ROW) {
             if(value != null) {
                 ((RobotExecutableRow<?>) linkedElement).setArgument(index, value);
             } else if (index < ((RobotExecutableRow<?>) linkedElement).getArguments().size()) {
@@ -74,5 +74,4 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     protected String getValue() {
         return value;
     }
-
 }
