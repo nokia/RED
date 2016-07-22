@@ -57,7 +57,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 final List<String> arguments = keywordCall.getArguments();
                 if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
                     if (columnIndex == 1 && !arguments.isEmpty()) {
-                        return getDocumentationTxt(arguments.get(0));
+                        return getDocumentationTxt(arguments);
                     }
                 } else if (columnIndex - 1 < arguments.size()) {
                     return arguments.get(columnIndex - 1);
@@ -172,10 +172,11 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         return false;
     }
     
-    private String getDocumentationTxt(final String txt) {
-        if(txt.length() > 100) {
+    private String getDocumentationTxt(final List<String> args) {
+        final String txt = args.get(0);
+        if (txt.length() > 100) {
             return txt.substring(0, 100) + "...";
         }
-        return txt;
+        return args.size() == 1 ? txt : txt + "...";
     }
 }
