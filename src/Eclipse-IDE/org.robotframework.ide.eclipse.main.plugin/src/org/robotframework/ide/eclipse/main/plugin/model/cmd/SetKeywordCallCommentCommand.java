@@ -43,7 +43,7 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
     protected void updateModelElement() {
         final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
         final ModelType modelType = linkedElement.getModelType();
-        if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+        if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW || modelType == ModelType.TEST_CASE_EXECUTABLE_ROW) {
             if (newComment != null) {
                 ((RobotExecutableRow<?>) linkedElement).setComment(newComment);
             } else {
