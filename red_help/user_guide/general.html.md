@@ -1,11 +1,11 @@
 ## General usage hints
 
-### Tab key behaviour
+### Tab key behavior
 
-Tab key behaviour is set by default to be aware of the file type. For .tsv
+Tab key behavior is set by default to be aware of the file type. For .tsv
 files each Tab will produce item separator, for text files 4 spaces will
 generated.  
-In Robot Framework preferences (Window -> Preferences), Tab behaviour can be
+In Robot Framework preferences (Window -> Preferences), Tab behavior can be
 changed if needed.  
   
 ![](general/gen_4.png)  
@@ -24,7 +24,7 @@ assist window.
 
 #### Content assistance preferences
 
-Behaviour of content assist can be changed in Robot Framework preferences
+Behavior of content assist can be changed in Robot Framework preferences
 (Window -> Preferences).  
 Proposed items can be put into testcase by either by insert or override.  
 It can also be configured if library/resource prefix should ba always used
@@ -74,7 +74,7 @@ right click menu Quick Fix or directly by Ctrl+1.
 
 #### Running selected test case
 
-RED can run or debug one,selected testcase. This can be achieved by altering
+RED can run or debug one, selected testcase. This can be achieved by altering
 Run Configuration :  
   
 ![](general/gen_7.png)  

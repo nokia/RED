@@ -31,7 +31,7 @@ selected folders:
 Include/exclude can also be found in red.xml editor under Validation table -
 include/exclude action is available as right click menu.  
 In case of big amounts of .txt or .tsv files which are not Robot test cases,
-validation can be excluded on files bigger than size threshold  
+validation can be excluded on files bigger than size threshold.  
   
   
 ![](validation/exclude_2.png)  
