@@ -21,9 +21,11 @@ import java.util.Map.Entry;
 import java.util.Objects;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -247,6 +249,9 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         }
         if (file != null) {
             try {
+                if (!file.isSynchronized(IResource.DEPTH_ONE)) {
+                    file.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
+                }
                 final IContentDescription contentDescription = file.getContentDescription();
                 if (contentDescription != null) {
                     final IContentType contentType = contentDescription.getContentType();
