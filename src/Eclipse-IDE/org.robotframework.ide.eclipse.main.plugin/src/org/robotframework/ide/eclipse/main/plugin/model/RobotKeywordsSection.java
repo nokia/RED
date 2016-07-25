@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 
@@ -17,8 +16,29 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Keywords";
 
-    RobotKeywordsSection(final RobotSuiteFile parent) {
-        super(parent, SECTION_NAME);
+    RobotKeywordsSection(final RobotSuiteFile parent, final KeywordTable keywordTable) {
+        super(parent, SECTION_NAME, keywordTable);
+    }
+
+    @Override
+    public void link() {
+        final KeywordTable keywordsTable = (KeywordTable) sectionTable;
+        for (final UserKeyword keyword : keywordsTable.getKeywords()) {
+            final RobotKeywordDefinition definition = new RobotKeywordDefinition(this, keyword);
+            definition.link();
+            elements.add(definition);
+        }
+    }
+
+    @Override
+    public KeywordTable getLinkedElement() {
+        return (KeywordTable) super.getLinkedElement();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<RobotKeywordDefinition> getChildren() {
+        return (List<RobotKeywordDefinition>) super.getChildren();
     }
 
     public RobotKeywordDefinition createKeywordDefinition(final String name) {
@@ -28,7 +48,7 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
     public RobotKeywordDefinition createKeywordDefinition(final int index, final String name) {
         final RobotKeywordDefinition keywordDefinition;
         
-        final KeywordTable keywordsTable = (KeywordTable) this.getLinkedElement();
+        final KeywordTable keywordsTable = getLinkedElement();
         if(index >= 0 && index < keywordsTable.getKeywords().size() && index < getChildren().size()) {
             keywordDefinition = new RobotKeywordDefinition(this, keywordsTable.createUserKeyword(name, index));
             elements.add(index, keywordDefinition);
@@ -45,23 +65,5 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
             userKeywords.add((RobotKeywordDefinition) child);
         }
         return userKeywords;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<RobotKeywordDefinition> getChildren() {
-        return (List<RobotKeywordDefinition>) super.getChildren();
-    }
-
-    @Override
-    public void link(final ARobotSectionTable table) {
-        super.link(table);
-
-        final KeywordTable keywordsTable = (KeywordTable) sectionTable;
-        for (final UserKeyword keyword : keywordsTable.getKeywords()) {
-            final RobotKeywordDefinition definition = new RobotKeywordDefinition(this, keyword);
-            definition.link();
-            elements.add(definition);
-        }
     }
 }

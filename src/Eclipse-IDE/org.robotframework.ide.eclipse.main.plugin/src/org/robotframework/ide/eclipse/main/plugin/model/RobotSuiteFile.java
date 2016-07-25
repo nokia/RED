@@ -77,20 +77,16 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         final RobotSuiteFileSection section;
         if (name.equals(RobotVariablesSection.SECTION_NAME)) {
             getLinkedElement().includeVariableTableSection();
-            section = new RobotVariablesSection(this);
-            section.link(getLinkedElement().getVariableTable());
+            section = new RobotVariablesSection(this, getLinkedElement().getVariableTable());
         } else if (name.equals(RobotSettingsSection.SECTION_NAME)) {
             getLinkedElement().includeSettingTableSection();
-            section = new RobotSettingsSection(this);
-            section.link(getLinkedElement().getSettingTable());
+            section = new RobotSettingsSection(this, getLinkedElement().getSettingTable());
         } else if (name.equals(RobotCasesSection.SECTION_NAME)) {
             getLinkedElement().includeTestCaseTableSection();
-            section = new RobotCasesSection(this);
-            section.link(getLinkedElement().getTestCaseTable());
+            section = new RobotCasesSection(this, getLinkedElement().getTestCaseTable());
         } else if (name.equals(RobotKeywordsSection.SECTION_NAME)) {
             getLinkedElement().includeKeywordTableSection();
-            section = new RobotKeywordsSection(this);
-            section.link(getLinkedElement().getKeywordTable());
+            section = new RobotKeywordsSection(this, getLinkedElement().getKeywordTable());
         } else {
             throw new IllegalStateException("Unrecognized section '" + name + "' cannot be created");
         }
@@ -145,23 +141,23 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     private void link(final RobotFile model) {
         sections = Collections.synchronizedList(new ArrayList<RobotSuiteFileSection>());
         if (model.getKeywordTable().isPresent()) {
-            final RobotKeywordsSection section = new RobotKeywordsSection(this);
-            section.link(model.getKeywordTable());
+            final RobotKeywordsSection section = new RobotKeywordsSection(this, model.getKeywordTable());
+            section.link();
             sections.add(section);
         }
         if (model.getTestCaseTable().isPresent()) {
-            final RobotCasesSection section = new RobotCasesSection(this);
-            section.link(model.getTestCaseTable());
+            final RobotCasesSection section = new RobotCasesSection(this, model.getTestCaseTable());
+            section.link();
             sections.add(section);
         }
         if (model.getSettingTable().isPresent()) {
-            final RobotSettingsSection section = new RobotSettingsSection(this);
-            section.link(model.getSettingTable());
+            final RobotSettingsSection section = new RobotSettingsSection(this, model.getSettingTable());
+            section.link();
             sections.add(section);
         }
         if (model.getVariableTable().isPresent()) {
-            final RobotVariablesSection section = new RobotVariablesSection(this);
-            section.link(model.getVariableTable());
+            final RobotVariablesSection section = new RobotVariablesSection(this, model.getVariableTable());
+            section.link();
             sections.add(section);
         }
         sections.sort(new Comparator<RobotSuiteFileSection>() {

@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 
@@ -15,20 +14,23 @@ public class RobotCasesSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Test Cases";
 
-    RobotCasesSection(final RobotSuiteFile parent) {
-        super(parent, SECTION_NAME);
+    RobotCasesSection(final RobotSuiteFile parent, final TestCaseTable testCaseTable) {
+        super(parent, SECTION_NAME, testCaseTable);
     }
 
-    public RobotCase createTestCase(final String name) {
-        return createTestCase(getChildren().size(), name);
+    @Override
+    public void link() {
+        final TestCaseTable testCaseTable = (TestCaseTable) sectionTable;
+        for (final TestCase testCase : testCaseTable.getTestCases()) {
+            final RobotCase newTestCase = new RobotCase(this, testCase);
+            newTestCase.link();
+            elements.add(newTestCase);
+        }
     }
 
-    public RobotCase createTestCase(final int index, final String name) {
-        final TestCaseTable casesTable = (TestCaseTable) this.getLinkedElement();
-        final TestCase userTestCase = casesTable.createTestCase(name);
-        final RobotCase testCase = new RobotCase(this, userTestCase);
-        elements.add(index, testCase);
-        return testCase;
+    @Override
+    public TestCaseTable getLinkedElement() {
+        return (TestCaseTable) super.getLinkedElement();
     }
 
     @SuppressWarnings("unchecked")
@@ -36,16 +38,16 @@ public class RobotCasesSection extends RobotSuiteFileSection {
     public List<RobotCase> getChildren() {
         return (List<RobotCase>) super.getChildren();
     }
-    
-    @Override
-    public void link(final ARobotSectionTable table) {
-        super.link(table);
 
-        final TestCaseTable testCaseTable = (TestCaseTable) sectionTable;
-        for (final TestCase testCase : testCaseTable.getTestCases()) {
-            final RobotCase newTestCase = new RobotCase(this, testCase);
-            newTestCase.link();
-            elements.add(newTestCase);
-        }
+    public RobotCase createTestCase(final String name) {
+        return createTestCase(getChildren().size(), name);
+    }
+
+    public RobotCase createTestCase(final int index, final String name) {
+        final TestCaseTable casesTable = getLinkedElement();
+        final TestCase userTestCase = casesTable.createTestCase(name);
+        final RobotCase testCase = new RobotCase(this, userTestCase);
+        elements.add(index, testCase);
+        return testCase;
     }
 }
