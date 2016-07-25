@@ -18,7 +18,6 @@ import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 import org.robotframework.red.viewers.Selections;
 
@@ -53,10 +52,17 @@ public class DocumentationElementsSelectionChangedListener implements ISelection
                     return;
                 } else if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
                     postEvent(robotFileInternalElement);
-                } else if (modelType == ModelType.USER_KEYWORD) {
-                    RobotKeywordDefinition keywordDefinition = (RobotKeywordDefinition) robotFileInternalElement;
-                    postEvent(keywordDefinition.getDocumentationSetting());
-                }
+                } else if (modelType == ModelType.TEST_CASE_DOCUMENTATION) {
+                    postEvent(robotFileInternalElement);
+                } 
+                /*else if (modelType == ModelType.USER_KEYWORD) {
+                    postEvent(((RobotKeywordDefinition) robotFileInternalElement).getDocumentationSetting());
+                } else if (modelType == ModelType.TEST_CASE) {
+                    final List<RobotDefinitionSetting> documentationSettings = ((RobotCase) robotFileInternalElement).getDocumentationSetting();
+                    if(!documentationSettings.isEmpty()) {
+                        postEvent(documentationSettings.get(0));
+                    }
+                }*/
             }
         }
 
