@@ -21,28 +21,40 @@ public class KeywordDocumentationModelOperation implements IKeywordTableElementO
     public boolean isApplicable(ModelType elementType) {
         return elementType == ModelType.USER_KEYWORD_DOCUMENTATION;
     }
-    
+
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
         return elementType == RobotTokenType.KEYWORD_SETTING_DOCUMENTATION;
     }
-    
+
     @Override
     public AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment) {
-        return null;
+        final KeywordDocumentation keywordDoc = userKeyword.newDocumentation();
+        for (int i = 0; i < args.size(); i++) {
+            keywordDoc.addDocumentationText(i, args.get(i));
+        }
+        if (comment != null && !comment.isEmpty()) {
+            keywordDoc.setComment(comment);
+        }
+        return keywordDoc;
     }
 
     @Override
-    public void update(AModelElement<?> modelElement, int index, String value) {
-        KeywordDocumentation keywordDocumentation = (KeywordDocumentation) modelElement;
+    public void update(final AModelElement<?> modelElement, final int index, final String value) {
+        final KeywordDocumentation keywordDocumentation = (KeywordDocumentation) modelElement;
+        if (value != null) {
+            keywordDocumentation.addDocumentationText(index, value);
+        } else {
+            keywordDocumentation.removeElementToken(index);
+        }
 
     }
-    
+
     @Override
     public AModelElement<?> createCopy(final AModelElement<?> modelElement) {
         return ((KeywordDocumentation) modelElement).copy();
     }
-    
+
     @Override
     public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
         userKeyword.addDocumentation((KeywordDocumentation) modelElement);
