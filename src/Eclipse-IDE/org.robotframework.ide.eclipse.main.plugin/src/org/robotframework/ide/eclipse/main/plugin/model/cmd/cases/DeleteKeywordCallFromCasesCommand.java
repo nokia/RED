@@ -36,14 +36,18 @@ public class DeleteKeywordCallFromCasesCommand extends EditorCommand {
         final TestCase testCase = (TestCase) parent.getLinkedElement();
         for (final RobotKeywordCall robotKeywordCall : callsToDelete) {
             @SuppressWarnings("unchecked")
-            final AModelElement<TestCase> modelElement = (AModelElement<TestCase>) robotKeywordCall.getLinkedElement();
-            if (modelElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
-                testCase.removeExecutableRow((RobotExecutableRow<TestCase>) modelElement);
-            } else {
-                new TestCaseTableModelUpdater().remove(testCase, modelElement);
-            }
+            final AModelElement<TestCase> linkedElement = (AModelElement<TestCase>) robotKeywordCall.getLinkedElement();
+            removeCallInModel(testCase, linkedElement);
         }
 
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, parent);
+    }
+
+    static void removeCallInModel(final TestCase testCase, final AModelElement<TestCase> modelElement) {
+        if (modelElement.getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW) {
+            testCase.removeExecutableRow((RobotExecutableRow<TestCase>) modelElement);
+        } else {
+            new TestCaseTableModelUpdater().remove(testCase, modelElement);
+        }
     }
 }

@@ -18,7 +18,6 @@ import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
@@ -48,140 +47,13 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     private final SettingTableModelUpdater settingTableModelUpdater;
 
-    RobotSettingsSection(final RobotSuiteFile parent) {
-        super(parent, SECTION_NAME);
+    RobotSettingsSection(final RobotSuiteFile parent, final SettingTable settingTable) {
+        super(parent, SECTION_NAME, settingTable);
         settingTableModelUpdater = new SettingTableModelUpdater();
     }
 
-    public RobotSetting createSetting(final String name, final String comment, final String... args) {
-        final List<String> settingArgs = newArrayList(args);
-        
-        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), -1, name, comment,
-                settingArgs);
-        
-        String consolidatedComment = comment;
-        if (!comment.isEmpty()) {
-            consolidatedComment = CommentServiceHandler.consolidate((ICommentHolder) newModelElement,
-                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
-        }
-        final RobotSetting setting = newSetting(name, consolidatedComment, settingArgs);
-        setting.link(newModelElement);
-
-        elements.add(setting);
-
-        return setting;
-    }
-
-    public void insertSetting(final String name, final String comment, final List<String> args, final int tableIndex,
-            final int allSettingsElementsIndex) {
-        final RobotSetting setting = newSetting(name, comment, args);
-
-        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), tableIndex, name,
-                comment, args);
-        setting.link(newModelElement);
-
-        if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex <= elements.size()) {
-            elements.add(allSettingsElementsIndex, setting);
-        }
-    }
-
-    private RobotSetting newSetting(final String name, final String comment, final List<String> settingArgs) {
-        RobotSetting setting;
-        if (name.equals(SettingsGroup.METADATA.getName())) {
-            setting = new RobotSetting(this, SettingsGroup.METADATA, name, settingArgs, comment);
-        } else if (name.equals(SettingsGroup.LIBRARIES.getName())) {
-            setting = new RobotSetting(this, SettingsGroup.LIBRARIES, name, settingArgs, comment);
-        } else if (name.equals(SettingsGroup.RESOURCES.getName())) {
-            setting = new RobotSetting(this, SettingsGroup.RESOURCES, name, settingArgs, comment);
-        } else if (name.equals(SettingsGroup.VARIABLES.getName())) {
-            setting = new RobotSetting(this, SettingsGroup.VARIABLES, name, settingArgs, comment);
-        } else {
-            setting = new RobotSetting(this, SettingsGroup.NO_GROUP, name, settingArgs, comment);
-        }
-        return setting;
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
-    public List<RobotKeywordCall> getChildren() {
-        return (List<RobotKeywordCall>) super.getChildren();
-    }
-
-    public List<RobotKeywordCall> getMetadataSettings() {
-        return getSettingsFromGroup(SettingsGroup.METADATA);
-    }
-
-    public List<RobotKeywordCall> getGeneralSettings() {
-        return getSettingsFromGroup(SettingsGroup.NO_GROUP);
-    }
-
-    public List<RobotKeywordCall> getResourcesSettings() {
-        return getSettingsFromGroup(SettingsGroup.RESOURCES);
-    }
-
-    public List<RobotKeywordCall> getVariablesSettings() {
-        return getSettingsFromGroup(SettingsGroup.VARIABLES);
-    }
-
-    public List<RobotKeywordCall> getImportSettings() {
-        return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
-
-            @Override
-            public boolean apply(final RobotKeywordCall element) {
-                return SettingsGroup.getImportsGroupsSet().contains((((RobotSetting) element).getGroup()));
-            }
-        }));
-    }
-
-    private List<RobotKeywordCall> getSettingsFromGroup(final SettingsGroup group) {
-        return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
-
-            @Override
-            public boolean apply(final RobotKeywordCall element) {
-                return (((RobotSetting) element).getGroup() == group);
-            }
-        }));
-    }
-
-    public RobotSetting getSetting(final String name) {
-        for (final RobotKeywordCall setting : getChildren()) {
-            if (name.equals(setting.getName())) {
-                return (RobotSetting) setting;
-            }
-        }
-        return null;
-    }
-
-    public List<IPath> getResourcesPaths() {
-        final List<RobotKeywordCall> resources = getResourcesSettings();
-        final List<IPath> paths = newArrayList();
-        for (final RobotElement element : resources) {
-            final RobotSetting setting = (RobotSetting) element;
-            final List<String> args = setting.getArguments();
-            if (!args.isEmpty()) {
-                paths.add(new org.eclipse.core.runtime.Path(args.get(0)));
-            }
-        }
-        return paths;
-    }
-
-    public List<IPath> getVariablesPaths() {
-        final List<RobotKeywordCall> variables = getVariablesSettings();
-        final List<IPath> paths = newArrayList();
-        for (final RobotElement element : variables) {
-            final RobotSetting setting = (RobotSetting) element;
-            final List<String> args = setting.getArguments();
-            if (!args.isEmpty()) {
-                paths.add(new org.eclipse.core.runtime.Path(args.get(0)));
-            }
-        }
-        return paths;
-    }
-
-    @Override
-    public void link(final ARobotSectionTable table) {
-        super.link(table);
-
+    public void link() {
         final SettingTable settingsTable = (SettingTable) sectionTable;
 
         for (final Metadata metadataSetting : settingsTable.getMetadatas()) {
@@ -323,6 +195,136 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 return Integer.compare(s1.getDefinitionPosition().getOffset(), s2.getDefinitionPosition().getOffset());
             }
         });
+    }
+
+    @Override
+    public SettingTable getLinkedElement() {
+        return (SettingTable) super.getLinkedElement();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<RobotKeywordCall> getChildren() {
+        return (List<RobotKeywordCall>) super.getChildren();
+    }
+
+    public RobotSetting createSetting(final String name, final String comment, final String... args) {
+        final List<String> settingArgs = newArrayList(args);
+
+        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), -1, name, comment,
+                settingArgs);
+
+        String consolidatedComment = comment;
+        if (!comment.isEmpty()) {
+            consolidatedComment = CommentServiceHandler.consolidate((ICommentHolder) newModelElement,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+        }
+        final RobotSetting setting = newSetting(name, consolidatedComment, settingArgs);
+        setting.link(newModelElement);
+
+        elements.add(setting);
+
+        return setting;
+    }
+
+    public void insertSetting(final String name, final String comment, final List<String> args, final int tableIndex,
+            final int allSettingsElementsIndex) {
+        final RobotSetting setting = newSetting(name, comment, args);
+
+        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), tableIndex, name,
+                comment, args);
+        setting.link(newModelElement);
+
+        if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex <= elements.size()) {
+            elements.add(allSettingsElementsIndex, setting);
+        }
+    }
+
+    private RobotSetting newSetting(final String name, final String comment, final List<String> settingArgs) {
+        RobotSetting setting;
+        if (name.equals(SettingsGroup.METADATA.getName())) {
+            setting = new RobotSetting(this, SettingsGroup.METADATA, name, settingArgs, comment);
+        } else if (name.equals(SettingsGroup.LIBRARIES.getName())) {
+            setting = new RobotSetting(this, SettingsGroup.LIBRARIES, name, settingArgs, comment);
+        } else if (name.equals(SettingsGroup.RESOURCES.getName())) {
+            setting = new RobotSetting(this, SettingsGroup.RESOURCES, name, settingArgs, comment);
+        } else if (name.equals(SettingsGroup.VARIABLES.getName())) {
+            setting = new RobotSetting(this, SettingsGroup.VARIABLES, name, settingArgs, comment);
+        } else {
+            setting = new RobotSetting(this, SettingsGroup.NO_GROUP, name, settingArgs, comment);
+        }
+        return setting;
+    }
+
+    public List<RobotKeywordCall> getMetadataSettings() {
+        return getSettingsFromGroup(SettingsGroup.METADATA);
+    }
+
+    public List<RobotKeywordCall> getGeneralSettings() {
+        return getSettingsFromGroup(SettingsGroup.NO_GROUP);
+    }
+
+    public List<RobotKeywordCall> getResourcesSettings() {
+        return getSettingsFromGroup(SettingsGroup.RESOURCES);
+    }
+
+    public List<RobotKeywordCall> getVariablesSettings() {
+        return getSettingsFromGroup(SettingsGroup.VARIABLES);
+    }
+
+    public List<RobotKeywordCall> getImportSettings() {
+        return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
+
+            @Override
+            public boolean apply(final RobotKeywordCall element) {
+                return SettingsGroup.getImportsGroupsSet().contains((((RobotSetting) element).getGroup()));
+            }
+        }));
+    }
+
+    private List<RobotKeywordCall> getSettingsFromGroup(final SettingsGroup group) {
+        return newArrayList(Iterables.filter(getChildren(), new Predicate<RobotKeywordCall>() {
+
+            @Override
+            public boolean apply(final RobotKeywordCall element) {
+                return (((RobotSetting) element).getGroup() == group);
+            }
+        }));
+    }
+
+    public RobotSetting getSetting(final String name) {
+        for (final RobotKeywordCall setting : getChildren()) {
+            if (name.equals(setting.getName())) {
+                return (RobotSetting) setting;
+            }
+        }
+        return null;
+    }
+
+    public List<IPath> getResourcesPaths() {
+        final List<RobotKeywordCall> resources = getResourcesSettings();
+        final List<IPath> paths = newArrayList();
+        for (final RobotElement element : resources) {
+            final RobotSetting setting = (RobotSetting) element;
+            final List<String> args = setting.getArguments();
+            if (!args.isEmpty()) {
+                paths.add(new org.eclipse.core.runtime.Path(args.get(0)));
+            }
+        }
+        return paths;
+    }
+
+    public List<IPath> getVariablesPaths() {
+        final List<RobotKeywordCall> variables = getVariablesSettings();
+        final List<IPath> paths = newArrayList();
+        for (final RobotElement element : variables) {
+            final RobotSetting setting = (RobotSetting) element;
+            final List<String> args = setting.getArguments();
+            if (!args.isEmpty()) {
+                paths.add(new org.eclipse.core.runtime.Path(args.get(0)));
+            }
+        }
+        return paths;
     }
 
     private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {

@@ -33,14 +33,13 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
 
     protected ARobotSectionTable sectionTable;
 
-    RobotSuiteFileSection(final RobotSuiteFile parent, final String name) {
+    RobotSuiteFileSection(final RobotSuiteFile parent, final String name, final ARobotSectionTable sectionTable) {
         this.parent = parent;
         this.name = name;
+        this.sectionTable = sectionTable;
     }
 
-    public void link(final ARobotSectionTable table) {
-        this.sectionTable = table;
-    }
+    public abstract void link();
 
     @Override
     public ARobotSectionTable getLinkedElement() {

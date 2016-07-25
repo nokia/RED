@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
@@ -19,8 +18,16 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
 
     public static final String SECTION_NAME = "Variables";
 
-    RobotVariablesSection(final RobotSuiteFile parent) {
-        super(parent, SECTION_NAME);
+    RobotVariablesSection(final RobotSuiteFile parent, final VariableTable variableTable) {
+        super(parent, SECTION_NAME, variableTable);
+    }
+
+    @Override
+    public void link() {
+        for (final AVariable variableHolder : getLinkedElement().getVariables()) {
+            final RobotVariable variable = new RobotVariable(this, variableHolder);
+            elements.add(variable);
+        }
     }
 
     @Override
@@ -32,16 +39,6 @@ public class RobotVariablesSection extends RobotSuiteFileSection {
     @Override
     public List<RobotVariable> getChildren() {
         return (List<RobotVariable>) super.getChildren();
-    }
-
-    @Override
-    public void link(final ARobotSectionTable table) {
-        super.link(table);
-
-        for (final AVariable variableHolder : getLinkedElement().getVariables()) {
-            final RobotVariable variable = new RobotVariable(this, variableHolder);
-            elements.add(variable);
-        }
     }
 
     public RobotVariable createVariable(final VariableType variableType, final String name) {
