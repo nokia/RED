@@ -31,7 +31,7 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
 
     protected final List<RobotFileInternalElement> elements = new ArrayList<>();
 
-    protected ARobotSectionTable sectionTable;
+    private final ARobotSectionTable sectionTable;
 
     RobotSuiteFileSection(final RobotSuiteFile parent, final String name, final ARobotSectionTable sectionTable) {
         this.parent = parent;

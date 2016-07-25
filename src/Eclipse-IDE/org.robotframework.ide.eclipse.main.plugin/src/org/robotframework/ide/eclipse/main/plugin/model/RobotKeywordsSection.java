@@ -22,7 +22,7 @@ public class RobotKeywordsSection extends RobotSuiteFileSection {
 
     @Override
     public void link() {
-        final KeywordTable keywordsTable = (KeywordTable) sectionTable;
+        final KeywordTable keywordsTable = getLinkedElement();
         for (final UserKeyword keyword : keywordsTable.getKeywords()) {
             final RobotKeywordDefinition definition = new RobotKeywordDefinition(this, keyword);
             definition.link();
