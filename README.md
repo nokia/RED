@@ -34,11 +34,11 @@ Open Help -> Installation Details, select old RED feature and perform unistall, 
 ## RED Help
 ![RED Robot Editor's application help](https://github.com/nokia/RED/tree/master/red_help)
 ## Look & feel
-![](https://github.com/nokia/RED/blob/master/doc/img/red_overview_source_1.png "Robot perspective with text editor")
+![](https://github.com/nokia/RED/blob/master/misc/img/red_overview_source_1.png "Robot perspective with text editor")
 
-![](https://github.com/nokia/RED/blob/master/doc/img/red_testcases_table.png "Table editor")
+![](https://github.com/nokia/RED/blob/master/misc/img/red_testcases_table.png "Table editor")
 
-![](https://github.com/nokia/RED/blob/master/doc/img/red_overview_debug.png "Debug perspective")
+![](https://github.com/nokia/RED/blob/master/misc/img/red_overview_debug.png "Debug perspective")
 
 
 
