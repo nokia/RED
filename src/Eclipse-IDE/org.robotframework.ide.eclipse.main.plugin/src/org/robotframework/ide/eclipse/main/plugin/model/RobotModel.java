@@ -70,6 +70,11 @@ public class RobotModel implements RobotElement {
     }
 
     @Override
+    public int getIndex() {
+        return -1;
+    }
+
+    @Override
     public ImageDescriptor getImage() {
         return null;
     }

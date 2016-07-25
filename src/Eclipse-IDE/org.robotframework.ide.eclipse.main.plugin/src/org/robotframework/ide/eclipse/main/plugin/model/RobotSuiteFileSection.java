@@ -136,6 +136,11 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
         return elements;
     }
 
+    @Override
+    public int getIndex() {
+        return parent == null ? -1 : parent.getChildren().indexOf(this);
+    }
+
     public RobotElement findChild(final String name) {
         for (final RobotElement element : elements) {
             if (element.getName().equals(name)) {

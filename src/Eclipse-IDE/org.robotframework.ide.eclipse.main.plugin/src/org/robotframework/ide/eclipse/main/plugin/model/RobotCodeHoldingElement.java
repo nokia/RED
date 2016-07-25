@@ -60,6 +60,11 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     }
 
     @Override
+    public int getIndex() {
+        return parent == null ? -1 : parent.getChildren().indexOf(this);
+    }
+
+    @Override
     public abstract Position getPosition();
 
     @Override
