@@ -1,6 +1,26 @@
-## local Python variable files to deal with missing variables
+## General info about python variable files used in Robot Test Suites
 
-In some test environments, Robot specific enviroments variables are used in
+RobotFramework allows to use python variable files in Robot Test Suites in two
+distinctive ways.  
+**Direct usage** is done by using python file declaration in Settings section as follows:  
+_variables &amp;ltpath;_to_python_var_file&gt;_  
+  
+Variable file content will be visible across Test Suite.  
+**Global usage** is a way to use common variable file across any Test Suite.  
+In RED, this can be achieved by including variable files in RED.xml under
+Variable Files tab.  
+From Robot perspective this is done by using -V switch in pybot execution.  
+
+## Reloading variable file content
+
+Since version 0.6.6, RED can automatically invoke refresh of variable files
+being changed.  
+This can be done manually by clicking on Project by RMB and selecting **Robot
+Framework -> Reset Robot Environment**  
+
+## Local Python variable files to deal with missing variables
+
+In some test environments, Robot specific environments variables are used in
 test cases or injected as arguments to Robot test runner.  
 RED is not aware of such usage thus those variables will be marked as unknown,
 error marker will be placed.  

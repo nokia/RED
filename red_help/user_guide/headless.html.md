@@ -4,8 +4,8 @@ RED can be run in headless mode to provide validation info of included
 projects.  
 During validation, settings are read from red.xml of each of the projects thus
 preserving links to referenced libraries, variable mappings or include/exclude
-folders. Only opened projects are validated  
-Output of headless run is report of validated projects and xml report in
+folders. Only opened projects are validated.  
+Output of headless execution is report of validated projects and xml report in
 checkstyle format.  
   
 Syntax:  
