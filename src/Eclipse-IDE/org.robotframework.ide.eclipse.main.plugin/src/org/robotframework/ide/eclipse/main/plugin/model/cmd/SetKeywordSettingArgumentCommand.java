@@ -5,8 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 
 public class SetKeywordSettingArgumentCommand extends SetKeywordCallArgumentCommand {
 
@@ -16,6 +19,12 @@ public class SetKeywordSettingArgumentCommand extends SetKeywordCallArgumentComm
 
     @Override
     protected void updateModelElement() {
-        new KeywordTableModelUpdater().update(getKeywordCall().getLinkedElement(), getIndex(), getValue());
+
+        final AModelElement<?> linkedElement = getKeywordCall().getLinkedElement();
+        new KeywordTableModelUpdater().update(linkedElement, getIndex(), getValue());
+        
+        if (linkedElement.getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION) {
+            eventBroker.post(DocumentationView.REFRESH_DOC_EVENT_TOPIC, getKeywordCall());
+        }
     }
 }
