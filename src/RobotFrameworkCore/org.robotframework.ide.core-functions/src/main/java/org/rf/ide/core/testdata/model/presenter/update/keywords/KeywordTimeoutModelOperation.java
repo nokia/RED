@@ -58,11 +58,6 @@ public class KeywordTimeoutModelOperation implements IKeywordTableElementOperati
     }
 
     @Override
-    public AModelElement<?> createCopy(final AModelElement<?> modelElement) {
-        return ((KeywordTimeout) modelElement).copy();
-    }
-    
-    @Override
     public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
         userKeyword.addTimeout((KeywordTimeout) modelElement);
     }

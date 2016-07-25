@@ -70,17 +70,6 @@ public class KeywordTableModelUpdater {
             }
         }
     }
-    
-    public AModelElement<?> createCopy(final AModelElement<?> modelElement) {
-
-        if (modelElement != null) {
-            final IKeywordTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
-            if (operationHandler != null) {
-                return operationHandler.createCopy(modelElement);
-            }
-        }
-        return null;
-    }
 
     public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
         if (modelElement != null) {
