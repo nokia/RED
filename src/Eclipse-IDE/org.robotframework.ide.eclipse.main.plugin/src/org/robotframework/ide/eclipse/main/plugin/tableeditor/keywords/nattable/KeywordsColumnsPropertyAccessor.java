@@ -55,11 +55,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                         ? keywordCall.getName() : "[" + keywordCall.getName() + "]";
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                 final List<String> arguments = keywordCall.getArguments();
-                if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
-                    if (columnIndex == 1 && !arguments.isEmpty()) {
-                        return getDocumentationTxt(arguments);
-                    }
-                } else if (columnIndex - 1 < arguments.size()) {
+                if (columnIndex - 1 < arguments.size()) {
                     return arguments.get(columnIndex - 1);
                 }
             } else if (columnIndex == (numberOfColumns - 1)) {
@@ -110,8 +106,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                     commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
                 }
             } else {
-                if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)
-                        && modelType != ModelType.USER_KEYWORD_DOCUMENTATION) {
+                if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
                 } else if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordSettingCommentCommand(keywordCall, value));
@@ -156,8 +151,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
     private boolean createNewKeywordSettingAndRemoveOldExeRow(final String value, final RobotKeywordCall keywordCall) {
         final RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(value);
-        if (tokenType != RobotTokenType.UNKNOWN && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS
-                && tokenType != RobotTokenType.KEYWORD_SETTING_DOCUMENTATION) {
+        if (tokenType != RobotTokenType.UNKNOWN && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS) {
             final RobotKeywordDefinition keywordDefinition = (RobotKeywordDefinition) keywordCall.getParent();
             keywordDefinition.getLinkedElement()
                     .removeExecutableRow((RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement());
@@ -172,12 +166,5 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         }
         return false;
     }
-    
-    private String getDocumentationTxt(final List<String> args) {
-        final String txt = args.get(0);
-        if (txt.length() > 100) {
-            return txt.substring(0, 100) + "...";
-        }
-        return args.size() == 1 ? txt : txt + "...";
-    }
+
 }
