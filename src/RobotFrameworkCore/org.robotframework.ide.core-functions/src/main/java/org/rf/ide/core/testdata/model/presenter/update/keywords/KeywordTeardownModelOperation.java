@@ -59,11 +59,6 @@ public class KeywordTeardownModelOperation implements IKeywordTableElementOperat
     }
 
     @Override
-    public AModelElement<?> createCopy(final AModelElement<?> modelElement) {
-        return ((KeywordTeardown) modelElement).copy();
-    }
-    
-    @Override
     public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
         userKeyword.addTeardown((KeywordTeardown) modelElement);
     }
