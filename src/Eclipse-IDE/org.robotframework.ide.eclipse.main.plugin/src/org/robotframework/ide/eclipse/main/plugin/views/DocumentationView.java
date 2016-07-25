@@ -31,7 +31,9 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -54,6 +56,8 @@ public class DocumentationView {
     public static final String ID = "org.robotframework.ide.DocumentationView";
 
     public static final String SHOW_DOC_EVENT_TOPIC = "DocumentationView/Show";
+
+    public static final String REFRESH_DOC_EVENT_TOPIC = "DocumentationView/Refresh";
 
     private StyledText styledText;
 
@@ -87,15 +91,30 @@ public class DocumentationView {
     private void showEvent(@UIEventTopic(SHOW_DOC_EVENT_TOPIC) final RobotFileInternalElement element) {
 
         if (element == null) {
+            resetCurrentlyDisplayedElement();
             styledText.setText("");
             return;
         }
 
-        if (currentlyDisplayedElement == null || currentlyDisplayedElement != element) {
+        if (isDifferentElementThanCurrentlyDisplayed(element)) {
             currentlyDisplayedElement = element;
             docLoadingJob.schedule();
         }
+    }
 
+    @Inject
+    @Optional
+    private void refreshEvent(@UIEventTopic(REFRESH_DOC_EVENT_TOPIC) final RobotFileInternalElement element) {
+        resetCurrentlyDisplayedElement();
+        showEvent(element);
+    }
+
+    private boolean isDifferentElementThanCurrentlyDisplayed(final RobotFileInternalElement element) {
+        return currentlyDisplayedElement == null || currentlyDisplayedElement != element;
+    }
+
+    private void resetCurrentlyDisplayedElement() {
+        currentlyDisplayedElement = null;
     }
 
     private void createToolbarActions(final IToolBarManager toolBarManager) {
@@ -232,16 +251,23 @@ public class DocumentationView {
                 final RobotSuiteFile suiteFile = currentlyDisplayedElement.getSuiteFile();
                 final RobotElement parent = currentlyDisplayedElement.getParent();
                 if (suiteFile != null && parent != null) {
-                    final RobotKeywordDefinition keywordDefinition = find(suiteFile.getUserDefinedKeywords(),
-                            new Predicate<RobotKeywordDefinition>() {
+                    ModelType modelType = ((AModelElement<?>) currentlyDisplayedElement.getLinkedElement())
+                            .getModelType();
+                    if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
+                        final RobotKeywordDefinition keywordDefinition = find(suiteFile.getUserDefinedKeywords(),
+                                new Predicate<RobotKeywordDefinition>() {
 
-                                @Override
-                                public boolean apply(final RobotKeywordDefinition def) {
-                                    return parent.getName().equals(def.getName());
-                                }
-                            }, null);
-                    if (keywordDefinition != null) {
-                        showEvent(keywordDefinition.getDocumentationSetting());
+                                    @Override
+                                    public boolean apply(final RobotKeywordDefinition def) {
+                                        return parent.getName().equals(def.getName());
+                                    }
+                                }, null);
+                        if (keywordDefinition != null) {
+                            resetCurrentlyDisplayedElement();
+                            showEvent(keywordDefinition.getDocumentationSetting());
+                        }
+                    } else {
+                        // TODO: Test cases doc
                     }
                 }
             }
