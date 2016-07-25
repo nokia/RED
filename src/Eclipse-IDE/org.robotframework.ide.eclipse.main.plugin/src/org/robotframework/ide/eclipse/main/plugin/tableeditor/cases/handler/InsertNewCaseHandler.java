@@ -40,7 +40,11 @@ public class InsertNewCaseHandler extends DIParameterizedHandler<E4InsertNewCase
         @Execute
         public void addNewTestCase(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
-            Selections.assureSingleElementIsSelected(selection);
+
+            if (selection.size() > 1) {
+                throw new IllegalArgumentException("Given selection should contain at most one element, but have "
+                        + selection.size() + " instead");
+            }
 
             RobotCase testCase = null;
 
@@ -50,9 +54,10 @@ public class InsertNewCaseHandler extends DIParameterizedHandler<E4InsertNewCase
                 testCase = (RobotCase) selectedElement.get().getParent();
             } else if (selectedElement.isPresent() && selectedElement.get() instanceof RobotCase) {
                 testCase = (RobotCase) selectedElement.get();
-            } else {
-                final AddingToken token = Selections.getSingleElement(selection, AddingToken.class);
-                testCase = (RobotCase) token.getParent();
+            }
+            final Optional<AddingToken> token = Selections.getOptionalFirstElement(selection, AddingToken.class);
+            if (token.isPresent()) {
+                testCase = (RobotCase) token.get().getParent();
             }
 
             if (testCase == null) {
