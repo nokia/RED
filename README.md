@@ -32,7 +32,7 @@ We recommend to not to do direct update of newer version, instead perform unista
 Open Help -> Installation Details, select old RED feature and perform unistall, restart Eclipse
 
 ## RED Help
-![RED Robot Editor's application help](https://github.com/nokia/RED/tree/master/red_help)
+![RED Robot Editor's application help](Red_Help.md)
 ## Look & feel
 ![](https://github.com/nokia/RED/blob/master/misc/img/red_overview_source_1.png "Robot perspective with text editor")
 
