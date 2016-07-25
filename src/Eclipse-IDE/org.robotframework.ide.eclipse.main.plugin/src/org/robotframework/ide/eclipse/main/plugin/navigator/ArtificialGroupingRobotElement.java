@@ -52,6 +52,11 @@ public class ArtificialGroupingRobotElement implements RobotFileInternalElement 
     }
 
     @Override
+    public int getIndex() {
+        return -1;
+    }
+
+    @Override
     public RobotSuiteFile getSuiteFile() {
         return groupedElements.get(0).getSuiteFile();
     }

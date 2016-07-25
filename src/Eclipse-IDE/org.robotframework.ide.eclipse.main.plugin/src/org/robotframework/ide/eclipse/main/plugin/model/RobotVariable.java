@@ -68,6 +68,11 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
         return newArrayList();
     }
 
+    @Override
+    public int getIndex() {
+        return parent == null ? -1 : parent.getChildren().indexOf(this);
+    }
+
     public String getPrefix() {
         return holder.getType().getIdentificator() + "{";
     }
