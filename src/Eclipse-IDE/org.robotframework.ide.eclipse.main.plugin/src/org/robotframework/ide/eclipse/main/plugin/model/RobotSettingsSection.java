@@ -54,7 +54,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
     @Override
     public void link() {
-        final SettingTable settingsTable = (SettingTable) sectionTable;
+        final SettingTable settingsTable = getLinkedElement();
 
         for (final Metadata metadataSetting : settingsTable.getMetadatas()) {
             final String name = metadataSetting.getDeclaration().getText().toString();

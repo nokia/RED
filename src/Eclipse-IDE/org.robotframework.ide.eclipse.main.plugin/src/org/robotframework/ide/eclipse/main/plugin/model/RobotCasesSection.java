@@ -20,7 +20,7 @@ public class RobotCasesSection extends RobotSuiteFileSection {
 
     @Override
     public void link() {
-        final TestCaseTable testCaseTable = (TestCaseTable) sectionTable;
+        final TestCaseTable testCaseTable = getLinkedElement();
         for (final TestCase testCase : testCaseTable.getTestCases()) {
             final RobotCase newTestCase = new RobotCase(this, testCase);
             newTestCase.link();
