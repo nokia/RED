@@ -11,6 +11,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.DeleteCasesCommand;
@@ -30,7 +31,8 @@ public class DeleteCasesHandler extends DIParameterizedHandler<E4DeleteCasesHand
     public static class E4DeleteCasesHandler {
 
         @Execute
-        public void deleteCasesAndCalls(final RobotFormEditor editor, final RobotEditorCommandsStack commandsStack,
+        public void deleteCasesAndCalls(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+                final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
             final List<RobotKeywordCall> keywordCalls = Selections.getElements(selection, RobotKeywordCall.class);
             final List<RobotCase> cases = Selections.getElements(selection, RobotCase.class);

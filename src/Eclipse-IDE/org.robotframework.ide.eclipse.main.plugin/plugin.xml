@@ -1529,18 +1529,23 @@
             </reference>
             <with
                   variable="selection">
-               <and>
+               <or>
                   <count
-                        value="1">
+                        value="0">
                   </count>
-                  <iterate
-                        ifEmpty="false"
-                        operator="and">
-                     <instanceof
-                           value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
-                     </instanceof>
-                  </iterate>
-               </and>
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
+                        </instanceof>
+                     </iterate>
+                  </and>
+               </or>
             </with>
           </or>
        </enabledWhen>
