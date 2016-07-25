@@ -1,4 +1,4 @@
-## Unicode - handling testcases with language specific characters.
+## Unicode - handling testcases with language specific characters
 
 Eclipse by default is not configured to interpret and display language
 specific characters in text editors.  

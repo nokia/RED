@@ -3,7 +3,7 @@
 ### Switch to Robot perspective
 
 In order to work with RED, Robot perspective needs to be activated.  
-This can be done in several ways,easiest is to use top menu items:  
+This can be done in several ways, easiest is to use top menu items:  
 _Window -> Perspective -> Open perspective -> Other and select **Robot **_
 
 ###  Create Robot Project
@@ -17,12 +17,12 @@ _File -> New -> Other -> Robot Framework -> Robot Project _
 
 Import Robot files by drag&amp;drop; to created project, alternatively you can
 import folders by:  
-Right click on project, select _Import -> General -> File System_ .
+right click on project, select _Import -> General -> File System_.
 
 ### Validate project and imported files
 
 When Robot files has been imported, it is time to validate all the files to
 get indication about possible issues - either errors in test cases or missing
-libraries links in red.xml  
+libraries links in red.xml.  
 Use _Project -> Clean_ from top menu.
 
