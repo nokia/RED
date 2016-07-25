@@ -117,7 +117,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
         RobotKeywordCall newCall = null;
 
-        if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+        if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW
+                || keywordCall.getLinkedElement().getModelType() == ModelType.UNKNOWN) {    // unknown when copy/paste empty lines
             newCall = new RobotKeywordCall(this, keywordCall.getName(), keywordCall.getArguments(),
                     keywordCall.getComment());
             final RobotExecutableRow<UserKeyword> robotExecutableRow = (RobotExecutableRow<UserKeyword>) keywordCall

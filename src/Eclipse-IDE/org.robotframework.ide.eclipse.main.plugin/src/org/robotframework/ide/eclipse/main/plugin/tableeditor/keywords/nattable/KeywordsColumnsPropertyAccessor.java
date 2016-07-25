@@ -100,7 +100,8 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 }
             }
 
-            if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+            final ModelType modelType = keywordCall.getLinkedElement().getModelType();
+            if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW || modelType == ModelType.UNKNOWN) {
                 if (columnIndex == 0) {
                     commandsStack.execute(new SetKeywordCallNameCommand(keywordCall, value));
                 } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
@@ -110,7 +111,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 }
             } else {
                 if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)
-                        && keywordCall.getLinkedElement().getModelType() != ModelType.USER_KEYWORD_DOCUMENTATION) {
+                        && modelType != ModelType.USER_KEYWORD_DOCUMENTATION) {
                     commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
                 } else if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordSettingCommentCommand(keywordCall, value));
