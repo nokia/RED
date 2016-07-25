@@ -87,6 +87,11 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     }
 
     @Override
+    public int getIndex() {
+        return parent == null ? -1 : parent.getChildren().indexOf(this);
+    }
+
+    @Override
     public ImageDescriptor getImage() {
         return RedImages.getKeywordImage();
     }

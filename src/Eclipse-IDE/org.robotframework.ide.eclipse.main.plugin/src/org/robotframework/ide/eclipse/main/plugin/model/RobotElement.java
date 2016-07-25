@@ -39,6 +39,14 @@ public interface RobotElement {
     List<? extends RobotElement> getChildren();
 
     /**
+     * Returns index of this element in it's parent children list. Returns -1 when there is no parent, or parent
+     * has no this element on its children list.
+     * 
+     * @return index of this element in parent's list; or -1 if not found
+     */
+    int getIndex();
+
+    /**
      * Gets image descriptor of this element
      * 
      * @return image descriptor
