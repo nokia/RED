@@ -51,11 +51,6 @@ public class KeywordDocumentationModelOperation implements IKeywordTableElementO
     }
 
     @Override
-    public AModelElement<?> createCopy(final AModelElement<?> modelElement) {
-        return ((KeywordDocumentation) modelElement).copy();
-    }
-
-    @Override
     public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
         userKeyword.addDocumentation((KeywordDocumentation) modelElement);
     }
