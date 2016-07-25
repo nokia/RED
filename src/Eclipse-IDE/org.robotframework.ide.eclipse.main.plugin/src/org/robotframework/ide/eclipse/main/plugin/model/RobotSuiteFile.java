@@ -68,6 +68,11 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         this.file = file;
     }
 
+    @Override
+    public int getIndex() {
+        return parent == null ? -1 : parent.getChildren().indexOf(this);
+    }
+
     public RobotSuiteFileSection createRobotSection(final String name) {
         final RobotSuiteFileSection section;
         if (name.equals(RobotVariablesSection.SECTION_NAME)) {
