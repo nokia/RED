@@ -19,8 +19,6 @@ public interface IKeywordTableElementOperation {
     boolean isApplicable(final IRobotTokenType elementType);
 
     AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment);
-    
-    AModelElement<?> createCopy(final AModelElement<?> modelElement);
 
     void update(final AModelElement<?> modelElement, final int index, final String value);
     
