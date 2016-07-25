@@ -44,6 +44,11 @@ public class NamedElement implements RobotElement {
     }
 
     @Override
+    public int getIndex() {
+        return parent == null ? -1 : parent.getChildren().indexOf(this);
+    }
+
+    @Override
     public ImageDescriptor getImage() {
         return null;
     }
