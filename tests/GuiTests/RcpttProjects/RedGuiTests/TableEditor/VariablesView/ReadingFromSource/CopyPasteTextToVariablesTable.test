@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _x6jyoEg6EeaRB_Xz0tiYpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/25/16 5:58 PM
+Save-Time: 7/26/16 11:25 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -76,7 +76,7 @@ with [get-editor "TestFile.robot"] {
 check-variable-row -file "TestFile.robot" -row "1" -var "${var}" -value "0r" -comment "#hij"
 check-variable-row -file "TestFile.robot" -row "2" -var "0r" -value "[3r]" -comment "#3r"
 check-variable-row -file "TestFile.robot" -row "3" -var "${var2}" -value "2r" -comment "#fgh"
-check-variable-row -file "TestFile.robot" -row "4" -var "${var3}" -value "3r" -comment "#hdddij"
+check-variable-row -file "TestFile.robot" -row "4" -var "${var3}" -value "3r" -comment "#hij"
 check-variable-row -file "TestFile.robot" -row "5" -var "${var4}" -value "4r" -comment "#klm"
 
 
