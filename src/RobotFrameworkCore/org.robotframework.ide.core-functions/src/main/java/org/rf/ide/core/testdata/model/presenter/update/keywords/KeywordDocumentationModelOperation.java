@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IKeywordTableElementOperation;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -43,11 +44,12 @@ public class KeywordDocumentationModelOperation implements IKeywordTableElementO
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final KeywordDocumentation keywordDocumentation = (KeywordDocumentation) modelElement;
         if (value != null) {
-            keywordDocumentation.addDocumentationText(index, value);
+            if (index == 0) {
+                DocumentationServiceHandler.update(keywordDocumentation, value);
+            }
         } else {
-            keywordDocumentation.removeElementToken(index);
+            keywordDocumentation.clearDocumentation();
         }
-
     }
 
     @Override
