@@ -126,6 +126,9 @@ public abstract class AKeywordBaseSetting<T> extends AModelElement<T> implements
             tokens.add(getDeclaration());
             if (getKeywordName() != null) {
                 tokens.add(getKeywordName());
+            } else if (!getArguments().isEmpty()) {
+                setKeywordName(new RobotToken());
+                tokens.add(getKeywordName());
             }
             tokens.addAll(getArguments());
             tokens.addAll(getComment());
