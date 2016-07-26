@@ -95,17 +95,15 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getDocumentationText(), settingArgs, setting.getComment(), comment);
 
+        settingArgs.clear();
         final String newArg3 = "arg3";
-        settingArgs.set(1, newArg3);
-        final String newArg4 = "arg4";
-        settingArgs.add(newArg4);
+        settingArgs.add(newArg3);
         final String newComment = "new comment";
 
-        modelUpdater.update(setting, 1, newArg3);
-        modelUpdater.update(setting, 2, newArg4);
+        modelUpdater.update(setting, 0, newArg3);
         modelUpdater.updateComment(setting, newComment);
 
-        checkSetting(setting.getDocumentationText(), settingArgs, setting.getComment(), newComment);
+        checkSetting(setting.getDocumentationText(), newArrayList(newArg3), setting.getComment(), newComment);
 
         checkRemoveMethod(userKeyword.getDocumentation(), modelElement);
     }
