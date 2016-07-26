@@ -45,11 +45,13 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     public void setAction(final RobotToken action) {
-        final IRobotTokenType actType = getActionType();
-        if (actType != null) {
-            fixForTheType(action, actType, true);
+        IRobotTokenType actType = getActionType();
+        if (actType == null) {
+            actType = RobotTokenType.UNKNOWN;
         }
         this.action = updateOrCreate(this.action, action, actType);
+
+        fixMissingTypes();
     }
 
     private IRobotTokenType getActionType() {
@@ -61,6 +63,10 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
             } else if (parentClass == UserKeyword.class) {
                 actType = RobotTokenType.KEYWORD_ACTION_NAME;
             }
+        }
+
+        if (actType == null) {
+            actType = RobotTokenType.UNKNOWN;
         }
 
         return actType;
@@ -79,6 +85,8 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     public void setArgument(final int index, final RobotToken argument) {
         updateOrCreateTokenInside(arguments, index, argument, getArgumentType());
+
+        fixMissingTypes();
     }
 
     public void addArgument(final RobotToken argument) {
@@ -87,6 +95,8 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
             fixForTheType(argument, argType, true);
         }
         arguments.add(argument);
+
+        fixMissingTypes();
     }
 
     public void removeArgument(final int index) {
@@ -184,6 +194,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     @Override
     public List<RobotToken> getElementTokens() {
+        fixMissingTypes();
         final List<RobotToken> tokens = new ArrayList<>();
         tokens.add(getAction());
         tokens.addAll(getArguments());
@@ -256,5 +267,20 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         }
 
         return execRow;
+    }
+
+    private void fixMissingTypes() {
+        if (getParent() != null) {
+            if (getAction() != null && (getArguments().size() > 0 || getAction().isNotEmpty())) {
+                getAction().getTypes().remove(RobotTokenType.UNKNOWN);
+                fixForTheType(getAction(), getActionType(), true);
+            }
+
+            for (int i = 0; i < getArguments().size(); i++) {
+                final RobotToken token = getArguments().get(i);
+                token.getTypes().remove(RobotTokenType.UNKNOWN);
+                fixForTheType(token, getArgumentType(), true);
+            }
+        }
     }
 }

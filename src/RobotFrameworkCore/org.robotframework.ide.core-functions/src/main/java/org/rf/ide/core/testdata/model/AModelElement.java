@@ -129,6 +129,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         if (newValue == null) {
             return null;
         } else if (current == null || current.getFilePosition().isNotSet()) {
+            fixForTheType(newValue, expectedType, true);
             return newValue;
         } else {
             return updateOrCreate(current, newValue.getText(), expectedType);
