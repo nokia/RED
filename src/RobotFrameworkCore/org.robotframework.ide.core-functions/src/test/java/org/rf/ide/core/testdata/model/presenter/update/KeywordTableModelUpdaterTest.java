@@ -13,6 +13,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -35,8 +36,10 @@ public class KeywordTableModelUpdaterTest {
 
     private static KeywordTableModelUpdater modelUpdater;
 
+    private UserKeyword userKeyword;
+
     @BeforeClass
-    public static void setup() {
+    public static void setupModel() {
         RobotFile model = NewRobotFileTestHelper.getModelFileToModify("2.9");
         model.includeKeywordTableSection();
         keywordTable = model.getKeywordTable();
@@ -44,13 +47,16 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater = new KeywordTableModelUpdater();
     }
 
+    @Before
+    public void setupKeyword() {
+        userKeyword = keywordTable.createUserKeyword("UserKeyword");
+    }
+
     @Test
     public void testArgumentsCRUD() {
         final String keywordSettingName = "[Arguments]";
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
-
-        final UserKeyword userKeyword = keywordTable.createUserKeyword("UserKeyword");
 
         final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment,
                 settingArgs);
@@ -72,9 +78,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getArguments(), settingArgs, setting.getComment(), newComment);
 
-        assertFalse(userKeyword.getArguments().isEmpty());
-        modelUpdater.remove(userKeyword, modelElement);
-        assertTrue(userKeyword.getArguments().isEmpty());
+        checkRemoveMethod(userKeyword.getArguments(), modelElement);
     }
 
     @Test
@@ -82,8 +86,6 @@ public class KeywordTableModelUpdaterTest {
         final String keywordSettingName = "[Documentation]";
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
-
-        final UserKeyword userKeyword = keywordTable.createUserKeyword("UserKeyword");
 
         final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment,
                 settingArgs);
@@ -105,9 +107,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getDocumentationText(), settingArgs, setting.getComment(), newComment);
 
-        assertFalse(userKeyword.getDocumentation().isEmpty());
-        modelUpdater.remove(userKeyword, modelElement);
-        assertTrue(userKeyword.getDocumentation().isEmpty());
+        checkRemoveMethod(userKeyword.getDocumentation(), modelElement);
     }
 
     @Test
@@ -115,8 +115,6 @@ public class KeywordTableModelUpdaterTest {
         final String keywordSettingName = "[Tags]";
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
-
-        final UserKeyword userKeyword = keywordTable.createUserKeyword("UserKeyword");
 
         final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment,
                 settingArgs);
@@ -138,9 +136,7 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getTags(), settingArgs, setting.getComment(), newComment);
 
-        assertFalse(userKeyword.getTags().isEmpty());
-        modelUpdater.remove(userKeyword, modelElement);
-        assertTrue(userKeyword.getTags().isEmpty());
+        checkRemoveMethod(userKeyword.getTags(), modelElement);
     }
 
     @Test
@@ -151,8 +147,6 @@ public class KeywordTableModelUpdaterTest {
         final List<String> args = newArrayList(timeout);
         args.addAll(settingArgs);
         final String comment = "comment";
-
-        final UserKeyword userKeyword = keywordTable.createUserKeyword("UserKeyword");
 
         final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment, args);
 
@@ -176,9 +170,7 @@ public class KeywordTableModelUpdaterTest {
         checkSetting(setting.getTimeout(), newTimeout, setting.getMessage(), settingArgs, setting.getComment(),
                 newComment);
 
-        assertFalse(userKeyword.getTimeouts().isEmpty());
-        modelUpdater.remove(userKeyword, modelElement);
-        assertTrue(userKeyword.getTimeouts().isEmpty());
+        checkRemoveMethod(userKeyword.getTimeouts(), modelElement);
     }
 
     @Test
@@ -189,8 +181,6 @@ public class KeywordTableModelUpdaterTest {
         final List<String> args = newArrayList(teardown);
         args.addAll(settingArgs);
         final String comment = "comment";
-
-        final UserKeyword userKeyword = keywordTable.createUserKeyword("UserKeyword");
 
         final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment, args);
 
@@ -215,9 +205,7 @@ public class KeywordTableModelUpdaterTest {
         checkSetting(setting.getKeywordName(), newTeardown, setting.getArguments(), settingArgs, setting.getComment(),
                 newComment);
 
-        assertFalse(userKeyword.getTeardowns().isEmpty());
-        modelUpdater.remove(userKeyword, modelElement);
-        assertTrue(userKeyword.getTeardowns().isEmpty());
+        checkRemoveMethod(userKeyword.getTeardowns(), modelElement);
     }
 
     @Test
@@ -225,8 +213,6 @@ public class KeywordTableModelUpdaterTest {
         final String keywordSettingName = "[Return]";
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
-
-        final UserKeyword userKeyword = keywordTable.createUserKeyword("UserKeyword");
 
         final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment,
                 settingArgs);
@@ -248,14 +234,43 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getReturnValues(), settingArgs, setting.getComment(), newComment);
 
-        assertFalse(userKeyword.getReturns().isEmpty());
-        modelUpdater.remove(userKeyword, modelElement);
-        assertTrue(userKeyword.getReturns().isEmpty());
+        checkRemoveMethod(userKeyword.getReturns(), modelElement);
     }
 
     @Test
-    public void testCreateWhenNoTableExists() {
+    public void testCreateWhenNoUserKeywordExists() {
         assertNull(modelUpdater.create(null, "Arguments", "", newArrayList("")));
+    }
+
+    @Test
+    public void testCreateWithUnknownSetting() {
+        assertNull(modelUpdater.create(userKeyword, "[Unknown]", "", newArrayList("")));
+    }
+
+    @Test
+    public void testUpdateParent() {
+        RobotToken declaration = new RobotToken();
+
+        KeywordArguments args = new KeywordArguments(declaration);
+        KeywordDocumentation doc = new KeywordDocumentation(declaration);
+        KeywordTags tags = new KeywordTags(declaration);
+        KeywordTimeout timeout = new KeywordTimeout(declaration);
+        KeywordTeardown teardown = new KeywordTeardown(declaration);
+        KeywordReturn returnValue = new KeywordReturn(declaration);
+
+        modelUpdater.updateParent(userKeyword, args);
+        modelUpdater.updateParent(userKeyword, doc);
+        modelUpdater.updateParent(userKeyword, tags);
+        modelUpdater.updateParent(userKeyword, timeout);
+        modelUpdater.updateParent(userKeyword, teardown);
+        modelUpdater.updateParent(userKeyword, returnValue);
+
+        assertTrue(userKeyword.getArguments().contains(args));
+        assertTrue(userKeyword.getDocumentation().contains(doc));
+        assertTrue(userKeyword.getTags().contains(tags));
+        assertTrue(userKeyword.getTimeouts().contains(timeout));
+        assertTrue(userKeyword.getTeardowns().contains(teardown));
+        assertTrue(userKeyword.getReturns().contains(returnValue));
     }
 
     private void checkSetting(final RobotToken actualKeywordName, final String expectedKeywordName,
@@ -283,22 +298,10 @@ public class KeywordTableModelUpdaterTest {
         }
     }
 
-    enum KeywordSettingName {
-        ARGUMENTS("Arguments"),
-        DOCUMENTATION("Documentation"),
-        TAGS("Tags"),
-        TIMEOUT("Timeout"),
-        RETURN("Return"),
-        TEARDOWN("Teardown");
-
-        private String name;
-
-        private KeywordSettingName(final String name) {
-            this.name = name;
-        }
-
-        public String getName() {
-            return name;
-        }
+    private void checkRemoveMethod(final List<?> keywordSettings, final AModelElement<?> modelElement) {
+        assertFalse(keywordSettings.isEmpty());
+        modelUpdater.remove(userKeyword, modelElement);
+        assertTrue(keywordSettings.isEmpty());
     }
+
 }
