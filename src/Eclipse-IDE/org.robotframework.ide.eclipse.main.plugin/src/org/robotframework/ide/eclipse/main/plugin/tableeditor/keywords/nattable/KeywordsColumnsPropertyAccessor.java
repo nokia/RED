@@ -8,7 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -55,7 +57,11 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                         ? keywordCall.getName() : "[" + keywordCall.getName() + "]";
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                 final List<String> arguments = keywordCall.getArguments();
-                if (columnIndex - 1 < arguments.size()) {
+                if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
+                    if (columnIndex == 1) {
+                        return getDocumentationText(keywordCall);
+                    }
+                } else if (columnIndex - 1 < arguments.size()) {
                     return arguments.get(columnIndex - 1);
                 }
             } else if (columnIndex == (numberOfColumns - 1)) {
@@ -167,4 +173,8 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         return false;
     }
 
+    private String getDocumentationText(final RobotKeywordCall keywordCall) {
+        return DocumentationServiceHandler
+        .toShowConsolidated((IDocumentationHolder) keywordCall.getLinkedElement());
+    }
 }
