@@ -13,8 +13,23 @@ import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class AModelElementTest {
+
+    @Test
+    public void test_shouldUpdateTypeForNewElement() {
+        // prepare
+        final RobotToken tok1 = token("c1");
+
+        // execute
+        AModelElementFake fake = new AModelElementFake();
+        final RobotToken returned = fake.updateOrCreate(null, tok1, RobotTokenType.ASSIGNMENT);
+
+        // verify
+        assertThat(returned).isSameAs(tok1);
+        assertThat(tok1.getTypes().get(0)).isEqualTo(RobotTokenType.ASSIGNMENT);
+    }
 
     @Test
     public void test_updateOrCreatTokenInside_withExpectedTypeToSet_threeElementListAndTheSecondToUpdate() {
