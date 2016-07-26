@@ -42,6 +42,7 @@ import org.rf.ide.core.testdata.text.write.tables.SettingsSectionTableDumper;
 import org.rf.ide.core.testdata.text.write.tables.TestCasesSectionTableDumper;
 import org.rf.ide.core.testdata.text.write.tables.VariablesSectionTableDumper;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
@@ -291,9 +292,10 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         return list;
     }
 
-    private void repositionElementsBaseOnList(final List<AModelElement<SettingTable>> src,
+    @VisibleForTesting
+    protected void repositionElementsBaseOnList(final List<AModelElement<SettingTable>> src,
             final List<? extends AModelElement<SettingTable>> correctors) {
-        if (!correctors.isEmpty()) {
+        if (correctors.size() >= 2) {
             int hitCorrectors = 0;
 
             AModelElement<SettingTable> currentCorrector = correctors.get(hitCorrectors);
@@ -326,13 +328,14 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                 }
             }
 
-            if (hitCorrectors < correctors.size()) {
+            if (hitCorrectors != correctors.size()) {
                 throw new IllegalStateException("Not all elements included in output before.");
             }
         }
     }
 
-    private boolean isNextTheSameAsCurrent(final List<AModelElement<SettingTable>> src,
+    @VisibleForTesting
+    protected boolean isNextTheSameAsCurrent(final List<AModelElement<SettingTable>> src,
             final AModelElement<SettingTable> m, int currentIndex) {
         return (currentIndex + 1 < src.size() && m == src.get(currentIndex + 1));
     }
