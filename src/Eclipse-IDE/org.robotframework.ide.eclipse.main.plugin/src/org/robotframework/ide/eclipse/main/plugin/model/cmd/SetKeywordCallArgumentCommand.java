@@ -39,7 +39,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             arguments.remove(index);
             if (value != null) {
                 arguments.add(index, value);
-            } else if (shouldAddBackSlashAtFirstArgPosition()) {
+            } else if (index == 0 && isKeywordBasedSetting()) {
                 arguments.add(index, "\\");
             }
             changed = true;
@@ -62,7 +62,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         }
     }
     
-    protected boolean shouldAddBackSlashAtFirstArgPosition() {
+    protected boolean isKeywordBasedSetting() {
         return false;
     }
 

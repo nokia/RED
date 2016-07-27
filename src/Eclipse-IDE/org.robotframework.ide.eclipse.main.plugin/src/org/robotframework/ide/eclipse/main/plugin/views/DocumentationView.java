@@ -265,6 +265,8 @@ public class DocumentationView {
                         if (keywordDefinition != null) {
                             resetCurrentlyDisplayedElement();
                             showEvent(keywordDefinition.getDocumentationSetting());
+                        } else {
+                            showEvent(null);
                         }
                     } else {
                         // TODO: Test cases doc
