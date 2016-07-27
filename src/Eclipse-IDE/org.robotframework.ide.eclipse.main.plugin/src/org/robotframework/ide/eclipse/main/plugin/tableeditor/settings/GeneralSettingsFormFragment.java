@@ -102,7 +102,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
@@ -446,7 +446,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 } else if (docSetting != null && newDocumentation.isEmpty()) {
                     commandsStack.execute(new DeleteSettingKeywordCallCommand(newArrayList(docSetting)));
                 } else if (docSetting != null) {
-                    commandsStack.execute(new SetKeywordCallArgumentCommand(docSetting, 0, newDocumentation));
+                    commandsStack.execute(new SetSettingKeywordCallArgumentCommand(docSetting, 0, newDocumentation));
                 }
 
                 return Status.OK_STATUS;

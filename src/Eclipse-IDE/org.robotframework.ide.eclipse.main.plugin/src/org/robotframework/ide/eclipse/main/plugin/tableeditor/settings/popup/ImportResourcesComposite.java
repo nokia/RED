@@ -56,7 +56,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
@@ -260,7 +260,7 @@ public class ImportResourcesComposite {
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
             if(!args.isEmpty() && oldPath.equals(new Path(args.get(0)))) {
-                commandsStack.execute(new SetKeywordCallArgumentCommand(setting, 0, newPath));
+                commandsStack.execute(new SetSettingKeywordCallArgumentCommand(setting, 0, newPath));
                 break;
             }
         }

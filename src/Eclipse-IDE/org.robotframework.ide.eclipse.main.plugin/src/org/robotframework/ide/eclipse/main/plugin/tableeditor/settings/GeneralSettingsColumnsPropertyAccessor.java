@@ -17,8 +17,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -68,7 +68,7 @@ public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAc
             if (robotElement != null) {
                 final RobotSetting setting = (RobotSetting) robotElement;
                 if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetKeywordCallArgumentCommand(setting, columnIndex - 1, newStringValue));
+                    commandsStack.execute(new SetSettingKeywordCallArgumentCommand(setting, columnIndex - 1, newStringValue));
                 } else if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordCallCommentCommand(setting, newStringValue));
                 }
