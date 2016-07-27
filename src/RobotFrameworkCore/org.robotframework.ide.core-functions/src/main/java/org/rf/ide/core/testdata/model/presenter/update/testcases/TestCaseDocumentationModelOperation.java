@@ -11,6 +11,7 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.ITestCaseTableElementOperation;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -27,12 +28,24 @@ public class TestCaseDocumentationModelOperation implements ITestCaseTableElemen
     }
     
     @Override
-    public AModelElement<TestCase> create(final TestCase userKeyword, final List<String> args, final String comment) {
+    public AModelElement<?> create(final TestCase userKeyword, final String settingName, final List<String> args,
+            final String comment) {
         return null;
     }
 
     @Override
-    public void update(final AModelElement<TestCase> modelElement, final int index, final String value) {
+    public void update(final AModelElement<?> modelElement, final int index, final String value) {
 
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
+        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+    }
+
+    @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        testCase.addDocumentation(0, (TestDocumentation) modelElement);
     }
 }
