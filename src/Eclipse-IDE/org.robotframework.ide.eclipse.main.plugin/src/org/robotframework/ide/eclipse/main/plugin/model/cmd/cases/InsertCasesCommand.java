@@ -32,7 +32,7 @@ public class InsertCasesCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final TestCaseTable testCaseTable = (TestCaseTable) casesSection.getLinkedElement();
+        final TestCaseTable testCaseTable = casesSection.getLinkedElement();
 
         int counter = index;
         for (final RobotCase testCase : casesToInsert) {
@@ -48,6 +48,8 @@ public class InsertCasesCommand extends EditorCommand {
             }
         }
 
-        eventBroker.post(RobotModelEvents.ROBOT_CASE_ADDED, casesSection);
+        if (casesToInsert.size() > 0) {
+            eventBroker.send(RobotModelEvents.ROBOT_CASE_ADDED, casesSection);
+        }
     }
 }

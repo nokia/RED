@@ -45,6 +45,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             changed = true;
         }
         if (changed) {
+            keywordCall.resetStored();
             updateModelElement();
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
         }

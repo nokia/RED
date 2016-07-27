@@ -30,9 +30,9 @@ public class MoveCaseUpCommand extends EditorCommand {
         }
         Collections.swap(section.getChildren(), index, index - 1);
 
-        final TestCaseTable linkedElement = (TestCaseTable) section.getLinkedElement();
+        final TestCaseTable linkedElement = section.getLinkedElement();
         linkedElement.moveUpTest(testCase.getLinkedElement());
 
-        eventBroker.post(RobotModelEvents.ROBOT_CASE_MOVED, section);
+        eventBroker.send(RobotModelEvents.ROBOT_CASE_MOVED, section);
     }
 }

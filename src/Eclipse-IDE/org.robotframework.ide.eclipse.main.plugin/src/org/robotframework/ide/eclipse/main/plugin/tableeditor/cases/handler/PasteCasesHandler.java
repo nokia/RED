@@ -14,8 +14,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordCallsCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.InsertCasesCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.InsertKeywordCallsToCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -113,23 +113,23 @@ public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandle
 
             } else if (firstSelected.get() instanceof RobotCase) {
                 final RobotCase targetCase = (RobotCase) firstSelected.get();
-                final int index = targetCase.getParent().getChildren().indexOf(targetCase);
+                final int index = targetCase.getChildren().size();
                 insertCallsAt(index, targetCase, calls);
 
             } else {
                 final RobotKeywordCall call = (RobotKeywordCall) firstSelected.get();
                 final RobotCase targetCase = (RobotCase) call.getParent();
-                final int index = targetCase.getChildren().indexOf(targetCase);
+                final int index = call.getIndex();
                 insertCallsAt(index, targetCase, calls);
             }
         }
 
         private void insertCallsAtCaseEnd(final RobotCase targetCase, final RobotKeywordCall[] calls) {
-            commandsStack.execute(new InsertKeywordCallsCommand(targetCase, calls));
+            commandsStack.execute(new InsertKeywordCallsToCaseCommand(targetCase, calls));
         }
 
         private void insertCallsAt(final int index, final RobotCase targetCase, final RobotKeywordCall[] calls) {
-            commandsStack.execute(new InsertKeywordCallsCommand(targetCase, index, index, calls));
+            commandsStack.execute(new InsertKeywordCallsToCaseCommand(targetCase, index, calls));
         }
     }
 }
