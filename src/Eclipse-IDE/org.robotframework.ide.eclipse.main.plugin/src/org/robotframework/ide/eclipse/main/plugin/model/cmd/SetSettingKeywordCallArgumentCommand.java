@@ -11,7 +11,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 
 public class SetSettingKeywordCallArgumentCommand extends SetKeywordCallArgumentCommand {
 
-    public SetSettingKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value) {
+    public SetSettingKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index,
+            final String value) {
         super(keywordCall, index, value);
     }
 
@@ -21,9 +22,8 @@ public class SetSettingKeywordCallArgumentCommand extends SetKeywordCallArgument
     }
 
     @Override
-    protected boolean shouldAddBackSlashAtFirstArgPosition() {
+    protected boolean isKeywordBasedSetting() {
         final ModelType modelType = getKeywordCall().getLinkedElement().getModelType();
-        return getIndex() == 0 && modelType != ModelType.DEFAULT_TAGS_SETTING
-                && modelType != ModelType.FORCE_TAGS_SETTING;
+        return modelType != ModelType.DEFAULT_TAGS_SETTING && modelType != ModelType.FORCE_TAGS_SETTING;
     }
 }
