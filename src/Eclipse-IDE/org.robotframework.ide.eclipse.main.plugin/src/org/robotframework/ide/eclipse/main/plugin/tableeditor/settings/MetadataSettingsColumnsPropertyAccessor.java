@@ -9,8 +9,8 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -42,7 +42,7 @@ public class MetadataSettingsColumnsPropertyAccessor implements IColumnPropertyA
     public void setDataValue(RobotKeywordCall rowObject, int columnIndex, Object newValue) {
         final String newStringValue = newValue != null ? (String) newValue : "";
         if (columnIndex < 2) {
-            commandsStack.execute(new SetKeywordCallArgumentCommand(rowObject, columnIndex, newStringValue));
+            commandsStack.execute(new SetSettingKeywordCallArgumentCommand(rowObject, columnIndex, newStringValue));
         } else if (columnIndex == 2) {
             commandsStack.execute(new SetKeywordCallCommentCommand(rowObject, newStringValue));
         }

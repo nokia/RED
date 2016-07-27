@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -40,7 +39,9 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             arguments.remove(index);
             if (value != null) {
                 arguments.add(index, value);
-            } 
+            } else if (shouldAddBackSlashAtFirstArgPosition()) {
+                arguments.add(index, "\\");
+            }
             changed = true;
         }
         if (changed) {
@@ -58,9 +59,11 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             } else if (index < ((RobotExecutableRow<?>) linkedElement).getArguments().size()) {
                 ((RobotExecutableRow<?>) linkedElement).removeElementToken(index);
             }
-        } else {
-            new SettingTableModelUpdater().update(linkedElement, index, value);
         }
+    }
+    
+    protected boolean shouldAddBackSlashAtFirstArgPosition() {
+        return false;
     }
 
     public int getIndex() {
