@@ -34,7 +34,8 @@ public class InsertKeywordCallsToCaseCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
 
-        // FIXME : settings should be inserted somewhere at the begining
+        // FIXME : settings should be inserted somewhere at the begining; while execution rows after
+        // the settings
 
         int shift = 0;
         for (final RobotKeywordCall call : callsToInsert) {
