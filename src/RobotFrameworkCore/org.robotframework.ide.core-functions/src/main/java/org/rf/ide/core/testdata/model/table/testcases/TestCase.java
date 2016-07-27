@@ -78,8 +78,12 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public void addUnknownSettings(final TestCaseUnknownSettings unknownSetting) {
+        addUnknownSettings(unknownSettings.size(), unknownSetting);
+    }
+
+    public void addUnknownSettings(final int index, final TestCaseUnknownSettings unknownSetting) {
         unknownSetting.setParent(this);
-        this.unknownSettings.add(unknownSetting);
+        this.unknownSettings.add(index, unknownSetting);
     }
 
     public List<TestCaseUnknownSettings> getUnknownSettings() {
@@ -140,8 +144,12 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public void addDocumentation(final TestDocumentation doc) {
+        addDocumentation(documentation.size(), doc);
+    }
+
+    public void addDocumentation(final int index, final TestDocumentation doc) {
         doc.setParent(this);
-        this.documentation.add(doc);
+        this.documentation.add(index, doc);
     }
 
     public List<TestDocumentation> getDocumentation() {
@@ -163,8 +171,12 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public void addTag(final TestCaseTags tag) {
+        addTag(tags.size(), tag);
+    }
+
+    public void addTag(final int index, final TestCaseTags tag) {
         tag.setParent(this);
-        tags.add(tag);
+        tags.add(index, tag);
     }
 
     public List<TestCaseTags> getTags() {
@@ -186,8 +198,12 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public void addSetup(final TestCaseSetup setup) {
+        addSetup(setups.size(), setup);
+    }
+
+    public void addSetup(final int index, final TestCaseSetup setup) {
         setup.setParent(this);
-        setups.add(setup);
+        setups.add(index, setup);
     }
 
     public List<TestCaseSetup> getSetups() {
@@ -209,8 +225,12 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public void addTeardown(final TestCaseTeardown teardown) {
+        addTeardown(teardowns.size(), teardown);
+    }
+
+    public void addTeardown(final int index, final TestCaseTeardown teardown) {
         teardown.setParent(this);
-        teardowns.add(teardown);
+        teardowns.add(index, teardown);
     }
 
     public List<TestCaseTeardown> getTeardowns() {
@@ -232,8 +252,12 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public void addTemplate(final TestCaseTemplate template) {
+        addTemplate(templates.size(), template);
+    }
+
+    public void addTemplate(final int index, final TestCaseTemplate template) {
         template.setParent(this);
-        templates.add(template);
+        templates.add(index, template);
     }
 
     public List<TestCaseTemplate> getTemplates() {
@@ -255,8 +279,12 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     }
 
     public void addTimeout(final TestCaseTimeout timeout) {
+        addTimeout(timeouts.size(), timeout);
+    }
+
+    public void addTimeout(final int index, final TestCaseTimeout timeout) {
         timeout.setParent(this);
-        timeouts.add(timeout);
+        timeouts.add(index, timeout);
     }
 
     public List<TestCaseTimeout> getTimeouts() {
@@ -383,6 +411,14 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         return this;
     }
 
+    public boolean isDuplicatedSetting(final AModelElement<TestCase> setting) {
+        if (setting.getModelType() == ModelType.TEST_CASE_SETTING_UNKNOWN) {
+            return false;
+        } else {
+            return getContainingList(setting).indexOf(setting) > 0;
+        }
+    }
+
     @Override
     public List<AModelElement<TestCase>> getUnitSettings() {
         final List<AModelElement<TestCase>> settings = new ArrayList<>();
@@ -399,29 +435,32 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
 
     @Override
     public boolean removeUnitSettings(final AModelElement<TestCase> setting) {
+        return getContainingList(setting).remove(setting);
+    }
+
+    public List<? extends AModelElement<TestCase>> getContainingList(final AModelElement<?> setting) {
         if (setting != null) {
             final ModelType settingType = setting.getModelType();
             switch (settingType) {
                 case TEST_CASE_DOCUMENTATION:
-                    return this.documentation.remove(setting);
+                    return documentation;
                 case TEST_CASE_TAGS:
-                    return this.tags.remove(setting);
+                    return tags;
                 case TEST_CASE_SETUP:
-                    return this.setups.remove(setting);
+                    return setups;
                 case TEST_CASE_TEARDOWN:
-                    return this.teardowns.remove(setting);
+                    return teardowns;
                 case TEST_CASE_TEMPLATE:
-                    return this.templates.remove(setting);
+                    return templates;
                 case TEST_CASE_TIMEOUT:
-                    return this.timeouts.remove(setting);
+                    return timeouts;
                 case TEST_CASE_SETTING_UNKNOWN:
-                    return this.unknownSettings.remove(setting);
+                    return unknownSettings;
                 default:
-                    return false;
+                    return new ArrayList<>();
             }
         }
-
-        return false;
+        return new ArrayList<>();
     }
 
     @Override
