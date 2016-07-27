@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.testdata.model.table.keywords;
 
+import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -150,5 +151,21 @@ public class KeywordDocumentation extends AModelElement<UserKeyword>
             keywordDoc.addCommentPart(commentToken.copyWithoutPosition());
         }
         return keywordDoc;
+    }
+    
+    private Object readResolve() throws ObjectStreamException {
+        //done during serialization, problems may occur when multiple tokens are in the same line  
+        int docSize = text.size();
+        for (int i = 1; i < (docSize * 2 - 1); i += 2) {
+            final RobotToken robotToken = text.get(i);
+            if (robotToken.getText().equals("\n...")) {
+                break;
+            }
+            final RobotToken token = new RobotToken();
+            token.setText("\n...");
+            text.add(i, token);
+        }
+
+        return this;
     }
 }
