@@ -25,7 +25,6 @@ public class SetCaseSettingNameCommand extends EditorCommand {
         if (setting.getName().equals(name)) {
             return;
         }
-        setting.setName(name.substring(0, name.length() - 1));
 
         final AModelElement<?> linkedSetting = setting.getLinkedElement();
         linkedSetting.getDeclaration().setText(name);

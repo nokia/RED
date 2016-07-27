@@ -5,6 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Iterables.filter;
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,33 +17,33 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ICommentHolder;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 
 public class RobotKeywordCall implements RobotFileInternalElement, Serializable {
 
-    private static final long serialVersionUID = 3968389012402369728L;
+    private static final long serialVersionUID = 1L;
     
-    private String name;
-    private List<String> args;
-    private String comment;
     private transient IRobotCodeHoldingElement parent;
-    // TODO : fix this stuff for serialization
-    private AModelElement<?> linkedElement;
 
-    public RobotKeywordCall(final IRobotCodeHoldingElement parent, final String name, final List<String> args,
-            final String comment) {
+    private final AModelElement<?> linkedElement;
+
+    protected transient List<String> arguments;
+
+    private transient String comment;
+
+    public RobotKeywordCall(final IRobotCodeHoldingElement parent, final AModelElement<?> linkedElement) {
         this.parent = parent;
-        this.name = name;
-        this.args = args;
-        this.comment = comment;
-    }
-
-    public void link(final AModelElement<?> executableRow) {
-        this.linkedElement = executableRow;
+        this.linkedElement = linkedElement;
     }
 
     @Override
@@ -49,22 +53,17 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     @Override
     public String getName() {
-        return name;
+        return linkedElement.getDeclaration().getText();
     }
 
     public String getLabel() {
-        RobotToken token;
-        if (linkedElement instanceof RobotExecutableRow<?>) {
+        if (linkedElement.getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW
+                || linkedElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-            token = row.buildLineDescription().getAction().getToken();
+            return row.buildLineDescription().getAction().getToken().getText();
         } else {
-            token = linkedElement.getElementTokens().get(0);
+            return linkedElement.getElementTokens().get(0).getText();
         }
-        return token.getText().toString();
-    }
-
-    public void setName(final String name) {
-        this.name = name;
     }
 
     @Override
@@ -91,26 +90,46 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         return parent == null ? -1 : parent.getChildren().indexOf(this);
     }
 
+    public boolean isExecutable() {
+        return linkedElement.getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW
+                || linkedElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+    }
+
     @Override
     public ImageDescriptor getImage() {
         return RedImages.getKeywordImage();
     }
 
     public List<String> getArguments() {
-        return args;
+        if (arguments == null) {
+            final List<RobotToken> allTokens = linkedElement.getElementTokens();
+            final Iterable<RobotToken> tokensWithoutComments = filter(allTokens, new Predicate<RobotToken>() {
+
+                @Override
+                public boolean apply(final RobotToken token) {
+                    return !token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                            && !token.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)
+                            && !token.getTypes().contains(RobotTokenType.KEYWORD_ACTION_NAME)
+                            && !token.getTypes().contains(RobotTokenType.TEST_CASE_ACTION_NAME);
+                }
+            });
+            arguments = newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));
+        }
+        return arguments;
+    }
+
+    public void resetStored() {
+        arguments = null;
+        comment = null;
     }
     
-    public void setArgs(final List<String> args) {
-        this.args = args;
-    }
-
     @Override
     public String getComment() {
+        if (comment == null) {
+            comment = CommentServiceHandler.consolidate((ICommentHolder) linkedElement,
+                    ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
+        }
         return comment;
-    }
-
-    public void setComment(final String comment) {
-        this.comment = comment;
     }
 
     public RobotSuiteFileSection getSection() {
@@ -155,5 +174,11 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getSection(), this);
+    }
+
+    @Override
+    public String toString() {
+        // for debugging purposes only
+        return getName();
     }
 }
