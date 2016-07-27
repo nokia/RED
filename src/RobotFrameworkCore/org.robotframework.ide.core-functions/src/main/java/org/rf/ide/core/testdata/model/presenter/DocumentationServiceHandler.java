@@ -67,6 +67,8 @@ public class DocumentationServiceHandler {
                         continue;
                     } else if (tokenLineNr == documentation.getBeginPosition().getLine()) {
                         currentLineNr = tokenLineNr;
+                    } else {
+                        currentLineNr = documentation.getBeginPosition().getLine();
                     }
                 }
 
