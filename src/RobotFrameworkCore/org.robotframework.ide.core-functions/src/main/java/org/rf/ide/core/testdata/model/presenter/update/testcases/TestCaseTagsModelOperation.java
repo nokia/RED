@@ -24,11 +24,12 @@ public class TestCaseTagsModelOperation implements ITestCaseTableElementOperatio
     
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
-        return elementType == RobotTokenType.TEST_CASE_SETTING_TAGS;
+        return elementType == RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION;
     }
 
     @Override
-    public AModelElement<TestCase> create(final TestCase testCase, final List<String> args, final String comment) {
+    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
+            final String comment) {
         final TestCaseTags tags = testCase.newTags();
         for (final String tag : args) {
             tags.addTag(tag);
@@ -40,12 +41,23 @@ public class TestCaseTagsModelOperation implements ITestCaseTableElementOperatio
     }
     
     @Override
-    public void update(final AModelElement<TestCase> modelElement, final int index, final String value) {
+    public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestCaseTags tags = (TestCaseTags) modelElement;
         if (value != null) {
             tags.setTag(index, value);
         } else {
             tags.removeElementToken(index);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
+        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+    }
+
+    @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        testCase.addTag(0, (TestCaseTags) modelElement);
     }
 }

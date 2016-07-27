@@ -28,7 +28,8 @@ public class TestCaseSetupModelOperation implements ITestCaseTableElementOperati
     }
 
     @Override
-    public AModelElement<TestCase> create(final TestCase testCase, final List<String> args, final String comment) {
+    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
+            final String comment) {
         final TestCaseSetup setup = testCase.newSetup();
         if (!args.isEmpty()) {
             setup.setKeywordName(args.get(0));
@@ -43,7 +44,7 @@ public class TestCaseSetupModelOperation implements ITestCaseTableElementOperati
     }
 
     @Override
-    public void update(final AModelElement<TestCase> modelElement, final int index, final String value) {
+    public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestCaseSetup setup = (TestCaseSetup) modelElement;
         if (index == 0) {
             setup.setKeywordName(value != null ? value : "");
@@ -56,4 +57,14 @@ public class TestCaseSetupModelOperation implements ITestCaseTableElementOperati
         }
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
+        testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
+    }
+
+    @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        testCase.addSetup(0, (TestCaseSetup) modelElement);
+    }
 }
