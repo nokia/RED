@@ -26,7 +26,6 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         if (keywordCall.getName().equals(name)) {
             return;
         }
-        keywordCall.setName(name);
 
         final RobotExecutableRow<?> exeRow = (RobotExecutableRow<?>) keywordCall.getLinkedElement();
         final RobotToken actionToken = new RobotToken();

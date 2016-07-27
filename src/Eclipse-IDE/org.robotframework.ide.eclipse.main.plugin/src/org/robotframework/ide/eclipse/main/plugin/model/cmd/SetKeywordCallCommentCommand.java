@@ -6,10 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -31,12 +28,10 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
         if (keywordCall.getComment() != null && keywordCall.getComment().equals(newComment)) {
             return;
         }
+        keywordCall.resetStored();
         
         updateModelElement();
         
-        keywordCall.setComment(CommentServiceHandler.consolidate((ICommentHolder) keywordCall.getLinkedElement(),
-                ETokenSeparator.PIPE_WRAPPED_WITH_SPACE));
-
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordCall);
     }
     

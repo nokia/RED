@@ -9,7 +9,6 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ObjectStreamException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -18,8 +17,6 @@ import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
-import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
@@ -42,7 +39,6 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
 
 public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
@@ -75,15 +71,14 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     @Override
     public RobotKeywordCall createKeywordCall(final String callName, final int modelTableIndex,
             final int codeHoldingElementIndex) {
-        final RobotKeywordCall call = new RobotKeywordCall(this, callName, new ArrayList<String>(), "");
-
         final RobotExecutableRow<UserKeyword> robotExecutableRow = new RobotExecutableRow<>();
+        final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
+
         if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
             getLinkedElement().addKeywordExecutionRow(robotExecutableRow, modelTableIndex);
         } else {
             getLinkedElement().addKeywordExecutionRow(robotExecutableRow);
         }
-        call.link(robotExecutableRow);
 
         if (codeHoldingElementIndex >= 0 && codeHoldingElementIndex < getChildren().size()) {
             getChildren().add(codeHoldingElementIndex, call);
@@ -96,12 +91,9 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     @Override
     public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
             final String comment) {
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(settingName), args,
-                comment);
-
         final AModelElement<?> newModelElement = new KeywordTableModelUpdater().create(getLinkedElement(), settingName,
                 comment, args);
-        setting.link(newModelElement);
+        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, newModelElement);
 
         if (newModelElement.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN) {
             newModelElement.getDeclaration().setText(settingName);
@@ -119,8 +111,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
 
         if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW
                 || keywordCall.getLinkedElement().getModelType() == ModelType.UNKNOWN) {    // unknown when copy/paste empty lines
-            newCall = new RobotKeywordCall(this, keywordCall.getName(), keywordCall.getArguments(),
-                    keywordCall.getComment());
+            newCall = new RobotKeywordCall(this, keywordCall.getLinkedElement());
             final RobotExecutableRow<UserKeyword> robotExecutableRow = (RobotExecutableRow<UserKeyword>) keywordCall
                     .getLinkedElement();
             if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
@@ -128,12 +119,9 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             } else {
                 keyword.addKeywordExecutionRow(robotExecutableRow);
             }
-            newCall.link(robotExecutableRow);
         } else {
-            newCall = new RobotDefinitionSetting(this, keywordCall.getName(), keywordCall.getArguments(),
-                    keywordCall.getComment());
+            newCall = new RobotDefinitionSetting(this, keywordCall.getLinkedElement());
             new KeywordTableModelUpdater().updateParent(keyword, keywordCall.getLinkedElement());
-            newCall.link(keywordCall.getLinkedElement());
         }
 
         if (codeHoldingElementIndex >= 0 && codeHoldingElementIndex < getChildren().size()) {
@@ -146,75 +134,28 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     public void link() {
         // settings
         for (final KeywordArguments argument : keyword.getArguments()) {
-            final String name = argument.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(
-                    Lists.transform(argument.getArguments(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(argument, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
-            setting.link(argument);
-            getChildren().add(setting);
+            getChildren().add(new RobotDefinitionSetting(this, argument));
         }
         for (final KeywordDocumentation documentation : keyword.getDocumentation()) {
-            final String name = documentation.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(
-                    Lists.transform(documentation.getDocumentationText(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(documentation, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
-            setting.link(documentation);
-            getChildren().add(setting);
+            getChildren().add(new RobotDefinitionSetting(this, documentation));
         }
         for (final KeywordTags tags : keyword.getTags()) {
-            final String name = tags.getDeclaration().getText().toString();
-            final List<String> args = newArrayList(Lists.transform(tags.getTags(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(tags, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
-            setting.link(tags);
-            getChildren().add(setting);
+            getChildren().add(new RobotDefinitionSetting(this, tags));
         }
         for (final KeywordTimeout timeout : keyword.getTimeouts()) {
-            final String name = timeout.getDeclaration().getText().toString();
-            final List<String> args = timeout.getTimeout() == null ? new ArrayList<String>()
-                    : newArrayList(timeout.getTimeout().getText().toString());
-            args.addAll(Lists.transform(timeout.getMessage(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(timeout, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
-            setting.link(timeout);
-            getChildren().add(setting);
+            getChildren().add(new RobotDefinitionSetting(this, timeout));
         }
         for (final KeywordTeardown teardown : keyword.getTeardowns()) {
-            final String name = teardown.getDeclaration().getText().toString();
-            final List<String> args = teardown.getKeywordName() == null ? new ArrayList<String>()
-                    : newArrayList(teardown.getKeywordName().getText().toString());
-            args.addAll(Lists.transform(teardown.getArguments(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(teardown, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
-            setting.link(teardown);
-            getChildren().add(setting);
+            getChildren().add(new RobotDefinitionSetting(this, teardown));
         }
         for (final KeywordReturn returnSetting : keyword.getReturns()) {
-            final String name = returnSetting.getDeclaration().getText().toString();
-            final List<String> args = returnSetting.getReturnValues() == null ? new ArrayList<String>()
-                    : newArrayList(Lists.transform(returnSetting.getReturnValues(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(returnSetting, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
-            final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, omitSquareBrackets(name), args, comment);
-            setting.link(returnSetting);
-            getChildren().add(setting);
+            getChildren().add(new RobotDefinitionSetting(this, returnSetting));
         }
         
         // body
         for (final RobotExecutableRow<UserKeyword> execRow : keyword.getKeywordExecutionRows()) {
-            final String callName = execRow.getAction().getText().toString();
-            final List<String> args = newArrayList(
-                    Lists.transform(execRow.getArguments(), TokenFunctions.tokenToString()));
-            final String comment = CommentServiceHandler.consolidate(execRow, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE);
-            final RobotKeywordCall call = new RobotKeywordCall(this, callName, args, comment);
-            getChildren().add(call);
-            call.link(execRow);
+            getChildren().add(new RobotKeywordCall(this, execRow));
         }
-    }
-
-    private static String omitSquareBrackets(final String nameInBrackets) {
-        return nameInBrackets.substring(1, nameInBrackets.length() - 1);
     }
 
     @Override
