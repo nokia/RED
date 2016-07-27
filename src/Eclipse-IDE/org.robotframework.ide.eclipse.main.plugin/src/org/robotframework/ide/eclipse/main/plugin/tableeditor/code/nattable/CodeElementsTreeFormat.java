@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortDirectionEnum;
+import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
@@ -49,14 +50,25 @@ public class CodeElementsTreeFormat implements TreeList.Format<Object> {
 
     private static class CallsFileOrderComparator implements Comparator<Object> {
 
+        private final CodeAlphabeticalComparator comparator = new CodeAlphabeticalComparator();
+
         @Override
         public int compare(final Object o1, final Object o2) {
+            final IRobotCodeHoldingElement holder1 = getHolder(o1);
+            final IRobotCodeHoldingElement holder2 = getHolder(o2);
+            if (holder1 != holder2) {
+                // final int index1 = holder1.getParent().getChildren().indexOf(holder1);
+                // final int index2 = holder2.getParent().getChildren().indexOf(holder2);
+                // return index1 < index2 ? -1 : 1;
+                return comparator.compare(holder1, holder2);
+            }
+
             if (o1 instanceof RobotKeywordCall && o2 instanceof RobotKeywordCall) {
                 final RobotKeywordCall call1 = (RobotKeywordCall) o1;
                 final RobotKeywordCall call2 = (RobotKeywordCall) o2;
                 final int index1 = call1.getParent().getChildren().indexOf(call1);
                 final int index2 = call2.getParent().getChildren().indexOf(call2);
-                return index1 - index2;
+                return o1 == o2 ? 0 : (index1 < index2 ? -1 : 1);
             } else if (o1 instanceof RobotKeywordCall && o2 instanceof AddingToken) {
                 return -1;
             } else if (o1 instanceof AddingToken && o2 instanceof RobotKeywordCall) {
@@ -66,15 +78,26 @@ public class CodeElementsTreeFormat implements TreeList.Format<Object> {
             }
         }
 
+        private IRobotCodeHoldingElement getHolder(final Object o) {
+            if (o instanceof RobotKeywordCall) {
+                final RobotKeywordCall call = (RobotKeywordCall) o;
+                return call.getParent();
+            } else if (o instanceof AddingToken) {
+                final AddingToken token = (AddingToken) o;
+                return (IRobotCodeHoldingElement) token.getParent();
+            }
+            throw new IllegalStateException("Unknown element " + o.toString());
+        }
+
     }
 
     private static class CodeAlphabeticalComparator implements Comparator<Object> {
 
         @Override
         public int compare(final Object o1, final Object o2) {
-            final RobotCodeHoldingElement case1 = (RobotCodeHoldingElement) o1;
-            final RobotCodeHoldingElement case2 = (RobotCodeHoldingElement) o2;
-            return case1.getName().compareToIgnoreCase(case2.getName());
+            final RobotCodeHoldingElement elem1 = (RobotCodeHoldingElement) o1;
+            final RobotCodeHoldingElement elem2 = (RobotCodeHoldingElement) o2;
+            return elem1.getName().compareToIgnoreCase(elem2.getName());
         }
     }
 

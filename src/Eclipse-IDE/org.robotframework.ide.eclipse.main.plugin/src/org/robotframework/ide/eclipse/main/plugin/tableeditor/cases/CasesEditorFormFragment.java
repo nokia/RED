@@ -50,7 +50,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -59,7 +58,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateCaseFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateFreshCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
@@ -301,8 +300,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 final RobotElement createdElement;
                 final AddingToken token = (AddingToken) dataProvider.getRowObject(addingTokenRowIndex);
                 if (token.isNested()) {
-                    final RobotCodeHoldingElement testCase = (RobotCodeHoldingElement) token.getParent();
-                    commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
+                    final RobotCase testCase = (RobotCase) token.getParent();
+                    commandsStack.execute(new CreateCaseFreshKeywordCallCommand(testCase));
                     createdElement = testCase.getChildren().get(testCase.getChildren().size() - 1);
 
                 } else {
