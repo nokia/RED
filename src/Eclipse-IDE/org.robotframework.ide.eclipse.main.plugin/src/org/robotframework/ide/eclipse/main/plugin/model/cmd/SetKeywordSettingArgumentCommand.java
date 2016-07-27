@@ -29,9 +29,8 @@ public class SetKeywordSettingArgumentCommand extends SetKeywordCallArgumentComm
     }
 
     @Override
-    protected boolean shouldAddBackSlashAtFirstArgPosition() {
+    protected boolean isKeywordBasedSetting() {
         final ModelType modelType = getKeywordCall().getLinkedElement().getModelType();
-        return getIndex() == 0
-                && (modelType == ModelType.USER_KEYWORD_TEARDOWN || modelType == ModelType.USER_KEYWORD_TIMEOUT);
+        return modelType == ModelType.USER_KEYWORD_TEARDOWN || modelType == ModelType.USER_KEYWORD_TIMEOUT;
     }
 }
