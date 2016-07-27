@@ -19,9 +19,10 @@ import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author Michal Anglart
- *
  */
 public class CellEditorValueValidationJobScheduler<V> {
 
@@ -56,6 +57,7 @@ public class CellEditorValueValidationJobScheduler<V> {
                         .getProperty(CellEditorValueValidationJob.getErrorMessagePropertyName());
 
                 SwtThread.syncExec(new Runnable() {
+
                     @Override
                     public void run() {
                         if (decoration != null) {
@@ -111,11 +113,17 @@ public class CellEditorValueValidationJobScheduler<V> {
             return;
         }
         textControl.addModifyListener(new ModifyListener() {
+
             @SuppressWarnings("unchecked")
             @Override
             public void modifyText(final ModifyEvent e) {
                 rescheduleValidation((V) textControl.getText(), textControl);
             }
         });
+    }
+
+    @VisibleForTesting
+    public CellEditorValueValidator<V> getValidator() {
+        return this.validator;
     }
 }
