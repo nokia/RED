@@ -61,7 +61,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -478,7 +478,7 @@ public class ImportLibraryComposite {
 
     private void handleEditLibraryArgs(final RobotSetting setting, final List<String> newArgs) {
         for (int i = 0; i < newArgs.size(); i++) {
-            commandsStack.execute(new SetKeywordCallArgumentCommand(setting, i + 1, newArgs.get(i))); // set arg after keyword name
+            commandsStack.execute(new SetSettingKeywordCallArgumentCommand(setting, i + 1, newArgs.get(i))); // set arg after keyword name
         }
     }
 
