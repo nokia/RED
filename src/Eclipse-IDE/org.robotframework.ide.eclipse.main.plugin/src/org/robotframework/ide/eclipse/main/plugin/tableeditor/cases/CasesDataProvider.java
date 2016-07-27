@@ -5,10 +5,16 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
@@ -80,11 +86,30 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
             
             for (final RobotCase robotCase : section.getChildren()) {
                 casesSortedList.add(robotCase);
-                casesSortedList.addAll(robotCase.getChildren());
+                casesSortedList.addAll(filteredCalls(robotCase));
                 casesSortedList.add(new AddingToken(robotCase, CasesAdderState.CALL));
             }
         }
 
+    }
+
+    private List<RobotKeywordCall> filteredCalls(final RobotCase robotCase) {
+        final List<RobotKeywordCall> allCalls = robotCase.getChildren();
+        final List<RobotKeywordCall> filteredCalls = new ArrayList<>();
+        for (final RobotKeywordCall call : allCalls) {
+            if (call instanceof RobotDefinitionSetting) {
+                final RobotDefinitionSetting setting = (RobotDefinitionSetting) call;
+                @SuppressWarnings("unchecked")
+                final AModelElement<TestCase> linkedSetting = (AModelElement<TestCase>) setting.getLinkedElement();
+                final TestCase testCase = robotCase.getLinkedElement();
+                if (!testCase.isDuplicatedSetting(linkedSetting)) {
+                    filteredCalls.add(call);
+                }
+            } else {
+                filteredCalls.add(call);
+            }
+        }
+        return filteredCalls;
     }
     
     SortedList<Object> getSortedList() {

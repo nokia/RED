@@ -34,6 +34,6 @@ public class DeleteCasesCommand extends EditorCommand {
             linkedElement.removeTest(caseToDelete.getLinkedElement());
         }
 
-        eventBroker.post(RobotModelEvents.ROBOT_CASE_REMOVED, casesSection);
+        eventBroker.send(RobotModelEvents.ROBOT_CASE_REMOVED, casesSection);
     }
 }
