@@ -5,16 +5,16 @@
  */
 package org.robotframework.red.nattable.edit;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public interface CellEditorValueValidator<V> {
 
     void validate(V value);
 
     public static class CellEditorValueValidationException extends RuntimeException {
+
+        private static final long serialVersionUID = 3031857236018948462L;
 
         public CellEditorValueValidationException(final String message) {
             super(message);
