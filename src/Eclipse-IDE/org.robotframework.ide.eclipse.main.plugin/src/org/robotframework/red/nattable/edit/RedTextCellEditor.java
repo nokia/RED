@@ -43,6 +43,7 @@ public class RedTextCellEditor extends TextCellEditor {
     public static final String DETAILS_EDITING_CONTEXT_ID = "org.robotframework.ide.eclipse.details.context";
 
     private final int selectionStartShift;
+
     private final int selectionEndShift;
 
     private final CellEditorValueValidationJobScheduler<String> validationJobScheduler;
@@ -50,7 +51,7 @@ public class RedTextCellEditor extends TextCellEditor {
     private final AssistanceSupport support;
 
     private IContextActivation contextActivation;
-    
+
     public RedTextCellEditor() {
         this(0, 0, new DefaultRedCellEditorValueValidator(), null);
     }
@@ -123,7 +124,7 @@ public class RedTextCellEditor extends TextCellEditor {
 
         final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
         contextActivation = service.activateContext(RedPlugin.DETAILS_EDITING_CONTEXT_ID);
-        
+
         return text;
     }
 
@@ -143,6 +144,10 @@ public class RedTextCellEditor extends TextCellEditor {
 
         final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
         service.deactivateContext(contextActivation);
+    }
+
+    public CellEditorValueValidationJobScheduler<String> getValidationJobScheduler() {
+        return this.validationJobScheduler;
     }
 
     private class TextKeyListener extends KeyAdapter {
