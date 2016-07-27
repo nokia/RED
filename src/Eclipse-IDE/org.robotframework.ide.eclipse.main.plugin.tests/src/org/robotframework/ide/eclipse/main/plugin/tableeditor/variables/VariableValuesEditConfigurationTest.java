@@ -19,10 +19,54 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreato
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.red.nattable.edit.CellEditorValueValidationJobScheduler;
+import org.robotframework.red.nattable.edit.CellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditor;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
+import org.robotframework.red.nattable.edit.VariableNameRedCellEditorValidator;
 
 public class VariableValuesEditConfigurationTest {
+
+    @Test
+    public void thereIsATextCellEditorRegisteredForDictionaryName() {
+        assertNameColumnValidator(VariableType.DICTIONARY);
+    }
+
+    @Test
+    public void thereIsATextCellEditorRegisteredForListName() {
+        assertNameColumnValidator(VariableType.LIST);
+    }
+
+    @Test
+    public void thereIsATextCellEditorRegisteredForScalarAsListName() {
+        assertNameColumnValidator(VariableType.SCALAR_AS_LIST);
+    }
+
+    @Test
+    public void thereIsATextCellEditorRegisteredForScalarName() {
+        assertNameColumnValidator(VariableType.SCALAR);
+    }
+
+    private void assertNameColumnValidator(final VariableType type) {
+        // prepare
+        final RobotSuiteFile suiteFile = new RobotSuiteFileCreator().build();
+        final VariableValuesEditConfiguration config = new VariableValuesEditConfiguration(mock(TableTheme.class),
+                suiteFile, mock(VariablesDataProvider.class), mock(RobotEditorCommandsStack.class));
+
+        // execute
+        final IConfigRegistry configRegistry = new ConfigRegistry();
+        config.configureRegistry(configRegistry);
+
+        // verify
+        final ICellEditor editor = configRegistry.getConfigAttribute(EditConfigAttributes.CELL_EDITOR,
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(type));
+        assertThat(editor).isInstanceOf(RedTextCellEditor.class);
+        final CellEditorValueValidationJobScheduler<String> validationScheduler = ((RedTextCellEditor) editor)
+                .getValidationJobScheduler();
+        final CellEditorValueValidator<String> validator = validationScheduler.getValidator();
+        assertThat(validator).isInstanceOf(VariableNameRedCellEditorValidator.class);
+        assertThat(((VariableNameRedCellEditorValidator) validator).getValidType()).isEqualTo(type);
+    }
 
     @Test
     public void thereIsATextCellEditorRegisteredForScalarVariableValues() {
