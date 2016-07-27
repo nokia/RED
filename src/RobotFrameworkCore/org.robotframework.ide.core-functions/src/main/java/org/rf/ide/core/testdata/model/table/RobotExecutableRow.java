@@ -197,10 +197,28 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         fixMissingTypes();
         final List<RobotToken> tokens = new ArrayList<>();
         tokens.add(getAction());
-        tokens.addAll(getArguments());
-        tokens.addAll(getComment());
+        tokens.addAll(compact(arguments));
+        tokens.addAll(compact(comments));
 
         return tokens;
+    }
+
+    private List<RobotToken> compact(final List<RobotToken> elementsSingleType) {
+        int size = elementsSingleType.size();
+        for (int i = size - 1; i >= 0; i--) {
+            if (elementsSingleType.size() == 0) {
+                break;
+            }
+
+            RobotToken t = elementsSingleType.get(i);
+            if (t.getText() == null || t.getText().isEmpty()) {
+                elementsSingleType.remove(i);
+            } else {
+                break;
+            }
+        }
+
+        return elementsSingleType;
     }
 
     public boolean isExecutable() {

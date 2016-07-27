@@ -26,6 +26,7 @@ public class RobotExecutableRowTypeSetTest {
         final RobotExecutableRow<Object> rowExec = new RobotExecutableRow<>();
         final RobotToken action = new RobotToken();
         final RobotToken arg = new RobotToken();
+        arg.setText("text");
 
         // execute
         rowExec.setAction(action);
@@ -45,6 +46,7 @@ public class RobotExecutableRowTypeSetTest {
         final RobotExecutableRow<Object> rowExec = new RobotExecutableRow<>();
         final RobotToken action = new RobotToken();
         final RobotToken arg = new RobotToken();
+        arg.setText("text");
 
         // execute
         rowExec.setAction(action);
@@ -64,6 +66,7 @@ public class RobotExecutableRowTypeSetTest {
         final RobotExecutableRow<Object> rowExec = new RobotExecutableRow<>();
         final RobotToken action = new RobotToken();
         final RobotToken arg = new RobotToken();
+        arg.setText("arg");
 
         // execute
         rowExec.setAction(action);
