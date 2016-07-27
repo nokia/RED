@@ -175,6 +175,6 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
     private String getDocumentationText(final RobotKeywordCall keywordCall) {
         return DocumentationServiceHandler
-        .toShowConsolidated((IDocumentationHolder) keywordCall.getLinkedElement());
+        .toEditConsolidated((IDocumentationHolder) keywordCall.getLinkedElement());
     }
 }
