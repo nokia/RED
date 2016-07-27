@@ -17,6 +17,7 @@ import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
@@ -93,49 +94,45 @@ public class RobotCase extends RobotCodeHoldingElement {
         throw new IllegalStateException("not implemented");
     }
 
-    // public RobotKeywordCall createKeywordCall(final int index, final String name, final
-    // List<String> args,
-    // final String comment) {
-    // @SuppressWarnings("unchecked")
-    // final RobotExecutableRow<TestCase> robotExecutableRow = (RobotExecutableRow<TestCase>) new
-    // TestCaseTableModelUpdater()
-    // .createExecutableRow(getLinkedElement(), name, comment, args);
-    //
-    // final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
-    //
-    // final int modelIndex = countRowsOfTypeUpTo(ModelType.TEST_CASE_EXECUTABLE_ROW, index);
-    // getLinkedElement().addTestExecutionRow(robotExecutableRow, modelIndex);
-    // getChildren().add(index, call);
-    //
-    // return call;
-    // }
+    public RobotKeywordCall createKeywordCall(final int index, final String name, final List<String> args,
+            final String comment) {
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<TestCase> robotExecutableRow = (RobotExecutableRow<TestCase>) new TestCaseTableModelUpdater()
+                .createExecutableRow(getLinkedElement(), name, comment, args);
+
+        final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
+
+        final int modelIndex = countRowsOfTypeUpTo(ModelType.TEST_CASE_EXECUTABLE_ROW, index);
+        getLinkedElement().addTestExecutionRow(robotExecutableRow, modelIndex);
+        getChildren().add(index, call);
+
+        return call;
+    }
 
     @Override
     public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
             final String comment) {
-        // final AModelElement<?> newModelElement = new
-        // TestCaseTableModelUpdater().createSetting(getLinkedElement(),
-        // settingName, comment, args);
-        //
-        // final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, newModelElement);
-        //
-        // getChildren().add(index, setting);
-        //
-        // return setting;
-        return null;
+        final AModelElement<?> newModelElement = new TestCaseTableModelUpdater().createSetting(getLinkedElement(),
+                settingName, comment, args);
+
+        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, newModelElement);
+
+        getChildren().add(index, setting);
+
+        return setting;
     }
 
-    // public void insertKeywordCall(final int index, final RobotKeywordCall call) {
-    // call.setParent(this);
-    //
-    // final int modelIndex = countRowsOfTypeUpTo(ModelType.TEST_CASE_EXECUTABLE_ROW, index);
-    // if (index == -1) {
-    // getChildren().add(call);
-    // } else {
-    // getChildren().add(index, call);
-    // }
-    // new TestCaseTableModelUpdater().insert(testCase, modelIndex, call.getLinkedElement());
-    // }
+    public void insertKeywordCall(final int index, final RobotKeywordCall call) {
+        call.setParent(this);
+
+        final int modelIndex = countRowsOfTypeUpTo(ModelType.TEST_CASE_EXECUTABLE_ROW, index);
+        if (index == -1) {
+            getChildren().add(call);
+        } else {
+            getChildren().add(index, call);
+        }
+        new TestCaseTableModelUpdater().insert(testCase, modelIndex, call.getLinkedElement());
+    }
 
     private int countRowsOfTypeUpTo(final ModelType type, final int toIndex) {
         int index = 0;
@@ -152,10 +149,10 @@ public class RobotCase extends RobotCodeHoldingElement {
         return count;
     }
 
-    // public void removeChild(final RobotKeywordCall child) {
-    // getChildren().remove(child);
-    // new TestCaseTableModelUpdater().remove(testCase, child.getLinkedElement());
-    // }
+    public void removeChild(final RobotKeywordCall child) {
+        getChildren().remove(child);
+        new TestCaseTableModelUpdater().remove(testCase, child.getLinkedElement());
+    }
 
     @Override
     public RobotCasesSection getParent() {

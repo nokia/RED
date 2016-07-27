@@ -27,10 +27,6 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
         this.parent = parent;
     }
 
-    public RobotKeywordCall createKeywordCall() {
-        return createKeywordCall("", -1, -1);
-    }
-
     public abstract RobotKeywordCall createKeywordCall(String callName, int modelTableIndex,
             final int codeHoldingElementIndex);
 
@@ -91,5 +87,4 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getParent(), this);
     }
-
 }

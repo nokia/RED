@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables;
+package org.robotframework.red.nattable.painter;
 
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
@@ -15,7 +15,6 @@ import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
-import org.robotframework.red.graphics.ColorsManager;
 
 
 /**
@@ -28,8 +27,18 @@ public class RedNatGridLayerPainter extends NatLayerPainter {
 
     private int defaultRowHeight = 0;
 
-    public RedNatGridLayerPainter(final NatTable natTable, final Color gridColor, final int defaultRowHeight) {
+    private final Color rowHeaderBg;
+
+    private final Color rowHeaderUnderlineColor;
+
+    private final int lineWidth;
+
+    public RedNatGridLayerPainter(final NatTable natTable, final Color gridColor, final Color rowHeaderBg,
+            final Color rowHeaderUnderlineColor, final int lineWidth, final int defaultRowHeight) {
         super(natTable);
+        this.rowHeaderBg = rowHeaderBg;
+        this.rowHeaderUnderlineColor = rowHeaderUnderlineColor;
+        this.lineWidth = lineWidth;
         this.gridColor = gridColor;
         setDefaultRowHeight(defaultRowHeight);
     }
@@ -83,14 +92,19 @@ public class RedNatGridLayerPainter extends NatLayerPainter {
                     + natLayer.getColumnWidthByPosition(columnPosition) - 1;
             if (columnPosition == 0) {
                 final Color fg = gc.getForeground();
+                final Color bg = gc.getBackground();
                 final int width = gc.getLineWidth();
 
-                gc.setForeground(ColorsManager.getColor(220, 220, 220));
-                gc.setLineWidth(2);
+                gc.setBackground(rowHeaderBg);
+                gc.fillRectangle(0, rectangle.y, x - 1, endY);
+
+                gc.setForeground(rowHeaderUnderlineColor);
+                gc.setLineWidth(lineWidth);
                 gc.drawLine(x - 1, rectangle.y, x - 1, endY);
 
                 gc.setLineWidth(width);
                 gc.setForeground(fg);
+                gc.setBackground(bg);
             }
             gc.drawLine(x, rectangle.y, x, endY);
         }
