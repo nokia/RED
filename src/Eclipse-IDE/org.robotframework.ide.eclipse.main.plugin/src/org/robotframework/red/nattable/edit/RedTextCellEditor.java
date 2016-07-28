@@ -30,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehav
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 /**
@@ -146,6 +147,7 @@ public class RedTextCellEditor extends TextCellEditor {
         service.deactivateContext(contextActivation);
     }
 
+    @VisibleForTesting
     public CellEditorValueValidationJobScheduler<String> getValidationJobScheduler() {
         return this.validationJobScheduler;
     }
