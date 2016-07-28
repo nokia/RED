@@ -96,16 +96,14 @@ public class RobotCase extends RobotCodeHoldingElement {
 
     public RobotKeywordCall createKeywordCall(final int index, final String name, final List<String> args,
             final String comment) {
+        final int modelIndex = countRowsOfTypeUpTo(ModelType.TEST_CASE_EXECUTABLE_ROW, index);
+
         @SuppressWarnings("unchecked")
         final RobotExecutableRow<TestCase> robotExecutableRow = (RobotExecutableRow<TestCase>) new TestCaseTableModelUpdater()
-                .createExecutableRow(getLinkedElement(), name, comment, args);
+                .createExecutableRow(getLinkedElement(), modelIndex, name, comment, args);
 
         final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
-
-        final int modelIndex = countRowsOfTypeUpTo(ModelType.TEST_CASE_EXECUTABLE_ROW, index);
-        getLinkedElement().addTestExecutionRow(robotExecutableRow, modelIndex);
         getChildren().add(index, call);
-
         return call;
     }
 

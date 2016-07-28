@@ -47,7 +47,7 @@ public class SetCaseKeywordCallArgumentCommand extends EditorCommand {
         if (changed) {
             final TestCaseTableModelUpdater updater = new TestCaseTableModelUpdater();
             for (int i = arguments.size() - 1; i >= 0; i--) {
-                updater.update(keywordCall.getLinkedElement(), i, arguments.get(i));
+                updater.updateArgument(keywordCall.getLinkedElement(), i, arguments.get(i));
             }
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
         }
