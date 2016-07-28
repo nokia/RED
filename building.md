@@ -5,7 +5,7 @@
 - maven installed
 - network connection to allow maven to fetch updartes from Eclipse's update sites
 - python to execute RedReleaseVersionUpdater.py which updates version number of packages for proper dependency management
-- Xvfb for some unit tests, this can be bypassed by commenting/removing sections <reporting> and ```<module>../org.robotframework.ide.eclipse.main.plugin.tests</module> ``` in src/Eclipse-IDE/org.robotframework.ide.eclipse.main.feature.buildParent/pom.xml 
+- Xvfb for some unit tests, this can be bypassed by commenting/removing sections ```<reporting>``` and ```<module>../org.robotframework.ide.eclipse.main.plugin.tests</module> ``` in src/Eclipse-IDE/org.robotframework.ide.eclipse.main.feature.buildParent/pom.xml 
 
 ### Setup
 - source should be under src folder (just like in git repo)
