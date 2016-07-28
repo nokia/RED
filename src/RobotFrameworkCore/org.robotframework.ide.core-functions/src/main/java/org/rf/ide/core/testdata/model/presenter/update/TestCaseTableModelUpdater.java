@@ -24,6 +24,7 @@ import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTags
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTeardownMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordTimeoutMorphOperation;
 import org.rf.ide.core.testdata.model.presenter.update.testcases.UserKeywordUnknownSettingMorphOperation;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -51,16 +52,19 @@ public class TestCaseTableModelUpdater {
         return operationHandler == null ? null : operationHandler.create(testCase, settingName, args, comment);
     }
 
-    public AModelElement<?> createExecutableRow(final TestCase testCase, final String action, final String comment,
-            final List<String> args) {
+    @SuppressWarnings("unchecked")
+    public AModelElement<?> createExecutableRow(final TestCase testCase, final int index, final String action,
+            final String comment, final List<String> args) {
         if (testCase == null) {
             return null;
         }
         final ITestCaseTableElementOperation operationHandler = getOperationHandler(ModelType.TEST_CASE_EXECUTABLE_ROW);
-        return operationHandler == null ? null : operationHandler.create(testCase, action, args, comment);
+        final AModelElement<?> row = operationHandler.create(testCase, action, args, comment);
+        testCase.addTestExecutionRow((RobotExecutableRow<TestCase>) row, index);
+        return row;
     }
 
-    public void update(final AModelElement<?> modelElement, final int index, final String value) {
+    public void updateArgument(final AModelElement<?> modelElement, final int index, final String value) {
         if (modelElement != null) {
             final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
             if (operationHandler != null) {
