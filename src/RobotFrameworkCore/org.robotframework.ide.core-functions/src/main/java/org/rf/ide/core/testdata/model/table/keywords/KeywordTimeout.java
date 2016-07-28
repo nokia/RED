@@ -52,7 +52,7 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
         fixForTheType(timeout, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE, true);
         this.timeout = timeout;
     }
-    
+
     public void setTimeout(final String timeout) {
         this.timeout = updateOrCreate(this.timeout, timeout, RobotTokenType.KEYWORD_SETTING_TIMEOUT_VALUE);
     }
@@ -65,7 +65,7 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
         fixForTheType(messagePart, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE, true);
         this.message.add(messagePart);
     }
-    
+
     public void addMessagePart(final int index, final String value) {
         updateOrCreateTokenInside(message, index, value, RobotTokenType.KEYWORD_SETTING_TIMEOUT_MESSAGE);
     }
@@ -119,6 +119,9 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
         final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
+            if (getTimeout() != null) {
+                tokens.add(getTimeout());
+            }
             tokens.addAll(getMessage());
             tokens.addAll(getComment());
         }
@@ -130,7 +133,7 @@ public class KeywordTimeout extends AModelElement<UserKeyword> implements IComme
     public boolean removeElementToken(final int index) {
         return super.removeElementFromList(message, index);
     }
-    
+
     public KeywordTimeout copy() {
         final KeywordTimeout keywordTimeout = new KeywordTimeout(this.getDeclaration().copyWithoutPosition());
         keywordTimeout.setTimeout(this.getTimeout().copyWithoutPosition());
