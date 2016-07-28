@@ -37,10 +37,8 @@ public class TestCaseUnkownModelOperation implements ITestCaseTableElementOperat
             final String comment) {
         final TestCaseUnknownSettings unknown = testCase.newUnknownSettings();
         unknown.getDeclaration().setText(settingName);
-        if (!args.isEmpty()) {
-            for (int i = 1; i < args.size(); i++) {
-                unknown.addArgument(args.get(i));
-            }
+        for (final String arg : args) {
+            unknown.addArgument(arg);
         }
         if (comment != null && !comment.isEmpty()) {
             unknown.setComment(comment);

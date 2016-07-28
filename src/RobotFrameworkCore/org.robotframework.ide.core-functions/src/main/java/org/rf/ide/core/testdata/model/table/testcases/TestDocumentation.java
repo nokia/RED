@@ -41,6 +41,10 @@ public class TestDocumentation extends AModelElement<TestCase>
         text.add(token);
     }
 
+    public void addDocumentationText(final int index, final String value) {
+        updateOrCreateTokenInside(text, index, value, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT);
+    }
+
     @Override
     public List<RobotToken> getDocumentationText() {
         return Collections.unmodifiableList(text);
