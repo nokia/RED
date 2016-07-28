@@ -1,0 +1,11 @@
+<FindBugsFilter>
+	<Match>
+		<Bug pattern="DM_DEFAULT_ENCODING" />
+	</Match>
+	<Match>
+        <Bug pattern="NP_BOOLEAN_RETURN_NULL" />
+    </Match>
+	<Match>
+  		<Rank value="16"/>
+	</Match>
+</FindBugsFilter>
