@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.ITestCaseTableElementOperation;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
@@ -28,14 +29,28 @@ public class TestCaseDocumentationModelOperation implements ITestCaseTableElemen
     }
     
     @Override
-    public AModelElement<?> create(final TestCase userKeyword, final String settingName, final List<String> args,
+    public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
             final String comment) {
-        return null;
+        final TestDocumentation testDoc = testCase.newDocumentation();
+        for (int i = 0; i < args.size(); i++) {
+            testDoc.addDocumentationText(i, args.get(i));
+        }
+        if (comment != null && !comment.isEmpty()) {
+            testDoc.setComment(comment);
+        }
+        return testDoc;
     }
 
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
-
+        final TestDocumentation testDoc = (TestDocumentation) modelElement;
+        if (value != null) {
+            if (index == 0) {
+                DocumentationServiceHandler.update(testDoc, value);
+            }
+        } else {
+            testDoc.clearDocumentation();
+        }
     }
 
     @SuppressWarnings("unchecked")
