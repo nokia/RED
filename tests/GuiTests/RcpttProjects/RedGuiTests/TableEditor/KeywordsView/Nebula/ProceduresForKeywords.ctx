@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YI1vUFJyEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/27/16 5:31 PM
+Save-Time: 7/28/16 1:07 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -38,15 +38,51 @@ proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""
 	    | my-assert-true -expected $comment -row $row -col 1 
 }
 
-proc "check-markers-in-table"  [val type ERROR] [val lines]  {
+//proc "check-markers-in-table"  [val file] [val type ERROR] [val lines]  {
+//
+//	$lines | each [val line]{
+//		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object 
+//		    | invoke getLayer| invoke getConfigLabelsByPosition 0 $line|  invoke getLabels  |invoke contains $type
+//		        | equals true | assert-true -message [format "In line %s is no marker" $line]
+//	}
+//
+//}
+//
+//proc "check-no-markers-in-table" [val file] [val lines]  {
+//
+//	$lines | each [val line]{
+//		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object 
+//		    | invoke getLayer| invoke getConfigLabelsByPosition 0 $line|  invoke getLabels  |invoke contains ERROR
+//		        | equals false | assert-true -message [format "In line %s should be no marker but is ERROR." $line]
+//		        
+//		get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object 
+//		    | invoke getLayer| invoke getConfigLabelsByPosition 0 $line|  invoke getLabels  |invoke contains WARNING
+//		        | equals false | assert-true -message [format "In line %s should be no marker but is WARNING." $line]	        
+//	}
+//
+//}
 
-	$lines | each [val line]{
-		get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1  | get-object 
-		    | invoke getLayer| invoke getConfigLabelsByPosition 0 $line|  invoke getLabels  |invoke contains $type | equals true | assert-true -message [format "In line %s is no marker" $line]
+proc "compare-markers-list-with-ref" [val markers -input] [val ref_markers] [val type]{
+
+	$ref_markers |each [val el] [val index]{
+			$el | eq [$markers | get $index] | equals true | assert-true -message [format "In line %s should be marker %s but is %s." $el $type [$markers | get $index]]
 	}
-
 }
 
+proc "set-list-with-markers-and-comapare"  [val file] [val ref_list] [val type "ERROR"] {
+	get-editor  $file| get-canvas -after [get-label "User Keywords"] -index 1 
+	    | get-property "getLayer().getBodyLayer().getRowCount()" -raw | int | let [val row_count -input]{
+	    
+			repeat [val row] -times $row_count -command{
+				if [get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object 
+					    | invoke getLayer| invoke getConfigLabelsByPosition 0 $row|  invoke getLabels  |invoke contains $type | eq true]{
+					   		echo $row
+				}
+					    
+			} | to-list | compare-markers-list-with-ref  -ref_markers $ref_list -type $type
+		
+		}
+}
 
 proc "compare-row-with-list" [val file]  [val col_amount] [val row] [val ref_table]
 {	
