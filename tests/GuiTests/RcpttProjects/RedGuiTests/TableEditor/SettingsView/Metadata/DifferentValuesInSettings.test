@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _RBRS8DlIEeaMk_UgyvYHpA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/19/16 10:45 AM
+Save-Time: 7/28/16 11:00 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -61,7 +61,7 @@ with [get-editor "Script.robot"] {
 }
 
 
-check-imports-row-for-default-or_11_columns -file "Script.robot" -row 1 -import "Resource" -name "res3.robot" -c11 "#here is param" -default_length false
+check-imports-row-for-default-or_11_columns -file "Script.robot" -row 1 -import "Resource" -name "res3.robot" -c1 "res2" -c2 "${param}" -c11 "#here is param" -default_length false
 check-imports-row-for-default-or_11_columns -file "Script.robot" -row 2 -import "Library" -name "String" -default_length false
 check-imports-row-for-default-or_11_columns -file "Script.robot" -row 3 -import "Library" -name "Collections" -default_length false
 check-imports-row-for-default-or_11_columns -file "Script.robot" -row 4 -import "Library" -name "Telnet" -default_length false
@@ -126,6 +126,8 @@ get-editor "res3.tsv" | get-section General | get-editbox -index 1 | get-propert
 
 check-imports-row-for-default-or_11_columns -file "res3.tsv" -row 1 -import "Library" -name "OperatingSystem" 
 check-imports-row-for-default-or_11_columns -file "res3.tsv" -row 2 -import "Variables" -name "libs/lib1.py" 
+check-imports-row-for-default-or_11_columns -file "res3.tsv" -row 3 -import "Resources" -name "resource.robot" 
+check-imports-row-for-default-or_11_columns -file "res3.tsv" -row 4 -import "Variables" -name "variables.py"
 
 
 
