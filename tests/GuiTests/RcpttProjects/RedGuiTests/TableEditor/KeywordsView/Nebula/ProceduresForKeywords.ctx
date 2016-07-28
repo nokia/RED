@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YI1vUFJyEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/25/16 4:23 PM
+Save-Time: 7/27/16 5:31 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -36,5 +36,25 @@ proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""
 	    | my-assert-true -expected $c5 -row $row -col 1 
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
 	    | my-assert-true -expected $comment -row $row -col 1 
+}
+
+proc "check-markers-in-table"  [val type ERROR] [val lines]  {
+
+	$lines | each [val line]{
+		get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1  | get-object 
+		    | invoke getLayer| invoke getConfigLabelsByPosition 0 $line|  invoke getLabels  |invoke contains $type | equals true | assert-true -message [format "In line %s is no marker" $line]
+	}
+
+}
+
+
+proc "compare-row-with-list" [val file]  [val col_amount] [val row] [val ref_table]
+{	
+	repeat [val index] -times $col_amount -command{
+		$ref_table | get $index| let [val ref_value -input]{
+			get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 | get-object | invoke getCellByPosition [plus $index 1] $row | invoke getDataValue 
+			     |  my-assert-true -expected  $ref_value -row $row -col [plus $index 1]
+		} 
+	}
 }
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
