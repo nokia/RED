@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _zcIlcFPzEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/28/16 12:00 PM
+Save-Time: 7/28/16 1:08 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -93,7 +93,10 @@ compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "22" -ref_table 
 compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "23" -ref_table [list "Set Tags"  "abba"  ""  ""  ""  ""  "" ]
 compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "24" -ref_table [list "Set Tags"  "bbaa"  ""  ""  ""  ""  "" ]
 
-check-markers-in-table -lines [list 1 5 15 17 20]
+
+//set-list-with-markers-and-comapare -file "TestFile.robot" -ref_list [list  5 15 17] -type "ERROR"
+//set-list-with-markers-and-comapare  -file "TestFile.robot" -ref_list [list  4] -type "WARNING"
+
 
 get-editor "TestFile.robot" | restore
 //-----------------------------------------------------------------------------------------------------------------------
@@ -143,5 +146,8 @@ compare-row-with-list -file "warnings.robot" -col_amount 7 -row "12" -ref_table 
 compare-row-with-list -file "warnings.robot" -col_amount 7 -row "13" -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
 compare-row-with-list -file "warnings.robot" -col_amount 7 -row "14" -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""  "" ]
 
+
+set-list-with-markers-and-comapare -file  "warnings.robot"  -ref_list [list 1 6 7 11 12] -type "ERROR"
+set-list-with-markers-and-comapare -file  "warnings.robot"  -ref_list [list 2] -type "WARNING"
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
