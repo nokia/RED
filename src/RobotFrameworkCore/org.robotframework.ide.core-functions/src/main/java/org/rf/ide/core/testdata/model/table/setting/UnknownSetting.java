@@ -24,7 +24,7 @@ public class UnknownSetting extends AModelElement<SettingTable> {
 
     public UnknownSetting(final RobotToken declaration) {
         this.declaration = declaration;
-        fixForTheType(declaration, RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION);
+        fixForTheType(declaration, RobotTokenType.SETTING_UNKNOWN);
     }
 
     @Override
@@ -42,6 +42,7 @@ public class UnknownSetting extends AModelElement<SettingTable> {
     }
 
     public void addTrash(final RobotToken trash) {
+        fixForTheType(trash, RobotTokenType.SETTING_UNKNOWN_ARGUMENT, true);
         trashs.add(trash);
     }
 
