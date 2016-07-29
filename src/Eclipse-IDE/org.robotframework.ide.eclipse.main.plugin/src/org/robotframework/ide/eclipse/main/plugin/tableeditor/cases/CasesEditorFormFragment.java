@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
@@ -310,12 +309,6 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                     commandsStack.execute(new CreateFreshCaseCommand(section));
                     createdElement = section.getChildren().get(section.getChildren().size() - 1);
                 }
-                SwtThread.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
-                    }
-                });
                 return createdElement;
             }
         };
