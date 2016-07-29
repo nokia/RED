@@ -1,0 +1,6 @@
+*** Keyword ***
+Kw with comments	#comment in line with kw
+	2 keyword
+	${EMPTY}
+	${new param}=	Convert To Number	56	#converting
+	${new param}=	${err}=	Convert To Number	56	#converting
