@@ -170,7 +170,9 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
         for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
             final IRobotLineElement tokElem = tokens.get(tokenId);
-            if (tokenId == 0 && tokElem == lastToken) {
+            if (tokenId == 0 && (tokElem == lastToken || lastToken.getTypes().contains(RobotTokenType.ASSIGNMENT)
+                    || lastToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE))) {
+                lastToken = tokElem;
                 continue;
             }
 
@@ -219,7 +221,8 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
                     if (thisTokenPosIndex >= 0) {
                         if (lineElements.size() - 1 > thisTokenPosIndex + 1) {
                             final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);
-                            if (nextElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                            if (nextElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
+                                    || nextElem.getTypes().contains(RobotTokenType.ASSIGNMENT)) {
                                 getDumperHelper().updateLine(model, lines, nextElem);
                                 lastToken = nextElem;
                             }
