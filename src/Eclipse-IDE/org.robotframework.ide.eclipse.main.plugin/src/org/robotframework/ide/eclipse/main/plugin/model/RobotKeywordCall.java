@@ -22,6 +22,7 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -107,10 +108,11 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
                 @Override
                 public boolean apply(final RobotToken token) {
-                    return !token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                            && !token.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)
-                            && !token.getTypes().contains(RobotTokenType.KEYWORD_ACTION_NAME)
-                            && !token.getTypes().contains(RobotTokenType.TEST_CASE_ACTION_NAME);
+                    final List<IRobotTokenType> types = token.getTypes();
+                    final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
+                    return type != RobotTokenType.START_HASH_COMMENT && type != RobotTokenType.COMMENT_CONTINUE
+                            && type != RobotTokenType.KEYWORD_ACTION_NAME
+                            && type != RobotTokenType.TEST_CASE_ACTION_NAME;
                 }
             });
             arguments = newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));

@@ -12,6 +12,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
@@ -40,22 +41,23 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
 
                 @Override
                 public boolean apply(final RobotToken token) {
-                    return !token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                            && !token.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)
-                            && !token.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_SETUP)
-                            && !token.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION)
-                            && !token.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_TEARDOWN)
-                            && !token.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_TEMPLATE)
-                            && !token.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_TIMEOUT)
-                            && !token.getTypes().contains(RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.KEYWORD_SETTING_ARGUMENTS)
-                            && !token.getTypes().contains(RobotTokenType.KEYWORD_SETTING_DOCUMENTATION)
-                            && !token.getTypes().contains(RobotTokenType.KEYWORD_SETTING_TAGS)
-                            && !token.getTypes().contains(RobotTokenType.KEYWORD_SETTING_TEARDOWN)
-                            && !token.getTypes().contains(RobotTokenType.KEYWORD_SETTING_RETURN)
-                            && !token.getTypes().contains(RobotTokenType.KEYWORD_SETTING_TIMEOUT)
-                            && !token.getTypes().contains(RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION);
+                    final List<IRobotTokenType> types = token.getTypes();
+                    final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
+                    return type != RobotTokenType.START_HASH_COMMENT && type != RobotTokenType.COMMENT_CONTINUE
+                            && type != RobotTokenType.TEST_CASE_SETTING_SETUP
+                            && type != RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION
+                            && type != RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION
+                            && type != RobotTokenType.TEST_CASE_SETTING_TEARDOWN
+                            && type != RobotTokenType.TEST_CASE_SETTING_TEMPLATE
+                            && type != RobotTokenType.TEST_CASE_SETTING_TIMEOUT
+                            && type != RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION
+                            && type != RobotTokenType.KEYWORD_SETTING_ARGUMENTS
+                            && type != RobotTokenType.KEYWORD_SETTING_DOCUMENTATION
+                            && type != RobotTokenType.KEYWORD_SETTING_TAGS
+                            && type != RobotTokenType.KEYWORD_SETTING_TEARDOWN
+                            && type != RobotTokenType.KEYWORD_SETTING_RETURN
+                            && type != RobotTokenType.KEYWORD_SETTING_TIMEOUT
+                            && type != RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION;
                 }
             });
             arguments = newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));
