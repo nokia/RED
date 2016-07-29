@@ -40,7 +40,6 @@ import org.eclipse.nebula.widgets.nattable.hover.HoverLayer;
 import org.eclipse.nebula.widgets.nattable.layer.DataLayer;
 import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ColumnLabelAccumulator;
-import org.eclipse.nebula.widgets.nattable.painter.layer.NatGridLayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.EditTraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
@@ -96,6 +95,7 @@ import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
+import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 import org.robotframework.red.swt.SwtThread;
 
@@ -233,7 +233,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         final NatTable table = new NatTable(parent, style, gridLayer, false);
         table.setConfigRegistry(configRegistry);
         table.setLayerPainter(
-                new NatGridLayerPainter(table, theme.getGridBorderColor(), RedNattableLayersFactory.ROW_HEIGHT));
+                new RedNatGridLayerPainter(table, theme.getGridBorderColor(), theme.getHeadersBackground(),
+                        theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
 
