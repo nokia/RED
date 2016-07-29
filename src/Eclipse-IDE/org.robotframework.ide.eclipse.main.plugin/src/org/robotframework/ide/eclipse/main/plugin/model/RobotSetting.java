@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
@@ -59,20 +60,21 @@ public class RobotSetting extends RobotKeywordCall {
 
                 @Override
                 public boolean apply(final RobotToken token) {
-                    return !token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                            && !token.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_METADATA_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_VARIABLES_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_RESOURCE_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_LIBRARY_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_SUITE_SETUP_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_TEST_SETUP_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_FORCE_TAGS_DECLARATION)
-                            && !token.getTypes().contains(RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION);
+                    final List<IRobotTokenType> types = token.getTypes();
+                    final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
+                    return type != RobotTokenType.START_HASH_COMMENT && type != RobotTokenType.COMMENT_CONTINUE
+                            && type != RobotTokenType.SETTING_METADATA_DECLARATION
+                            && type != RobotTokenType.SETTING_VARIABLES_DECLARATION
+                            && type != RobotTokenType.SETTING_RESOURCE_DECLARATION
+                            && type != RobotTokenType.SETTING_LIBRARY_DECLARATION
+                            && type != RobotTokenType.SETTING_SUITE_SETUP_DECLARATION
+                            && type != RobotTokenType.SETTING_SUITE_TEARDOWN_DECLARATION
+                            && type != RobotTokenType.SETTING_TEST_SETUP_DECLARATION
+                            && type != RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION
+                            && type != RobotTokenType.SETTING_TEST_TEMPLATE_DECLARATION
+                            && type != RobotTokenType.SETTING_TEST_TIMEOUT_DECLARATION
+                            && type != RobotTokenType.SETTING_FORCE_TAGS_DECLARATION
+                            && type != RobotTokenType.SETTING_DEFAULT_TAGS_DECLARATION;
                 }
             });
             return newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));
