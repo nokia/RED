@@ -21,7 +21,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
@@ -93,7 +92,6 @@ import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
-import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 
@@ -315,12 +313,6 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                     commandsStack.execute(new CreateFreshKeywordDefinitionCommand(section, true));
                     createdElement = section.getChildren().get(section.getChildren().size() - 1);
                 }
-                SwtThread.asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
-                    }
-                });
                 return createdElement;
             }
         };
