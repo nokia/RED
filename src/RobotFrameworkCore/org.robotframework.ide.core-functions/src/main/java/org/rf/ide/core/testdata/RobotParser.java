@@ -34,13 +34,17 @@ public class RobotParser {
         AVAIL_FORMAT_PARSERS.add(new TsvRobotFileParser());
     }
 
-    private final boolean shouldEagerImport;
+    private final RobotParserConfig parserCfg;
 
     private final String robotVersionFromCommand;
 
     private final RobotVersion robotVersion;
 
     private final RobotProjectHolder robotProject;
+
+    public static RobotParser create(final RobotProjectHolder projectHolder, final RobotParserConfig cfg) {
+        return new RobotParser(projectHolder, cfg);
+    }
 
     /**
      * Creates parser which eagerly parses given file with all dependent
@@ -50,7 +54,9 @@ public class RobotParser {
      * @return eager parser
      */
     public static RobotParser createEager(final RobotProjectHolder projectHolder) {
-        return new RobotParser(projectHolder, true);
+        RobotParserConfig cfg = new RobotParserConfig();
+        cfg.setEagerImport(true);
+        return create(projectHolder, cfg);
     }
 
     /**
@@ -60,15 +66,15 @@ public class RobotParser {
      * @return normal parser
      */
     public static RobotParser create(final RobotProjectHolder projectHolder) {
-        return new RobotParser(projectHolder, false);
+        return new RobotParser(projectHolder, new RobotParserConfig());
     }
 
-    private RobotParser(final RobotProjectHolder robotProject, final boolean shouldImportEagerly) {
+    private RobotParser(final RobotProjectHolder robotProject, final RobotParserConfig cfg) {
         this.robotProject = robotProject;
         this.robotVersionFromCommand = robotProject.getRobotRuntime() != null
                 ? robotProject.getRobotRuntime().getVersion() : null;
         this.robotVersion = robotVersionFromCommand != null ? RobotVersion.from(robotVersionFromCommand) : null;
-        this.shouldEagerImport = shouldImportEagerly;
+        this.parserCfg = cfg;
     }
 
     public final RobotVersion getRobotVersion() {
@@ -76,7 +82,7 @@ public class RobotParser {
     }
 
     public boolean isImportingEagerly() {
-        return shouldEagerImport;
+        return this.parserCfg.isEagerImportOn();
     }
 
     /**
@@ -173,16 +179,18 @@ public class RobotParser {
 
     private void importExternal(final RobotFileOutput robotFile) {
         if (robotFile.getStatus() == Status.PASSED) {
-            if (shouldEagerImport) {
+            if (parserCfg.isEagerImportOn()) {
                 // eager get resources example
                 final ResourceImporter resImporter = new ResourceImporter();
                 resImporter.importResources(this, robotFile);
             }
 
-            final VariablesImporter varImporter = new VariablesImporter();
-            final List<VariablesFileImportReference> varsImported = varImporter
-                    .importVariables(robotProject.getRobotRuntime(), robotProject, robotFile);
-            robotFile.addVariablesReferenced(varsImported);
+            if (parserCfg.shouldImportVariables()) {
+                final VariablesImporter varImporter = new VariablesImporter();
+                final List<VariablesFileImportReference> varsImported = varImporter
+                        .importVariables(robotProject.getRobotRuntime(), robotProject, robotFile);
+                robotFile.addVariablesReferenced(varsImported);
+            }
         }
     }
 
@@ -197,5 +205,28 @@ public class RobotParser {
             }
         }
         return parserToUse;
+    }
+
+    public static class RobotParserConfig {
+
+        private boolean shouldEagerImport = false;
+
+        private boolean shouldImportVariables = true;
+
+        public void setEagerImport(final boolean shouldEagerImport) {
+            this.shouldEagerImport = shouldEagerImport;
+        }
+
+        public void setIncludeImportVariables(final boolean shouldImportVariables) {
+            this.shouldImportVariables = shouldImportVariables;
+        }
+
+        public boolean isEagerImportOn() {
+            return this.shouldEagerImport;
+        }
+
+        public boolean shouldImportVariables() {
+            return this.shouldImportVariables;
+        }
     }
 }
