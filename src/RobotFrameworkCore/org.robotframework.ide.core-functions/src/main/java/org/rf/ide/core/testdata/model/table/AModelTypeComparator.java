@@ -30,17 +30,9 @@ public abstract class AModelTypeComparator<T extends AModelElement<?>> implement
             result = Integer.compare(position.get(modelElement1.getModelType()),
                     position.get(modelElement2.getModelType()));
         } else if (filePos1.isNotSet()) {
-            result = Integer.compare(position.get(modelElement1.getModelType()),
-                    position.get(modelElement2.getModelType()));
-            if (result == ECompareResult.EQUAL_TO.getValue()) {
-                result = ECompareResult.LESS_THAN.getValue();
-            }
+            result = ECompareResult.GREATER_THAN.getValue();
         } else if (filePos2.isNotSet()) {
-            result = Integer.compare(position.get(modelElement1.getModelType()),
-                    position.get(modelElement2.getModelType()));
-            if (result == ECompareResult.EQUAL_TO.getValue()) {
-                result = ECompareResult.GREATER_THAN.getValue();
-            }
+            result = ECompareResult.LESS_THAN.getValue();
         } else {
             result = filePos1.compare(filePos2);
         }
