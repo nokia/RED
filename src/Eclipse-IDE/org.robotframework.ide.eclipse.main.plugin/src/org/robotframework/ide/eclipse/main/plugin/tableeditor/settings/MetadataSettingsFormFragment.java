@@ -30,7 +30,6 @@ import org.eclipse.nebula.widgets.nattable.config.DefaultComparator;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.config.NullComparator;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
@@ -333,13 +332,6 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             public RobotElement createNew(final int addingTokenRowIndex) {
                 final RobotSettingsSection section = dataProvider.getInput();
                 commandsStack.execute(new CreateFreshGeneralSettingCommand(section, "Metadata", newArrayList("data")));
-                SwtThread.asyncExec(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
-                    }
-                });
                 return section.getChildren().get(section.getChildren().size() - 1);
             }
         };

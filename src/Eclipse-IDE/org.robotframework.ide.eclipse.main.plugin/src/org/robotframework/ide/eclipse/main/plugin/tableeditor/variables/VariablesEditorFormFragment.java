@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
-import org.eclipse.nebula.widgets.nattable.edit.command.EditSelectionCommand;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
@@ -242,13 +241,6 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 final RobotVariablesSection section = dataProvider.getInput();
                 commandsStack.execute(
                         new CreateFreshVariableCommand(section, dataProvider.getAdderState().getVariableType()));
-                SwtThread.asyncExec(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        table.doCommand(new EditSelectionCommand(table, table.getConfigRegistry()));
-                    }
-                });
                 return section.getChildren().get(section.getChildren().size() - 1);
             }
         };
