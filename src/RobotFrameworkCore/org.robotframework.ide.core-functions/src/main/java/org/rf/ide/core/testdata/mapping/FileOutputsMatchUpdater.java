@@ -88,9 +88,11 @@ public class FileOutputsMatchUpdater {
                 oldToken.setStartOffset(newToken.getStartOffset());
                 oldToken.clearDirtyFlag();
 
-                final RobotLine robotLine = newContentLines.get(newToken.getLineNumber() - 1);
-                final Optional<Integer> posToken = robotLine.getElementPositionInLine(newToken);
-                robotLine.setLineElementAt(posToken.get(), oldToken);
+                if (newToken.getLineNumber() >= 0) {
+                    final RobotLine robotLine = newContentLines.get(newToken.getLineNumber() - 1);
+                    final Optional<Integer> posToken = robotLine.getElementPositionInLine(newToken);
+                    robotLine.setLineElementAt(posToken.get(), oldToken);
+                }
             }
         }
 
