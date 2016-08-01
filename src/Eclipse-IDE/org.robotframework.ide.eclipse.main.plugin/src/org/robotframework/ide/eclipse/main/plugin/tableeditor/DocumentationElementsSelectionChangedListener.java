@@ -48,9 +48,8 @@ public class DocumentationElementsSelectionChangedListener implements ISelection
                 final ModelType modelType = ((AModelElement<?>) robotFileInternalElement.getLinkedElement())
                         .getModelType();
 
-                if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
-                    postEvent(robotFileInternalElement);
-                } else if (modelType == ModelType.TEST_CASE_DOCUMENTATION) {
+                if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION
+                        || modelType == ModelType.TEST_CASE_DOCUMENTATION) {
                     postEvent(robotFileInternalElement);
                 }
             }
