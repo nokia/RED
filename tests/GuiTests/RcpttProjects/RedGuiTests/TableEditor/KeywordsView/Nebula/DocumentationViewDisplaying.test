@@ -1,0 +1,250 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: DocumentationViewDisplaying
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _GkXZcFf4EeaXa9IMuAImUg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/1/16 6:01 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | double-click
+
+get-editor "TestFile.robot" | get-text-viewer |set-text "*** Test Cases ***\n"
+    + "*** Setting ***\n"
+    + "*** Keyword ***\n"
+    + "test1\n"
+    + "    [Documentation]    Single line doc\n"
+    + "    Log  6\n"
+    + "    \n"
+    + "test2\n"
+    + "    [Documentation]    New line:\\n"
+    + "Second line with tab \\t.Next sentence\n"
+    + "    \n"
+    + "test3\n"
+    + "    [Documentation]    Many lines \\n"
+    + "1\\n"
+    + "2\\n"
+    + "3\\n"
+    + "4\\n"
+    + "5\\n"
+    + "6\\n"
+    + "7\\n"
+    + "8\\n"
+    + "9\\n"
+    + "10\\n"
+    + "11\\n"
+    + "12\\n"
+    + "13\\n"
+    + "14\\n"
+    + "15\\n"
+    + "16\\n"
+    + "17\\n"
+    + "18\n"
+    + "    \n"
+    + "    \n"
+    + "test 4\n"
+    + "    [Documentation]        \n"
+    + "    \n"
+    + "test 5\n"
+    + "    [Documentation]    Here are dots:\n"
+    + "    ...  rest of line    \n"
+    + "    Should Be Empty    item    \n"
+    + "TEST_6\n"
+    + "    [Documentation]    Longer line contains few words to see if all line is shown in DOcumentation view because manybe some kind of problem (or not)\n"
+    + "    Catenate    a    b" 
+    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+s"
+}
+
+//set focus on first KW    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "TestFile.robot/Keywords/test1" | click
+
+//set focus on arg of documentation
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    key-type Down
+}
+
+//check i Doc view is shown
+with [get-tab-folder -index 5] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property "pages[2]" | equals "Documentation View" | verify-true
+    get-property activePage | equals "Documentation View" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
+//check buttons on doec view
+with [get-view "Documentation View"] {
+    with [get-button "Show In Source"] {
+        get-property tooltip | equals "Show In Source" | verify-true
+        get-property selected | equals false | verify-true
+        get-property index | equals 0 | verify-true
+    }
+    with [get-button "Word Wrap"] {
+        get-property tooltip | equals "Word Wrap" | verify-true
+        get-property selected | equals false | verify-true
+        get-property index | equals 1 | verify-true
+    }
+    with [get-button Refresh] {
+        get-property tooltip | equals Refresh | verify-true
+        get-property selected | equals false | verify-true
+        get-property index | equals 2 | verify-true
+    }
+}
+
+//check text in doc view
+get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
+    + "TestFile.robot\n\n"
+    + "Single line doc" | verify-true
+    
+//go down to next doc (this will check if focus is still set in KW view)    
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down -times 4
+}
+get-view "Documentation View" | get-editbox | get-property text | equals "test2\n"
+    + "TestFile.robot\n\n"
+    + "New line:\n"
+    + "Second line with tab \t.Next sentence" | verify-true
+    
+//go to next doc    
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down -times 3
+}
+get-view "Documentation View" | get-editbox | get-property text | equals "test3\n"
+    + "TestFile.robot\n\n"
+    + "Many lines \n1\n2\n3\n4\n5\n6\n7\n8\n9\n"
+    + "10\n"
+    + "11\n"
+    + "12\n"
+    + "13\n"
+    + "14\n"
+    + "15\n"
+    + "16\n"
+    + "17\n"
+    + "18" | verify-true
+    
+ 
+//go to empty doc  
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down -times 3
+get-view "Documentation View" | get-editbox | get-property text | equals "test 4\n"
+    + "TestFile.robot" | verify-true
+
+
+//go to doc with triple dots  
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down -times 3
+get-view "Documentation View" | get-editbox | get-property text | equals "test 5\n"
+    + "TestFile.robot\n\n"
+    + "Here are dots:\n"
+    + "rest of line" | verify-true
+    
+//go to longer line doc    
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down -times 4
+get-view "Documentation View" | get-editbox | get-property text | equals "TEST_6\n"
+    + "TestFile.robot\n\n"
+    + "Longer line contains few words to see if all line is shown in DOcumentation view because manybe some kind of problem (or not)" 
+    | verify-true
+
+//check that view is not editable    
+get-view "Documentation View" | get-editbox | get-property "getEditable()" | equals false | verify-true
+
+//select World Wrap     
+with [get-view "Documentation View"] {
+    click
+    get-button "Word Wrap" | click
+}
+
+//select test3 kw and select its doc
+get-view Outline | get-tree | select "TestFile.robot/Keywords/test3"
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    key-type Down
+}
+
+//check if doc was changed and button is still selected
+with [get-view "Documentation View"] {
+    get-editbox | get-property text | equals "test3\n"
+        + "TestFile.robot\n\n"
+        + "Many lines \n1\n2\n3\n4\n5\n6\n7\n8\n9\n"
+        + "10\n"
+        + "11\n"
+        + "12\n"
+        + "13\n"
+        + "14\n"
+        + "15\n"
+        + "16\n"
+        + "17\n"
+        + "18" | verify-true
+    get-button "Word Wrap" | get-property selected | equals true | verify-true
+}
+
+//press "show in Source"
+with [get-view "Documentation View"] {
+    get-button "Show In Source" | click
+}
+
+//check if Source is selected
+get-editor "TestFile.robot" | get-tab-folder | get-property activePage | equals Source | verify-true
+get-editor "TestFile.robot" | get-text-viewer | get-property "getSelectionText()" | equals "[Documentation]" 
+    | verify-true
+    
+//check that in line 12 is selection    
+get-editor "TestFile.robot" | get-text-viewer | get-property "caretPosition.line" | equals 12 | verify-true   
+
+//"Show in source" is not selected 
+get-view "Documentation View" | get-button "Show In Source" | get-property selected | equals false | verify-true
+
+
+//close Doc view
+get-view "Documentation View" | close
+
+//select first test and select doc arg - doc is not opened 
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+get-view Outline | get-tree | select "TestFile.robot/Keywords/test1"
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    key-type Down
+}
+
+with [get-tab-folder -index 5] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property activePage | equals "Message Log" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+
+//close editor and open it again
+get-editor "TestFile.robot" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+//select now [Doc] section
+get-view Outline | get-tree | select "TestFile.robot/Keywords/test1"
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    key-type Left
+    key-type Down
+}
+//see if view is no open
+with [get-tab-folder -index 5] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property "pages[2]" | equals "Documentation View" | verify-true
+    get-property activePage | equals "Documentation View" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
+
+//check text
+get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
+    + "TestFile.robot\n\n"
+    + "Single line doc" | verify-true
+    
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
