@@ -91,7 +91,9 @@ public class FileOutputsMatchUpdater {
                 if (newToken.getLineNumber() >= 0) {
                     final RobotLine robotLine = newContentLines.get(newToken.getLineNumber() - 1);
                     final Optional<Integer> posToken = robotLine.getElementPositionInLine(newToken);
-                    robotLine.setLineElementAt(posToken.get(), oldToken);
+                    if (posToken.isPresent()) {
+                        robotLine.setLineElementAt(posToken.get(), oldToken);
+                    }
                 }
             }
         }
