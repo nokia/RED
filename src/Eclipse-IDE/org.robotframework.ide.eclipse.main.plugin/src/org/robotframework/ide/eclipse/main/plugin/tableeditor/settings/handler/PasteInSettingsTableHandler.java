@@ -39,12 +39,9 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
         @Inject
         private RobotEditorCommandsStack commandsStack;
 
-        @Inject
-        @Named(RobotEditorSources.SUITE_FILE_MODEL)
-        private RobotSuiteFile fileModel;
-
         @Execute
         public void paste(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+                @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard,
                 final IContextService contextService) {
 
