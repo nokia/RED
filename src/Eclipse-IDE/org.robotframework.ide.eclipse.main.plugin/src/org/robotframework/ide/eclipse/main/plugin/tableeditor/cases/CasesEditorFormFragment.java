@@ -59,6 +59,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateCaseFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateFreshCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.DocumentationElementsSelectionChangedListener;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
@@ -215,6 +216,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
+        
+        selectionProvider.addSelectionChangedListener(new DocumentationElementsSelectionChangedListener(eventBroker));
 
         new CasesTableContentTooltip(table, markersContainer, dataProvider);
     }
