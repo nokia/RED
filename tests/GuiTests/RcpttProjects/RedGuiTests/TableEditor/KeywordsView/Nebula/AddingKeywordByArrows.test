@@ -1,0 +1,334 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YI1vUFJyEea8WJ7bbC6OBw
+Element-Name: AddingKeywordByArrows
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _1a2hUFVmEeaLgpF-R5GRxw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 7/29/16 7:23 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7\n"
+    + "*** Keyword ***\n"
+    + "My KW" 
+    
+
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 1 1
+        key-type "M1+s"
+    }
+}    
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+
+
+
+//uncoment this after fix
+
+//
+//
+//get-view Outline | get-tree | select "TestFile.robot/Keywords/My KW"
+//with [get-editor "TestFile.robot"] {
+//    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+//    	//set focus on first column, 
+//        key-type Right
+//        key-type Down
+//        key-type Left
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//    	//add KW - line1
+//        type-text line1
+//        key-type Enter
+//    }
+//    //add all args and comment
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text arg1
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text arg2
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text arg3
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text arg4
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text arg5
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text com
+//        key-type Enter
+//    }
+//    //add kw: line 2
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text line2
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text b1
+//        key-type Enter
+//    }
+//    //turn off editing mode, go down and press enter - new line will be added
+//    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+//    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+//        key-type Down
+//        key-type Enter
+//    }
+//    //add 2. arg
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text c2
+//        key-type Enter
+//    }
+//    //go to column 5 and add arg
+//    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_TAB_NEXT"
+//    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_TAB_NEXT"
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text c5
+//        key-type Enter
+//    }
+//    //press Down arrow when cell is in edit mode - new line is added
+//    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Down
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//    	//add comment to new line
+//        type-text "only comment"
+//        key-type Enter
+//    }
+//    //go down and add new main kw
+//    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+//        key-type Down -times 2
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text "second kw"
+//        key-type Enter
+//    }
+//    //add arg to kw
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text "${s1}"
+//        key-type Enter
+//    }
+//    //turn off editing cell and go to 5. column
+//    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+//    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+//        key-type Right -times 3
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text "${s5}"
+//        key-type Enter
+//    }
+//    //go down and add new kw
+//    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Down
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        key-type Left -times 6
+//        key-type "TRAVERSE_ESCAPE"
+//    }
+//    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+//        key-type Left -times 7
+//        key-type Right
+//        key-type Enter
+//    }
+//    //add log
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        type-text Log
+//        key-type Enter
+//    }
+//    //add value = 12
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        set-text 12
+//        key-type Enter
+//    }
+//}
+
+
+
+
+
+//set focus on kw
+get-view Outline | get-tree | select "TestFile.robot/Keywords/My KW"
+
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+    	//set focus on first column, 
+        key-type Right
+        key-type Down
+        key-type Left
+        key-type Enter -times 2
+        //key-type e
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+    	//add KW - line1
+    	//key-type Enter
+        type-text line1
+        key-type Enter
+    }
+    //add all args and comment
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text arg1
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text arg2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text arg3
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text arg4
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text arg5
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text com
+        key-type Enter 
+    }
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
+    //add kw: line 2
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text line2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text b1
+        key-type Enter
+    }
+    //turn off editing mode, go down and press enter - new line will be added
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
+    //add 2. arg
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text c2
+        key-type Enter
+    }
+    //go to column 5 and add arg
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_TAB_NEXT"
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_TAB_NEXT"
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text c5
+        key-type Enter
+    }
+    //press Down arrow when cell is in edit mode - new line is added
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Down
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+    	//add comment to new line
+        type-text "only comment"
+        key-type Enter
+    }
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "empty kw"
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+
+    //go down and add new main kw
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down -times 2
+        key-type Left
+        key-type Enter
+    }
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "second kw"
+        key-type Enter
+    }
+    //add arg to kw
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "${s1}"
+        key-type Enter
+    }
+    //turn off editing cell and go to 5. column
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right -times 3
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "${s5}"
+        key-type Enter
+    }
+    //go down and add new kw
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Down
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type Left -times 6
+        key-type "TRAVERSE_ESCAPE"
+    }
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Left -times 7
+        key-type Right
+        key-type Enter
+    }
+    //add log
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text Log
+        key-type Enter
+    }
+    //add value = 12
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text 12
+        key-type Enter
+    }
+}
+
+check-keyword-row -file "TestFile.robot" -row  1 -kw "My KW"
+check-keyword-row -file "TestFile.robot" -row  2 -kw "line1" -c1 "arg1" -c2 "arg2" -c3 "arg3" -c4 "arg4" -c5 "arg5" -comment "#com"
+check-keyword-row -file "TestFile.robot" -row  3 -kw "line2" -c1 "b1" 
+check-keyword-row -file "TestFile.robot" -row  4 -kw "" -c1 "\\" -c2 "c2" -c3 "\\" -c4 "\\" -c5 "c5"
+check-keyword-row -file "TestFile.robot" -row  5 -kw "" -comment "#only comment"
+check-keyword-row -file "TestFile.robot" -row  6 -kw "empty kw" 
+check-keyword-row -file "TestFile.robot" -row  7 -kw "..." 
+
+check-keyword-row -file "TestFile.robot" -row  8 -kw "second kw"  -c1 "${s1}" -c2 "\\" -c3 "\\" -c4 "\\" -c5 "${s5}"
+check-keyword-row -file "TestFile.robot" -row  9 -kw "Log" -c1 "12"
+check-keyword-row -file "TestFile.robot" -row  10 -kw "..."
+check-keyword-row -file "TestFile.robot" -row  11 -kw "...add new keyword"
+
+
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7\n"
+    + "*** Keyword ***\n"
+    + "My KW\n"
+    + "    line1    arg1    arg2    arg3    arg4    arg5    #com\n"
+    + "    line2    b1\n"
+    + "    \\    \\    c2    \\    \\    c5\n"
+    + "    #only comment\n"
+    + "    empty kw\n"
+    + "second kw\n"
+    + "    [Arguments]    ${s1}    \\    \\    \\    ${s5}\n"
+    + "    Log    12"| verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
