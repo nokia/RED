@@ -19,25 +19,21 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class LibraryArgumentsMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
-    private final ParsingStateHelper stateHelper;
 
+    private final ParsingStateHelper stateHelper;
 
     public LibraryArgumentsMapper() {
         this.utility = new ElementsUtility();
         this.stateHelper = new ParsingStateHelper();
     }
 
-
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
-        rt.setType(RobotTokenType.SETTING_LIBRARY_ARGUMENT);
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+        rt.getTypes().add(0, RobotTokenType.SETTING_LIBRARY_ARGUMENT);
         rt.setText(text);
         final AImported imported = utility.getNearestImport(robotFileOutput);
         LibraryImport lib;
@@ -57,19 +53,15 @@ public class LibraryArgumentsMapper implements IParsingMapper {
         return rt;
     }
 
-
     @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
-            final ParsingState currentState = stateHelper
-                    .getCurrentStatus(processingState);
+            final ParsingState currentState = stateHelper.getCurrentStatus(processingState);
             if (currentState == ParsingState.SETTING_LIBRARY_NAME_OR_PATH
                     || currentState == ParsingState.SETTING_LIBRARY_ARGUMENTS) {
-                if (rt.getTypes()
-                        .contains(RobotTokenType.SETTING_LIBRARY_ALIAS)) {
+                if (rt.getTypes().contains(RobotTokenType.SETTING_LIBRARY_ALIAS)) {
                     result = false;
                 } else {
                     result = true;
