@@ -32,7 +32,7 @@ public class MetadataRecognizerTest {
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
@@ -46,7 +46,7 @@ public class MetadataRecognizerTest {
     public void test_twoSpacesAndMetadataColonThanWord() {
         StringBuilder text = new StringBuilder(" Metadata:");
         StringBuilder d = new StringBuilder(" ").append(text);
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -60,7 +60,7 @@ public class MetadataRecognizerTest {
         StringBuilder text = new StringBuilder(" Metadata:");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -74,7 +74,7 @@ public class MetadataRecognizerTest {
         StringBuilder text = new StringBuilder("Metadata:");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -87,7 +87,7 @@ public class MetadataRecognizerTest {
     public void test_singleMetadataColonWord() {
         StringBuilder text = new StringBuilder("Metadata:");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -103,7 +103,7 @@ public class MetadataRecognizerTest {
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
@@ -117,7 +117,7 @@ public class MetadataRecognizerTest {
     public void test_twoSpacesAndMetadataThanWord() {
         StringBuilder text = new StringBuilder(" Metadata");
         StringBuilder d = new StringBuilder(" ").append(text);
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -131,7 +131,7 @@ public class MetadataRecognizerTest {
         StringBuilder text = new StringBuilder(" Metadata");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -145,7 +145,7 @@ public class MetadataRecognizerTest {
         StringBuilder text = new StringBuilder("Metadata");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -158,7 +158,7 @@ public class MetadataRecognizerTest {
     public void test_singleMetadataWord() {
         StringBuilder text = new StringBuilder("Metadata");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -169,11 +169,10 @@ public class MetadataRecognizerTest {
 
     @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Metadata") + "[\\s]*:" + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Metadata") + ")|("
-                        + ATokenRecognizer.createUpperLowerCaseWord("Meta") + "[\\s]*:" + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Meta") + ")");
+        assertThat(rec.getPattern().pattern()).isEqualTo("[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Metadata")
+                + "[\\s]*:" + "|" + ATokenRecognizer.createUpperLowerCaseWord("Metadata") + ")|("
+                + ATokenRecognizer.createUpperLowerCaseWord("Meta") + "[\\s]*:" + "|"
+                + ATokenRecognizer.createUpperLowerCaseWord("Meta") + ")");
 
     }
 

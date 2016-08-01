@@ -25,44 +25,36 @@ import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 @SuppressWarnings({ "PMD.MethodNamingConventions", "PMD.TooManyMethods" })
 public class TestTeardownRecognizerTest {
 
     @ForClean
     private ATokenRecognizer rec;
 
-
     @Test
-    public void test_testPostconditionColonWord_allCombinations()
-            throws IOException, URISyntaxException {
+    public void test_testPostconditionColonWord_allCombinations() throws IOException, URISyntaxException {
         // List<String> combinations = new CombinationGenerator()
         // .combinations("Test Postcondition:");
-        Path p = Paths.get(this.getClass()
-                .getResource("Test_Postcondition_LetterCombinations.txt")
-                .toURI());
-        List<String> combinations = Files.readAllLines(p,
-                Charset.defaultCharset());
+        Path p = Paths.get(this.getClass().getResource("Test_Postcondition_LetterCombinations.txt").toURI());
+        List<String> combinations = Files.readAllLines(p, Charset.defaultCharset());
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb).append(':');
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_twoSpacesAndTestPostconditionColonThanWord() {
         StringBuilder text = new StringBuilder(" Test Postcondition:");
         StringBuilder d = new StringBuilder(" ").append(text);
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -70,14 +62,13 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleSpaceAndTestPostconditionColonThanWord() {
         StringBuilder text = new StringBuilder(" Test Postcondition:");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -85,14 +76,13 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleTestPostconditionColonThanLetterCWord() {
         StringBuilder text = new StringBuilder("Test Postcondition:");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -100,13 +90,12 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleTestPostconditionColonWord() {
         StringBuilder text = new StringBuilder("Test Postcondition:");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -115,37 +104,30 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
-    public void test_testPostconditionWord_allCombinations()
-            throws IOException, URISyntaxException {
+    public void test_testPostconditionWord_allCombinations() throws IOException, URISyntaxException {
         // List<String> combinations = new CombinationGenerator()
         // .combinations("Test Postcondition");
-        Path p = Paths.get(this.getClass()
-                .getResource("Test_Postcondition_LetterCombinations.txt")
-                .toURI());
-        List<String> combinations = Files.readAllLines(p,
-                Charset.defaultCharset());
+        Path p = Paths.get(this.getClass().getResource("Test_Postcondition_LetterCombinations.txt").toURI());
+        List<String> combinations = Files.readAllLines(p, Charset.defaultCharset());
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_twoSpacesAndTestPostconditionThanWord() {
         StringBuilder text = new StringBuilder(" Test Postcondition");
         StringBuilder d = new StringBuilder(" ").append(text);
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -153,14 +135,13 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleSpaceAndTestPostconditionThanWord() {
         StringBuilder text = new StringBuilder(" Test Postcondition");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -168,14 +149,13 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleTestPostconditionThanLetterCWord() {
         StringBuilder text = new StringBuilder("Test Postcondition");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -183,13 +163,12 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleTestPostconditionWord() {
         StringBuilder text = new StringBuilder("Test Postcondition");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -198,32 +177,28 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_testSetupColonWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator()
-                .combinations("Test Teardown:");
+        List<String> combinations = new CombinationGenerator().combinations("Test Teardown:");
 
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_twoSpacesAndTestTeardownColonThanWord() {
         StringBuilder text = new StringBuilder(" Test Teardown:");
         StringBuilder d = new StringBuilder(" ").append(text);
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -231,14 +206,13 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleSpaceAndTestTeardownColonThanWord() {
         StringBuilder text = new StringBuilder(" Test Teardown:");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -246,14 +220,13 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleTestTeardownColonThanLetterCWord() {
         StringBuilder text = new StringBuilder("Test Teardown:");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -261,13 +234,12 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleTestTeardownColonWord() {
         StringBuilder text = new StringBuilder("Test Teardown:");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -276,32 +248,28 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_testTeardownWord_allCombinations() {
-        List<String> combinations = new CombinationGenerator()
-                .combinations("Test Teardown");
+        List<String> combinations = new CombinationGenerator().combinations("Test Teardown");
 
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
             assertThat(token.getEndColumn()).isEqualTo(textOfHeader.length());
-            assertThat(token.getText().toString()).isEqualTo(
-                    textOfHeader.toString());
+            assertThat(token.getText().toString()).isEqualTo(textOfHeader.toString());
             assertThat(token.getTypes()).containsExactly(rec.getProducedType());
         }
     }
-
 
     @Test
     public void test_twoSpacesAndTestTeardownThanWord() {
         StringBuilder text = new StringBuilder(" Test Teardown");
         StringBuilder d = new StringBuilder(" ").append(text);
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -310,13 +278,12 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_singleSpaceAndTestTeardownThanWord() {
         StringBuilder text = new StringBuilder(" Test Teardown");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -324,14 +291,13 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleTestTeardownThanLetterCWord() {
         StringBuilder text = new StringBuilder("Test Teardown");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -339,13 +305,12 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getText().toString()).isEqualTo(text.toString());
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
-
 
     @Test
     public void test_singleTestTeardownWord() {
         StringBuilder text = new StringBuilder("Test Teardown");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -354,47 +319,28 @@ public class TestTeardownRecognizerTest {
         assertThat(token.getTypes()).containsExactly(rec.getProducedType());
     }
 
-
     @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?(("
-                        + ATokenRecognizer.createUpperLowerCaseWord("Test")
-                        + "[\\s]+"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Teardown")
-                        + "[\\s]*:"
-                        + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Test")
-                        + "[\\s]+"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Teardown")
-                        + ")|("
-                        + ATokenRecognizer.createUpperLowerCaseWord("Test")
-                        + "[\\s]+"
-                        + ATokenRecognizer
-                                .createUpperLowerCaseWord("Postcondition")
-                        + "[\\s]*:"
-                        + "|"
-                        + ATokenRecognizer.createUpperLowerCaseWord("Test")
-                        + "[\\s]+"
-                        + ATokenRecognizer
-                                .createUpperLowerCaseWord("Postcondition")
-                        + "))");
+        assertThat(rec.getPattern().pattern()).isEqualTo("[ ]?((" + ATokenRecognizer.createUpperLowerCaseWord("Test")
+                + "[\\s]+" + ATokenRecognizer.createUpperLowerCaseWord("Teardown") + "[\\s]*:" + "|"
+                + ATokenRecognizer.createUpperLowerCaseWord("Test") + "[\\s]+"
+                + ATokenRecognizer.createUpperLowerCaseWord("Teardown") + ")|("
+                + ATokenRecognizer.createUpperLowerCaseWord("Test") + "[\\s]+"
+                + ATokenRecognizer.createUpperLowerCaseWord("Postcondition") + "[\\s]*:" + "|"
+                + ATokenRecognizer.createUpperLowerCaseWord("Test") + "[\\s]+"
+                + ATokenRecognizer.createUpperLowerCaseWord("Postcondition") + "))");
 
     }
-
 
     @Test
     public void test_getProducedType() {
-        assertThat(rec.getProducedType()).isEqualTo(
-                RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION);
+        assertThat(rec.getProducedType()).isEqualTo(RobotTokenType.SETTING_TEST_TEARDOWN_DECLARATION);
     }
-
 
     @Before
     public void setUp() {
         rec = new TestTeardownRecognizer();
     }
-
 
     @After
     public void tearDown() throws Exception {

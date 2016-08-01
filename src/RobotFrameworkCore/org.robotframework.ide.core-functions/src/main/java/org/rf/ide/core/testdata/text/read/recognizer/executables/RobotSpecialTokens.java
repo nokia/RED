@@ -14,10 +14,10 @@ import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class RobotSpecialTokens {
 
     private static final List<ATokenRecognizer> SPECIAL_RECOGNIZERS = new ArrayList<>();
+
     static {
         SPECIAL_RECOGNIZERS.add(new CommentActionLiteral());
         SPECIAL_RECOGNIZERS.add(new ForActionLiteral());
@@ -28,10 +28,8 @@ public class RobotSpecialTokens {
     private static class ForContinueToken extends ATokenRecognizer {
 
         protected ForContinueToken() {
-            super(Pattern.compile("^(\\s)*" + "[\\\\]" + "(\\s)*"),
-                    RobotTokenType.FOR_CONTINUE_TOKEN);
+            super(Pattern.compile("^(\\s)*" + "[\\\\]" + "(\\s)*"), RobotTokenType.FOR_CONTINUE_TOKEN);
         }
-
 
         @Override
         public ATokenRecognizer newInstance() {
@@ -42,10 +40,8 @@ public class RobotSpecialTokens {
     private static class ForInActionLiteral extends ATokenRecognizer {
 
         protected ForInActionLiteral() {
-            super(Pattern.compile("^(\\s)*" + "[i|I](\\s)*[n|N]" + "(\\s)*"),
-                    RobotTokenType.IN_TOKEN);
+            super(Pattern.compile("^(\\s)*" + "[i|I](\\s)*[n|N]" + "(\\s)*"), RobotTokenType.IN_TOKEN);
         }
-
 
         @Override
         public ATokenRecognizer newInstance() {
@@ -56,11 +52,9 @@ public class RobotSpecialTokens {
     private static class ForActionLiteral extends ATokenRecognizer {
 
         protected ForActionLiteral() {
-            super(Pattern.compile("^(\\s)*[:](\\s)*"
-                    + "[f|F](\\s)*[o|O](\\s)*[r|R]" + "(\\s)*$"),
+            super(Pattern.compile("^(\\s)*[:](\\s)*" + "[f|F](\\s)*[o|O](\\s)*[r|R]" + "(\\s)*$"),
                     RobotTokenType.FOR_TOKEN);
         }
-
 
         @Override
         public ATokenRecognizer newInstance() {
@@ -71,10 +65,8 @@ public class RobotSpecialTokens {
     private static class CommentActionLiteral extends ATokenRecognizer {
 
         protected CommentActionLiteral() {
-            super(Pattern.compile("^[ ]?" + createUpperLowerCaseWord("comment")
-                    + "$"), RobotTokenType.COMMENT_TOKEN);
+            super(Pattern.compile("^[ ]?" + createUpperLowerCaseWord("comment") + "$"), RobotTokenType.COMMENT_TOKEN);
         }
-
 
         @Override
         public ATokenRecognizer newInstance() {
@@ -82,13 +74,12 @@ public class RobotSpecialTokens {
         }
     }
 
-
     public List<RobotToken> recognize(final FilePosition fp, final String text) {
         final List<RobotToken> possibleRobotTokens = new ArrayList<>();
         final StringBuilder sb = new StringBuilder(text);
         for (final ATokenRecognizer rec : SPECIAL_RECOGNIZERS) {
             final ATokenRecognizer newInstance = rec.newInstance();
-            if (newInstance.hasNext(sb, fp.getLine())) {
+            if (newInstance.hasNext(sb, fp.getLine(), fp.getColumn())) {
                 final RobotToken t = newInstance.next();
                 t.setStartColumn(t.getStartColumn() + fp.getColumn());
                 possibleRobotTokens.add(t);

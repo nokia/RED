@@ -42,7 +42,7 @@ public class TestCasesTableHeaderRecognizerTest {
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder("*** ").append(comb).append(" ***");
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
@@ -57,7 +57,7 @@ public class TestCasesTableHeaderRecognizerTest {
         String expectedToCut = " *  Test Cases *";
         StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -70,7 +70,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_spaceLetterT_and_TestCases_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *  Test Cases ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -83,7 +83,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_spaceTestCases_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder(" *  Test Cases ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -96,7 +96,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_TestCases_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*  Test Cases ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -110,7 +110,7 @@ public class TestCasesTableHeaderRecognizerTest {
         String expectedToCut = " ***  Test Cases ***";
         StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -123,7 +123,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_spaceLetterT_and_TestCases_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T ***  Test Cases ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -136,7 +136,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_spaceTestCases_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder(" ***  Test Cases ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -149,7 +149,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_TestCases_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("***  Test Cases ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -163,7 +163,7 @@ public class TestCasesTableHeaderRecognizerTest {
         String expectedToCut = " * Test Case *";
         StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -176,7 +176,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_spaceLetterT_and_TestCase_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T * Test Case ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -189,7 +189,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_spaceTestCase_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder(" * Test Case ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -202,7 +202,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_TestCase_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("* Test Case ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -216,7 +216,7 @@ public class TestCasesTableHeaderRecognizerTest {
         String expectedToCut = " *** Test Case ***";
         StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -229,7 +229,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_spaceLetterT_and_TestCase_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *** Test Case ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -242,7 +242,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_spaceTestCase_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder(" *** Test Case ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -255,7 +255,7 @@ public class TestCasesTableHeaderRecognizerTest {
     public void test_check_TestCase_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*** Test Case ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
