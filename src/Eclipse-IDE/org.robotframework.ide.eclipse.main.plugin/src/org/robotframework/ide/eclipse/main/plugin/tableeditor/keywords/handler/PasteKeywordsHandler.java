@@ -36,19 +36,15 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
     public static class E4PasteKeywordsHandler {
 
         @Inject
-        @Named(RobotEditorSources.SUITE_FILE_MODEL)
-        private RobotSuiteFile fileModel;
-
-        @Inject
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public void pasteKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final RedClipboard clipboard) {
+        public void pasteKeywords(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
             final RobotKeywordDefinition[] keywordDefs = clipboard.getKeywordDefinitions();
             if (keywordDefs != null) {
-                insertDefinitions(selection, keywordDefs);
+                insertDefinitions(fileModel, selection, keywordDefs);
                 return;
             }
 
@@ -58,7 +54,7 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
             }
         }
 
-        private void insertDefinitions(final IStructuredSelection selection,
+        private void insertDefinitions(final RobotSuiteFile fileModel, final IStructuredSelection selection,
                 final RobotKeywordDefinition[] definitions) {
             final Optional<RobotKeywordDefinition> firstSelected = Selections.getOptionalFirstElement(selection,
                     RobotKeywordDefinition.class);
