@@ -685,7 +685,7 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         final List<RobotToken> possibleRobotTokens = new ArrayList<>();
         final StringBuilder sb = new StringBuilder(text);
         for (final ATokenRecognizer rec : recognized) {
-            if (rec.hasNext(sb, fp.getLine())) {
+            if (rec.hasNext(sb, fp.getLine(), fp.getColumn())) {
                 final RobotToken t = rec.next();
                 t.setStartColumn(t.getStartColumn() + fp.getColumn());
                 possibleRobotTokens.add(t);

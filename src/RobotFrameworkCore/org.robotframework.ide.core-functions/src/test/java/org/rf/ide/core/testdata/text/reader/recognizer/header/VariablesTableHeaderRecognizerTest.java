@@ -31,7 +31,7 @@ public class VariablesTableHeaderRecognizerTest {
         String expectedToCut = " * Variables *";
         StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -44,7 +44,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_spaceLetterT_and_Variables_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T * Variables ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -57,7 +57,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_spaceVariables_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder(" * Variables ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -70,7 +70,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_Variables_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("* Variables ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -84,7 +84,7 @@ public class VariablesTableHeaderRecognizerTest {
         String expectedToCut = " *** Variables ***";
         StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -97,7 +97,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_spaceLetterT_and_Variables_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *** Variables ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -110,7 +110,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_spaceVariables_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder(" *** Variables ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -123,7 +123,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_Variables_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*** Variables ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -137,7 +137,7 @@ public class VariablesTableHeaderRecognizerTest {
         String expectedToCut = " * Variable *";
         StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -150,7 +150,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_spaceLetterT_and_Variable_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T * Variable ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -163,7 +163,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_spaceVariable_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder(" * Variable ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -176,7 +176,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_Variable_withAsterisk_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("* Variable ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -190,7 +190,7 @@ public class VariablesTableHeaderRecognizerTest {
         String expectedToCut = " *** Variable ***";
         StringBuilder text = new StringBuilder(expectedToCut).append(" T");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -203,7 +203,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_spaceLetterT_and_Variable_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("T *** Variable ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -216,7 +216,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_spaceVariable_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder(" *** Variable ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -241,7 +241,7 @@ public class VariablesTableHeaderRecognizerTest {
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder("*** ").append(comb).append(" ***");
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
@@ -255,7 +255,7 @@ public class VariablesTableHeaderRecognizerTest {
     public void test_check_Variable_withAsterisks_atTheBeginAndEnd() {
         StringBuilder text = new StringBuilder("*** Variable ***");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
