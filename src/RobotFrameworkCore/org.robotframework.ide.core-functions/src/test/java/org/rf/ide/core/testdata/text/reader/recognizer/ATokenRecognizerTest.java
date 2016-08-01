@@ -18,7 +18,6 @@ import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 @SuppressWarnings("PMD.MethodNamingConventions")
 public class ATokenRecognizerTest {
 
@@ -31,13 +30,13 @@ public class ATokenRecognizerTest {
         StringBuilder text = new StringBuilder("foobarfoobar");
 
         // execute & verify
-        assertThat(rec.hasNext(text, 0)).isTrue();
+        assertThat(rec.hasNext(text, 0, 0)).isTrue();
         RobotToken one = rec.next();
         assertThat(one.getStartColumn()).isEqualTo(0);
         assertThat(one.getText().toString()).isEqualTo("foobar");
         assertThat(one.getEndColumn()).isEqualTo("foobar".length());
         assertThat(one.getTypes()).containsExactly(type);
-        assertThat(rec.hasNext(text, 0)).isTrue();
+        assertThat(rec.hasNext(text, 0, 0)).isTrue();
 
         RobotToken two = rec.next();
         assertThat(two.getStartColumn()).isEqualTo(6);
@@ -45,7 +44,6 @@ public class ATokenRecognizerTest {
         assertThat(two.getEndColumn()).isEqualTo(6 + "foobar".length());
         assertThat(two.getTypes()).containsExactly(type);
     }
-
 
     @Test
     public void test_hasNextAndNextGetting_oneTimeForFoobar() {
@@ -56,15 +54,14 @@ public class ATokenRecognizerTest {
         StringBuilder text = new StringBuilder("foobar");
 
         // execute & verify
-        assertThat(rec.hasNext(text, 0)).isTrue();
+        assertThat(rec.hasNext(text, 0, 0)).isTrue();
         RobotToken one = rec.next();
         assertThat(one.getStartColumn()).isEqualTo(0);
         assertThat(one.getText().toString()).isEqualTo(text.toString());
         assertThat(one.getEndColumn()).isEqualTo(text.length());
         assertThat(one.getTypes()).containsExactly(type);
-        assertThat(rec.hasNext(new StringBuilder(""), 0)).isFalse();
+        assertThat(rec.hasNext(new StringBuilder(""), 0, 0)).isFalse();
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsFoobar1AllPossibleCombinations() {
@@ -72,14 +69,11 @@ public class ATokenRecognizerTest {
         String text = "foobar1";
 
         // verify & execute
-        List<String> combinations = new CombinationGenerator()
-                .combinations(text);
+        List<String> combinations = new CombinationGenerator().combinations(text);
         for (String comb : combinations) {
-            assertThat(ATokenRecognizer.createUpperLowerCaseWord(comb))
-                    .isEqualTo("[F|f][O|o][O|o][B|b][A|a][R|r][1]");
+            assertThat(ATokenRecognizer.createUpperLowerCaseWord(comb)).isEqualTo("[F|f][O|o][O|o][B|b][A|a][R|r][1]");
         }
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIs1FoobarAllPossibleCombinations() {
@@ -87,14 +81,11 @@ public class ATokenRecognizerTest {
         String text = "1foobar";
 
         // verify & execute
-        List<String> combinations = new CombinationGenerator()
-                .combinations(text);
+        List<String> combinations = new CombinationGenerator().combinations(text);
         for (String comb : combinations) {
-            assertThat(ATokenRecognizer.createUpperLowerCaseWord(comb))
-                    .isEqualTo("[1][F|f][O|o][O|o][B|b][A|a][R|r]");
+            assertThat(ATokenRecognizer.createUpperLowerCaseWord(comb)).isEqualTo("[1][F|f][O|o][O|o][B|b][A|a][R|r]");
         }
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsFoo1barAllPossibleCombinations() {
@@ -102,14 +93,11 @@ public class ATokenRecognizerTest {
         String text = "foo1bar";
 
         // verify & execute
-        List<String> combinations = new CombinationGenerator()
-                .combinations(text);
+        List<String> combinations = new CombinationGenerator().combinations(text);
         for (String comb : combinations) {
-            assertThat(ATokenRecognizer.createUpperLowerCaseWord(comb))
-                    .isEqualTo("[F|f][O|o][O|o][1][B|b][A|a][R|r]");
+            assertThat(ATokenRecognizer.createUpperLowerCaseWord(comb)).isEqualTo("[F|f][O|o][O|o][1][B|b][A|a][R|r]");
         }
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsFoobarAllPossibleCombinations() {
@@ -117,14 +105,11 @@ public class ATokenRecognizerTest {
         String text = "foobar";
 
         // verify & execute
-        List<String> combinations = new CombinationGenerator()
-                .combinations(text);
+        List<String> combinations = new CombinationGenerator().combinations(text);
         for (String comb : combinations) {
-            assertThat(ATokenRecognizer.createUpperLowerCaseWord(comb))
-                    .isEqualTo("[F|f][O|o][O|o][B|b][A|a][R|r]");
+            assertThat(ATokenRecognizer.createUpperLowerCaseWord(comb)).isEqualTo("[F|f][O|o][O|o][B|b][A|a][R|r]");
         }
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsFoobar() {
@@ -132,10 +117,8 @@ public class ATokenRecognizerTest {
         String text = "foobar";
 
         // verify & execute
-        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo(
-                "[F|f][O|o][O|o][B|b][A|a][R|r]");
+        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo("[F|f][O|o][O|o][B|b][A|a][R|r]");
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsThreeTimesAmpersand() {
@@ -144,11 +127,9 @@ public class ATokenRecognizerTest {
         String expectedOneIteration = "[&]";
 
         // verify & execute
-        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo(
-                expectedOneIteration + expectedOneIteration
-                        + expectedOneIteration);
+        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text))
+                .isEqualTo(expectedOneIteration + expectedOneIteration + expectedOneIteration);
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsAmpersand() {
@@ -156,10 +137,8 @@ public class ATokenRecognizerTest {
         String text = "&";
 
         // verify & execute
-        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo(
-                "[" + text + "]");
+        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo("[" + text + "]");
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsThreeTimesNumber() {
@@ -168,11 +147,9 @@ public class ATokenRecognizerTest {
         String expectedOneIteration = "[1]";
 
         // verify & execute
-        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo(
-                expectedOneIteration + expectedOneIteration
-                        + expectedOneIteration);
+        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text))
+                .isEqualTo(expectedOneIteration + expectedOneIteration + expectedOneIteration);
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsNumber() {
@@ -180,10 +157,8 @@ public class ATokenRecognizerTest {
         String text = "1";
 
         // verify & execute
-        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo(
-                "[" + text + "]");
+        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo("[" + text + "]");
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsSpace() {
@@ -191,10 +166,8 @@ public class ATokenRecognizerTest {
         String text = " ";
 
         // verify & execute
-        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo(
-                "[" + text + "]");
+        assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEqualTo("[" + text + "]");
     }
-
 
     @Test
     public void test_createUpperLowerCaseWord_textIsEmpty() {
@@ -205,7 +178,6 @@ public class ATokenRecognizerTest {
         assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEmpty();
     }
 
-
     @Test
     public void test_createUpperLowerCaseWord_textIsNull() {
         // prepare
@@ -214,7 +186,6 @@ public class ATokenRecognizerTest {
         // verify & execute
         assertThat(ATokenRecognizer.createUpperLowerCaseWord(text)).isEmpty();
     }
-
 
     @Test
     public void test_retrieveTypeAndPattern() {
@@ -228,7 +199,6 @@ public class ATokenRecognizerTest {
         assertThat(rec.getPattern()).isEqualTo(p);
     }
 
-
     @Test
     public void test_getProducedType() {
         // prepare
@@ -239,7 +209,6 @@ public class ATokenRecognizerTest {
         // execute & verify
         assertThat(rec.getProducedType()).isEqualTo(type);
     }
-
 
     @Test
     public void test_getPattern() {
@@ -252,7 +221,6 @@ public class ATokenRecognizerTest {
         assertThat(rec.getPattern()).isEqualTo(p);
     }
 
-
     @After
     public void tearDown() throws Exception {
         ClassFieldCleaner.init(this);
@@ -263,7 +231,6 @@ public class ATokenRecognizerTest {
         public DummyTokenRecognizer(Pattern p, RobotTokenType type) {
             super(p, type);
         }
-
 
         @Override
         public ATokenRecognizer newInstance() {

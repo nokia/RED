@@ -46,7 +46,8 @@ public class LibraryAliasFixer {
             if (argumentsSize >= 2) {
                 RobotToken argumentPossibleAlias = arguments.get(argumentsSize - 2);
                 ATokenRecognizer rec = new LibraryAliasRecognizer();
-                if (rec.hasNext(argumentPossibleAlias.getText(), argumentPossibleAlias.getLineNumber())) {
+                if (rec.hasNext(argumentPossibleAlias.getText(), argumentPossibleAlias.getLineNumber(),
+                        argumentPossibleAlias.getStartColumn())) {
                     argumentPossibleAlias.setType(RobotTokenType.SETTING_LIBRARY_ALIAS);
                     LibraryAlias alias = new LibraryAlias(argumentPossibleAlias);
                     RobotToken aliasValue = arguments.get(argumentsSize - 1);
@@ -103,7 +104,7 @@ public class LibraryAliasFixer {
             if (alias.isPresent()) {
                 RobotToken libraryAlias = alias.getLibraryAlias();
                 ATokenRecognizer rec = new LibraryAliasRecognizer();
-                if (rec.hasNext(libraryAlias.getText(), libraryAlias.getLineNumber())) {
+                if (rec.hasNext(libraryAlias.getText(), libraryAlias.getLineNumber(), libraryAlias.getStartColumn())) {
                     // alias value has WITH NAME case and we have additional
                     // argument case: WITH NAME (lib argument) WITH NAME p
                     RobotToken aliasDeclared = alias.getLibraryAliasDeclaration();
