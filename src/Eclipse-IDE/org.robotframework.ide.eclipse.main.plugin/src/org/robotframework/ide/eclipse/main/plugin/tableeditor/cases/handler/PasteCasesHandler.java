@@ -27,6 +27,7 @@ import org.robotframework.red.viewers.Selections;
 import com.google.common.base.Optional;
 
 public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandler> {
+
     public PasteCasesHandler() {
         super(E4PasteCasesHandler.class);
     }
@@ -34,19 +35,15 @@ public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandle
     public static class E4PasteCasesHandler {
 
         @Inject
-        @Named(RobotEditorSources.SUITE_FILE_MODEL)
-        private RobotSuiteFile fileModel;
-
-        @Inject
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public void pasteCases(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final RedClipboard clipboard) {
+        public void pasteCases(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
             final RobotCase[] cases = clipboard.getCases();
             if (cases != null) {
-                insertCases(selection, cases);
+                insertCases(fileModel, selection, cases);
                 return;
             }
 
@@ -56,42 +53,43 @@ public class PasteCasesHandler extends DIParameterizedHandler<E4PasteCasesHandle
             }
         }
 
-        private void insertCases(final IStructuredSelection selection, final RobotCase[] cases) {
+        private void insertCases(final RobotSuiteFile fileModel, final IStructuredSelection selection,
+                final RobotCase[] cases) {
             if (selection.isEmpty()) {
-                insertCasesAtSectionEnd(cases);
+                insertCasesAtSectionEnd(fileModel, cases);
                 return;
             }
-            
+
             final Optional<Object> firstSelected = Selections.getOptionalFirstElement(selection, Object.class);
 
             if (firstSelected.get() instanceof AddingToken && ((AddingToken) firstSelected.get()).getParent() == null) {
-                insertCasesAtSectionEnd(cases);
+                insertCasesAtSectionEnd(fileModel, cases);
 
             } else if (firstSelected.get() instanceof AddingToken) {
                 final AddingToken token = (AddingToken) firstSelected.get();
                 final RobotCase targetCase = (RobotCase) token.getParent();
                 final int index = targetCase.getParent().getChildren().indexOf(targetCase);
-                insertCaseAt(index, cases);
+                insertCaseAt(fileModel, index, cases);
 
             } else if (firstSelected.get() instanceof RobotCase) {
                 final RobotCase targetCase = (RobotCase) firstSelected.get();
                 final int index = targetCase.getParent().getChildren().indexOf(targetCase);
-                insertCaseAt(index, cases);
+                insertCaseAt(fileModel, index, cases);
 
             } else {
                 final RobotKeywordCall call = (RobotKeywordCall) firstSelected.get();
                 final RobotCase targetCase = (RobotCase) call.getParent();
                 final int index = targetCase.getParent().getChildren().indexOf(targetCase);
-                insertCaseAt(index, cases);
+                insertCaseAt(fileModel, index, cases);
             }
         }
 
-        private void insertCasesAtSectionEnd(final RobotCase[] cases) {
+        private void insertCasesAtSectionEnd(final RobotSuiteFile fileModel, final RobotCase[] cases) {
             final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class).get();
             commandsStack.execute(new InsertCasesCommand(section, cases));
         }
 
-        private void insertCaseAt(final int index, final RobotCase[] cases) {
+        private void insertCaseAt(final RobotSuiteFile fileModel, final int index, final RobotCase[] cases) {
             final RobotCasesSection section = fileModel.findSection(RobotCasesSection.class).get();
             commandsStack.execute(new InsertCasesCommand(section, index, cases));
         }
