@@ -72,6 +72,9 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     public RobotKeywordCall createKeywordCall(final String callName, final int modelTableIndex,
             final int codeHoldingElementIndex) {
         final RobotExecutableRow<UserKeyword> robotExecutableRow = new RobotExecutableRow<>();
+        robotExecutableRow.setParent(getLinkedElement());
+        robotExecutableRow.setAction(RobotToken.create(callName));
+        
         final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
 
         if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
