@@ -18,6 +18,8 @@ public abstract class ATokenRecognizer {
 
     private int lineNumber = -1;
 
+    private int columnNumber = -1;
+
     private final RobotTokenType type;
 
     private String text;
@@ -30,15 +32,17 @@ public abstract class ATokenRecognizer {
     public abstract ATokenRecognizer newInstance();
 
     @VisibleForTesting
-    public boolean hasNext(final StringBuilder newText, final int currentLineNumber) {
-        return hasNext(newText.toString(), currentLineNumber);
+    public boolean hasNext(final StringBuilder newText, final int currentLineNumber, final int currentColumnNumber) {
+        return hasNext(newText.toString(), currentLineNumber, currentColumnNumber);
     }
 
-    public boolean hasNext(final String newText, final int currentLineNumber) {
-        if (m == null || lineNumber != currentLineNumber || !text.equals(newText)) {
+    public boolean hasNext(final String newText, final int currentLineNumber, final int currentColumnNumber) {
+        if (m == null || lineNumber != currentLineNumber || !text.equals(newText)
+                || columnNumber != currentColumnNumber) {
             m = pattern.matcher(newText);
             this.text = newText;
             this.lineNumber = currentLineNumber;
+            this.columnNumber = currentColumnNumber;
         }
 
         return m.find();

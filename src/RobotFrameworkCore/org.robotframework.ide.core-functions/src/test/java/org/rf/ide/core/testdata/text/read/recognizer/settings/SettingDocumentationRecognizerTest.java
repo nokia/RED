@@ -32,7 +32,7 @@ public class SettingDocumentationRecognizerTest {
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
@@ -46,7 +46,7 @@ public class SettingDocumentationRecognizerTest {
     public void test_twoSpacesAndDocumentationColonThanWord() {
         StringBuilder text = new StringBuilder(" Documentation:");
         StringBuilder d = new StringBuilder(" ").append(text);
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -60,7 +60,7 @@ public class SettingDocumentationRecognizerTest {
         StringBuilder text = new StringBuilder(" Documentation:");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -74,7 +74,7 @@ public class SettingDocumentationRecognizerTest {
         StringBuilder text = new StringBuilder("Documentation:");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -87,7 +87,7 @@ public class SettingDocumentationRecognizerTest {
     public void test_singleDocumentationColonWord() {
         StringBuilder text = new StringBuilder("Documentation:");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -103,7 +103,7 @@ public class SettingDocumentationRecognizerTest {
         for (String comb : combinations) {
             StringBuilder textOfHeader = new StringBuilder(comb);
 
-            assertThat(rec.hasNext(textOfHeader, 1)).isTrue();
+            assertThat(rec.hasNext(textOfHeader, 1, 0)).isTrue();
             RobotToken token = rec.next();
             assertThat(token.getStartColumn()).isEqualTo(0);
             assertThat(token.getLineNumber()).isEqualTo(1);
@@ -117,7 +117,7 @@ public class SettingDocumentationRecognizerTest {
     public void test_twoSpacesAndDocumentationThanWord() {
         StringBuilder text = new StringBuilder(" Documentation");
         StringBuilder d = new StringBuilder(" ").append(text);
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(1);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -131,7 +131,7 @@ public class SettingDocumentationRecognizerTest {
         StringBuilder text = new StringBuilder(" Documentation");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -145,7 +145,7 @@ public class SettingDocumentationRecognizerTest {
         StringBuilder text = new StringBuilder("Documentation");
         StringBuilder d = new StringBuilder(text).append("C");
 
-        assertThat(rec.hasNext(d, 1)).isTrue();
+        assertThat(rec.hasNext(d, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -158,7 +158,7 @@ public class SettingDocumentationRecognizerTest {
     public void test_singleDocumentationWord() {
         StringBuilder text = new StringBuilder("Documentation");
 
-        assertThat(rec.hasNext(text, 1)).isTrue();
+        assertThat(rec.hasNext(text, 1, 0)).isTrue();
         RobotToken token = rec.next();
         assertThat(token.getStartColumn()).isEqualTo(0);
         assertThat(token.getLineNumber()).isEqualTo(1);
@@ -169,8 +169,8 @@ public class SettingDocumentationRecognizerTest {
 
     @Test
     public void test_getPattern() {
-        assertThat(rec.getPattern().pattern()).isEqualTo(
-                "[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Documentation") + "[\\s]*:" + "|"
+        assertThat(rec.getPattern().pattern())
+                .isEqualTo("[ ]?(" + ATokenRecognizer.createUpperLowerCaseWord("Documentation") + "[\\s]*:" + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Documentation") + ")|("
                         + ATokenRecognizer.createUpperLowerCaseWord("Document") + "[\\s]*:" + "|"
                         + ATokenRecognizer.createUpperLowerCaseWord("Document") + ")");
