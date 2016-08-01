@@ -48,21 +48,11 @@ public class DocumentationElementsSelectionChangedListener implements ISelection
                 final ModelType modelType = ((AModelElement<?>) robotFileInternalElement.getLinkedElement())
                         .getModelType();
 
-                if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
-                    return;
-                } else if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
+                if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
                     postEvent(robotFileInternalElement);
                 } else if (modelType == ModelType.TEST_CASE_DOCUMENTATION) {
                     postEvent(robotFileInternalElement);
-                } 
-                /*else if (modelType == ModelType.USER_KEYWORD) {
-                    postEvent(((RobotKeywordDefinition) robotFileInternalElement).getDocumentationSetting());
-                } else if (modelType == ModelType.TEST_CASE) {
-                    final List<RobotDefinitionSetting> documentationSettings = ((RobotCase) robotFileInternalElement).getDocumentationSetting();
-                    if(!documentationSettings.isEmpty()) {
-                        postEvent(documentationSettings.get(0));
-                    }
-                }*/
+                }
             }
         }
 
