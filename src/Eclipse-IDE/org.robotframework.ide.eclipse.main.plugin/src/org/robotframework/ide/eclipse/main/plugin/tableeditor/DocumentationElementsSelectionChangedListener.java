@@ -76,7 +76,7 @@ public class DocumentationElementsSelectionChangedListener implements ISelection
                             final IViewPart docViewPart = page.findView(DocumentationView.ID);
                             if (docViewPart == null || !page.isPartVisible(docViewPart)) {
                                 try {
-                                    page.showView(DocumentationView.ID);
+                                    page.showView(DocumentationView.ID, null, IWorkbenchPage.VIEW_VISIBLE);
                                 } catch (final PartInitException e) {
                                     e.printStackTrace();
                                 }
