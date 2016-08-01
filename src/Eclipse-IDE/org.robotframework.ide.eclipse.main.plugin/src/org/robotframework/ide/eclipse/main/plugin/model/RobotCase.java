@@ -166,6 +166,10 @@ public class RobotCase extends RobotCodeHoldingElement {
     public List<RobotDefinitionSetting> getTagsSetting() {
         return findSettings(ModelType.TEST_CASE_TAGS);
     }
+    
+    public List<RobotDefinitionSetting> getDocumentationSetting() {
+        return findSettings(ModelType.TEST_CASE_DOCUMENTATION);
+    }
 
     private List<RobotDefinitionSetting> findSettings(final ModelType modelType) {
         final List<RobotDefinitionSetting> matchingSettings = new ArrayList<>();

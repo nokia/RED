@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.views;
 
 import static com.google.common.collect.Iterables.find;
 
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
@@ -36,6 +38,9 @@ import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
@@ -253,6 +258,7 @@ public class DocumentationView {
                 if (suiteFile != null && parent != null) {
                     ModelType modelType = ((AModelElement<?>) currentlyDisplayedElement.getLinkedElement())
                             .getModelType();
+                    RobotFileInternalElement docElement = null;
                     if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
                         final RobotKeywordDefinition keywordDefinition = find(suiteFile.getUserDefinedKeywords(),
                                 new Predicate<RobotKeywordDefinition>() {
@@ -263,13 +269,35 @@ public class DocumentationView {
                                     }
                                 }, null);
                         if (keywordDefinition != null) {
-                            resetCurrentlyDisplayedElement();
-                            showEvent(keywordDefinition.getDocumentationSetting());
-                        } else {
-                            showEvent(null);
+                            docElement = keywordDefinition.getDocumentationSetting();
                         }
+                    } else if (modelType == ModelType.TEST_CASE_DOCUMENTATION) {
+                        final com.google.common.base.Optional<RobotCasesSection> casesSection = suiteFile
+                                .findSection(RobotCasesSection.class);
+                        if (casesSection.isPresent()) {
+                            final RobotCase testCase = find(casesSection.get().getChildren(),
+                                    new Predicate<RobotCase>() {
+
+                                        @Override
+                                        public boolean apply(final RobotCase robotCase) {
+                                            return parent.getName().equals(robotCase.getName());
+                                        }
+                                    });
+                            if (testCase != null) {
+                                final List<RobotDefinitionSetting> documentationSetting = testCase
+                                        .getDocumentationSetting();
+                                if (!documentationSetting.isEmpty()) {
+                                    docElement = documentationSetting.get(0);
+                                }
+                            }
+                        }
+                    }
+
+                    if (docElement != null) {
+                        resetCurrentlyDisplayedElement();
+                        showEvent(docElement);
                     } else {
-                        // TODO: Test cases doc
+                        showEvent(null);
                     }
                 }
             }

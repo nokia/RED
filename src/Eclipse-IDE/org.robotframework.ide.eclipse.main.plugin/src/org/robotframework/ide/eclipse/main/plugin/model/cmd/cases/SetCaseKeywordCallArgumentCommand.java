@@ -7,10 +7,13 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 
 public class SetCaseKeywordCallArgumentCommand extends EditorCommand {
 
@@ -45,10 +48,17 @@ public class SetCaseKeywordCallArgumentCommand extends EditorCommand {
         }
 
         if (changed) {
+            final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
+            
             final TestCaseTableModelUpdater updater = new TestCaseTableModelUpdater();
             for (int i = arguments.size() - 1; i >= 0; i--) {
-                updater.updateArgument(keywordCall.getLinkedElement(), i, arguments.get(i));
+                updater.updateArgument(linkedElement, i, arguments.get(i));
             }
+            
+            if (linkedElement.getModelType() == ModelType.TEST_CASE_DOCUMENTATION) {
+                eventBroker.post(DocumentationView.REFRESH_DOC_EVENT_TOPIC, keywordCall);
+            }
+            
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
         }
     }
