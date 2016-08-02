@@ -107,11 +107,29 @@ public abstract class ATags<T> extends AModelElement<T> implements ICommentHolde
         final List<RobotToken> tokens = new ArrayList<>();
         if (isPresent()) {
             tokens.add(getDeclaration());
-            tokens.addAll(getTags());
+            tokens.addAll(compact(tags));
             tokens.addAll(getComment());
         }
 
         return tokens;
+    }
+
+    private List<RobotToken> compact(final List<RobotToken> elementsSingleType) {
+        int size = elementsSingleType.size();
+        for (int i = size - 1; i >= 0; i--) {
+            if (elementsSingleType.size() == 0) {
+                break;
+            }
+
+            RobotToken t = elementsSingleType.get(i);
+            if (t.getText() == null || t.getText().isEmpty()) {
+                elementsSingleType.remove(i);
+            } else {
+                break;
+            }
+        }
+
+        return elementsSingleType;
     }
 
     @Override
