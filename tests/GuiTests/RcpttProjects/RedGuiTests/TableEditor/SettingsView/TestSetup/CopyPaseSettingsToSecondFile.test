@@ -1,0 +1,90 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _2rVvIENaEeaEVfxTnoQ14g
+Element-Name: CopyPaseSettingsToSecondFile
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _3Aa-4FgBEeaKPZp2wD-8qw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/2/16 11:40 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file and set text
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "*** Settings ***\n"
+    + "Suite Setup    new" 
+    
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+
+//go to settinhs
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
+
+//set focus on fist setting and copy "new"
+get-view Outline | get-tree | select "TestFile.robot/Settings/Suite Setup"
+with [get-editor "TestFile.robot" | get-section General | get-canvas] {
+    key-type Right
+    key-type "M1+c"
+    
+    //paste to Test Teardown
+    key-type Down -times 3
+    key-type "M1+v"
+    key-type "M1+s"
+}
+
+//create new file
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text "second_file2"
+    get-button Finish | click
+}
+
+//set one setting
+get-editor "second_file2.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "*** Settings ***\n"
+    + "Suite Teardown    Log" 
+    
+//set focus   
+get-editor "second_file2.robot" | get-text-viewer  | key-type "M1+s"
+
+//go to settings and paste to force tags and default tags
+get-editor "second_file2.robot" | get-tab-folder | get-tab-item Settings | click
+get-view Outline | get-tree | select "second_file2.robot/Settings/Suite Teardown"
+with [get-editor "second_file2.robot" | get-section General | get-canvas] {
+    key-type Right
+    key-type Down -times 5
+    key-type "M1+v"
+    key-type Down
+    key-type "M1+v"
+}
+
+//check if text was pasted
+check-row-for-test-setup-default -file "second_file2.robot" -row 1 -setting "Suite Setup" 
+check-row-for-test-setup-default -file "second_file2.robot" -row 2 -setting "Suite Teardown" -c1 "Log"
+check-row-for-test-setup-default -file "second_file2.robot" -row 3 -setting "Test Setup" 
+check-row-for-test-setup-default -file "second_file2.robot" -row 4 -setting "Test Teardown" 
+check-row-for-test-setup-default -file "second_file2.robot" -row 5 -setting "Test Template" 
+check-row-for-test-setup-default -file "second_file2.robot" -row 6 -setting "Test Timeout" 
+check-row-for-test-setup-default -file "second_file2.robot" -row 7 -setting "Force Tags"  -c1 "new"
+check-row-for-test-setup-default -file "second_file2.robot" -row 8 -setting "Default Tags"  -c1 "new"
+
+//check if setting were not paste to first file
+get-editor "TestFile.robot" | click
+check-row-for-test-setup-default -file "TestFile.robot" -row 1 -setting "Suite Setup" -c1 "new"
+check-row-for-test-setup-default -file "TestFile.robot" -row 2 -setting "Suite Teardown" 
+check-row-for-test-setup-default -file "TestFile.robot" -row 3 -setting "Test Setup" 
+check-row-for-test-setup-default -file "TestFile.robot" -row 4 -setting "Test Teardown" -c1 "new"
+check-row-for-test-setup-default -file "TestFile.robot" -row 5 -setting "Test Template" 
+check-row-for-test-setup-default -file "TestFile.robot" -row 6 -setting "Test Timeout" 
+check-row-for-test-setup-default -file "TestFile.robot" -row 7 -setting "Force Tags"  
+check-row-for-test-setup-default -file "TestFile.robot" -row 8 -setting "Default Tags"  
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
