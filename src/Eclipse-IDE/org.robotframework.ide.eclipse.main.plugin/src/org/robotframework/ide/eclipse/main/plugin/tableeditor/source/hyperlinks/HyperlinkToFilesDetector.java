@@ -42,7 +42,8 @@ public class HyperlinkToFilesDetector implements IHyperlinkDetector {
             final boolean canShowMultipleHyperlinks) {
         try {
             final IDocument document = textViewer.getDocument();
-            final Optional<IRegion> hyperlinkRegion = DocumentUtilities.findCellRegion(document, region.getOffset());
+            final Optional<IRegion> hyperlinkRegion = DocumentUtilities.findCellRegion(document, suiteFile.isTsvFile(),
+                    region.getOffset());
             if (!hyperlinkRegion.isPresent()) {
                 return null;
             }

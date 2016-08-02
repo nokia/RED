@@ -46,7 +46,7 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
             final boolean canShowMultipleHyperlinks) {
         try {
             final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(textViewer.getDocument(),
-                    region.getOffset());
+                    suiteFile.isTsvFile(), region.getOffset());
             if (!variableRegion.isPresent()) {
                 return null;
             }

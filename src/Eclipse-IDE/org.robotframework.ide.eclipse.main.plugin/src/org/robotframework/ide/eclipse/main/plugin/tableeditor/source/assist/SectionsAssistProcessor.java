@@ -55,12 +55,14 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
     public List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
         final IDocument document = viewer.getDocument();
         try {
+            final boolean isTsv = assist.isTsvFile();
+
             final IRegion lineInformation = document.getLineInformationOfOffset(offset);
-            final boolean shouldShowProposal = shouldShowProposals(offset, document, lineInformation);
+            final boolean shouldShowProposal = shouldShowProposals(offset, document, isTsv, lineInformation);
 
             if (shouldShowProposal) {
                 final String prefix = DocumentUtilities.getPrefix(document, Optional.of(lineInformation), offset);
-                final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, offset);
+                final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, isTsv, offset);
                 final String content = cellRegion.isPresent()
                         ? document.get(cellRegion.get().getOffset(), cellRegion.get().getLength()) : "";
 
@@ -103,10 +105,11 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
         }
     }
 
-    private boolean shouldShowProposals(final int offset, final IDocument document, final IRegion lineInformation)
+    private boolean shouldShowProposals(final int offset, final IDocument document, final boolean isTsv,
+            final IRegion lineInformation)
             throws BadLocationException {
         if (offset != lineInformation.getOffset()) {
-            final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
+            final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
             return cellRegion.isPresent() && lineInformation.getOffset() == cellRegion.get().getOffset();
         }
         return true;

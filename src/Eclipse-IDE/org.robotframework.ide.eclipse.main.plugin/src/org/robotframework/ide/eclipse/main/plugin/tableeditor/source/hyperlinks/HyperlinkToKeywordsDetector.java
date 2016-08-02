@@ -64,7 +64,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
 
         try {
             final Optional<IRegion> hyperlinkRegion = DocumentUtilities.findCellRegion(textViewer.getDocument(),
-                    region.getOffset());
+                    suiteFile.isTsvFile(), region.getOffset());
             if (!hyperlinkRegion.isPresent()) {
                 return null;
             }
