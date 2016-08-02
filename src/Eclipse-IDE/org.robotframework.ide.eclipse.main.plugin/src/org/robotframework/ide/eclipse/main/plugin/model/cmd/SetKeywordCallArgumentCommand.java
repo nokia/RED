@@ -35,15 +35,16 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             arguments.add("\\");
             changed = true;
         }
-        if (!arguments.get(index).equals(value)) {
-            arguments.remove(index);
-            if (value != null) {
-                arguments.add(index, value);
-            } else if (index == 0 && isKeywordBasedSetting()) {
-                arguments.add(index, "\\");
+        changed |= index < arguments.size() && !arguments.get(index).equals(value);
+        arguments.set(index, value == null || value.isEmpty() ? "\\" : value);
+
+        for (int i = arguments.size() - 1; i >= 0; i--) {
+            if (!arguments.get(i).equals("\\")) {
+                break;
             }
-            changed = true;
+            arguments.set(i, null);
         }
+        
         if (changed) {
             keywordCall.resetStored();
             updateModelElement(arguments);
@@ -64,10 +65,6 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
                 ((RobotExecutableRow<?>) linkedElement).removeElementToken(index);
             }
         }
-    }
-    
-    protected boolean isKeywordBasedSetting() {
-        return false;
     }
 
     public int getIndex() {
