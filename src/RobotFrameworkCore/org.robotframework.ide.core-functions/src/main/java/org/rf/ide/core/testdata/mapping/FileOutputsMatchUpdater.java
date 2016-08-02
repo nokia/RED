@@ -146,7 +146,7 @@ public class FileOutputsMatchUpdater {
                 final RobotToken rtOld = oldToks.get(i);
                 final RobotToken rtNew = newToks.get(i);
                 if (!rtOld.getText().equals(rtNew.getText())) {
-                    if (!(rtOld.getText().trim().isEmpty() && rtNew.getText().trim().equals("\\"))) {
+                    if (!isAcceptableContent(rtOld, rtNew)) {
                         throw new DifferentOutputFile("Token type " + t + " with index " + i
                                 + " doesn't contain the same content as old. Expected " + rtOld.getText() + " got "
                                 + rtNew.getText());
@@ -155,6 +155,18 @@ public class FileOutputsMatchUpdater {
             }
         }
 
+    }
+
+    private boolean isAcceptableContent(final RobotToken rtOld, final RobotToken rtNew) {
+        if ((rtOld.getText().trim().isEmpty() && rtNew.getText().trim().equals("\\"))) {
+            return true;
+        }
+
+        if (rtOld.getText().trim().equals("...") && rtNew.getText().trim().equals("...")) {
+            return true;
+        }
+
+        return false;
     }
 
     private void removePreviousLineContinue(final List<RobotToken> toks) {
