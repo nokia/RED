@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -17,7 +19,7 @@ public class SetSettingKeywordCallArgumentCommand extends SetKeywordCallArgument
     }
 
     @Override
-    protected void updateModelElement() {
+    protected void updateModelElement(final List<String> arguments) {
         new SettingTableModelUpdater().update(getKeywordCall().getLinkedElement(), getIndex(), getValue());
     }
 
