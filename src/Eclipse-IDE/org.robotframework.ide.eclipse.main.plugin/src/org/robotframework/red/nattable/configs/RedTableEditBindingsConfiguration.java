@@ -11,6 +11,9 @@ import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration
 import org.eclipse.nebula.widgets.nattable.edit.action.KeyEditAction;
 import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
 import org.eclipse.nebula.widgets.nattable.grid.GridRegion;
+import org.eclipse.nebula.widgets.nattable.resize.action.ColumnResizeCursorAction;
+import org.eclipse.nebula.widgets.nattable.resize.event.ColumnResizeEventMatcher;
+import org.eclipse.nebula.widgets.nattable.resize.mode.ColumnResizeDragMode;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellEditorMouseEventMatcher;
@@ -39,6 +42,11 @@ public class RedTableEditBindingsConfiguration extends AbstractUiBindingConfigur
                 newArrayList(DisplayMode.SELECT, DisplayMode.SELECT_HOVER)), new MouseEditAction());
         uiBindingRegistry.registerDoubleClickBinding(new CellEditorMouseEventMatcher(GridRegion.BODY),
                 new MouseEditAction());
+        
+        uiBindingRegistry.registerFirstMouseMoveBinding(
+                new ColumnResizeEventMatcher(SWT.NONE, GridRegion.COLUMN_HEADER, 0), new ColumnResizeCursorAction());
+        uiBindingRegistry.registerFirstMouseDragMode(
+                new ColumnResizeEventMatcher(SWT.NONE, GridRegion.COLUMN_HEADER, 1), new ColumnResizeDragMode());
 
         // uiBindingRegistry.registerMouseDragMode(new CellEditorMouseEventMatcher(GridRegion.BODY),
         // new CellEditDragMode());

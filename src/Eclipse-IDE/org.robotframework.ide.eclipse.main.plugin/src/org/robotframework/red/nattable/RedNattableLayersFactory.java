@@ -60,7 +60,7 @@ public class RedNattableLayersFactory {
     public DataLayer createDataLayer(final IDataProvider dataProvider, final int firstColumnWidth,
             final int secondColumnWidth, final IConfigLabelAccumulator... accumulators) {
         final DataLayer dataLayer = new DataLayer(dataProvider);
-        dataLayer.setColumnPercentageSizing(2, true);
+        dataLayer.setColumnPercentageSizing(dataProvider.getColumnCount()-1, true);
         dataLayer.setColumnWidthByPosition(0, firstColumnWidth);
         dataLayer.setColumnWidthByPosition(1, secondColumnWidth);
         dataLayer.setDefaultRowHeight(ROW_HEIGHT);
