@@ -54,11 +54,12 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
         final IDocument document = viewer.getDocument();
         try {
             final IRegion lineInformation = document.getLineInformationOfOffset(offset);
-            final boolean shouldShowProposal = shouldShowProposals(offset, document, lineInformation);
+            final boolean isTsv = assist.isTsvFile();
+            final boolean shouldShowProposal = shouldShowProposals(offset, document, isTsv, lineInformation);
 
             if (shouldShowProposal) {
                 final String prefix = DocumentUtilities.getPrefix(document, Optional.of(lineInformation), offset);
-                final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, offset);
+                final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, isTsv, offset);
                 final String content = cellRegion.isPresent()
                         ? document.get(cellRegion.get().getOffset(), cellRegion.get().getLength()) : "";
 
@@ -98,11 +99,12 @@ public class GeneralSettingsAssistProcessor extends RedContentAssistProcessor {
                 "suite teardown", "test template").contains(settingName.toLowerCase());
     }
 
-    private boolean shouldShowProposals(final int offset, final IDocument document, final IRegion lineInformation)
+    private boolean shouldShowProposals(final int offset, final IDocument document, final boolean isTsv,
+            final IRegion lineInformation)
             throws BadLocationException {
         if (isInApplicableContentType(document, offset)) {
             if (offset != lineInformation.getOffset()) {
-                final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
+                final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
                 return cellRegion.isPresent() && lineInformation.getOffset() == cellRegion.get().getOffset();
             } else {
                 return true;

@@ -46,7 +46,8 @@ public class RenameInSourceHandler extends DIParameterizedHandler<E4RenameInSour
             final IDocument document = editor.getSourceEditor().getDocument();
 
             try {
-                final Optional<IRegion> cell = DocumentUtilities.findCellRegion(document, offset);
+                final Optional<IRegion> cell = DocumentUtilities.findCellRegion(document, fileModel.isTsvFile(),
+                        offset);
                 if (cell.isPresent()) {
                     /* create groups - this step is independent of the linked mode */
                     final LinkedPositionGroup group1 = new LinkedPositionGroup();

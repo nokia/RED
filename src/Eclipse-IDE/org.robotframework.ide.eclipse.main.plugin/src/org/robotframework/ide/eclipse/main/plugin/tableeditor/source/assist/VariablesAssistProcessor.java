@@ -56,7 +56,8 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
                 return null;
             }
 
-            final Optional<IRegion> variable = DocumentUtilities.findLiveVariable(document, offset);
+            final boolean isTsv = assist.isTsvFile();
+            final Optional<IRegion> variable = DocumentUtilities.findLiveVariable(document, isTsv, offset);
 
             final String prefix = variable.isPresent() ? DocumentUtilities.getPrefix(document, variable, offset) : "";
             final String content = variable.isPresent()

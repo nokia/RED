@@ -40,9 +40,9 @@ public class DocumentUtilities {
      * @return The region describing location of variable or absent if offset lies outside variable
      * @throws BadLocationException
      */
-    public static Optional<IRegion> findVariable(final IDocument document, final int offset)
+    public static Optional<IRegion> findVariable(final IDocument document, final boolean isTsv, final int offset)
             throws BadLocationException {
-        final Optional<IRegion> cellRegion = findCellRegion(document, offset);
+        final Optional<IRegion> cellRegion = findCellRegion(document, isTsv, offset);
         if (cellRegion.isPresent()) {
             final String cellContent = document.get(cellRegion.get().getOffset(), cellRegion.get().getLength());
 
@@ -84,9 +84,9 @@ public class DocumentUtilities {
         return i < cellContent.length() && cellContent.charAt(i) == '}';
     }
 
-    public static Optional<IRegion> findLiveVariable(final IDocument document, final int offset)
+    public static Optional<IRegion> findLiveVariable(final IDocument document, final boolean isTsv, final int offset)
             throws BadLocationException {
-        final Optional<IRegion> cellRegion = findLiveCellRegion(document, offset);
+        final Optional<IRegion> cellRegion = findLiveCellRegion(document, isTsv, offset);
         if (cellRegion.isPresent()) {
             final String cellContent = document.get(cellRegion.get().getOffset(), cellRegion.get().getLength());
 
@@ -117,21 +117,21 @@ public class DocumentUtilities {
      *            Document in which cell should be find
      * @param offset
      *            Current offset at which search should start
-     * @return The region describing whole cell or absent if offset is inside cell separator. If returned region 
+     * @return The region describing whole cell or absent if offset is inside cell separator. If returned region
      * is present then it is always true that:
-     *     region.getOffset() <= offset <= region.getOffset() + region.getLength() 
+     *     region.getOffset() <= offset <= region.getOffset() + region.getLength()
      * @throws BadLocationException
      */
-    public static Optional<IRegion> findCellRegion(final IDocument document, final int offset)
+    public static Optional<IRegion> findCellRegion(final IDocument document, final boolean isTsv, final int offset)
             throws BadLocationException {
         final String prev = offset > 0 ? document.get(offset - 1, 1) : "";
         final String next = offset < document.getLength() ? document.get(offset, 1) : "";
-        if (isInsideSeparator(prev, next)) {
+        if (isInsideSeparator(prev, next, isTsv)) {
             return Optional.absent();
         }
 
-        final int beginOffset = offset - calculateCellRegionBegin(document, offset);
-        final int endOffset = offset + calculateCellRegionEnd(document, offset);
+        final int beginOffset = offset - calculateCellRegionBegin(document, isTsv, offset);
+        final int endOffset = offset + calculateCellRegionEnd(document, isTsv, offset);
         return Optional.<IRegion> of(new Region(beginOffset, endOffset - beginOffset));
     }
 
@@ -145,13 +145,13 @@ public class DocumentUtilities {
      * @return
      * @throws BadLocationException
      */
-    public static Optional<IRegion> findLiveCellRegion(final IDocument document, final int offset)
+    public static Optional<IRegion> findLiveCellRegion(final IDocument document, final boolean isTsv, final int offset)
             throws BadLocationException {
-        final Optional<IRegion> firstCandidate = findCellRegion(document, offset);
+        final Optional<IRegion> firstCandidate = findCellRegion(document, isTsv, offset);
         if (!firstCandidate.isPresent() && (offset > 0 ? document.get(offset - 1, 1) : "").equals("\t")) {
             return firstCandidate;
         }
-        final Optional<IRegion> region = firstCandidate.or(findCellRegion(document, offset - 1));
+        final Optional<IRegion> region = firstCandidate.or(findCellRegion(document, isTsv, offset - 1));
         if (region.isPresent()) {
             final int length = Math.max(offset - region.get().getOffset(), region.get().getLength());
             return Optional.<IRegion>of(new Region(region.get().getOffset(), length));
@@ -159,30 +159,34 @@ public class DocumentUtilities {
         return region;
     }
 
-    private static boolean isInsideSeparator(final String prev, final String next) {
+    private static boolean isInsideSeparator(final String prev, final String next, final Boolean isTsv) {
+        if (isTsv) {
+            return !prev.isEmpty() && (prev.charAt(0) == '\t' || prev.charAt(0) == '\n' || prev.charAt(0) == '\r')
+                    && !next.isEmpty() && (next.charAt(0) == '\t' || next.charAt(0) == '\n' || prev.charAt(0) == '\r');
+        }
         return !prev.isEmpty() && (Character.isWhitespace(prev.charAt(0)) || prev.charAt(0) == '|') && !next.isEmpty()
                 && (Character.isWhitespace(next.charAt(0)) || next.charAt(0) == '|');
     }
 
-    private static int calculateCellRegionBegin(final IDocument document, final int caretOffset)
+    private static int calculateCellRegionBegin(final IDocument document, final boolean isTsv, final int caretOffset)
             throws BadLocationException {
         int j = 1;
         while (true) {
             if (caretOffset - j < 0) {
                 break;
             }
-            final String prev = document.get(caretOffset - j, 1);
-            if (prev.equals("\t") || prev.equals("\r") || prev.equals("\n")) {
+            final char prev = document.get(caretOffset - j, 1).charAt(0);
+            if (prev == '\t' || prev == '\r' || prev == '\n') {
                 break;
             }
 
             if (caretOffset - j - 1 < 0) {
-                if (!prev.equals(" ")) {
+                if (prev != ' ') {
                     j++;
                 }
                 break;
             }
-            if (prev.equals(" ")) {
+            if (prev == ' ' && !isTsv) {
                 final char lookBack = document.get(caretOffset - j - 1, 1).charAt(0);
                 if (Character.isWhitespace(lookBack) || lookBack == '|') {
                     break;
@@ -193,24 +197,24 @@ public class DocumentUtilities {
         return j - 1;
     }
 
-    private static int calculateCellRegionEnd(final IDocument document, final int caretOffset)
+    private static int calculateCellRegionEnd(final IDocument document, final boolean isTsv, final int caretOffset)
             throws BadLocationException {
         int i = 0;
         while (true) {
             if (caretOffset + i >= document.getLength()) {
                 break;
             }
-            final String next = document.get(caretOffset + i, 1);
-            if (next.equals("\t") || next.equals("\r") || next.equals("\n")) {
+            final char next = document.get(caretOffset + i, 1).charAt(0);
+            if (next == '\t' || next == '\r' || next == '\n') {
                 break;
             }
             if (caretOffset + i + 1 >= document.getLength()) {
-                if (!next.equals(" ")) {
+                if (next != ' ') {
                     i++;
                 }
                 break;
             }
-            if (next.equals(" ")) {
+            if (next == ' ' && !isTsv) {
                 final char lookAhead = document.get(caretOffset + i + 1, 1).charAt(0);
                 if (Character.isWhitespace(lookAhead) || lookAhead == '|') {
                     break;

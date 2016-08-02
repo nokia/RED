@@ -69,7 +69,7 @@ public class SuiteSourceAssistantContext {
     }
 
     public boolean isTsvFile() {
-        return getFile().getFileExtension().equals("tsv");
+        return suiteModel.isTsvFile();
     }
 
     public AcceptanceMode getAcceptanceMode() {

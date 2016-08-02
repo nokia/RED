@@ -32,6 +32,8 @@ public abstract class ASuiteFileDescriber implements ITextContentDescriber {
 
     public static final String SUITE_FILE_CONTENT_ID = "org.robotframework.red.robotsuitefile";
 
+    public static final String SUITE_FILE_TSV_CONTENT_ID = "org.robotframework.red.robotsuitefile_tsv";
+
     public static final String RESOURCE_FILE_CONTENT_ID = "org.robotframework.red.robotfile";
 
     public static final String INIT_FILE_CONTENT_ID = "org.robotframework.red.robotsuiteinitfile";
