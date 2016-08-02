@@ -48,6 +48,14 @@ public class DocumentationServiceHandlerTest {
     }
 
     @Test
+    public void test_toShowConsolidated_threeLinesWithContinoue_andWithDuplicatedDeclaration() throws Exception {
+        final String inFileName = DIR_PATH + "DocPresentationMultipleLinesAndDuplicatedDeclaration.robot";
+        final String expectedText = "text1 text2 text3" + "\n" + "text4 text5 text6" + "\n" + "text7 text8" + "\n"
+                + "... ..." + "\n" + "dd33";
+        assertThatViewIsTheSameAsItShouldBe(inFileName, expectedText);
+    }
+
+    @Test
     public void test_toShowConsolidated_singleLineWithTheFirstAndMiddleAsPreviousLine() throws Exception {
         final String inFileName = DIR_PATH + "DocPresentationSingleLineWithPreviousLineAtFirstAndMiddlePosition.robot";
         final String expectedText = "text2 ... text3";
