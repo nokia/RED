@@ -22,7 +22,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsOutsideTheCell_nothingIsReturned() throws BadLocationException {
         final IDocument document = new Document("cell   ${var}   cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 14);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 14);
 
         assertThat(variableRegion.isPresent()).isFalse();
     }
@@ -31,7 +31,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsTheCellOutsideVariable_nothingIsReturned() throws BadLocationException {
         final IDocument document = new Document("cell  abc ${var} def  cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 8);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 8);
 
         assertThat(variableRegion.isPresent()).isFalse();
     }
@@ -40,7 +40,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsInvalidVariable_nothingIsReturned_1() throws BadLocationException {
         final IDocument document = new Document("cell  ${var  cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 9);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 9);
 
         assertThat(variableRegion.isPresent()).isFalse();
     }
@@ -49,7 +49,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsInvalidVariable_nothingIsReturned_2() throws BadLocationException {
         final IDocument document = new Document("cell  var}  cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 7);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 7);
 
         assertThat(variableRegion.isPresent()).isFalse();
     }
@@ -58,7 +58,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsTheVariable_thenItsRegionIsReturned() throws BadLocationException {
         final IDocument document = new Document("cell  ${var}  cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 9);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 9);
 
         assertThat(variableRegion.isPresent()).isTrue();
         assertThat(variableRegion.get()).isEqualTo(new Region(6, 6));
@@ -68,7 +68,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsTheCellOutsideVariable_nothingIsReturned_2() throws BadLocationException {
         final IDocument document = new Document("cell  abc ${var} def  cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 17);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 17);
 
         assertThat(variableRegion.isPresent()).isFalse();
     }
@@ -77,7 +77,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsTheVariableInsideTheCell_thenItsRegionIsReturned() throws BadLocationException {
         final IDocument document = new Document("cell  abc ${var} def  cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 12);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 12);
 
         assertThat(variableRegion.isPresent()).isTrue();
         assertThat(variableRegion.get()).isEqualTo(new Region(10, 6));
@@ -87,7 +87,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsTheOuterVariableInsideTheCell_thenItsRegionIsReturned_1() throws BadLocationException {
         final IDocument document = new Document("cell  abc ${outer${var}outer} def  cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 14);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 14);
 
         assertThat(variableRegion.isPresent()).isTrue();
         assertThat(variableRegion.get()).isEqualTo(new Region(10, 19));
@@ -97,7 +97,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsTheOuterVariableInsideTheCell_thenItsRegionIsReturned_2() throws BadLocationException {
         final IDocument document = new Document("cell  abc ${outer${var}outer} def  cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 25);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 25);
 
         assertThat(variableRegion.isPresent()).isTrue();
         assertThat(variableRegion.get()).isEqualTo(new Region(10, 19));
@@ -107,7 +107,7 @@ public class DocumentUtilitiesTest {
     public void whenOffsetHitsTheInnerVariableInsideTheCell_thenItsRegionIsReturned() throws BadLocationException {
         final IDocument document = new Document("cell  abc ${outer${var}outer} def  cell");
 
-        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, 20);
+        final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(document, false, 20);
 
         assertThat(variableRegion.isPresent()).isTrue();
         assertThat(variableRegion.get()).isEqualTo(new Region(17, 6));
