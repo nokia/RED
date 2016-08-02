@@ -18,23 +18,18 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class LibraryNameOrPathMapper implements IParsingMapper {
 
     private final ElementsUtility utility;
-
 
     public LibraryNameOrPathMapper() {
         this.utility = new ElementsUtility();
     }
 
-
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
-        rt.setType(RobotTokenType.SETTING_LIBRARY_NAME);
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
+        rt.getTypes().add(0, RobotTokenType.SETTING_LIBRARY_NAME);
         rt.setText(text);
         final AImported imported = utility.getNearestImport(robotFileOutput);
         LibraryImport lib;
@@ -52,11 +47,9 @@ public class LibraryNameOrPathMapper implements IParsingMapper {
         return rt;
     }
 
-
     @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result;
         if (!processingState.isEmpty()) {
             result = (processingState.get(processingState.size() - 1) == ParsingState.SETTING_LIBRARY_IMPORT);
