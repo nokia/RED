@@ -57,7 +57,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     private final IFile file;
 
-    private String contentTypeId;
+    protected String contentTypeId;
 
     private RobotFileOutput fileOutput;
 
@@ -229,6 +229,14 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             refreshOnFileChange();
         }
         return new ArrayList<>();
+    }
+
+    public boolean isTsvFile() {
+        final String fileExt = getFileExtension();
+        if (fileExt != null && fileExt.toLowerCase().equals("tsv")) {
+            return true;
+        }
+        return getContentTypeId().equals(ASuiteFileDescriber.SUITE_FILE_TSV_CONTENT_ID);
     }
 
     public boolean isSuiteFile() {

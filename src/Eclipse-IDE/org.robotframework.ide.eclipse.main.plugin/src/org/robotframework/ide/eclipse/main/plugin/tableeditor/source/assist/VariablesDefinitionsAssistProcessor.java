@@ -59,12 +59,14 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
     public List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
         final IDocument document = viewer.getDocument();
         try {
+            final boolean isTsv = assist.isTsvFile();
+
             final IRegion lineInformation = document.getLineInformationOfOffset(offset);
-            final boolean shouldShowProposal = shouldShowProposals(offset, document, lineInformation);
+            final boolean shouldShowProposal = shouldShowProposals(offset, document, isTsv, lineInformation);
 
             if (shouldShowProposal) {
                 final String prefix = DocumentUtilities.getPrefix(document, Optional.of(lineInformation), offset);
-                final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, offset);
+                final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, isTsv, offset);
                 final String content = cellRegion.isPresent()
                         ? document.get(cellRegion.get().getOffset(), cellRegion.get().getLength()) : "";
                 final String separator = assist.getSeparatorToFollow();
@@ -105,12 +107,13 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
         }
     }
 
-    private boolean shouldShowProposals(final int offset, final IDocument document, final IRegion lineInformation)
+    private boolean shouldShowProposals(final int offset, final IDocument document, final boolean isTsv,
+            final IRegion lineInformation)
             throws BadLocationException {
         if (isInApplicableContentType(document, offset)) {
             // we only want to show those proposals in first cell of the line
             if (offset != lineInformation.getOffset()) {
-                final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, offset);
+                final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
                 return cellRegion.isPresent() && lineInformation.getOffset() == cellRegion.get().getOffset();
             } else {
                 return true;
@@ -176,11 +179,11 @@ public class VariablesDefinitionsAssistProcessor extends RedContentAssistProcess
     }
 
     private enum VarDef {
-        SCALAR("${newScalar}", new ArrayList<String>(), "Fresh scalar", 
+        SCALAR("${newScalar}", new ArrayList<String>(), "Fresh scalar",
                 RedImages.getRobotScalarVariableImage(), "Creates fresh scalar variable"),
-        LIST("@{newList}", newArrayList("item"), "Fresh list", 
+        LIST("@{newList}", newArrayList("item"), "Fresh list",
                 RedImages.getRobotListVariableImage(), "Creates fresh list variable"),
-        DICT("&{newDict}", newArrayList("key=value"), "Fresh dictionary", 
+        DICT("&{newDict}", newArrayList("key=value"), "Fresh dictionary",
                 RedImages.getRobotDictionaryVariableImage(), "Creates fresh dictionary variable");
 
         private String content;

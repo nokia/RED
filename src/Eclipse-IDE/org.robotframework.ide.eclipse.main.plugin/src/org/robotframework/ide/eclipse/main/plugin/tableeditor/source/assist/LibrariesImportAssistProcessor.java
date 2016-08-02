@@ -55,7 +55,8 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
             final boolean shouldShowProposal = shouldShowProposals(lineContent, document, offset);
 
             if (shouldShowProposal) {
-                final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, offset);
+                final boolean isTsv = assist.isTsvFile();
+                final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
                 final String prefix = DocumentUtilities.getPrefix(document, region, offset);
                 final String content = region.isPresent()
                         ? document.get(region.get().getOffset(), region.get().getLength()) : "";

@@ -70,7 +70,7 @@ class SuiteSourceCurrentCellHighlighter {
     private void refreshCurrentCell(final int offset) {
         try {
             final Optional<IRegion> newRegion = offset == -1 ? Optional.<IRegion> absent()
-                    : DocumentUtilities.findCellRegion(document, offset);
+                    : DocumentUtilities.findCellRegion(document, isTsv(), offset);
             if (!newRegion.isPresent()) {
                 removeCellHighlighting();
                 currentCell = null;
@@ -82,6 +82,10 @@ class SuiteSourceCurrentCellHighlighter {
         } catch (final BadLocationException | InterruptedException e) {
             RedPlugin.logError("Unable to create cell highlight markers", e);
         }
+    }
+
+    private boolean isTsv() {
+        return file.getFileExtension().equals("tsv");
     }
 
     private void removeCellHighlighting() {
