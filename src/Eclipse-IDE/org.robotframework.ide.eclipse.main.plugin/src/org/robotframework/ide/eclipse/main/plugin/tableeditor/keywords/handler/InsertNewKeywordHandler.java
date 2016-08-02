@@ -14,11 +14,12 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDefinitionCommand;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.InsertNewKeywordHandler.E4InsertNewKeywordHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -37,33 +38,36 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
         private RobotEditorCommandsStack stack;
 
         @Execute
-        public void addNewUserDefinedKeyword(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void insertNewUserDefinedKeyword(
+                @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
+                @Named(Selections.SELECTION) final IStructuredSelection selection) {
+
             final Optional<RobotElement> selectedElement = Selections.getOptionalFirstElement(selection,
                     RobotElement.class);
 
-            EditorCommand newKeywordCommand = null;
+            RobotKeywordDefinition definition = null;
             if (selectedElement.isPresent()) {
                 if (selectedElement.get() instanceof RobotKeywordCall) {
-                    final RobotKeywordDefinition definition = (RobotKeywordDefinition) selectedElement.get()
-                            .getParent();
-                    final int codeHoldingElementIndex = definition.getChildren().indexOf(selectedElement.get());
-                    final int modelTableIndex = ((RobotKeywordDefinition) selectedElement.get().getParent())
-                            .findExecutableRowIndex((RobotKeywordCall) selectedElement.get());
-                    newKeywordCommand = new CreateFreshKeywordCallCommand(definition, "", modelTableIndex,
-                            codeHoldingElementIndex);
+                    definition = (RobotKeywordDefinition) selectedElement.get().getParent();
                 } else if (selectedElement.get() instanceof RobotKeywordDefinition) {
-                    final RobotKeywordDefinition definition = (RobotKeywordDefinition) selectedElement.get();
-                    final RobotSuiteFileSection section = definition.getParent();
-                    if (section != null) {
-                        final int index = section.getChildren().indexOf(definition);
-                        newKeywordCommand = new CreateFreshKeywordDefinitionCommand((RobotKeywordsSection) section,
-                                index);
-                    }
+                    definition = (RobotKeywordDefinition) selectedElement.get();
+                }
+            } else {
+                final Optional<AddingToken> token = Selections.getOptionalFirstElement(selection, AddingToken.class);
+                if (token.isPresent()) {
+                    definition = (RobotKeywordDefinition) token.get().getParent();
                 }
             }
 
-            if (newKeywordCommand != null) {
-                stack.execute(newKeywordCommand);
+            if (definition != null) {
+                final RobotSuiteFileSection section = definition.getParent();
+                if (section != null) {
+                    final int index = section.getChildren().indexOf(definition);
+                    stack.execute(new CreateFreshKeywordDefinitionCommand((RobotKeywordsSection) section, index));
+                }
+            } else {
+                final RobotKeywordsSection section = fileModel.findSection(RobotKeywordsSection.class).get();
+                stack.execute(new CreateFreshKeywordDefinitionCommand(section, true));
             }
         }
     }

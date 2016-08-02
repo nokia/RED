@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
@@ -18,10 +20,17 @@ public class SetKeywordSettingArgumentCommand extends SetKeywordCallArgumentComm
     }
 
     @Override
-    protected void updateModelElement() {
+    protected void updateModelElement(final List<String> arguments) {
 
         final AModelElement<?> linkedElement = getKeywordCall().getLinkedElement();
-        new KeywordTableModelUpdater().update(linkedElement, getIndex(), getValue());
+        final KeywordTableModelUpdater updater = new KeywordTableModelUpdater();
+        if (getValue() != null) {
+            for (int i = arguments.size() - 1; i >= 0; i--) {
+                updater.update(linkedElement, i, arguments.get(i));
+            }
+        } else {
+            updater.update(linkedElement, getIndex(), getValue());
+        }
 
         if (linkedElement.getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION) {
             eventBroker.post(DocumentationView.REFRESH_DOC_EVENT_TOPIC, getKeywordCall());

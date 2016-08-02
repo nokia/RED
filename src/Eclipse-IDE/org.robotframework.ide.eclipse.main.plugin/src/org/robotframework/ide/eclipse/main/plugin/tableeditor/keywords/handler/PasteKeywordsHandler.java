@@ -77,10 +77,7 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
 
             if (firstSelected.isPresent()) {
                 final int index = firstSelected.get().getParent().getChildren().indexOf(firstSelected.get());
-                final int modelTableIndex = ((RobotKeywordDefinition) firstSelected.get().getParent())
-                        .findExecutableRowIndex(firstSelected.get());
-                commandsStack.execute(
-                        new InsertKeywordCallsCommand(firstSelected.get().getParent(), modelTableIndex, index, calls));
+                commandsStack.execute(new InsertKeywordCallsCommand(firstSelected.get().getParent(), index, calls));
             } else {
                 final Optional<AddingToken> selected = Selections.getOptionalFirstElement(selection, AddingToken.class);
                 if (selected.isPresent() && selected.get().getParent() != null) {
