@@ -17,18 +17,18 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class InsertKeywordCallsCommand extends EditorCommand {
 
     private final IRobotCodeHoldingElement parent;
-    private final int modelTableIndex;
+
     private final int codeHoldingElementIndex;
+
     private final List<RobotKeywordCall> callsToInsert;
 
     public InsertKeywordCallsCommand(final IRobotCodeHoldingElement parent, final RobotKeywordCall[] callsToInsert) {
-        this(parent, -1, -1, callsToInsert);
+        this(parent, -1, callsToInsert);
     }
 
-    public InsertKeywordCallsCommand(final IRobotCodeHoldingElement parent, final int modelTableIndex, final int codeHoldingElementIndex,
+    public InsertKeywordCallsCommand(final IRobotCodeHoldingElement parent, final int codeHoldingElementIndex,
             final RobotKeywordCall[] callsToInsert) {
         this.parent = parent;
-        this.modelTableIndex = modelTableIndex;
         this.codeHoldingElementIndex = codeHoldingElementIndex;
         this.callsToInsert = Arrays.asList(callsToInsert);
     }
@@ -39,13 +39,13 @@ public class InsertKeywordCallsCommand extends EditorCommand {
         final RobotCodeHoldingElement parentElement = (RobotCodeHoldingElement) parent;
         int shift = 0;
         for (final RobotKeywordCall call : callsToInsert) {
-            if(call.getLinkedElement() != null) {
-                parentElement.insertKeywordCall(modelTableIndex < 0 ? -1 : modelTableIndex + shift,
-                        codeHoldingElementIndex < 0 ? -1 : codeHoldingElementIndex + shift, call);
+            if (call.getLinkedElement() != null) {
+                parentElement.insertKeywordCall(codeHoldingElementIndex < 0 ? -1 : codeHoldingElementIndex + shift,
+                        call);
             }
             shift++;
         }
- 
+
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
 }

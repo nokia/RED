@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ObjectStreamException;
@@ -37,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 
-import com.google.common.base.Predicate;
 import com.google.common.base.Splitter;
 
 public class RobotKeywordDefinition extends RobotCodeHoldingElement {
@@ -69,14 +67,15 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     }
 
     @Override
-    public RobotKeywordCall createKeywordCall(final String callName, final int modelTableIndex,
-            final int codeHoldingElementIndex) {
+    public RobotKeywordCall createKeywordCall(final int codeHoldingElementIndex, final String name,
+            final List<String> args, final String comment) {
         final RobotExecutableRow<UserKeyword> robotExecutableRow = new RobotExecutableRow<>();
         robotExecutableRow.setParent(getLinkedElement());
-        robotExecutableRow.setAction(RobotToken.create(callName));
-        
+        robotExecutableRow.setAction(RobotToken.create(name));
+
         final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
 
+        final int modelTableIndex = countRowsOfTypeUpTo(ModelType.USER_KEYWORD_EXECUTABLE_ROW, codeHoldingElementIndex);
         if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
             getLinkedElement().addKeywordExecutionRow(robotExecutableRow, modelTableIndex);
         } else {
@@ -108,7 +107,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     
     @SuppressWarnings("unchecked")
     @Override
-    public void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex, final RobotKeywordCall keywordCall) {
+    public void insertKeywordCall(final int codeHoldingElementIndex, final RobotKeywordCall keywordCall) {
 
         RobotKeywordCall newCall = null;
 
@@ -117,6 +116,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
             newCall = new RobotKeywordCall(this, keywordCall.getLinkedElement());
             final RobotExecutableRow<UserKeyword> robotExecutableRow = (RobotExecutableRow<UserKeyword>) keywordCall
                     .getLinkedElement();
+            final int modelTableIndex = countRowsOfTypeUpTo(ModelType.USER_KEYWORD_EXECUTABLE_ROW, codeHoldingElementIndex);
             if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
                 keyword.addKeywordExecutionRow(robotExecutableRow, modelTableIndex);
             } else {
@@ -321,20 +321,6 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         keywordSpecification.setFormat("ROBOT");
         keywordSpecification.setDocumentation(getDocumentation());
         return keywordSpecification;
-    }
-    
-    public int findExecutableRowIndex(final RobotKeywordCall keywordCallWithExeRow) {
-        return getExecutableRows().indexOf(keywordCallWithExeRow);
-    }
-
-    public List<RobotKeywordCall> getExecutableRows() {
-        return newArrayList(filter(getChildren(), new Predicate<RobotKeywordCall>() {
-
-            @Override
-            public boolean apply(final RobotKeywordCall call) {
-                return call.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
-            }
-        }));
     }
 
     @SuppressWarnings("unchecked")

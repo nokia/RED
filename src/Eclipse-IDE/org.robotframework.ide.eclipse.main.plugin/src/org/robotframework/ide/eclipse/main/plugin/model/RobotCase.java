@@ -82,18 +82,6 @@ public class RobotCase extends RobotCodeHoldingElement {
         }
     }
 
-    @Override
-    public RobotKeywordCall createKeywordCall(final String callName, final int modelTableIndex,
-            final int codeHoldingElementIndex) {
-        throw new IllegalStateException("not implemented");
-    }
-
-    @Override
-    public void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex,
-            final RobotKeywordCall keywordCall) {
-        throw new IllegalStateException("not implemented");
-    }
-
     public RobotKeywordCall createKeywordCall(final int index, final String name, final List<String> args,
             final String comment) {
         final int modelIndex = countRowsOfTypeUpTo(ModelType.TEST_CASE_EXECUTABLE_ROW, index);
@@ -120,6 +108,7 @@ public class RobotCase extends RobotCodeHoldingElement {
         return setting;
     }
 
+    @Override
     public void insertKeywordCall(final int index, final RobotKeywordCall call) {
         call.setParent(this);
 
@@ -130,21 +119,6 @@ public class RobotCase extends RobotCodeHoldingElement {
             getChildren().add(index, call);
         }
         new TestCaseTableModelUpdater().insert(testCase, modelIndex, call.getLinkedElement());
-    }
-
-    private int countRowsOfTypeUpTo(final ModelType type, final int toIndex) {
-        int index = 0;
-        int count = 0;
-        for (final RobotKeywordCall call : getChildren()) {
-            if (index >= toIndex) {
-                break;
-            }
-            if (call.getLinkedElement().getModelType() == type) {
-                count++;
-            }
-            index++;
-        }
-        return count;
     }
 
     public void removeChild(final RobotKeywordCall child) {
