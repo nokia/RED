@@ -37,9 +37,4 @@ public class SetKeywordSettingArgumentCommand extends SetKeywordCallArgumentComm
         }
     }
 
-    @Override
-    protected boolean isKeywordBasedSetting() {
-        final ModelType modelType = getKeywordCall().getLinkedElement().getModelType();
-        return modelType == ModelType.USER_KEYWORD_TEARDOWN || modelType == ModelType.USER_KEYWORD_TIMEOUT;
-    }
 }
