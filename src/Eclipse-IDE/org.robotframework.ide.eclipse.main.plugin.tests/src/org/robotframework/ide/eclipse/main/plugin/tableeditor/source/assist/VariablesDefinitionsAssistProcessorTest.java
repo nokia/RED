@@ -17,6 +17,7 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
@@ -64,7 +65,9 @@ public class VariablesDefinitionsAssistProcessorTest {
     }
 
     private static SuiteSourceAssistantContext createAssitant() {
-        return new SuiteSourceAssistantContext(null, new AssistPreferences(AcceptanceMode.INSERT, true, "  "));
+        final RobotSuiteFile file = mock(RobotSuiteFile.class);
+        when(file.getFileExtension()).thenReturn("robot");
+        return new SuiteSourceAssistantContext(file, new AssistPreferences(AcceptanceMode.INSERT, true, "  "));
     }
 
 }

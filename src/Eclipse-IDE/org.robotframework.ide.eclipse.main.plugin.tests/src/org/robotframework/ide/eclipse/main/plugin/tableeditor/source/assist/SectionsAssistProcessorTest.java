@@ -51,7 +51,8 @@ public class SectionsAssistProcessorTest {
 
         when(viewer.getDocument()).thenReturn(document);
 
-        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant());
+        final RobotSuiteFile model = new RobotSuiteFileCreator().build();
+        final SectionsAssistProcessor processor = new SectionsAssistProcessor(createAssitant(model));
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 7);
 
         assertThat(proposals).isNull();
