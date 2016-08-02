@@ -34,7 +34,7 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
     @Override
     public String getFileExtension() {
-        return name.contains(".") ? name.substring(name.lastIndexOf('.') + 1) : "";
+        return name.contains(".") ? name.substring(name.lastIndexOf('.') + 1) : null;
     }
 
     @Override
@@ -43,24 +43,25 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
         if (id != null) {
             return id;
         }
+        contentTypeId = null;
         if (input != null) {
             int validationResult;
             try {
-                ASuiteFileDescriber desc = new RobotSuiteFileDescriber();
-                if (getFileExtension() != null && "tsv".equals(getFileExtension().toLowerCase())) {
-                    desc = new TsvRobotSuiteFileDescriber();
-                }
+                final String fileExt = getFileExtension();
+                final ASuiteFileDescriber desc = fileExt.toLowerCase().equals("tsv") ? new TsvRobotSuiteFileDescriber()
+                        : new RobotSuiteFileDescriber();
+
                 validationResult = desc.describe(input, null);
                 if (validationResult == IContentDescriber.VALID) {
-                    return ASuiteFileDescriber.SUITE_FILE_CONTENT_ID;
+                    contentTypeId = ASuiteFileDescriber.SUITE_FILE_CONTENT_ID;
                 } else {
-                    return ASuiteFileDescriber.RESOURCE_FILE_CONTENT_ID;
+                    contentTypeId = ASuiteFileDescriber.RESOURCE_FILE_CONTENT_ID;
                 }
             } catch (final IOException e) {
-                return null;
+                // null will be returned
             }
         }
-        return null;
+        return contentTypeId;
     }
 
     @Override

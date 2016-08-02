@@ -110,7 +110,13 @@ class SuiteSourceOccurrenceMarksHighlighter {
     }
 
     private Optional<IRegion> getCurrentRegion(final int offset) throws BadLocationException {
-        return DocumentUtilities.findVariable(document, offset).or(DocumentUtilities.findCellRegion(document, offset));
+        final boolean isTsv = isTsv();
+        return DocumentUtilities.findVariable(document, isTsv, offset)
+                .or(DocumentUtilities.findCellRegion(document, isTsv, offset));
+    }
+
+    private boolean isTsv() {
+        return file.getFileExtension().equals("tsv");
     }
 
     private Set<IRegion> findOccurencesRegions(final IRegion region) throws BadLocationException {

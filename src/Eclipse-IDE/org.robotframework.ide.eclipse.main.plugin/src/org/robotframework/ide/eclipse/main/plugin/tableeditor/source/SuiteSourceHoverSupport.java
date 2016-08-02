@@ -71,8 +71,9 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     public IRegion getHoverRegion(final ITextViewer textViewer, final int offset) {
         try {
             final IDocument document = textViewer.getDocument();
-            return DocumentUtilities.findVariable(document, offset)
-                    .or(DocumentUtilities.findCellRegion(document, offset))
+            final boolean isTsv = suiteFile.isTsvFile();
+            return DocumentUtilities.findVariable(document, isTsv, offset)
+                    .or(DocumentUtilities.findCellRegion(document, isTsv, offset))
                     .or(Optional.of(new Region(0, 0)))
                     .get();
         } catch (final BadLocationException e) {
@@ -164,7 +165,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                     final RobotStackFrame robotStackFrame = (RobotStackFrame) stackFrame;
                     if (robotStackFrame.getFileName().equals(suiteFile.getFile().getName())) {
                         for (final IVariable variable : robotStackFrame.getAllVariables()) {
-                            if (VariableNamesSupport.hasEqualNames(variable.getName(), variableName)) {    
+                            if (VariableNamesSupport.hasEqualNames(variable.getName(), variableName)) {
                                 return "Current value:\n" + RobotDebugValueManager.extractValueDetail(variable.getValue());
                             }
                         }
