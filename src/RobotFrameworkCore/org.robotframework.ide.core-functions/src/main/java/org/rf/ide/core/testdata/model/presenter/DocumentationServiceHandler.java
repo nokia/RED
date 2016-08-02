@@ -72,7 +72,10 @@ public class DocumentationServiceHandler {
                     }
                 }
 
-                if (LINE_CONTINUE.matcher(tokenText).find() || tokenText.equals("\n...")) {
+                if (currentLineNr < tokenLineNr && tokenText.trim().isEmpty()) {
+                    continue;
+                } else if (LINE_CONTINUE.matcher(tokenText).find() || tokenText.equals("\n...")
+                        || (currentLineNr < tokenLineNr && tokenText.trim().equals("..."))) {
                     text.append("\n");
                     currentLineNr = tokenLineNr;
                     prevNewLine = true;
