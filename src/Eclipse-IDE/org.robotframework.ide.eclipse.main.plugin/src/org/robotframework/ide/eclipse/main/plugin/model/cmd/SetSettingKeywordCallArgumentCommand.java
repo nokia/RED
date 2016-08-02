@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 
@@ -23,9 +22,4 @@ public class SetSettingKeywordCallArgumentCommand extends SetKeywordCallArgument
         new SettingTableModelUpdater().update(getKeywordCall().getLinkedElement(), getIndex(), getValue());
     }
 
-    @Override
-    protected boolean isKeywordBasedSetting() {
-        final ModelType modelType = getKeywordCall().getLinkedElement().getModelType();
-        return modelType != ModelType.DEFAULT_TAGS_SETTING && modelType != ModelType.FORCE_TAGS_SETTING;
-    }
 }
