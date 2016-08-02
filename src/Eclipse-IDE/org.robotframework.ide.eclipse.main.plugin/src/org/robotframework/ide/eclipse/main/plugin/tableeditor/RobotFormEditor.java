@@ -223,21 +223,17 @@ public class RobotFormEditor extends FormEditor {
 
     @Override
     public void doSave(final IProgressMonitor monitor) {
+        waitForPendingEditorJobs();
+
         boolean shouldSave = true;
         boolean shouldClose = false;
         final RobotSuiteFile currentModel = provideSuiteModel();
 
-        int description = IContentDescriber.INDETERMINATE;
-        try {
-            final StringReader reader = new StringReader(getSourceEditor().getDocument().get());
-            ASuiteFileDescriber desc = new RobotSuiteFileDescriber();
-            if ("tsv".equals(suiteModel.getFileExtension().toLowerCase())) {
-                desc = new TsvRobotSuiteFileDescriber();
-            }
-            description = desc.describe(reader, null);
-        } catch (final IOException e) {
-            // nothing to do
+        if (!(getActiveEditor() instanceof SuiteSourceEditor)) {
+            updateSourceFromModel();
         }
+
+        final int description = determineContentDescription();
         if (currentModel.isSuiteFile() && description == IContentDescriber.INVALID) {
             shouldSave = MessageDialog.openConfirm(getSite().getShell(), "File content mismatch",
                     "The file " + currentModel.getFile().getName() + " is a Suite file, but after "
@@ -256,20 +252,29 @@ public class RobotFormEditor extends FormEditor {
             return;
         }
 
-        waitForPendingEditorJobs();
-
-        if (!(getActiveEditor() instanceof SuiteSourceEditor)) {
-            updateSourceFromModel();
-        }
         for (final IEditorPart dirtyEditor : getDirtyEditors()) {
             dirtyEditor.doSave(monitor);
         }
-
         updateActivePage();
 
         if (shouldClose) {
             reopenEditor();
         }
+    }
+
+    private int determineContentDescription() {
+        try {
+            final StringReader reader = new StringReader(getSourceEditor().getDocument().get());
+            final String fileExt = suiteModel.getFileExtension();
+
+            final ASuiteFileDescriber desc = fileExt != null && fileExt.toLowerCase().equals("tsv")
+                    ? new TsvRobotSuiteFileDescriber() : new RobotSuiteFileDescriber();
+
+            return desc.describe(reader, null);
+        } catch (final IOException e) {
+            // nothing to do
+        }
+        return IContentDescriber.INDETERMINATE;
     }
 
     private void waitForPendingEditorJobs() {
@@ -556,6 +561,8 @@ public class RobotFormEditor extends FormEditor {
 
     private static class IllegalRobotEditorInputException extends RuntimeException {
 
+        private static final long serialVersionUID = 1L;
+
         public IllegalRobotEditorInputException(final String message) {
             super(message);
         }
@@ -566,6 +573,8 @@ public class RobotFormEditor extends FormEditor {
     }
 
     public static class RobotEditorOpeningException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
 
         public RobotEditorOpeningException(final String message, final Throwable cause) {
             super(message, cause);
