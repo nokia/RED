@@ -82,9 +82,6 @@ public class DocumentationServiceHandler {
                     continue;
                 } else if (currentLineNr != tokenLineNr && tokenLineNr != FilePosition.NOT_SET) {
                     text.append("\n");
-                    for (int i = 0; i < tokenLineNr - currentLineNr - 1; i++) {
-                        text.append("\n");
-                    }
                     currentLineNr = tokenLineNr;
                 } else if (tokId > 0 && text.length() > 0) {
                     if (!prevNewLine && !tokenText.isEmpty()) {
