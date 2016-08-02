@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.rf.ide.core.testdata.model.ModelType;
 
 import com.google.common.base.Optional;
 
@@ -27,11 +28,10 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
         this.parent = parent;
     }
 
-    public abstract RobotKeywordCall createKeywordCall(String callName, int modelTableIndex,
-            final int codeHoldingElementIndex);
+    public abstract RobotKeywordCall createKeywordCall(final int index, final String name, final List<String> args,
+            final String comment);
 
-    public abstract void insertKeywordCall(final int modelTableIndex, final int codeHoldingElementIndex,
-            final RobotKeywordCall keywordCall);
+    public abstract void insertKeywordCall(final int index, final RobotKeywordCall keywordCall);
 
     public abstract RobotDefinitionSetting createSetting(final int index, final String name, final List<String> args,
             final String comment);
@@ -86,5 +86,20 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     @Override
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getParent(), this);
+    }
+    
+    protected int countRowsOfTypeUpTo(final ModelType type, final int toIndex) {
+        int index = 0;
+        int count = 0;
+        for (final RobotKeywordCall call : getChildren()) {
+            if (index >= toIndex) {
+                break;
+            }
+            if (call.getLinkedElement().getModelType() == type) {
+                count++;
+            }
+            index++;
+        }
+        return count;
     }
 }

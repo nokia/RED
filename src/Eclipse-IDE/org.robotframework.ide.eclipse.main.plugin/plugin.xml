@@ -1195,6 +1195,11 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.insertNewLine"
+          name="Add new line">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.moveElementUp"
           name="Move up">
     </command>
@@ -1551,6 +1556,42 @@
        </enabledWhen>
     </handler>
     <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertNewLineHandler"
+          commandId="org.robotframework.ide.eclipse.insertNewLine">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.casesPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+       <enabledWhen>
+          <or>
+            <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+            </reference>
+            <with
+                  variable="selection">
+               <or>
+                  <count
+                        value="0">
+                  </count>
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
+                        </instanceof>
+                     </iterate>
+                  </and>
+               </or>
+            </with>
+          </or>
+       </enabledWhen>
+    </handler>
+    <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.MoveCaseUpHandler"
           commandId="org.robotframework.ide.eclipse.moveElementUp">
        <activeWhen>
@@ -1678,9 +1719,67 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <reference
+          <or>
+            <reference
                 definitionId="org.robotframework.exactlyOneElementIsSelected">
+            </reference>
+            <with
+                  variable="selection">
+               <or>
+                  <count
+                        value="0">
+                  </count>
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
+                        </instanceof>
+                     </iterate>
+                  </and>
+               </or>
+            </with>
+          </or>
+       </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertNewLineHandler"
+          commandId="org.robotframework.ide.eclipse.insertNewLine">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.keywordsPartIsActiveAndEditable">
           </reference>
+       </activeWhen>
+       <enabledWhen>
+          <or>
+            <reference
+                definitionId="org.robotframework.exactlyOneElementIsSelected">
+            </reference>
+            <with
+                  variable="selection">
+               <or>
+                  <count
+                        value="0">
+                  </count>
+                  <and>
+                     <count
+                           value="1">
+                     </count>
+                     <iterate
+                           ifEmpty="false"
+                           operator="and">
+                        <instanceof
+                              value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
+                        </instanceof>
+                     </iterate>
+                  </and>
+               </or>
+            </with>
+          </or>
        </enabledWhen>
     </handler>
     <handler
@@ -2482,7 +2581,13 @@
              value="SCALAR">
        </parameter>
     </key>
-   <key
+    <key
+          commandId="org.robotframework.ide.eclipse.insertNewLine"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+L">
+    </key>
+    <key
           commandId="org.robotframework.ide.eclipse.moveElementUp"
           contextId="org.eclipse.ui.contexts.window"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
@@ -2685,6 +2790,12 @@
              label="Add new test case"
              style="push">
        </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNewLine"
+             icon="resources/add.png"
+             label="Add new line"
+             style="push">
+       </command>
        <separator
              name="navigation"
              visible="true">
@@ -2852,6 +2963,12 @@
              commandId="org.robotframework.ide.eclipse.insertNew"
              icon="resources/add.png"
              label="Add new keyword"
+             style="push">
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.insertNewLine"
+             icon="resources/add.png"
+             label="Add new line"
              style="push">
        </command>
        <separator

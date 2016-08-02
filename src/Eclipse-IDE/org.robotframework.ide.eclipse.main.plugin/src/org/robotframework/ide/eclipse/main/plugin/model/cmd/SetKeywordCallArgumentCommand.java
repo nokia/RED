@@ -46,17 +46,20 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         }
         if (changed) {
             keywordCall.resetStored();
-            updateModelElement();
+            updateModelElement(arguments);
+            
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
         }
     }
 
-    protected void updateModelElement() {
+    protected void updateModelElement(final List<String> arguments) {
         final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
         final ModelType modelType = linkedElement.getModelType();
         if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW || modelType == ModelType.TEST_CASE_EXECUTABLE_ROW) {
-            if(value != null) {
-                ((RobotExecutableRow<?>) linkedElement).setArgument(index, value);
+            if (value != null) {
+                for (int i = arguments.size() - 1; i >= 0; i--) {
+                    ((RobotExecutableRow<?>) linkedElement).setArgument(i, arguments.get(i));
+                }
             } else if (index < ((RobotExecutableRow<?>) linkedElement).getArguments().size()) {
                 ((RobotExecutableRow<?>) linkedElement).removeElementToken(index);
             }
