@@ -65,7 +65,7 @@ public class DocumentationLineContinueMissingFixer implements IPostProcessFixAct
                     RobotTokenType.SETTING_DOCUMENTATION_TEXT, RobotTokenType.PRETTY_ALIGN_SPACE,
                     RobotTokenType.PREVIOUS_LINE_CONTINUE);
             for (final RobotToken textDoc : docTokens) {
-                docDec.addDocumentationText(textDoc);
+                docDeclarations.get(0).addDocumentationText(textDoc);
             }
         }
     }
@@ -82,7 +82,7 @@ public class DocumentationLineContinueMissingFixer implements IPostProcessFixAct
                         RobotTokenType.KEYWORD_SETTING_DOCUMENTATION_TEXT, RobotTokenType.PRETTY_ALIGN_SPACE,
                         RobotTokenType.PREVIOUS_LINE_CONTINUE);
                 for (final RobotToken textDoc : docTokens) {
-                    keywordDocumentation.addDocumentationText(textDoc);
+                    documentation.get(0).addDocumentationText(textDoc);
                 }
             }
         }
@@ -100,7 +100,7 @@ public class DocumentationLineContinueMissingFixer implements IPostProcessFixAct
                         RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION_TEXT, RobotTokenType.PRETTY_ALIGN_SPACE,
                         RobotTokenType.PREVIOUS_LINE_CONTINUE);
                 for (final RobotToken textDoc : docTokens) {
-                    testDocumentation.addDocumentationText(textDoc);
+                    documentation.get(0).addDocumentationText(textDoc);
                 }
             }
         }
