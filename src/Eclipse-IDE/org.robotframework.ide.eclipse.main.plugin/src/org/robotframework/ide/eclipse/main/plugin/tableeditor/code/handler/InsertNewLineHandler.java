@@ -45,11 +45,6 @@ public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLine
         public void addNewLine(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
 
-            if (selection.size() > 1) {
-                throw new IllegalArgumentException("Given selection should contain at most one element, but have "
-                        + selection.size() + " instead");
-            }
-
             final Optional<RobotElement> selectedElement = Selections.getOptionalFirstElement(selection,
                     RobotElement.class);
 
