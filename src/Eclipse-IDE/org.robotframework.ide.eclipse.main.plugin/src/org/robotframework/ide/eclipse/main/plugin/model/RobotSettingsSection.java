@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         if (timeoutSetting.isPresent()) {
             elements.add(new RobotSetting(this, timeoutSetting.get()));
         }
-        elements.sort(new Comparator<RobotFileInternalElement>() {
+        Collections.sort(elements, new Comparator<RobotFileInternalElement>() {
 
             @Override
             public int compare(final RobotFileInternalElement o1, final RobotFileInternalElement o2) {
