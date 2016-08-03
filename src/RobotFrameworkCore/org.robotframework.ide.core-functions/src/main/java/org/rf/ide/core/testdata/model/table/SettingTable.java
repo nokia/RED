@@ -79,7 +79,7 @@ public class SettingTable extends ARobotSectionTable {
     public List<AImported> getImports() {
         return Collections.unmodifiableList(imports);
     }
-    
+
     public LibraryImport newLibraryImport() {
         return newLibraryImport(imports.size());
     }
@@ -94,7 +94,7 @@ public class SettingTable extends ARobotSectionTable {
 
         return libImp;
     }
-    
+
     public ResourceImport newResourceImport() {
         return newResourceImport(imports.size());
     }
@@ -109,7 +109,7 @@ public class SettingTable extends ARobotSectionTable {
 
         return resImp;
     }
-    
+
     public VariablesImport newVariablesImport() {
         return newVariablesImport(imports.size());
     }
@@ -169,9 +169,14 @@ public class SettingTable extends ARobotSectionTable {
     public void addDocumentation(final SuiteDocumentation doc) {
         doc.setParent(this);
         documentations.add(doc);
+        getParent().getParent().getDocumentationCacher().unregister(doc);
+        getParent().getParent().getDocumentationCacher().register(doc);
     }
 
     public void removeDocumentation() {
+        for (final SuiteDocumentation doc : documentations) {
+            getParent().getParent().getDocumentationCacher().unregister(doc);
+        }
         documentations.clear();
     }
 
@@ -182,7 +187,7 @@ public class SettingTable extends ARobotSectionTable {
     public Metadata newMetadata() {
         return newMetadata(metadatas.size());
     }
-    
+
     public Metadata newMetadata(final int index) {
         final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_METADATA_DECLARATION
