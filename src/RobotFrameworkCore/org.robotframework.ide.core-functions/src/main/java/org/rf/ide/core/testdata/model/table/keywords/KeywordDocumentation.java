@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -141,7 +142,7 @@ public class KeywordDocumentation extends AModelElement<UserKeyword>
     public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("Please see " + DocumentationServiceHandler.class);
     }
-    
+
     public KeywordDocumentation copy() {
         final KeywordDocumentation keywordDoc = new KeywordDocumentation(this.getDeclaration().copyWithoutPosition());
         for (final RobotToken txt : getDocumentationText()) {
@@ -152,9 +153,9 @@ public class KeywordDocumentation extends AModelElement<UserKeyword>
         }
         return keywordDoc;
     }
-    
+
     private Object readResolve() throws ObjectStreamException {
-        //done during serialization, problems may occur when multiple tokens are in the same line  
+        // done during serialization, problems may occur when multiple tokens are in the same line
         int docSize = text.size();
         for (int i = 1; i < (docSize * 2 - 1); i += 2) {
             final RobotToken robotToken = text.get(i);
@@ -166,6 +167,16 @@ public class KeywordDocumentation extends AModelElement<UserKeyword>
             text.add(i, token);
         }
 
+        return this;
+    }
+
+    @Override
+    public FileRegion getRegion() {
+        return new FileRegion(getBeginPosition(), getEndPosition());
+    }
+
+    @Override
+    public KeywordDocumentation getCached() {
         return this;
     }
 }

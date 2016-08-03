@@ -19,6 +19,8 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 
+import com.google.common.base.Optional;
+
 public class RobotFileOutput {
 
     public static final long FILE_NOT_EXIST_EPOCH = 0;
@@ -41,9 +43,12 @@ public class RobotFileOutput {
 
     private FileFormat format = FileFormat.UNKNOWN;
 
+    private FileRegionCacher<IDocumentationHolder> docCacher;
+
     public RobotFileOutput(final RobotVersion robotVersion) {
         this.robotVersion = robotVersion;
         this.fileModel = new RobotFile(this);
+        this.docCacher = new FileRegionCacher<>();
     }
 
     public String getFileLineSeparator() {
@@ -63,6 +68,19 @@ public class RobotFileOutput {
         }
 
         return result;
+    }
+
+    public Optional<IDocumentationHolder> findDocumentationFor(final int offset) {
+        final List<IRegionCacheable<IDocumentationHolder>> found = docCacher.findByOffset(offset);
+        if (found.size() == 1) {
+            return Optional.of((IDocumentationHolder) found.get(0).getCached());
+        }
+
+        return Optional.absent();
+    }
+
+    public FileRegionCacher<IDocumentationHolder> getDocumentationCacher() {
+        return this.docCacher;
     }
 
     public RobotVersion getRobotVersion() {

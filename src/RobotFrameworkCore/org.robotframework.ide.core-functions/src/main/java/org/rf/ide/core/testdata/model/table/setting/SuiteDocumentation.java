@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -139,5 +140,15 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
     @Override
     public boolean removeElementToken(int index) {
         throw new UnsupportedOperationException("Please see " + DocumentationServiceHandler.class);
+    }
+
+    @Override
+    public FileRegion getRegion() {
+        return new FileRegion(getBeginPosition(), getEndPosition());
+    }
+
+    @Override
+    public IDocumentationHolder getCached() {
+        return this;
     }
 }

@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.SuiteDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -23,7 +25,7 @@ public class SuiteDocumentationViewTest {
     @Test
     public void test_twoSuiteDocDeclarations_shouldReturn_commonView() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFile robotFile = new RobotFile(new RobotFileOutput(RobotVersion.from("3.0")));
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -51,7 +53,7 @@ public class SuiteDocumentationViewTest {
     @Test
     public void test_twoSuiteDocumentations_addOneArgument_shouldReturn_singleSuiteDoc() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFile robotFile = new RobotFile(new RobotFileOutput(RobotVersion.from("3.0")));
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
@@ -82,7 +84,7 @@ public class SuiteDocumentationViewTest {
     @Test
     public void test_twoSuiteDocumentations_modificationOfOneArgument_shouldReturn_twoSuiteDocsStill() {
         // prepare
-        final RobotFile robotFile = new RobotFile(null);
+        final RobotFile robotFile = new RobotFile(new RobotFileOutput(RobotVersion.from("3.0")));
         robotFile.includeSettingTableSection();
         final SettingTable settingTable = robotFile.getSettingTable();
 
