@@ -160,7 +160,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             section.link();
             sections.add(section);
         }
-        sections.sort(new Comparator<RobotSuiteFileSection>() {
+        Collections.sort(sections, new Comparator<RobotSuiteFileSection>() {
+
             @Override
             public int compare(final RobotSuiteFileSection section1, final RobotSuiteFileSection section2) {
                 return Integer.compare(section1.getHeaderLine(), section2.getHeaderLine());
