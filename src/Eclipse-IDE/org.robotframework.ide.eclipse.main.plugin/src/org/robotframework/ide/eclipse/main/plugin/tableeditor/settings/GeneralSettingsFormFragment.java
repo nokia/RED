@@ -307,12 +307,55 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                         final int lengthAfter = documentation.getCharCount();
                         documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
                     }
+                } else if (e.character == '#') {
+                    if (documentation.isEnabled()) {
+                        final int caretOffset = documentation.getCaretOffset();
+                        final int lengthBefore = documentation.getCharCount();
+                        documentation.setText(escapeNotEscapedHashSigns(documentation.getText()));
+                        final int lengthAfter = documentation.getCharCount();
+                        documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
+                    }
+                } else if (e.character == SWT.SPACE) {
+                    if (documentation.isEnabled()) {
+                        final int caretOffset = documentation.getCaretOffset();
+                        final int lengthBefore = documentation.getCharCount();
+                        documentation.setText(documentation.getText().replaceAll("  ", "\\\\ \\\\ "));
+                        final int lengthAfter = documentation.getCharCount();
+                        documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
+                    }
                 }
             }
         });
 
         createPopupMenu();
         GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 30).applyTo(documentation);
+    }
+
+    private String escapeNotEscapedHashSigns(final String text) {
+        if (text != null) {
+            StringBuilder str = new StringBuilder("");
+            boolean wasLastEscape = false;
+            char[] charArray = text.toCharArray();
+            for (char c : charArray) {
+                if (c == '\\') {
+                    wasLastEscape = true;
+                } else if (c == '#') {
+                    if (!wasLastEscape) {
+                        str.append('\\');
+                    }
+
+                    wasLastEscape = false;
+                } else {
+                    wasLastEscape = false;
+                }
+
+                str.append(c);
+            }
+
+            return str.toString();
+        }
+
+        return text;
     }
 
     protected void createPopupMenu() {
@@ -913,6 +956,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private static class GeneralSettingsTableContentTooltip extends RedNatTableContentTooltip {
 
         private final Map<String, String> tooltips = new HashMap<>();
+
         {
             tooltips.put("Suite Setup",
                     "The keyword %s is executed before executing any of the test cases or lower level suites");
