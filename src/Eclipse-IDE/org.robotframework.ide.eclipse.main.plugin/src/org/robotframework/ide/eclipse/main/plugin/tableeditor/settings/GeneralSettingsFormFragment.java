@@ -300,35 +300,27 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                         documentation.cut();
                     }
                 } else if (e.stateMask == SWT.NONE && e.character == SWT.TAB) {
-                    if (documentation.isEnabled()) {
-                        final int caretOffset = documentation.getCaretOffset();
-                        final int lengthBefore = documentation.getCharCount();
-                        documentation.setText(documentation.getText().replaceAll("\\t", "\\\\t"));
-                        final int lengthAfter = documentation.getCharCount();
-                        documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
-                    }
+                    updateDocumentationWithPositionPresave(documentation.getText().replaceAll("\\t", "\\\\t"));
                 } else if (e.character == '#') {
-                    if (documentation.isEnabled()) {
-                        final int caretOffset = documentation.getCaretOffset();
-                        final int lengthBefore = documentation.getCharCount();
-                        documentation.setText(escapeNotEscapedHashSigns(documentation.getText()));
-                        final int lengthAfter = documentation.getCharCount();
-                        documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
-                    }
+                    updateDocumentationWithPositionPresave(escapeNotEscapedHashSigns(documentation.getText()));
                 } else if (e.character == SWT.SPACE) {
-                    if (documentation.isEnabled()) {
-                        final int caretOffset = documentation.getCaretOffset();
-                        final int lengthBefore = documentation.getCharCount();
-                        documentation.setText(documentation.getText().replaceAll("  ", "\\\\ \\\\ "));
-                        final int lengthAfter = documentation.getCharCount();
-                        documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
-                    }
+                    updateDocumentationWithPositionPresave(documentation.getText().replaceAll("  ", " \\\\ "));
                 }
             }
         });
 
         createPopupMenu();
         GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 30).applyTo(documentation);
+    }
+
+    private void updateDocumentationWithPositionPresave(final String newText) {
+        if (documentation.isEnabled()) {
+            final int caretOffset = documentation.getCaretOffset();
+            final int lengthBefore = documentation.getCharCount();
+            documentation.setText(newText);
+            final int lengthAfter = documentation.getCharCount();
+            documentation.setCaretOffset(caretOffset + (lengthAfter - lengthBefore));
+        }
     }
 
     private String escapeNotEscapedHashSigns(final String text) {
