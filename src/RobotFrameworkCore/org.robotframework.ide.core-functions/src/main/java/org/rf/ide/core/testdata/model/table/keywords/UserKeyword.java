@@ -359,4 +359,37 @@ public class UserKeyword extends AModelElement<KeywordTable>
     public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("This operation is not allowed inside UserKeyword.");
     }
+    
+    public boolean isDuplicatedSetting(final AModelElement<UserKeyword> setting) {
+        if (setting.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN) {
+            return false;
+        } else {
+            return getContainingList(setting).indexOf(setting) > 0;
+        }
+    }
+
+    public List<? extends AModelElement<UserKeyword>> getContainingList(final AModelElement<?> setting) {
+        if (setting != null) {
+            final ModelType settingType = setting.getModelType();
+            switch (settingType) {
+                case USER_KEYWORD_DOCUMENTATION:
+                    return documentation;
+                case USER_KEYWORD_TAGS:
+                    return tags;
+                case USER_KEYWORD_TEARDOWN:
+                    return teardowns;
+                case USER_KEYWORD_TIMEOUT:
+                    return timeouts;
+                case USER_KEYWORD_ARGUMENTS:
+                    return keywordArguments;
+                case USER_KEYWORD_RETURN:
+                    return keywordReturns;
+                case USER_KEYWORD_SETTING_UNKNOWN:
+                    return unknownSettings;
+                default:
+                    return new ArrayList<>();
+            }
+        }
+        return new ArrayList<>();
+    }
 }
