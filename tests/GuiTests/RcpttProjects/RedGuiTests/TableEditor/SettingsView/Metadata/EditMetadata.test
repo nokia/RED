@@ -7,9 +7,15 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KeFc8P4OEeSvjNrJkS7N6Q
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/18/16 5:16 PM
+Save-Time: 8/3/16 1:13 PM
 Testcase-Type: ecl
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Workaround added
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
@@ -26,38 +32,66 @@ with [get-editor "TestFile.robot"] {
 }
 
 //metadata: new
-with [get-editor "TestFile.robot"] {
-    with [get-section Metadata] {
-        with [get-canvas] {
-            mouse-move 118 33
-            mouse-press 118 33 button1
-            mouse-release 118 33 button1 524288
-            mouse-press 118 33 button1
-            mouse-double-click 118 33 button1
-            mouse-release 118 33 button1 524288
-        }
-        with [get-editbox] {
-            type-text new
-            key-type Enter
-        }
-        //value: text
-        with [get-canvas] {
-            mouse-move 386 31
-            mouse-press 386 31 button1
-            mouse-release 386 31 button1 524288
-            mouse-press 386 31 button1
-            mouse-double-click 386 31 button1
-            mouse-release 386 31 button1 524288
-        }
-        with [get-editbox] {
-            type-text text
-            key-type Enter
-        }
-        get-editbox | key-type "M1+s"
-        get-canvas | mouse-move 361 144
+//with [get-editor "TestFile.robot"] {
+//    with [get-section Metadata] {
+//        with [get-canvas] {
+//            mouse-move 118 33
+//            mouse-press 118 33 button1
+//            mouse-release 118 33 button1 524288
+//            mouse-press 118 33 button1
+//            mouse-double-click 118 33 button1
+//            mouse-release 118 33 button1 524288
+//        }
+//        with [get-editbox] {
+//            type-text new
+//            key-type Enter
+//        }
+//        //value: text
+//        with [get-canvas] {
+//            mouse-move 386 31
+//            mouse-press 386 31 button1
+//            mouse-release 386 31 button1 524288
+//            mouse-press 386 31 button1
+//            mouse-double-click 386 31 button1
+//            mouse-release 386 31 button1 524288
+//        }
+//        with [get-editbox] {
+//            type-text text
+//            key-type Enter
+//        }
+//        get-editbox | key-type "M1+s"
+//        get-canvas | mouse-move 361 144
+//    }
+//    get-tab-folder | get-tab-item Source | click
+//}
+//workaround
+with [get-editor "TestFile.robot" | get-section Metadata] {
+    with [get-canvas] {
+    	//add new
+        mouse-press 152 34 button1
+        mouse-release 152 34 button1 524288
+        mouse-press 152 34 button1
+        mouse-double-click 152 34 button1
+        mouse-release 152 34 button1 524288
+        mouse-move 150 33
+        type-text n
     }
-    get-tab-folder | get-tab-item Source | click
+    get-editbox | set-text new
+    //add text as value
+    with [get-canvas] {
+        mouse-move 371 27
+        mouse-press 371 27 button1
+        mouse-release 371 27 button1 524288
+        mouse-press 371 27 button1
+        mouse-double-click 371 27 button1
+        mouse-release 371 27 button1 524288
+    }
+    get-editbox | set-text text
+   
 }
+get-eclipse-window | key-type "M1+s"
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
     + "Metadata    new    text\n"
     + "*** Test Cases ***" | verify-true
@@ -89,30 +123,54 @@ try -times 10 -delay 1000 -command{
 }
 
 //add new line
+//with [get-editor "TestFile.robot" | get-section Metadata] {
+//	//add default value
+//    with [get-canvas] {
+//        mouse-press 129 74 button1
+//        mouse-release 129 74 button1 524288
+//        mouse-press 129 74 button1
+//        mouse-double-click 129 74 button1
+//        mouse-release 129 74 button1 524288
+//    }
+//    get-editbox | key-type Enter
+//    with [get-canvas] {
+//        mouse-move 297 69
+//        mouse-press 297 69 button1
+//        mouse-release 297 69 button1 524288
+//        mouse-press 297 69 button1
+//        mouse-double-click 297 69 button1
+//        mouse-release 297 69 button1 524288
+//    }
+//    //add value
+//    with [get-editbox] {
+//        type-text "CAPITAL CASE"
+//        key-type Enter
+//    }
+//}
+
+//woraround
 with [get-editor "TestFile.robot" | get-section Metadata] {
-	//add default value
     with [get-canvas] {
-        mouse-press 129 74 button1
-        mouse-release 129 74 button1 524288
-        mouse-press 129 74 button1
-        mouse-double-click 129 74 button1
-        mouse-release 129 74 button1 524288
+    	//add deafult value
+        mouse-press 92 80 button1
+        mouse-release 92 80 button1 524288
+        mouse-press 92 80 button1
+        mouse-double-click 92 80 button1
+        mouse-release 92 80 button1 524288
+        mouse-move 319 73
+        mouse-press 319 73 button1
+        mouse-release 319 73 button1 524288
+        mouse-press 319 73 button1
+        mouse-double-click 319 73 button1
+        mouse-release 319 73 button1 524288
     }
-    get-editbox | key-type Enter
-    with [get-canvas] {
-        mouse-move 297 69
-        mouse-press 297 69 button1
-        mouse-release 297 69 button1 524288
-        mouse-press 297 69 button1
-        mouse-double-click 297 69 button1
-        mouse-release 297 69 button1 524288
-    }
-    //add value
     with [get-editbox] {
         type-text "CAPITAL CASE"
         key-type Enter
     }
+    get-canvas | mouse-move 1020 171
 }
+
 
 //check source    
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
