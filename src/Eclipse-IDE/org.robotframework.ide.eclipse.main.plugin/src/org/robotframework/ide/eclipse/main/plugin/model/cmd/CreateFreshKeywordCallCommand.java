@@ -18,7 +18,7 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
     private final int codeHoldingElementIndex;
 
     public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent) {
-        this(parent, -1);
+        this(parent, parent.getChildren().size());
     }
 
     public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent, final int codeHoldingElementIndex) {

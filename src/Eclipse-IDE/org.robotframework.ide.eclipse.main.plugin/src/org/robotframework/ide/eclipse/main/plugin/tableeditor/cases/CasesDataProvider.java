@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -68,7 +69,11 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         if (cases != null) {
             for (final Object element : cases) {
                 if (element instanceof RobotKeywordCall) {
-                    max = Math.max(max, ((RobotKeywordCall) element).getArguments().size());
+                    final RobotKeywordCall keyword = (RobotKeywordCall) element;
+                    if (keyword != null
+                            && keyword.getLinkedElement().getModelType() != ModelType.TEST_CASE_DOCUMENTATION) {
+                        max = Math.max(max, ((RobotKeywordCall) element).getArguments().size());
+                    }
                 }
             }
         }
