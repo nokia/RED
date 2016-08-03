@@ -123,6 +123,8 @@ public class UserKeyword extends AModelElement<KeywordTable>
     public void addDocumentation(final KeywordDocumentation doc) {
         doc.setParent(this);
         this.documentation.add(doc);
+        getParent().getParent().getParent().getDocumentationCacher().unregister(doc);
+        getParent().getParent().getParent().getDocumentationCacher().register(doc);
     }
 
     public List<KeywordDocumentation> getDocumentation() {
@@ -359,7 +361,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
     public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("This operation is not allowed inside UserKeyword.");
     }
-    
+
     public boolean isDuplicatedSetting(final AModelElement<UserKeyword> setting) {
         if (setting.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN) {
             return false;
