@@ -7,9 +7,15 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ddTAYEH8EeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/27/16 11:27 AM
+Save-Time: 8/3/16 12:06 PM
 Testcase-Type: ecl
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+Temporary adding method is used.
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
@@ -34,14 +40,39 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
 get-view Outline | get-tree | select "TestFile.robot/Variables/a"
 
 
+//with [get-editor "TestFile.robot"] {
+//    with [get-canvas -after [get-label Variables] -index 1] {
+//        key-type Down
+//        key-type Enter
+//    }
+//    //add var without last  "}"
+//    with [get-editbox -after [get-label Variables] -index 1] {
+//        key-type Right
+//        set-text ""
+//        type-text "${var"
+//        // press enter and add correct value - cannot leave until correct value is set
+//        key-type Enter
+//        set-text ""
+//        type-text "${var}"
+//        key-type Enter
+//    }
+//	//add value
+//    with [get-editbox -after [get-label Variables] -index 1] {
+//        type-text text
+//        key-type Enter
+//    }
+//   get-editbox -after [get-label Variables] -index 1 | key-type Esc
+//}
+
+
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label Variables] -index 1] {
         key-type Down
-        key-type Enter
+        key-type Enter -times 2
     }
     //add var without last  "}"
     with [get-editbox -after [get-label Variables] -index 1] {
-        key-type Right
+        //key-type Right
         set-text ""
         type-text "${var"
         // press enter and add correct value - cannot leave until correct value is set
@@ -57,8 +88,46 @@ with [get-editor "TestFile.robot"] {
     }
    get-editbox -after [get-label Variables] -index 1 | key-type Esc
 }
-
 check-variable-row -file  "TestFile.robot" -row 2 -var "${var}" -value "text"
+
+//
+//with [get-editor "TestFile.robot"] {
+//	//add new variable
+//    with [get-canvas -after [get-label Variables] -index 1] {
+//        key-type Left -times 2
+//        key-type Down
+//        key-type Enter
+//    }
+//    
+//    with [get-editbox -after [get-label Variables] -index 1] {
+//        key-type Right
+//        set-text ""
+//        type-text "{no dolar}"
+//        // press enter and add correct value - cannot leave until correct value is set
+//        key-type Enter
+//        set-text ""
+//        type-text "${no dolar}"
+//        key-type Enter
+//    }
+//    
+//    //add value
+//    with [get-editbox -after [get-label Variables] -index 1] {
+//        type-text 34
+//        key-type Enter
+//      
+//    }
+//    get-canvas -after [get-label Variables] -index 1 | key-type Esc
+//    
+//    ///add new var
+//    with [get-canvas -after [get-label Variables] -index 1] {
+//        key-type Left -times 2
+//        key-type Down
+//        key-type Enter
+//    }
+//    get-canvas -after [get-label Variables] -index 1 | key-type Right
+//    get-canvas -after [get-label Variables] -index 1 | key-type Enter
+//}
+
 
 
 with [get-editor "TestFile.robot"] {
@@ -66,11 +135,11 @@ with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label Variables] -index 1] {
         key-type Left -times 2
         key-type Down
-        key-type Enter
+        key-type Enter -times 2
     }
     
     with [get-editbox -after [get-label Variables] -index 1] {
-        key-type Right
+        //key-type Right
         set-text ""
         type-text "{no dolar}"
         // press enter and add correct value - cannot leave until correct value is set
