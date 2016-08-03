@@ -65,7 +65,7 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                 simple.addUsedVariables(correctVariables);
                 simple.addTextParameters(mappingResult.getTextElements());
                 if (!execRowLine.getComment().contains(elem)) {
-                    simple.addKeywordArgument(elem);
+                    simple.addKeywordArgument(elem.copy());
                 }
             } else {
                 if (correctVariables.size() == 1 && mappedElements.size() == 1) {
@@ -75,7 +75,7 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
                     if (elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
                         simple.addTextParameters(mappingResult.getTextElements());
                     } else {
-                        simple.setAction(new RobotAction(elem, mappedElements));
+                        simple.setAction(new RobotAction(elem.copy(), mappedElements));
                         simple.addUsedVariables(correctVariables);
                         isAfterFirstAction = true;
                     }
