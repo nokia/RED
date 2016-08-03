@@ -85,7 +85,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         final List<RobotToken> lineElements = execRowLine.getElementTokens();
         final MappingResult mappingResult = varExtractor.extract(execRowLine.getAction(), fileName);
         forContinueDesc.addMessages(mappingResult.getMessages());
-        forContinueDesc.setAction(new RobotAction(execRowLine.getAction(), mappingResult.getMappedElements()));
+        forContinueDesc.setAction(new RobotAction(execRowLine.getAction().copy(), mappingResult.getMappedElements()));
 
         if (lineElements.size() > 1) {
             mapRestOfForLoopContinue(execRowLine, forContinueDesc, lineElements);
@@ -107,9 +107,9 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         RobotToken robotToken = lineElements.get(startIndex);
         if (robotToken.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
             mapToComment = true;
-            rowWithoutLoopContinue.addCommentPart(robotToken);
+            rowWithoutLoopContinue.addCommentPart(robotToken.copy());
         } else {
-            rowWithoutLoopContinue.setAction(robotToken);
+            rowWithoutLoopContinue.setAction(robotToken.copy());
         }
         rowWithoutLoopContinue.setParent(execRowLine.getParent());
         final int size = lineElements.size();
