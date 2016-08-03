@@ -7,8 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _YgoMMDSBEeat08T3d_ERug
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/18/16 11:17 AM
-Tags: Bugs
+Save-Time: 8/3/16 4:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -86,10 +85,10 @@ with [get-editor "TestFile.robot"] {
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
     + "Documentation    doc1    \n"
-    + "...    \\\n"
+    + "...    \n"
     + "...    doc3    \n"
     + "...    doc4    \n"
-    + "...    \\    \n"
+    + "...    \n"
     + "...    doc6\n"
     + "Metadata    nothng\n\n"
     + "*** Test Cases ***\n"
@@ -118,9 +117,9 @@ with [get-editor "TestFile.robot"] {
 
 //check that one sectionis visible
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
-    + "Documentation\tdoc1\t\n"
-    + "...\tdoc2\t\n"
-    + "...\tdoc3\n"
+    + "Documentation    doc1    \n"
+    + "...    doc2    \n"
+    + "...    doc3\n"
     + "Metadata    nothng\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
@@ -151,12 +150,12 @@ with [get-editor "TestFile.robot"] {
 
 //check thal all wasmerged and first line was removed
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
-    + "Documentation\t\\\t\n"
-    + "...\tdoc2\t\n"
-    + "...\tdoc3\t\n"
-    + "...\tdoc4\t\n"
-    + "...\tdoc5\t\n"
-    + "...\tdoc6\n"
+    + "Documentation    \\    \n"
+    + "...    doc2    \n"
+    + "...    doc3    \n"
+    + "...    doc4    \n"
+    + "...    doc5    \n"
+    + "...    doc6\n"
     + "Metadata    nothng\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
@@ -170,12 +169,12 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 //remove all doc without first line    
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
-        set-caret-pos 6 9
-        select-range 7 9 3 1
+        set-caret-pos 6 13
+        select-range 7 12 2 14
         key-type BackSpace
         key-type "M1+s"
+        wait 2000
     }
-    wait 2000
     get-tab-folder | get-tab-item Settings | click
 }
 
@@ -185,13 +184,15 @@ get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-p
 //add new word
 with [get-editor "TestFile.robot"] {
     with [get-section General | get-editbox -index 1] {
-        set-text-offset 1 0
+    	click
+    	set-focus
+        set-text-offset 0 0
         type-text new
     }
     get-tab-folder | get-tab-item Source | click
 }
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
-    + "Documentation\t\\new\n\n"
+    + "Documentation    new\n"
     + "Metadata    nothng\n\n"
     + "*** Test Cases ***\n"
     + "test\n"
@@ -203,16 +204,14 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 //remove all docs    
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
-        set-caret-pos 2 1
-        select-range 3 1 2 1
-    }
-    get-left-ruler | get-ruler-column LineNumberColumn | hover-ruler -line 3
-    with [get-text-viewer] {
+        set-caret-pos 2 2
+        select-range 2 1 2 21
         key-type BackSpace
         key-type "M1+s"
+        wait 2000
     }
-    wait 2000
     get-tab-folder | get-tab-item Settings | click
 }
+
 get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text | equals "" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
