@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
-public interface IDocumentationHolder {
+public interface IDocumentationHolder extends IRegionCacheable<IDocumentationHolder> {
 
     FilePosition getBeginPosition();
 
