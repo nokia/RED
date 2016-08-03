@@ -5,12 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -20,8 +23,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommand
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.nattable.CodeElementsTreeFormat;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsMatchesCollection.KeywordsFilter;
 import org.robotframework.red.nattable.IFilteringDataProvider;
-
-import com.google.common.base.Predicate;
 
 import ca.odell.glazedlists.FilterList;
 import ca.odell.glazedlists.GlazedLists;
@@ -71,17 +72,29 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
             
             for (final RobotKeywordDefinition robotKeywordDefinition : section.getChildren()) {
                 keywordsSortedList.add(robotKeywordDefinition);
-                keywordsSortedList.addAll(newArrayList(filter(robotKeywordDefinition.getChildren(), new Predicate<RobotKeywordCall>() {
-
-                    @Override
-                    public boolean apply(final RobotKeywordCall call) {
-                        final ModelType modelType = call.getLinkedElement().getModelType();
-                        return modelType != ModelType.USER_KEYWORD_ARGUMENTS;
-                    }
-                })));
+                keywordsSortedList.addAll(filteredCalls(robotKeywordDefinition));
                 keywordsSortedList.add(new AddingToken(robotKeywordDefinition, KeywordsAdderState.CALL));
             }
         }
+    }
+    
+    private List<RobotKeywordCall> filteredCalls(final RobotKeywordDefinition keywordDefinition) {
+        final List<RobotKeywordCall> allCalls = keywordDefinition.getChildren();
+        final List<RobotKeywordCall> filteredCalls = new ArrayList<>();
+        for (final RobotKeywordCall call : allCalls) {
+            if (call instanceof RobotDefinitionSetting) {
+                final RobotDefinitionSetting setting = (RobotDefinitionSetting) call;
+                @SuppressWarnings("unchecked")
+                final AModelElement<UserKeyword> linkedSetting = (AModelElement<UserKeyword>) setting.getLinkedElement();
+                final UserKeyword userKeyword = keywordDefinition.getLinkedElement();
+                if (!userKeyword.isDuplicatedSetting(linkedSetting) && linkedSetting.getModelType() != ModelType.USER_KEYWORD_ARGUMENTS) {
+                    filteredCalls.add(call);
+                }
+            } else {
+                filteredCalls.add(call);
+            }
+        }
+        return filteredCalls;
     }
 
     private int countColumnsNumber() {
