@@ -71,7 +71,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
                     wasElementsToIterate = true;
                 } else {
                     if (ForDescriptorInfo.isInToken(elem)) {
-                        loopDescriptor.setInAction(new RobotAction(elem, mappedElements));
+                        loopDescriptor.setInAction(new RobotAction(elem.copy(), mappedElements));
                         wasIn = true;
                     } else {
                         final int variablesSize = correctVariables.size();
@@ -90,7 +90,7 @@ public class ForLoopDeclarationRowDescriptorBuilder implements IRowDescriptorBui
                 }
             } else {
                 if (ForDescriptorInfo.isForToken(elem)) {
-                    loopDescriptor.setAction(new RobotAction(elem, mappedElements));
+                    loopDescriptor.setAction(new RobotAction(elem.copy(), mappedElements));
                     wasFor = true;
                 } else {
                     throw new IllegalStateException("Internal problem - :FOR should be the first token.");
