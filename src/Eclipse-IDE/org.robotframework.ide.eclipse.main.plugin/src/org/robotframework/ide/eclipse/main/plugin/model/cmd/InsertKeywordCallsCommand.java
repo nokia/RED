@@ -23,7 +23,7 @@ public class InsertKeywordCallsCommand extends EditorCommand {
     private final List<RobotKeywordCall> callsToInsert;
 
     public InsertKeywordCallsCommand(final IRobotCodeHoldingElement parent, final RobotKeywordCall[] callsToInsert) {
-        this(parent, -1, callsToInsert);
+        this(parent, parent.getChildren().size(), callsToInsert);
     }
 
     public InsertKeywordCallsCommand(final IRobotCodeHoldingElement parent, final int codeHoldingElementIndex,
@@ -40,8 +40,7 @@ public class InsertKeywordCallsCommand extends EditorCommand {
         int shift = 0;
         for (final RobotKeywordCall call : callsToInsert) {
             if (call.getLinkedElement() != null) {
-                parentElement.insertKeywordCall(codeHoldingElementIndex < 0 ? -1 : codeHoldingElementIndex + shift,
-                        call);
+                parentElement.insertKeywordCall(codeHoldingElementIndex + shift, call);
             }
             shift++;
         }
