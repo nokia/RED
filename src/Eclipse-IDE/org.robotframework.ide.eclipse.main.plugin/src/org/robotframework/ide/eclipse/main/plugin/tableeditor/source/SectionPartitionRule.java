@@ -16,10 +16,8 @@ import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderR
 import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.header.VariablesTableHeaderRecognizer;
 
-
 /**
  * @author Michal Anglart
- *
  */
 class SectionPartitionRule implements IPredicateRule {
 
@@ -61,9 +59,11 @@ class SectionPartitionRule implements IPredicateRule {
     }
 
     private boolean startDetected(final ICharacterScanner scanner) {
-        final int readAdditionally = eatPipedLineStart(scanner);
-
-        final String sectionHeader = Rules.getSectionHeader(scanner);
+        if (scanner.getColumn() != 0) {
+            return false;
+        }
+        final int readAdditionally = readBeforeSection(scanner);
+        final String sectionHeader = getSectionHeader(scanner);
         if (!sectionHeader.isEmpty()) {
             if (sectionType.matches(sectionHeader)) {
                 return true;
@@ -77,9 +77,11 @@ class SectionPartitionRule implements IPredicateRule {
     }
 
     private boolean endDetected(final ICharacterScanner scanner) {
-        final int readAdditionally = eatPipedLineStart(scanner);
-
-        final String sectionHeader = Rules.getSectionHeader(scanner);
+        if (scanner.getColumn() != 0) {
+            return false;
+        }
+        final int readAdditionally = readBeforeSection(scanner);
+        final String sectionHeader = getSectionHeader(scanner);
         if (!sectionHeader.isEmpty()) {
             for (int i = 0; i < sectionHeader.length() + readAdditionally; i++) {
                 scanner.unread();
@@ -89,19 +91,80 @@ class SectionPartitionRule implements IPredicateRule {
         return false;
     }
 
-    private int eatPipedLineStart(final ICharacterScanner scanner) {
-        int readAdditionally = 0;
-        if (CharacterScannerUtilities.lookAhead(scanner, 1).equals("|")) {
+    private static int readBeforeSection(final ICharacterScanner scanner) {
+        if (lookAhead(scanner) == ' ') {
             scanner.read();
-            readAdditionally++;
-            String next = CharacterScannerUtilities.lookAhead(scanner, 1);
-            while (next.equals(" ") || next == "\t") {
-                scanner.read();
-                readAdditionally++;
-                next = CharacterScannerUtilities.lookAhead(scanner, 1);
+            return 1;
+        } else if (lookAhead(scanner, 2).equals("| ") || lookAhead(scanner, 2).equals("|\t")) {
+            return eatPipedLineStart(scanner);
+        } else {
+            return 0;
+        }
+    }
+
+    static int lookAhead(final ICharacterScanner scanner) {
+        final int ch = scanner.read();
+        scanner.unread();
+        return ch;
+    }
+
+    static String lookAhead(final ICharacterScanner scanner, final int n) {
+        boolean eofOccured = false;
+        final StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < n; i++) {
+            final int ch = scanner.read();
+            if (ch == -1) {
+                eofOccured = true;
+                break;
+            } else {
+                builder.append((char) ch);
             }
         }
+        final int additional = eofOccured ? 1 : 0;
+        // maybe we've read less due to EOF
+        for (int i = 0; i < builder.length() + additional; i++) {
+            scanner.unread();
+        }
+        return builder.toString();
+    }
+
+    private static int eatPipedLineStart(final ICharacterScanner scanner) {
+        int readAdditionally = 0;
+        int ch = scanner.read();
+        if (ch == '|') {
+            readAdditionally++;
+
+            ch = scanner.read();
+            while (ch == ' ' || ch == '\t') {
+                readAdditionally++;
+                ch = scanner.read();
+            }
+        }
+        scanner.unread();
         return readAdditionally;
+    }
+
+    private static String getSectionHeader(final ICharacterScanner scanner) {
+        int next = scanner.read();
+        if (next == '*') {
+            final StringBuilder header = new StringBuilder();
+            header.append((char) next);
+            do {
+                next = scanner.read();
+                header.append((char) next);
+            } while (next == '*');
+
+            while (next == '*' || next == ' ' || next == '\t' || Character.isLetter(next)) {
+                next = scanner.read();
+                header.append((char) next);
+            }
+            header.deleteCharAt(header.length() - 1);
+            scanner.unread();
+            return header.toString();
+        } else {
+            scanner.unread();
+            return "";
+        }
     }
 
     static enum Section {

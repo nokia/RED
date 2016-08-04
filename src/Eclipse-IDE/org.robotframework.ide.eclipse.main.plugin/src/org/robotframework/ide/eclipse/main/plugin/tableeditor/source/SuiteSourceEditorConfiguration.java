@@ -6,16 +6,8 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createCommentRule;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createDefinitionRule;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordCallRule;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordDefinitionRule;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createKeywordUsageInSettings;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createLocalSettingRule;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createReadAllRule;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createSectionHeaderRule;
-import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.Rules.createVariableRule;
 
+import java.io.File;
 import java.util.List;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
@@ -42,10 +34,7 @@ import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
-import org.eclipse.jface.text.rules.EndOfLineRule;
-import org.eclipse.jface.text.rules.IRule;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.DefaultAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationHover;
@@ -56,12 +45,14 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
+import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceTokenScanner.SuiteTsvSourceTokenScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
@@ -77,6 +68,22 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Suit
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesDefinitionsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.VariablesImportAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableRowCallRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsCallRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.MatchEverythingRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokenScanner;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SectionHeaderRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingsCallRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsCallRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToFilesDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToVariablesDetector;
@@ -374,28 +381,31 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 .getSyntaxColoring(SyntaxHighlightingCategory.DEFAULT_SECTION);
         final IToken defaultSection = new Token(createAttribute(garbagePref));
 
-        final boolean isTsv = "tsv".equals(editor.fileModel.getFileExtension());
+        final ISyntaxColouringRule[] defaultRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
+                new CommentRule(comment), new MatchEverythingRule(defaultSection) };
+        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, editor.fileModel, defaultRules);
 
-        final IRule[] defaultRules = new IRule[] { new EndOfLineRule("#", comment), createReadAllRule(defaultSection) };
-        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, defaultRules, isTsv);
+        final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
+                new CaseNameRule(definition), new TestCaseSettingsRule(setting), new TestCaseSettingsCallRule(call),
+                new ExecutableRowCallRule(call), new CommentRule(comment), new VariableUsageRule(variable) };
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, editor.fileModel,
+                testCasesRules);
 
-        final IRule[] testCasesRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
-                createDefinitionRule(definition), createLocalSettingRule(setting), createKeywordCallRule(call),
-                createCommentRule(comment) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, testCasesRules, isTsv);
+        final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
+                new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
+                new KeywordSettingsCallRule(call), new ExecutableRowCallRule(call), new CommentRule(comment),
+                new VariableUsageRule(variable) };
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, editor.fileModel, keywordsRules);
 
-        final IRule[] keywordsRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
-                createKeywordDefinitionRule(definition), createLocalSettingRule(setting), createKeywordCallRule(call),
-                createCommentRule(comment) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules, isTsv);
+        final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
+                new SettingRule(setting), new SettingsCallRule(call), new CommentRule(comment),
+                new VariableUsageRule(variable) };
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, editor.fileModel, settingsRules);
 
-        final IRule[] settingsRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
-                createDefinitionRule(setting), createKeywordUsageInSettings(call), createCommentRule(comment) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, settingsRules, isTsv);
-
-        final IRule[] variablesRules = new IRule[] { createVariableRule(variable), createSectionHeaderRule(section),
-                createDefinitionRule(variable), createCommentRule(comment) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, variablesRules, isTsv);
+        final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
+                new VariableDefinitionRule(variable), new CommentRule(comment), new VariableUsageRule(variable) };
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, editor.fileModel,
+                variablesRules);
 
         return reconciler;
     }
@@ -405,12 +415,23 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private static void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
-            final IRule[] rules, final boolean isTsv) {
-        final ITokenScanner scanner = isTsv ? new SuiteTsvSourceTokenScanner(rules)
-                : new SuiteSourceTokenScanner(rules);
+            final RobotSuiteFile fileModel, final ISyntaxColouringRule[] rules) {
+        final RobotParser parser = createParser(fileModel);
+
+        final RedTokenScanner scanner = new RedTokenScanner(parser, new File(fileModel.getName()), rules);
         final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(scanner);
         reconciler.setDamager(damagerRepairer, contentType);
         reconciler.setRepairer(damagerRepairer, contentType);
+    }
+
+    private static RobotParser createParser(final RobotSuiteFile file) {
+        final RobotParserConfig parserCfg = new RobotParserConfig();
+        parserCfg.setEagerImport(false);
+        parserCfg.setIncludeImportVariables(false);
+
+        final RobotProject project = file.getProject();
+        final RobotParser parser = RobotParser.create(project.getRobotProjectHolder(), parserCfg);
+        return parser;
     }
 
     @Override
