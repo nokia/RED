@@ -394,7 +394,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                     continue;
                 } else if (elemPos.isSamePlace(start) || elemPos.isSamePlace(end)
                         || (elemPos.isAfter(start) && elemPos.isBefore(end))) {
-                    aDumpHelper.updateLine(model, outLines, elem);
+                    aDumpHelper.getDumpLineUpdater().updateLine(model, outLines, elem);
                 } else {
                     meetEnd = true;
                     break;
@@ -408,7 +408,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
                 final FilePosition endOfLineFP = endOfLine.getFilePosition();
                 if (endOfLineFP.isSamePlace(start) || endOfLineFP.isSamePlace(end)
                         || (endOfLineFP.isAfter(start) && endOfLineFP.isBefore(end))) {
-                    aDumpHelper.updateLine(model, outLines, endOfLine);
+                    aDumpHelper.getDumpLineUpdater().updateLine(model, outLines, endOfLine);
                 }
             }
         }
