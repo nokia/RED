@@ -101,10 +101,8 @@ public class DocumentationView {
             return;
         }
 
-        if (isDifferentElementThanCurrentlyDisplayed(element)) {
-            currentlyDisplayedElement = element;
-            docLoadingJob.schedule();
-        }
+        currentlyDisplayedElement = element;
+        docLoadingJob.schedule();
     }
 
     @Inject
@@ -112,10 +110,6 @@ public class DocumentationView {
     private void refreshEvent(@UIEventTopic(REFRESH_DOC_EVENT_TOPIC) final RobotFileInternalElement element) {
         resetCurrentlyDisplayedElement();
         showEvent(element);
-    }
-
-    private boolean isDifferentElementThanCurrentlyDisplayed(final RobotFileInternalElement element) {
-        return currentlyDisplayedElement == null || currentlyDisplayedElement != element;
     }
 
     private void resetCurrentlyDisplayedElement() {
