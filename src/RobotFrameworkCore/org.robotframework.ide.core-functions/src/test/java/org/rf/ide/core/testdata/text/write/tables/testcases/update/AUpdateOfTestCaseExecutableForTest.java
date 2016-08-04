@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.update;
 
 import java.nio.file.Path;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -24,6 +25,28 @@ public abstract class AUpdateOfTestCaseExecutableForTest {
 
     public AUpdateOfTestCaseExecutableForTest(final String extension) {
         this.extension = extension;
+    }
+
+    @Ignore(value = "RED-441")
+    @Test
+    public void test_update_secondTestCaseWithCommentBetween() throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_TestExecutionActionWithForCommentInside."
+                + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Output_TestExecutionActionWithForCommentInside."
+                + getExtension();
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        final TestCase testCase = testCaseTable.getTestCases().get(1);
+        final RobotExecutableRow<TestCase> rExecRow = testCase.getExecutionContext().get(1);
+        rExecRow.setArgument(0, "${x2}");
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+
     }
 
     @Test
