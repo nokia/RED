@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OaCcMFocEea7jMRO_K8Wdw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/4/16 1:52 PM
+Save-Time: 8/4/16 4:56 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -127,7 +127,7 @@ get-view "Documentation View" | get-editbox | get-property text | equals "test3\
 get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 21 12
 
 //check that view is empty
-get-view "Documentation View" | get-editbox | get-property text | equals "" | verify-true
+wait-for-view
 
 //set caret at the end of line with dots
 with [get-editor "TestFile.robot" | get-text-viewer] {
