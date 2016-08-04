@@ -70,8 +70,17 @@ public class RobotFileOutput {
         return result;
     }
 
-    public Optional<IDocumentationHolder> findDocumentationFor(final int offset) {
+    public Optional<IDocumentationHolder> findDocumentationForOffset(final int offset) {
         final List<IRegionCacheable<IDocumentationHolder>> found = docCacher.findByOffset(offset);
+        if (found.size() == 1) {
+            return Optional.of((IDocumentationHolder) found.get(0).getCached());
+        }
+
+        return Optional.absent();
+    }
+
+    public Optional<IDocumentationHolder> findDocumentationForLine(final int lineNumber) {
+        final List<IRegionCacheable<IDocumentationHolder>> found = docCacher.findByLineNumber(lineNumber);
         if (found.size() == 1) {
             return Optional.of((IDocumentationHolder) found.get(0).getCached());
         }

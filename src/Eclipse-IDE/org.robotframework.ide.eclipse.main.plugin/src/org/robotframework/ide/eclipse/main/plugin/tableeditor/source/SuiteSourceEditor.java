@@ -44,6 +44,7 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.GotoLineAction;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -51,10 +52,17 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
+import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
+
+import com.google.common.base.Optional;
 
 public class SuiteSourceEditor extends TextEditor {
 
     private static final String SOURCE_PART_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.sources.context";
+
+    private IDocumentationHolder lastShowDocumentation = null;
+
+    private int lastLength = -1;
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -72,6 +80,11 @@ public class SuiteSourceEditor extends TextEditor {
 
         setSourceViewerConfiguration(new SuiteSourceEditorConfiguration(this));
         setDocumentProvider(new SuiteSourceDocumentProvider());
+    }
+
+    public void setLastShowDocumentation(final IDocumentationHolder doc) {
+        this.lastShowDocumentation = doc;
+        this.lastLength = getDocument().getLength();
     }
 
     @Override
@@ -143,8 +156,33 @@ public class SuiteSourceEditor extends TextEditor {
             public void caretMoved(final CaretEvent event) {
                 updateLineLocationStatusBar(event.caretOffset);
                 updateLineDelimitersStatus();
+
+                if (checkIfReconcilationHasNotHappened()) {
+                    Optional<IDocumentationHolder> docToShow = getFileModel().getLinkedElement()
+                            .getParent()
+                            .findDocumentationForOffset(event.caretOffset);
+                    if (docToShow.isPresent()) {
+                        if (docToShow.get() != lastShowDocumentation) {
+                            setLastShowDocumentation(docToShow.get());
+                            final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench()
+                                    .getService(IEventBroker.class);
+                            eventBroker.post(DocumentationView.SHOW_DOC_EVENT_TOPIC,
+                                    getFileModel().findElement(event.caretOffset).get());
+                        }
+                    } else {
+                        setLastShowDocumentation(null);
+                        final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench()
+                                .getService(IEventBroker.class);
+                        eventBroker.post(DocumentationView.SHOW_DOC_EVENT_TOPIC, null);
+                    }
+                }
+            }
+
+            private boolean checkIfReconcilationHasNotHappened() {
+                return lastLength == getDocument().getLength() || lastLength == -1;
             }
         });
+
     }
 
     private void updateLineLocationStatusBar(final int caretPostion) {
