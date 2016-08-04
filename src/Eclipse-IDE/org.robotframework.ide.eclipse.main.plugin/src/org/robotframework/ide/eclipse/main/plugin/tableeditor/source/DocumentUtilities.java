@@ -302,6 +302,14 @@ public class DocumentUtilities {
         return delimiter != null ? delimiter : System.lineSeparator();
     }
 
+    public static int getLine(final IDocument document, final int offset) {
+        try {
+            return document.getLineOfOffset(offset);
+        } catch (final BadLocationException e) {
+            return 0;
+        }
+    }
+
     public static Optional<IRegion> getSnippet(final IDocument document, final int offset, final int noOfLinesBeforeAndAfter) {
         if (noOfLinesBeforeAndAfter < 0) {
             return Optional.absent();
