@@ -31,6 +31,20 @@ public class FileRegionCacher<T> {
         cache.remove(removeCacheable);
     }
 
+    public List<IRegionCacheable<T>> findByLineNumber(final int lineNumber) {
+        final List<IRegionCacheable<T>> inPosition = new ArrayList<IRegionCacheable<T>>(0);
+
+        if (lineNumber > FilePosition.NOT_SET) {
+            for (final IRegionCacheable<T> cacheElement : cache) {
+                if (cacheElement.getRegion().isBetweenLines(lineNumber)) {
+                    inPosition.add(cacheElement);
+                }
+            }
+        }
+
+        return inPosition;
+    }
+
     public List<IRegionCacheable<T>> findByOffset(final int offset) {
         final List<IRegionCacheable<T>> inPosition = new ArrayList<IRegionCacheable<T>>(0);
 
