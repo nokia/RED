@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _emIDYDe5EeaJIKJT0Mv9ow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/13/16 3:07 PM
+Save-Time: 8/4/16 5:43 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -204,5 +204,34 @@ check-metadata-row -file "TestFile.robot" -row 7 -metadata "a7" -val "7" -commen
 check-metadata-row -file "TestFile.robot" -row 8 -metadata "a8" -val "8" -comment "#comment8"
 check-metadata-row -file "TestFile.robot" -row 9 -metadata "a9" -val "9" -comment "#comment9"   
 
+
+with [get-editor "TestFile.robot"] {
+    with [get-section Metadata] {
+        with [get-canvas] {
+            mouse-press 396 140 button1
+            mouse-release 396 140 button1 524288
+        }
+        with [get-editbox] {
+            type-text "not comment"
+        }
+        get-editbox | key-type "M1+s"
+        get-canvas | mouse-move 376 426
+    }
+    get-tab-folder | get-tab-item Source | click
+
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Metadata    a1    #comment1\n"
+    + "Metadata    a2    1    #comment2\n"
+    + "Metadata    a3    3    \n"
+    + "Metadata    a4    4    #comment4\n"
+    + "Metadata    a5    5    #comment5\n"
+    + "Metadata    a6    not comment    #comment6\n"
+    + "Metadata    a7    7    #comment7\n"
+    + "Metadata    a8    8    #comment8\n"
+    + "Metadata    a9    9    #comment9\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
