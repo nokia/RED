@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.text.write.tables.settings.update;
 
 import java.nio.file.Path;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -23,6 +24,33 @@ public abstract class AUpdateOfSettingsMetadataTest {
 
     public AUpdateOfSettingsMetadataTest(final String extension) {
         this.extension = extension;
+    }
+
+    @Ignore(value = "RED-441")
+    @Test
+    public void test_UpdateMetadataDeclarationWithKeyAndValueAndCommentAfter_updateMetadata_withKeyAndValue()
+            throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_MetadataDeclarationWithKeyAndValueAndCommentAfter."
+                + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION
+                + "Output_MetadataDeclarationWithKeyAndValueAndCommentAfter." + getExtension();
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final SettingTable settingTable = modelFile.getSettingTable();
+
+        int i = 1;
+        for (final Metadata meta : settingTable.getMetadatas()) {
+            meta.setKey("key" + i + "updated");
+            meta.setValues(0, "value" + i + "updated");
+
+            i++;
+        }
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
     @Test
