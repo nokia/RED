@@ -279,7 +279,7 @@ public class TableElementDumperHelper {
         }
 
         for (final IRobotLineElement rle : dumps) {
-            dumpHelper.updateLine(model, lines, rle);
+            dumpHelper.getDumpLineUpdater().updateLine(model, lines, rle);
         }
 
         return (dumps.size() > 0);

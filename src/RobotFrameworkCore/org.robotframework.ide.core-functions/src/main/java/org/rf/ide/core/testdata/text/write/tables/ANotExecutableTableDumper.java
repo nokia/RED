@@ -16,6 +16,7 @@ import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
+import org.rf.ide.core.testdata.text.write.EmptyLineDumper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 
@@ -23,10 +24,13 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
 
     private final DumperHelper aDumpHelper;
 
+    private final EmptyLineDumper anEmptyLineDumper;
+
     private final List<ISectionElementDumper> dumpers;
 
     public ANotExecutableTableDumper(final DumperHelper aDumpHelper, final List<ISectionElementDumper> dumpers) {
         this.aDumpHelper = aDumpHelper;
+        this.anEmptyLineDumper = new EmptyLineDumper(aDumpHelper);
         this.dumpers = dumpers;
     }
 
@@ -34,14 +38,18 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
         return this.aDumpHelper;
     }
 
+    protected EmptyLineDumper getEmptyDumperHelper() {
+        return this.anEmptyLineDumper;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
             final TableHeader<? extends ARobotSectionTable> th, final List<AModelElement<ARobotSectionTable>> sorted,
             final List<RobotLine> lines) {
-        getDumperHelper().dumpHeader(model, th, lines);
+        getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
 
-        getDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th);
+        getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th);
 
         if (!sorted.isEmpty()) {
             final List<Section> settingSections = SectionType.filterByType(sections, sectionWithHeaderPos,
@@ -58,11 +66,17 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
                             || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
                             && !lastLine.getLineElements().isEmpty()) {
                         final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                        getDumperHelper().updateLine(model, lines, lineSeparator);
+                        getDumperHelper().getDumpLineUpdater().updateLine(model, lines, lineSeparator);
                     }
                 }
 
                 final AModelElement<ARobotSectionTable> setting = sorted.get(settingIndex);
+                if (settingIndex > 0) {
+                    if (sorted.get(settingIndex - 1).getEndPosition().getLine() + 1 != setting.getBeginPosition()
+                            .getLine()) {
+                        // TODO: fix for removing comment RED-441
+                    }
+                }
 
                 ISectionElementDumper elemDumper = null;
                 for (final ISectionElementDumper dumper : dumpers) {
@@ -74,7 +88,7 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
 
                 elemDumper.dump(model, settingSections, sectionWithHeaderPos, th, sorted, setting, lines);
 
-                getDumperHelper().dumpEmptyLines(model, lines, setting);
+                getEmptyDumperHelper().dumpEmptyLines(model, lines, setting);
             }
 
             if (lastIndexToDump == sorted.size() - 1) {
