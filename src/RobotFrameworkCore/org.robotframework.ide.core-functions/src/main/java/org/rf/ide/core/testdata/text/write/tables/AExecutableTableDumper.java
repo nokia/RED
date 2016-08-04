@@ -21,7 +21,9 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.write.DumpLineUpdater;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
+import org.rf.ide.core.testdata.text.write.EmptyLineDumper;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.SectionType;
 
@@ -31,10 +33,13 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
 
     private final DumperHelper aDumpHelper;
 
+    private final DumpLineUpdater lineUpdater;
+
     private final List<IExecutableSectionElementDumper> dumpers;
 
     public AExecutableTableDumper(final DumperHelper aDumpHelper, final List<IExecutableSectionElementDumper> dumpers) {
         this.aDumpHelper = aDumpHelper;
+        this.lineUpdater = new DumpLineUpdater(aDumpHelper);
         this.dumpers = dumpers;
     }
 
@@ -42,14 +47,22 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
         return this.aDumpHelper;
     }
 
+    protected EmptyLineDumper getEmptyDumperHelper() {
+        return getDumperHelper().getEmptyLineDumper();
+    }
+
+    protected DumpLineUpdater getLineDumperHelper() {
+        return this.lineUpdater;
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void dump(final RobotFile model, final List<Section> sections, final int sectionWithHeaderPos,
             final TableHeader<? extends ARobotSectionTable> th, final List<AModelElement<ARobotSectionTable>> sorted,
             final List<RobotLine> lines) {
-        getDumperHelper().dumpHeader(model, th, lines);
+        getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
 
-        getDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th);
+        getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th);
 
         if (!sorted.isEmpty()) {
             final List<Section> execUnits = SectionType.filterByType(sections, sectionWithHeaderPos, getSectionType());
@@ -65,11 +78,18 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                             || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
                             && !lastLine.getLineElements().isEmpty()) {
                         final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                        getDumperHelper().updateLine(model, lines, lineSeparator);
+                        getLineDumperHelper().updateLine(model, lines, lineSeparator);
                     }
                 }
 
                 final AModelElement<ARobotSectionTable> execUnit = sorted.get(execUnitIndex);
+                if (execUnitIndex > 0) {
+                    if (sorted.get(execUnitIndex - 1).getEndPosition().getLine() + 1 != execUnit.getBeginPosition()
+                            .getLine()) {
+                        // TODO: fix for removing comment RED-441
+                    }
+                }
+
                 @SuppressWarnings("rawtypes")
                 final IExecutableStepsHolder execHolder = (IExecutableStepsHolder) execUnit;
 
@@ -89,11 +109,12 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                 }
 
                 if (currentLine != null) {
-                    getDumperHelper().dumpSeparatorsBeforeToken(model, currentLine, elemDeclaration, lines);
+                    getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine,
+                            elemDeclaration, lines);
                 }
 
                 if (!elemDeclaration.isDirty() && currentLine != null) {
-                    getDumperHelper().updateLine(model, lines, elemDeclaration);
+                    getLineDumperHelper().updateLine(model, lines, elemDeclaration);
                     final List<IRobotLineElement> lineElements = currentLine.getLineElements();
                     final int tokenPosIndex = lineElements.indexOf(elemDeclaration);
                     if (lineElements.size() - 1 > tokenPosIndex + 1) {
@@ -102,14 +123,14 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                             final List<IRobotTokenType> types = nextElem.getTypes();
                             if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
                                     || types.contains(RobotTokenType.ASSIGNMENT)) {
-                                getDumperHelper().updateLine(model, lines, nextElem);
+                                getLineDumperHelper().updateLine(model, lines, nextElem);
                             } else {
                                 break;
                             }
                         }
                     }
                 } else {
-                    getDumperHelper().updateLine(model, lines, elemDeclaration);
+                    getLineDumperHelper().updateLine(model, lines, elemDeclaration);
                 }
 
                 final List<AModelElement<? extends IExecutableStepsHolder<?>>> sortedUnits = getSortedUnits(execHolder);
@@ -125,7 +146,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
 
                             if (shouldSeparateLine) {
                                 final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                                getDumperHelper().updateLine(model, lines, lineSeparator);
+                                getLineDumperHelper().updateLine(model, lines, lineSeparator);
                             }
                         }
                     }
@@ -141,7 +162,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                     elemDumper.dump(model, sections, sectionWithHeaderPos, th, sortedUnits, execElement, lines);
                 }
 
-                getDumperHelper().dumpEmptyLines(model, lines, execUnit);
+                getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit);
             }
 
             if (lastIndexToDump == sorted.size() - 1) {

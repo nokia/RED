@@ -87,7 +87,8 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
         }
 
         if (currentLine != null) {
-            getDumperHelper().dumpSeparatorsBeforeToken(model, currentLine, elemDeclaration, lines);
+            getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine, elemDeclaration,
+                    lines);
         }
 
         final RobotElementsComparatorWithPositionChangedPresave sorter = getSorter(currentElement);
@@ -99,7 +100,7 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
         IRobotLineElement lastToken = elemDeclaration;
         if (!elemDeclaration.isDirty() && currentLine != null) {
-            getDumperHelper().updateLine(model, lines, elemDeclaration);
+            getDumperHelper().getDumpLineUpdater().updateLine(model, lines, elemDeclaration);
             final List<IRobotLineElement> lineElements = currentLine.getLineElements();
             final int tokenPosIndex = lineElements.indexOf(elemDeclaration);
             if (lineElements.size() - 1 > tokenPosIndex + 1) {
@@ -108,7 +109,7 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
                     final List<IRobotTokenType> types = nextElem.getTypes();
                     if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
                             || types.contains(RobotTokenType.ASSIGNMENT)) {
-                        getDumperHelper().updateLine(model, lines, nextElem);
+                        getDumperHelper().getDumpLineUpdater().updateLine(model, lines, nextElem);
                         lastToken = nextElem;
                     } else {
                         break;
@@ -130,11 +131,11 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
             if (shouldDumpDeclaration) {
                 if (!wasSeparatorBefore(lines)) {
-                    getDumperHelper().updateLine(model, lines,
+                    getDumperHelper().getDumpLineUpdater().updateLine(model, lines,
                             getDumperHelper().getSeparator(model, lines, lastToken, lastToken));
                 }
 
-                getDumperHelper().updateLine(model, lines, elemDeclaration);
+                getDumperHelper().getDumpLineUpdater().updateLine(model, lines, elemDeclaration);
             }
             lastToken = elemDeclaration;
         }
@@ -154,18 +155,18 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
         // just dump now
         if (tokens.size() > 1 && lineEndPos.contains(0)) {
             if (currentLine != null) {
-                getDumperHelper().updateLine(model, lines, currentLine.getEndOfLine());
+                getDumperHelper().getDumpLineUpdater().updateLine(model, lines, currentLine.getEndOfLine());
             }
 
             Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokens.get(0));
-            getDumperHelper().updateLine(model, lines, sep);
+            getDumperHelper().getDumpLineUpdater().updateLine(model, lines, sep);
 
             RobotToken lineContinueToken = new RobotToken();
             lineContinueToken.setRaw("...");
             lineContinueToken.setText("...");
             lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
 
-            getDumperHelper().updateLine(model, lines, lineContinueToken);
+            getDumperHelper().getDumpLineUpdater().updateLine(model, lines, lineContinueToken);
         }
 
         for (int tokenId = 0; tokenId < nrOfTokens; tokenId++) {
@@ -177,19 +178,20 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             }
 
             if (tokElem.getText().equals("\n...")) {
-                getDumperHelper().updateLine(model, lines, getDumperHelper().getLineSeparator(model));
+                getDumperHelper().getDumpLineUpdater().updateLine(model, lines,
+                        getDumperHelper().getLineSeparator(model));
 
                 RobotToken lineContinueToken = new RobotToken();
                 lineContinueToken.setRaw("...");
                 lineContinueToken.setText("...");
                 lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
 
-                getDumperHelper().updateLine(model, lines,
+                getDumperHelper().getDumpLineUpdater().updateLine(model, lines,
                         getDumperHelper().getSeparator(model, lines, lastToken, lineContinueToken));
 
-                getDumperHelper().updateLine(model, lines, lineContinueToken);
+                getDumperHelper().getDumpLineUpdater().updateLine(model, lines, lineContinueToken);
 
-                getDumperHelper().updateLine(model, lines,
+                getDumperHelper().getDumpLineUpdater().updateLine(model, lines,
                         getDumperHelper().getSeparator(model, lines, lastToken, lineContinueToken));
 
                 lastToken = tokElem;
@@ -198,11 +200,11 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
             if (!wasSeparatorBefore(lines)) {
                 Separator sep = getDumperHelper().getSeparator(model, lines, lastToken, tokElem);
-                getDumperHelper().updateLine(model, lines, sep);
+                getDumperHelper().getDumpLineUpdater().updateLine(model, lines, sep);
                 lastToken = sep;
             }
 
-            getDumperHelper().updateLine(model, lines, tokElem);
+            getDumperHelper().getDumpLineUpdater().updateLine(model, lines, tokElem);
             lastToken = tokElem;
 
             RobotLine currentLineTok = null;
@@ -223,7 +225,7 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
                             final IRobotLineElement nextElem = lineElements.get(thisTokenPosIndex + 1);
                             if (nextElem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
                                     || nextElem.getTypes().contains(RobotTokenType.ASSIGNMENT)) {
-                                getDumperHelper().updateLine(model, lines, nextElem);
+                                getDumperHelper().getDumpLineUpdater().updateLine(model, lines, nextElem);
                                 lastToken = nextElem;
                             }
                         }
@@ -246,27 +248,28 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             }
 
             if (dumpAfterSep && currentLine != null) {
-                getDumperHelper().dumpSeparatorsAfterToken(model, currentLine, lastToken, lines);
+                getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsAfterToken(model, currentLine, lastToken,
+                        lines);
             }
 
             // check if is not end of line
             if (lineEndPos.contains(tokenId) && tokenId + 1 < nrOfTokens) {
                 if (currentLine != null) {
-                    getDumperHelper().updateLine(model, lines, currentLine.getEndOfLine());
+                    getDumperHelper().getDumpLineUpdater().updateLine(model, lines, currentLine.getEndOfLine());
                 } else {
                     // new end of line
                 }
 
                 if (!tokens.isEmpty()) {
                     Separator sepNew = getDumperHelper().getSeparator(model, lines, lastToken, tokens.get(tokenId + 1));
-                    getDumperHelper().updateLine(model, lines, sepNew);
+                    getDumperHelper().getDumpLineUpdater().updateLine(model, lines, sepNew);
 
                     RobotToken lineContinueToken = new RobotToken();
                     lineContinueToken.setRaw("...");
                     lineContinueToken.setText("...");
                     lineContinueToken.setType(RobotTokenType.PREVIOUS_LINE_CONTINUE);
 
-                    getDumperHelper().updateLine(model, lines, lineContinueToken);
+                    getDumperHelper().getDumpLineUpdater().updateLine(model, lines, lineContinueToken);
 
                     // updateLine(model, lines, sepNew);
                 }
