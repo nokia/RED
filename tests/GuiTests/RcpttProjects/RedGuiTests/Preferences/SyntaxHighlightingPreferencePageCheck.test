@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _A4f3gJQTEeWNpL9oeriwCw
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/26/15 12:14 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/4/16 3:07 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -60,7 +60,12 @@ with [get-window Preferences] {
 // reload editor and check if comments in editor are pink
 get-editor "Script.robot" | close
 get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | double-click
-get-editor "Script.robot" | get-text-viewer | get-property "styles[42].foregroundColor" | equals "#FF0080" | verify-true
+with [get-editor "Script.robot" | get-text-viewer] {
+    get-property "styles[39].text" | equals "#${new}" | verify-true
+    get-property "styles[39].foregroundColor" | equals "#FF0080" | verify-true
+    get-property "styles[41].text" | equals comment | verify-true
+    get-property "styles[41].foregroundColor" | equals "#FF0080" | verify-true
+}
 
 // open preferences and set bold-italic style for comments
 get-preferences-menu | click
@@ -80,7 +85,16 @@ with [get-window Preferences] {
 // reopen editor and check if comments are in bold-italic
 get-editor "Script.robot" | close
 get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | double-click
-get-editor "Script.robot" | get-text-viewer | get-property "styles[42].fontStyle" | equals "bold-italic" | verify-true
+
+with [get-editor "Script.robot" | get-text-viewer] {
+    get-property "styles[39].text" | equals "#${new}" | verify-true
+    get-property "styles[39].fontStyle" | equals "bold-italic" | verify-true
+    get-property "styles[39].foregroundColor" | equals "#FF0080" | verify-true
+    get-property "styles[41].text" | equals comment | verify-true
+    get-property "styles[41].fontStyle" | equals "bold-italic" | verify-true
+    get-property "styles[41].foregroundColor" | equals "#FF0080" | verify-true
+}
+
 // open preferences and restore default coloring
 get-preferences-menu | click
 get-window Preferences | get-button "Restore Defaults" | click
@@ -94,7 +108,14 @@ with [get-window Preferences] {
 // reload editor and check if Comments are in grey
 get-editor "Script.robot" | close
 get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | double-click
-get-editor "Script.robot" | get-text-viewer | get-property "styles[42].foregroundColor" | equals "#C0C0C0" | verify-true
+with [get-editor "Script.robot" | get-text-viewer] {
+    get-property "styles[39].text" | equals "#${new}" | verify-true
+    get-property "styles[39].fontStyle" | equals normal | verify-true
+    get-property "styles[39].foregroundColor" | equals "#C0C0C0" | verify-true
+    get-property "styles[41].text" | equals comment | verify-true
+    get-property "styles[41].fontStyle" | equals normal | verify-true
+    get-property "styles[41].foregroundColor" | equals "#C0C0C0" | verify-true
+}
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
