@@ -1,0 +1,207 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: DocumentationViewForSource
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _OaCcMFocEea7jMRO_K8Wdw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/4/16 1:52 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "wait-for-view" [val text ""]{
+	try -times 5 -delay 500 -command{
+		get-view "Documentation View" | get-editbox | get-property text | equals $text | verify-true
+	}
+}
+
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | double-click
+//add KW with documentations
+get-editor "TestFile.robot" | get-text-viewer |set-text "*** Test Cases ***\n"
+    + "*** Setting ***\n"
+    + "*** Keyword ***\n"
+    + "test1\n"
+    + "    [Documentation]    Single line doc\n"
+    + "    Log  6\n"
+    + "    \n"
+    + "test2\n"
+    + "    [Documentation]    New line:\\n"
+    + "Second line with tab \\t.Next sentence\n"
+    + "    \n"
+    + "test3\n"
+    + "    [Documentation]    Many lines \\n"
+    + "1\\n"
+    + "2\\n"
+    + "3\\n"
+    + "4\\n"
+    + "5\\n"
+    + "6\\n"
+    + "7\\n"
+    + "8\\n"
+    + "9\\n"
+    + "10\\n"
+    + "11\\n"
+    + "12\\n"
+    + "13\\n"
+    + "14\\n"
+    + "15\\n"
+    + "16\\n"
+    + "17\\n"
+    + "18\n"
+    + "    \n"
+    + "    \n"
+    + "test 4\n"
+    + "    [Documentation]        \n"
+    + "    \n"
+    + "test 5\n"
+    + "    [Documentation]    Here are dots:\n"
+    + "    ...  rest of line    \n"
+    + "    Should Be Empty    item    \n"
+    + "TEST_6\n"
+    + "    [Documentation]    Longer line contains few words to see if all line is shown in DOcumentation view because manybe some kind of problem (or not)\n"
+    + "    Catenate    a    b" 
+    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+s"
+}
+
+//set focus on [doc] tag and check that Doc view was not opened
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 5 15
+
+with [get-tab-folder -index 5] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property activePage | equals "Message Log" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+//set focus not on doc
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 1 7
+
+//open doc view form Window
+get-menu "Window/Show View/Other..." | click
+with [get-window "Show View"] {
+    get-editbox | set-text Docu
+    get-tree | select "Robot/Documentation View" | double-click
+}
+
+with [get-tab-folder -index 5] {
+    get-property "pages[0]" | equals "Message Log" | verify-true
+    get-property "pages[1]" | equals "Execution View" | verify-true
+    get-property "pages[2]" | equals "Documentation View" | verify-true
+    get-property activePage | equals "Documentation View" | verify-true
+    get-property tabCount | equals 3 | verify-true
+}
+
+//click on [Doc] section
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 5 12
+
+//check if doc was displayed
+get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
+    + "TestFile.robot\n\n"
+    + "Single line doc" | verify-true
+    
+//set caret on text of documentation
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 12 52
+
+//check if view content was changed
+get-view "Documentation View" | get-editbox | get-property text | equals "test3\n"
+    + "TestFile.robot\n\n"
+    + "Many lines \n1\n2\n3\n4\n5\n6\n7\n8\n9\n"
+    + "10\n"
+    + "11\n"
+    + "12\n"
+    + "13\n"
+    + "14\n"
+    + "15\n"
+    + "16\n"
+    + "17\n"
+    + "18" | verify-true
+    
+//set focus on KW    
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 21 12
+
+//check that view is empty
+get-view "Documentation View" | get-editbox | get-property text | equals "" | verify-true
+
+//set caret at the end of line with dots
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 20 22
+    key-type "NUMPAD_ENTER" "\\u000D"
+}
+
+//check that new line is not treat as doc
+wait-for-view
+
+//add single dot
+get-editor "TestFile.robot" | get-text-viewer | type-text "."
+wait-for-view
+
+//add second dot
+get-editor "TestFile.robot" | get-text-viewer | type-text "."
+wait-for-view
+
+//add 3.rd dot
+get-editor "TestFile.robot" | get-text-viewer | type-text "."
+wait-for-view -text "test 5\n"
+    + "TestFile.robot\n\n"
+    + "Here are dots:\n"
+    + "rest of line"
+
+//add 4th dot
+get-editor "TestFile.robot" | get-text-viewer | type-text "."
+wait-for-view
+
+//add text after 2 spaces
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type BackSpace
+    type-text "  text"
+}
+
+wait-for-view -text "test 5\n"
+    + "TestFile.robot\n\n"
+    + "Here are dots:\n"
+    + "rest of line\n"
+    + "text" 
+
+//add more text    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 21 14
+    type-text "\\n"
+        + " aaa\\tbbb ${empty}  new"
+}
+
+wait 2000
+wait-for-view -text  "test 5\n"
+    + "TestFile.robot\n\n"
+    + "Here are dots:\n"
+    + "rest of line\n"
+    + "text\n"
+    + " aaa\tbbb ${empty} new"
+    
+    
+//addd new KW with new doc section      
+with [get-editor "TestFile.robot" | get-text-viewer] {   
+    set-caret-pos 25 23
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type BackSpace -times 4
+    type-text "test 7"
+    key-type Enter
+    key-type "M1+SPACE"
+    wait 300
+    key-type Down
+    key-type Enter
+    type-text "next test 7"
+}
+wait 2000
+
+wait-for-view -text "test 7\n"
+    + "TestFile.robot\n\n"
+    + "next test 7" 
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
