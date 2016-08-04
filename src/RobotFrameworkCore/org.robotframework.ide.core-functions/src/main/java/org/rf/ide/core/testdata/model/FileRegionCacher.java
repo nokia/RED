@@ -6,11 +6,13 @@
 package org.rf.ide.core.testdata.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import com.google.common.annotations.Beta;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * Please considerate to move this logic to global region cacher, in case of refactor API will be
@@ -61,5 +63,10 @@ public class FileRegionCacher<T> {
 
     public void clearCache() {
         cache.clear();
+    }
+
+    @VisibleForTesting
+    public Set<IRegionCacheable<T>> getUnmodificableCacheContent() {
+        return Collections.unmodifiableSet(cache);
     }
 }
