@@ -137,6 +137,10 @@ public class DocumentationLineContinueMissingFixer implements IPostProcessFixAct
                             RobotTokenType.START_HASH_COMMENT, RobotTokenType.COMMENT_CONTINUE)) {
                         continue;
                     } else if (isAnyOfType(elemTypes, acceptable)) {
+                        if (elemTypes.contains(RobotTokenType.PREVIOUS_LINE_CONTINUE)
+                                && !elem.getText().trim().equals("...")) {
+                            return toks;
+                        }
                         toks.add((RobotToken) elem);
                     } else {
                         return toks;
