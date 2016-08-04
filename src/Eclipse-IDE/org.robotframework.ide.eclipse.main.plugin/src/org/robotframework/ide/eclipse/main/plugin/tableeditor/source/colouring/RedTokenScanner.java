@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
+import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IDocumentListener;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.ITokenScanner;
@@ -22,12 +24,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
-public class RedTokenScanner implements ITokenScanner {
+public class RedTokenScanner implements ITokenScanner, IDocumentListener {
 
     private final RobotParser parser;
     private final File file;
 
-    private final List<ISyntaxColouringRule> rules = new ArrayList<>();
+    private final List<ISyntaxColouringRule> rules;
 
     private Position lastTokenPosition;
 
@@ -36,19 +38,41 @@ public class RedTokenScanner implements ITokenScanner {
     private List<IRobotLineElement> analyzedTokens;
     private Deque<IRobotLineElement> tokensToAnalyze;
 
+    private List<RobotLine> lines;
+
+    private boolean listenerInstalled;
+
     public RedTokenScanner(final RobotParser parser, final File file, final ISyntaxColouringRule... rules) {
         this.parser = parser;
         this.file = file;
-        this.rules.addAll(newArrayList(rules));
+        this.rules = newArrayList(rules);
+        this.listenerInstalled = false;
+    }
+
+    @Override
+    public void documentAboutToBeChanged(final DocumentEvent event) {
+        // we will need to reparse the file in this case
+        lines = null;
+    }
+
+    @Override
+    public void documentChanged(final DocumentEvent event) {
+        // nothing to do
     }
 
     @Override
     public void setRange(final IDocument document, final int offset, final int length) {
-        final RobotFileOutput content = parser.parseEditorContent(document.get(), file);
-        final List<RobotLine> lines = content.getFileModel().getFileContent();
+        if (!listenerInstalled) {
+            document.addDocumentListener(this);
+            listenerInstalled = true;
+        }
+
+        if (lines == null) {
+            final RobotFileOutput content = parser.parseEditorContent(document.get(), file);
+            lines = content.getFileModel().getFileContent();
+        }
 
         final int startingLine = DocumentUtilities.getLine(document, offset);
-
         setRange(startingLine, offset, length, lines);
     }
 
