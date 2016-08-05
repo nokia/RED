@@ -26,6 +26,7 @@ public class FileRegionCacher<T> {
     private final Set<IRegionCacheable<T>> cache = new HashSet<IRegionCacheable<T>>(0);
 
     public void register(final IRegionCacheable<T> newCacheable) {
+        unregister(newCacheable);
         cache.add(newCacheable);
     }
 
@@ -38,7 +39,7 @@ public class FileRegionCacher<T> {
 
         if (lineNumber > FilePosition.NOT_SET) {
             for (final IRegionCacheable<T> cacheElement : cache) {
-                if (cacheElement.getRegion().isBetweenLines(lineNumber)) {
+                if (cacheElement.getRegion().containsLine(lineNumber)) {
                     inPosition.add(cacheElement);
                 }
             }
@@ -59,10 +60,6 @@ public class FileRegionCacher<T> {
         }
 
         return inPosition;
-    }
-
-    public void clearCache() {
-        cache.clear();
     }
 
     @VisibleForTesting

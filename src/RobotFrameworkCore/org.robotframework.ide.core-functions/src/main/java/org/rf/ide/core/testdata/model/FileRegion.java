@@ -38,7 +38,7 @@ public class FileRegion {
         return Range.closed(start.getOffset(), end.getOffset()).contains(offset);
     }
 
-    public boolean isBetweenLines(final int line) {
+    public boolean containsLine(final int line) {
         if (line > FilePosition.NOT_SET) {
             return Range.closed(start.getLine(), end.getLine()).contains(line);
         }
