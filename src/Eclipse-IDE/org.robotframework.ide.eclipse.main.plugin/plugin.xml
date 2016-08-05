@@ -2573,7 +2573,25 @@
        point="org.eclipse.ui.bindings">
     <key
           commandId="org.robotframework.ide.eclipse.insertNew"
-          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          contextId="org.robotframework.ide.eclipse.tableeditor.cases.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+N">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.insertNew"
+          contextId="org.robotframework.ide.eclipse.tableeditor.keywords.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+N">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.insertNew"
+          contextId="org.robotframework.ide.eclipse.tableeditor.settings.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+N">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.insertNew"
+          contextId="org.robotframework.ide.eclipse.tableeditor.variables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+N">
        <parameter
