@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _E0anoDR-Eeat08T3d_ERug
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/4/16 5:50 PM
+Save-Time: 8/5/16 11:42 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -135,7 +135,10 @@ with [get-editor "tsv_file.tsv"] {
         type-text "*** Settings ***"
         key-type Enter
         type-text "Documentation\tsecond"
+        wait 500
         key-type "M1+s"
+        wait 1000
+        
     }
 }
 
