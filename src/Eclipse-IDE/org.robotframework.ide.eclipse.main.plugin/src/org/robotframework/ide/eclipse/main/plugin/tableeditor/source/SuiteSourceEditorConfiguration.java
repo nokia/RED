@@ -47,10 +47,10 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
@@ -429,9 +429,14 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         parserCfg.setEagerImport(false);
         parserCfg.setIncludeImportVariables(false);
 
-        final RobotProject project = file.getProject();
-        final RobotParser parser = RobotParser.create(project.getRobotProjectHolder(), parserCfg);
-        return parser;
+        final RobotProjectHolder holder;
+        if (file.getFile() == null) {
+            // when model is build on e.g. history revision
+            holder = new RobotProjectHolder();
+        } else {
+            holder = file.getProject().getRobotProjectHolder();
+        }
+        return RobotParser.create(holder, parserCfg);
     }
 
     @Override
