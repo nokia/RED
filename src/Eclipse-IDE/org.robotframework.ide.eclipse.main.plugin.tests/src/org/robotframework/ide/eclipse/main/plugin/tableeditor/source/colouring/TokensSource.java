@@ -9,6 +9,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo;
 import org.rf.ide.core.testdata.text.read.VersionAvailabilityInfo.VersionAvailabilityInfoBuilder;
@@ -94,9 +95,14 @@ public class TokensSource {
 
     static RobotLine line(final int no, final LineElement... elements) {
         final RobotLine line = new RobotLine(no, null);
+        final int firstOffset = elements[0].getStartOffset();
+        int currentColumn = 0;
         for (final LineElement element : elements) {
             line.addLineElement(element);
+
+            currentColumn += element.getText().length();
         }
+        line.setEndOfLine(newArrayList(Constant.LF), firstOffset + currentColumn, currentColumn);
         return line;
     }
 
