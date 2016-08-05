@@ -11,10 +11,7 @@ import org.eclipse.jface.text.rules.ICharacterScanner;
 import org.eclipse.jface.text.rules.IPredicateRule;
 import org.eclipse.jface.text.rules.IToken;
 import org.eclipse.jface.text.rules.Token;
-import org.rf.ide.core.testdata.text.read.recognizer.header.KeywordsTableHeaderRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.header.SettingsTableHeaderRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.header.TestCasesTableHeaderRecognizer;
-import org.rf.ide.core.testdata.text.read.recognizer.header.VariablesTableHeaderRecognizer;
+import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 
 /**
  * @author Michal Anglart
@@ -65,7 +62,8 @@ class SectionPartitionRule implements IPredicateRule {
         final int readAdditionally = readBeforeSection(scanner);
         final String sectionHeader = getSectionHeader(scanner);
         if (!sectionHeader.isEmpty()) {
-            if (sectionType.matches(sectionHeader)) {
+            final boolean startedWithPipedSeparator = readAdditionally > 1;
+            if (sectionType.matches(sectionHeader, startedWithPipedSeparator)) {
                 return true;
             } else {
                 for (int i = 0; i < sectionHeader.length() + readAdditionally; i++) {
@@ -92,14 +90,16 @@ class SectionPartitionRule implements IPredicateRule {
     }
 
     private static int readBeforeSection(final ICharacterScanner scanner) {
+        int readAdditionally = 0;
         if (lookAhead(scanner) == ' ') {
             scanner.read();
-            return 1;
-        } else if (lookAhead(scanner, 2).equals("| ") || lookAhead(scanner, 2).equals("|\t")) {
-            return eatPipedLineStart(scanner);
-        } else {
-            return 0;
+            readAdditionally++;
         }
+        if (lookAhead(scanner, 2).equals("| ") || lookAhead(scanner, 2).equals("|\t")) {
+            readAdditionally += eatPipedLineStart(scanner);
+        }
+        // this is > 1 when pipe were read
+        return readAdditionally;
     }
 
     static int lookAhead(final ICharacterScanner scanner) {
@@ -167,20 +167,64 @@ class SectionPartitionRule implements IPredicateRule {
         }
     }
 
+    private static final String PIPED_SECTION_START = "^\\*(\\s*\\*)*\\s?";
+    private static final String PIPED_SECTION_END = "(\\s*\\*)*((( \\|).*)?|\\s*)$";
+
+    private static final String NORMAL_SECTION_START = "^\\*(\\s?\\*)*\\s?";
+    private static final String NORMAL_SECTION_END = "\\s?(\\*\\s?)*(((  )|\\t).*)?$";
+
+
+    private static final Pattern SETTINGS_NORMAL = Pattern.compile(
+            NORMAL_SECTION_START + "(" + insensitiveWithSpace("Settings") + "|" + insensitiveWithSpace("Setting") + "|"
+                    + insensitiveWithSpace("Metadata") + ")" + NORMAL_SECTION_END);
+    private static final Pattern SETTINGS_PIPES = Pattern.compile(
+            PIPED_SECTION_START + "(" + insensitiveWithSpaces("Settings") + "|" + insensitiveWithSpaces("Setting") + "|"
+                    + insensitiveWithSpaces("Metadata") + ")" + PIPED_SECTION_END);
+
+    private static final Pattern VARIABLES_NORMAL = Pattern.compile(NORMAL_SECTION_START + "("
+            + insensitiveWithSpace("Variables") + "|" + insensitiveWithSpace("Variable") + ")" + NORMAL_SECTION_END);
+    private static final Pattern VARIABLES_PIPES = Pattern.compile(PIPED_SECTION_START + "("
+            + insensitiveWithSpace("Variables") + "|" + insensitiveWithSpace("Variable") + ")" + PIPED_SECTION_END);
+
+    private static final Pattern KEYWORDS_NORMAL = Pattern.compile(NORMAL_SECTION_START + "("
+            + insensitiveWithSpace("User") + "[\\s]?)?" + "(" + insensitiveWithSpace("Keywords") + "|"
+            + insensitiveWithSpace("Keyword") + ")" + NORMAL_SECTION_END);
+    private static final Pattern KEYWORDS_PIPES = Pattern.compile(PIPED_SECTION_START + "("
+            + insensitiveWithSpaces("User") + "[\\s]*)?" + "(" + insensitiveWithSpaces("Keywords") + "|"
+            + insensitiveWithSpaces("Keyword") + ")" + PIPED_SECTION_END);
+
+    private static final Pattern TEST_CASE_NORMAL = Pattern
+            .compile(NORMAL_SECTION_START + insensitiveWithSpace("Test") + "[\\s]?" + "("
+                    + insensitiveWithSpace("Cases") + "|" + insensitiveWithSpace("Case") + ")" + NORMAL_SECTION_END);
+    private static final Pattern TEST_CASE_PIPES = Pattern
+            .compile(PIPED_SECTION_START + insensitiveWithSpaces("Test") + "[\\s]*" + "("
+                    + insensitiveWithSpaces("Cases") + "|" + insensitiveWithSpaces("Case") + ")" + PIPED_SECTION_END);
+
+    private static String insensitiveWithSpaces(final String text) {
+        return ATokenRecognizer.createUpperLowerCaseWordWithSpacesInside(text);
+    }
+
+    private static String insensitiveWithSpace(final String text) {
+        return ATokenRecognizer.createUpperLowerCaseWordWithOptionalSpaceInside(text);
+    }
+
     static enum Section {
-        TEST_CASES(TestCasesTableHeaderRecognizer.EXPECTED),
-        KEYWORDS(KeywordsTableHeaderRecognizer.EXPECTED),
-        SETTINGS(SettingsTableHeaderRecognizer.EXPECTED),
-        VARIABLES(VariablesTableHeaderRecognizer.EXPECTED);
+        TEST_CASES(TEST_CASE_NORMAL, TEST_CASE_PIPES),
+        KEYWORDS(KEYWORDS_NORMAL, KEYWORDS_PIPES),
+        SETTINGS(SETTINGS_NORMAL, SETTINGS_PIPES),
+        VARIABLES(VARIABLES_NORMAL, VARIABLES_PIPES);
 
-        private Pattern pattern;
+        private final Pattern normalPattern;
 
-        private Section(final Pattern pattern) {
-            this.pattern = pattern;
+        private final Pattern pipedStartPattern;
+
+        private Section(final Pattern normalPattern, final Pattern pipedStartPattenr) {
+            this.normalPattern = normalPattern;
+            this.pipedStartPattern = pipedStartPattenr;
         }
 
-        boolean matches(final String header) {
-            return pattern.matcher(header).find();
+        boolean matches(final String header, final boolean startedWithPipedSeparator) {
+            return (startedWithPipedSeparator ? pipedStartPattern : normalPattern).matcher(header).find();
         }
     }
 }
