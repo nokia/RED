@@ -21,6 +21,7 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -71,12 +72,14 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     public void reconcile(final DirtyRegion dirtyRegion, final IRegion subRegion) {
         reconcile();
 
-        Optional<IDocumentationHolder> docToShow = editor.getFileModel()
-                .getLinkedElement()
-                .getParent()
+        final RobotFile linkedFile = editor.getFileModel().getLinkedElement();
+        if (linkedFile == null) {
+            return;
+        }
+        final Optional<IDocumentationHolder> docToShow = linkedFile.getParent()
                 .findDocumentationForOffset(dirtyRegion.getOffset());
         if (docToShow.isPresent()) {
-            final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+            final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
             eventBroker.post(DocumentationView.SHOW_DOC_EVENT_TOPIC,
                     editor.getFileModel().findElement(dirtyRegion.getOffset()).get());
             editor.setLastShowDocumentation(docToShow.get());
@@ -99,7 +102,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     private void reparseModel() {
         final RobotSuiteFile suiteModel = getSuiteModel();
         suiteModel.reparseEverything(document.get());
-        final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
+        final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         eventBroker.post(RobotModelEvents.REPARSING_DONE, suiteModel);
     }
 
