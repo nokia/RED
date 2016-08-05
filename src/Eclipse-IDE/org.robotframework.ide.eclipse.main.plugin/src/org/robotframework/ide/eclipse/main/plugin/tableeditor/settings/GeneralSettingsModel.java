@@ -107,7 +107,7 @@ public class GeneralSettingsModel {
         static AccessibleSettings forFile(final RobotSuiteFile suiteModel) {
             if (suiteModel.isInitializationFile()) {
                 return OF_INIT_FILE;
-            } else if (suiteModel.isInitializationFile()) {
+            } else if (suiteModel.isSuiteFile()) {
                 return OF_SUITE_FILE;
             } else {
                 return OF_RESOURCE_FILE;
