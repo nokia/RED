@@ -13,11 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.base.Predicates;
 import com.google.common.collect.Iterables;
@@ -43,7 +42,7 @@ public class GeneralSettingsModel {
     }
 
     public static Map<String, RobotElement> fillSettingsMapping(final RobotSettingsSection section) {
-        final Map<String, RobotElement> initialMapping = AccessibleSettings.forFile(section.getSuiteFile().getFile())
+        final Map<String, RobotElement> initialMapping = AccessibleSettings.forFile(section.getSuiteFile())
                 .createInitialMapping();
 
         if (section != null) {
@@ -105,10 +104,10 @@ public class GeneralSettingsModel {
 
         abstract Map<String, RobotElement> createInitialMapping();
 
-        static AccessibleSettings forFile(final IFile file) {
-            if (ASuiteFileDescriber.isInitializationFile(file)) {
+        static AccessibleSettings forFile(final RobotSuiteFile suiteModel) {
+            if (suiteModel.isInitializationFile()) {
                 return OF_INIT_FILE;
-            } else if (ASuiteFileDescriber.isSuiteFile(file)) {
+            } else if (suiteModel.isInitializationFile()) {
                 return OF_SUITE_FILE;
             } else {
                 return OF_RESOURCE_FILE;
