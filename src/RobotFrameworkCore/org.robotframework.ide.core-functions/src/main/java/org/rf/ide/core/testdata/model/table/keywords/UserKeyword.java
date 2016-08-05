@@ -123,7 +123,6 @@ public class UserKeyword extends AModelElement<KeywordTable>
     public void addDocumentation(final KeywordDocumentation doc) {
         doc.setParent(this);
         this.documentation.add(doc);
-        getParent().getParent().getParent().getDocumentationCacher().unregister(doc);
         getParent().getParent().getParent().getDocumentationCacher().register(doc);
     }
 
