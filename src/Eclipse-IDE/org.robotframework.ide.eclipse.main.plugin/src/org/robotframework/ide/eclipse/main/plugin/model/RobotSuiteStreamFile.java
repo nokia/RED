@@ -45,6 +45,11 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
         }
         contentTypeId = null;
         if (input != null) {
+            if ("__init__.robot".equals(name) || "__init__.tsv".equals(name) || "__init__.txt".equals(name)) {
+                contentTypeId = ASuiteFileDescriber.INIT_FILE_CONTENT_ID;
+                return contentTypeId;
+            }
+
             int validationResult;
             try {
                 final String fileExt = getFileExtension();
