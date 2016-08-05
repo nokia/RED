@@ -169,7 +169,6 @@ public class SettingTable extends ARobotSectionTable {
     public void addDocumentation(final SuiteDocumentation doc) {
         doc.setParent(this);
         documentations.add(doc);
-        getParent().getParent().getDocumentationCacher().unregister(doc);
         getParent().getParent().getDocumentationCacher().register(doc);
     }
 

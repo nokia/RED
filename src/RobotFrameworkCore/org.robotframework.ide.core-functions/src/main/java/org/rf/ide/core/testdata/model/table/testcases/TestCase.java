@@ -150,7 +150,6 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     public void addDocumentation(final int index, final TestDocumentation doc) {
         doc.setParent(this);
         this.documentation.add(index, doc);
-        getParent().getParent().getParent().getDocumentationCacher().unregister(doc);
         getParent().getParent().getParent().getDocumentationCacher().register(doc);
     }
 
