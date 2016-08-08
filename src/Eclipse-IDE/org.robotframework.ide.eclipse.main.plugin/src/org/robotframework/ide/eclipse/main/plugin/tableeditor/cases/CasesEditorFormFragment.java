@@ -13,6 +13,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
+import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.viewers.ISelection;
@@ -90,9 +91,9 @@ import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
+import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
-import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 
@@ -271,6 +272,15 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     @Override
     public void setFocus() {
         table.setFocus();
+    }
+
+    public void aboutToChangeToOtherPage() {
+        CellEditorCloser.closeForcibly(table);
+    }
+
+    @Persist
+    public void onSave() {
+        CellEditorCloser.closeForcibly(table);
     }
 
     private void setDirty() {

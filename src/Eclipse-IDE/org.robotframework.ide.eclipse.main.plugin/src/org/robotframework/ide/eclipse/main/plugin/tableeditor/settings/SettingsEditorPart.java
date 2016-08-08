@@ -168,6 +168,15 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
         }
 
         @Override
+        public void aboutToChangeToOtherPage() {
+            generalFragment.aboutToChangeToOtherPage();
+            importFragment.aboutToChangeToOtherPage();
+            if (metadataFragment.isPresent()) {
+                metadataFragment.get().aboutToChangeToOtherPage();
+            }
+        }
+
+        @Override
         @Persist
         public void onSave() {
             final ISelection selection = settingsEditorPageSelectionProvider.getSelection();

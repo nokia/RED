@@ -96,6 +96,11 @@ public class KeywordsEditorPart extends DISectionEditorPart<KeywordsEditor> {
         }
 
         @Override
+        public void aboutToChangeToOtherPage() {
+            keywordsFragment.aboutToChangeToOtherPage();
+        }
+
+        @Override
         public void waitForPendingJobs() {
             return;
         }

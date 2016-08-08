@@ -51,7 +51,6 @@ import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
 import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
@@ -133,9 +132,9 @@ import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
+import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
-import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
@@ -325,10 +324,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private String escapeNotEscapedHashSigns(final String text) {
         if (text != null) {
-            StringBuilder str = new StringBuilder("");
+            final StringBuilder str = new StringBuilder("");
             boolean wasLastEscape = false;
-            char[] charArray = text.toCharArray();
-            for (char c : charArray) {
+            final char[] charArray = text.toCharArray();
+            for (final char c : charArray) {
                 if (c == '\\') {
                     wasLastEscape = true;
                 } else if (c == '#') {
@@ -737,26 +736,18 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         onSave();
     }
 
+    public void aboutToChangeToOtherPage() {
+        if (table.isPresent()) {
+            CellEditorCloser.closeForcibly(table.get());
+        }
+    }
+
     @Persist
     public void onSave() {
         isDocumentationModified = false;
-        if (!table.isPresent()) {
-            return;
+        if (table.isPresent()) {
+            CellEditorCloser.closeForcibly(table.get());
         }
-        final ICellEditor cellEditor = table.get().getActiveCellEditor();
-        if (cellEditor != null && !cellEditor.isClosed()) {
-            final boolean commited = cellEditor.commit(MoveDirectionEnum.NONE);
-            if (!commited) {
-                cellEditor.close();
-            }
-        }
-        SwtThread.asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                setFocus();
-            }
-        });
     }
 
     protected void waitForDocumentationChangeJob() {
