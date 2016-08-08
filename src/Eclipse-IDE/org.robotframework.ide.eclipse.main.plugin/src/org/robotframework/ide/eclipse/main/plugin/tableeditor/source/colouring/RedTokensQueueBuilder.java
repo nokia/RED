@@ -16,12 +16,12 @@ class RedTokensQueueBuilder {
             final RobotLine line = lines.get(lineIndex);
 
             for (final IRobotLineElement lineElement : line.getLineElements()) {
-                final boolean shouldStop = foo(lineElement, tokens, offset, length);
+                final boolean shouldStop = processElement(lineElement, tokens, offset, length);
                 if (shouldStop) {
                     return tokens;
                 }
             }
-            final boolean shouldStop = foo(line.getEndOfLine(), tokens, offset, length);
+            final boolean shouldStop = processElement(line.getEndOfLine(), tokens, offset, length);
             if (shouldStop) {
                 return tokens;
             }
@@ -29,7 +29,7 @@ class RedTokensQueueBuilder {
         return tokens;
     }
 
-    private boolean foo(final IRobotLineElement lineElement, final Deque<IRobotLineElement> tokens, final int offset, final int length) {
+    private boolean processElement(final IRobotLineElement lineElement, final Deque<IRobotLineElement> tokens, final int offset, final int length) {
         if (lineElement.getStartOffset() >= offset
                 && lineElement.getStartOffset() + lineElement.getText().length() <= offset + length) {
             // when token is within given region
