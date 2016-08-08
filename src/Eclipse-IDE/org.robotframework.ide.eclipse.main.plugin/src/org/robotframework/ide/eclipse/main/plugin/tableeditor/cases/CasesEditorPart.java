@@ -93,6 +93,11 @@ public class CasesEditorPart extends DISectionEditorPart<CasesEditor> {
         public Optional<TreeLayerAccessor> getTreeLayerAccessor() {
             return Optional.of(casesFragment.getTreeLayerAccessor());
         }
+
+        @Override
+        public void aboutToChangeToOtherPage() {
+            casesFragment.aboutToChangeToOtherPage();
+        }
         
         @Override
         public void waitForPendingJobs() {

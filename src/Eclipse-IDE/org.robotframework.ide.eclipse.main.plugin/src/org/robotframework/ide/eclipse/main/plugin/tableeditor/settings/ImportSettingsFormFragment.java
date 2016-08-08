@@ -37,7 +37,6 @@ import org.eclipse.nebula.widgets.nattable.selection.ITraversalStrategy;
 import org.eclipse.nebula.widgets.nattable.selection.MoveCellSelectionCommandHandler;
 import org.eclipse.nebula.widgets.nattable.selection.RowSelectionProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
@@ -86,6 +85,7 @@ import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
+import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 import org.robotframework.red.swt.SwtThread;
@@ -280,22 +280,13 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         onSave();
     }
 
+    public void aboutToChangeToOtherPage() {
+        CellEditorCloser.closeForcibly(table);
+    }
+
     @Persist
     public void onSave() {
-        final ICellEditor cellEditor = table.getActiveCellEditor();
-        if (cellEditor != null && !cellEditor.isClosed()) {
-            final boolean commited = cellEditor.commit(MoveDirectionEnum.NONE);
-            if (!commited) {
-                cellEditor.close();
-            }
-        }
-        SwtThread.asyncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                setFocus();
-            }
-        });
+        CellEditorCloser.closeForcibly(table);
     }
 
     private void setDirty() {
