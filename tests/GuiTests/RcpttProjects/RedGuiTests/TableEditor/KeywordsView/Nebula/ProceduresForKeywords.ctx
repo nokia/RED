@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YI1vUFJyEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/28/16 1:07 PM
+Save-Time: 8/8/16 3:18 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -93,4 +93,18 @@ proc "compare-row-with-list" [val file]  [val col_amount] [val row] [val ref_tab
 		} 
 	}
 }
+
+//rows starts from 0
+proc "is-row-fully-selected" [val row]{
+	get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+			| invoke getUnderlyingLayerByPosition 0 0 | invoke isRowPositionFullySelected  $row | eq true | verify-true
+	
+	get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+			| invoke getUnderlyingLayerByPosition 0 0 | invoke hasRowSelection | eq true | verify-true
+					
+	get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+		| invoke getUnderlyingLayerByPosition 0 0 | invoke getSelectedRowCount | eq 1 | verify-true
+} 
+
+
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
