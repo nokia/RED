@@ -96,6 +96,11 @@ public class VariablesEditorPart extends DISectionEditorPart<VariablesEditor> {
         public Optional<TreeLayerAccessor> getTreeLayerAccessor() {
             return Optional.absent();
         }
+
+        @Override
+        public void aboutToChangeToOtherPage() {
+            variablesFragment.aboutToChangeToOtherPage();
+        }
         
         @Override
         public void waitForPendingJobs() {

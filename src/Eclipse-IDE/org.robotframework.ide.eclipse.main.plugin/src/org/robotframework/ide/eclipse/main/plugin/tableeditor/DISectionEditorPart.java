@@ -29,6 +29,11 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     }
 
     @Override
+    public void aboutToChangeToOtherPage() {
+        getComponent().aboutToChangeToOtherPage();
+    }
+
+    @Override
     public Optional<? extends RobotSuiteFileSection> provideSection(final RobotSuiteFile suiteModel) {
         return getComponent().provideSection(suiteModel);
     }
@@ -62,5 +67,4 @@ public class DISectionEditorPart<C extends ISectionEditorPart> extends DIEditorP
     public void waitForPendingJobs() {
         getComponent().waitForPendingJobs();
     }
-
 }
