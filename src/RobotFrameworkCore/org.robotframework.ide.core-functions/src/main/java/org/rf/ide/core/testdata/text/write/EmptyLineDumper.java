@@ -60,23 +60,12 @@ public class EmptyLineDumper {
             while (fileContent.size() > currentLineNumber + 1) {
                 final RobotLine nextLine = fileContent.get(currentLineNumber + 1);
                 if (isEmptyLine(nextLine)) {
-                    dumpLineDirectly(model, lines, nextLine);
+                    dumperHelper.dumpLineDirectly(model, lines, nextLine);
                     currentLineNumber++;
                 } else {
                     break;
                 }
             }
-        }
-    }
-
-    private void dumpLineDirectly(final RobotFile model, final List<RobotLine> outLines, final RobotLine currentLine) {
-        for (final IRobotLineElement elem : currentLine.getLineElements()) {
-            dumperHelper.getDumpLineUpdater().updateLine(model, outLines, elem);
-        }
-
-        final IRobotLineElement endOfLine = currentLine.getEndOfLine();
-        if (endOfLine != null && !endOfLine.getFilePosition().isNotSet()) {
-            dumperHelper.getDumpLineUpdater().updateLine(model, outLines, endOfLine);
         }
     }
 

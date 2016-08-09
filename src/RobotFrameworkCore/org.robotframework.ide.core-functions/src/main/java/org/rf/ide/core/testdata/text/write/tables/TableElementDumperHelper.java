@@ -198,13 +198,18 @@ public class TableElementDumperHelper {
 
             int elementPositionInLine;
             if (offset != startOffset) {
-                elementPositionInLine = lastLine.getElementPositionInLine(offset, PositionCheck.STARTS).get();
+                final Optional<Integer> elemPosInLine = lastLine.getElementPositionInLine(offset, PositionCheck.STARTS);
+                if (elemPosInLine.isPresent()) {
+                    elementPositionInLine = elemPosInLine.get();
+                } else {
+                    elementPositionInLine = -1;
+                }
             } else {
                 elementPositionInLine = lastLine.getElementPositionInLine(lastToken).get() + 1;
             }
             currentSize = dumps.size();
             removeUpdated = false;
-            for (int i = elementPositionInLine; i < lastToksSize; i++) {
+            for (int i = elementPositionInLine; elementPositionInLine > -1 && i < lastToksSize; i++) {
                 final IRobotLineElement e = lastToks.get(i);
                 lastToken = e;
                 if (e instanceof Separator) {
