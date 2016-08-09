@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VT-NwF1kEeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/8/16 3:50 PM
+Save-Time: 8/9/16 1:26 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -48,7 +48,7 @@ with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords
 	//move this line up
     get-menu "Row/Move up" | click
 }
-
+wait 500
 is-row-fully-selected -row 6
 
 
@@ -85,6 +85,7 @@ with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords
     key-type Down -times 12
     key-type "M1+ARROW_DOWN"
 }
+wait 500
 is-row-fully-selected -row 17
 
 //set focus on "..."
@@ -115,7 +116,7 @@ with [get-editor "TestFile.robot" ] {
 
 //set on single kw and move it down/up - it should not move
 
-get-view Outline | get-tree | select "TestFile.robot/Keywords/kw_3/abc"
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw_3/abc" | click
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type "M1+ARROW_UP" -times 2
 }   
