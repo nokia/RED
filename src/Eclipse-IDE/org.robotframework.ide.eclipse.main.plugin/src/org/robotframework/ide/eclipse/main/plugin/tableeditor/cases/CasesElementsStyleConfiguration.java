@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.InactiveCellPainter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -87,12 +88,15 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
                 new SearchMatchesTextPainter(matchesSupplier, 2), CellEdgeEnum.LEFT,
                 new ImagePainter(ImagesManager.getImage(templatedCaseImage)));
 
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, caseCellPainter,
-                DisplayMode.NORMAL,
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, caseCellPainter, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, templatedCaseCellPainter,
-                DisplayMode.NORMAL,
-                CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
+                DisplayMode.NORMAL, CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
+
+        final ICellPainter inactiveCellPainter = new CellPainterDecorator(new InactiveCellPainter(), CellEdgeEnum.LEFT,
+                new ImagePainter());
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, inactiveCellPainter,
+                DisplayMode.NORMAL, CasesElementsLabelAccumulator.CASE_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
     }
 
     private Style createStyle(final RedPreferences preferences, final SyntaxHighlightingCategory category) {
