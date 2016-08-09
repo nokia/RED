@@ -7,7 +7,6 @@ package org.rf.ide.core.testdata.text.write.tables.testcases.update;
 
 import java.nio.file.Path;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -27,7 +26,6 @@ public abstract class AUpdateOfTestCaseExecutableForTest {
         this.extension = extension;
     }
 
-    @Ignore(value = "RED-441")
     @Test
     public void test_update_secondTestCaseWithCommentBetween() throws Exception {
         // prepare
@@ -42,7 +40,7 @@ public abstract class AUpdateOfTestCaseExecutableForTest {
         final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
         final TestCase testCase = testCaseTable.getTestCases().get(1);
         final RobotExecutableRow<TestCase> rExecRow = testCase.getExecutionContext().get(1);
-        rExecRow.setArgument(0, "${x2}");
+        rExecRow.setArgument(1, "${x2}");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);

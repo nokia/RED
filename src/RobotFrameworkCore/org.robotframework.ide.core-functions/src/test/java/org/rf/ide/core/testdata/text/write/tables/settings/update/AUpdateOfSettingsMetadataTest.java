@@ -7,7 +7,6 @@ package org.rf.ide.core.testdata.text.write.tables.settings.update;
 
 import java.nio.file.Path;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -26,7 +25,6 @@ public abstract class AUpdateOfSettingsMetadataTest {
         this.extension = extension;
     }
 
-    @Ignore(value = "RED-441")
     @Test
     public void test_UpdateMetadataDeclarationWithKeyAndValueAndCommentAfter_updateMetadata_withKeyAndValue()
             throws Exception {

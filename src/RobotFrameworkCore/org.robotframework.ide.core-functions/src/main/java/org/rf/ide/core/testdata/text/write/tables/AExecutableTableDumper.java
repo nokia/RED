@@ -84,10 +84,8 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
 
                 final AModelElement<ARobotSectionTable> execUnit = sorted.get(execUnitIndex);
                 if (execUnitIndex > 0) {
-                    if (sorted.get(execUnitIndex - 1).getEndPosition().getLine() + 1 != execUnit.getBeginPosition()
-                            .getLine()) {
-                        // TODO: fix for removing comment RED-441
-                    }
+                    getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(sorted.get(execUnitIndex - 1),
+                            execUnit, model, lines);
                 }
 
                 @SuppressWarnings("rawtypes")
