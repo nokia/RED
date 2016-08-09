@@ -121,25 +121,25 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private HeaderFilterMatchesCollection matches;
 
     private NatTable table;
-    
+
     private ISortModel sortModel;
 
     private KeywordsDataProvider dataProvider;
 
     private RowSelectionProvider<Object> selectionProvider;
-    
+
     private SelectionLayerAccessor selectionLayerAccessor;
-    
+
     private TreeLayerAccessor treeLayerAccessor;
 
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
-    
+
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         return selectionLayerAccessor;
     }
-    
+
     public TreeLayerAccessor getTreeLayerAccessor() {
         return treeLayerAccessor;
     }
@@ -164,7 +164,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         // data providers
         dataProvider = new KeywordsDataProvider(commandsStack, getSection());
-        
+
         final IDataProvider columnHeaderDataProvider = new KeywordsColumnHeaderDataProvider();
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
@@ -185,14 +185,14 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         // column header layers
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider);
-        final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer, bodySelectionLayer,
-                bodyViewportLayer);
-        
+        final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
+                bodySelectionLayer, bodyViewportLayer);
+
         sortModel = new GlazedListsSortModel<>(dataProvider.getSortedList(), dataProvider.getPropertyAccessor(),
                 configRegistry, columnHeaderDataLayer);
         dataProvider.getTreeFormat().setSortModel(sortModel);
-        final SortHeaderLayer<Object> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
-                columnHeaderLayer, sortModel);
+        final SortHeaderLayer<Object> columnHeaderSortingLayer = factory
+                .createSortingColumnHeaderLayer(columnHeaderLayer, sortModel);
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
@@ -206,7 +206,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator()));
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
+                KeywordTableEditableRule.createEditableRule(fileModel)));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 
@@ -217,7 +218,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
-        
+
         selectionProvider.addSelectionChangedListener(new DocumentationElementsSelectionChangedListener(eventBroker));
 
         new KeywordsTableContentTooltip(table, markersContainer, dataProvider);
@@ -239,7 +240,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
         table.addConfiguration(new KeywordsTableSortingConfiguration(dataProvider));
-        
+
         // popup menus
         table.addConfiguration(new KeywordsTableMenuConfiguration(site, table, selectionProvider));
 
@@ -358,7 +359,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             table.refresh();
         }
     }
-    
+
     @Inject
     @Optional
     private void whenKeywordDefinitionIsAdded(
@@ -390,7 +391,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         whenKeywordDefinitionIsAddedOrRemoved(section);
         selectionProvider.setSelection(oldSelection);
     }
-    
+
     @Inject
     @Optional
     private void whenKeywordDefinitionArgumentChanged(
