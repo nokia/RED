@@ -393,4 +393,9 @@ public class UserKeyword extends AModelElement<KeywordTable>
         }
         return new ArrayList<>();
     }
+
+    @Override
+    public RobotToken getName() {
+        return getKeywordName();
+    }
 }
