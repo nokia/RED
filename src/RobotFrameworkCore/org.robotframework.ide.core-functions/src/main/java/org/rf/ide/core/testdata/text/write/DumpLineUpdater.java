@@ -165,7 +165,7 @@ public class DumpLineUpdater {
                 elemPos.getOffset() + dataLength);
     }
 
-    private IRobotLineElement cloneWithPositionRecalculate(final IRobotLineElement elem, final RobotLine line,
+    public IRobotLineElement cloneWithPositionRecalculate(final IRobotLineElement elem, final RobotLine line,
             final List<RobotLine> outLines) {
         IRobotLineElement newElem;
         if (elem instanceof RobotToken) {
