@@ -121,21 +121,21 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private HeaderFilterMatchesCollection matches;
 
     private NatTable table;
-    
+
     private ISortModel sortModel;
 
     private CasesDataProvider dataProvider;
 
     private RowSelectionProvider<Object> selectionProvider;
-    
-    private SelectionLayerAccessor selectionLayerAccessor;
-    private TreeLayerAccessor treeLayerAccessor;
 
+    private SelectionLayerAccessor selectionLayerAccessor;
+
+    private TreeLayerAccessor treeLayerAccessor;
 
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
     }
-    
+
     public SelectionLayerAccessor getSelectionLayerAccessor() {
         return selectionLayerAccessor;
     }
@@ -164,7 +164,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
         // data providers
         dataProvider = new CasesDataProvider(commandsStack, getSection());
-        
+
         final IDataProvider columnHeaderDataProvider = new CasesColumnHeaderDataProvider();
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
@@ -187,12 +187,12 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider);
         final ColumnHeaderLayer columnHeaderLayer = factory.createColumnHeaderLayer(columnHeaderDataLayer,
                 bodySelectionLayer, bodyViewportLayer);
-        
+
         sortModel = new GlazedListsSortModel<>(dataProvider.getSortedList(), dataProvider.getPropertyAccessor(),
                 configRegistry, columnHeaderDataLayer);
         dataProvider.getTreeFormat().setSortModel(sortModel);
-        final SortHeaderLayer<Object> columnHeaderSortingLayer = factory.createSortingColumnHeaderLayer(
-                columnHeaderLayer, sortModel);
+        final SortHeaderLayer<Object> columnHeaderSortingLayer = factory
+                .createSortingColumnHeaderLayer(columnHeaderLayer, sortModel);
 
         // row header layers
         final RowHeaderLayer rowHeaderLayer = factory.createRowsHeaderLayer(bodySelectionLayer, bodyViewportLayer,
@@ -206,7 +206,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         // combined grid layer
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
-        gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator()));
+        gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
+                CasesTableEditableRule.createEditableRule(fileModel)));
 
         table = createTable(parent, theme, gridLayer, configRegistry);
 
@@ -217,7 +218,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
-        
+
         selectionProvider.addSelectionChangedListener(new DocumentationElementsSelectionChangedListener(eventBroker));
 
         new CasesTableContentTooltip(table, markersContainer, dataProvider);
@@ -239,7 +240,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
         table.addConfiguration(new CasesTableSortingConfiguration(dataProvider));
-        
+
         // popup menus
         table.addConfiguration(new CasesTableMenuConfiguration(site, table, selectionProvider));
 
@@ -251,6 +252,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
         final Supplier<HeaderFilterMatchesCollection> matchesSupplier = new Supplier<HeaderFilterMatchesCollection>() {
+
             @Override
             public HeaderFilterMatchesCollection get() {
                 return matches;
@@ -359,8 +361,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenCaseIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_CASE_ADDED) final RobotSuiteFileSection section) {
+    private void whenCaseIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_CASE_ADDED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
         }

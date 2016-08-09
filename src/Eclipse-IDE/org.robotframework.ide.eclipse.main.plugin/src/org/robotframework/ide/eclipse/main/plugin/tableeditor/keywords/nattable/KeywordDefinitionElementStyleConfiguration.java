@@ -24,6 +24,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.InactiveCellPainter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
@@ -70,7 +71,7 @@ public class KeywordDefinitionElementStyleConfiguration extends AbstractRegistry
                 KeywordElementsInTreeLabelAccumulator.KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, argumentStyle, DisplayMode.SELECT,
                 KeywordElementsInTreeLabelAccumulator.KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
-        
+
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.NORMAL,
                 KeywordElementsInTreeLabelAccumulator.KEYWORD_DEFINITION_SETTING_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.SELECT,
@@ -80,9 +81,14 @@ public class KeywordDefinitionElementStyleConfiguration extends AbstractRegistry
         final Image imageToUse = ImagesManager
                 .getImage(isEditable ? keywordImage : RedImages.getGreyedImage(keywordImage));
 
+        final ICellPainter inactiveCellPainter = new CellPainterDecorator(new InactiveCellPainter(), CellEdgeEnum.LEFT,
+                new ImagePainter());
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, inactiveCellPainter,
+                DisplayMode.NORMAL,
+                KeywordElementsInTreeLabelAccumulator.KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
+
         final ICellPainter cellPainter = new CellPainterDecorator(new SearchMatchesTextPainter(matchesSupplier, 2),
                 CellEdgeEnum.LEFT, new ImagePainter(imageToUse));
-
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
                 KeywordElementsInTreeLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL);
     };
