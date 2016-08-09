@@ -468,4 +468,9 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     public boolean removeElementToken(final int index) {
         throw new UnsupportedOperationException("This operation is not allowed inside TestCase.");
     }
+
+    @Override
+    public RobotToken getName() {
+        return getTestName();
+    }
 }

@@ -8,6 +8,7 @@ package org.rf.ide.core.testdata.model.table;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobotSectionTable>> {
 
@@ -18,4 +19,6 @@ public interface IExecutableStepsHolder<T extends AModelElement<? extends ARobot
     boolean removeUnitSettings(final AModelElement<T> setting);
 
     T getHolder();
+
+    RobotToken getName();
 }
