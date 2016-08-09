@@ -71,12 +71,6 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
                 }
 
                 final AModelElement<ARobotSectionTable> setting = sorted.get(settingIndex);
-                if (settingIndex > 0) {
-                    if (sorted.get(settingIndex - 1).getEndPosition().getLine() + 1 != setting.getBeginPosition()
-                            .getLine()) {
-                        // TODO: fix for removing comment RED-441
-                    }
-                }
 
                 ISectionElementDumper elemDumper = null;
                 for (final ISectionElementDumper dumper : dumpers) {
@@ -87,6 +81,13 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
                 }
 
                 elemDumper.dump(model, settingSections, sectionWithHeaderPos, th, sorted, setting, lines);
+
+                if (settingIndex + 1 < lastIndexToDump) {
+                    getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(setting,
+                            sorted.get(settingIndex + 1), model, lines);
+                } else {
+                    getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(setting, null, model, lines);
+                }
 
                 getEmptyDumperHelper().dumpEmptyLines(model, lines, setting);
             }

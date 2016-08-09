@@ -46,12 +46,15 @@ public class DumperHelper {
 
     private final SeparatorsDumpHelper aSeparatorDumper;
 
+    private final NotModelRelatedHashCommentedLineDumper aCommentHashDumper;
+
     public DumperHelper(final ARobotFileDumper currentDumper) {
         this.currentDumper = currentDumper;
         this.aDumpLineUpdater = new DumpLineUpdater(this);
         this.anEmptyLineDumper = new EmptyLineDumper(this);
         this.aHeaderDumper = new HeaderDumperHelper(this);
         this.aSeparatorDumper = new SeparatorsDumpHelper(this);
+        this.aCommentHashDumper = new NotModelRelatedHashCommentedLineDumper(this);
     }
 
     public DumpLineUpdater getDumpLineUpdater() {
@@ -68,6 +71,10 @@ public class DumperHelper {
 
     public SeparatorsDumpHelper getSeparatorDumpHelper() {
         return this.aSeparatorDumper;
+    }
+
+    public NotModelRelatedHashCommentedLineDumper getHashCommentDumper() {
+        return this.aCommentHashDumper;
     }
 
     public void addEOFinCaseIsMissing(final RobotFile model, final List<RobotLine> lines) {
@@ -223,6 +230,17 @@ public class DumperHelper {
         }
 
         return result;
+    }
+
+    public void dumpLineDirectly(final RobotFile model, final List<RobotLine> outLines, final RobotLine currentLine) {
+        for (final IRobotLineElement elem : currentLine.getLineElements()) {
+            getDumpLineUpdater().updateLine(model, outLines, elem);
+        }
+
+        final IRobotLineElement endOfLine = currentLine.getEndOfLine();
+        if (endOfLine != null && !endOfLine.getFilePosition().isNotSet()) {
+            getDumpLineUpdater().updateLine(model, outLines, endOfLine);
+        }
     }
 
     public int getNumberOfNewToTreatAsNewUnit() {
