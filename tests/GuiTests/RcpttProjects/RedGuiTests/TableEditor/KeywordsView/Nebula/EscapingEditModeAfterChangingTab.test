@@ -1,0 +1,159 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YI1vUFJyEea8WJ7bbC6OBw
+Element-Name: EscapingEditModeAfterChangingTab
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _0dTcMF4zEeaRBaqqj0N1Gg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/9/16 5:03 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "kw1\n"
+    + "    log  1\n"
+    + "    [return]  9\n"
+    + "   \n"
+    + "kw-2\n"
+    + "    Should Be Empty    item       \n"
+    + "   \n" 
+    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type "M1+s"
+}
+//set focus on first KW    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 500    
+
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw1" | click
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        key-type Left
+        key-type Down
+        key-type Enter
+    }
+    //ass 2 spaces ath the end of [return]
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        type-text "[return]  "
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 
+       | get-property "decorators[0].description" | equals "Single entry cannot contain cells separator" | verify-true
+    //switch to Test CAses and go back
+    with [get-tab-folder] {
+        get-tab-item "Test Cases" | click
+        get-tab-item Keywords | click
+    }
+    //check that user can move by arrows to next cell
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    //change value
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text 8
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "Esc"
+    
+	//go to kw-2
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down -times 3
+        key-type Left -times 2
+        key-type Enter
+    }
+    //change kw name to double space
+    get-editbox -after [get-label "User Keywords"] -index 1 | type-text "  "
+    get-editbox -after [get-label "User Keywords"] -index 1 
+       | get-property "decorators[0].description" | equals "Single entry cannot contain cells separator" | verify-true
+    with [get-tab-folder] {
+        get-tab-item "Variables" | click
+        get-tab-item Keywords | click
+    }
+    //go down to kw "Should be empty" and change its name
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "  new name"
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 
+       | get-property "decorators[0].description" | equals "Single entry cannot contain cells separator" | verify-true
+       
+    with [get-tab-folder] {
+        get-tab-item Source | click
+        get-tab-item Keywords | click
+    }
+}
+
+
+//go to argument and add text with double space in the middle
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | type-text "text  space"
+}
+get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1 
+    | get-property "decorators[0].description" | equals "Single entry cannot contain cells separator" | verify-true
+
+//set text to correct
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        set-text "text is ok"
+    }
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Enter
+    }
+    //set again wrong name: only 2 spaces and press esc - "test is ok" should be restore
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "  "
+        key-type Esc
+    }
+}
+
+//add new incorrect arg and press escape - no new arg should be added
+with [get-editor "TestFile.robot"] {
+
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "  second arg"
+        key-type  Esc
+    }
+}
+
+check-keyword-row -file "TestFile.robot" -row 1 -kw "kw1"
+check-keyword-row -file "TestFile.robot" -row 2 -kw "[return]" -c1 8
+check-keyword-row -file "TestFile.robot" -row 3 -kw "log" -c1 1
+check-keyword-row -file "TestFile.robot" -row 4 -kw "..."
+
+check-keyword-row -file "TestFile.robot" -row 5 -kw "kw-2"
+check-keyword-row -file "TestFile.robot" -row 6 -kw "Should Be Empty" -c1 "text is ok"
+check-keyword-row -file "TestFile.robot" -row 7 -kw "..."
+check-keyword-row -file "TestFile.robot" -row 8 -kw "...add new keyword"
+
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "kw1\n"
+    + "    log  1\n"
+    + "    [return]  8\n"
+    + "   \n"
+    + "kw-2\n"
+    + "    Should Be Empty    text is ok" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
