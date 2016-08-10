@@ -126,10 +126,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     public synchronized List<RobotSuiteFileSection> getSections(final ParsingStrategy parsingStrategy) {
         if (sections == null) {
-            fileOutput = parseModel(parsingStrategy);
-            if (fileOutput != null) {
-                link(fileOutput.getFileModel());
-            }
+            link(parseModel(parsingStrategy));
         }
         return sections == null ? new ArrayList<RobotSuiteFileSection>() : sections;
     }
@@ -138,7 +135,14 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         getSections(); // this will parse the file if needed
     }
 
-    public void link(final RobotFile model) {
+    public void link(final RobotFileOutput fileOutput) {
+        this.fileOutput = fileOutput;
+        if (this.fileOutput != null) {
+            link(fileOutput.getFileModel());
+        }
+    }
+
+    private void link(final RobotFile model) {
         sections = Collections.synchronizedList(new ArrayList<RobotSuiteFileSection>());
         if (model.getKeywordTable().isPresent()) {
             final RobotKeywordsSection section = new RobotKeywordsSection(this, model.getKeywordTable());
