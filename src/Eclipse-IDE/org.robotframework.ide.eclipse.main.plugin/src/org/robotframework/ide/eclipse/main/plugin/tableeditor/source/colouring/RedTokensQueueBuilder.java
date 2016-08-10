@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
 
+import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 
@@ -20,6 +21,9 @@ class RedTokensQueueBuilder {
                 if (shouldStop) {
                     return tokens;
                 }
+            }
+            if (line.getEndOfLine().getTypes().contains(EndOfLineTypes.EOF)) {
+                return tokens;
             }
             final boolean shouldStop = processElement(line.getEndOfLine(), tokens, offset, length);
             if (shouldStop) {

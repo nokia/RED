@@ -11,9 +11,22 @@ import org.eclipse.jface.text.IDocumentPartitioner;
 import org.eclipse.jface.text.rules.FastPartitioner;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.editors.text.FileDocumentProvider;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+
+import com.google.common.base.Supplier;
 
 class SuiteSourceDocumentProvider extends FileDocumentProvider {
 
+    private final Supplier<RobotSuiteFile> supplier;
+
+    SuiteSourceDocumentProvider(final Supplier<RobotSuiteFile> supplier) {
+        this.supplier = supplier;
+    }
+
+    @Override
+    protected IDocument createEmptyDocument() {
+        return new RobotDocument(supplier);
+    }
 
     @Override
     protected IDocument createDocument(final Object element) throws CoreException {
