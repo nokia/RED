@@ -5,6 +5,7 @@ import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colo
 import static org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokensSource.lines;
 
 import java.io.File;
+import java.util.Deque;
 import java.util.List;
 
 import org.eclipse.jface.text.rules.IToken;
@@ -18,10 +19,12 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TokensSource.LineElement;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Supplier;
 
 public class RedTokenScannerTest {
 
@@ -30,9 +33,7 @@ public class RedTokenScannerTest {
     @ClassRule
     public static ProjectProvider projectProvider = new ProjectProvider(PROJECT_NAME);
 
-    private static RobotParser parser;
-
-    private static File file;
+    private static RobotDocument document;
 
     @BeforeClass
     public static void beforeSuite() {
@@ -41,8 +42,10 @@ public class RedTokenScannerTest {
         final RobotParserConfig cfg = new RobotParserConfig();
         cfg.setEagerImport(false);
         cfg.setIncludeImportVariables(false);
-        parser = RobotParser.create(robotProject.getRobotProjectHolder(), cfg);
-        file = new File("file.robot");
+        final RobotParser parser = RobotParser.create(robotProject.getRobotProjectHolder(), cfg);
+        final File file = new File("file.robot");
+
+        document = new RobotDocument(parser, file);
     }
 
     @Test
@@ -52,13 +55,44 @@ public class RedTokenScannerTest {
                 line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
                 line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
 
-        final RedTokenScanner scanner = createScanner();
-        scanner.setRange(0, 0, 36, lines);
+        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
+            @Override
+            public Deque<IRobotLineElement> get() {
+                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
+            }
+        };
 
-        IToken nextToken = scanner.nextToken();
+        final RedTokenScanner scanner = createScanner();
+        scanner.setRange(document, 0, 38);
+
+        IToken nextToken = scanner.nextToken(supplier);
         while (!nextToken.isEOF()) {
             assertThat(nextToken).isSameAs(ISyntaxColouringRule.DEFAULT_TOKEN);
-            nextToken = scanner.nextToken();
+            nextToken = scanner.nextToken(supplier);
+        }
+    }
+
+    @Test
+    public void onlyDefaultTokensAreReturned_whenThereAreNoApplicableRules() throws Exception {
+        final List<RobotLine> lines = lines(
+                line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")),
+                line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
+                line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
+
+        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
+            @Override
+            public Deque<IRobotLineElement> get() {
+                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
+            }
+        };
+
+        final RedTokenScanner scanner = createScanner(nonApplicableRule(new Token("token")));
+        scanner.setRange(document, 0, 38);
+
+        IToken nextToken = scanner.nextToken(supplier);
+        while (!nextToken.isEOF()) {
+            assertThat(nextToken).isSameAs(ISyntaxColouringRule.DEFAULT_TOKEN);
+            nextToken = scanner.nextToken(supplier);
         }
     }
 
@@ -68,14 +102,20 @@ public class RedTokenScannerTest {
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")),
                 line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
                 line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
+        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
+            @Override
+            public Deque<IRobotLineElement> get() {
+                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
+            }
+        };
 
         final RedTokenScanner scanner = createScanner(nonMatchingRule());
-        scanner.setRange(0, 0, 36, lines);
+        scanner.setRange(document, 0, 38);
 
-        IToken nextToken = scanner.nextToken();
+        IToken nextToken = scanner.nextToken(supplier);
         while (!nextToken.isEOF()) {
             assertThat(nextToken).isSameAs(ISyntaxColouringRule.DEFAULT_TOKEN);
-            nextToken = scanner.nextToken();
+            nextToken = scanner.nextToken(supplier);
         }
     }
 
@@ -86,12 +126,19 @@ public class RedTokenScannerTest {
                 line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
                 line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
 
+        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
+            @Override
+            public Deque<IRobotLineElement> get() {
+                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
+            }
+        };
+
         final RedTokenScanner scanner = createScanner(textMatchingRule("bbbb", new Token("b_token")),
                 textMatchingRule("eeee", new Token("e_token")));
-        scanner.setRange(0, 0, 36, lines);
+        scanner.setRange(document, 0, 38);
 
         int matchingTokens = 0;
-        IToken nextToken = scanner.nextToken();
+        IToken nextToken = scanner.nextToken(supplier);
         while (!nextToken.isEOF()) {
             if (nextToken != ISyntaxColouringRule.DEFAULT_TOKEN) {
                 matchingTokens++;
@@ -104,7 +151,7 @@ public class RedTokenScannerTest {
                 }
                 assertThat(scanner.getTokenLength()).isEqualTo(4);
             }
-            nextToken = scanner.nextToken();
+            nextToken = scanner.nextToken(supplier);
         }
         assertThat(matchingTokens).isEqualTo(2);
     }
@@ -116,11 +163,18 @@ public class RedTokenScannerTest {
                 line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
                 line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
 
+        final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
+            @Override
+            public Deque<IRobotLineElement> get() {
+                return new RedTokensQueueBuilder().buildQueue(0, 38, lines, 0);
+            }
+        };
+
         final RedTokenScanner scanner = createScanner(partiallyMatchingRule("gggg", new Token("g_token")));
-        scanner.setRange(0, 0, 36, lines);
+        scanner.setRange(document, 0, 38);
 
         int matchingTokens = 0;
-        IToken nextToken = scanner.nextToken();
+        IToken nextToken = scanner.nextToken(supplier);
         while (!nextToken.isEOF()) {
             if (nextToken != ISyntaxColouringRule.DEFAULT_TOKEN) {
                 matchingTokens++;
@@ -129,7 +183,7 @@ public class RedTokenScannerTest {
                 assertThat(scanner.getTokenOffset()).isIn(25, 26);
                 assertThat(scanner.getTokenLength()).isEqualTo(1);
             }
-            nextToken = scanner.nextToken();
+            nextToken = scanner.nextToken(supplier);
         }
         assertThat(matchingTokens).isEqualTo(2);
     }
@@ -196,7 +250,24 @@ public class RedTokenScannerTest {
         };
     }
 
+    private static ISyntaxColouringRule nonApplicableRule(final IToken token) {
+        return new ISyntaxColouringRule() {
+
+            @Override
+            public boolean isApplicable(final IRobotLineElement nextToken) {
+                return false;
+            }
+
+            @Override
+            public Optional<PositionedTextToken> evaluate(final IRobotLineElement robotToken, final int offsetInToken,
+                    final List<IRobotLineElement> analyzedTokens) {
+                return Optional
+                        .of(new PositionedTextToken(token, robotToken.getStartOffset(), robotToken.getText().length()));
+            }
+        };
+    }
+
     private static RedTokenScanner createScanner(final ISyntaxColouringRule... rules) {
-        return new RedTokenScanner(parser, file, rules);
+        return new RedTokenScanner(rules);
     }
 }
