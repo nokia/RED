@@ -62,7 +62,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
             final List<RobotLine> lines) {
         getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
 
-        getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th);
+        getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th, sorted.isEmpty());
 
         if (!sorted.isEmpty()) {
             final List<Section> execUnits = SectionType.filterByType(sections, sectionWithHeaderPos, getSectionType());
@@ -160,7 +160,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                     elemDumper.dump(model, sections, sectionWithHeaderPos, th, sortedUnits, execElement, lines);
                 }
 
-                getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit);
+                getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit, execUnitIndex == lastIndexToDump);
             }
 
             if (lastIndexToDump == sorted.size() - 1) {

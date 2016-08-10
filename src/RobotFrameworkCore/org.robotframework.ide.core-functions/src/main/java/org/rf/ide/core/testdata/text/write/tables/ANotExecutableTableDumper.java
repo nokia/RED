@@ -49,7 +49,7 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
             final List<RobotLine> lines) {
         getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
 
-        getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th);
+        getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th, sorted.isEmpty());
 
         if (!sorted.isEmpty()) {
             final List<Section> settingSections = SectionType.filterByType(sections, sectionWithHeaderPos,
@@ -89,7 +89,7 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
                     getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(setting, null, model, lines);
                 }
 
-                getEmptyDumperHelper().dumpEmptyLines(model, lines, setting);
+                getEmptyDumperHelper().dumpEmptyLines(model, lines, setting, settingIndex == lastIndexToDump);
             }
 
             if (lastIndexToDump == sorted.size() - 1) {
