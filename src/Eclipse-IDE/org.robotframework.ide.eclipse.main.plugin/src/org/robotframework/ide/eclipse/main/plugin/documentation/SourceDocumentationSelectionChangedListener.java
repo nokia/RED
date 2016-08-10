@@ -65,7 +65,7 @@ public class SourceDocumentationSelectionChangedListener {
 
         public DocViewDelayedUpdateJob(final String name) {
             super(name);
-            setUser(true);
+            setSystem(true);
         }
 
         @Override

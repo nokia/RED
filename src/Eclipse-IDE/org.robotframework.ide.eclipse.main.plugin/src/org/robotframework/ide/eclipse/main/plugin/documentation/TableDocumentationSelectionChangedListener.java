@@ -62,7 +62,7 @@ public class TableDocumentationSelectionChangedListener implements ISelectionCha
 
         public DocViewUpdateJob(final String name) {
             super(name);
-            setUser(true);
+            setSystem(true);
         }
 
         @Override
