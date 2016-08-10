@@ -56,8 +56,23 @@ public class ExecutableUnitsFixer {
                     }
                 } else if (rowType == ERowType.SIMPLE) {
                     if (containsArtifactalContinueAfectingForLoop(currentExecLine)) {
-                        lastForExecutableIndex = newExecutionContext.size();
-                        newExecutionContext.add(row);
+                        lastForExecutableIndex = newExecutionContext.size() - 1;
+                        if (lastForIndex == -1) {
+                            Optional<Integer> execLine = findLineWithExecAction(newExecutionContext);
+                            if (execLine.isPresent()) {
+                                final int parentLine = execLine.get();
+                                final RobotExecutableRow<T> toMergeLine = newExecutionContext.get(parentLine);
+                                final int numberOfMerges = lastForExecutableIndex - parentLine;
+                                for (int i = 0; i < numberOfMerges; i++) {
+                                    merge(toMergeLine, newExecutionContext.get(parentLine + 1));
+                                    newExecutionContext.remove(parentLine + 1);
+                                }
+
+                                merge(toMergeLine, row);
+                            } else {
+                                newExecutionContext.add(row);
+                            }
+                        }
                     } else {
                         Optional<RobotToken> previousLineContinue = getPreviouseLineContinueToken(
                                 row.getElementTokens());
@@ -81,6 +96,7 @@ public class ExecutableUnitsFixer {
                             + row.getBeginPosition());
                 }
             }
+
         }
 
         if (lastForIndex > -1 && lastForExecutableIndex > -1) {
@@ -88,6 +104,32 @@ public class ExecutableUnitsFixer {
         }
 
         return newExecutionContext;
+
+    }
+
+    private <T> Optional<Integer> findLineWithExecAction(final List<RobotExecutableRow<T>> newExecutionContext) {
+        for (int i = newExecutionContext.size() - 1; i >= 0; i--) {
+            if (newExecutionContext.get(i).isExecutable()) {
+                return Optional.of(i);
+            }
+        }
+        return Optional.absent();
+    }
+
+    private <T> void merge(final RobotExecutableRow<T> outputLine, final RobotExecutableRow<T> toMerge) {
+        if (!toMerge.getAction().getFilePosition().isNotSet()) {
+            outputLine.addArgument(toMerge.getAction());
+        }
+
+        List<RobotToken> arguments = toMerge.getArguments();
+        for (RobotToken t : arguments) {
+            outputLine.addArgument(t);
+        }
+
+        List<RobotToken> comments = toMerge.getComment();
+        for (RobotToken robotToken : comments) {
+            outputLine.addCommentPart(robotToken);
+        }
     }
 
     private <T extends AModelElement<? extends ARobotSectionTable>> void merge(
