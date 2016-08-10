@@ -45,6 +45,7 @@ import org.eclipse.ui.texteditor.GotoLineAction;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -165,7 +166,11 @@ public class SuiteSourceEditor extends TextEditor {
                 updateLineDelimitersStatus();
 
                 if (checkIfReconcilationHasNotHappened()) {
-                    Optional<IDocumentationHolder> docToShow = getFileModel().getLinkedElement()
+                    final RobotFile linkedModel = getFileModel().getLinkedElement();
+                    if (linkedModel == null) {
+                        return;
+                    }
+                    final Optional<IDocumentationHolder> docToShow = linkedModel
                             .getParent()
                             .findDocumentationForOffset(event.caretOffset);
                     if (docToShow.isPresent()) {
