@@ -20,7 +20,7 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -85,11 +85,11 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     }
 
     private void reparseModel() {
-        final RobotFile fileModel = document.getNewestModel();
+        final RobotFileOutput fileOutput = document.getNewestFileOutput();
 
         final RobotSuiteFile suiteModel = getSuiteModel();
         suiteModel.dispose();
-        suiteModel.link(fileModel);
+        suiteModel.link(fileOutput);
 
         final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         eventBroker.post(RobotModelEvents.REPARSING_DONE, suiteModel);
