@@ -90,7 +90,9 @@ public class SectionBuilder {
                         }
                         section = new Section(currentSectionType, startPos);
                         List<Section> subSections = sections.get(sections.size() - 1).getSubSections();
-                        subSections.get(subSections.size() - 1).addSubSection(section);
+                        if (!subSections.isEmpty()) {
+                            subSections.get(subSections.size() - 1).addSubSection(section);
+                        }
                     } else if (isSettingTestCaseDeclaration(line, elemIndex)) {
                         currentSectionType = SectionType.TEST_CASE_SETTING;
                         FilePosition startPos;
@@ -120,7 +122,9 @@ public class SectionBuilder {
                         }
                         section = new Section(currentSectionType, startPos);
                         List<Section> subSections = sections.get(sections.size() - 1).getSubSections();
-                        subSections.get(subSections.size() - 1).addSubSection(section);
+                        if (!subSections.isEmpty()) {
+                            subSections.get(subSections.size() - 1).addSubSection(section);
+                        }
                     } else if (isSettingKeywordDeclaration(line, elemIndex)) {
                         currentSectionType = SectionType.KEYWORD_SETTING;
                         FilePosition startPos;
