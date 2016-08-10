@@ -88,6 +88,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
         final RobotFileOutput fileOutput = document.getNewestFileOutput();
 
         final RobotSuiteFile suiteModel = getSuiteModel();
+        fileOutput.addVariablesReferenced(newArrayList(suiteModel.getVariablesFromLocalReferencedFiles()));
         suiteModel.dispose();
         suiteModel.link(fileOutput);
 
