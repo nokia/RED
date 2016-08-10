@@ -6,6 +6,7 @@
 package org.rf.ide.core.testdata.text.write.tables.settings.update;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
@@ -23,6 +24,28 @@ public abstract class AUpdateOfSettingsMetadataTest {
 
     public AUpdateOfSettingsMetadataTest(final String extension) {
         this.extension = extension;
+    }
+
+    @Test
+    public void test_givenThreeMetadatas_whenUpdateMetadataByMovingLastElementUpper_emptyLinesInTheEnd()
+            throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_ThreeMetadatasAndEmptyLinesThenMoveUpLast."
+                + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Output_ThreeMetadatasAndEmptyLinesThenMoveUpLast."
+                + getExtension();
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final SettingTable settingTable = modelFile.getSettingTable();
+
+        // action
+        List<Metadata> metadatas = settingTable.getMetadatas();
+        settingTable.moveUpMetadata(metadatas.get(metadatas.size() - 1));
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
     @Test
