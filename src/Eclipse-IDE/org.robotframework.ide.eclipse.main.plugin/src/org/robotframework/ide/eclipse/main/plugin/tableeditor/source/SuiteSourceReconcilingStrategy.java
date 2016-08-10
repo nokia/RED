@@ -20,7 +20,6 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.IReconcilingStrategyExtension;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
-import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
@@ -29,7 +28,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
-import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -72,20 +70,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     public void reconcile(final DirtyRegion dirtyRegion, final IRegion subRegion) {
         reconcile();
 
-        final RobotFile linkedFile = editor.getFileModel().getLinkedElement();
-        if (linkedFile == null) {
-            return;
-        }
-        final Optional<IDocumentationHolder> docToShow = linkedFile.getParent()
-                .findDocumentationForOffset(dirtyRegion.getOffset());
-        if (docToShow.isPresent()) {
-            final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
-            eventBroker.post(DocumentationView.SHOW_DOC_EVENT_TOPIC,
-                    editor.getFileModel().findElement(dirtyRegion.getOffset()).get());
-            editor.setLastShowDocumentation(docToShow.get());
-        } else {
-            editor.setLastShowDocumentation(null);
-        }
+        notifyDocSelectionChangedListener(dirtyRegion.getOffset());
     }
 
     @Override
@@ -180,5 +165,12 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
                 }
             }
         };
+    }
+    
+    private void notifyDocSelectionChangedListener(final int offset) {
+        if (editor.getSourceDocSelectionChangedListener() != null) {
+            editor.getSourceDocSelectionChangedListener().positionChanged(editor.getDocument(), editor.getFileModel(), offset, true);
+            editor.updateLastDocumentLength();
+        }
     }
 }

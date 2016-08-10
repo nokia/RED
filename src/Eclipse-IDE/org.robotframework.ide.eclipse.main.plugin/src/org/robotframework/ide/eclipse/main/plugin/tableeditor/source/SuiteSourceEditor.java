@@ -44,25 +44,22 @@ import org.eclipse.ui.editors.text.TextEditor;
 import org.eclipse.ui.texteditor.GotoLineAction;
 import org.eclipse.ui.texteditor.ITextEditorActionConstants;
 import org.eclipse.ui.texteditor.StatusLineContributionItem;
-import org.rf.ide.core.testdata.model.IDocumentationHolder;
-import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
+import org.robotframework.ide.eclipse.main.plugin.documentation.SourceDocumentationSelectionChangedListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditorActionBarContributor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler;
-import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
 public class SuiteSourceEditor extends TextEditor {
 
     private static final String SOURCE_PART_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.sources.context";
 
-    private IDocumentationHolder lastShowDocumentation = null;
+    private SourceDocumentationSelectionChangedListener sourceDocSelectionChangedListener = null;
 
     private int lastLength = -1;
 
@@ -88,11 +85,6 @@ public class SuiteSourceEditor extends TextEditor {
                 return fileModel;
             }
         }));
-    }
-
-    public void setLastShowDocumentation(final IDocumentationHolder doc) {
-        this.lastShowDocumentation = doc;
-        this.lastLength = getDocument().getLength();
     }
 
     @Override
@@ -164,37 +156,9 @@ public class SuiteSourceEditor extends TextEditor {
             public void caretMoved(final CaretEvent event) {
                 updateLineLocationStatusBar(event.caretOffset);
                 updateLineDelimitersStatus();
-
-                if (checkIfReconcilationHasNotHappened()) {
-                    final RobotFile linkedModel = getFileModel().getLinkedElement();
-                    if (linkedModel == null) {
-                        return;
-                    }
-                    final Optional<IDocumentationHolder> docToShow = linkedModel
-                            .getParent()
-                            .findDocumentationForOffset(event.caretOffset);
-                    if (docToShow.isPresent()) {
-                        if (docToShow.get() != lastShowDocumentation) {
-                            setLastShowDocumentation(docToShow.get());
-                            final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench()
-                                    .getService(IEventBroker.class);
-                            eventBroker.post(DocumentationView.SHOW_DOC_EVENT_TOPIC,
-                                    getFileModel().findElement(event.caretOffset).get());
-                        }
-                    } else {
-                        setLastShowDocumentation(null);
-                        final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench()
-                                .getService(IEventBroker.class);
-                        eventBroker.post(DocumentationView.SHOW_DOC_EVENT_TOPIC, null);
-                    }
-                }
-            }
-
-            private boolean checkIfReconcilationHasNotHappened() {
-                return lastLength == getDocument().getLength() || lastLength == -1;
+                notifyDocSelectionChangedListener(event.caretOffset);
             }
         });
-
     }
 
     private void updateLineLocationStatusBar(final int caretPostion) {
@@ -221,6 +185,21 @@ public class SuiteSourceEditor extends TextEditor {
                 .find(RobotFormEditorActionBarContributor.DELIMITERS_INFO_ID);
         final String delimiter = DocumentUtilities.getDelimiter(document);
         find.setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
+    }
+    
+    public void notifyDocSelectionChangedListener(final int offset) {
+        if (sourceDocSelectionChangedListener != null && isDocumentLengthNotChanged()) {
+            sourceDocSelectionChangedListener.positionChanged(getDocument(), getFileModel(), offset, false);
+            updateLastDocumentLength();
+        }
+    }
+
+    public void updateLastDocumentLength() {
+        this.lastLength = getDocument().getLength();
+    }
+
+    private boolean isDocumentLengthNotChanged() {
+        return lastLength == getDocument().getLength() || lastLength == -1;
     }
 
     private void installBreakpointTogglingOnDoubleClick() {
@@ -376,5 +355,17 @@ public class SuiteSourceEditor extends TextEditor {
     public void disableReconcilation() {
         final IReconciler reconciler = getSourceViewerConfiguration().getReconciler(getSourceViewer());
         reconciler.uninstall();
+    }
+    
+    public void setSourceDocSelectionChangedListener(final SourceDocumentationSelectionChangedListener listener) {
+        this.sourceDocSelectionChangedListener = listener;
+    }
+    
+    public SourceDocumentationSelectionChangedListener getSourceDocSelectionChangedListener() {
+        return sourceDocSelectionChangedListener;
+    }
+
+    public void removeSourceDocSelectionChangedListener() {
+        this.sourceDocSelectionChangedListener = null;
     }
 }
