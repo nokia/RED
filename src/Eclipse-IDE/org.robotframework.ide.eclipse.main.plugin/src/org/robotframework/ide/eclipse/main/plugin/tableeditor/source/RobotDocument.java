@@ -123,7 +123,7 @@ public class RobotDocument extends Document {
         job.schedule(150);
     }
 
-    public Future<RobotFileOutput> getNewestOutput() {
+    private Future<RobotFileOutput> getNewestOutput() {
         return new Future<RobotFileOutput>() {
 
             @Override
@@ -167,8 +167,18 @@ public class RobotDocument extends Document {
      * @return
      */
     public RobotFile getNewestModel() {
+        return getNewestFileOutput().getFileModel();
+    }
+
+    /**
+     * Gets newest parsed file output. Waits for reparsing end if needed. IllegalStateException is
+     * thrown when waiting has been interrupted.
+     * 
+     * @return
+     */
+    public RobotFileOutput getNewestFileOutput() {
         try {
-            return getNewestOutput().get().getFileModel();
+            return getNewestOutput().get();
         } catch (InterruptedException | ExecutionException e) {
             throw new IllegalStateException("Waiting for newest model has been interrupted", e);
         }
