@@ -19,8 +19,6 @@ import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-import com.google.common.base.Optional;
-
 /**
  * @author wypych
  */
@@ -33,7 +31,7 @@ public class EmptyLineDumper {
     }
 
     public void dumpEmptyLines(final RobotFile model, final List<RobotLine> lines,
-            final AModelElement<ARobotSectionTable> setting) {
+            final AModelElement<ARobotSectionTable> setting, boolean isLastElement) {
         final FilePosition fPosEnd = setting.getEndPosition();
         if (!fPosEnd.isNotSet()) {
             if (!lines.isEmpty()) {
@@ -48,25 +46,29 @@ public class EmptyLineDumper {
                 }
             }
 
-            Optional<Integer> currentLine = model.getRobotLineIndexBy(fPosEnd.getOffset());
-            int currentLineNumber;
-            if (currentLine.isPresent()) {
-                currentLineNumber = currentLine.get();
-            } else {
-                currentLineNumber = fPosEnd.getLine();
-            }
-
+            int currentLineNumberInDump = lines.size() - 1;
             final List<RobotLine> fileContent = model.getFileContent();
-            while (fileContent.size() > currentLineNumber + 1) {
-                final RobotLine nextLine = fileContent.get(currentLineNumber + 1);
+            if (currentLineNumberInDump >= fileContent.size()) {
+                return;
+            }
+            if (!isFirstLineEmpty(fileContent, currentLineNumberInDump)) {
+                return;
+            }
+            while (fileContent.size() > currentLineNumberInDump) {
+                final RobotLine nextLine = fileContent.get(currentLineNumberInDump);
                 if (isEmptyLine(nextLine)) {
                     dumperHelper.dumpLineDirectly(model, lines, nextLine);
-                    currentLineNumber++;
+                    currentLineNumberInDump++;
                 } else {
                     break;
                 }
             }
         }
+    }
+
+    private boolean isFirstLineEmpty(final List<RobotLine> fileContent,
+            final int currentLineNumberInDump) {
+        return isEmptyLine(fileContent.get(currentLineNumberInDump));
     }
 
     private boolean isEmptyLine(final RobotLine line) {
