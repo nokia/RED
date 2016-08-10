@@ -55,6 +55,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.Tog
 import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Supplier;
 
 public class SuiteSourceEditor extends TextEditor {
 
@@ -79,7 +80,13 @@ public class SuiteSourceEditor extends TextEditor {
         super.initializeEditor();
 
         setSourceViewerConfiguration(new SuiteSourceEditorConfiguration(this));
-        setDocumentProvider(new SuiteSourceDocumentProvider());
+        setDocumentProvider(new SuiteSourceDocumentProvider(new Supplier<RobotSuiteFile>() {
+
+            @Override
+            public RobotSuiteFile get() {
+                return fileModel;
+            }
+        }));
     }
 
     public void setLastShowDocumentation(final IDocumentationHolder doc) {

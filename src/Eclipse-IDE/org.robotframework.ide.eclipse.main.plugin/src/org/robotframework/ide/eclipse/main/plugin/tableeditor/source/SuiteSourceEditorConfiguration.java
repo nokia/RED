@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.io.File;
 import java.util.List;
 
 import org.eclipse.jface.bindings.keys.KeySequence;
@@ -35,6 +34,7 @@ import org.eclipse.jface.text.reconciler.IReconcilingStrategy;
 import org.eclipse.jface.text.reconciler.MonoReconciler;
 import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.IToken;
+import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.eclipse.jface.text.source.DefaultAnnotationHover;
 import org.eclipse.jface.text.source.IAnnotationHover;
@@ -45,9 +45,6 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
-import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
-import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
@@ -383,28 +380,28 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] defaultRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CommentRule(comment), new MatchEverythingRule(defaultSection) };
-        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, editor.fileModel, defaultRules);
+        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, defaultRules);
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new TestCaseSettingsCallRule(call),
                 new ExecutableRowCallRule(call), new CommentRule(comment), new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, editor.fileModel,
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION,
                 testCasesRules);
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
                 new KeywordSettingsCallRule(call), new ExecutableRowCallRule(call), new CommentRule(comment),
                 new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, editor.fileModel, keywordsRules);
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules);
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsCallRule(call), new CommentRule(comment),
                 new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, editor.fileModel, settingsRules);
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, settingsRules);
 
         final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new VariableDefinitionRule(variable), new CommentRule(comment), new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, editor.fileModel,
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION,
                 variablesRules);
 
         return reconciler;
@@ -415,28 +412,12 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private static void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
-            final RobotSuiteFile fileModel, final ISyntaxColouringRule[] rules) {
-        final RobotParser parser = createParser(fileModel);
-
-        final RedTokenScanner scanner = new RedTokenScanner(parser, new File(fileModel.getName()), rules);
+            final ISyntaxColouringRule[] rules) {
+        // final ITokenScanner scanner = new RedCachingScanner(new RedTokenScanner(rules));
+        final ITokenScanner scanner = new RedTokenScanner(rules);
         final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(scanner);
         reconciler.setDamager(damagerRepairer, contentType);
         reconciler.setRepairer(damagerRepairer, contentType);
-    }
-
-    private static RobotParser createParser(final RobotSuiteFile file) {
-        final RobotParserConfig parserCfg = new RobotParserConfig();
-        parserCfg.setEagerImport(false);
-        parserCfg.setIncludeImportVariables(false);
-
-        final RobotProjectHolder holder;
-        if (file.getFile() == null) {
-            // when model is build on e.g. history revision
-            holder = new RobotProjectHolder();
-        } else {
-            holder = file.getProject().getRobotProjectHolder();
-        }
-        return RobotParser.create(holder, parserCfg);
     }
 
     @Override

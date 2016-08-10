@@ -37,7 +37,7 @@ import com.google.common.collect.Lists;
 
 public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IReconcilingStrategyExtension {
 
-    private IDocument document;
+    private RobotDocument document;
 
     private final SuiteSourceEditor editor;
 
@@ -60,7 +60,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
 
     @Override
     public void setDocument(final IDocument document) {
-        this.document = document;
+        this.document = (RobotDocument) document;
     }
 
     @Override
@@ -100,8 +100,12 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     }
 
     private void reparseModel() {
+        final RobotFile fileModel = document.getNewestModel();
+
         final RobotSuiteFile suiteModel = getSuiteModel();
-        suiteModel.reparseEverything(document.get());
+        suiteModel.dispose();
+        suiteModel.link(fileModel);
+
         final IEventBroker eventBroker = PlatformUI.getWorkbench().getService(IEventBroker.class);
         eventBroker.post(RobotModelEvents.REPARSING_DONE, suiteModel);
     }
