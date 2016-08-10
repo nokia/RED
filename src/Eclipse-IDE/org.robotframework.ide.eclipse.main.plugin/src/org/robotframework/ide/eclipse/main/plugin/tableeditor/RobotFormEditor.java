@@ -53,6 +53,7 @@ import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.documentation.DocumentationViewPartListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
@@ -92,6 +93,8 @@ public class RobotFormEditor extends FormEditor {
     private boolean isEditable;
 
     private SuiteFileValidationListener validationListener;
+    
+    private DocumentationViewPartListener documentationViewPartListener;
 
     public RedClipboard getClipboard() {
         return clipboard;
@@ -405,6 +408,10 @@ public class RobotFormEditor extends FormEditor {
         updateActivePage();
         final IEditorPart activeEditor = getActiveEditor();
         saveActivePage(activeEditor instanceof ISectionEditorPart ? ((ISectionEditorPart) activeEditor).getId() : "");
+        
+        if(documentationViewPartListener != null) {
+            documentationViewPartListener.pageChanged(activeEditor);
+        }
     }
 
     private void updateActivePage() {
@@ -562,6 +569,14 @@ public class RobotFormEditor extends FormEditor {
         if (suiteModel == file) {
             updateActivePage();
         }
+    }
+    
+    public void setDocumentationViewPartListener(final DocumentationViewPartListener listener) {
+        this.documentationViewPartListener = listener;
+    }
+    
+    public void removeDocumentationViewPartListener() {
+        this.documentationViewPartListener = null;
     }
 
     private static class IllegalRobotEditorInputException extends RuntimeException {
