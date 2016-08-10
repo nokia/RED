@@ -21,8 +21,6 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
 
     public static final String CASE_SETTING_CONFIG_LABEL = "CASE_SETTING";
 
-    public static final String CASE_SETTING_DOCUMENTATION_LABEL = "CASE_SETTING_DOCUMENTATION";
-
     public static final String CASE_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL = "CASE_SETTING_DOCUMENTATION_NOT_EDITABLE";
 
     public static final String CASE_CALL_CONFIG_LABEL = "CASE_CALL";
@@ -40,10 +38,6 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
         if (columnPosition == 0) {
             if (rowObject instanceof RobotDefinitionSetting) {
                 configLabels.addLabel(CASE_SETTING_CONFIG_LABEL);
-                if (((RobotDefinitionSetting) rowObject).getLinkedElement()
-                        .getModelType() == ModelType.TEST_CASE_DOCUMENTATION) {
-                    configLabels.addLabel(CASE_SETTING_DOCUMENTATION_LABEL);
-                }
             } else if (rowObject instanceof RobotKeywordCall) {
                 configLabels.addLabel(CASE_CALL_CONFIG_LABEL);
             } else if (rowObject instanceof RobotCase) {
