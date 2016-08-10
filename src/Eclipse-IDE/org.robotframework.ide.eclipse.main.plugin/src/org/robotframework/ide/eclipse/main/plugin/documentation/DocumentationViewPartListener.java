@@ -23,8 +23,8 @@ public class DocumentationViewPartListener implements IPartListener {
     private IEditorPart currentlyActiveEditor;
 
     public DocumentationViewPartListener(final DocumentationView view) {
-        sourceDocSelectionChangedListener = new SourceDocumentationSelectionChangedListener(view);
-        tableDocSelectionChangedListener = new TableDocumentationSelectionChangedListener(view);
+        this.sourceDocSelectionChangedListener = new SourceDocumentationSelectionChangedListener(view);
+        this.tableDocSelectionChangedListener = new TableDocumentationSelectionChangedListener(view);
     }
  
     @Override
