@@ -60,7 +60,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.DocumentationElementsSelectionChangedListener;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
@@ -219,8 +218,6 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
-        selectionProvider.addSelectionChangedListener(new DocumentationElementsSelectionChangedListener(eventBroker));
-
         new KeywordsTableContentTooltip(table, markersContainer, dataProvider);
     }
 
@@ -243,7 +240,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         // popup menus
         table.addConfiguration(new KeywordsTableMenuConfiguration(site, table, selectionProvider));
-
+        
         table.configure();
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
