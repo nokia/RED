@@ -142,8 +142,8 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
         // dump as it is
         if (!lastToken.getFilePosition().isNotSet()
-                && !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent()
-                && !tokens.isEmpty()) {
+                && !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent() && !tokens.isEmpty()
+                && !getElementDumperHelper().isDirtyAnyDirtyInside(tokens)) {
             boolean wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
             if (wasDumped) {
                 return;

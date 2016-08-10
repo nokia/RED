@@ -186,7 +186,8 @@ public class TableElementDumperHelper {
             offset = tokens.get(0).getFilePosition().getOffset();
         }
 
-        if (isLastElementTheSameAsFirstInTokensToDump(lastToken, tokens)) {
+        if (isLastElementTheSameAsFirstInTokensToDump(lastToken, tokens)
+                || isAssigmentAfterCurrentToken(tokens.get(0), lastToken)) {
             // dump token before this method
             meatTokens++;
         }
@@ -288,6 +289,13 @@ public class TableElementDumperHelper {
         }
 
         return (dumps.size() > 0);
+    }
+
+    private boolean isAssigmentAfterCurrentToken(final IRobotLineElement prevToken,
+            final IRobotLineElement currentToken) {
+        return (!prevToken.getFilePosition().isNotSet() && prevToken.getFilePosition().getOffset()
+                + prevToken.getText().length() == currentToken.getFilePosition().getOffset()
+                && currentToken.getTypes().contains(RobotTokenType.ASSIGNMENT));
     }
 
     private boolean isLastElementTheSameAsFirstInTokensToDump(final IRobotLineElement startToken,

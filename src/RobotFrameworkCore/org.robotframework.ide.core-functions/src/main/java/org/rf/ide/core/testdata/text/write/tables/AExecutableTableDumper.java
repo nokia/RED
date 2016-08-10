@@ -158,6 +158,8 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                     }
 
                     elemDumper.dump(model, sections, sectionWithHeaderPos, th, sortedUnits, execElement, lines);
+
+                    getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit, execUnitIndex == lastIndexToDump);
                 }
 
                 getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit, execUnitIndex == lastIndexToDump);
