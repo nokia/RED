@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
+import org.eclipse.nebula.widgets.nattable.painter.cell.BackgroundPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.CellPainterWrapper;
 import org.eclipse.nebula.widgets.nattable.util.GUIHelper;
 import org.eclipse.swt.graphics.Color;
@@ -16,6 +17,7 @@ import org.robotframework.red.graphics.ColorsManager;
 
 /**
  * @author wypych
+ * @see BackgroundPainter
  */
 public class InactiveCellPainter extends CellPainterWrapper {
 
