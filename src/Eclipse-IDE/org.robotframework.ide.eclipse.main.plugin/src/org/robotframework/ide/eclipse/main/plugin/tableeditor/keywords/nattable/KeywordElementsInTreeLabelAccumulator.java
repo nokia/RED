@@ -20,8 +20,6 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
 
     public static final String KEYWORD_DEFINITION_SETTING_CONFIG_LABEL = "KEYWORD_DEFINITION_SETTING";
 
-    public static final String KEYWORD_DEFINITION_SETTING_DOCUMENTATION = "KEYWORD_DEFINITION_SETTING_DOCUMENTATION";
-
     public static final String KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL = "KEYWORD_SETTING_DOCUMENTATION_NOT_EDITABLE";
 
     private final IRowDataProvider<Object> dataProvider;
@@ -37,10 +35,6 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
         if (columnPosition == 0) {
             if (rowObject instanceof RobotDefinitionSetting) {
                 configLabels.addLabel(KEYWORD_DEFINITION_SETTING_CONFIG_LABEL);
-                if (((RobotDefinitionSetting) rowObject).getLinkedElement()
-                        .getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION) {
-                    configLabels.addLabel(KEYWORD_DEFINITION_SETTING_DOCUMENTATION);
-                }
             } else if (rowObject instanceof RobotKeywordDefinition) {
                 configLabels.addLabel(KEYWORD_DEFINITION_CONFIG_LABEL);
             }
