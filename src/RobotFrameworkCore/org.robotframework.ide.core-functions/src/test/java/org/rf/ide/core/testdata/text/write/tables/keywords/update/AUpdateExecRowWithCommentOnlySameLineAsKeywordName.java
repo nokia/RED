@@ -22,12 +22,33 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
  */
 public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
 
+    public static final String PRETTY_NEW_DIR_LOCATION_NEW_UNITS = "keywords//new//";
+
     public static final String PRETTY_NEW_DIR_LOCATION = "keywords//exec//update//";
 
     private final String extension;
 
     public AUpdateExecRowWithCommentOnlySameLineAsKeywordName(final String extension) {
         this.extension = extension;
+    }
+
+    @Test
+    public void test_update_addingNewKeyword() throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS + "Input_ThreeKeywordsAndAddingNewEmptyOne."
+                + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS + "Output_ThreeKeywordsAndAddingNewEmptyOne."
+                + getExtension();
+
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test prepare
+        KeywordTable table = modelFile.getKeywordTable();
+        table.createUserKeyword("key 3");
+
+        // execute & verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
     @Test
