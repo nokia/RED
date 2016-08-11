@@ -10,6 +10,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
+import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 import org.robotframework.ide.eclipse.main.plugin.views.ExecutionView;
 import org.robotframework.ide.eclipse.main.plugin.views.MessageLogView;
 
@@ -37,6 +38,7 @@ public class RobotPerspective implements IPerspectiveFactory {
         layout.addPerspectiveShortcut(IDebugUIConstants.ID_DEBUG_PERSPECTIVE);
         layout.addShowViewShortcut(MessageLogView.ID);
         layout.addShowViewShortcut(ExecutionView.ID);
+        layout.addShowViewShortcut(DocumentationView.ID);
 
         layout.addShowInPart("org.eclipse.ui.navigator.ProjectExplorer");
 	}
