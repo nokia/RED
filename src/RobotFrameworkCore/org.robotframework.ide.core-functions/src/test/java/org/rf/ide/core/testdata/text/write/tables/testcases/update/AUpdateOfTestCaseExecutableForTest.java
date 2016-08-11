@@ -18,12 +18,32 @@ import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
 
 public abstract class AUpdateOfTestCaseExecutableForTest {
 
+    public static final String PRETTY_NEW_DIR_LOCATION_NEW_UNITS = "testCases//new//";
+
     public static final String PRETTY_NEW_DIR_LOCATION = "testCases//exec//update//";
 
     private final String extension;
 
     public AUpdateOfTestCaseExecutableForTest(final String extension) {
         this.extension = extension;
+    }
+
+    @Test
+    public void test_update_addingNewTestCase() throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS + "Input_ThreeTestCasesAndAddingNewEmptyOne."
+                + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS + "Output_ThreeTestCasesAndAddingNewEmptyOne."
+                + getExtension();
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final TestCaseTable testCaseTable = modelFile.getTestCaseTable();
+        testCaseTable.createTestCase("case 3");
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
     }
 
     @Test
