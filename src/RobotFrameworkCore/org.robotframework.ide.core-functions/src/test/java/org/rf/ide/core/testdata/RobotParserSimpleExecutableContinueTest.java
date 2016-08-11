@@ -73,7 +73,7 @@ public class RobotParserSimpleExecutableContinueTest {
     private void assertExecutableLine(final RobotExecutableRow<UserKeyword> robotExecutableRow, final String actionText,
             final List<String> args, final List<String> comment) {
         if (actionText == null) {
-            assertToken(robotExecutableRow.getAction(), "", RobotTokenType.UNKNOWN);
+            assertToken(robotExecutableRow.getAction(), "", RobotTokenType.KEYWORD_ACTION_NAME);
         } else {
             assertToken(robotExecutableRow.getAction(), actionText, RobotTokenType.KEYWORD_ACTION_NAME);
         }
