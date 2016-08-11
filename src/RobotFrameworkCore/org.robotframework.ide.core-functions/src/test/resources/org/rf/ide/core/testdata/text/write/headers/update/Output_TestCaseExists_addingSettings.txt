@@ -1,0 +1,4 @@
+*** Setting ***
+*** Test Case ***
+T1
+	Log	done
