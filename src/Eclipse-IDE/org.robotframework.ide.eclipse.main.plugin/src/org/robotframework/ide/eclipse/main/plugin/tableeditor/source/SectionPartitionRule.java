@@ -61,17 +61,10 @@ class SectionPartitionRule implements IPredicateRule {
         }
         final int readAdditionally = readBeforeSection(scanner);
         final String sectionHeader = getSectionHeader(scanner);
-        if (!sectionHeader.isEmpty()) {
-            final boolean startedWithPipedSeparator = readAdditionally > 1;
-            if (sectionType.matches(sectionHeader, startedWithPipedSeparator)) {
-                return true;
-            } else {
-                for (int i = 0; i < sectionHeader.length() + readAdditionally; i++) {
-                    scanner.unread();
-                }
-            }
+        if (sectionHeader.isEmpty()) {
+            return false;
         }
-        return false;
+        return sectionIsOfExpectedType(scanner, sectionHeader, readAdditionally);
     }
 
     private boolean endDetected(final ICharacterScanner scanner) {
@@ -80,13 +73,25 @@ class SectionPartitionRule implements IPredicateRule {
         }
         final int readAdditionally = readBeforeSection(scanner);
         final String sectionHeader = getSectionHeader(scanner);
-        if (!sectionHeader.isEmpty()) {
+
+        if (sectionHeader.isEmpty()) {
+            return false;
+        }
+        return !sectionIsOfExpectedType(scanner, sectionHeader, readAdditionally);
+        // because we want to have a single partition for sequence of same-type tables
+    }
+
+    private boolean sectionIsOfExpectedType(final ICharacterScanner scanner, final String sectionHeader,
+            final int readAdditionally) {
+        final boolean startedWithPipedSeparator = readAdditionally > 1;
+        if (sectionType.matches(sectionHeader, startedWithPipedSeparator)) {
+            return true;
+        } else {
             for (int i = 0; i < sectionHeader.length() + readAdditionally; i++) {
                 scanner.unread();
             }
-            return true;
+            return false;
         }
-        return false;
     }
 
     private static int readBeforeSection(final ICharacterScanner scanner) {
