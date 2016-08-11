@@ -10,37 +10,35 @@ import java.util.Stack;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.ParsingState;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-
 public class GarbageBeforeFirstTableMapper implements IParsingMapper {
 
     @Override
-    public RobotToken map(final RobotLine currentLine,
-            final Stack<ParsingState> processingState,
-            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp,
-            final String text) {
+    public RobotToken map(final RobotLine currentLine, final Stack<ParsingState> processingState,
+            final RobotFileOutput robotFileOutput, final RobotToken rt, final FilePosition fp, final String text) {
         // nothing to do
         rt.setText(text);
         final List<IRobotTokenType> types = rt.getTypes();
-        if (!types.contains(RobotTokenType.START_HASH_COMMENT)
-                && !types.contains(RobotTokenType.COMMENT_CONTINUE)) {
-            rt.setType(RobotTokenType.UNKNOWN);
+        if (containsInLineOnlyComment(currentLine)) {
+            types.add(0, RobotTokenType.COMMENT_CONTINUE);
+        }
+        if (!types.contains(RobotTokenType.START_HASH_COMMENT) && !types.contains(RobotTokenType.COMMENT_CONTINUE)) {
+            types.add(0, RobotTokenType.UNKNOWN);
         }
         return rt;
     }
 
-
     @Override
-    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput,
-            final RobotLine currentLine, final RobotToken rt, final String text,
-            final Stack<ParsingState> processingState) {
+    public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
+            final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || containsInLineOnlyComment(currentLine)) {
             if (processingState.isEmpty()) {
                 result = true;
             } else {
@@ -50,5 +48,22 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
         }
 
         return result;
+    }
+
+    private boolean containsInLineOnlyComment(final RobotLine currentLine) {
+        for (final IRobotLineElement e : currentLine.getLineElements()) {
+            if (e.getClass() == RobotToken.class) {
+                if (e.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
+                    return true;
+                } else if (e.getTypes().contains(RobotTokenType.ASSIGNMENT)
+                        || e.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return false;
     }
 }
