@@ -1,0 +1,3 @@
+# comment
+#	*** Settings ***
+#d	ok
