@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _czEysDPaEeat08T3d_ERug
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/5/16 2:45 PM
+Save-Time: 8/11/16 3:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -100,7 +100,7 @@ get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-p
     + "\\\n"
     + "next 6 with space\n"
     + "next7" | verify-true
-s    
+ 
 //===========================================================
     
 //create resource file    
@@ -231,11 +231,11 @@ get-editor "file.tsv" | get-section General | get-editbox -index 1 | get-propert
     
 //go to Source and check text    
 get-editor "file.tsv" | get-tab-folder | get-tab-item Source | click
+    
 get-editor "file.tsv" | get-text-viewer | get-property text | equals "*** Setting ***\n"
     + "Documentation\tline1 with tab\\t\t\n"
     + "...\tlin2 with space\t\n"
     + "...\t\n"
-    + "...\tline3 end\\t\#commnet\n"
-    + "*** Test Cases ***" | verify-true 
-    
+    + "...\tline3 end \\t\\#commnet\n"
+    + "*** Test Cases ***" | verify-true    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
