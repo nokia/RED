@@ -5,17 +5,22 @@
  */
 package org.robotframework.red.nattable.edit;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class DefaultRedCellEditorValueValidator implements CellEditorValueValidator<String> {
 
     @Override
     public void validate(final String value) {
+        if (value == null) {
+            return;
+        }
         if (value.contains("  ") || value.contains("\t") || value.contains(" | ")) {
             throw new CellEditorValueValidationException("Single entry cannot contain cells separator");
+        }
+
+        if (value.startsWith(" ") || (value.endsWith(" ") && !value.endsWith("\\ "))) {
+            throw new CellEditorValueValidationException("Space should be escaped.");
         }
     }
 }
