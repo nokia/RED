@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _C_3tUDyAEeaUDrMBSMf5Ag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/28/16 11:31 AM
+Save-Time: 8/11/16 2:01 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -138,9 +138,9 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "Library    XML   arg1  arg2  arg3  arg4          arg5    \n\n"
     + "Resource  folder/inside/res2.tsv\n"
     + "Library    MyLibrary    my1  \\  my2  \\\\  my3  \n"
-    + "Library    ${LIBRARY}\n\n"
-    + "Variables    libs/lib1.py  1    2    3    4\n"
     + "    \n"
+    + "Library    ${LIBRARY}\n"
+    + "Variables    libs/lib1.py  1    2    3    4\n\n"
     + "Variables    libs/lib1.py\n"
     + "...  val1  #my value\n"
     + "...  val2\n"
@@ -186,11 +186,11 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "...  ${param}  #here is param\n\n"
     + "Library    Telnet\n"
     + "Library    ${LIBRARY}\n\n"
-    + "Library    XML   arg1  arg2  arg3  arg4          arg5    \n\n"
+    + "Library    XML   arg1  arg2  arg3  arg4          arg5    \n"
     + "Resource  folder/inside/res2.tsv\n"
-    + "Library    MyLibrary    my1  \\  my2  \\\\  my3  \n"
-    + "Variables    libs/lib1.py  1    2    3    4\n"
     + "    \n"
+    + "Library    MyLibrary    my1  \\  my2  \\\\  my3  \n"
+    + "Variables    libs/lib1.py  1    2    3    4\n\n"
     + "Variables    libs/lib1.py\n"
     + "...  val1  #my value\n"
     + "...  val2\n"
