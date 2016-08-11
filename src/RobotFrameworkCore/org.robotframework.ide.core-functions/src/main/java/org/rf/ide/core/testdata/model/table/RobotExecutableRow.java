@@ -289,7 +289,8 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     private void fixMissingTypes() {
         if (getParent() != null) {
-            if (getAction() != null && (getArguments().size() > 0 || getAction().isNotEmpty())) {
+            if (getAction() != null
+                    && (getArguments().size() > 0 || getAction().isNotEmpty() || getComment().size() > 0)) {
                 getAction().getTypes().remove(RobotTokenType.UNKNOWN);
                 fixForTheType(getAction(), getActionType(), true);
             }
