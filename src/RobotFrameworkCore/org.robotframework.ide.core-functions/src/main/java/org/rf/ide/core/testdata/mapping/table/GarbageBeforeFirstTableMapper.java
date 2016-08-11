@@ -25,7 +25,7 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
         // nothing to do
         rt.setText(text);
         final List<IRobotTokenType> types = rt.getTypes();
-        if (containsInLineOnlyComment(currentLine)) {
+        if (containsInLineOnlyComment(currentLine) || isPreviousLineContinueOrStartComment(currentLine)) {
             types.add(0, RobotTokenType.COMMENT_CONTINUE);
         }
         if (!types.contains(RobotTokenType.START_HASH_COMMENT) && !types.contains(RobotTokenType.COMMENT_CONTINUE)) {
@@ -34,11 +34,28 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
         return rt;
     }
 
+    private boolean isPreviousLineContinueOrStartComment(final RobotLine currentLine) {
+        final List<IRobotLineElement> lineElements = currentLine.getLineElements();
+        int size = lineElements.size();
+        if (size > 0) {
+            for (int i = size - 1; i >= 0; i--) {
+                final IRobotLineElement elem = lineElements.get(i);
+                if (elem.getClass() == RobotToken.class) {
+                    return (elem.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                            || elem.getTypes().contains(RobotTokenType.COMMENT_CONTINUE));
+                }
+            }
+        }
+
+        return false;
+    }
+
     @Override
     public boolean checkIfCanBeMapped(final RobotFileOutput robotFileOutput, final RobotLine currentLine,
             final RobotToken rt, final String text, final Stack<ParsingState> processingState) {
         boolean result = false;
-        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || containsInLineOnlyComment(currentLine)) {
+        if (rt.getTypes().contains(RobotTokenType.START_HASH_COMMENT) || containsInLineOnlyComment(currentLine)
+                || isCurrentLineTrash(currentLine)) {
             if (processingState.isEmpty()) {
                 result = true;
             } else {
@@ -48,6 +65,23 @@ public class GarbageBeforeFirstTableMapper implements IParsingMapper {
         }
 
         return result;
+    }
+
+    private boolean isCurrentLineTrash(final RobotLine currentLine) {
+        for (final IRobotLineElement e : currentLine.getLineElements()) {
+            if (e.getClass() == RobotToken.class) {
+                if (e.getTypes().contains(RobotTokenType.UNKNOWN)) {
+                    return true;
+                } else if (e.getTypes().contains(RobotTokenType.ASSIGNMENT)
+                        || e.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return false;
     }
 
     private boolean containsInLineOnlyComment(final RobotLine currentLine) {
