@@ -7,6 +7,7 @@ package org.rf.ide.core.testdata.model.table;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
@@ -19,6 +20,28 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
  * @author wypych
  */
 public class RobotExecutableRowTypeSetTest {
+
+    @Test
+    public void test_getAllElementsWhen_parentIsTestCase_andWithoutSetActionAndOnlyComment_shouldReturnAllTokensWithType_TestCase() {
+        // prepare
+        final RobotExecutableRow<Object> rowExec = new RobotExecutableRow<>();
+        final RobotToken comment = new RobotToken();
+        comment.setText("comment");
+
+        // execute
+        rowExec.setParent(new TestCase(new RobotToken()));
+        rowExec.addCommentPart(comment);
+        final List<RobotToken> toks = rowExec.getElementTokens();
+
+        // verify
+        assertThat(rowExec.getAction().getTypes().get(0)).isEqualTo(RobotTokenType.TEST_CASE_ACTION_NAME);
+        assertThat(rowExec.getArguments()).isEmpty();
+        assertThat(rowExec.getComment()).hasSize(1);
+        assertThat(rowExec.getComment().get(0).getTypes().get(0)).isEqualTo(RobotTokenType.START_HASH_COMMENT);
+
+        assertThat(toks).hasSize(2);
+        assertThat(toks).containsExactlyElementsOf(Arrays.asList(rowExec.getAction(), rowExec.getComment().get(0)));
+    }
 
     @Test
     public void test_getAllElementsWhen_parentIsTestCase_shouldReturnAllTokensWithType_TestCase() {
