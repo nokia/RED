@@ -40,18 +40,27 @@ public class NotModelRelatedHashCommentedLineDumper {
                 final List<RobotLine> oldContent = model.getFileContent();
                 final int lastLineToDump = findLastHashLine(oldContent, startLine);
                 if (lastLineToDump > -1) {
-                    for (int lineIndex = startLine; lineIndex < lastLineToDump; lineIndex++) {
-                        final RobotLine robotLine = oldContent.get(lineIndex);
-                        for (IRobotLineElement e : robotLine.getLineElements()) {
-                            generalHelper.getDumpLineUpdater().updateLine(model, lines, e);
-                        }
-
-                        if (!robotLine.getEndOfLine().getFilePosition().isNotSet()) {
-                            generalHelper.getDumpLineUpdater().updateLine(model, lines, robotLine.getEndOfLine());
-                        }
-                    }
+                    dumpCommentHashes(model, lines, startLine, oldContent, lastLineToDump);
                 }
             }
+        }
+    }
+
+    private void dumpCommentHashes(final RobotFile model, final List<RobotLine> lines, final int startLine,
+            final List<RobotLine> oldContent, final int lastLineToDump) {
+        for (int lineIndex = startLine; lineIndex < lastLineToDump; lineIndex++) {
+            final RobotLine robotLine = oldContent.get(lineIndex);
+            dumpHashLine(model, lines, robotLine);
+        }
+    }
+
+    private void dumpHashLine(final RobotFile model, final List<RobotLine> lines, final RobotLine robotLine) {
+        for (IRobotLineElement e : robotLine.getLineElements()) {
+            generalHelper.getDumpLineUpdater().updateLine(model, lines, e);
+        }
+
+        if (!robotLine.getEndOfLine().getFilePosition().isNotSet()) {
+            generalHelper.getDumpLineUpdater().updateLine(model, lines, robotLine.getEndOfLine());
         }
     }
 
