@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
 import org.rf.ide.core.testdata.RobotParser;
@@ -32,7 +29,11 @@ public class RobotDocument extends Document {
     private boolean hasNewestVersion = false;
     private final Semaphore parsingSemaphore = new Semaphore(1);
 
-    private Job job;
+    private final Semaphore parsingFinishedSemaphore = new Semaphore(1);
+
+    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+
+    private Runnable parsingRunnable;
 
     private final Supplier<RobotSuiteFile> fileModelSupplier;
     private RobotParser parser;
@@ -108,19 +109,16 @@ public class RobotDocument extends Document {
     }
 
     private void reparseInSeparateThread() {
-        if (job != null && job.getState() == Job.SLEEPING) {
-            job.cancel();
+        if (parsingRunnable != null) {
+            executor.remove(parsingRunnable);
         }
-        job = new Job("Document reparsing") {
-
+        parsingRunnable = new Runnable() {
             @Override
-            protected IStatus run(final IProgressMonitor monitor) {
+            public void run() {
                 reparse();
-                return Status.OK_STATUS;
             }
         };
-        job.setSystem(true);
-        job.schedule(150);
+        executor.schedule(parsingRunnable, 150, TimeUnit.MILLISECONDS);
     }
 
     private Future<RobotFileOutput> getNewestOutput() {
@@ -144,11 +142,15 @@ public class RobotDocument extends Document {
 
             @Override
             public RobotFileOutput get() throws InterruptedException, ExecutionException {
+                // we don't want situation, when two threads acquire parsingSemaphore and parsing
+                // task cannot be performed
+                parsingFinishedSemaphore.acquire();
                 parsingSemaphore.acquire();
                 try {
                     return output;
                 } finally {
                     parsingSemaphore.release();
+                    parsingFinishedSemaphore.release();
                 }
             }
 
