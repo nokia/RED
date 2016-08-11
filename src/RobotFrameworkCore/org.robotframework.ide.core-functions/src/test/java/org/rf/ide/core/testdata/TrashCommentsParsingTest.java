@@ -60,7 +60,7 @@ public class TrashCommentsParsingTest {
         assertThat(fileModel.getKeywordTable().isPresent()).isFalse();
 
         final List<RobotLine> fileContent = fileModel.getFileContent();
-        assertThat(fileContent).hasSize(3);
+        assertThat(fileContent).hasSize(5);
         assertLine(fileContent.get(0),
                 RobotToken.create("# comment", Arrays.asList(RobotTokenType.START_HASH_COMMENT)));
         assertLine(fileContent.get(1), RobotToken.create("#", Arrays.asList(RobotTokenType.START_HASH_COMMENT)),
@@ -69,6 +69,11 @@ public class TrashCommentsParsingTest {
         assertLine(fileContent.get(2), RobotToken.create("#d", Arrays.asList(RobotTokenType.START_HASH_COMMENT)),
                 separator("\t"),
                 RobotToken.create("ok", Arrays.asList(RobotTokenType.COMMENT_CONTINUE, RobotTokenType.UNKNOWN)));
+        assertLine(fileContent.get(3),
+                RobotToken.create("*** unknown header ***", Arrays.asList(RobotTokenType.USER_OWN_TABLE_HEADER)));
+        assertLine(fileContent.get(4), RobotToken.create("d", Arrays.asList(RobotTokenType.UNKNOWN)), separator("\t"),
+                RobotToken.create("#start", Arrays.asList(RobotTokenType.START_HASH_COMMENT)), separator("\t"),
+                RobotToken.create("continue", Arrays.asList(RobotTokenType.COMMENT_CONTINUE, RobotTokenType.UNKNOWN)));
     }
 
     private void assertLine(final RobotLine toTest, final IRobotLineElement... toks) {
