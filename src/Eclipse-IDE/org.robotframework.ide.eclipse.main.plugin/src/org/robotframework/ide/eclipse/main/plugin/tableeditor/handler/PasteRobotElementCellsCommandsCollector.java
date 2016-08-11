@@ -27,7 +27,7 @@ public abstract class PasteRobotElementCellsCommandsCollector {
 
         final List<EditorCommand> pasteCommands = new ArrayList<>();
 
-        if (selectionLayer.getSelectedCellPositions().length == 1 && clipboard.hasText()) {
+        if (selectionLayer.getSelectedCellPositions().length == 1 && clipboard.hasText() && !selectedElements.isEmpty()) {
             final String textToPaste = clipboard.getText();
             pasteCommands.addAll(collectPasteCommandsForSelectedElement(selectedElements.get(0),
                     newArrayList(textToPaste), selectionLayer.getSelectedCellPositions()[0].getColumnPosition(),
