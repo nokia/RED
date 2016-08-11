@@ -321,7 +321,13 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                     commandsStack.execute(new CreateFreshCaseCommand(section));
                     createdElement = section.getChildren().get(section.getChildren().size() - 1);
                 }
+                refreshSelectionAfterNewElementAddition(createdElement);
                 return createdElement;
+            }
+            
+            private void refreshSelectionAfterNewElementAddition(final RobotElement createdElement) {
+                selectionProvider.setSelection(new StructuredSelection(new Object[] { createdElement }));
+                selectionLayerAccessor.selectFirstColumnInCurrentlySelectedRow();
             }
         };
     }
