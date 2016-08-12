@@ -1,0 +1,268 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: WritingLongLinesToSource
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _9Tqr0GCXEeaRBaqqj0N1Gg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/12/16 4:25 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 0 0
+    key-type "M1+a"
+    key-type Del
+    key-type "NUMPAD_MULTIPLY" "*"
+    type-text Settngs
+    key-type "NUMPAD_MULTIPLY" "*"
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "REsource  "
+    key-type Up
+    key-type Left -times 4
+    type-text i
+    key-type Down
+    key-type End
+    set-caret-pos 2 9
+    type-text "  my resouce"
+    key-type Enter
+    type-text "metadata nothing"
+    key-type Enter -times 2
+    key-type "NUMPAD_MULTIPLY" "*" -times 3
+    type-text " Test cases\""
+    key-type BackSpace
+    type-text " "
+    key-type "NUMPAD_MULTIPLY" "*" -times 3
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "test 1"
+    key-type Enter
+    type-text "Run Keyword If All Critical Tests Passed    name"
+    key-type Enter
+    type-text "log "
+    key-type Tab
+    type-text 56
+    key-type Enter
+    key-type BackSpace -times 4
+    type-text "test 2"
+    key-type Enter
+    type-text "my_kw "
+    key-type Enter
+    type-text abcdefghijklmnoprstqwixyz12abcdefghi
+    key-type Enter -times 2
+    key-type Left -times 4
+    type-text "test 3"
+    key-type Enter
+    type-text Shou
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text this
+    key-type Enter -times 2
+    type-text "catenate  2  55  6"
+    key-type "NUMPAD_ENTER" "\\u000D" -times 2
+    key-type Left -times 4
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "my_kw"
+    key-type Enter
+    type-text "log 34"
+    key-type Enter
+    type-text "Log  this is n"
+    key-type BackSpace
+    type-text longet
+    key-type BackSpace
+    type-text "r text to check how we write to source"
+    key-type Enter
+    key-type "M1+s"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*Settings*\n"
+    + "REsource  my resouce\n"
+    + "metadata nothing\n\n"
+    + "*** Test cases ***\n"
+    + "test 1\n"
+    + "    Run Keyword If All Critical Tests Passed    name\n"
+    + "    log     56\n"
+    + "test 2\n"
+    + "    my_kw \n"
+    + "    abcdefghijklmnoprstqwixyz12abcdefghi\n"
+    + "    \n"
+    + "test 3\n"
+    + "    Should Be Empty    this\n"
+    + "    catenate  2  55  6\n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "my_kw\n"
+    + "    log 34\n"
+    + "    Log  this is longer text to check how we write to source" | verify-true
+    
+    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 21 5
+    type-text Commet
+    key-type BackSpace
+    type-text "nt  "
+    
+    //slower text
+    type-text s 
+    wait 50
+    type-text l
+    wait 50
+    type-text o 
+    wait 50
+    type-text w 
+    wait 50
+    type-text e 
+    wait 50
+    type-text r
+    wait 50
+    
+    type-text " writing"
+    wait 1000
+    
+    type-text " in this line"
+
+    key-type Enter
+    type-text "my mistake"
+    key-type BackSpace -times 10
+    type-text "run keywords"
+    key-type BackSpace
+    type-text s
+    key-type BackSpace
+    type-text s
+    key-type BackSpace
+    type-text s
+    key-type BackSpace
+    type-text "s "
+    key-type BackSpace -times 2
+    type-text s
+    key-type BackSpace
+    type-text "  if run"
+    key-type "NUMPAD_ENTER" "\\u000D"
+    set-caret-pos 13 7
+    type-text " or more"
+}    
+
+
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 23 1
+    type-text "kw name is here to "
+    key-type Home
+    set-caret-pos 23 1
+    key-type Enter
+    key-type BackSpace -times 4
+    key-type End
+    set-caret-pos 24 19
+    type-text " be longer than norlam"
+    key-type BackSpace -times 3
+    type-text mal
+    key-type Enter
+    type-text "Should Be Equal  abcdefghi abcdefgj"
+    key-type BackSpace
+    type-text hi
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type "M1+SPACE"
+    key-type Down -times 2
+    key-type Enter
+    type-text "${variable number 1}"
+    key-type Enter
+    set-caret-pos 3 17
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "Library  file_wiy"
+    key-type BackSpace
+    type-text "th _lib______.py"
+}
+
+    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 4 33
+    hover-text 4 21
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "Variables  "
+    type-text  "1234568911223344556677889910111213141516"
+    
+  }  
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*Settings*\n"
+    + "REsource  my resouce\n"
+    + "metadata nothing\n"
+    + "Library  file_with _lib______.py\n"
+    + "Variables  1234568911223344556677889910111213141516\n\n"
+    + "*** Test cases ***\n"
+    + "test 1\n"
+    + "    Run Keyword If All Critical Tests Passed    name\n"
+    + "    log     56\n"
+    + "test 2\n"
+    + "    my_kw \n"
+    + "    abcdefghijklmnoprstqwixyz12abcdefghi\n"
+    + "    \n"
+    + "test 3 or more\n"
+    + "    Should Be Empty    this\n"
+    + "    catenate  2  55  6\n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "my_kw\n"
+    + "    log 34\n"
+    + "    Log  this is longer text to check how we write to source\n"
+    + "    Comment  slower writing in this line\n"
+    + "    run keyword  if run\n\n"
+    + "kw name is here to be longer than normal\n"
+    + "    Should Be Equal  abcdefghi abcdefghi\n"
+    + "    [Return]    ${variable number 1}" | verify-true
+
+ 
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    key-type Home
+    
+    key-type End
+  
+    key-type Home
+    
+    key-type End
+ 
+    key-type Home
+   
+    key-type End
+
+    key-type Enter
+    
+}
+
+get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 19 1
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    type-text "test case name .with.dots:;89just-5+"
+    key-type "NUMPAD_SUBTRACT" "-"
+    key-type Enter
+}   
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*Settings*\n"
+    + "REsource  my resouce\n"
+    + "metadata nothing\n"
+    + "Library  file_with _lib______.py\n"
+    + "Variables  1234568911223344556677889910111213141516\n\n\n"
+    + "*** Test cases ***\n"
+    + "test 1\n"
+    + "    Run Keyword If All Critical Tests Passed    name\n"
+    + "    log     56\n"
+    + "test 2\n"
+    + "    my_kw \n"
+    + "    abcdefghijklmnoprstqwixyz12abcdefghi\n"
+    + "    \n"
+    + "test 3 or more\n"
+    + "    Should Be Empty    this\n"
+    + "    catenate  2  55  6\n"
+    + "test case name .with.dots:;89just-5+-\n"
+    + "        \n"
+    + "*** Keywords ***\n"
+    + "my_kw\n"
+    + "    log 34\n"
+    + "    Log  this is longer text to check how we write to source\n"
+    + "    Comment  slower writing in this line\n"
+    + "    run keyword  if run\n\n"
+    + "kw name is here to be longer than normal\n"
+    + "    Should Be Equal  abcdefghi abcdefghi\n"
+    + "    [Return]    ${variable number 1}" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
