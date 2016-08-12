@@ -24,12 +24,13 @@ import com.google.common.base.Supplier;
 
 public class RobotDocument extends Document {
 
-    private static final int LIMIT = 50000;
+    private static final int DELAY = 250;
+    private static final int LIMIT = 800;
 
     private boolean hasNewestVersion = false;
     private final Semaphore parsingSemaphore = new Semaphore(1);
-
     private final Semaphore parsingFinishedSemaphore = new Semaphore(1);
+    private boolean reparseInSameThread = true;
 
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
 
@@ -67,16 +68,22 @@ public class RobotDocument extends Document {
         parseListeners.remove(listener);
     }
 
+    public boolean hasNewestModel() {
+        return hasNewestVersion;
+    }
+
     @Override
     protected void fireDocumentAboutToBeChanged(final DocumentEvent event) {
         createParserIfNeeded();
-
-        try {
-            parsingSemaphore.acquire();
-            hasNewestVersion = false;
-        } catch (final InterruptedException e) {
-            throw new IllegalStateException("Document reparsing interrupted!", e);
+        reparseInSameThread = getNumberOfLines() < LIMIT;
+        if (!reparseInSameThread) {
+            try {
+                parsingSemaphore.acquire();
+            } catch (final InterruptedException e) {
+                throw new IllegalStateException("Document reparsing interrupted!", e);
+            }
         }
+        hasNewestVersion = false;
         super.fireDocumentAboutToBeChanged(event);
     }
 
@@ -89,7 +96,7 @@ public class RobotDocument extends Document {
 
     @Override
     protected void fireDocumentChanged(final DocumentEvent event) {
-        if (getLength() < LIMIT) {
+        if (reparseInSameThread) {
             // short documents can be reparsed in the same thread as this does not
             // affect performance too much
             reparse();
@@ -105,7 +112,6 @@ public class RobotDocument extends Document {
             listener.reparsingFinished(output);
         }
         hasNewestVersion = true;
-        parsingSemaphore.release();
     }
 
     private void reparseInSeparateThread() {
@@ -116,9 +122,10 @@ public class RobotDocument extends Document {
             @Override
             public void run() {
                 reparse();
+                parsingSemaphore.release();
             }
         };
-        executor.schedule(parsingRunnable, 150, TimeUnit.MILLISECONDS);
+        executor.schedule(parsingRunnable, DELAY, TimeUnit.MILLISECONDS);
     }
 
     private Future<RobotFileOutput> getNewestOutput() {
