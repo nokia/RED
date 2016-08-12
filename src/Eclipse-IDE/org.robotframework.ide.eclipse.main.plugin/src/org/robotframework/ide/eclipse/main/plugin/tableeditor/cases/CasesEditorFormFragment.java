@@ -168,7 +168,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
-        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 270, 150,
+        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
                 new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider),
                 new CasesElementsLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
@@ -208,7 +208,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
                 CasesTableEditableRule.createEditableRule(fileModel)));
 
-        table = createTable(parent, theme, gridLayer, configRegistry);
+        table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 
         bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
@@ -221,8 +221,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         new CasesTableContentTooltip(table, markersContainer, dataProvider);
     }
 
-    private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
-            final ConfigRegistry configRegistry) {
+    private NatTable createTable(final Composite parent, final TableTheme theme, final RedNattableLayersFactory factory,
+            final GridLayer gridLayer, final DataLayer dataLayer, final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
         final NatTable table = new NatTable(parent, style, gridLayer, false);
         table.setConfigRegistry(configRegistry);
@@ -231,6 +231,10 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                         theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
+        
+        // calculate columns width
+        table.addListener(SWT.Paint,
+                factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer, 270, 200));
 
         addCustomStyling(table, theme);
 
