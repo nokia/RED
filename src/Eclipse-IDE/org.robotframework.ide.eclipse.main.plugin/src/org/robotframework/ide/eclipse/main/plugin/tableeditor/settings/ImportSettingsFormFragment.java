@@ -175,7 +175,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
-        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 120, 150);
+        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider);
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -206,7 +206,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(bodySelectionLayer),
                 SettingsTableEditableRule.createEditableRule(fileModel)));
 
-        table = createTable(parent, theme, gridLayer, configRegistry);
+        table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 
         bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
@@ -223,8 +223,8 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
     }
 
-    private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
-            final ConfigRegistry configRegistry) {
+    private NatTable createTable(final Composite parent, final TableTheme theme, final RedNattableLayersFactory factory,
+            final GridLayer gridLayer, final DataLayer dataLayer, final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
         final NatTable table = new NatTable(parent, style, gridLayer, false);
         table.setConfigRegistry(configRegistry);
@@ -233,6 +233,10 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                         theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
+        
+        // calculate columns width
+        table.addListener(SWT.Paint,
+                factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer, 120, 200));
 
         addCustomStyling(table, theme);
 

@@ -40,9 +40,9 @@ public class ImportSettingsDataProvider implements IFilteringDataProvider, IRowD
     }
 
     void setInput(final RobotSettingsSection section) {
-        this.propertyAccessor.setNumberOfColumns(countImportSettingsTableColumnsNumber());
         this.section = section;
         createLists(section);
+        this.propertyAccessor.setNumberOfColumns(countImportSettingsTableColumnsNumber());
     }
 
     private int countImportSettingsTableColumnsNumber() {

@@ -141,7 +141,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
-        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider, 270, 270,
+        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
                 new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider, true),
                 new VariableTypesAndColumnsLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory.createGlazedListEventsLayer(bodyDataLayer,
@@ -174,7 +174,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator()));
         gridLayer.addConfiguration(new VariableValuesEditConfiguration(theme, fileModel, dataProvider, commandsStack));
 
-        table = createTable(parent, theme, gridLayer, configRegistry);
+        table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 
         bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
@@ -188,8 +188,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         new RedNatTableContentTooltip(table, markersContainer, dataProvider);
     }
 
-    private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
-            final ConfigRegistry configRegistry) {
+    private NatTable createTable(final Composite parent, final TableTheme theme, final RedNattableLayersFactory factory,
+            final GridLayer gridLayer, final DataLayer dataLayer, final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
         final NatTable table = new NatTable(parent, style, gridLayer, false);
         table.setConfigRegistry(configRegistry);
@@ -198,6 +198,9 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                         theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
+        
+        // calculate columns width
+        table.addListener(SWT.Paint, factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer));
 
         addCustomStyling(table, theme);
 
