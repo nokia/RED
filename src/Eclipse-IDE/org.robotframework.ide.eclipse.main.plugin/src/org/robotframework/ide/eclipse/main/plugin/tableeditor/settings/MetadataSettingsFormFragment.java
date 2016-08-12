@@ -209,7 +209,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                 cornerLayer);
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(fileModel, newElementsCreator()));
 
-        table = createTable(parent, theme, gridLayer, configRegistry);
+        table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 
         bodyViewportLayer.registerCommandHandler(new MoveCellSelectionCommandHandler(bodySelectionLayer,
                 new EditTraversalStrategy(ITraversalStrategy.TABLE_CYCLE_TRAVERSAL_STRATEGY, table),
@@ -225,8 +225,8 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
         metadataSection.setClient(table);
     }
 
-    private NatTable createTable(final Composite parent, final TableTheme theme, final GridLayer gridLayer,
-            final ConfigRegistry configRegistry) {
+    private NatTable createTable(final Composite parent, final TableTheme theme, final RedNattableLayersFactory factory,
+            final GridLayer gridLayer, final DataLayer dataLayer, final ConfigRegistry configRegistry) {
         final int style = SWT.NO_BACKGROUND | SWT.NO_REDRAW_RESIZE | SWT.DOUBLE_BUFFERED | SWT.V_SCROLL | SWT.H_SCROLL;
         final NatTable table = new NatTable(parent, style, gridLayer, false);
         table.setConfigRegistry(configRegistry);
@@ -235,6 +235,9 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                         theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
+        
+        // calculate columns width
+        table.addListener(SWT.Paint, factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer));
 
         addCustomStyling(table, theme);
 
