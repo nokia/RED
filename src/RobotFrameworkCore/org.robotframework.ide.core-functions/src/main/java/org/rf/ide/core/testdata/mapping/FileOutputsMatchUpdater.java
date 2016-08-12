@@ -177,6 +177,17 @@ public class FileOutputsMatchUpdater {
             }
         }
 
+        if (rtNew.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
+            String oldText = rtOld.getText().trim();
+            String newText = rtNew.getText().trim();
+
+            if (oldText.endsWith("=")) {
+                if (newText.equals(oldText.substring(0, oldText.length() - 1).trim())) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 

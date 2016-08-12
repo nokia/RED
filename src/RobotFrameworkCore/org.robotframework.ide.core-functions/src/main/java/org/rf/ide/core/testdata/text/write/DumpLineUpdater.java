@@ -116,10 +116,10 @@ public class DumpLineUpdater {
         }
 
         final int toCheck;
-        if (outLines.size() == 1) {
-            toCheck = 0;
-        } else {
+        if (outLines.get(outLines.size() - 1).getLineElements().isEmpty() && outLines.size() > 1) {
             toCheck = outLines.size() - 2;
+        } else {
+            toCheck = outLines.size() - 1;
         }
 
         final RobotLine previousLine = outLines.get(toCheck);
@@ -128,7 +128,7 @@ public class DumpLineUpdater {
             IRobotLineElement lineSeparator = aDumperHelper.getLineSeparator(model);
             previousLine.setEndOfLine(Constant.get(lineSeparator), previousEol.getStartOffset(),
                     previousEol.getStartColumn());
-            if (toCheck == 0) {
+            if (toCheck == outLines.size() - 1) {
                 outLines.add(new RobotLine(previousLine.getLineNumber() + 1, model));
             }
         }
