@@ -13,7 +13,6 @@ import org.robotframework.red.nattable.painter.UnderlinedCellBackgroundPainter.S
 
 /**
  * @author Michal Anglart
- *
  */
 public class ColumnHeaderStyleConfiguration extends DefaultColumnHeaderStyleConfiguration {
 
@@ -23,5 +22,6 @@ public class ColumnHeaderStyleConfiguration extends DefaultColumnHeaderStyleConf
         this.fgColor = theme.getHeadersForeground();
         this.cellPainter = new UnderlinedCellBackgroundPainter(new TextPainter(false, false), Side.BOTTOM,
                 theme.getHeadersUnderlineColor().getRGB());
+        this.renderGridLines = true;
     }
 }
