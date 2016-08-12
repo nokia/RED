@@ -1,0 +1,6 @@
+*** Keywords ***
+Key1
+	\	...		Log
+	\	...		ok
+	\	log	ok
+	
