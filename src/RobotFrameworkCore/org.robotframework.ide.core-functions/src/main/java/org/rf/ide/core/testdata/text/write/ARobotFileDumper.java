@@ -75,7 +75,9 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     public String dump(final List<RobotLine> lines) {
         final StringBuilder strLine = new StringBuilder();
 
-        for (final RobotLine line : lines) {
+        final int nrOfLines = lines.size();
+        for (int i = 0; i < nrOfLines; i++) {
+            final RobotLine line = lines.get(i);
             for (final IRobotLineElement elem : line.getLineElements()) {
                 strLine.append(elem.getRaw());
             }
