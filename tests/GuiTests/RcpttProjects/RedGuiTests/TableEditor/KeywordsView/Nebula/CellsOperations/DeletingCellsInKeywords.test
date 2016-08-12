@@ -1,0 +1,148 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YI1vUFJyEea8WJ7bbC6OBw
+Element-Name: DeletingCellsInKeywords
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _wBhPoFsNEearwpaEcDJbag
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/12/16 2:37 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n\n"
+    + "*** Keywords ***\n"
+    + "Wait for ${timeDuration} seconds\n"
+    + "    ${timeInterval}=    Set Variable    ${1}\n"
+    + "\tLog\tWaiting ${timeDuration} seconds and display the progress...\n"
+    + "\t: FOR\t${d}\tIN RANGE\t${timeDuration}\n"
+    + "\t\\\tLog\t. loop index=${idx}\n"
+    + "\t\\\tSleep\t${timeInterval}\n"
+    + "\t[Return]    ${timeInterval}\n"
+    + "    \\  \\   text  text2\n\n"
+    + "Print output\n"
+    + "    [Arguments]   ${teObj}\n"
+    + "    [Timeout]    69s\n"
+    + "    ${output1}=   Catenate      ${teObj}   ${0}    #comment1\n"
+    + "    ${output2}=  Catenate    ${teObj}   ${2}\n"
+    + "    Log   Show: ${output1}\n"
+    + "    Log   Show detailed view: : ${output2}\n\n"
+    + "Doc here\n"
+    + "    [Documentation]    Create txt file with path to 'resultDir'.\n"
+    + "    [Teardown]    Print output    teObj    Convert To Hex    899\n"
+    + "    [Teardown]\n"
+    + "    Should Be Equal As Strings      ${OUTPUT_DIR}${/}robotReportTargetDir.txt    ${result}"
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 500
+get-view Outline | get-tree | select "TestFile.robot/Keywords/Wait for ${timeDuration} seconds"
+wait 5000
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+	//remove [return]
+    key-type Down
+    key-type Del
+    //remove :FOR
+    key-type Down -times 3
+    key-type Del
+    //remove  arg 3 in 6.th line
+    key-type Right -times 2
+    key-type Down
+    key-type Del
+    
+    //remove comment
+    key-type Down -times 6
+    key-type Right -times 4
+    key-type Del
+}
+
+//set focus
+get-view Outline | get-tree | select "TestFile.robot/Keywords/Print output"
+//remove Log in last line in keyword
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down -times 5
+    key-type Del
+}
+
+//remove arg1 in [Teardown]
+get-view Outline | get-tree | select "TestFile.robot/Keywords/Doc here"
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Down -times 2
+    key-type Right
+    key-type Del
+}
+//remove Catenate kw
+get-view Outline | get-tree | select [get-item "TestFile.robot/Keywords/Print output" | get-item Catenate -index 1]
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    key-type Right
+    key-type Del
+}
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 1 -ref_table [list "Wait for ${timeDuration} seconds"  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 2 -ref_table [list "[Return]"  "${timeInterval}"  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 3 -ref_table [list "${timeInterval}"  "Set Variable"  "${1}"  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 4 -ref_table [list "Log"  "Waiting ${timeDuration} seconds and display the progress..."  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 5 -ref_table [list ""  "${d}"  "IN RANGE"  "${timeDuration}"  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 6 -ref_table [list "\\"  "Log"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 7 -ref_table [list "\\"  "Sleep"  "${timeInterval}"  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 8 -ref_table [list "\\"  "\\"  "text"  "text2"  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 9 -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
+
+
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 10 -ref_table [list "Print output"  "${teObj}"  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 11 -ref_table [list "[Timeout]"  "69s"  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 12 -ref_table [list "${output1}"  "Catenate"  "${teObj}"  "${0}"  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 13 -ref_table [list "${output2}" "${teObj}"  "${2}"  ""  ""  "" ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 14 -ref_table [list "Log"  "Show: ${output1}"  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 15 -ref_table [list ""  "Show detailed view: : ${output2}"  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 16 -ref_table [list  "..."  ""  ""  ""  ""  ""  "" ]
+
+
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 17 -ref_table [list "Doc here"  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 18 -ref_table [list "[Documentation]"  "Create txt file with path to 'resultDir'."  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 19 -ref_table [list "[Teardown]"  ""  "teObj"  "Convert To Hex"  "899"  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 20 -ref_table [list "Should Be Equal As Strings"  "${OUTPUT_DIR}${/}robotReportTargetDir.txt"  "${result}"  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 21 -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 22 -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""  "" ]
+
+
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Keywords | click
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
+}
+
+//tu jest bug - powinno byc przesuniecie w lewo
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 5 -ref_table [list "\\"  "${d}"  "IN RANGE"  "${timeDuration}"  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 15 -ref_table [list "\\"  "Show detailed view: : ${output2}"  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 19 -ref_table [list "[Teardown]"  ""  "teObj"  "Convert To Hex"  "899"  ""  "" ]
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n\n"
+    + "*** Keywords ***\n"
+    + "Wait for ${timeDuration} seconds\n"
+    + "    ${timeInterval}=    Set Variable    ${1}\n"
+    + "\tLog\tWaiting ${timeDuration} seconds and display the progress...\n"
+    + "\t\\\t${d}\tIN RANGE\t${timeDuration}\n"
+    + "\t\\\tLog\t\n"
+    + "\t\\\tSleep\t${timeInterval}\n"
+    + "\t[Return]    ${timeInterval}\n"
+    + "    \\  \\   text  text2\n\n"
+    + "Print output\n"
+    + "    [Arguments]   ${teObj}\n"
+    + "    [Timeout]    69s\n"
+    + "    ${output1}=   Catenate      ${teObj}   ${0}    \n"
+    + "    ${output2}=    ${teObj}   ${2}\n"
+    + "    Log   Show: ${output1}\n"
+    + "    \\   Show detailed view: : ${output2}\n\n"
+    + "Doc here\n"
+    + "    [Documentation]    Create txt file with path to 'resultDir'.\n"
+    + "    [Teardown]    \\    teObj    Convert To Hex    899\n"
+    + "    [Teardown]\n"
+    + "    Should Be Equal As Strings      ${OUTPUT_DIR}${/}robotReportTargetDir.txt    ${result}" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
