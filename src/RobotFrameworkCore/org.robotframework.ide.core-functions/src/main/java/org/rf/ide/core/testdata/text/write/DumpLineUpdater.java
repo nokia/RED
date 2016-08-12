@@ -46,6 +46,8 @@ public class DumpLineUpdater {
                 outLines.add(new RobotLine(outLines.size() + 1, model));
             }
         } else {
+            replaceEOFbyEOL(model, outLines);
+
             final RobotLine line;
             if (outLines.isEmpty()) {
                 line = new RobotLine(1, model);
@@ -105,6 +107,30 @@ public class DumpLineUpdater {
             }
 
             line.addLineElement(cloneWithPositionRecalculate(artToken, line, outLines));
+        }
+    }
+
+    private void replaceEOFbyEOL(final RobotFile model, final List<RobotLine> outLines) {
+        if (outLines.isEmpty()) {
+            return;
+        }
+
+        final int toCheck;
+        if (outLines.size() == 1) {
+            toCheck = 0;
+        } else {
+            toCheck = outLines.size() - 2;
+        }
+
+        final RobotLine previousLine = outLines.get(toCheck);
+        final IRobotLineElement previousEol = previousLine.getEndOfLine();
+        if (previousEol != null && previousEol.getTypes().contains(EndOfLineTypes.EOF)) {
+            IRobotLineElement lineSeparator = aDumperHelper.getLineSeparator(model);
+            previousLine.setEndOfLine(Constant.get(lineSeparator), previousEol.getStartOffset(),
+                    previousEol.getStartColumn());
+            if (toCheck == 0) {
+                outLines.add(new RobotLine(previousLine.getLineNumber() + 1, model));
+            }
         }
     }
 
