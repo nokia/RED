@@ -39,11 +39,4 @@ public class SelectionLayerAccessor {
     public boolean noFullRowIsSelected() {
         return selectionLayer.getFullySelectedRowPositions().length == 0;
     }
-    
-    public void selectFirstColumnInCurrentlySelectedRow() {
-        final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
-        if (selectedCellPositions.length > 0) {
-            selectionLayer.setSelectedCell(0, selectedCellPositions[0].getRowPosition());
-        }
-    }
 }

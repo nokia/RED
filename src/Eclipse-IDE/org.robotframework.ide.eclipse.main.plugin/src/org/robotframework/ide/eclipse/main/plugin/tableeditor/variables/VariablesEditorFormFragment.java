@@ -42,7 +42,6 @@ import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -241,14 +240,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 final RobotVariablesSection section = dataProvider.getInput();
                 commandsStack.execute(
                         new CreateFreshVariableCommand(section, dataProvider.getAdderState().getVariableType()));
-                final RobotVariable createdElement = section.getChildren().get(section.getChildren().size() - 1);
-                refreshSelectionAfterNewElementAddition(createdElement);
-                return createdElement;
-            }
-            
-            private void refreshSelectionAfterNewElementAddition(final RobotElement createdElement) {
-                selectionProvider.setSelection(new StructuredSelection(new Object[] { createdElement }));
-                selectionLayerAccessor.selectFirstColumnInCurrentlySelectedRow();
+                return section.getChildren().get(section.getChildren().size() - 1);
             }
         };
     }

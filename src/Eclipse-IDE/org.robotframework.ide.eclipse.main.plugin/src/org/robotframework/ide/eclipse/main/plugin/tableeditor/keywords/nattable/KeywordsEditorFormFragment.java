@@ -322,13 +322,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                     commandsStack.execute(new CreateFreshKeywordDefinitionCommand(section, true));
                     createdElement = section.getChildren().get(section.getChildren().size() - 1);
                 }
-                refreshSelectionAfterNewElementAddition(createdElement);
                 return createdElement;
-            }
-
-            private void refreshSelectionAfterNewElementAddition(final RobotElement createdElement) {
-                selectionProvider.setSelection(new StructuredSelection(new Object[] { createdElement }));
-                selectionLayerAccessor.selectFirstColumnInCurrentlySelectedRow();
             }
         };
     }
