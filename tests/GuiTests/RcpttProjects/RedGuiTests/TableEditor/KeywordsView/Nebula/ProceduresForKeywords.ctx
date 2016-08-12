@@ -6,14 +6,14 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YI1vUFJyEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/8/16 3:18 PM
+Save-Time: 8/12/16 5:34 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
 Entry-Name: .ecl.context
 
 proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {	
-	$result | eq $expected | assert-true -message [format "Value in row %s, colum %s should be: '%s', but is '%s'" $row $col $expected $result]
+	$result | eq $expected | assert-true -message [format "Value in row %s, column %s should be: '%s', but is '%s'" $row $col $expected $result]
 }
 
 
@@ -25,17 +25,17 @@ proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 		| my-assert-true -expected $kw -row $row -col 1 
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c1 -row $row -col 1 
+	    | my-assert-true -expected $c1 -row $row -col 2
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c2 -row $row -col 1 
+	    | my-assert-true -expected $c2 -row $row -col 3 
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 4 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c3 -row $row -col 1 
+	    | my-assert-true -expected $c3 -row $row -col 4 
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 5 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c4 -row $row -col 1     
+	    | my-assert-true -expected $c4 -row $row -col 5     
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c5 -row $row -col 1 
+	    | my-assert-true -expected $c5 -row $row -col 6 
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
-	    | my-assert-true -expected $comment -row $row -col 1 
+	    | my-assert-true -expected $comment -row $row -col 7
 }
 
 //proc "check-markers-in-table"  [val file] [val type ERROR] [val lines]  {
