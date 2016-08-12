@@ -41,6 +41,7 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
     }
 
     public RobotToken getAction() {
+        fixMissingTypes();
         return action;
     }
 
@@ -289,10 +290,9 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     private void fixMissingTypes() {
         if (getParent() != null) {
-            if (getAction() != null
-                    && (getArguments().size() > 0 || getAction().isNotEmpty() || getComment().size() > 0)) {
-                getAction().getTypes().remove(RobotTokenType.UNKNOWN);
-                fixForTheType(getAction(), getActionType(), true);
+            if (action != null && (getArguments().size() > 0 || action.isNotEmpty() || getComment().size() > 0)) {
+                action.getTypes().remove(RobotTokenType.UNKNOWN);
+                fixForTheType(action, getActionType(), true);
             }
 
             for (int i = 0; i < getArguments().size(); i++) {

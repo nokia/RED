@@ -1,0 +1,6 @@
+*** Keywords ***
+Key1
+	:FOR	${x}	IN	a	b	c
+		Log	ok	#cm1
+		Log	ok2	#cm2
+	Log	done
