@@ -1,0 +1,6 @@
+*** Keywords ***
+Key1
+	${x}    
+	...		Set Variable
+	\	...	2
+	

@@ -1,0 +1,11 @@
+*** Keywords ***
+Key1
+	: FoR	${x}	IN	cebula
+	\
+	\	#woda3
+	\	#woda
+	\	...	Log	ok
+	\	Log	${x}
+	#	ok
+	log	ok
+	
