@@ -50,15 +50,15 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
     public KeywordsDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotKeywordsSection section) {
         this.section = section;
-        this.propertyAccessor = new KeywordsColumnsPropertyAccessor(commandsStack, countColumnsNumber());
         this.keywordsTreeFormat = new CodeElementsTreeFormat();
         createLists(section);
+        this.propertyAccessor = new KeywordsColumnsPropertyAccessor(commandsStack, countColumnsNumber());
     }
     
     public void setInput(final RobotKeywordsSection section) {
-        propertyAccessor.setNumberOfColumns(countColumnsNumber());
         this.section = section;
         createLists(section);
+        propertyAccessor.setNumberOfColumns(countColumnsNumber());
     }
 
     private void createLists(final RobotKeywordsSection section) {

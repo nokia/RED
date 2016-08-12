@@ -49,15 +49,15 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     CasesDataProvider(final RobotEditorCommandsStack commandsStack,
             final RobotCasesSection section) {
         this.section = section;
-        this.propertyAccessor = new CasesColumnsPropertyAccessor(commandsStack, countColumnsNumber());
         this.casesTreeFormat = new CodeElementsTreeFormat();
         createLists(section);
+        this.propertyAccessor = new CasesColumnsPropertyAccessor(commandsStack, countColumnsNumber());
     }
     
     void setInput(final RobotCasesSection section) {
-        propertyAccessor.setColumnCount(countColumnsNumber());
         this.section = section;
         createLists(section);
+        propertyAccessor.setColumnCount(countColumnsNumber());
     }
 
     private int countColumnsNumber() {

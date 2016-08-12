@@ -43,9 +43,9 @@ public class GeneralSettingsDataProvider
 
     public void setInput(final RobotSettingsSection section) {
         propertyAccessor.setSection(section);
-        propertyAccessor.setNumberOfColumns(countGeneralSettingsTableColumnsNumber());
         this.section = section;
         createLists(section);
+        propertyAccessor.setNumberOfColumns(countGeneralSettingsTableColumnsNumber());
     }
 
     private int countGeneralSettingsTableColumnsNumber() {

@@ -5,9 +5,11 @@
  */
 package org.robotframework.red.nattable;
 
+import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
@@ -32,6 +34,9 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionModel;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.nattable.configs.RedTableEditBindingsConfiguration;
@@ -41,30 +46,19 @@ import ca.odell.glazedlists.SortedList;
 
 /**
  * @author Michal Anglart
- *
  */
 public class RedNattableLayersFactory {
 
     public final static int ROW_HEIGHT = 22;
 
     public DataLayer createDataLayer(final IDataProvider dataProvider) {
-        return createDataLayer(dataProvider, 270, 270);
-    }
-    
-    public DataLayer createDataLayer(final IDataProvider dataProvider, final int firstColumnWidth,
-            final int secondColumnWidth) {
-        return createDataLayer(dataProvider, firstColumnWidth, secondColumnWidth,
-                new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider));
+        return createDataLayer(dataProvider, new AlternatingRowConfigLabelAccumulator(),
+                new AddingElementLabelAccumulator(dataProvider));
     }
 
-    public DataLayer createDataLayer(final IDataProvider dataProvider, final int firstColumnWidth,
-            final int secondColumnWidth, final IConfigLabelAccumulator... accumulators) {
+    public DataLayer createDataLayer(final IDataProvider dataProvider, final IConfigLabelAccumulator... accumulators) {
         final DataLayer dataLayer = new DataLayer(dataProvider);
-        dataLayer.setColumnPercentageSizing(dataProvider.getColumnCount()-1, true);
-        dataLayer.setColumnWidthByPosition(0, firstColumnWidth);
-        dataLayer.setColumnWidthByPosition(1, secondColumnWidth);
         dataLayer.setDefaultRowHeight(ROW_HEIGHT);
-
         dataLayer.setConfigLabelAccumulator(aggregatedFrom(accumulators));
         return dataLayer;
     }
@@ -124,8 +118,9 @@ public class RedNattableLayersFactory {
     public DataLayer createColumnHeaderDataLayer(final IDataProvider columnHeaderDataProvider) {
         return createColumnHeaderDataLayer(columnHeaderDataProvider, new ColumnLabelAccumulator());
     }
-    
-    public DataLayer createColumnHeaderDataLayer(final IDataProvider columnHeaderDataProvider, final IConfigLabelAccumulator configLabelAccumulator) {
+
+    public DataLayer createColumnHeaderDataLayer(final IDataProvider columnHeaderDataProvider,
+            final IConfigLabelAccumulator configLabelAccumulator) {
         final DataLayer columnHeaderDataLayer = new DataLayer(columnHeaderDataProvider);
         columnHeaderDataLayer.setDefaultRowHeight(ROW_HEIGHT);
         columnHeaderDataLayer.setConfigLabelAccumulator(configLabelAccumulator);
@@ -171,11 +166,60 @@ public class RedNattableLayersFactory {
                 new DefaultCornerDataProvider(columnHeaderDataProvider, rowHeaderDataProvider));
         return new CornerLayer(columnHeaderDataLayer, rowHeaderLayer, columnHeaderLayer);
     }
-    
+
     public GridLayer createGridLayer(final ILayer viewportLayer, final ILayer columnHeaderLayer,
             final ILayer rowHeaderLayer, final ILayer cornerLayer) {
         final GridLayer gridLayer = new GridLayer(viewportLayer, columnHeaderLayer, rowHeaderLayer, cornerLayer, false);
         gridLayer.addConfiguration(new RedTableEditBindingsConfiguration());
         return gridLayer;
     }
+
+    public Listener getColumnsWidthCalculatingPaintListener(final NatTable table,
+            final IRowDataProvider<?> dataProvider, final DataLayer dataLayer) {
+        return getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer, 270, 270);
+    }
+
+    public Listener getColumnsWidthCalculatingPaintListener(final NatTable table,
+            final IRowDataProvider<?> dataProvider, final DataLayer dataLayer, final int firstColumnWidth,
+            final int secondColumnWidth) {
+        return new Listener() {
+
+            @Override
+            public void handleEvent(final Event event) {
+
+                final int tableWidth = event.width - 15; // - row header width
+                final int columnCount = dataProvider.getColumnCount();
+
+                if (columnCount == 3) {
+                    final int columnWidth = tableWidth / 3;
+                    dataLayer.setColumnWidthByPosition(0, columnWidth);
+                    dataLayer.setColumnWidthByPosition(1, columnWidth);
+                    dataLayer.setColumnWidthByPosition(2, tableWidth - (columnWidth * 2));
+                } else {
+                    final int defaultArgColumnWidth = 100;
+                    final int commentColumnWidth = 100;
+
+                    final int argsColumnsCount = columnCount - 3;
+
+                    dataLayer.setColumnWidthByPosition(0, firstColumnWidth);
+                    dataLayer.setColumnWidthByPosition(1, secondColumnWidth);
+                    for (int i = 2; i < argsColumnsCount + 2; i++) {
+                        dataLayer.setColumnWidthByPosition(i, defaultArgColumnWidth);
+                    }
+                    final int allColumnsWidth = firstColumnWidth + secondColumnWidth
+                            + (argsColumnsCount * defaultArgColumnWidth) + commentColumnWidth;
+                    if (tableWidth >= allColumnsWidth) {
+                        final int remainingSpace = tableWidth
+                                - (firstColumnWidth + secondColumnWidth + (argsColumnsCount * defaultArgColumnWidth));
+                        dataLayer.setColumnWidthByPosition(columnCount - 1, remainingSpace);
+                    } else {
+                        dataLayer.setColumnWidthByPosition(columnCount - 1, commentColumnWidth);
+                    }
+                }
+                
+                table.removeListener(SWT.Paint, this);
+            }
+        };
+    }
+
 }
