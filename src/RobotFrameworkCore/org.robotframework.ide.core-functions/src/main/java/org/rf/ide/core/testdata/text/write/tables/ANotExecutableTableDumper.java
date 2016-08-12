@@ -49,6 +49,8 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
             final List<RobotLine> lines) {
         getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
 
+        getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
+
         getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th, sorted.isEmpty());
 
         if (!sorted.isEmpty()) {
