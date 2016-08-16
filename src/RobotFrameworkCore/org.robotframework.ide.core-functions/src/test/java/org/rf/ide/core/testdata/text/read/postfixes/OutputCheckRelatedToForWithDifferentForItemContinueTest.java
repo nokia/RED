@@ -75,9 +75,9 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
         assertExecutableLine(executionContext.get(0), ":FOR", Arrays.asList("${x}", "IN", "a", "b", "c"),
                 new ArrayList<String>(0));
         assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR);
-        assertExecutableLine(executionContext.get(1), "", Arrays.asList("Log", "ok"), Arrays.asList("#cm1"));
+        assertExecutableLine(executionContext.get(1), "\\", Arrays.asList("Log", "ok"), Arrays.asList("#cm1"));
         assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
-        assertExecutableLine(executionContext.get(2), "", Arrays.asList("Log", "ok2"), Arrays.asList("#cm2"));
+        assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("Log", "ok2"), Arrays.asList("#cm2"));
         assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
         assertExecutableLine(executionContext.get(3), "Log", Arrays.asList("done"), new ArrayList<String>(0));
         assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(ERowType.SIMPLE);
@@ -195,11 +195,11 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
         assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR);
         assertExecutableLine(executionContext.get(1), "\\", Arrays.asList("${x}"), Arrays.asList("#   data"));
         assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
-        assertExecutableLine(executionContext.get(2), "log", new ArrayList<String>(0), Arrays.asList("#   hugo"));
+        assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("log"), Arrays.asList("#   hugo"));
         assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
-        assertExecutableLine(executionContext.get(3), null, new ArrayList<String>(0), Arrays.asList("#", "hash"));
+        assertExecutableLine(executionContext.get(3), "\\", new ArrayList<String>(0), Arrays.asList("#", "hash"));
         assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(ERowType.COMMENTED_HASH);
-        assertExecutableLine(executionContext.get(4), "", Arrays.asList("kw_w"), Arrays.asList("#", "d"));
+        assertExecutableLine(executionContext.get(4), "\\", Arrays.asList("\\", "kw_w"), Arrays.asList("#", "d"));
         assertThat(executionContext.get(4).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
         assertExecutableLine(executionContext.get(5), "\\", Arrays.asList("kw_w"), new ArrayList<String>(0));
         assertThat(executionContext.get(5).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
