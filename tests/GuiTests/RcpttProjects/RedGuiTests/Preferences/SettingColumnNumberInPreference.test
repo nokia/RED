@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _XxFF4JQgEeWNpL9oeriwCw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/14/16 1:24 PM
+Save-Time: 8/16/16 10:31 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,8 +18,8 @@ proc "check-column-amount-for-main_view" [val view] [val tab_label] [val col_nr]
 	get-editor "TestFile.robot" | get-tab-folder | get-tab-item $view | click
 	
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label $tab_label] -index 1 ] {
-	    get-property "getLayer().getBodyLayer().getColumnCount()" | equals $col_nr | verify-true
-	    get-property "getLayer().getBodyLayer().getRowCount()" | equals $row_nr | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getColumnCount()" | equals $col_nr | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()"  | equals $row_nr | verify-true
 	}
 }
 
@@ -27,8 +27,8 @@ proc "check-column-amount-in-settings" [val tab_label] [val col_nr]
 {
 
 	with [get-editor "TestFile.robot" | get-section $tab_label | get-canvas] {
-	    get-property "getLayer().getBodyLayer().getColumnCount()" | equals $col_nr | verify-true
-	    get-property "getLayer().getBodyLayer().getRowCount()" | equals 0 | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getColumnCount()" | equals $col_nr | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()"  | equals 0 | verify-true
 	}
 }
 
