@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _2DXt4Em1EeaRB_Xz0tiYpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/16/16 10:26 AM
+Save-Time: 8/16/16 10:45 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -18,8 +18,8 @@ proc "check-column-amount-for-main_view" [val view] [val tab_label] [val col_nr]
 	get-editor "TestFile.robot" | get-tab-folder | get-tab-item $view | click
 	
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label $tab_label] -index 1 ] {
-	    get-property "getLayer().getBodyLayer().getColumnCount()" | equals $col_nr | verify-true
-	    get-property "getLayer().getBodyLayer().getRowCount()" | equals $row_nr | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getColumnCount()" | equals $col_nr | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()" | equals $row_nr | verify-true
 	}
 }
 
@@ -27,8 +27,8 @@ proc "check-column-amount-in-settings" [val tab_label] [val col_nr] [val row 0]
 {
 
 	with [get-editor "TestFile.robot" | get-section $tab_label | get-canvas] {
-	    get-property "getLayer().getBodyLayer().getColumnCount()" | equals $col_nr | verify-true
-	    get-property "getLayer().getBodyLayer().getRowCount()" | equals $row | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getColumnCount()" | equals $col_nr | verify-true
+	    get-property "getLayer().getBodyLayer().getScrollableLayer().getRowCount()" | equals $row | verify-true
 	}
 }
 
@@ -62,7 +62,7 @@ proc "check-columns-in-all-tables" [val tc 8] [val kw 10] [val gen 9] [val impor
 }
 
 proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {	
-	$result | eq $expected | assert-true -message [format "Value in row %s, column %s should be: '%s', but is '%s'" $row $col $expected $result]
+	$result | eq $expected | assert-true -message [format "Value in row %s, colum %s should be: '%s', but is '%s'" $row $col $expected $result]
 }
 
 
@@ -129,9 +129,8 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
 
 //test suite has more than 5 columns - check if even 5 are set in preference than view will be expanded
 
-get-editor "TestFile.robot" | maximize
 check-columns-in-all-tables
-get-editor "TestFile.robot" | restore
+
 
 //-------------------- change column amount to 2 ------------------------------
 get-preferences-menu | click
@@ -151,9 +150,8 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 
 //go to test cases and chcek column amount
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
-get-editor "TestFile.robot" | maximize
 check-columns-in-all-tables
-get-editor "TestFile.robot" | restore
+
 
 //--------------------------------change column amount to 16 -------------------------------------
 
@@ -170,7 +168,6 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 
 get-editor "TestFile.robot" | maximize
 check-columns-in-all-tables -tc 16 -kw 16 -gen 16 -imports 16
-
 
 //check cells inputs
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
@@ -211,5 +208,4 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
 compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Variables" -col_amount 3 -row "1" -ref_table [list "${var}"  "4"  "#com" ]
 compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Variables" -col_amount 3 -row "2" -ref_table [list "${var1}"  "5"  "#com2" ]
 
-get-editor "TestFile.robot" | restore
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
