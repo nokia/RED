@@ -5,8 +5,8 @@ Element-Name: adding_content
 Element-Type: context
 Element-Version: 2.0
 Id: _wdMmkIk5EeWHhtZu19MBKw
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/19/15 11:45 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/16/16 5:25 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -24,6 +24,8 @@ proc "add-init-content" [val file_name] [val is_tsv]{
 	    get-property "getItems().TableItem[1].getText()" | equals "*** Settings ***" | verify-true
 	    get-property "getItems().TableItem[2].getText()" | equals "*** Variables ***" | verify-true
 	}
+	get-editor $file_name| get-text-viewer | key-type ESC
+	
 	//add kewyword
 	with [get-editor $file_name| get-text-viewer] {
 	    key-type "M1+SPACE"
