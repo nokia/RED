@@ -1,0 +1,105 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: EditingResourceWithComments
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _-SZoMF_XEeaRBaqqj0N1Gg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/11/16 5:40 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Resource file" | click
+with [get-window "New Robot Resource file"] {
+    get-editbox -after [get-label "File name:"] | set-text res
+    get-button Finish | click
+}
+
+
+get-editor "res.robot" | get-text-viewer | set-text "*** Settings ***\n"
+    + "Library   OperatingSystem \n\n"
+    + " *** Keyword ***\n"
+    + "kw1\n"
+    + "    [Documentation]    doc1    \n"
+    + "    Import Resource    path\n"
+    + "    None Shall Pass    who\n"
+    + "    Repeat Keyword    repeat    name    \n"
+    + "    \n"
+    + "kw2\n"
+    + "    [Arguments]    ${a}  ${b}\n"
+    + "    [Tags]    new    \n"
+    + "    Catenate    a  b  c\n"
+    + "    \n"
+    + "# kw3\n"
+    + "    # Log  4\n"
+    + "    # log  5\n"
+    + "    \n"
+    + "    # log  7" 
+    
+get-editor "res.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 500
+get-view Outline | get-tree | select "res.robot/Keywords/kw1/Import Resource"
+wait 500
+
+//change path to "new path"
+with [get-editor "res.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        set-text "new path"
+        key-type Enter
+    }
+    //save and go to source
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
+    get-tab-folder | get-tab-item Source | click
+}
+
+//bug
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library   OperatingSystem \n\n"
+    + " *** Keyword ***\n"
+    + "kw1\n"
+    + "    [Documentation]    doc1    \n"
+    + "    Import Resource    new path\n"
+    + "    None Shall Pass    who\n"
+    + "    Repeat Keyword    repeat    name    \n"
+    + "    \n"
+    + "kw2\n"
+    + "    [Arguments]    ${a}  ${b}\n"
+    + "    [Tags]    new    \n"
+    + "    Catenate    a  b  c" | verify-true
+    
+//back to keywords and check if selection can be changed    
+with [get-editor "res.robot"] {
+    get-tab-folder | get-tab-item Keywords | click
+    //go down and change arg
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Left
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text me
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
+    
+    //go to kw name and change to Log
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Left -times 2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        set-text Log
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
+    get-tab-folder | get-tab-item Source | click
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
