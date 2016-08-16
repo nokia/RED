@@ -18,11 +18,13 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.tables.AExecutableTableElementDumper;
+import org.rf.ide.core.testdata.text.write.tables.ForContinueStartWithCommentFixer;
 
 public class TestCaseExecutionRowDumper extends AExecutableTableElementDumper {
 
     public TestCaseExecutionRowDumper(final DumperHelper aDumpHelper) {
         super(aDumpHelper, ModelType.TEST_CASE_EXECUTABLE_ROW);
+        addAfterSortTask(new ForContinueStartWithCommentFixer());
     }
 
     @SuppressWarnings("unchecked")

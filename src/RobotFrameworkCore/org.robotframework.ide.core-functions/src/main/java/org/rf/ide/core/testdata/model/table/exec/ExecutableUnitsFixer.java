@@ -50,9 +50,14 @@ public class ExecutableUnitsFixer {
                 if (rowType == ERowType.FOR_CONTINUE) {
                     Optional<RobotToken> previousLineContinue = getPreviouseLineContinueToken(row.getElementTokens());
                     if (previousLineContinue.isPresent()) {
-                        merge(newExecutionContext, preBuildDescriptors, lineId, previousLineContinue.get());
+                        merge(execUnit, newExecutionContext, preBuildDescriptors, lineId, previousLineContinue.get());
                     } else {
                         newExecutionContext.add(row);
+
+                        if (lastForIndex > -1 && lastForExecutableIndex > -1) {
+                            lastForExecutableIndex = newExecutionContext.size() - 1;
+                            applyArtifactalForLineContinue(newExecutionContext, lastForIndex, lastForExecutableIndex);
+                        }
                     }
                 } else if (rowType == ERowType.SIMPLE) {
                     if (containsArtifactalContinueAfectingForLoop(currentExecLine)) {
@@ -64,11 +69,11 @@ public class ExecutableUnitsFixer {
                                 final RobotExecutableRow<T> toMergeLine = newExecutionContext.get(parentLine);
                                 final int numberOfMerges = lastForExecutableIndex - parentLine;
                                 for (int i = 0; i < numberOfMerges; i++) {
-                                    merge(toMergeLine, newExecutionContext.get(parentLine + 1));
+                                    merge(execUnit, toMergeLine, newExecutionContext.get(parentLine + 1));
                                     newExecutionContext.remove(parentLine + 1);
                                 }
 
-                                merge(toMergeLine, row);
+                                merge(execUnit, toMergeLine, row);
                             } else {
                                 newExecutionContext.add(row);
                             }
@@ -84,7 +89,8 @@ public class ExecutableUnitsFixer {
                         Optional<RobotToken> previousLineContinue = getPreviouseLineContinueToken(
                                 row.getElementTokens());
                         if (previousLineContinue.isPresent()) {
-                            merge(newExecutionContext, preBuildDescriptors, lineId, previousLineContinue.get());
+                            merge(execUnit, newExecutionContext, preBuildDescriptors, lineId,
+                                    previousLineContinue.get());
                         } else {
                             newExecutionContext.add(row);
                         }
@@ -110,8 +116,54 @@ public class ExecutableUnitsFixer {
             applyArtifactalForLineContinue(newExecutionContext, lastForIndex, lastForExecutableIndex);
         }
 
-        return newExecutionContext;
+        boolean isContinue = false;
+        int size = newExecutionContext.size();
+        for (int i = size - 1; i >= 0; i--) {
+            final RobotExecutableRow<T> execLine = newExecutionContext.get(i);
+            final IRowType rowType = execLine.buildLineDescription().getRowType();
+            if (rowType == ERowType.FOR_CONTINUE) {
+                if (execLine.getAction().getText().isEmpty()) {
+                    if (execLine.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN)) {
+                        RobotToken actionToBeArgument = execLine.getAction().copy();
+                        actionToBeArgument.getTypes().remove(RobotTokenType.KEYWORD_ACTION_NAME);
+                        actionToBeArgument.getTypes().remove(RobotTokenType.TEST_CASE_ACTION_NAME);
+                        actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                        actionToBeArgument.setRaw("\\");
+                        actionToBeArgument.setText("\\");
+                        execLine.addArgument(0, actionToBeArgument);
+                        execLine.getAction().setText("\\");
+                        execLine.getAction().setRaw("\\");
+                    } else {
+                        execLine.getAction().setText("\\");
+                        execLine.getAction().setRaw("\\");
+                    }
+                } else if (!execLine.getAction().getText().equals("\\")) {
+                    RobotToken actionToBeArgument = execLine.getAction().copy();
+                    actionToBeArgument.getTypes().remove(RobotTokenType.KEYWORD_ACTION_NAME);
+                    actionToBeArgument.getTypes().remove(RobotTokenType.TEST_CASE_ACTION_NAME);
+                    actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                    execLine.addArgument(0, actionToBeArgument);
+                    execLine.getAction().setText("\\");
+                    execLine.getAction().setRaw("\\");
+                    execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                } else {
+                    execLine.getAction().getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                }
+                isContinue = true;
+            } else if (rowType == ERowType.COMMENTED_HASH) {
+                if (isContinue) {
+                    if (!execLine.getAction().getText().equals("\\")) {
+                        execLine.getAction().setText("\\");
+                        execLine.getAction().setRaw("\\");
+                        execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                    }
+                }
+            } else if (rowType == ERowType.FOR || rowType == ERowType.SIMPLE) {
+                isContinue = false;
+            }
+        }
 
+        return newExecutionContext;
     }
 
     private <T> Optional<Integer> findLineWithExecAction(final List<RobotExecutableRow<T>> newExecutionContext) {
@@ -123,7 +175,8 @@ public class ExecutableUnitsFixer {
         return Optional.absent();
     }
 
-    private <T> void merge(final RobotExecutableRow<T> outputLine, final RobotExecutableRow<T> toMerge) {
+    private <T extends AModelElement<? extends ARobotSectionTable>> void merge(final IExecutableStepsHolder<T> execUnit,
+            final RobotExecutableRow<T> outputLine, final RobotExecutableRow<T> toMerge) {
         if (!toMerge.getAction().getFilePosition().isNotSet()) {
             outputLine.addArgument(toMerge.getAction());
         }
@@ -139,7 +192,8 @@ public class ExecutableUnitsFixer {
         }
     }
 
-    private <T extends AModelElement<? extends ARobotSectionTable>> void merge(
+    @SuppressWarnings("unchecked")
+    private <T extends AModelElement<? extends ARobotSectionTable>> void merge(final IExecutableStepsHolder<T> execUnit,
             final List<RobotExecutableRow<T>> newExecutionContext,
             final List<IExecutableRowDescriptor<T>> preBuildDescriptors, final int currentLine,
             final RobotToken previousLineContinueToken) {
@@ -148,6 +202,7 @@ public class ExecutableUnitsFixer {
         RobotExecutableRow<T> toUpdate = null;
         if (newExecutionContext.isEmpty()) {
             toUpdate = new RobotExecutableRow<>();
+            toUpdate.setParent((T) execUnit);
             newExecutionContext.add(toUpdate);
         } else {
             toUpdate = newExecutionContext.get(newExecutionContext.size() - 1);

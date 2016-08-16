@@ -90,6 +90,16 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
         fixMissingTypes();
     }
 
+    public void addArgument(final int index, final RobotToken argument) {
+        final IRobotTokenType argType = getArgumentType();
+        if (argType != null) {
+            fixForTheType(argument, argType, true);
+        }
+        arguments.add(index, argument);
+
+        fixMissingTypes();
+    }
+
     public void addArgument(final RobotToken argument) {
         final IRobotTokenType argType = getArgumentType();
         if (argType != null) {

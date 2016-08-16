@@ -13,6 +13,7 @@ import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
@@ -28,13 +29,17 @@ public class RedTokenScanner implements ITokenScanner {
     private final List<ISyntaxColouringRule> rules;
 
     private Deque<IRobotLineElement> tokensToAnalyze;
+
     private List<IRobotLineElement> analyzedTokens;
 
     private Position lastTokenPosition;
 
     private int rangeOffset;
+
     private int rangeLength;
+
     private int rangeLine;
+
     private int currentOffsetInToken;
 
     public RedTokenScanner(final ISyntaxColouringRule... rules) {
@@ -81,8 +86,10 @@ public class RedTokenScanner implements ITokenScanner {
         if (tokensToAnalyze.isEmpty()) {
             return Token.EOF;
         }
-        final IRobotLineElement nextToken = tokensToAnalyze.poll();
-
+        IRobotLineElement nextToken = tokensToAnalyze.poll();
+        if (nextToken.getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN)) {
+            nextToken = tokensToAnalyze.poll();
+        }
         for (final ISyntaxColouringRule rule : rules) {
             if (!rule.isApplicable(nextToken)) {
                 continue;

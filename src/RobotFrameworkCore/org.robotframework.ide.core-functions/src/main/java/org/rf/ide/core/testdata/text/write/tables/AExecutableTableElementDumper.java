@@ -39,11 +39,17 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
     private final TableElementDumperHelper elemDumperHelper;
 
+    private final List<IForceFixBeforeDumpTask> afterSortTasks = new ArrayList<>(0);
+
     public AExecutableTableElementDumper(final DumperHelper aDumpHelper, final ModelType servedType) {
         this.aDumpHelper = aDumpHelper;
         this.anElementHelper = new ElementsUtility();
         this.servedType = servedType;
         this.elemDumperHelper = new TableElementDumperHelper();
+    }
+
+    protected void addAfterSortTask(final IForceFixBeforeDumpTask fixTask) {
+        this.afterSortTasks.add(fixTask);
     }
 
     protected DumperHelper getDumperHelper() {
@@ -95,6 +101,9 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
         final List<RobotToken> tokens = sorter.getTokensInElement();
 
         Collections.sort(tokens, sorter);
+        for (final IForceFixBeforeDumpTask task : afterSortTasks) {
+            task.fixBeforeDump(currentElement, tokens);
+        }
 
         int nrOfTokens = getElementDumperHelper().getLastIndexNotEmptyIndex(tokens) + 1;
 
@@ -271,7 +280,6 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
 
                     getDumperHelper().getDumpLineUpdater().updateLine(model, lines, lineContinueToken);
 
-                    // updateLine(model, lines, sepNew);
                 }
             }
         }
