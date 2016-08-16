@@ -8,18 +8,84 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
+import org.rf.ide.core.testdata.text.read.RobotLine;
 
 @SuppressWarnings("PMD.MethodNamingConventions")
 public class RobotParserTest {
+
+    @Test
+    public void test_eolInLinux_lineChecksWithoutNewLineAtTheEnd_offsetCheck() {
+        // prepare
+        final String fileContent = "*** Test Cases ***\nTest1\n\tLog\t\tc";
+
+        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        when(runtime.getVersion()).thenReturn("2.9");
+        RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
+        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+
+        // execute
+        final RobotParser parser = RobotParser.create(projectHolder);
+        final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
+
+        // verify
+        final RobotFile fileModel = editorContent.getFileModel();
+        final List<RobotLine> lineContents = fileModel.getFileContent();
+        assertThat(lineContents).hasSize(3);
+        assertLine(lineContents.get(0), Arrays.asList("*** Test Cases ***"), "\n");
+        assertLine(lineContents.get(1), Arrays.asList("Test1"), "\n");
+        assertLine(lineContents.get(2), Arrays.asList("\t", "Log", "\t\t", "c"), null);
+    }
+
+    @Test
+    public void test_eolInLinux_lineChecks_offsetCheck() {
+        // prepare
+        final String fileContent = "*** Test Cases ***\nTest1\n\tLog\t\tc\n";
+
+        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        when(runtime.getVersion()).thenReturn("2.9");
+        RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
+        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+
+        // execute
+        final RobotParser parser = RobotParser.create(projectHolder);
+        final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
+
+        // verify
+        final RobotFile fileModel = editorContent.getFileModel();
+        final List<RobotLine> lineContents = fileModel.getFileContent();
+        assertThat(lineContents).hasSize(4);
+        assertLine(lineContents.get(0), Arrays.asList("*** Test Cases ***"), "\n");
+        assertLine(lineContents.get(1), Arrays.asList("Test1"), "\n");
+        assertLine(lineContents.get(2), Arrays.asList("\t", "Log", "\t\t", "c"), "\n");
+        assertLine(lineContents.get(3), new ArrayList<String>(0), null);
+    }
+
+    private void assertLine(final RobotLine line, final List<String> elems, final String eol) {
+        int tokenId = 0;
+        for (final String e : elems) {
+            assertThat(line.getLineElements().get(tokenId).getText()).isEqualTo(e);
+            tokenId++;
+        }
+
+        if (eol == null) {
+            assertThat(line.getEndOfLine().getTypes()).containsOnly(EndOfLineTypes.EOF);
+        } else {
+            assertThat(line.getEndOfLine().getText()).isEqualTo(eol);
+        }
+    }
 
     @Test
     public void test_create_when_robotFramework_correct29() {
