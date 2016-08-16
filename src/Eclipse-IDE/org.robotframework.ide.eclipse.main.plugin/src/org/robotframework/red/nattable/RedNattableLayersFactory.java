@@ -196,27 +196,36 @@ public class RedNattableLayersFactory {
                     dataLayer.setColumnWidthByPosition(1, columnWidth);
                     dataLayer.setColumnWidthByPosition(2, tableWidth - (columnWidth * 2));
                 } else {
-                    final int defaultArgColumnWidth = 100;
-                    final int commentColumnWidth = 100;
-
-                    final int argsColumnsCount = columnCount - 3;
+                    final int commentColumnDefaultWidth = 150;
 
                     dataLayer.setColumnWidthByPosition(0, firstColumnWidth);
                     dataLayer.setColumnWidthByPosition(1, secondColumnWidth);
+                    
+                    final int argsColumnsCount = columnCount - 3;
+                    final int argColumnDefaultWidth = 100;
+
+                    final int remainingSpaceWithDefaultArgColumnsWidth = tableWidth - (firstColumnWidth
+                            + secondColumnWidth + (argsColumnsCount * argColumnDefaultWidth) + commentColumnDefaultWidth);
+                    int argColumnWidth = argColumnDefaultWidth;
+                    if (remainingSpaceWithDefaultArgColumnsWidth > 0 && argsColumnsCount > 0) {
+                        final int additionalSpaceForArgs = remainingSpaceWithDefaultArgColumnsWidth / argsColumnsCount;
+                        argColumnWidth += additionalSpaceForArgs;
+                    }
+
                     for (int i = 2; i < argsColumnsCount + 2; i++) {
-                        dataLayer.setColumnWidthByPosition(i, defaultArgColumnWidth);
+                        dataLayer.setColumnWidthByPosition(i, argColumnWidth);
                     }
                     final int allColumnsWidth = firstColumnWidth + secondColumnWidth
-                            + (argsColumnsCount * defaultArgColumnWidth) + commentColumnWidth;
+                            + (argsColumnsCount * argColumnWidth) + commentColumnDefaultWidth;
                     if (tableWidth >= allColumnsWidth) {
                         final int remainingSpace = tableWidth
-                                - (firstColumnWidth + secondColumnWidth + (argsColumnsCount * defaultArgColumnWidth));
+                                - (firstColumnWidth + secondColumnWidth + (argsColumnsCount * argColumnWidth));
                         dataLayer.setColumnWidthByPosition(columnCount - 1, remainingSpace);
                     } else {
-                        dataLayer.setColumnWidthByPosition(columnCount - 1, commentColumnWidth);
+                        dataLayer.setColumnWidthByPosition(columnCount - 1, commentColumnDefaultWidth);
                     }
                 }
-                
+
                 table.removeListener(SWT.Paint, this);
             }
         };
