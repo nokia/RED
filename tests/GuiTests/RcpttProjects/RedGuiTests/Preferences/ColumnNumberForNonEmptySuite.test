@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _2DXt4Em1EeaRB_Xz0tiYpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/15/16 10:46 AM
+Save-Time: 8/16/16 10:26 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -62,7 +62,7 @@ proc "check-columns-in-all-tables" [val tc 8] [val kw 10] [val gen 9] [val impor
 }
 
 proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {	
-	$result | eq $expected | assert-true -message [format "Value in row %s, colum %s should be: '%s', but is '%s'" $row $col $expected $result]
+	$result | eq $expected | assert-true -message [format "Value in row %s, column %s should be: '%s', but is '%s'" $row $col $expected $result]
 }
 
 
@@ -129,8 +129,9 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
 
 //test suite has more than 5 columns - check if even 5 are set in preference than view will be expanded
 
+get-editor "TestFile.robot" | maximize
 check-columns-in-all-tables
-
+get-editor "TestFile.robot" | restore
 
 //-------------------- change column amount to 2 ------------------------------
 get-preferences-menu | click
@@ -150,15 +151,16 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
 
 //go to test cases and chcek column amount
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-editor "TestFile.robot" | maximize
 check-columns-in-all-tables
-
+get-editor "TestFile.robot" | restore
 
 //--------------------------------change column amount to 16 -------------------------------------
 
 get-preferences-menu | click
 with [get-window Preferences] {
     get-group Tables | get-editbox -after [get-label "Default number of columns for arguments in table editors"] 
-        | set-text 16
+        | set-text 14
     get-button Apply | click
     get-button OK | click
 }
@@ -166,27 +168,28 @@ get-view "Project Explorer" | click
 get-editor "TestFile.robot" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click 
 
-check-columns-in-all-tables -tc 18 -kw 18 -gen 18 -imports 18
+get-editor "TestFile.robot" | maximize
+check-columns-in-all-tables -tc 16 -kw 16 -gen 16 -imports 16
 
 
 //check cells inputs
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 18 -row "1" -ref_table [list "test 1"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 18 -row "2" -ref_table [list "Catenate"  "Test"  "number"  "1"  "that"  "do"  "nothing"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 18 -row "3" -ref_table [list "Set Test Message"  "message"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 18 -row "4" -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 18 -row "5" -ref_table [list "...add new case"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 16 -row "1" -ref_table [list "test 1"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" "" ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 16 -row "2" -ref_table [list "Catenate"  "Test"  "number"  "1"  "that"  "do"  "nothing"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 16 -row "3" -ref_table [list "Set Test Message"  "message"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 16 -row "4" -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""   ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Test Cases" -col_amount 16 -row "5" -ref_table [list "...add new case"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ]
 
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 18 -row "1" -ref_table [list "Keyword"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 18 -row "2" -ref_table [list "Should Be Equal As Strings"  "a"  "b"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 18 -row "3" -ref_table [list "Catenate"  "this"  "is"  "text"  "with"  "8"  "args"  "for"  "tab."  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 18 -row "4" -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 18 -row "5" -ref_table [list "Keyword 2"  "${a1}"  "${a2}"  "${a3}"  "${a4}"  "${a5}"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 18 -row "6" -ref_table [list "Log"  "Longer text to log for robot to see if table is still visible"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 18 -row "7" -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 18 -row "8" -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 16 -row "1" -ref_table [list "Keyword"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 16 -row "2" -ref_table [list "Should Be Equal As Strings"  "a"  "b"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 16 -row "3" -ref_table [list "Catenate"  "this"  "is"  "text"  "with"  "8"  "args"  "for"  "tab."  ""  ""  ""  ""  ""  ""  "" ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 16 -row "4" -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 16 -row "5" -ref_table [list "Keyword 2"  "${a1}"  "${a2}"  "${a3}"  "${a4}"  "${a5}"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 16 -row "6" -ref_table [list "Log"  "Longer text to log for robot to see if table is still visible"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 16 -row "7" -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""   ]
+compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "User Keywords" -col_amount 16 -row "8" -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
 
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
@@ -196,15 +199,17 @@ with [get-editor "TestFile.robot"] {
 }
 
 //check Genral
-compare-row-with-data-in-settings -file "TestFile.robot" -section  "General" -col_amount 18 -row "1" -ref_table [list "Suite Setup"  "Catenate"  "r"  "t"  "y"  "u"  "i"  "o"  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
+compare-row-with-data-in-settings -file "TestFile.robot" -section  "General" -col_amount 16 -row "1" -ref_table [list "Suite Setup"  "Catenate"  "r"  "t"  "y"  "u"  "i"  "o"  ""  ""  ""  ""  ""  ""  ""  ""   ]
 
 //check Imports
-compare-row-with-data-in-settings -file "TestFile.robot" -section  "Imports" -col_amount 18 -row "1" -ref_table [list "Library"  "OperatingSystem"  "a"  "b"  "c"  "d"  "e"  "f"  "g"  "h"  "i"  ""  ""  ""  ""  ""  ""  "" ]
-compare-row-with-data-in-settings -file "TestFile.robot" -section  "Imports" -col_amount 18 -row "2" -ref_table [list "Library"  "Telnet"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
+compare-row-with-data-in-settings -file "TestFile.robot" -section  "Imports" -col_amount 16 -row "1" -ref_table [list "Library"  "OperatingSystem"  "a"  "b"  "c"  "d"  "e"  "f"  "g"  "h"  "i"  ""  ""  ""  ""  "" ]
+compare-row-with-data-in-settings -file "TestFile.robot" -section  "Imports" -col_amount 16 -row "2" -ref_table [list "Library"  "Telnet"  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  ""  "" ]
 
 //chec Variables
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
 
 compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Variables" -col_amount 3 -row "1" -ref_table [list "${var}"  "4"  "#com" ]
 compare-row-with-data-in-main-tables -file "TestFile.robot" -section  "Variables" -col_amount 3 -row "2" -ref_table [list "${var1}"  "5"  "#com2" ]
+
+get-editor "TestFile.robot" | restore
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
