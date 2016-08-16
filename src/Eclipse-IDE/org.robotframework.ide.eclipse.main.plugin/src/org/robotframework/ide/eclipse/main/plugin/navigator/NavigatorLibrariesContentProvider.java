@@ -87,7 +87,9 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        viewer.refresh();
+                        if (viewer != null) {
+                            viewer.refresh();
+                        }
                     }
                 });
             }
