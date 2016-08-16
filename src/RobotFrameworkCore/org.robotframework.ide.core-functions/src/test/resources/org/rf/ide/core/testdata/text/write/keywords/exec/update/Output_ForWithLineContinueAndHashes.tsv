@@ -1,0 +1,12 @@
+*** Keywords ***
+Key1
+	:FOR	${x}	IN	1	2
+	...		3	4	Log	
+	\	${x}	#   data
+	\	log	#   hugo
+	\	#	hash
+	\	\	kw_w	#	d
+	\	kw_w
+	...  #ok4
+	log	ok
+	...  #ok

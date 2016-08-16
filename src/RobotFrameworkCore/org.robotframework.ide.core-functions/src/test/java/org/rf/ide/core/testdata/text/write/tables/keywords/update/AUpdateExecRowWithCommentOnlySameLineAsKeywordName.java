@@ -33,6 +33,19 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
     }
 
     @Test
+    public void test_update_forLoopFix() throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_ForWithLineContinueAndHashes." + getExtension();
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Output_ForWithLineContinueAndHashes." + getExtension();
+
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // execute & verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    @Test
     public void test_update_addingNewKeyword() throws Exception {
         // prepare
         final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS + "Input_ThreeKeywordsAndAddingNewEmptyOne."
