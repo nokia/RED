@@ -51,6 +51,7 @@ import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.recognizer.ATokenRecognizer;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -192,8 +193,9 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
         final Stack<ParsingState> processingState = new Stack<>();
         boolean isNewLine = false;
         try {
+            final RobotFile fileModel = parsingOutput.getFileModel();
             while ((currentLineText = lineReader.readLine()) != null) {
-                final RobotLine line = new RobotLine(lineNumber, parsingOutput.getFileModel());
+                final RobotLine line = new RobotLine(lineNumber, fileModel);
                 currentOffset = handleCRLFcaseSplittedBetweenBuffers(parsingOutput, lineHolder, lineNumber,
                         currentOffset);
                 // removing BOM
@@ -314,13 +316,36 @@ public abstract class ATextualRobotFileParser implements IRobotFileParser {
                     variableHelper.extractVariableAssignmentPart(line, processingState);
                     previousLineHandler.flushNew(processingState);
                 }
-                parsingOutput.getFileModel().addNewLine(line);
+                fileModel.addNewLine(line);
 
                 parsingStateHelper.updateStatusesForNewLine(processingState);
                 isNewLine = true;
             }
 
-            currentOffset = handleCRLFcaseSplittedBetweenBuffers(parsingOutput, lineHolder, lineNumber, currentOffset);
+            boolean isEOL = false;
+            final List<Constant> endOfLine = lineHolder.getLineEnd(currentOffset);
+            if (endOfLine.contains(Constant.EOF)) {
+                isEOL = true;
+                final List<RobotLine> fileContent = fileModel.getFileContent();
+                if (fileContent.size() > 1) {
+                    RobotLine robotLine = fileContent.get(fileContent.size() - 1);
+                    if (robotLine.getEndOfLine().getFilePosition().isNotSet()) {
+                        final List<IRobotLineElement> lastLineElements = robotLine.getLineElements();
+                        robotLine.setEndOfLine(endOfLine, currentOffset,
+                                lastLineElements.get(lastLineElements.size() - 1).getEndColumn());
+                    } else {
+                        if (!robotLine.getEndOfLine().getTypes().contains(EndOfLineTypes.EOF)) {
+                            RobotLine newLine = new RobotLine(lineNumber, fileModel);
+                            newLine.setEndOfLine(endOfLine, currentOffset, 0);
+                            fileModel.addNewLine(newLine);
+                        }
+                    }
+                }
+            }
+            if (!isEOL) {
+                currentOffset = handleCRLFcaseSplittedBetweenBuffers(parsingOutput, lineHolder, lineNumber,
+                        currentOffset);
+            }
         } catch (final FileNotFoundException e) {
             parsingOutput.addBuildMessage(BuildMessage
                     .createErrorMessage("File " + robotFile + " was not found.\nStack:" + e, "File " + robotFile));

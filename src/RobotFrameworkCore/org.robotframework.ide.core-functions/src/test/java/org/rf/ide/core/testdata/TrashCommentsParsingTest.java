@@ -60,7 +60,7 @@ public class TrashCommentsParsingTest {
         assertThat(fileModel.getKeywordTable().isPresent()).isFalse();
 
         final List<RobotLine> fileContent = fileModel.getFileContent();
-        assertThat(fileContent).hasSize(5);
+        assertThat(fileContent).hasSize(6);
         assertLine(fileContent.get(0),
                 RobotToken.create("# comment", Arrays.asList(RobotTokenType.START_HASH_COMMENT)));
         assertLine(fileContent.get(1), RobotToken.create("#", Arrays.asList(RobotTokenType.START_HASH_COMMENT)),
