@@ -1,0 +1,284 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: DoubleSectionsEditingInKeywords
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _GWpiMGRcEeayWasF5RXANg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/17/16 2:20 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Case ***\n"
+    + "ddd\n"
+    + "    ada\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    [Documentation]    my doc\n"
+    + "    Convert To Binary    42442\n"
+    + "    [Teardown]    a    b    c   \n"
+    + "    [Teardown]  fff"
+    
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 300
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw/Convert To Binary" | click
+wait 300
+
+//go to last arg in [Teardown]
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right -times 4
+        key-type Up
+        key-type Enter
+    }
+    //change value 
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text d
+        key-type Enter
+    }
+    //go to Source
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Case ***\n"
+    + "ddd\n"
+    + "    ada\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    [Documentation]    my doc\n"
+    + "    Convert To Binary    42442\n"
+    + "    [Teardown]    a    b    c  d\n"
+    + "    [Teardown]" | verify-true
+    
+//reset
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Case ***\n"
+    + "ddd\n"
+    + "    ada\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    [Documentation]    my doc\n"
+    + "    Convert To Binary    42442\n"
+    + "    [Teardown]    a    b    c   \n"
+    + "    [Teardown]  fff"
+    
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 200
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw/Convert To Binary"
+wait 300
+
+//go to empty cell after last arg (fff)
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right -times 5
+        key-type Up
+        key-type Enter
+    }
+    //add new value
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "new item"
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+//check source
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Case ***\n"
+    + "ddd\n"
+    + "    ada\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    [Documentation]    my doc\n"
+    + "    Convert To Binary    42442\n"
+    + "    [Teardown]    a    b    c  fff    new item\n"
+    + "    [Teardown]" | verify-true    
+        
+
+        
+//-------------------------------------------- double documentation ---------------------------------------        
+        
+//set text               
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "*** Keyword ***\n\n"
+    + "Keyword 2\n"
+    + "    [Documentation]  aa\n"
+    + "    [Documentation]  bb"
+    
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 200
+get-view Outline | get-tree | select "TestFile.robot/Keywords/Keyword 2"
+wait 200
+
+//add at the end  "cc"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        key-type Down
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        set-text-selection  -offset 6 -startLine 1 -endLine 1 -endOffset 6
+        type-text " cc"
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keyword ***\n\n"
+    + "Keyword 2\n"
+    + "    [Documentation]  aa\n"
+    + "    ...    bb cc\n"
+    + "    [Documentation]" | verify-true
+    
+//add at the beggining "44"    
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Keywords | click
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Left -times 5
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        set-text-selection  -offset 0 -startLine 1 -endLine 1 -endOffset 0
+        type-text "44 "
+           
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keyword ***\n\n"
+    + "Keyword 2\n"
+    + "    [Documentation]  44 aa\n"
+    + "    ...    bb cc\n"
+    + "    [Documentation]" | verify-true        
+ 
+//------------------------------------------- teardown ----------------------------------------------------------
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "*** Keyword ***\n\n"
+    + "Keyword 2\n"
+    + "    [Documentation]  44 aa\n"
+    + "    log  6\n"
+    + "    [Teardown]    Log   999    \n"
+    + "    [Teardown]    Convert To Binary    66" 
+    
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 200
+get-view Outline | get-tree | select "TestFile.robot/Keywords/Keyword 2" | click
+wait 200
+
+//change 999-> 55
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down -times 2
+        key-type Right -times 2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text 55
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    //go to source
+    get-tab-folder | get-tab-item Source | click
+
+}
+//check Source
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keyword ***\n\n"
+    + "Keyword 2\n"
+    + "    [Documentation]  44 aa\n"
+    + "    log  6\n"
+    + "    [Teardown]    Log   55    Convert To Binary    66\n"
+    + "    [Teardown]" | verify-true
+//restet text
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "*** Keyword ***\n\n"
+    + "Keyword 2\n"
+    + "    [Documentation]  44 aa\n"
+    + "    log  6\n"
+    + "    [Teardown]    Log   999    \n"
+    + "    [Teardown]    Convert To Binary    66" 
+
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type "M1+s"
+}    
+   
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+
+wait 200    
+get-view Outline | get-tree | select "TestFile.robot/Keywords/Keyword 2" | click
+wait 200
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down -times 2
+        key-type Right -times 5
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "new item"
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keyword ***\n\n"
+    + "Keyword 2\n"
+    + "    [Documentation]  44 aa\n"
+    + "    log  6\n"
+    + "    [Teardown]    Log   999    Convert To Binary    66    new item\n"
+    + "    [Teardown]" | verify-true
+
+//----------------------------------------------- arguments --------------------------------------------
+
+//get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+//    + "*** Keyword ***\n\n"
+//    + "Keyword 2\n"
+//    + "    [Documentation]  44 aa\n"
+//    + "    log  6\n"
+//    + "    [Arguments]  ${d}\n"
+//    + "    [Arguments]  ${e}" | verify-true
+//get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+//get-view Outline | get-tree | select "TestFile.robot/Keywords/Keyword 2"
+//with [get-editor "TestFile.robot"] {
+//    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+//        key-type Right -times 2
+//        key-type Enter
+//    }
+//    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+//        set-text "${new}"
+//        key-type Enter
+//    }
+//}      
+
+//
+//*** Test Cases ***
+//*** Keyword ***
+//
+//Keyword 2
+//    [Tags]    ada
+//    [Tags]    888
+//    
+//
+//
+//# *** Test Cases ***
+//# *** Keyword ***
+//
+//# Keyword 2
+//    # [Documentation]  44 aa
+//    # log  6
+//    # [Return]    333
+//    # [Return]    88
+//       
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
