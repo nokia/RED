@@ -294,8 +294,9 @@ public class DocumentationView {
 
                     final Optional<DefinitionPosition> position = currentlyDisplayedDocElement.getDefinitionPosition();
                     if (position.isPresent()) {
+                        final DefinitionPosition definitionPosition = position.get();
                         selectionProvider.setSelection(
-                                new TextSelection(position.get().getOffset(), position.get().getLength()));
+                                new TextSelection(definitionPosition.getOffset(), definitionPosition.getLength()));
                     }
                 }
             }
