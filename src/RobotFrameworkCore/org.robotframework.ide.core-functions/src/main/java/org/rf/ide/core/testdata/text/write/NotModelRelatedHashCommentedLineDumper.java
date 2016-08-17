@@ -38,9 +38,9 @@ public class NotModelRelatedHashCommentedLineDumper {
             if (maxPosition.isPresent()) {
                 final int startLine = maxPosition.get().getLineNumber();
                 final List<RobotLine> oldContent = model.getFileContent();
-                final int lastLineToDump = findLastHashLine(oldContent, startLine);
-                if (lastLineToDump > -1) {
-                    dumpCommentHashes(model, lines, startLine, oldContent, lastLineToDump);
+                final Pair<Integer> boundaries = findLastHashLine(oldContent, startLine);
+                if (boundaries.getLowerPoint() > -1) {
+                    dumpCommentHashes(model, lines, boundaries.getLowerPoint(), oldContent, boundaries.getUpperPoint());
                 }
             }
         }
@@ -48,7 +48,7 @@ public class NotModelRelatedHashCommentedLineDumper {
 
     private void dumpCommentHashes(final RobotFile model, final List<RobotLine> lines, final int startLine,
             final List<RobotLine> oldContent, final int lastLineToDump) {
-        for (int lineIndex = startLine; lineIndex < lastLineToDump; lineIndex++) {
+        for (int lineIndex = startLine; lineIndex <= lastLineToDump; lineIndex++) {
             final RobotLine robotLine = oldContent.get(lineIndex);
             dumpHashLine(model, lines, robotLine);
         }
@@ -79,8 +79,8 @@ public class NotModelRelatedHashCommentedLineDumper {
         return max;
     }
 
-    private int findLastHashLine(final List<RobotLine> lines, final int startLine) {
-        int lastHash = -1;
+    private Pair<Integer> findLastHashLine(final List<RobotLine> lines, final int startLine) {
+        Pair<Integer> hashBoundaries = new Pair<>(-1, -1);
 
         int lineSize = lines.size();
         for (int lineIndex = startLine; lineIndex < lineSize; lineIndex++) {
@@ -89,14 +89,39 @@ public class NotModelRelatedHashCommentedLineDumper {
                 if (rle instanceof RobotToken) {
                     if (rle.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                             || rle.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
-                        lastHash = line.getLineNumber();
+                        if (hashBoundaries.getLowerPoint() == -1) {
+                            hashBoundaries = new Pair<>(line.getLineNumber() - 1, line.getLineNumber() - 1);
+                        } else {
+                            hashBoundaries = new Pair<>(hashBoundaries.getLowerPoint(), line.getLineNumber() - 1);
+                        }
                     } else {
-                        return lastHash;
+                        return hashBoundaries;
                     }
                 }
             }
         }
 
-        return lastHash;
+        return hashBoundaries;
+    }
+
+    private static class Pair<T> {
+
+        private final T lowerPoint;
+
+        private final T upperPoint;
+
+        public Pair(final T lowerPoint, final T upperPoint) {
+            this.lowerPoint = lowerPoint;
+            this.upperPoint = upperPoint;
+        }
+
+        public T getLowerPoint() {
+            return lowerPoint;
+        }
+
+        public T getUpperPoint() {
+            return upperPoint;
+        }
+
     }
 }
