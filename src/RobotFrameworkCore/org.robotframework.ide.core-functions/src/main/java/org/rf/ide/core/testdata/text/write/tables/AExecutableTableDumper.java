@@ -71,6 +71,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
             final int lastIndexToDump = getDumperHelper().getLastSortedToDump(model, execUnits,
                     new ArrayList<AModelElement<ARobotSectionTable>>(sorted));
 
+            AModelElement<?> last = null;
             for (int execUnitIndex = 0; execUnitIndex <= lastIndexToDump; execUnitIndex++) {
                 if (!lines.isEmpty()) {
                     RobotLine lastLine = lines.get(lines.size() - 1);
@@ -162,9 +163,17 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                     elemDumper.dump(model, sections, sectionWithHeaderPos, th, sortedUnits, execElement, lines);
 
                     getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit, execUnitIndex == lastIndexToDump);
+                    last = execElement;
                 }
 
+                if (sortedUnits.isEmpty()) {
+                    last = null;
+                }
                 getEmptyDumperHelper().dumpEmptyLines(model, lines, execUnit, execUnitIndex == lastIndexToDump);
+            }
+
+            if (last != null) {
+                getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(last, null, model, lines);
             }
 
             if (lastIndexToDump == sorted.size() - 1) {
