@@ -38,7 +38,7 @@ public class SetCaseKeywordCallArgumentCommand extends EditorCommand {
             changed = true;
         }
         changed |= index < arguments.size() && !arguments.get(index).equals(value);
-        arguments.set(index, value.isEmpty() ? "\\" : value);
+        arguments.set(index, value == null || value.isEmpty() ? "\\" : value);
 
         for (int i = arguments.size() - 1; i >= 0; i--) {
             if (!arguments.get(i).equals("\\")) {
@@ -51,8 +51,12 @@ public class SetCaseKeywordCallArgumentCommand extends EditorCommand {
             final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
             
             final TestCaseTableModelUpdater updater = new TestCaseTableModelUpdater();
-            for (int i = arguments.size() - 1; i >= 0; i--) {
-                updater.updateArgument(linkedElement, i, arguments.get(i));
+            if (value != null) {
+                for (int i = arguments.size() - 1; i >= 0; i--) {
+                    updater.updateArgument(linkedElement, i, arguments.get(i));
+                }
+            } else {
+                updater.updateArgument(linkedElement, index, value);
             }
             
             if (linkedElement.getModelType() == ModelType.TEST_CASE_DOCUMENTATION) {
