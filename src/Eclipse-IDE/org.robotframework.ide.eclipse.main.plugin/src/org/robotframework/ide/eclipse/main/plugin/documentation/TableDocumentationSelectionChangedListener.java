@@ -26,6 +26,8 @@ public class TableDocumentationSelectionChangedListener implements ISelectionCha
 
     private DocViewUpdateJob updateJob = new DocViewUpdateJob("Documentation View Update Job");
 
+    private RobotFileInternalElement robotFileInternalElement;
+
     public TableDocumentationSelectionChangedListener(DocumentationView view) {
         this.view = view;
     }
@@ -44,21 +46,15 @@ public class TableDocumentationSelectionChangedListener implements ISelectionCha
 
                 if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION
                         || modelType == ModelType.TEST_CASE_DOCUMENTATION) {
-                    showDoc(robotFileInternalElement);
+                    this.robotFileInternalElement = robotFileInternalElement;
+                    updateJob.schedule();
                 }
             }
         }
 
     }
 
-    private void showDoc(final RobotFileInternalElement robotFileInternalElement) {
-        updateJob.setRobotFileInternalElement(robotFileInternalElement);
-        updateJob.schedule();
-    }
-
     class DocViewUpdateJob extends Job {
-
-        private RobotFileInternalElement robotFileInternalElement;
 
         public DocViewUpdateJob(final String name) {
             super(name);
@@ -69,10 +65,6 @@ public class TableDocumentationSelectionChangedListener implements ISelectionCha
         protected IStatus run(final IProgressMonitor monitor) {
             view.showDocumentation(robotFileInternalElement);
             return Status.OK_STATUS;
-        }
-
-        public void setRobotFileInternalElement(final RobotFileInternalElement robotFileInternalElement) {
-            this.robotFileInternalElement = robotFileInternalElement;
         }
     }
 }

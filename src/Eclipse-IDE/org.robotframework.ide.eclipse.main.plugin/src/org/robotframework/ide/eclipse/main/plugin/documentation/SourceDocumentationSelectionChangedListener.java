@@ -27,6 +27,8 @@ public class SourceDocumentationSelectionChangedListener {
     private IDocument document;
 
     private int offset;
+    
+    private boolean shouldRefreshCurrentDoc;
 
     private DocViewDelayedUpdateJob delayedUpdateJob = new DocViewDelayedUpdateJob(
             "Documentation View Delayed Update Job");
@@ -37,24 +39,15 @@ public class SourceDocumentationSelectionChangedListener {
 
     public void positionChanged(final IDocument document, final RobotSuiteFile suiteFile, final int offset,
             final boolean shouldRefreshCurrentDoc) {
-        if (delayedUpdateJob.getState() == Job.RUNNING) {
-            return;
-        }
 
         if (delayedUpdateJob.getState() == Job.SLEEPING) {
-            this.document = document;
-            this.suiteFile = suiteFile;
-            this.offset = offset;
-            return;
+            delayedUpdateJob.cancel();
         }
 
         this.document = document;
         this.suiteFile = suiteFile;
         this.offset = offset;
-
-        if (shouldRefreshCurrentDoc) {
-            view.resetCurrentlyDisplayedElement();
-        }
+        this.shouldRefreshCurrentDoc = shouldRefreshCurrentDoc;
 
         delayedUpdateJob.schedule(DocViewDelayedUpdateJob.DELAY);
     }
@@ -79,6 +72,9 @@ public class SourceDocumentationSelectionChangedListener {
                         .findDocumentationForOffset(offset);
 
                 if (docToShow.isPresent()) {
+                    if (shouldRefreshCurrentDoc) {
+                        view.resetCurrentlyDisplayedElement();
+                    }
                     view.showDocumentation(docToShow.get(), suiteFile);
                 }
             }

@@ -60,6 +60,7 @@ public class DocumentationViewPartListener implements IPartListener {
 
 
     public void pageChanged(final IEditorPart activeEditor) {
+        // TODO: IPageChangedListener should be added
         if (currentlyActiveEditor != null) {
             removeDocSelectionChangedListenerFromActiveEditor(currentlyActiveEditor);
         }
