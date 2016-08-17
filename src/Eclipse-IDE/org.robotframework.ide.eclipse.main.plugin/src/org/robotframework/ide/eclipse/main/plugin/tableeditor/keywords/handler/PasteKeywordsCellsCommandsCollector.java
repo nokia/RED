@@ -21,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCo
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobotElementCellsCommandsCollector;
@@ -130,8 +131,12 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
             } else if (selectedElementColumnIndex == (tableColumnsCount - 1)) {
                 return new SetKeywordCallCommentCommand(keywordCall, valueToPaste);
             }
-        } else if (selectedElementColumnIndex > 0 && selectedElementColumnIndex < (tableColumnsCount - 1)) {
-            return new SetKeywordSettingArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
+        } else {
+            if (selectedElementColumnIndex > 0 && selectedElementColumnIndex < (tableColumnsCount - 1)) {
+                return new SetKeywordSettingArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
+            } else if (selectedElementColumnIndex == (tableColumnsCount - 1)) {
+                return new SetKeywordSettingCommentCommand(keywordCall, valueToPaste);
+            }
         }
         return null;
     }
