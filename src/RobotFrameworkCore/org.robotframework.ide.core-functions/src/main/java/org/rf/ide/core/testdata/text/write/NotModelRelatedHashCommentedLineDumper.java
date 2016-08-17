@@ -38,9 +38,9 @@ public class NotModelRelatedHashCommentedLineDumper {
             if (maxPosition.isPresent()) {
                 final int startLine = maxPosition.get().getLineNumber();
                 final List<RobotLine> oldContent = model.getFileContent();
-                final Pair<Integer> boundaries = findLastHashLine(oldContent, startLine);
-                if (boundaries.getLowerPoint() > -1) {
-                    dumpCommentHashes(model, lines, boundaries.getLowerPoint(), oldContent, boundaries.getUpperPoint());
+                final int lastLineToDump = findLastHashLine(oldContent, startLine);
+                if (lastLineToDump > -1) {
+                    dumpCommentHashes(model, lines, startLine, oldContent, lastLineToDump);
                 }
             }
         }
@@ -48,10 +48,30 @@ public class NotModelRelatedHashCommentedLineDumper {
 
     private void dumpCommentHashes(final RobotFile model, final List<RobotLine> lines, final int startLine,
             final List<RobotLine> oldContent, final int lastLineToDump) {
-        for (int lineIndex = startLine; lineIndex <= lastLineToDump; lineIndex++) {
+        // assumption that empties was dumped
+        boolean isLastEmpty = (lines.size() > 0) ? isEmpty(lines.get(lines.size() - 1)) : false;
+        for (int lineIndex = startLine; lineIndex < lastLineToDump; lineIndex++) {
             final RobotLine robotLine = oldContent.get(lineIndex);
+            if (isLastEmpty && isEmpty(robotLine)) {
+                continue;
+            }
+            isLastEmpty = false;
             dumpHashLine(model, lines, robotLine);
         }
+    }
+
+    private boolean isEmpty(final RobotLine line) {
+        for (final IRobotLineElement rle : line.getLineElements()) {
+            if (rle instanceof RobotToken) {
+                if (rle.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                    continue;
+                }
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private void dumpHashLine(final RobotFile model, final List<RobotLine> lines, final RobotLine robotLine) {
@@ -79,8 +99,8 @@ public class NotModelRelatedHashCommentedLineDumper {
         return max;
     }
 
-    private Pair<Integer> findLastHashLine(final List<RobotLine> lines, final int startLine) {
-        Pair<Integer> hashBoundaries = new Pair<>(-1, -1);
+    private int findLastHashLine(final List<RobotLine> lines, final int startLine) {
+        int lastHash = -1;
 
         int lineSize = lines.size();
         for (int lineIndex = startLine; lineIndex < lineSize; lineIndex++) {
@@ -89,39 +109,14 @@ public class NotModelRelatedHashCommentedLineDumper {
                 if (rle instanceof RobotToken) {
                     if (rle.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
                             || rle.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
-                        if (hashBoundaries.getLowerPoint() == -1) {
-                            hashBoundaries = new Pair<>(line.getLineNumber() - 1, line.getLineNumber() - 1);
-                        } else {
-                            hashBoundaries = new Pair<>(hashBoundaries.getLowerPoint(), line.getLineNumber() - 1);
-                        }
+                        lastHash = line.getLineNumber();
                     } else {
-                        return hashBoundaries;
+                        return lastHash;
                     }
                 }
             }
         }
 
-        return hashBoundaries;
-    }
-
-    private static class Pair<T> {
-
-        private final T lowerPoint;
-
-        private final T upperPoint;
-
-        public Pair(final T lowerPoint, final T upperPoint) {
-            this.lowerPoint = lowerPoint;
-            this.upperPoint = upperPoint;
-        }
-
-        public T getLowerPoint() {
-            return lowerPoint;
-        }
-
-        public T getUpperPoint() {
-            return upperPoint;
-        }
-
+        return lastHash;
     }
 }
