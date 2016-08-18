@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
 import java.util.HashMap;
 import java.util.Map;

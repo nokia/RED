@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
 import java.util.Collection;
 
@@ -73,8 +73,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsMatchesCollection.KeywordsFilter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsMatchesCollection.KeywordsFilter;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
