@@ -207,6 +207,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 cornerLayer);
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
                 CasesTableEditableRule.createEditableRule(fileModel)));
+        gridLayer.addConfiguration(new CasesTableEditConfiguration(fileModel));
 
         table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 

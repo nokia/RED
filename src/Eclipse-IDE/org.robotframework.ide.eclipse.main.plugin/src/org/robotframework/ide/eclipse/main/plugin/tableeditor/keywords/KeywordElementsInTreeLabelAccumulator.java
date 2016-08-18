@@ -22,6 +22,10 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
 
     public static final String KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL = "KEYWORD_SETTING_DOCUMENTATION_NOT_EDITABLE";
 
+    static final String KEYWORD_ASSIST_REQUIRED = "KEYWORD_ASSIST_REQUIRED";
+
+    static final String VARIABLES_ASSIST_REQUIRED = "VARIABLES_ASSIST_REQUIRED";
+
     private final IRowDataProvider<Object> dataProvider;
 
     public KeywordElementsInTreeLabelAccumulator(final IRowDataProvider<Object> dataProvider) {
@@ -37,18 +41,38 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
                 configLabels.addLabel(KEYWORD_DEFINITION_SETTING_CONFIG_LABEL);
             } else if (rowObject instanceof RobotKeywordDefinition) {
                 configLabels.addLabel(KEYWORD_DEFINITION_CONFIG_LABEL);
+            } else {
+                configLabels.addLabel(KEYWORD_ASSIST_REQUIRED);
             }
-        } else if (columnPosition > 0 && rowObject instanceof RobotKeywordDefinition) {
-            configLabels.addLabel(KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
-        }
-
-        if (columnPosition > 1 && columnPosition < dataProvider.getColumnCount() - 1) {
-            if (rowObject instanceof RobotDefinitionSetting) {
-                if (((RobotDefinitionSetting) rowObject).getLinkedElement()
-                        .getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION) {
-                    configLabels.addLabel(KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
+        } else if (columnPosition > 0 && columnPosition < dataProvider.getColumnCount() - 1) {
+            if (rowObject instanceof RobotKeywordDefinition) {
+                configLabels.addLabel(KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
+                configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
+            } else if (rowObject instanceof RobotDefinitionSetting) {
+                final ModelType modelType = ((RobotDefinitionSetting) rowObject).getLinkedElement().getModelType();
+                if (columnPosition == 1) {
+                    if (isKeywordBasedSetting(modelType)) {
+                        configLabels.addLabel(KEYWORD_ASSIST_REQUIRED);
+                    } else {
+                        configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
+                    }
+                } else {
+                    configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
+                    if (isDocumentationSetting(modelType)) {
+                        configLabels.addLabel(KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
+                    }
                 }
+            } else {
+                configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
             }
         }
+    }
+
+    private boolean isKeywordBasedSetting(final ModelType type) {
+        return type == ModelType.USER_KEYWORD_TEARDOWN;
+    }
+
+    private boolean isDocumentationSetting(final ModelType type) {
+        return type == ModelType.USER_KEYWORD_DOCUMENTATION;
     }
 }
