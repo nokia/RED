@@ -73,8 +73,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsMatchesCollection.KeywordsFilter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsMatchesCollection.KeywordsFilter;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
@@ -207,6 +207,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 cornerLayer);
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
                 KeywordTableEditableRule.createEditableRule(fileModel)));
+        gridLayer.addConfiguration(new KeywordsTableEditConfiguration(fileModel));
 
         table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 
