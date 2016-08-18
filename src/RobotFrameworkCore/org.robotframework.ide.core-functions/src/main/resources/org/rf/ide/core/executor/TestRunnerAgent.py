@@ -208,6 +208,7 @@ class TestRunnerAgent:
         self._send_socket("end_suite", name, attrs)
 
     def start_keyword(self, name, attrs):
+        attrs['args'] = []
         self._send_socket("start_keyword", name, attrs)
         if self._is_debug_enabled:
             self._send_vars()
@@ -351,6 +352,7 @@ class TestRunnerAgent:
                 pass
 
     def end_keyword(self, name, attrs):
+        attrs['args'] = []
         self._send_socket("end_keyword", name, attrs)
         self._debugger.end_keyword(attrs['status'] == 'PASS')
 
