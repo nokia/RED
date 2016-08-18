@@ -17,6 +17,7 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotElementsComparatorWithPositionChangedPresave;
 import org.rf.ide.core.testdata.model.table.TableHeader;
+import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -89,6 +90,12 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
         if (currentLine != null) {
             getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine, elemDeclaration,
                     lines);
+        }
+
+        if (!lines.isEmpty()) {
+            if (lines.get(lines.size() - 1).getEndOfLine().getTypes().contains(EndOfLineTypes.EOF)) {
+                lines.get(lines.size() - 1).setEndOfLine(null, -1, -1);
+            }
         }
 
         IRobotLineElement lastToken = elemDeclaration;
