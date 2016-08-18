@@ -73,12 +73,14 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.K
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.MatchEverythingRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedCachingScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokenScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SectionHeaderRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingsCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokensStore;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToFilesDetector;
@@ -380,28 +382,31 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] defaultRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CommentRule(comment), new MatchEverythingRule(defaultSection) };
-        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, defaultRules);
+        final RedTokensStore store = new RedTokensStore();
+        sourceViewer.addTextInputListener(store);
+
+        createDamageRepairer(reconciler, IDocument.DEFAULT_CONTENT_TYPE, store, defaultRules);
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new TestCaseSettingsCallRule(call),
                 new ExecutableRowCallRule(call), new CommentRule(comment), new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION,
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, store,
                 testCasesRules);
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
                 new KeywordSettingsCallRule(call), new ExecutableRowCallRule(call), new CommentRule(comment),
                 new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, keywordsRules);
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, store, keywordsRules);
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new SettingRule(setting), new SettingsCallRule(call), new CommentRule(comment),
                 new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, settingsRules);
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.SETTINGS_SECTION, store, settingsRules);
 
         final ISyntaxColouringRule[] variablesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new VariableDefinitionRule(variable), new CommentRule(comment), new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION,
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.VARIABLES_SECTION, store,
                 variablesRules);
 
         return reconciler;
@@ -412,9 +417,11 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private static void createDamageRepairer(final PresentationReconciler reconciler, final String contentType,
-            final ISyntaxColouringRule[] rules) {
-        // final ITokenScanner scanner = new RedCachingScanner(new RedTokenScanner(rules));
-        final ITokenScanner scanner = new RedTokenScanner(rules);
+            final RedTokensStore store, final ISyntaxColouringRule[] rules) {
+        final boolean useDirectScanner = Boolean.valueOf(System.getProperty("red.tmp.useDirectScanner")).booleanValue();
+        final RedTokenScanner tokenScanner = new RedTokenScanner(rules);
+        final ITokenScanner scanner = useDirectScanner ? tokenScanner : new RedCachingScanner(tokenScanner, store);
+
         final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(scanner);
         reconciler.setDamager(damagerRepairer, contentType);
         reconciler.setRepairer(damagerRepairer, contentType);
