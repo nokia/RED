@@ -572,6 +572,24 @@ public class ElementsUtility {
                     }
                 }
             }
+        } else {
+            final LineTokenInfo lineTokenInfo = LineTokenInfo.build(splittedLine);
+            final boolean isContinoue = lineTokenInfo.isLineContinoueTheFirst();
+            if (tableType == TableType.SETTINGS || tableType == TableType.VARIABLES) {
+                if (isContinoue) {
+                    final RobotFile model = parsingOutput.getFileModel();
+                    final PreviousLineHandler prevLineHandler = new PreviousLineHandler();
+                    if (prevLineHandler.isSomethingToContinue(model)) {
+                        result = lineTokenInfo.getDataStartIndex() <= separator.getCurrentElementIndex();
+                    } else {
+                        result = true;
+                    }
+                } else {
+                    result = true;
+                }
+
+                result = result && lineTokenInfo.getDataEndIndex() >= separator.getCurrentElementIndex();
+            }
         }
 
         return result;
