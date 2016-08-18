@@ -36,7 +36,7 @@ class RedTokensQueueBuilder {
 
     private boolean processElement(final IRobotLineElement lineElement, final Deque<IRobotLineElement> tokens,
             final int offset, final int length) {
-        if (!lineElement.getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN)) {
+        if (!lineElement.getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)) {
             if (lineElement.getStartOffset() >= offset
                     && lineElement.getStartOffset() + lineElement.getText().length() <= offset + length) {
                 // when token is within given region

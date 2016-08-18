@@ -35,7 +35,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
             final String trimmed = text.trim();
             if (RobotTokenType.FOR_CONTINUE_TOKEN.getRepresentation().get(0).equalsIgnoreCase(trimmed)
                     || (trimmed.isEmpty() && isTsv(execRowLine))
-                    || action.getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN)) {
+                    || action.getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)) {
                 final int forLoopDeclarationLine = getForLoopDeclarationLine(execRowLine);
                 result = new AcceptResultWithParameters(forLoopDeclarationLine >= 0, forLoopDeclarationLine);
             }
@@ -100,7 +100,7 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         boolean mapToComment = false;
 
         int startIndex = 1;
-        if (execRowLine.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN)) {
+        if (execRowLine.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)) {
             startIndex = 0;
         }
 
