@@ -36,18 +36,25 @@ public class NotModelRelatedHashCommentedLineDumper {
             }
             final Optional<RobotToken> maxPosition = tokenWithMaxLineNumber(previousElementDumped);
             if (maxPosition.isPresent()) {
+                final RobotToken lastTokenInLines;
+                if (nextElementToBeDumped != null && !nextElementToBeDumped.getElementTokens().isEmpty()) {
+                    lastTokenInLines = nextElementToBeDumped.getElementTokens()
+                            .get(nextElementToBeDumped.getElementTokens().size() - 1);
+                } else {
+                    lastTokenInLines = maxPosition.get();
+                }
                 final int startLine = maxPosition.get().getLineNumber();
                 final List<RobotLine> oldContent = model.getFileContent();
-                final int lastLineToDump = findLastHashLine(oldContent, startLine);
+                final int lastLineToDump = findLastHashLine(oldContent, startLine, lastTokenInLines);
                 if (lastLineToDump > -1) {
-                    dumpCommentHashes(model, lines, startLine, oldContent, lastLineToDump);
+                    dumpCommentHashes(model, lines, startLine, oldContent, lastLineToDump, lastTokenInLines);
                 }
             }
         }
     }
 
     private void dumpCommentHashes(final RobotFile model, final List<RobotLine> lines, final int startLine,
-            final List<RobotLine> oldContent, final int lastLineToDump) {
+            final List<RobotLine> oldContent, final int lastLineToDump, final RobotToken lastTokenInLines) {
         // assumption that empties was dumped
         boolean isLastEmpty = (lines.size() > 0) ? isEmpty(lines.get(lines.size() - 1)) : false;
         for (int lineIndex = startLine; lineIndex < lastLineToDump; lineIndex++) {
@@ -99,7 +106,7 @@ public class NotModelRelatedHashCommentedLineDumper {
         return max;
     }
 
-    private int findLastHashLine(final List<RobotLine> lines, final int startLine) {
+    private int findLastHashLine(final List<RobotLine> lines, final int startLine, final RobotToken lastTokenInLines) {
         int lastHash = -1;
 
         int lineSize = lines.size();
@@ -107,8 +114,8 @@ public class NotModelRelatedHashCommentedLineDumper {
             final RobotLine line = lines.get(lineIndex);
             for (final IRobotLineElement rle : line.getLineElements()) {
                 if (rle instanceof RobotToken) {
-                    if (rle.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
-                            || rle.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) {
+                    if ((rle.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
+                            || rle.getTypes().contains(RobotTokenType.COMMENT_CONTINUE)) && rle != lastTokenInLines) {
                         lastHash = line.getLineNumber();
                     } else {
                         return lastHash;
