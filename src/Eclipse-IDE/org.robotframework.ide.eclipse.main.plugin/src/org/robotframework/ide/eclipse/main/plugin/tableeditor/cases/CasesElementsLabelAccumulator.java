@@ -25,6 +25,10 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
 
     public static final String CASE_CALL_CONFIG_LABEL = "CASE_CALL";
 
+    static final String KEYWORD_ASSIST_REQUIRED = "KEYWORD_ASSIST_REQUIRED";
+
+    static final String VARIABLES_ASSIST_REQUIRED = "VARIABLES_ASSIST_REQUIRED";
+
     private final IRowDataProvider<Object> dataProvider;
 
     public CasesElementsLabelAccumulator(final IRowDataProvider<Object> dataProvider) {
@@ -40,6 +44,7 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
                 configLabels.addLabel(CASE_SETTING_CONFIG_LABEL);
             } else if (rowObject instanceof RobotKeywordCall) {
                 configLabels.addLabel(CASE_CALL_CONFIG_LABEL);
+                configLabels.addLabel(KEYWORD_ASSIST_REQUIRED);
             } else if (rowObject instanceof RobotCase) {
                 final RobotCase testCase = (RobotCase) rowObject;
                 if (testCase.getTemplateInUse().isPresent()) {
@@ -48,15 +53,33 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
                     configLabels.addLabel(CASE_CONFIG_LABEL);
                 }
             }
-        }
-
-        if (columnPosition > 1 && columnPosition < dataProvider.getColumnCount() - 1) {
+        } else if (columnPosition > 0 && columnPosition < dataProvider.getColumnCount() - 1) {
             if (rowObject instanceof RobotDefinitionSetting) {
-                if (((RobotDefinitionSetting) rowObject).getLinkedElement()
-                        .getModelType() == ModelType.TEST_CASE_DOCUMENTATION) {
-                    configLabels.addLabel(CASE_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
+                final ModelType modelType = ((RobotDefinitionSetting) rowObject).getLinkedElement().getModelType();
+                if (columnPosition == 1) {
+                    if (isKeywordBasedSetting(modelType)) {
+                        configLabels.addLabel(KEYWORD_ASSIST_REQUIRED);
+                    } else {
+                        configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
+                    }
+                } else {
+                    configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
+                    if (isDocumentationSetting(modelType)) {
+                        configLabels.addLabel(CASE_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
+                    }
                 }
+            } else if (rowObject instanceof RobotKeywordCall) {
+                configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
             }
         }
+    }
+
+    private boolean isKeywordBasedSetting(final ModelType type) {
+        return type == ModelType.TEST_CASE_SETUP || type == ModelType.TEST_CASE_TEARDOWN
+                || type == ModelType.TEST_CASE_TEMPLATE;
+    }
+
+    private boolean isDocumentationSetting(final ModelType type) {
+        return type == ModelType.TEST_CASE_DOCUMENTATION;
     }
 }
