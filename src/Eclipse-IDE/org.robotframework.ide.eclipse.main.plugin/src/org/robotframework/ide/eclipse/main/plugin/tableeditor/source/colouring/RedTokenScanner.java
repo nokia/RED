@@ -9,36 +9,32 @@ import java.util.List;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.rules.IToken;
-import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.jface.text.rules.Token;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.RobotDocument;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule.PositionedTextToken;
+import org.robotframework.red.jface.text.rules.IRedTokenScanner;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Supplier;
 
-public class RedTokenScanner implements ITokenScanner {
+public class RedTokenScanner implements IRedTokenScanner {
 
     private RobotDocument document;
 
     private final List<ISyntaxColouringRule> rules;
 
     private Deque<IRobotLineElement> tokensToAnalyze;
-
-    private List<IRobotLineElement> analyzedTokens;
+    private final List<IRobotLineElement> analyzedTokens = new ArrayList<>();
 
     private Position lastTokenPosition;
 
     private int rangeOffset;
-
     private int rangeLength;
-
     private int rangeLine;
-
     private int currentOffsetInToken;
 
     public RedTokenScanner(final ISyntaxColouringRule... rules) {
@@ -46,17 +42,24 @@ public class RedTokenScanner implements ITokenScanner {
     }
 
     @Override
+    public void resetPosition() {
+        lastTokenPosition = null;
+    }
+
+    @Override
     public void setRange(final IDocument document, final int offset, final int length) {
         this.document = (RobotDocument) document;
 
-        this.tokensToAnalyze = null;
-        this.analyzedTokens = new ArrayList<>();
+        if (lastTokenPosition == null || lastTokenPosition.getOffset() + lastTokenPosition.getLength() != offset) {
+            this.tokensToAnalyze = null;
+            this.analyzedTokens.clear();
 
-        this.rangeOffset = offset;
-        this.rangeLength = length;
-        this.rangeLine = DocumentUtilities.getLine(document, offset);
+            this.rangeOffset = offset;
+            this.rangeLength = length;
+            this.rangeLine = DocumentUtilities.getLine(document, offset);
 
-        this.currentOffsetInToken = 0;
+            this.currentOffsetInToken = 0;
+        }
     }
 
     @Override
@@ -83,9 +86,10 @@ public class RedTokenScanner implements ITokenScanner {
         }
 
         if (tokensToAnalyze.isEmpty()) {
+            lastTokenPosition = new Position(getTokenOffset() + getTokenLength(), 0);
             return Token.EOF;
         }
-        IRobotLineElement nextToken = tokensToAnalyze.poll();
+        final IRobotLineElement nextToken = tokensToAnalyze.poll();
         for (final ISyntaxColouringRule rule : rules) {
             if (!rule.isApplicable(nextToken)) {
                 continue;
