@@ -123,11 +123,11 @@ public class ExecutableUnitsFixer {
             final IRowType rowType = execLine.buildLineDescription().getRowType();
             if (rowType == ERowType.FOR_CONTINUE) {
                 if (execLine.getAction().getText().isEmpty()) {
-                    if (execLine.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN)) {
+                    if (execLine.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)) {
                         RobotToken actionToBeArgument = execLine.getAction().copy();
                         actionToBeArgument.getTypes().remove(RobotTokenType.KEYWORD_ACTION_NAME);
                         actionToBeArgument.getTypes().remove(RobotTokenType.TEST_CASE_ACTION_NAME);
-                        actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                        actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                         actionToBeArgument.setRaw("\\");
                         actionToBeArgument.setText("\\");
                         execLine.addArgument(0, actionToBeArgument);
@@ -141,13 +141,13 @@ public class ExecutableUnitsFixer {
                     RobotToken actionToBeArgument = execLine.getAction().copy();
                     actionToBeArgument.getTypes().remove(RobotTokenType.KEYWORD_ACTION_NAME);
                     actionToBeArgument.getTypes().remove(RobotTokenType.TEST_CASE_ACTION_NAME);
-                    actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                    actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                     execLine.addArgument(0, actionToBeArgument);
                     execLine.getAction().setText("\\");
                     execLine.getAction().setRaw("\\");
-                    execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                    execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                 } else {
-                    execLine.getAction().getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                    execLine.getAction().getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                 }
                 isContinue = true;
             } else if (rowType == ERowType.COMMENTED_HASH) {
@@ -155,7 +155,7 @@ public class ExecutableUnitsFixer {
                     if (!execLine.getAction().getText().equals("\\")) {
                         execLine.getAction().setText("\\");
                         execLine.getAction().setRaw("\\");
-                        execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+                        execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                     }
                 }
             } else if (rowType == ERowType.FOR || rowType == ERowType.SIMPLE) {
@@ -243,7 +243,7 @@ public class ExecutableUnitsFixer {
             final List<RobotExecutableRow<T>> newExecutionContext, final int lastForIndex,
             final int lastForExecutableIndex) {
         for (int line = lastForIndex + 1; line <= lastForExecutableIndex; line++) {
-            newExecutionContext.get(line).getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFACTAL_TOKEN);
+            newExecutionContext.get(line).getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
         }
     }
 
