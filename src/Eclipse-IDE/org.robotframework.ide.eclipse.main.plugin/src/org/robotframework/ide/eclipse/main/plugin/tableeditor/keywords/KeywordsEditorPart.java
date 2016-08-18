@@ -21,7 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SectionEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsEditorPart.KeywordsEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable.KeywordsEditorFormFragment;
 import org.robotframework.red.graphics.ImagesManager;
 
 import com.google.common.base.Optional;

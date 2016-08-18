@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.nattable;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken.TokenState;
 
