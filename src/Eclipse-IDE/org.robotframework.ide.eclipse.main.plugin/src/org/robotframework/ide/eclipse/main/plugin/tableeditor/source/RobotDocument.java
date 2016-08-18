@@ -5,10 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
@@ -24,17 +26,15 @@ import com.google.common.base.Supplier;
 
 public class RobotDocument extends Document {
 
-    private static final int DELAY = 250;
-    private static final int LIMIT = 800;
+    private static final int DELAY = 200;
+    private static final int LIMIT = 500;
 
-    private boolean hasNewestVersion = false;
+    private final AtomicBoolean hasNewestVersion = new AtomicBoolean(false);
     private final Semaphore parsingSemaphore = new Semaphore(1);
     private final Semaphore parsingFinishedSemaphore = new Semaphore(1);
     private boolean reparseInSameThread = true;
 
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
-
-    private Runnable parsingRunnable;
 
     private final Supplier<RobotSuiteFile> fileModelSupplier;
     private RobotParser parser;
@@ -43,6 +43,7 @@ public class RobotDocument extends Document {
     private RobotFileOutput output;
 
     private final List<IRobotDocumentParsingListener> parseListeners = new ArrayList<>();
+    private ScheduledFuture<?> scheduledOperation;
 
     public RobotDocument(final Supplier<RobotSuiteFile> fileModelSupplier) {
         this.fileModelSupplier = fileModelSupplier;
@@ -69,21 +70,21 @@ public class RobotDocument extends Document {
     }
 
     public boolean hasNewestModel() {
-        return hasNewestVersion;
+        return hasNewestVersion.get();
     }
 
     @Override
     protected void fireDocumentAboutToBeChanged(final DocumentEvent event) {
         createParserIfNeeded();
         reparseInSameThread = getNumberOfLines() < LIMIT;
-        if (!reparseInSameThread) {
+        if (!reparseInSameThread && hasNewestVersion.getAndSet(false)) {
             try {
+                // it will be acquired only by the first event
                 parsingSemaphore.acquire();
             } catch (final InterruptedException e) {
                 throw new IllegalStateException("Document reparsing interrupted!", e);
             }
         }
-        hasNewestVersion = false;
         super.fireDocumentAboutToBeChanged(event);
     }
 
@@ -91,6 +92,7 @@ public class RobotDocument extends Document {
         if (parser == null) {
             parser = createParser(fileModelSupplier.get());
             file = new File(fileModelSupplier.get().getName());
+            reparse();
         }
     }
 
@@ -111,21 +113,21 @@ public class RobotDocument extends Document {
         for (final IRobotDocumentParsingListener listener : parseListeners) {
             listener.reparsingFinished(output);
         }
-        hasNewestVersion = true;
+        hasNewestVersion.set(true);
     }
 
     private void reparseInSeparateThread() {
-        if (parsingRunnable != null) {
-            executor.remove(parsingRunnable);
+        if (scheduledOperation != null) {
+            scheduledOperation.cancel(false);
         }
-        parsingRunnable = new Runnable() {
+        final Runnable parsingRunnable = new Runnable() {
             @Override
             public void run() {
                 reparse();
                 parsingSemaphore.release();
             }
         };
-        executor.schedule(parsingRunnable, DELAY, TimeUnit.MILLISECONDS);
+        scheduledOperation = executor.schedule(parsingRunnable, DELAY, TimeUnit.MILLISECONDS);
     }
 
     private Future<RobotFileOutput> getNewestOutput() {
@@ -144,7 +146,7 @@ public class RobotDocument extends Document {
 
             @Override
             public boolean isDone() {
-                return hasNewestVersion;
+                return hasNewestVersion.get();
             }
 
             @Override
