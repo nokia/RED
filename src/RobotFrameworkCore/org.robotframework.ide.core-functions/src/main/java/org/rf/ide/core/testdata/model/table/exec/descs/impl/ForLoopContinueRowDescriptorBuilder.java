@@ -100,7 +100,9 @@ public class ForLoopContinueRowDescriptorBuilder implements IRowDescriptorBuilde
         boolean mapToComment = false;
 
         int startIndex = 1;
-        if (execRowLine.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)) {
+        final RobotToken action = execRowLine.getAction();
+        if (action.getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)
+                && action.isNotEmpty() && !action.getText().equals("\\")) {
             startIndex = 0;
         }
 
