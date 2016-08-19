@@ -1,0 +1,158 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YI1vUFJyEea8WJ7bbC6OBw
+Element-Name: ContenttAssistInKeywordTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _I3FgsGXzEeayWasF5RXANg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/19/16 4:55 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+	+ "*** Variables ***\n"
+    + "${a1111}  4\n"
+    + "@{myList}\t1  2  2\t\t\n"
+    + "&{list22}    key=value    \n\n"
+    + "*** Keyword ***\n"
+    + "my kw" 
+    
+
+with [get-editor "TestFile.robot"] {
+    get-text-viewer | key-type "M1+s"
+}    
+wait 200
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw"
+wait 200
+
+//go to KW name, remove it and try to open CA
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right
+        key-type Left
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text ""
+        key-type "M1+SPACE"
+    }
+}
+
+// check tah CA window is not shown
+verify-error {get-window -class ContentProposalPopup | get-table}
+
+//set new name
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "no CA"
+        key-type Enter
+    }
+    //go down and add new line
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Left
+        key-type Enter -times 2
+    }
+    //open CA
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+SPACE"
+}
+
+get-window -class ContentProposalPopup | get-table |  get-property itemCount -raw | let [val nr_of_items -input] {
+	with [get-window -class ContentProposalPopup | get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "Call Method - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "Catenate - BuiltIn" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()"   [minus $nr_of_items 1]] | equals "no CA - TestFile.robot" | verify-true
+	}
+}
+//close CA and open again (problem to add from content assist after verifcation)
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "TRAVERSE_ESCAPE"
+        key-type "M1+SPACE" 
+    }
+}
+
+//add first kw - Call Method and accept
+get-editor "TestFile.robot" | get-editbox -after [get-label "User Keywords"] -index 1 | key-type Enter -times 2
+
+ 
+//open CA in arg cell
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+SPACE"
+}
+wait 200
+//check if all variables are (first declared by user)
+with [get-window -class ContentProposalPopup | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "${a1111}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "&{list22}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "@{myList}" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[4].getText()" | equals "${:}" | verify-true
+}
+
+//close CA and open again
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "TRAVERSE_ESCAPE"
+        key-type "M1+SPACE"
+ 
+ 		//add @myList
+        key-type Down -times 2
+        key-type Enter -times 2
+    }
+}
+
+//add next args
+with [get-editor "TestFile.robot"] {
+   
+    //add "&{list22}"
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "M1+SPACE"
+        key-type Down
+        key-type Enter -times 2
+    }
+    
+    //add ${a1111}
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "M1+SPACE"
+        key-type Enter
+
+        key-type Enter
+    }
+    //add "${True}"
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "M1+SPACE"
+        key-type Up -times 5
+        key-type Enter -times 2
+    }
+    //add SUITE_DOCUMENTATIOn
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "M1+SPACE"
+        key-type Up -times 16
+        key-type Enter -times 2
+    }
+    //go to comment
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "M1+SPACE"
+    }
+}
+
+//check that in commetn ther is no CA
+verify-error {get-window -class ContentProposalPopup | get-table}   
+
+check-keyword-row -file "TestFile.robot" -row 1 -kw "no CA"
+check-keyword-row -file "TestFile.robot" -row 2 -kw "Call Method" -c1 "@{myList}"-c2 "&{list22}" -c3 "${a1111}" -c4 "${True}" -c5 "${SUITE_DOCUMENTATION}" -comment ""
+check-keyword-row -file "TestFile.robot" -row 3 -kw "..."
+check-keyword-row -file "TestFile.robot" -row 4 -kw "...add new keyword"
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
