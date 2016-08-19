@@ -198,4 +198,14 @@ public class RobotToken implements IRobotLineElement, Serializable {
 
         return t;
     }
+
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        return super.equals(obj);
+    }
 }
