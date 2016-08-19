@@ -12,6 +12,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -63,5 +64,16 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
             arguments = newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));
         }
         return arguments;
+    }
+    
+    public boolean isDocumentation() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return modelType == ModelType.TEST_CASE_DOCUMENTATION || modelType == ModelType.USER_KEYWORD_DOCUMENTATION;
+    }
+
+    public boolean isKeywordBased() {
+        final ModelType modelType = getLinkedElement().getModelType();
+        return modelType == ModelType.TEST_CASE_SETUP || modelType == ModelType.TEST_CASE_TEARDOWN
+                || modelType == ModelType.TEST_CASE_TEMPLATE || modelType == ModelType.USER_KEYWORD_TEARDOWN;
     }
 }

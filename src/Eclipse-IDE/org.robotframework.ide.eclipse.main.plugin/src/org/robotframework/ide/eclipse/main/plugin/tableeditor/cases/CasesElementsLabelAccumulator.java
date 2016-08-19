@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
-import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -55,16 +54,16 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
             }
         } else if (columnPosition > 0 && columnPosition < dataProvider.getColumnCount() - 1) {
             if (rowObject instanceof RobotDefinitionSetting) {
-                final ModelType modelType = ((RobotDefinitionSetting) rowObject).getLinkedElement().getModelType();
+                final RobotDefinitionSetting setting = (RobotDefinitionSetting) rowObject;
                 if (columnPosition == 1) {
-                    if (isKeywordBasedSetting(modelType)) {
+                    if (setting.isKeywordBased()) {
                         configLabels.addLabel(KEYWORD_ASSIST_REQUIRED);
                     } else {
                         configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
                     }
                 } else {
                     configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
-                    if (isDocumentationSetting(modelType)) {
+                    if (setting.isDocumentation()) {
                         configLabels.addLabel(CASE_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
                     }
                 }
@@ -74,12 +73,4 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
         }
     }
 
-    private boolean isKeywordBasedSetting(final ModelType type) {
-        return type == ModelType.TEST_CASE_SETUP || type == ModelType.TEST_CASE_TEARDOWN
-                || type == ModelType.TEST_CASE_TEMPLATE;
-    }
-
-    private boolean isDocumentationSetting(final ModelType type) {
-        return type == ModelType.TEST_CASE_DOCUMENTATION;
-    }
 }
