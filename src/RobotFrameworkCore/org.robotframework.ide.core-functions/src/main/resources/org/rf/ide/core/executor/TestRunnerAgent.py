@@ -53,6 +53,7 @@ import sys
 import socket
 import threading
 import inspect
+import copy
 
 if sys.version_info < (3, 0, 0):
     import SocketServer as socketserver
@@ -208,12 +209,13 @@ class TestRunnerAgent:
         self._send_socket("end_suite", name, attrs)
 
     def start_keyword(self, name, attrs):
-        attrs['args'] = []
-        self._send_socket("start_keyword", name, attrs)
+        attrs_copy = copy.copy(attrs)
+        attrs_copy['args'] = list()
+        self._send_socket("start_keyword", name, attrs_copy)
         if self._is_debug_enabled:
             self._send_vars()
         self._is_robot_paused = False
-        # if self._debugger.is_breakpoint(name, attrs):
+        # if self._debugger.is_breakpoint(name, attrs_copy):
         if self._is_debug_enabled:
             if self._check_breakpoint():
                 self._is_robot_paused = True
@@ -352,8 +354,9 @@ class TestRunnerAgent:
                 pass
 
     def end_keyword(self, name, attrs):
-        attrs['args'] = []
-        self._send_socket("end_keyword", name, attrs)
+        attrs_copy = copy.copy(attrs)
+        attrs_copy['args'] = list()
+        self._send_socket("end_keyword", name, attrs_copy)
         self._debugger.end_keyword(attrs['status'] == 'PASS')
 
     def resource_import(self, name, attributes):
