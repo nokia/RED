@@ -7,14 +7,12 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import java.util.Collections;
 
-import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
-
 
 public class MoveKeywordCallUpCommand extends EditorCommand {
 
@@ -24,43 +22,47 @@ public class MoveKeywordCallUpCommand extends EditorCommand {
         this.keywordCall = keywordCall;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
-        if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
-            final IRobotCodeHoldingElement codeElement = keywordCall.getParent();
-            final int index = codeElement.getChildren().indexOf(keywordCall);
-            
-            // TODO: will be support for parent changes in model?
-//            if (index == 0) {
-//                // lets try to the element up from here
-//                final int indexOfElement = codeElement.getParent().getChildren().indexOf(codeElement);
-//                if (indexOfElement == 0) {
-//                    return;
-//                }
-//                final IRobotCodeHoldingElement targetElement = (IRobotCodeHoldingElement) codeElement.getParent()
-//                        .getChildren()
-//                        .get(indexOfElement - 1);
-//
-//                codeElement.getChildren().remove(index);
-//                targetElement.getChildren().add(keywordCall);
-//                keywordCall.setParent(targetElement);
-//
-//                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, targetElement);
-//                eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeElement);
-//
-//                return;
-//            }
-            if(index > 0) {
-                Collections.swap(codeElement.getChildren(), index, index - 1);
-            }
-            
-            final Object linkedElement = codeElement.getLinkedElement();
-            if (linkedElement != null && linkedElement instanceof UserKeyword) {
-                ((UserKeyword) linkedElement)
-                        .moveUpExecutableRow((RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement());
-            }
 
-            eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, codeElement);
+        if (!keywordCall.isExecutable()) {
+            throw new IllegalStateException("Unable to move non-executable rows");
+        }
+
+        final RobotKeywordDefinition keywordDefinition = (RobotKeywordDefinition) keywordCall.getParent();
+        final int index = keywordCall.getIndex();
+
+        if (index == 0 || !keywordDefinition.getChildren().get(index - 1).isExecutable()) {
+            // lets try to the element up from here
+            final int indexOfElement = keywordDefinition.getIndex();
+            if (indexOfElement == 0) {
+                // no place to move it further up
+                return;
+            }
+            final RobotKeywordDefinition prevKeywordDefinition = keywordDefinition.getParent()
+                    .getChildren()
+                    .get(indexOfElement - 1);
+
+            keywordDefinition.getChildren().remove(keywordCall);
+            keywordDefinition.getLinkedElement()
+                    .removeExecutableRow((RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement());
+
+            prevKeywordDefinition.insertKeywordCall(prevKeywordDefinition.getChildren().size(), keywordCall);
+
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, prevKeywordDefinition);
+
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, keywordDefinition);
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, prevKeywordDefinition);
+        } else {
+            Collections.swap(keywordDefinition.getChildren(), index, index - 1);
+
+            final UserKeyword linkedElement = keywordDefinition.getLinkedElement();
+            final RobotExecutableRow<UserKeyword> linkedCall = (RobotExecutableRow<UserKeyword>) keywordCall
+                    .getLinkedElement();
+            linkedElement.moveUpExecutableRow(linkedCall);
+
+            eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, keywordDefinition);
         }
     }
 }
