@@ -70,7 +70,7 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
         int offset = start;
         while (offset < end) {
             final char c = document.getChar(offset);
-            if (c != ' ' && c != '\t') {
+            if ((c != ' ' || isTsvFile) && c != '\t') {
                 return offset;
             }
             offset++;
