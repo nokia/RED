@@ -26,6 +26,7 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
+import com.google.common.xml.XmlEscapers;
 
 public class RedKeywordProposal extends KeywordEntity {
 
@@ -80,7 +81,7 @@ public class RedKeywordProposal extends KeywordEntity {
         final Supplier<String> htmlDocuProvider = new Supplier<String>() {
             @Override
             public String get() {
-                return "<p>" + userKeyword.getDocumentation() + "</p>";
+                return "<p>" + XmlEscapers.xmlAttributeEscaper().escape(userKeyword.getDocumentation()) + "</p>";
             }
         };
         final ArgumentsDescriptor argsDescriptor = userKeyword.createArgumentsDescriptor();
