@@ -122,7 +122,10 @@ class SuiteSourceOccurrenceMarksHighlighter {
     private Set<IRegion> findOccurencesRegions(final IRegion region) throws BadLocationException {
         final Set<IRegion> regions = newHashSet();
 
-        final String selectedText = document.get(region.getOffset(), region.getLength());
+        final String selectedText = document.get(region.getOffset(), region.getLength()).trim();
+        if (selectedText.isEmpty()) {
+            return regions;
+        }
 
         int currentOffset = 0;
         IRegion foundedRegion = findAdapter.find(currentOffset, selectedText, true, true, !isVariable(selectedText),
