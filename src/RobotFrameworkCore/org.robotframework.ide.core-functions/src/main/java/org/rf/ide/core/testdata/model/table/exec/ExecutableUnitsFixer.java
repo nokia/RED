@@ -120,17 +120,20 @@ public class ExecutableUnitsFixer {
         int size = newExecutionContext.size();
         for (int i = size - 1; i >= 0; i--) {
             final RobotExecutableRow<T> execLine = newExecutionContext.get(i);
-            final IRowType rowType = execLine.buildLineDescription().getRowType();
+            final IExecutableRowDescriptor<T> lineDescription = execLine.buildLineDescription();
+            final IRowType rowType = lineDescription.getRowType();
             if (rowType == ERowType.FOR_CONTINUE) {
                 if (execLine.getAction().getText().isEmpty()) {
                     if (execLine.getAction().getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)) {
-                        RobotToken actionToBeArgument = execLine.getAction().copy();
-                        actionToBeArgument.getTypes().remove(RobotTokenType.KEYWORD_ACTION_NAME);
-                        actionToBeArgument.getTypes().remove(RobotTokenType.TEST_CASE_ACTION_NAME);
-                        actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
-                        actionToBeArgument.setRaw("\\");
-                        actionToBeArgument.setText("\\");
-                        execLine.addArgument(0, actionToBeArgument);
+                        if (isActionNotTheFirstElement(execLine.getAction(), execLine.getElementTokens())) {
+                            RobotToken actionToBeArgument = execLine.getAction().copy();
+                            actionToBeArgument.getTypes().remove(RobotTokenType.KEYWORD_ACTION_NAME);
+                            actionToBeArgument.getTypes().remove(RobotTokenType.TEST_CASE_ACTION_NAME);
+                            actionToBeArgument.getTypes().remove(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
+                            actionToBeArgument.setRaw("\\");
+                            actionToBeArgument.setText("\\");
+                            execLine.addArgument(0, actionToBeArgument);
+                        }
                         execLine.getAction().setText("\\");
                         execLine.getAction().setRaw("\\");
                     } else {
@@ -165,6 +168,35 @@ public class ExecutableUnitsFixer {
         }
 
         return newExecutionContext;
+    }
+
+    /**
+     * Special hanlding for TSV format:
+     * <code>
+     *  :FOR    ${x}    IN  10
+        #   d
+        ...     kw_w
+        \   kw_w
+     * </code>
+     * 
+     * @param action
+     * @param elementTokens
+     * @return
+     */
+    private boolean isActionNotTheFirstElement(final RobotToken action, final List<RobotToken> elementTokens) {
+        final FilePosition actionPosition = action.getFilePosition();
+        if (!actionPosition.isNotSet()) {
+            for (final RobotToken tok : elementTokens) {
+                final FilePosition currentTokenPosition = tok.getFilePosition();
+                if (!currentTokenPosition.isNotSet()) {
+                    if (currentTokenPosition.isBefore(actionPosition)) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     private <T> Optional<Integer> findLineWithExecAction(final List<RobotExecutableRow<T>> newExecutionContext) {
