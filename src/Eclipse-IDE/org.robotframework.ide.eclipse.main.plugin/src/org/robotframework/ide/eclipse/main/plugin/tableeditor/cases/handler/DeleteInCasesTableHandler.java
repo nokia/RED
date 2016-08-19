@@ -35,7 +35,7 @@ public class DeleteInCasesTableHandler extends DIParameterizedHandler<E4DeleteIn
                     return new SetCaseKeywordCallCommentCommand(keywordCall, null);
                 }
             } else if (selectedElement instanceof RobotCase && columnIndex == 0) {
-                return new SetCaseNameCommand((RobotCase) selectedElement, "");
+                return new SetCaseNameCommand((RobotCase) selectedElement, "\\");
             }
             return null;
         }

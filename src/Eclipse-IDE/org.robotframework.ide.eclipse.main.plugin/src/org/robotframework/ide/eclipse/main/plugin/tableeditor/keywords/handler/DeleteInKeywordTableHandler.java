@@ -53,7 +53,7 @@ public class DeleteInKeywordTableHandler extends DIParameterizedHandler<E4Delete
             } else if (selectedElement instanceof RobotKeywordDefinition) {
                 final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) selectedElement;
                 if (columnIndex == 0) {
-                    return new SetKeywordDefinitionNameCommand(keywordDef, "");
+                    return new SetKeywordDefinitionNameCommand(keywordDef, "\\");
                 } else if (columnIndex > 0 && columnIndex < tableColumnCount - 1) {
                     final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
                     if (argumentsSetting != null && columnIndex - 1 < argumentsSetting.getArguments().size()) {
