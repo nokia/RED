@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.layer.LabelStack;
 import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
-import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 
@@ -49,16 +48,16 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
                 configLabels.addLabel(KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
                 configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
             } else if (rowObject instanceof RobotDefinitionSetting) {
-                final ModelType modelType = ((RobotDefinitionSetting) rowObject).getLinkedElement().getModelType();
+                final RobotDefinitionSetting setting = (RobotDefinitionSetting) rowObject;
                 if (columnPosition == 1) {
-                    if (isKeywordBasedSetting(modelType)) {
+                    if (setting.isKeywordBased()) {
                         configLabels.addLabel(KEYWORD_ASSIST_REQUIRED);
                     } else {
                         configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
                     }
                 } else {
                     configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
-                    if (isDocumentationSetting(modelType)) {
+                    if (setting.isDocumentation()) {
                         configLabels.addLabel(KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
                     }
                 }
@@ -68,11 +67,4 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
         }
     }
 
-    private boolean isKeywordBasedSetting(final ModelType type) {
-        return type == ModelType.USER_KEYWORD_TEARDOWN;
-    }
-
-    private boolean isDocumentationSetting(final ModelType type) {
-        return type == ModelType.USER_KEYWORD_DOCUMENTATION;
-    }
 }
