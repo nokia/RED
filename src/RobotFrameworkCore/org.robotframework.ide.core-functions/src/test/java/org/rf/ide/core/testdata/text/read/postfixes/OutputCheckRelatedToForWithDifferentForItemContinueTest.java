@@ -78,12 +78,16 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
         assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR);
         assertExecutableLine(executionContext.get(1), "\\", Arrays.asList("Log", "ok"), Arrays.asList("#cm1"));
         assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
-        ForLoopContinueRowDescriptor<UserKeyword> buildLineDescription = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
+        ForLoopContinueRowDescriptor<UserKeyword> forLineOne = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
                 .get(1).buildLineDescription();
-        assertThat(buildLineDescription.getKeywordAction().getToken().getText()).isEqualTo("Log");
-        assertThat(buildLineDescription.getAction().getToken().getText()).isEqualTo("\\");
+        assertThat(forLineOne.getKeywordAction().getToken().getText()).isEqualTo("Log");
+        assertThat(forLineOne.getAction().getToken().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("Log", "ok2"), Arrays.asList("#cm2"));
         assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
+        ForLoopContinueRowDescriptor<UserKeyword> forLineTwo = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
+                .get(2).buildLineDescription();
+        assertThat(forLineTwo.getKeywordAction().getToken().getText()).isEqualTo("Log");
+        assertThat(forLineTwo.getAction().getToken().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(3), "Log", Arrays.asList("done"), new ArrayList<String>(0));
         assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(ERowType.SIMPLE);
     }
@@ -107,8 +111,16 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
         assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR);
         assertExecutableLine(executionContext.get(1), "\\", Arrays.asList("Log", "ok"), Arrays.asList("#cm1"));
         assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
+        ForLoopContinueRowDescriptor<UserKeyword> forLineOne = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
+                .get(1).buildLineDescription();
+        assertThat(forLineOne.getKeywordAction().getToken().getText()).isEqualTo("Log");
+        assertThat(forLineOne.getAction().getToken().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("Log", "ok2"), Arrays.asList("#cm2"));
         assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
+        ForLoopContinueRowDescriptor<UserKeyword> forLineTwo = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
+                .get(1).buildLineDescription();
+        assertThat(forLineTwo.getKeywordAction().getToken().getText()).isEqualTo("Log");
+        assertThat(forLineTwo.getAction().getToken().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(3), "Log", Arrays.asList("done"), new ArrayList<String>(0));
         assertThat(executionContext.get(3).buildLineDescription().getRowType()).isEqualTo(ERowType.SIMPLE);
     }
@@ -282,6 +294,28 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
         assertThat(executionContext.get(6).buildLineDescription().getRowType()).isEqualTo(ERowType.SIMPLE);
         assertExecutableLine(executionContext.get(7), "...  #ok", new ArrayList<String>(0), new ArrayList<String>(0));
         assertThat(executionContext.get(7).buildLineDescription().getRowType()).isEqualTo(ERowType.SIMPLE);
+    }
+
+    @Test
+    public void test_forLoopWithTwoContinueOnePythonLineOneHashComment() throws Exception {
+        final RobotFile modelFile = getModelFile("ForLoopWithTwoContinueOnePythonLineOneHashComment.tsv");
+
+        // verify
+        assertThatOnlyKeywordTableIsPresent(modelFile);
+        final KeywordTable keywordTable = modelFile.getKeywordTable();
+        final List<UserKeyword> keywords = keywordTable.getKeywords();
+        assertThat(keywords).hasSize(1);
+        final UserKeyword userKeyword = keywords.get(0);
+        final List<RobotExecutableRow<UserKeyword>> executionContext = userKeyword.getExecutionContext();
+        assertThat(executionContext).hasSize(3);
+
+        assertExecutableLine(executionContext.get(0), ":FOR", Arrays.asList("${x}", "IN", "10"),
+                new ArrayList<String>(0));
+        assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR);
+        assertExecutableLine(executionContext.get(1), "\\", Arrays.asList("Log2", "ok"), new ArrayList<String>(0));
+        assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
+        assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("Log", "${x}"), Arrays.asList("#cm1"));
+        assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
     }
 
     private void assertExecutableLine(final RobotExecutableRow<UserKeyword> robotExecutableRow, final String actionText,
