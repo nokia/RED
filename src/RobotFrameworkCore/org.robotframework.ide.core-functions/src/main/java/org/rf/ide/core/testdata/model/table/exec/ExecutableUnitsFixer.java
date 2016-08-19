@@ -136,6 +136,7 @@ public class ExecutableUnitsFixer {
                     } else {
                         execLine.getAction().setText("\\");
                         execLine.getAction().setRaw("\\");
+                        execLine.getAction().getTypes().add(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
                     }
                 } else if (!execLine.getAction().getText().equals("\\")) {
                     RobotToken actionToBeArgument = execLine.getAction().copy();
