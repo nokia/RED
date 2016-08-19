@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
-import static com.google.common.collect.Iterables.transform;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,11 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedC
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
 import org.robotframework.red.graphics.ImagesManager;
 
-import com.google.common.base.CaseFormat;
-import com.google.common.base.Function;
-import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 
 /**
@@ -53,20 +47,11 @@ public class CreateKeywordFixer extends RedSuiteMarkerResolution {
             @Override
             public void perform(final String gherkinNameVariant) {
                 if (!gherkinNameVariant.isEmpty()) {
-                    fixers.add(new CreateKeywordFixer(toCamelCased(gherkinNameVariant)));
+                    fixers.add(new CreateKeywordFixer(gherkinNameVariant));
                 }
             }
         });
         return fixers;
-    }
-
-    private static String toCamelCased(final String name) {
-        return Joiner.on(' ').join(transform(Splitter.on(' ').splitToList(name), new Function<String, String>() {
-            @Override
-            public String apply(final String str) {
-                return CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, str.toLowerCase());
-            }
-        }));
     }
 
     private final String keywordName;
