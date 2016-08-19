@@ -38,7 +38,9 @@ public class ExecutableRowCallRule implements ISyntaxColouringRule {
                 final RobotToken prevToken = tokensBeforeInLine.get(i);
                 if (!prevToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
                         && !prevToken.getTypes().contains(RobotTokenType.ASSIGNMENT)
-                        && !prevToken.getText().isEmpty() && !prevToken.getText().equals("\\")) {
+                        && !prevToken.getText().isEmpty()
+                        && !prevToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
+                        && !prevToken.getText().equals("\\")) {
                     return Optional.absent();
                 }
             }
