@@ -123,7 +123,7 @@ public class RedTextCellEditor extends TextCellEditor {
         }
         ((InlineFocusListener) focusListener).handleFocusChanges = true;
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         contextActivation = service.activateContext(RedPlugin.DETAILS_EDITING_CONTEXT_ID);
 
         return text;
@@ -143,7 +143,7 @@ public class RedTextCellEditor extends TextCellEditor {
     public void close() {
         super.close();
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         service.deactivateContext(contextActivation);
     }
 
@@ -227,7 +227,7 @@ public class RedTextCellEditor extends TextCellEditor {
 
         @Override
         public void proposalAccepted(final IContentProposal proposal) {
-            // nothing to do
+            getEditorControl().forceFocus();
         }
     }
 }
