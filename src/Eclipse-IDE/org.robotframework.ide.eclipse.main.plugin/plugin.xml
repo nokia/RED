@@ -1870,9 +1870,23 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <reference
+          <and>
+          	<reference
                 definitionId="org.robotframework.exactlyOneElementIsSelected">
-          </reference>
+          	</reference>
+           <with
+                 variable="selection">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <not>
+                    <instanceof
+                          value="org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting">
+                    </instanceof>
+                 </not>
+              </iterate>
+           </with>
+          </and>
        </enabledWhen>
     </handler>
     <handler
@@ -1884,9 +1898,23 @@
           </reference>
        </activeWhen>
        <enabledWhen>
-          <reference
+          <and>
+          	<reference
                 definitionId="org.robotframework.exactlyOneElementIsSelected">
-          </reference>
+          	</reference>
+           <with
+                 variable="selection">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <not>
+                    <instanceof
+                          value="org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting">
+                    </instanceof>
+                 </not>
+              </iterate>
+           </with>
+          </and>
        </enabledWhen>
     </handler>
     <handler
