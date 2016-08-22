@@ -34,26 +34,8 @@ public class MoveKeywordCallUpCommand extends EditorCommand {
         final int index = keywordCall.getIndex();
 
         if (index == 0 || !keywordDefinition.getChildren().get(index - 1).isExecutable()) {
-            // lets try to the element up from here
-            final int indexOfElement = keywordDefinition.getIndex();
-            if (indexOfElement == 0) {
-                // no place to move it further up
-                return;
-            }
-            final RobotKeywordDefinition prevKeywordDefinition = keywordDefinition.getParent()
-                    .getChildren()
-                    .get(indexOfElement - 1);
-
-            keywordDefinition.getChildren().remove(keywordCall);
-            keywordDefinition.getLinkedElement()
-                    .removeExecutableRow((RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement());
-
-            prevKeywordDefinition.insertKeywordCall(prevKeywordDefinition.getChildren().size(), keywordCall);
-
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, prevKeywordDefinition);
-
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, keywordDefinition);
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, prevKeywordDefinition);
+            // no place to move it further up
+            return;
         } else {
             Collections.swap(keywordDefinition.getChildren(), index, index - 1);
 
