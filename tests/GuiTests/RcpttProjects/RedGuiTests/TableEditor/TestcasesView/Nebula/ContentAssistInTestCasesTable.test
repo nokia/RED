@@ -1,0 +1,215 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _AXAyAF_dEeaRBaqqj0N1Gg
+Element-Name: ContentAssistInTestCasesTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _mnMpkGhbEeahDKoeWWpvig
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/22/16 1:55 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Variables ***\n"
+    + "${a1}  8    \n"
+    + "&{myDict}    key=value\n"
+    + "    \n"
+    + "*** Setting ***\n"
+    + "*** Test Cases ***\n"
+    + "tc1"  
+
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s" 
+    
+with [get-editor "TestFile.robot" | get-tab-folder] {
+    get-tab-item "Test Cases" | click
+}
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/tc1" | click
+wait 200
+
+//go to KW name, remove it and try to open CA
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Right
+        key-type Left
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text ""
+        key-type "M1+SPACE"
+    }
+}
+
+// check tah CA window is not shown
+verify-error {get-window -class ContentProposalPopup | get-table}
+
+//set new name
+with [get-editor "TestFile.robot"] {
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "new test"
+        key-type Enter
+    }
+    //go down and add new line
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Left
+        key-type Enter -times 2
+    }
+}   
+//check info of CA
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 
+    | get-property "decorators[0].description" | equals "Press Ctrl+Space for content assist" | verify-true
+
+with [get-editor "TestFile.robot"] {        
+    //open CA
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "M1+SPACE"
+}
+
+get-window -class ContentProposalPopup | get-table |  get-property itemCount -raw | let [val nr_of_items -input] {
+	with [get-window -class ContentProposalPopup | get-table] {
+	    get-property "getItems().TableItem[0].getText()" | equals "Call Method - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[1].getText()" | equals "Catenate - BuiltIn" | verify-true
+	    get-property [format "getItems().TableItem[%s].getText()"   [minus $nr_of_items 1]] | equals "While - Reserved" | verify-true
+	}
+}
+
+//select KW
+with [get-window -class ContentProposalPopup | get-table] {
+    select "Continue For Loop - BuiltIn" | key-type Enter
+    click -default
+}
+
+//add first kw - Call Method and accept
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
+
+//check if info about content assist is shown
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 
+    | get-property "decorators[0].description" | equals "Press Ctrl+Space for content assist" | verify-true
+ 
+//open CA in arg cell
+with [get-editor "TestFile.robot"] {
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "M1+SPACE"
+}
+wait 200
+//check if all variables are (first declared by user)
+with [get-window -class ContentProposalPopup | get-table] {
+    get-property "getItems().TableItem[0].getText()" | equals "${a1}" | verify-true
+    get-property "getItems().TableItem[1].getText()" | equals "&{myDict}" | verify-true
+    get-property "getItems().TableItem[2].getText()" | equals "${/}" | verify-true
+    get-property "getItems().TableItem[3].getText()" | equals "${:}" | verify-true
+}
+
+//select ${EXECDIR}
+with [get-window -class ContentProposalPopup | get-table] {
+    select "${EXECDIR}" | key-type Enter
+    click -default
+}
+
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
+
+//add next args
+with [get-editor "TestFile.robot"] {
+   
+    //add "$empty"
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+SPACE"
+        key-type Down -times 5
+        key-type Enter -times 2
+    }
+    
+    //add ${a1}
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+SPACE"
+        key-type Enter
+        key-type Enter
+    }
+    //add "${True}"
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+SPACE"
+        key-type Up -times 5
+        key-type Enter -times 2
+    }
+    //add SUITE_DOCUMENTATIOn
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+SPACE"
+        key-type Up -times 16
+        key-type Enter -times 2
+    }
+    //go to comment
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+SPACE"
+    }
+}
+
+//check that in comment there is no CA
+verify-error {get-window -class ContentProposalPopup | get-table}   
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 
+    | verify-error { get-property "decorators[0].description" | equals "Press Ctrl+Space for content assist" | verify-true}
+
+check-test_case-row -file "TestFile.robot" -row 1 -tc "new test"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "Continue For Loop" -c1 "${EXECDIR}"-c2 "${CURDIR}" -c3 "${a1}" -c4 "${True}" -c5 "${SUITE_DOCUMENTATION}" -comment ""
+check-test_case-row -file "TestFile.robot" -row 3 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 4 -tc "...add new case"
+
+//go to Source
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${a1}  8    \n"
+    + "&{myDict}    key=value\n"
+    + "    \n"
+    + "*** Setting ***\n"
+    + "*** Test Cases ***\n"
+    + "new test\n"
+    + "    Continue For Loop    ${EXECDIR}    ${CURDIR}    ${a1}    ${True}    ${SUITE_DOCUMENTATION}" | verify-true
+    
+//add kw section with one new kw    
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 4 4
+        key-type Enter
+        key-type Left -times 3
+        key-type "M1+SPACE"
+        key-type Down -times 3
+        key-type Enter
+        type-text "my_KW"
+        key-type Enter
+        type-text log
+        key-type Tab
+        type-text 67
+    }
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+
+//go to TC table
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/new test/Continue For Loop" | click
+wait 200
+with [get-editor "TestFile.robot"] {
+	//set focus on fist column
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Right
+        key-type Left
+        key-type Enter
+    }
+    //remove old kw and open CA
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text ""
+        key-type "M1+SPACE"
+    }
+}
+//check that new KS is at the end
+get-window -class ContentProposalPopup | get-table |  get-property itemCount -raw | let [val nr_of_items -input] {
+	with [get-window -class ContentProposalPopup | get-table] {
+	    get-property [format "getItems().TableItem[%s].getText()"   [minus $nr_of_items 1]] | equals "my_KW - TestFile.robot"| verify-true
+	}
+}
+
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
