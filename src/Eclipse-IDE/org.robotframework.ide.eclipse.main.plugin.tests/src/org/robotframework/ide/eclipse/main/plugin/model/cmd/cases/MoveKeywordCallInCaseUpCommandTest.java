@@ -87,7 +87,7 @@ public class MoveKeywordCallInCaseUpCommandTest {
     }
 
     @Test
-    public void rowIsProperlyMovedToPreviousCase_whenItIsTopmostInNonFirstCase() {
+    public void rowIsNotMovedToPreviousCase_whenItIsTopmostInNonFirstCase() {
         final List<RobotCase> cases = createTestCasesWithoutSettings();
         final RobotCase fstCase = cases.get(0);
         final RobotCase sndCase = cases.get(1);
@@ -99,21 +99,17 @@ public class MoveKeywordCallInCaseUpCommandTest {
                 .isInjectedInto(new MoveKeywordCallInCaseUpCommand(callToMove))
                 .execute();
 
-        assertThat(fstCase.getChildren()).hasSize(4);
+        assertThat(fstCase.getChildren()).hasSize(3);
         assertThat(fstCase.getChildren().get(0).getName()).isEqualTo("Log1");
         assertThat(fstCase.getChildren().get(1).getName()).isEqualTo("Log2");
         assertThat(fstCase.getChildren().get(2).getName()).isEqualTo("Log3");
-        assertThat(fstCase.getChildren().get(3).getName()).isEqualTo("Log");
 
-        assertThat(sndCase.getChildren()).isEmpty();
-
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, fstCase);
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, sndCase);
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, fstCase);
+        assertThat(sndCase.getChildren()).isNotEmpty();
+        assertThat(sndCase.getChildren().get(0).getName()).isEqualTo("Log");
     }
 
     @Test
-    public void rowIsProperlyMovedToPreviousCase_whenItIsTopmostExcludingSettingsInNonFirstCase() {
+    public void rowIsNotMovedToPreviousCase_whenItIsTopmostExcludingSettingsInNonFirstCase() {
         final List<RobotCase> cases = createTestCasesWithSettings();
         final RobotCase fstCase = cases.get(0);
         final RobotCase sndCase = cases.get(1);
@@ -125,19 +121,15 @@ public class MoveKeywordCallInCaseUpCommandTest {
                 .isInjectedInto(new MoveKeywordCallInCaseUpCommand(callToMove))
                 .execute();
 
-        assertThat(fstCase.getChildren()).hasSize(5);
+        assertThat(fstCase.getChildren()).hasSize(4);
         assertThat(fstCase.getChildren().get(0).getName()).isEqualTo("Tags");
         assertThat(fstCase.getChildren().get(1).getName()).isEqualTo("Log1");
         assertThat(fstCase.getChildren().get(2).getName()).isEqualTo("Log2");
         assertThat(fstCase.getChildren().get(3).getName()).isEqualTo("Log3");
-        assertThat(fstCase.getChildren().get(4).getName()).isEqualTo("Log");
 
-        assertThat(sndCase.getChildren()).hasSize(1);
+        assertThat(sndCase.getChildren()).hasSize(2);
         assertThat(sndCase.getChildren().get(0).getName()).isEqualTo("Setup");
-
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, fstCase);
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, sndCase);
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, fstCase);
+        assertThat(sndCase.getChildren().get(1).getName()).isEqualTo("Log");
     }
 
     private static List<RobotCase> createTestCasesWithSettings() {
