@@ -70,7 +70,7 @@ public class MoveKeywordCallInCaseDownCommandTest {
     }
 
     @Test
-    public void rowIsProperlyMovedToNextCase_whenItIsBottommostInCase() {
+    public void rowIsNotMovedToNextCase_whenItIsBottommostInCase() {
         final List<RobotCase> cases = createTestCasesWithoutSettings();
         final RobotCase sndCase = cases.get(1);
         final RobotCase trdCase = cases.get(2);
@@ -82,20 +82,16 @@ public class MoveKeywordCallInCaseDownCommandTest {
                 .isInjectedInto(new MoveKeywordCallInCaseDownCommand(callToMove))
                 .execute();
 
-        assertThat(sndCase.getChildren()).isEmpty();
+        assertThat(sndCase.getChildren()).hasSize(1);
+        assertThat(sndCase.getChildren().get(0).getName()).isEqualTo("Log");
 
-        assertThat(trdCase.getChildren()).hasSize(3);
-        assertThat(trdCase.getChildren().get(0).getName()).isEqualTo("Log");
-        assertThat(trdCase.getChildren().get(1).getName()).isEqualTo("Log1");
-        assertThat(trdCase.getChildren().get(2).getName()).isEqualTo("Log2");
-
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, trdCase);
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, sndCase);
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, trdCase);
+        assertThat(trdCase.getChildren()).hasSize(2);
+        assertThat(trdCase.getChildren().get(0).getName()).isEqualTo("Log1");
+        assertThat(trdCase.getChildren().get(1).getName()).isEqualTo("Log2");
     }
 
     @Test
-    public void rowIsProperlyMovedToNextCaseWithSettings_whenItIsBottomostInCase() {
+    public void rowIsNotMovedToNextCaseWithSettings_whenItIsBottomostInCase() {
         final List<RobotCase> cases = createTestCasesWithSettings();
         final RobotCase fstCase = cases.get(0);
         final RobotCase sndCase = cases.get(1);
@@ -107,19 +103,15 @@ public class MoveKeywordCallInCaseDownCommandTest {
                 .isInjectedInto(new MoveKeywordCallInCaseDownCommand(callToMove))
                 .execute();
 
-        assertThat(fstCase.getChildren()).hasSize(3);
+        assertThat(fstCase.getChildren()).hasSize(4);
         assertThat(fstCase.getChildren().get(0).getName()).isEqualTo("Tags");
         assertThat(fstCase.getChildren().get(1).getName()).isEqualTo("Log1");
         assertThat(fstCase.getChildren().get(2).getName()).isEqualTo("Log2");
+        assertThat(fstCase.getChildren().get(3).getName()).isEqualTo("Log3");
 
-        assertThat(sndCase.getChildren()).hasSize(3);
+        assertThat(sndCase.getChildren()).hasSize(2);
         assertThat(sndCase.getChildren().get(0).getName()).isEqualTo("Setup");
-        assertThat(sndCase.getChildren().get(1).getName()).isEqualTo("Log3");
-        assertThat(sndCase.getChildren().get(2).getName()).isEqualTo("Log");
-
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, sndCase);
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, fstCase);
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, sndCase);
+        assertThat(sndCase.getChildren().get(1).getName()).isEqualTo("Log");
     }
 
     private static List<RobotCase> createTestCasesWithSettings() {
