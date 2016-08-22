@@ -335,6 +335,10 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
                 tokens.addAll(template.getElementTokens());
             }
 
+            for (final TestCaseUnknownSettings setting : unknownSettings) {
+                tokens.addAll(setting.getElementTokens());
+            }
+
             final List<RobotToken> testCaseContextInModel = new ArrayList<>(0);
             for (final RobotExecutableRow<TestCase> row : testContext) {
                 testCaseContextInModel.addAll(row.getElementTokens());
