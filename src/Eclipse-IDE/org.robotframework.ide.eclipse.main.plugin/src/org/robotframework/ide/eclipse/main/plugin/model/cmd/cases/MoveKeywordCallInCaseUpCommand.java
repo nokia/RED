@@ -14,7 +14,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-
 public class MoveKeywordCallInCaseUpCommand extends EditorCommand {
 
     private final RobotKeywordCall keywordCall;
@@ -33,23 +32,8 @@ public class MoveKeywordCallInCaseUpCommand extends EditorCommand {
         final int index = keywordCall.getIndex();
 
         if (index == 0 || !robotCase.getChildren().get(index - 1).isExecutable()) {
-            // lets try to move the element up from here
-            final int indexOfElement = robotCase.getIndex();
-            if (indexOfElement == 0) {
-                // no place to move it further up
-                return;
-            }
-
-            final RobotCase prevTestCase = robotCase.getParent().getChildren().get(indexOfElement - 1);
-
-            robotCase.removeChild(keywordCall);
-            prevTestCase.insertKeywordCall(prevTestCase.getChildren().size(), keywordCall);
-
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, prevTestCase);
-
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, robotCase);
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, prevTestCase);
-
+            // no place to move it further up
+            return;
         } else {
             Collections.swap(robotCase.getChildren(), index, index - 1);
 
