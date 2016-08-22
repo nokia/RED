@@ -303,6 +303,10 @@ public class UserKeyword extends AModelElement<KeywordTable>
                 tokens.addAll(timeout.getElementTokens());
             }
 
+            for (final KeywordUnknownSettings setting : unknownSettings) {
+                tokens.addAll(setting.getElementTokens());
+            }
+
             Collections.sort(tokens, new RobotTokenPositionComparator());
             positionRevertToExpectedOrder(tokens, keywordContextInModel);
         }
