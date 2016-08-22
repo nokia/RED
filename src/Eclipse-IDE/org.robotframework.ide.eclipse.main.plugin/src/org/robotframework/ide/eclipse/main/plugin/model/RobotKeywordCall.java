@@ -65,15 +65,16 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
             @SuppressWarnings("unchecked")
             RobotExecutableRowView view = RobotExecutableRowView.buildView(
                     (RobotExecutableRow<? extends IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>>) linkedElement);
-            if (isAlreadyUpdatedWithAssignment()) {
+            if (wasNotUpdatedWithAssignment()) {
                 linkedElement.getDeclaration().setText(view.getTokenRepresentation(linkedElement.getDeclaration()));
             }
         }
         return linkedElement.getDeclaration().getText();
     }
 
-    private boolean isAlreadyUpdatedWithAssignment() {
-        return !linkedElement.getDeclaration().isDirty()
+    private boolean wasNotUpdatedWithAssignment() {
+        final RobotToken declaration = linkedElement.getDeclaration();
+        return !declaration.isDirty()
                 && !linkedElement.getDeclaration().getText().trim().endsWith("=");
     }
 
