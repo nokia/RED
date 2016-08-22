@@ -113,7 +113,7 @@ public class RedTextCellEditor extends TextCellEditor {
         validationJobScheduler.armRevalidationOn(text);
 
         final RedContentProposalListener assistListener = new ContentProposalsListener();
-        support.install(text, Optional.of(assistListener), RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+        support.install(text, Optional.of(assistListener), RedContentProposalAdapter.PROPOSAL_SHOULD_REPLACE);
         parent.redraw();
 
         if ((selectionStartShift > 0 || selectionEndShift > 0) && !text.isDisposed()) {
