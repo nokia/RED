@@ -34,24 +34,8 @@ public class MoveKeywordCallInCaseDownCommand extends EditorCommand {
         final int index = keywordCall.getIndex();
 
         if (index == size - 1) {
-            // lets try to move the element down from here
-            final int defsSize = robotCase.getParent().getChildren().size();
-            final int indexOfElement = robotCase.getIndex();
-            if (indexOfElement == defsSize - 1) {
-                // no place to move it further down
-                return;
-            }
-
-            final RobotCase nextTestCase = robotCase.getParent().getChildren().get(indexOfElement + 1);
-
-            robotCase.removeChild(keywordCall);
-            nextTestCase.insertKeywordCall(findIndex(nextTestCase), keywordCall);
-
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, nextTestCase);
-
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, robotCase);
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, nextTestCase);
-
+            // no place to move it further down
+            return;
         } else {
             Collections.swap(robotCase.getChildren(), index, index + 1);
 
@@ -63,16 +47,5 @@ public class MoveKeywordCallInCaseDownCommand extends EditorCommand {
 
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, robotCase);
         }
-    }
-
-    private int findIndex(final RobotCase nextTestCase) {
-        int i = 0;
-        for (final RobotKeywordCall call : nextTestCase.getChildren()) {
-            if (call.getLinkedElement().getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW) {
-                break;
-            }
-            i++;
-        }
-        return i;
     }
 }
