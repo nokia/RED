@@ -5,8 +5,6 @@
  */
 package org.robotframework.red.nattable.configs;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import org.eclipse.nebula.widgets.nattable.config.AbstractUiBindingConfiguration;
 import org.eclipse.nebula.widgets.nattable.edit.action.KeyEditAction;
 import org.eclipse.nebula.widgets.nattable.edit.action.MouseEditAction;
@@ -15,7 +13,6 @@ import org.eclipse.nebula.widgets.nattable.resize.action.AutoResizeColumnAction;
 import org.eclipse.nebula.widgets.nattable.resize.action.ColumnResizeCursorAction;
 import org.eclipse.nebula.widgets.nattable.resize.event.ColumnResizeEventMatcher;
 import org.eclipse.nebula.widgets.nattable.resize.mode.ColumnResizeDragMode;
-import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.CellEditorMouseEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
@@ -39,8 +36,9 @@ public class RedTableEditBindingsConfiguration extends AbstractUiBindingConfigur
         uiBindingRegistry.registerKeyBinding(new LetterOrDigitKeyEventMatcher(), new KeyEditAction());
         uiBindingRegistry.registerKeyBinding(new LetterOrDigitKeyEventMatcher(SWT.SHIFT), new KeyEditAction());
 
-        uiBindingRegistry.registerFirstMouseDownBinding(new TableCellEditorMouseEventMatcher(GridRegion.BODY,
-                newArrayList(DisplayMode.SELECT, DisplayMode.SELECT_HOVER)), new MouseEditAction());
+        // uiBindingRegistry.registerFirstMouseDownBinding(new
+        // TableCellEditorMouseEventMatcher(GridRegion.BODY,
+        // newArrayList(DisplayMode.SELECT, DisplayMode.SELECT_HOVER)), new MouseEditAction());
         uiBindingRegistry.registerDoubleClickBinding(new CellEditorMouseEventMatcher(GridRegion.BODY),
                 new MouseEditAction());
         
