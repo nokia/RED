@@ -87,7 +87,7 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        if (viewer != null) {
+                        if (viewer != null && !viewer.getControl().isDisposed()) {
                             viewer.refresh();
                         }
                     }
@@ -99,7 +99,7 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
     }
     
     private IEclipseContext getContext() {
-        return (IEclipseContext) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
+        return PlatformUI.getWorkbench().getActiveWorkbenchWindow().getService(IEclipseContext.class);
     }
 
     @Override
