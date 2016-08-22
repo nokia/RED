@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
-import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 
 /**
  * This is a custom implementation of TextCellEditor which can be activated by
@@ -24,7 +23,6 @@ import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
     private final String contextToDeactivate;
-    private RedContentProposalAdapter contentProposalAdapter;
 
     public ActivationCharPreservingTextCellEditor(final ColumnViewerEditor viewerEditor, final Composite parent,
             final String contextToDeactivate) {
@@ -51,14 +49,10 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
 
     @Override
     protected void focusLost() {
-        if (isActivated() && (contentProposalAdapter == null || !isContentProposalOpened())) {
+        if (isActivated()) {
             fireApplyEditorValue();
             deactivate();
         }
-    }
-
-    protected final boolean isContentProposalOpened() {
-        return contentProposalAdapter != null && contentProposalAdapter.isProposalPopupOpen();
     }
 
     @Override
@@ -68,21 +62,6 @@ public class ActivationCharPreservingTextCellEditor extends TextCellEditor {
                 && activationEvent.character != SWT.CR) {
             text.setText(Character.toString(activationEvent.character));
         }
-    }
-
-    public void addContentProposalsSupport(final IContentProposingSupport support) {
-        final ILabelProvider labelProvider = support.getLabelProvider();
-        contentProposalAdapter = new RedContentProposalAdapter(text, support.getControlAdapter(text),
-                support.getProposalProvider(), support.getKeyStroke(), support.getActivationKeys());
-        contentProposalAdapter.setLabelProvider(labelProvider);
-        contentProposalAdapter.setAutoActivationDelay(200);
-        contentProposalAdapter.setProposalAcceptanceStyle(RedContentProposalAdapter.PROPOSAL_SHOULD_REPLACE);
-    }
-
-    @Override
-    public void dispose() {
-        contentProposalAdapter = null;
-        super.dispose();
     }
 
     private class EditorActivationListener extends ColumnViewerEditorActivationListener {
