@@ -55,8 +55,8 @@ public class RobotKeywordCallTest {
         assertThat(calls.get(9).getArguments()).containsExactly("kw9", "1", "2");
         assertThat(calls.get(10).getArguments()).containsExactly("${y}", "kw10", "1", "2");
         assertThat(calls.get(11).getArguments()).containsExactly("${y}", "kw11", "1", "2");
-        assertThat(calls.get(12).getArguments()).containsExactly("${y}", "kw12", "1", "2");
-        assertThat(calls.get(13).getArguments()).containsExactly("${y}", "kw13", "1", "2");
+        assertThat(calls.get(12).getArguments()).containsExactly("${y}=", "kw12", "1", "2");
+        assertThat(calls.get(13).getArguments()).containsExactly("${y}=", "kw13", "1", "2");
     }
 
     private static void assertName(final List<RobotKeywordCall> calls) {
@@ -68,8 +68,8 @@ public class RobotKeywordCallTest {
         assertThat(calls.get(5).getName()).isEqualTo("kw5");
         assertThat(calls.get(6).getName()).isEqualTo("${x}");
         assertThat(calls.get(7).getName()).isEqualTo("${x}");
-        assertThat(calls.get(8).getName()).isEqualTo("${x}");
-        assertThat(calls.get(9).getName()).isEqualTo("${x}");
+        assertThat(calls.get(8).getName()).isEqualTo("${x}=");
+        assertThat(calls.get(9).getName()).isEqualTo("${x}=");
         assertThat(calls.get(10).getName()).isEqualTo("${x}");
         assertThat(calls.get(11).getName()).isEqualTo("${x}");
         assertThat(calls.get(12).getName()).isEqualTo("${x}");
