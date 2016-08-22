@@ -9,6 +9,8 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,19 +23,23 @@ import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
+import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRowView;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
 public class RobotKeywordCall implements RobotFileInternalElement, Serializable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private transient IRobotCodeHoldingElement parent;
 
     private final AModelElement<?> linkedElement;
@@ -54,12 +60,26 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     @Override
     public String getName() {
+        final ModelType modelType = linkedElement.getModelType();
+        if (modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+            @SuppressWarnings("unchecked")
+            RobotExecutableRowView view = RobotExecutableRowView.buildView(
+                    (RobotExecutableRow<? extends IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>>) linkedElement);
+            if (isAlreadyUpdatedWithAssignment()) {
+                linkedElement.getDeclaration().setText(view.getTokenRepresentation(linkedElement.getDeclaration()));
+            }
+        }
         return linkedElement.getDeclaration().getText();
     }
 
+    private boolean isAlreadyUpdatedWithAssignment() {
+        return !linkedElement.getDeclaration().isDirty()
+                && !linkedElement.getDeclaration().getText().trim().endsWith("=");
+    }
+
     public String getLabel() {
-        if (linkedElement.getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW
-                || linkedElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+        final ModelType modelType = linkedElement.getModelType();
+        if (modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
             final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
             return row.buildLineDescription().getAction().getToken().getText();
         } else {
@@ -115,16 +135,42 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
                             && type != RobotTokenType.TEST_CASE_ACTION_NAME;
                 }
             });
-            arguments = newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));
+            final ModelType modelType = linkedElement.getModelType();
+            if (modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+                @SuppressWarnings("unchecked")
+                RobotExecutableRowView view = RobotExecutableRowView.buildView(
+                        (RobotExecutableRow<? extends IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>>) linkedElement);
+                arguments = newArrayList(transform(tokensWithoutComments, tokenViaExecutableView(view)));
+            } else {
+                arguments = newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));
+            }
         }
         return arguments;
+    }
+
+    static Function<RobotToken, String> tokenViaExecutableView(final RobotExecutableRowView view) {
+        return new Function<RobotToken, String>() {
+
+            @Override
+            public String apply(final RobotToken token) {
+                if (wasAlreadyUpdatedWithAssignment(token)) {
+                    String text = view.getTokenRepresentation(token);
+                    token.setText(text);
+                }
+                return token.getText();
+            }
+
+            private boolean wasAlreadyUpdatedWithAssignment(final RobotToken token) {
+                return !token.isDirty() && !token.getText().trim().endsWith("=");
+            }
+        };
     }
 
     public void resetStored() {
         arguments = null;
         comment = null;
     }
-    
+
     @Override
     public String getComment() {
         if (comment == null) {
@@ -182,5 +228,17 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     public String toString() {
         // for debugging purposes only
         return getName();
+    }
+
+    private void writeObject(final ObjectOutputStream out) throws IOException {
+        addAssignmentToRobotKeywordCall();
+
+        out.defaultWriteObject();
+    }
+
+    private void addAssignmentToRobotKeywordCall() {
+        this.getName();
+        this.getArguments();
+        this.getComment();
     }
 }
