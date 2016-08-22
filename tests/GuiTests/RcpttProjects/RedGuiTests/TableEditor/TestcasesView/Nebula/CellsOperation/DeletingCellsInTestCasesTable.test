@@ -1,0 +1,109 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _AXAyAF_dEeaRBaqqj0N1Gg
+Element-Name: DeletingCellsInTestCasesTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _CEmxMGhtEeahDKoeWWpvig
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/22/16 3:51 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add new tsv file
+get-menu "File/New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text suite
+    get-button "as .tsv file" | click
+    get-tree | select RobotProject
+    get-button Finish | click
+}
+
+//set text
+get-editor "suite.tsv" | get-text-viewer | set-text "*Settings*\t\t\t\t\t\t\t\n"
+    + "Test Timeout\t2 hours\t\t\t\t\t\t\n\n"
+    + "*Test Cases*\t\t\t\t\t\t\t\n"
+    + "test 1\t\t\t\t\t\t\t\t\t\t\t\n"
+    + "\tCatenate\t4\t5\t6\t7\t8\n"
+    + "\t\t\t\t\n"
+    + "\t\t\t\t\t\t\t\n"
+    + "test_2\t[Documentation]\tsecond test\t\t\t\t\t\t\n"
+    + "\tlog\t12\n"
+    + "\tShould Be Empty\titem\titem2\t#comment fo kw"
+
+//save file    
+with [get-editor "suite.tsv"] {
+    with [get-text-viewer] {
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+
+//set focus
+get-view Outline | get-tree | select "suite.tsv/Test Cases/test 1" | click
+
+
+with [get-editor "suite.tsv" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    //delete test case name
+    key-type Right
+    key-type Left
+    key-type Del
+    
+    //remove "6" value
+    key-type Down
+    key-type Right -times 3
+    key-type Del
+    
+    //remove Documentation (is not deleted)
+    key-type Down -times 3
+    key-type Left -times 3
+    key-type Del
+    
+    //remove "LOG"
+    key-type Down
+    key-type Del
+    
+    //remove comment
+    key-type Down
+    key-type Right -times 8
+    key-type Del
+}
+
+
+check-test_case-row -file "suite.tsv" -row 1 -tc "\\"
+check-test_case-row -file "suite.tsv" -row 2 -tc "Catenate" -c1 "4" -c2 "5" -c3 "7" -c4 "8"
+check-test_case-row -file "suite.tsv" -row 3 -tc "..."
+
+check-test_case-row -file "suite.tsv" -row 4 -tc "test_2"
+check-test_case-row -file "suite.tsv" -row 5 -tc "[Documentation]" -c1 "second test"
+check-test_case-row -file "suite.tsv" -row 6 -tc "" -c1 "12"
+check-test_case-row -file "suite.tsv" -row 7 -tc "Should Be Empty" -c1 "item" -c2 "item2" -comment "#comment fo kw"
+check-test_case-row -file "suite.tsv" -row 8 -tc "..."
+
+
+get-editor "suite.tsv" | get-tab-folder | get-tab-item Source | click
+get-editor "suite.tsv" | get-text-viewer | get-property text | equals "*Settings*\t\t\t\t\t\t\t\n"
+    + "Test Timeout\t2 hours\t\t\t\t\t\t\n\n"
+    + "*Test Cases*\t\t\t\t\t\t\t\n"
+    + "\\\n"
+    + "\tCatenate\t4\t5\t7\t8\n"
+    + "\t\t\t\t\n"
+    + "\t\t\t\t\t\t\t\n"
+    + "test_2\t[Documentation]\tsecond test\t\t\t\t\t\t\n"
+    + "\t\\\t12\n"
+    + "\tShould Be Empty\titem\titem2\t#comment fo kw" | verify-true
+    
+//go to Test cases again and save file    
+with [get-editor "suite.tsv"] {
+    with [get-tab-folder] {
+        get-tab-item "Test Cases" | click
+    }
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+s"
+}    
+
+check-test_case-row -file "suite.tsv" -row 6 -tc "\\" -c1 "12"
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
