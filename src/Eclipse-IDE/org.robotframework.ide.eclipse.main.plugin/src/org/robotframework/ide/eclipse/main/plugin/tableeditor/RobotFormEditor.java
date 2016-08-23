@@ -398,19 +398,21 @@ public class RobotFormEditor extends FormEditor {
 
     @Override
     protected void pageChange(final int newPageIndex) {
-        if (getActiveEditor() instanceof ISectionEditorPart) {
-            final ISectionEditorPart page = (ISectionEditorPart) getActiveEditor();
-            page.aboutToChangeToOtherPage();
+        if (newPageIndex != getActivePage() && getActiveEditor() instanceof ISectionEditorPart) {
+            ((ISectionEditorPart) getActiveEditor()).aboutToChangeToOtherPage();
         }
         
         super.pageChange(newPageIndex);
 
-        updateActivePage();
-        final IEditorPart activeEditor = getActiveEditor();
-        saveActivePage(activeEditor instanceof ISectionEditorPart ? ((ISectionEditorPart) activeEditor).getId() : "");
-        
-        if(documentationViewPartListener != null) {
-            documentationViewPartListener.pageChanged(activeEditor);
+        if (newPageIndex != getActivePage()) {
+            updateActivePage();
+            final IEditorPart activeEditor = getActiveEditor();
+            saveActivePage(
+                    activeEditor instanceof ISectionEditorPart ? ((ISectionEditorPart) activeEditor).getId() : "");
+
+            if (documentationViewPartListener != null) {
+                documentationViewPartListener.pageChanged(activeEditor);
+            }
         }
     }
 
