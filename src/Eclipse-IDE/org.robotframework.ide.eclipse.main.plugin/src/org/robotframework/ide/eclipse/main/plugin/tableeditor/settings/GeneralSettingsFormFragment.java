@@ -626,14 +626,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         return fileModel.findSection(RobotSettingsSection.class).orNull();
     }
 
-    public void revealSetting(final Entry<String, RobotElement> setting) {
-        Sections.maximizeChosenSectionAndMinimalizeOthers(generalSettingsSection);
-        if (table.isPresent()) {
-            selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
-        }
-        setFocus();
-    }
-
     public void revealSetting(final RobotSetting setting) {
         Sections.maximizeChosenSectionAndMinimalizeOthers(generalSettingsSection);
         if ("Documentation".equals(setting.getName())) {
