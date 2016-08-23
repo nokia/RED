@@ -16,21 +16,13 @@ import com.google.common.base.Optional;
  */
 public class VariableNameRedCellEditorValidator extends DefaultRedCellEditorValueValidator {
 
-    private final VariableType validType;
-
-    private final CommonVariableHelper commonVarHelper;
-
-    public VariableNameRedCellEditorValidator(final VariableType validType) {
-        super();
-        this.validType = validType;
-        this.commonVarHelper = new CommonVariableHelper();
-    }
+    private final CommonVariableHelper commonVarHelper = new CommonVariableHelper();
 
     @Override
     public void validate(final String value) {
         super.validate(value);
 
-        Optional<String> error = getProblemsWithVariableName(value);
+        final Optional<String> error = getProblemsWithVariableName(value);
 
         if (error.isPresent()) {
             throw new CellEditorValueValidationException(error.get());
@@ -38,30 +30,26 @@ public class VariableNameRedCellEditorValidator extends DefaultRedCellEditorValu
     }
 
     @VisibleForTesting
-    protected Optional<String> getProblemsWithVariableName(final String value) {
+    Optional<String> getProblemsWithVariableName(final String value) {
         Optional<String> error = Optional.absent();
-        char[] chars = value.toCharArray();
-        final String identificator = validType.getIdentificator();
+        final char[] chars = value.toCharArray();
         if (chars.length > 3) {
-            if (value.startsWith(identificator + '{')) {
+            if (value.startsWith(VariableType.SCALAR.getIdentificator() + "{")
+                    || value.startsWith(VariableType.LIST.getIdentificator() + "{")
+                    || value.startsWith(VariableType.DICTIONARY.getIdentificator() + "{")) {
                 if (value.endsWith("}")) {
                     if (!commonVarHelper.isCorrectVariable(value)) {
-                        error = Optional
-                                .of("Incorrect variable name it should be in syntax " + identificator + "{name} .");
+                        error = Optional.of("Name should match with [$@&]{name}");
                     }
                 } else {
-                    error = Optional.of("Expected to ends variable with } .");
+                    error = Optional.of("Name should end with }");
                 }
             } else {
-                error = Optional.of("Expected to start variable with " + identificator + "{ .");
+                error = Optional.of("Name should start with one of [$@&] followed by {");
             }
         } else {
-            error = Optional.of("Is not variable syntax " + identificator + "{[name]}.");
+            error = Optional.of("Name should match with [$@&]{name}");
         }
         return error;
-    }
-
-    public VariableType getValidType() {
-        return validType;
     }
 }

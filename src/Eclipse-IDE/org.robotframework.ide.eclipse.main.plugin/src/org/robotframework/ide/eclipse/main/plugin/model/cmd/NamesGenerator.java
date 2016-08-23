@@ -41,13 +41,13 @@ public class NamesGenerator {
                 new Function<RobotElement, String>() {
                     @Override
                     public String apply(final RobotElement element) {
-                        return element.getName();
+                        return element.getName().toLowerCase();
                     }
                 });
         final Collection<Integer> numbers = Collections2.transform(currentNames, new Function<String, Integer>() {
             @Override
             public Integer apply(final String name) {
-                if (name.startsWith(prefix)) {
+                if (name.startsWith(prefix.toLowerCase())) {
                     final String number = name.substring(prefix.length()).trim();
                     final Integer num = Ints.tryParse(number);
                     return num == null ? 0 : num;
