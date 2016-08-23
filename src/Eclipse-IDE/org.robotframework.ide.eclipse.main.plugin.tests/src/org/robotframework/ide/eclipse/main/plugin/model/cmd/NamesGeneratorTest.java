@@ -38,9 +38,19 @@ public class NamesGeneratorTest {
     @Test
     public void generatedNameHaveConsecutiveNumber_whenThereAreAlreadyNumberedChildren_1() {
         final ParentElement parent = new ParentElement(
-                new NamedElement("name"), 
-                new NamedElement("name 1"), 
+                new NamedElement("name"),
+                new NamedElement("name 1"),
                 new NamedElement("name 2"));
+
+        assertThat(NamesGenerator.generateUniqueName(parent, "name")).isEqualTo("name 3");
+    }
+
+    @Test
+    public void generatedNameHaveConsecutiveNumber_whenThereAreAlreadyNumberedChildrenRegardlessCase() {
+        final ParentElement parent = new ParentElement(
+                new NamedElement("name"),
+                new NamedElement("name 1"),
+                new NamedElement("NAME 2"));
 
         assertThat(NamesGenerator.generateUniqueName(parent, "name")).isEqualTo("name 3");
     }
@@ -48,8 +58,8 @@ public class NamesGeneratorTest {
     @Test
     public void generatedNameHaveConsecutiveNumber_whenThereAreAlreadyNumberedChildren_2() {
         final ParentElement parent = new ParentElement(
-                new NamedElement("name"), 
-                new NamedElement("name 100"), 
+                new NamedElement("name"),
+                new NamedElement("name 100"),
                 new NamedElement("name 200"));
 
         assertThat(NamesGenerator.generateUniqueName(parent, "name")).isEqualTo("name 201");
@@ -58,8 +68,8 @@ public class NamesGeneratorTest {
     @Test
     public void generatedNameHaveNoSpace_whenAskedToNotIncludeIt() {
         final ParentElement parent = new ParentElement(
-                new NamedElement("name"), 
-                new NamedElement("name 1"), 
+                new NamedElement("name"),
+                new NamedElement("name 1"),
                 new NamedElement("name 2"));
 
         assertThat(NamesGenerator.generateUniqueName(parent, "name", false)).isEqualTo("name3");
