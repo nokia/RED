@@ -29,6 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
@@ -112,8 +113,9 @@ public class RedTextCellEditor extends TextCellEditor {
 
         validationJobScheduler.armRevalidationOn(text);
 
-        final RedContentProposalListener assistListener = new ContentProposalsListener();
-        support.install(text, Optional.of(assistListener), RedContentProposalAdapter.PROPOSAL_SHOULD_REPLACE);
+        final RedContentProposalListener assistListener = new ContentProposalsListener(
+                (InlineFocusListener) focusListener);
+        support.install(text, Optional.of(assistListener), RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
         parent.redraw();
 
         if ((selectionStartShift > 0 || selectionEndShift > 0) && !text.isDisposed()) {
@@ -215,19 +217,39 @@ public class RedTextCellEditor extends TextCellEditor {
 
     private class ContentProposalsListener implements RedContentProposalListener {
 
+        private final InlineFocusListener focusListener;
+
+        public ContentProposalsListener(final InlineFocusListener focusListener) {
+            this.focusListener = focusListener;
+        }
+
         @Override
         public void proposalPopupOpened(final RedContentProposalAdapter adapter) {
+            // under GTK2 when user double-clicks proposal the focus is lost which
+            // results in editor closing
+            focusListener.handleFocusChanges = false;
             RedTextCellEditor.this.removeEditorControlListeners();
         }
 
         @Override
         public void proposalPopupClosed(final RedContentProposalAdapter adapter) {
+            // due to GTK2 issue we're queuing new runnable to be executed after all
+            // currently waiting operations in order to regain focus to text control
+            // end enable focus changes handling once again
+            SwtThread.asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    getEditorControl().forceFocus();
+                    focusListener.handleFocusChanges = true;
+                }
+            });
             RedTextCellEditor.this.addEditorControlListeners();
         }
 
         @Override
         public void proposalAccepted(final IContentProposal proposal) {
-            getEditorControl().forceFocus();
+            // nothing to do
         }
     }
 }
