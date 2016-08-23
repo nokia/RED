@@ -126,7 +126,8 @@ class VariablesTableValidator implements ModelUnitValidator {
         }
 
         for (final IVariableHolder variable : variableTable.getVariables()) {
-            if (duplicatedNames.contains(VariableNamesSupport.extractUnifiedVariableName(variable.getName()))) {
+            if (variable.getName() != null
+                    && duplicatedNames.contains(VariableNamesSupport.extractUnifiedVariableName(variable.getName()))) {
                 final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.DUPLICATED_VARIABLE)
                         .formatMessageWith(variable.getName());
                 final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
