@@ -65,7 +65,6 @@ public class VariableValuesEditConfigurationTest {
                 .getValidationJobScheduler();
         final CellEditorValueValidator<String> validator = validationScheduler.getValidator();
         assertThat(validator).isInstanceOf(VariableNameRedCellEditorValidator.class);
-        assertThat(((VariableNameRedCellEditorValidator) validator).getValidType()).isEqualTo(type);
     }
 
     @Test
