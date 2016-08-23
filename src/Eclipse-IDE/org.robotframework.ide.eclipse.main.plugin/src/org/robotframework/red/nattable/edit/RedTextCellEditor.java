@@ -115,7 +115,7 @@ public class RedTextCellEditor extends TextCellEditor {
 
         final RedContentProposalListener assistListener = new ContentProposalsListener(
                 (InlineFocusListener) focusListener);
-        support.install(text, Optional.of(assistListener), RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+        support.install(text, Optional.of(assistListener), RedContentProposalAdapter.PROPOSAL_SHOULD_REPLACE);
         parent.redraw();
 
         if ((selectionStartShift > 0 || selectionEndShift > 0) && !text.isDisposed()) {
