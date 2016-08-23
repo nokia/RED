@@ -9,7 +9,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator.CellEditorValueValidationException;
 
 import com.google.common.base.Optional;
@@ -21,19 +20,15 @@ public class VariableNameRedCellEditorValidatorTest {
 
     private VariableNameRedCellEditorValidator testable;
 
-    private String identificator;
-
     @Before
     public void setUp() {
-        final VariableType varType = VariableType.SCALAR;
-        this.testable = new VariableNameRedCellEditorValidator(varType);
-        this.identificator = varType.getIdentificator();
+        this.testable = new VariableNameRedCellEditorValidator();
     }
 
     @Test
     public void test_logicExecution_shouldNotBeAnyErrorThrown() {
         // given
-        final String varName = identificator + "{var}";
+        final String varName = "${var}";
 
         // when
         testable.validate(varName);
@@ -60,10 +55,10 @@ public class VariableNameRedCellEditorValidatorTest {
     @Test
     public void checkProblemsWith_variableNameIsCorrect_shouldNotBe_anyMsgReturn() {
         // given
-        final String varName = identificator + "{a}";
+        final String varName = "${a}";
 
         // when
-        Optional<String> msg = testable.getProblemsWithVariableName(varName);
+        final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
         assertThat(msg.isPresent()).isFalse();
@@ -72,40 +67,40 @@ public class VariableNameRedCellEditorValidatorTest {
     @Test
     public void checkProblemsWith_variableNameContainsMoreThanTwoBrackets_shouldBe_properMsgReturn() {
         // given
-        final String varName = identificator + "{a}}";
+        final String varName = "${a}}";
 
         // when
-        Optional<String> msg = testable.getProblemsWithVariableName(varName);
+        final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
         assertThat(msg.isPresent()).isTrue();
-        assertThat(msg.get()).isEqualTo("Incorrect variable name it should be in syntax " + identificator + "{name} .");
+        assertThat(msg.get()).isEqualTo("Name should match with [$@&]{name}");
     }
 
     @Test
     public void checkProblemsWith_variableNameNotEndsWithBracket_shouldBe_properMsgReturn() {
         // given
-        final String varName = identificator + "{aa";
+        final String varName = "${aa";
 
         // when
-        Optional<String> msg = testable.getProblemsWithVariableName(varName);
+        final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
         assertThat(msg.isPresent()).isTrue();
-        assertThat(msg.get()).isEqualTo("Expected to ends variable with } .");
+        assertThat(msg.get()).isEqualTo("Name should end with }");
     }
 
     @Test
     public void checkProblemsWith_variableNameNotStartsWithBracket_shouldBe_properMsgReturn() {
         // given
-        final String varName = identificator + " {a}";
+        final String varName = " {a}";
 
         // when
-        Optional<String> msg = testable.getProblemsWithVariableName(varName);
+        final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
         assertThat(msg.isPresent()).isTrue();
-        assertThat(msg.get()).isEqualTo("Expected to start variable with " + identificator + "{ .");
+        assertThat(msg.get()).isEqualTo("Name should start with one of [$@&] followed by {");
     }
 
     @Test
@@ -114,10 +109,10 @@ public class VariableNameRedCellEditorValidatorTest {
         final String varName = "";
 
         // when
-        Optional<String> msg = testable.getProblemsWithVariableName(varName);
+        final Optional<String> msg = testable.getProblemsWithVariableName(varName);
 
         // then
         assertThat(msg.isPresent()).isTrue();
-        assertThat(msg.get()).isEqualTo("Is not variable syntax " + identificator + "{[name]}.");
+        assertThat(msg.get()).isEqualTo("Name should match with [$@&]{name}");
     }
 }
