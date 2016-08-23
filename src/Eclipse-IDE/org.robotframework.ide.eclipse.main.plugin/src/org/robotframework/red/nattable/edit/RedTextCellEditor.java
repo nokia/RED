@@ -240,7 +240,10 @@ public class RedTextCellEditor extends TextCellEditor {
 
                 @Override
                 public void run() {
-                    getEditorControl().forceFocus();
+                    final Text editorControl = getEditorControl();
+                    if (editorControl != null && !editorControl.isDisposed()) {
+                        editorControl.forceFocus();
+                    }
                     focusListener.handleFocusChanges = true;
                 }
             });
