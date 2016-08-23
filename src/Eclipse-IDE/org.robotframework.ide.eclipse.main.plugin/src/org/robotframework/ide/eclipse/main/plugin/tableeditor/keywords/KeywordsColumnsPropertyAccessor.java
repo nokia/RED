@@ -90,7 +90,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
     @Override
     public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
 
-        final String value = newValue != null ? (String) newValue : "";
+        String value = newValue != null ? (String) newValue : "";
 
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
@@ -118,10 +118,10 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                     commandsStack.execute(new SetKeywordSettingCommentCommand(keywordCall, value));
                 }
             }
-        } else if (rowObject instanceof RobotKeywordDefinition && !value.isEmpty()) {
+        } else if (rowObject instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
             if (columnIndex == 0) {
-                commandsStack.execute(new SetKeywordDefinitionNameCommand(keywordDef, value));
+                commandsStack.execute(new SetKeywordDefinitionNameCommand(keywordDef, value.isEmpty() ? "\\" : value));
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                 commandsStack.execute(new SetKeywordDefinitionArgumentCommand(keywordDef, columnIndex - 1, value));
             }
