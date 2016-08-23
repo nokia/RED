@@ -71,10 +71,10 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
     public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
         final String value = newValue != null ? (String) newValue : "";
 
-        if (rowObject instanceof RobotCase && !value.isEmpty()) {
+        if (rowObject instanceof RobotCase) {
             final RobotCase testCase = (RobotCase) rowObject;
             if (columnIndex == 0) {
-                commandsStack.execute(new SetCaseNameCommand(testCase, value));
+                commandsStack.execute(new SetCaseNameCommand(testCase, value.isEmpty() ? "\\" : value));
             }
         } else if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall call = (RobotKeywordCall) rowObject;

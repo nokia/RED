@@ -8,7 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -17,7 +19,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
     private final RobotKeywordDefinition definition;
+
     private final int index;
+
     private final String value;
 
     public SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
@@ -27,13 +31,14 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         this.value = value;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
         RobotDefinitionSetting argumentsSetting = definition.getArgumentsSetting();
         if (argumentsSetting == null) {
             argumentsSetting = definition.createSetting(0, "[" + RobotKeywordDefinition.ARGUMENTS + "]",
-                   new ArrayList<String>(), "");
-            
+                    new ArrayList<String>(), "");
+
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
         }
 
@@ -44,29 +49,37 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             arguments.add("\\");
             changed = true;
         }
-        if (!arguments.get(index).equals(value)) {
-            arguments.remove(index);
-            if (value != null) {
-                arguments.add(index, value);
+        changed |= index < arguments.size() && !arguments.get(index).equals(value);
+        arguments.set(index, value == null || value.isEmpty() ? "\\" : value);
+        for (int i = arguments.size() - 1; i >= 0; i--) {
+            if (!arguments.get(i).equals("\\")) {
+                break;
             }
-            changed = true;
+            arguments.set(i, null);
         }
         if (changed) {
-            if(argumentsSetting.getArguments().isEmpty()) {
-                new KeywordTableModelUpdater().remove(definition.getLinkedElement(), argumentsSetting.getLinkedElement());
+            final KeywordTableModelUpdater updater = new KeywordTableModelUpdater();
+            if (value != null) {
+                for (int i = arguments.size() - 1; i >= 0; i--) {
+                    updater.update(argumentsSetting.getLinkedElement(), i, arguments.get(i));
+                }
             } else {
-                new KeywordTableModelUpdater().update(argumentsSetting.getLinkedElement(), index, value);
+                updater.update(argumentsSetting.getLinkedElement(), index, value);
             }
-            
+
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
         }
 
         boolean allAreEmpty = true;
         for (final String argument : arguments) {
-            allAreEmpty &= argument.trim().isEmpty();
+            if (argument != null)
+                allAreEmpty &= argument.trim().isEmpty();
         }
         if (allAreEmpty) {
             definition.getChildren().remove(argumentsSetting);
+            definition.getLinkedElement()
+                    .removeUnitSettings((AModelElement<UserKeyword>) argumentsSetting.getLinkedElement());
+
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, definition);
         }
     }
