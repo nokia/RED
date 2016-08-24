@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _cr2voLk0EeWzJthH3JoEWQ
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/24/16 2:44 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/24/16 3:05 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -145,7 +145,7 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select "abc.Cat" | click -default
 
 with [get-editor "tsv_test.tsv" | get-text-viewer] {
-    key-type BackSpace -times 7
+    key-type BackSpace -times 8
     key-type "M1+SPACE"
 }
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | select getVar | click -default
@@ -161,6 +161,6 @@ get-editor "tsv_test.tsv" | get-text-viewer | get-property text | equals "*** Te
     + "Variables\tspace in name/after  .py\n"
     + "Variables\tgetVar.py\n"
     + "Resource\tresources/ space.tsv\n"
-    + "Library\t getVar" | verify-true
+    + "Library\tgetVar" | verify-true
     
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
