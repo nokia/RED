@@ -135,7 +135,11 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                 }
 
                 final List<AModelElement<? extends IExecutableStepsHolder<?>>> sortedUnits = getSortedUnits(execHolder);
-                for (AModelElement<? extends IExecutableStepsHolder<?>> execElement : sortedUnits) {
+                int sortedUnitsSize = sortedUnits.size();
+                for (int sortedUnitId = 0; sortedUnitId < sortedUnitsSize; sortedUnitId++) {
+                    final AModelElement<? extends IExecutableStepsHolder<?>> execElement = sortedUnits
+                            .get(sortedUnitId);
+
                     if (!lines.isEmpty()) {
                         RobotLine lastLine = lines.get(lines.size() - 1);
                         IRobotLineElement endOfLine = lastLine.getEndOfLine();
