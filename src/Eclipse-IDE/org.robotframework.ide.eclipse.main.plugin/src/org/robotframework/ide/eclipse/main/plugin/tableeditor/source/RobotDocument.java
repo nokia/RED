@@ -30,8 +30,8 @@ public class RobotDocument extends Document {
     private static final int LIMIT = 500;
 
     private final AtomicBoolean hasNewestVersion = new AtomicBoolean(false);
-    private final Semaphore parsingSemaphore = new Semaphore(1);
-    private final Semaphore parsingFinishedSemaphore = new Semaphore(1);
+    private final Semaphore parsingSemaphore = new Semaphore(1, true);
+    private final Semaphore parsingFinishedSemaphore = new Semaphore(1, true);
     private boolean reparseInSameThread = true;
 
     private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
@@ -110,7 +110,7 @@ public class RobotDocument extends Document {
         super.fireDocumentChanged(event);
     }
 
-    private void reparse() {
+    private synchronized void reparse() {
         output = parser.parseEditorContent(get(), file);
         for (final IRobotDocumentParsingListener listener : parseListeners) {
             listener.reparsingFinished(output);
