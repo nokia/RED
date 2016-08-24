@@ -1,0 +1,131 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _9iuJED04EeaUDrMBSMf5Ag
+Element-Name: ChangingVariableType
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _llOEgGniEeaVB7Q9BJdfQg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/24/16 3:48 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n\n"
+    + "*** Variables ***\n"
+    + "${var1}    6\n"
+    + "@{VAR3}    1  2  3\n"
+    + "&{newDict}    key=value   a=b" 
+    
+//save file and go to  Variable table   
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        key-type "M1+s"
+    }
+    get-tab-folder | get-tab-item Variables | click
+}
+//set focus
+get-view Outline | get-tree | select "TestFile.robot/Variables/newDict" | click
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+    	//add new var
+        key-type Down
+        key-type Enter
+    }
+}
+//check if variable name increment correctly (previouse was in capital case)
+check-variable-row -file  "TestFile.robot" -row 4 -var "${var4}" -value ""
+    
+//change it type and name    
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Enter
+    }    
+    with [get-editbox -after [get-label Variables] -index 1] {
+        set-text "@{vaR6}"
+    }
+    //go down and add new var
+    with [get-canvas -after [get-label Variables] -index 1] {
+        //key-type Left
+        key-type Down
+        key-type Enter
+    }
+}
+
+//check if variable name increment correctly
+check-variable-row -file  "TestFile.robot" -row 5 -var "${var7}" -value ""
+
+//add value to var7
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    //add values like in dictionary
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text "a=c"
+        key-type Enter
+    }
+    //go to var7 name and change it to dict
+    get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Left -times 2
+        key-type Enter
+    }
+    //select fist char and replace to &
+    with [get-editbox -after [get-label Variables] -index 1] {
+        set-text-selection  -offset 0 -startLine 1 -endLine 1 -length 1
+        type-text "&"
+        key-type Enter
+    }
+    //escape from edit mode
+    get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_TAB_NEXT"
+    get-editbox -after [get-label Variables] -index 1 | key-type "Esc"
+    
+    //go to ${newDict}
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Up
+        key-type Left -times 2
+        key-type Up
+        key-type Enter
+    }
+    
+    //change dict to list
+    with [get-editbox -after [get-label Variables] -index 1] {
+        set-text-selection  -offset 0 -startLine 1 -endLine 1 -length 1
+        type-text "@"
+        key-type Enter
+    }
+    get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_TAB_NEXT"
+    get-editbox -after [get-label Variables] -index 1 | key-type "Esc"
+    
+    //go to "@{VAR3}"
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Up
+        key-type Left -times 2
+        key-type Enter
+    }
+    //change its type to var
+    with [get-editbox -after [get-label Variables] -index 1] {
+        set-text-selection  -offset 0 -startLine 1 -endLine 1 -length 1
+        type-text "$"
+        key-type Enter
+    }
+    get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_TAB_NEXT"
+    get-editbox -after [get-label Variables] -index 1 | key-type "Esc"
+}
+
+check-variable-row -file  "TestFile.robot" -row 1 -var "${var1}" -value "6"
+check-variable-row -file  "TestFile.robot" -row 2 -var "${VAR3}" -value "[1, 2, 3]"
+check-variable-row -file  "TestFile.robot" -row 3 -var "@{newDict}" -value "[key=value, a=b]"
+check-variable-row -file  "TestFile.robot" -row 4 -var "@{vaR6}" -value "[]"
+check-variable-row -file  "TestFile.robot" -row 5 -var "&{var7}" -value "{a = c}"
+
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
