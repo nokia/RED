@@ -90,8 +90,10 @@ public class RobotDocument extends Document {
 
     private void createParserIfNeeded() {
         if (parser == null) {
-            parser = createParser(fileModelSupplier.get());
-            file = new File(fileModelSupplier.get().getName());
+            final RobotSuiteFile suiteFile = fileModelSupplier.get();
+            parser = createParser(suiteFile);
+            file = suiteFile.getFile() == null ? new File(suiteFile.getName())
+                    : suiteFile.getFile().getLocation().toFile();
             reparse();
         }
     }

@@ -496,7 +496,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public List<VariablesFileImportReference> getVariablesFromLocalReferencedFiles() {
-        return fileOutput != null ? fileOutput.getVariablesImportReferences()
+        return fileOutput != null ? fileOutput.getVariablesImportReferences(getProject().getRobotProjectHolder())
                 : new ArrayList<VariablesFileImportReference>();
     }
 
