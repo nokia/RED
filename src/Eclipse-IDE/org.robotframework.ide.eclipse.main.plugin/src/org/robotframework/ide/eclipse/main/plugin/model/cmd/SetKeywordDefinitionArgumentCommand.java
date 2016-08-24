@@ -58,6 +58,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             arguments.set(i, null);
         }
         if (changed) {
+            argumentsSetting.resetStored();
             final KeywordTableModelUpdater updater = new KeywordTableModelUpdater();
             if (value != null) {
                 for (int i = arguments.size() - 1; i >= 0; i--) {
