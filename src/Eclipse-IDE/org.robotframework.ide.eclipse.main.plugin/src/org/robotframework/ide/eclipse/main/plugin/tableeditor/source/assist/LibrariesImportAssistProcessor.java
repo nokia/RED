@@ -70,6 +70,8 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
 
                         final String argument = library.isRemote() ? separator + library.getSecondaryKey() : "";
                         final String textToInsert = libraryName + argument;
+                        final String labelToDisplay = libraryName
+                                + (library.isRemote() ? " " + library.getSecondaryKey() : "");
 
                         final Image image = ImagesManager.getImage(RedImages.getLibraryImage());
                         
@@ -85,7 +87,7 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
                                 .secondaryPopupShouldBeDisplayed(library.getDocumentation())
                                 .thenCursorWillStopAtTheEndOfInsertion()
                                 .currentPrefixShouldBeDecorated()
-                                .displayedLabelShouldBe(textToInsert.replaceAll("  +", " ").trim())
+                                .displayedLabelShouldBe(labelToDisplay)
                                 .proposalsShouldHaveIcon(image)
                                 .labelShouldBeAugmentedWith(importedInfo)
                                 .createWithPriority(isImported ? 1 : 0);
