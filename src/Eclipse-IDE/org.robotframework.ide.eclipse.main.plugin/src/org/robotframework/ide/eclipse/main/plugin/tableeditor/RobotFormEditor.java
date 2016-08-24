@@ -398,7 +398,7 @@ public class RobotFormEditor extends FormEditor {
 
     @Override
     protected void pageChange(final int newPageIndex) {
-        if (newPageIndex != getActivePage() && getActiveEditor() instanceof ISectionEditorPart) {
+        if (newPageIndex != getCurrentPage() && getActiveEditor() instanceof ISectionEditorPart) {
             ((ISectionEditorPart) getActiveEditor()).aboutToChangeToOtherPage();
         }
         
