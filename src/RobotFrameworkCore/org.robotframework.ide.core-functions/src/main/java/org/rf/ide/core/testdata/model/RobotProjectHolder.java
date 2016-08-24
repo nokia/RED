@@ -161,7 +161,8 @@ public class RobotProjectHolder {
         public boolean matchCriteria(final RobotFileOutput robotFile) {
             boolean matchResult = false;
             if (robotFile != null) {
-                final List<VariablesFileImportReference> varImports = robotFile.getVariablesImportReferences();
+                final List<VariablesFileImportReference> varImports = robotFile
+                        .getVariablesImportReferences(RobotProjectHolder.this);
                 for (final VariablesFileImportReference variablesFileImportReference : varImports) {
                     if (variablesFileImportReference.getVariablesFile()
                             .getAbsolutePath()

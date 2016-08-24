@@ -133,7 +133,7 @@ public class VariablesImporter {
                 .findFilesWithImportedVariableFile(varFile);
         VariablesFileImportReference varImportRef = null;
         for (final RobotFileOutput rfo : filesWhichImportingVariables) {
-            final VariablesFileImportReference variableFile = findVariableFileByPath(rfo, varFile);
+            final VariablesFileImportReference variableFile = findVariableFileByPath(robotProject, rfo, varFile);
             if (variableFile != null) {
                 if (checkIfImportDeclarationAreTheSame(varImport, variableFile.getImportDeclaration())) {
                     if (varFile.lastModified() == varFile.lastModified()) {
@@ -147,9 +147,11 @@ public class VariablesImporter {
     }
 
     @VisibleForTesting
-    protected VariablesFileImportReference findVariableFileByPath(final RobotFileOutput rfo, final File varFile) {
+    protected VariablesFileImportReference findVariableFileByPath(final RobotProjectHolder robotProject,
+            final RobotFileOutput rfo, final File varFile) {
         VariablesFileImportReference varFileImportReference = null;
-        final List<VariablesFileImportReference> variablesImportReferences = rfo.getVariablesImportReferences();
+        final List<VariablesFileImportReference> variablesImportReferences = rfo
+                .getVariablesImportReferences(robotProject);
         for (final VariablesFileImportReference varFileImport : variablesImportReferences) {
             if (varFileImport.getVariablesFile().getAbsolutePath().equals(varFile.getAbsolutePath())) {
                 varFileImportReference = varFileImport;

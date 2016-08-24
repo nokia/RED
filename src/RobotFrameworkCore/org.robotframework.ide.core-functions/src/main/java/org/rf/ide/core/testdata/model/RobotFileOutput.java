@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
+import org.rf.ide.core.testdata.importer.VariablesImporter;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
@@ -35,7 +36,7 @@ public class RobotFileOutput {
 
     private final List<ResourceImportReference> resourceReferences = new ArrayList<>();
 
-    private final List<VariablesFileImportReference> variablesReferenced = new ArrayList<>();
+    private List<VariablesFileImportReference> variablesReferenced = null;
 
     private final List<BuildMessage> buildingMessages = new ArrayList<>();
 
@@ -43,7 +44,7 @@ public class RobotFileOutput {
 
     private FileFormat format = FileFormat.UNKNOWN;
 
-    private FileRegionCacher<IDocumentationHolder> docCacher;
+    private final FileRegionCacher<IDocumentationHolder> docCacher;
 
     public RobotFileOutput(final RobotVersion robotVersion) {
         this.robotVersion = robotVersion;
@@ -73,7 +74,7 @@ public class RobotFileOutput {
     public Optional<IDocumentationHolder> findDocumentationForOffset(final int offset) {
         final List<IRegionCacheable<IDocumentationHolder>> found = docCacher.findByOffset(offset);
         if (found.size() == 1) {
-            return Optional.of((IDocumentationHolder) found.get(0).getCached());
+            return Optional.of(found.get(0).getCached());
         }
 
         return Optional.absent();
@@ -82,7 +83,7 @@ public class RobotFileOutput {
     public Optional<IDocumentationHolder> findDocumentationForLine(final int lineNumber) {
         final List<IRegionCacheable<IDocumentationHolder>> found = docCacher.findByLineNumber(lineNumber);
         if (found.size() == 1) {
-            return Optional.of((IDocumentationHolder) found.get(0).getCached());
+            return Optional.of(found.get(0).getCached());
         }
 
         return Optional.absent();
@@ -191,17 +192,18 @@ public class RobotFileOutput {
         return Collections.unmodifiableList(resourceReferences);
     }
 
-    public void addVariablesReferenced(final List<VariablesFileImportReference> varsImported) {
-        for (final VariablesFileImportReference variablesFileImportReference : varsImported) {
-            addVariablesReference(variablesFileImportReference);
+    public void setVariablesImportReferences(final List<VariablesFileImportReference> varReferences) {
+        this.variablesReferenced = varReferences;
+    }
+
+    public List<VariablesFileImportReference> getVariablesImportReferences(final RobotProjectHolder robotProject) {
+        if (variablesReferenced == null) {
+            variablesReferenced = new ArrayList<>();
+
+            final List<VariablesFileImportReference> varsImported = new VariablesImporter()
+                    .importVariables(robotProject.getRobotRuntime(), robotProject, this);
+            variablesReferenced.addAll(varsImported);
         }
-    }
-
-    public void addVariablesReference(final VariablesFileImportReference varImportRef) {
-        variablesReferenced.add(varImportRef);
-    }
-
-    public List<VariablesFileImportReference> getVariablesImportReferences() {
         return Collections.unmodifiableList(variablesReferenced);
     }
 
