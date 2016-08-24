@@ -189,7 +189,7 @@ public class RobotParser {
                 final VariablesImporter varImporter = new VariablesImporter();
                 final List<VariablesFileImportReference> varsImported = varImporter
                         .importVariables(robotProject.getRobotRuntime(), robotProject, robotFile);
-                robotFile.addVariablesReferenced(varsImported);
+                robotFile.setVariablesImportReferences(varsImported);
             }
         }
     }
