@@ -30,6 +30,8 @@ import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
 import org.robotframework.ide.eclipse.main.plugin.documentation.DocumentationViewPartListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
@@ -56,6 +58,8 @@ public class DocumentationView {
     private DocumentationViewPartListener documentationViewPartListener;
 
     private CurrentlyDisplayedDocElement currentlyDisplayedDocElement;
+    
+    private boolean hasShowLibdocEnabled;
 
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part) {
@@ -94,14 +98,11 @@ public class DocumentationView {
 
     public void showDocumentation(final RobotFileInternalElement element) {
         if (element == null) {
-            resetCurrentlyDisplayedElement();
-            styledText.setText("");
+            clearView();
             return;
         }
 
-        if (currentlyDisplayedDocElement == null) {
-            currentlyDisplayedDocElement = new CurrentlyDisplayedDocElement();
-        }
+        initCurrentlyDisplayedDocElement();
 
         if (!currentlyDisplayedDocElement.isEqualTo(element)) {
             currentlyDisplayedDocElement.setRobotFileInternalElement(element);
@@ -111,14 +112,11 @@ public class DocumentationView {
 
     public void showDocumentation(final IDocumentationHolder documentationHolder, final RobotSuiteFile suiteFile) {
         if (documentationHolder == null) {
-            resetCurrentlyDisplayedElement();
-            styledText.setText("");
+            clearView();
             return;
         }
 
-        if (currentlyDisplayedDocElement == null) {
-            currentlyDisplayedDocElement = new CurrentlyDisplayedDocElement();
-        }
+        initCurrentlyDisplayedDocElement();
 
         if (!currentlyDisplayedDocElement.isEqualTo(documentationHolder)) {
             currentlyDisplayedDocElement.setDocumentationHolder(documentationHolder, suiteFile);
@@ -137,17 +135,62 @@ public class DocumentationView {
         }
     }
     
+    public void showLibdoc(final RobotFileInternalElement element) {
+        if (element == null) {
+            clearView();
+            return;
+        }
+
+        initCurrentlyDisplayedDocElement();
+
+        if (!currentlyDisplayedDocElement.isEqualTo(element)) {
+            currentlyDisplayedDocElement.setRobotFileInternalElement(element);
+            showLibdocText(element.getName(), element.getSuiteFile());
+        }
+    }
+
+    public void showLibdoc(final String elementName, final RobotSuiteFile suiteFile) {
+        if (elementName == null) {
+            clearView();
+            return;
+        }
+        showLibdocText(elementName, suiteFile);
+    }
+
+    private void showLibdocText(final String elementName, final RobotSuiteFile suiteFile) {
+        final RedKeywordProposal proposal = new RedKeywordProposals(suiteFile)
+                .getBestMatchingKeywordProposal(elementName);
+        if (proposal != null) {
+            SwtThread.asyncExec(new DocTextSetter(proposal.getDocumentation(), "", ""));
+        }
+    }
+
     @Inject
     @org.eclipse.e4.core.di.annotations.Optional
     private void refreshEvent(@UIEventTopic(REFRESH_DOC_EVENT_TOPIC) final RobotFileInternalElement element) {
         resetCurrentlyDisplayedElement();
         showDocumentation(element);
     }
+    
+    private void initCurrentlyDisplayedDocElement() {
+        if (currentlyDisplayedDocElement == null) {
+            currentlyDisplayedDocElement = new CurrentlyDisplayedDocElement();
+        }
+    }
+    
+    private void clearView() {
+        resetCurrentlyDisplayedElement();
+        SwtThread.asyncExec(new DocTextSetter());
+    }
 
     public void resetCurrentlyDisplayedElement() {
         if (currentlyDisplayedDocElement != null) {
             currentlyDisplayedDocElement.reset();
         }
+    }
+    
+    public boolean hasShowLibdocEnabled() {
+        return hasShowLibdocEnabled;
     }
 
     private void createToolbarActions(final IToolBarManager toolBarManager) {
@@ -160,6 +203,11 @@ public class DocumentationView {
         toggleWordWrapAction.setText("Word Wrap");
         toggleWordWrapAction.setImageDescriptor(RedImages.getWordwrapImage());
         toolBarManager.add(toggleWordWrapAction);
+        final ShowLibdocAction showLibdocAction = new ShowLibdocAction();
+        showLibdocAction.setChecked(false);
+        showLibdocAction.setText("Show Libdoc");
+        showLibdocAction.setImageDescriptor(RedImages.getBookImage());
+        toolBarManager.add(showLibdocAction);
     }
 
     class DocTextSetter implements Runnable {
@@ -169,6 +217,10 @@ public class DocumentationView {
         private String documentationSettingParentName;
 
         private String fileName;
+        
+        public DocTextSetter() {
+            this("", "", "");
+        }
 
         public DocTextSetter(final String documentationText, final String documentationSettingParentName,
                 final String fileName) {
@@ -181,12 +233,15 @@ public class DocumentationView {
         public void run() {
             styledText.setText("");
 
-            styledText.append(documentationSettingParentName + "\n");
-            styledText.append(fileName + "\n\n");
-            styledText.setStyleRange(new StyleRange(0, documentationSettingParentName.length(), null, null, SWT.BOLD));
-            styledText.setStyleRange(new StyleRange(documentationSettingParentName.length() + 1, fileName.length(),
-                    null, null, SWT.ITALIC));
+            if (!documentationSettingParentName.isEmpty() && !fileName.isEmpty()) {
+                styledText.append(documentationSettingParentName + "\n");
+                styledText.append(fileName + "\n\n");
 
+                styledText.setStyleRange(
+                        new StyleRange(0, documentationSettingParentName.length(), null, null, SWT.BOLD));
+                styledText.setStyleRange(new StyleRange(documentationSettingParentName.length() + 1, fileName.length(),
+                        null, null, SWT.ITALIC));
+            }
             styledText.append(documentationText);
         }
 
@@ -318,6 +373,24 @@ public class DocumentationView {
         @Override
         public void run() {
             styledText.setWordWrap(!styledText.getWordWrap());
+        }
+
+        @Override
+        public void dispose() {
+        }
+    }
+    
+    class ShowLibdocAction extends Action implements IWorkbenchAction {
+
+        private static final String ID = "org.robotframework.action.documentationView.ShowLibdocAction";
+
+        public ShowLibdocAction() {
+            setId(ID);
+        }
+
+        @Override
+        public void run() {
+            hasShowLibdocEnabled = !hasShowLibdocEnabled;
         }
 
         @Override

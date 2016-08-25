@@ -35,13 +35,16 @@ class SuiteSourceCurrentCellHighlighter {
 
     private static final String MARKER_ID = "org.robotframework.red.cellHighlighting";
 
+    private final SuiteSourceEditor editor;
+    
     private final IFile file;
 
     private final IDocument document;
 
     private IRegion currentCell;
 
-    SuiteSourceCurrentCellHighlighter(final IFile file, final IDocument document) {
+    SuiteSourceCurrentCellHighlighter(final SuiteSourceEditor editor, final IFile file, final IDocument document) {
+        this.editor = editor;
         this.file = file;
         this.document = document;
         this.currentCell = null;
@@ -78,6 +81,7 @@ class SuiteSourceCurrentCellHighlighter {
                 removeCellHighlighting();
                 highlightCell(newRegion.get());
                 currentCell = newRegion.get();
+                editor.notifyDocSelectionChangedListener(currentCell, false);
             }
         } catch (final BadLocationException | InterruptedException e) {
             RedPlugin.logError("Unable to create cell highlight markers", e);
