@@ -221,15 +221,6 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         return findSetting(TIMEOUT);
     }
 
-    private RobotDefinitionSetting findSetting(final String name) {
-        for (final RobotKeywordCall call : getChildren()) {
-            if (call instanceof RobotDefinitionSetting && call.getName().equalsIgnoreCase(name)) {
-                return (RobotDefinitionSetting) call;
-            }
-        }
-        return null;
-    }
-
     public String getDocumentation() {
         final RobotDefinitionSetting documentationSetting = getDocumentationSetting();
         if (documentationSetting != null) {

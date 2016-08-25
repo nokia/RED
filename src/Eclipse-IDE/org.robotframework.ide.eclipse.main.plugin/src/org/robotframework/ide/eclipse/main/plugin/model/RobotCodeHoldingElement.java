@@ -102,4 +102,13 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
         }
         return count;
     }
+    
+    public RobotDefinitionSetting findSetting(final String name) {
+        for (final RobotKeywordCall call : getChildren()) {
+            if (call instanceof RobotDefinitionSetting && call.getName().equalsIgnoreCase(name)) {
+                return (RobotDefinitionSetting) call;
+            }
+        }
+        return null;
+    }
 }
