@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
@@ -14,10 +16,13 @@ import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCodeHolderSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
@@ -112,7 +117,9 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                     commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
                 }
             } else {
-                if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
+                if (columnIndex == 0) {
+                    createNewElementAndRemoveOldSetting(value, keywordCall);
+                } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
                 } else if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordSettingCommentCommand(keywordCall, value));
@@ -155,6 +162,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         this.numberOfColumns = numberOfColumns;
     }
 
+    @SuppressWarnings("unchecked")
     private boolean createNewKeywordSettingAndRemoveOldExeRow(final String value, final RobotKeywordCall keywordCall) {
         final RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(value);
         if (tokenType != RobotTokenType.UNKNOWN && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS) {
@@ -171,6 +179,23 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
             return true;
         }
         return false;
+    }
+    
+    private void createNewElementAndRemoveOldSetting(final String value, final RobotKeywordCall keywordSetting) {
+        final RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(value);
+        if (!value.isEmpty() && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS) {
+            final RobotCodeHoldingElement parent = (RobotCodeHoldingElement) keywordSetting.getParent();
+            final int index = keywordSetting.getIndex();
+            commandsStack.execute(new DeleteKeywordCallCommand(newArrayList(keywordSetting)));
+
+            if (tokenType == RobotTokenType.UNKNOWN) {
+                commandsStack.execute(new CreateFreshKeywordCallCommand(parent, value, keywordSetting.getArguments(),
+                        keywordSetting.getComment(), index));
+            } else {
+                commandsStack.execute(
+                        new CreateFreshCodeHolderSettingCommand(parent, index, value, keywordSetting.getArguments()));
+            }
+        }
     }
 
     private String getDocumentationText(final RobotKeywordCall keywordCall) {
