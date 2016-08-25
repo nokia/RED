@@ -29,7 +29,9 @@ public class RedTokensStore implements ITextInputListener, IDocumentListener, IR
         }
         if (this.document == null) {
             this.document = document;
-            this.document.addDocumentListener(this);
+            // it has to know first about changes in order to update tokens, so that
+            // painting will use properly adjusted cached tokens
+            this.document.addFirstDocumentListener(this);
             this.document.addParseListener(this);
         }
     }
@@ -162,10 +164,17 @@ public class RedTokensStore implements ITextInputListener, IDocumentListener, IR
             int length = firstEntry.getLength();
             firstEntry.setLength(
                     Math.max(damageOffset - firstEntry.getOffset(), firstEntry.getLength() - toRemove));
+
+            int i = startIndex;
+            if (firstEntry.getLength() == 0
+                    && (!firstEntry.getToken().isEOF() || (i > 0 && tokens.get(i - 1).getToken().isEOF()))) {
+                tokens.remove(startIndex);
+            } else {
+                i++;
+            }
             int removedSoFar = length - firstEntry.getLength();
             toRemove -= removedSoFar;
             
-            int i = startIndex + 1;
             while (i < tokens.size()) {
                 final PositionedTextToken entry = tokens.get(i);
                 
