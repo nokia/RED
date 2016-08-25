@@ -14,6 +14,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.views.DocumentationView;
 import org.robotframework.red.viewers.Selections;
@@ -26,9 +29,9 @@ public class TableDocumentationSelectionChangedListener implements ISelectionCha
 
     private DocViewUpdateJob updateJob = new DocViewUpdateJob("Documentation View Update Job");
 
-    private RobotFileInternalElement robotFileInternalElement;
+    private RobotElement currentElementParent;
 
-    public TableDocumentationSelectionChangedListener(DocumentationView view) {
+    public TableDocumentationSelectionChangedListener(final DocumentationView view) {
         this.view = view;
     }
 
@@ -40,21 +43,61 @@ public class TableDocumentationSelectionChangedListener implements ISelectionCha
             final Optional<RobotFileInternalElement> selectedElement = Selections.getOptionalFirstElement(selection,
                     RobotFileInternalElement.class);
             if (selectedElement.isPresent() && selection.size() == 1) {
+
+                if (updateJob.getState() == Job.SLEEPING) {
+                    updateJob.cancel();
+                }
+
                 final RobotFileInternalElement robotFileInternalElement = selectedElement.get();
                 final ModelType modelType = ((AModelElement<?>) robotFileInternalElement.getLinkedElement())
                         .getModelType();
 
-                if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION
-                        || modelType == ModelType.TEST_CASE_DOCUMENTATION) {
-                    this.robotFileInternalElement = robotFileInternalElement;
-                    updateJob.schedule();
+                final DocViewUpdateType docViewUpdateType = chooseDocViewUpdateType(robotFileInternalElement,
+                        modelType);
+                scheduleUpdate(robotFileInternalElement, docViewUpdateType);
+            }
+        }
+    }
+
+    private DocViewUpdateType chooseDocViewUpdateType(final RobotFileInternalElement robotFileInternalElement,
+            final ModelType modelType) {
+        if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION || modelType == ModelType.TEST_CASE_DOCUMENTATION) {
+            currentElementParent = robotFileInternalElement.getParent();
+            return DocViewUpdateType.SETTING;
+        } else {
+            if (view.hasShowLibdocEnabled() && (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW
+                    || modelType == ModelType.TEST_CASE_EXECUTABLE_ROW)) {
+                currentElementParent = null;
+                return DocViewUpdateType.LIBDOC;
+            } else {
+
+                final RobotElement parent = modelType == ModelType.USER_KEYWORD || modelType == ModelType.TEST_CASE
+                        ? robotFileInternalElement : robotFileInternalElement.getParent();
+                if (parent != null && currentElementParent != parent) {
+                    currentElementParent = parent;
+                    return DocViewUpdateType.PARENT;
                 }
             }
         }
+        return DocViewUpdateType.UNKNOWN;
+    }
 
+    private void scheduleUpdate(final RobotFileInternalElement robotFileInternalElement,
+            final DocViewUpdateType docUpdateType) {
+        if (docUpdateType != DocViewUpdateType.UNKNOWN) {
+            updateJob.setRobotFileInternalElement(robotFileInternalElement);
+            updateJob.setDocUpdateType(docUpdateType);
+            updateJob.schedule(DocViewUpdateJob.DOCVIEW_UPDATE_JOB_DELAY);
+        }
     }
 
     class DocViewUpdateJob extends Job {
+
+        public static final int DOCVIEW_UPDATE_JOB_DELAY = 500;
+
+        private DocViewUpdateType docViewUpdateType;
+        
+        private RobotFileInternalElement robotFileInternalElement;
 
         public DocViewUpdateJob(final String name) {
             super(name);
@@ -63,8 +106,31 @@ public class TableDocumentationSelectionChangedListener implements ISelectionCha
 
         @Override
         protected IStatus run(final IProgressMonitor monitor) {
-            view.showDocumentation(robotFileInternalElement);
+            if (docViewUpdateType == DocViewUpdateType.SETTING) {
+                view.showDocumentation(robotFileInternalElement);
+            } else if (docViewUpdateType == DocViewUpdateType.LIBDOC) {
+                view.showLibdoc(robotFileInternalElement);
+            } else if (docViewUpdateType == DocViewUpdateType.PARENT && currentElementParent != null) {
+                final RobotCodeHoldingElement codeHoldingElement = (RobotCodeHoldingElement) currentElementParent;
+                final RobotDefinitionSetting docSettingFromParent = codeHoldingElement.findSetting("Documentation");
+                view.showDocumentation(docSettingFromParent);
+            }
             return Status.OK_STATUS;
         }
+
+        public void setDocUpdateType(final DocViewUpdateType docViewUpdateType) {
+            this.docViewUpdateType = docViewUpdateType;
+        }
+        
+        public void setRobotFileInternalElement(final RobotFileInternalElement robotFileInternalElement) {
+            this.robotFileInternalElement = robotFileInternalElement;
+        }
+    }
+
+    private enum DocViewUpdateType {
+        SETTING,
+        LIBDOC,
+        PARENT,
+        UNKNOWN
     }
 }

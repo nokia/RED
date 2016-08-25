@@ -5,11 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.documentation;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -26,9 +30,11 @@ public class SourceDocumentationSelectionChangedListener {
 
     private IDocument document;
 
-    private int offset;
-    
-    private boolean shouldRefreshCurrentDoc;
+    private IRegion currentRegion;
+
+    private boolean isEditing;
+
+    private Pattern possibleKeywordPattern = Pattern.compile("^[A-Za-z].*");
 
     private DocViewDelayedUpdateJob delayedUpdateJob = new DocViewDelayedUpdateJob(
             "Documentation View Delayed Update Job");
@@ -37,8 +43,8 @@ public class SourceDocumentationSelectionChangedListener {
         this.view = view;
     }
 
-    public void positionChanged(final IDocument document, final RobotSuiteFile suiteFile, final int offset,
-            final boolean shouldRefreshCurrentDoc) {
+    public void positionChanged(final IDocument document, final RobotSuiteFile suiteFile, final IRegion region,
+            final boolean isEditing) {
 
         if (delayedUpdateJob.getState() == Job.SLEEPING) {
             delayedUpdateJob.cancel();
@@ -46,8 +52,8 @@ public class SourceDocumentationSelectionChangedListener {
 
         this.document = document;
         this.suiteFile = suiteFile;
-        this.offset = offset;
-        this.shouldRefreshCurrentDoc = shouldRefreshCurrentDoc;
+        this.currentRegion = region;
+        this.isEditing = isEditing;
 
         delayedUpdateJob.schedule(DocViewDelayedUpdateJob.DELAY);
     }
@@ -67,19 +73,39 @@ public class SourceDocumentationSelectionChangedListener {
             if (linkedFile == null && document != null) {
                 linkedFile = ((RobotDocument) document).getNewestModel();
             }
-            if (linkedFile != null) {
-                final Optional<IDocumentationHolder> docToShow = linkedFile.getParent()
-                        .findDocumentationForOffset(offset);
 
-                if (docToShow.isPresent()) {
-                    if (shouldRefreshCurrentDoc) {
+            if (linkedFile != null) {
+                final Optional<IDocumentationHolder> docSettingToShow = linkedFile.getParent()
+                        .findDocumentationForOffset(currentRegion.getOffset());
+
+                if (docSettingToShow.isPresent()) {
+                    if (isEditing) {
                         view.resetCurrentlyDisplayedElement();
                     }
-                    view.showDocumentation(docToShow.get(), suiteFile);
+                    view.showDocumentation(docSettingToShow.get(), suiteFile);
+
+                } else if (shouldTryToFindKeywordDoc()) {
+                    try {
+                        final String textFromCurrentRegion = document.get(currentRegion.getOffset(),
+                                currentRegion.getLength());
+                        if (isPossibleKeyword(textFromCurrentRegion)) {
+                            view.showLibdoc(textFromCurrentRegion, suiteFile);
+                        }
+                    } catch (final BadLocationException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
             return Status.OK_STATUS;
+        }
+
+        private boolean shouldTryToFindKeywordDoc() {
+            return currentRegion != null && view.hasShowLibdocEnabled() && !isEditing;
+        }
+
+        private boolean isPossibleKeyword(final String text) {
+            return possibleKeywordPattern.matcher(text).matches();
         }
     }
 

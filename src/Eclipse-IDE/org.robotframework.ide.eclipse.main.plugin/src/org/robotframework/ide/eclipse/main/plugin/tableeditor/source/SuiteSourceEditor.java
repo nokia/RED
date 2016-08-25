@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewerExtension;
 import org.eclipse.jface.text.reconciler.IReconciler;
 import org.eclipse.jface.text.source.ISourceViewer;
@@ -60,8 +61,6 @@ public class SuiteSourceEditor extends TextEditor {
     private static final String SOURCE_PART_CONTEXT_ID = "org.robotframework.ide.eclipse.tableeditor.sources.context";
 
     private SourceDocumentationSelectionChangedListener sourceDocSelectionChangedListener = null;
-
-    private int lastLength = -1;
 
     @Inject
     @Named(RobotEditorSources.SUITE_FILE_MODEL)
@@ -112,7 +111,7 @@ public class SuiteSourceEditor extends TextEditor {
         final ProjectionViewer viewer = (ProjectionViewer) getSourceViewer();
 
         installProjectionAndFolding(viewer);
-        new SuiteSourceCurrentCellHighlighter(fileModel.getFile(), viewer.getDocument()).install(viewer);
+        new SuiteSourceCurrentCellHighlighter(this, fileModel.getFile(), viewer.getDocument()).install(viewer);
         new SuiteSourceOccurrenceMarksHighlighter(fileModel.getFile(), viewer.getDocument()).install(viewer);
         installBreakpointTogglingOnDoubleClick();
         installStatusBarUpdater(viewer);
@@ -156,7 +155,6 @@ public class SuiteSourceEditor extends TextEditor {
             public void caretMoved(final CaretEvent event) {
                 updateLineLocationStatusBar(event.caretOffset);
                 updateLineDelimitersStatus();
-                notifyDocSelectionChangedListener(event.caretOffset);
             }
         });
     }
@@ -185,21 +183,6 @@ public class SuiteSourceEditor extends TextEditor {
                 .find(RobotFormEditorActionBarContributor.DELIMITERS_INFO_ID);
         final String delimiter = DocumentUtilities.getDelimiter(document);
         find.setText("\r\n".equals(delimiter) ? "CR+LF" : "LF");
-    }
-    
-    public void notifyDocSelectionChangedListener(final int offset) {
-        if (sourceDocSelectionChangedListener != null && isDocumentLengthNotChanged()) {
-            sourceDocSelectionChangedListener.positionChanged(getDocument(), getFileModel(), offset, false);
-            updateLastDocumentLength();
-        }
-    }
-
-    public void updateLastDocumentLength() {
-        this.lastLength = getDocument().getLength();
-    }
-
-    private boolean isDocumentLengthNotChanged() {
-        return lastLength == getDocument().getLength() || lastLength == -1;
     }
 
     private void installBreakpointTogglingOnDoubleClick() {
@@ -355,6 +338,12 @@ public class SuiteSourceEditor extends TextEditor {
     public void disableReconcilation() {
         final IReconciler reconciler = getSourceViewerConfiguration().getReconciler(getSourceViewer());
         reconciler.uninstall();
+    }
+
+    public void notifyDocSelectionChangedListener(final IRegion region, final boolean isEditing) {
+        if (sourceDocSelectionChangedListener != null) {
+            sourceDocSelectionChangedListener.positionChanged(getDocument(), getFileModel(), region, isEditing);
+        }
     }
     
     public void setSourceDocSelectionChangedListener(final SourceDocumentationSelectionChangedListener listener) {
