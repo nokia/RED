@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -44,21 +45,24 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
         if (!(activeWindow.getActivePage().getActiveEditor() instanceof RobotFormEditor)) {
             return new IContributionItem[0];
         }
-
-        final StructuredSelection selection = (StructuredSelection) activeWindow.getSelectionService().getSelection();
-
-        RobotCase testCase = null;
-        Object firstElement = selection.getFirstElement();
-        if(firstElement instanceof RobotKeywordCall) {
-            firstElement = ((RobotKeywordCall) firstElement).getParent();
-        }
-        if(firstElement instanceof RobotCase) {
-            testCase = (RobotCase) firstElement;
-        }
         final List<IContributionItem> contributedItems = new ArrayList<>();
-        if (testCase != null) {
-            contributeBefore(contributedItems);
-            contributedItems.add(createCurrentCaseItem(activeWindow, testCase));
+        final ISelection selection = activeWindow.getSelectionService().getSelection();
+        if (selection != null && selection instanceof StructuredSelection && !selection.isEmpty()) {
+            final StructuredSelection structuredSelection = (StructuredSelection) selection;
+
+            RobotCase testCase = null;
+            Object firstElement = structuredSelection.getFirstElement();
+            if (firstElement instanceof RobotKeywordCall) {
+                firstElement = ((RobotKeywordCall) firstElement).getParent();
+            }
+            if (firstElement instanceof RobotCase) {
+                testCase = (RobotCase) firstElement;
+            }
+
+            if (testCase != null) {
+                contributeBefore(contributedItems);
+                contributedItems.add(createCurrentCaseItem(activeWindow, testCase));
+            }
         }
         return contributedItems.toArray(new IContributionItem[0]);
     }
