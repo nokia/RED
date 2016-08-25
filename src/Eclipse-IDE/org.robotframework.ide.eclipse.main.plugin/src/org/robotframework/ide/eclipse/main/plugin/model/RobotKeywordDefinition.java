@@ -72,6 +72,9 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
         final RobotExecutableRow<UserKeyword> robotExecutableRow = new RobotExecutableRow<>();
         robotExecutableRow.setParent(getLinkedElement());
         robotExecutableRow.setAction(RobotToken.create(name));
+        for (int i = 0; i < args.size(); i++) {
+            robotExecutableRow.setArgument(i, args.get(i));
+        }
 
         final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
 
