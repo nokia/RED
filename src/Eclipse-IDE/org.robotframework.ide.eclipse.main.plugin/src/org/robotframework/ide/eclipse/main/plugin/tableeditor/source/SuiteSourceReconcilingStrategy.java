@@ -70,7 +70,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
     public void reconcile(final DirtyRegion dirtyRegion, final IRegion subRegion) {
         reconcile();
 
-        notifyDocSelectionChangedListener(dirtyRegion.getOffset());
+        editor.notifyDocSelectionChangedListener(dirtyRegion, true);
     }
 
     @Override
@@ -165,12 +165,5 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
                 }
             }
         };
-    }
-    
-    private void notifyDocSelectionChangedListener(final int offset) {
-        if (editor.getSourceDocSelectionChangedListener() != null) {
-            editor.getSourceDocSelectionChangedListener().positionChanged(editor.getDocument(), editor.getFileModel(), offset, true);
-            editor.updateLastDocumentLength();
-        }
     }
 }
