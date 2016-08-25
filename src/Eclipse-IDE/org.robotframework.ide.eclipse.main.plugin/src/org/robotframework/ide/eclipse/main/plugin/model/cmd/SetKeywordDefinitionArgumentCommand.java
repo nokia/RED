@@ -35,6 +35,9 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
         RobotDefinitionSetting argumentsSetting = definition.getArgumentsSetting();
+        if (argumentsSetting == null && value.isEmpty()) {
+            return;
+        }
         if (argumentsSetting == null) {
             argumentsSetting = definition.createSetting(0, "[" + RobotKeywordDefinition.ARGUMENTS + "]",
                     new ArrayList<String>(), "");
@@ -73,8 +76,9 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
         boolean allAreEmpty = true;
         for (final String argument : arguments) {
-            if (argument != null)
+            if (argument != null) {
                 allAreEmpty &= argument.trim().isEmpty();
+            }
         }
         if (allAreEmpty) {
             definition.getChildren().remove(argumentsSetting);
