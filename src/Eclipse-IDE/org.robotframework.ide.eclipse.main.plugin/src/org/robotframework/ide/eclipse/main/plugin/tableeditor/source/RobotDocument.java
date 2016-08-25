@@ -12,8 +12,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
+import org.eclipse.jface.text.IDocumentListener;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -59,6 +61,21 @@ public class RobotDocument extends Document {
         };
         this.parser = parser;
         this.file = file;
+    }
+
+    public void addFirstDocumentListener(final IDocumentListener documentListener) {
+        Assert.isNotNull(documentListener);
+
+        final List<IDocumentListener> allListeners = new ArrayList<>();
+        allListeners.add(documentListener);
+
+        for (final Object listener : getDocumentListeners()) {
+            allListeners.add((IDocumentListener) listener);
+            removeDocumentListener((IDocumentListener) listener);
+        }
+        for (final IDocumentListener listener : allListeners) {
+            addDocumentListener(listener);
+        }
     }
 
     public void addParseListener(final IRobotDocumentParsingListener listener) {

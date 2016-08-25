@@ -77,16 +77,32 @@ public class RedCachingScanner implements ITokenScanner {
         } else if (entries.size() > 1 && currentOffset == rangeOffset) {
             // there is eof from previous section and also cached token from current section begin
             token = entries.get(1).getToken();
-            lastTokenPosition = entries.get(1).getPosition();
+            lastTokenPosition = cropPositionToCurrentRange(entries.get(1).getPosition());
 
         } else {
             // just return cached entry
             token = entries.get(0).getToken();
-            lastTokenPosition = entries.get(0).getPosition();
+            lastTokenPosition = cropPositionToCurrentRange(entries.get(0).getPosition());
         }
         currentOffset = lastTokenPosition.getOffset() + lastTokenPosition.getLength();
 
         return token;
+    }
+
+    private Position cropPositionToCurrentRange(final Position position) {
+        // we need to crop the position when cached token begins before current range or ends after it
+        final Position positionCopy = new Position(position.getOffset(), position.getLength());
+
+        if (rangeOffset > positionCopy.getOffset()) {
+            positionCopy.setLength(positionCopy.getLength() - (rangeOffset - positionCopy.getOffset()));
+            positionCopy.setOffset(rangeOffset);
+        }
+
+        final int delta = positionCopy.getOffset() + positionCopy.getLength() - (rangeOffset + rangeLength);
+        if (delta > 0) {
+            positionCopy.setLength(positionCopy.getLength() - delta);
+        }
+        return positionCopy;
     }
 
     @Override
