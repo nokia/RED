@@ -3119,10 +3119,6 @@
              </parameter>
           </command>
        </menu>
-       <separator
-             name="run"
-             visible="true">
-       </separator>
        <dynamic
                class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunTestFromTableDynamicMenuItem"
                id="org.robotframework.red.menu.dynamic.table.run">
