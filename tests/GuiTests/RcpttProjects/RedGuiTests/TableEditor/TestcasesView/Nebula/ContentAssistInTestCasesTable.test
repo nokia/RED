@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mnMpkGhbEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/22/16 5:09 PM
+Save-Time: 8/25/16 10:38 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -81,15 +81,14 @@ get-window -class ContentProposalPopup | get-table |  get-property itemCount -ra
 }
 
 //select KW
-with [get-window -class ContentProposalPopup | get-table] {
-    select "Continue For Loop - BuiltIn" | key-type Enter
-    click -default
-}
+//open on  more time cell and select from list kw
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 |  key-type "M1+SPACE"
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Down -times 3
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter -times 2
 
-//add first kw - Call Method and accept
-get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
 
-//check if info about content assist is shown
+//check if info about content assist is shown in next cell
 get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 
     | get-property "decorators[0].description" | equals "Press Ctrl+Space for content assist" | verify-true
  
@@ -107,12 +106,11 @@ with [get-window -class ContentProposalPopup | get-table] {
 }
 
 //select ${EXECDIR}
-with [get-window -class ContentProposalPopup | get-table] {
-    select "${EXECDIR}" | key-type Enter
-    click -default
-}
-
-get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
+//open on  more time cell and select from list kw
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Enter
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 |  key-type "M1+SPACE"
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Down -times 8
+get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter -times 2
 
 //add next args
 with [get-editor "TestFile.robot"] {
@@ -224,20 +222,25 @@ with [get-editor "TestFile.robot"] {
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
         type-text sho
         key-type "M1+SPACE"
-        key-type Enter -times 2
+        wait 200
+        key-type Enter
+        wait 500
+        key-type Enter
     }
 }
 
 //add new line with variable
 
 get-view Outline | get-tree | select "TestFile.robot/Test Cases/new test/Should Be Empty" | click
-wait 200
+wait 300
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
         key-type Right
         key-type Down
         key-type Left
-        key-type Enter -times 2
+        key-type Enter 
+        wait 200
+        key-type Enter
     }
     //seet in first column Log
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
@@ -248,7 +251,9 @@ with [get-editor "TestFile.robot"] {
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
         type-text "${Deb"
         key-type "M1+SPACE"
-        key-type Enter -times 2
+        key-type Enter
+        wait 200
+        key-type Enter
     }
 }
 
