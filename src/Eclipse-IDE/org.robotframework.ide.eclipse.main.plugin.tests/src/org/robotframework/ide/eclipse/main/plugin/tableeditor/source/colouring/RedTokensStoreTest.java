@@ -31,7 +31,7 @@ public class RedTokensStoreTest {
         store.installFor(doc1);
         store.installFor(doc1);
 
-        verify(doc1, times(1)).addDocumentListener(any(IDocumentListener.class));
+        verify(doc1, times(1)).addFirstDocumentListener(any(IDocumentListener.class));
         verify(doc1, times(1)).addParseListener(any(IRobotDocumentParsingListener.class));
     }
 
@@ -56,9 +56,9 @@ public class RedTokensStoreTest {
 
         store.installFor(doc2);
 
-        verify(doc1, times(1)).addDocumentListener(any(IDocumentListener.class));
+        verify(doc1, times(1)).addFirstDocumentListener(any(IDocumentListener.class));
         verify(doc1, times(1)).addParseListener(any(IRobotDocumentParsingListener.class));
-        verify(doc2, times(1)).addDocumentListener(any(IDocumentListener.class));
+        verify(doc2, times(1)).addFirstDocumentListener(any(IDocumentListener.class));
         verify(doc2, times(1)).addParseListener(any(IRobotDocumentParsingListener.class));
     }
 
