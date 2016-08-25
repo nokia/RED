@@ -33,7 +33,7 @@ public class RobotExecutableRowView {
         this.specialTokens = specialTokens;
     }
 
-    public static <T extends IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>> RobotExecutableRowView buildView(
+    public static <T extends IExecutableStepsHolder<?>> RobotExecutableRowView buildView(
             final RobotExecutableRow<T> execRowOne) {
         final ListMultimap<RobotToken, RobotToken> specialTokens = ArrayListMultimap.create();
 
