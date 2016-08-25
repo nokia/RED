@@ -48,10 +48,11 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
         final StructuredSelection selection = (StructuredSelection) activeWindow.getSelectionService().getSelection();
 
         RobotCase testCase = null;
-        final Object firstElement = selection.getFirstElement();
+        Object firstElement = selection.getFirstElement();
         if(firstElement instanceof RobotKeywordCall) {
-            testCase = (RobotCase) ((RobotKeywordCall) firstElement).getParent();
-        } else if(firstElement instanceof RobotCase) {
+            firstElement = ((RobotKeywordCall) firstElement).getParent();
+        }
+        if(firstElement instanceof RobotCase) {
             testCase = (RobotCase) firstElement;
         }
         final List<IContributionItem> contributedItems = new ArrayList<>();
