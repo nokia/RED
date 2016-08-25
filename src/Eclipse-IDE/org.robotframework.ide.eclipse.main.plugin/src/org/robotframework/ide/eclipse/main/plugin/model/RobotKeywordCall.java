@@ -23,7 +23,6 @@ import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRowView;
@@ -61,10 +60,11 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
     @Override
     public String getName() {
         final ModelType modelType = linkedElement.getModelType();
-        if (modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+        if ((modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW)
+                && linkedElement.getClass() == RobotExecutableRow.class) {
             @SuppressWarnings("unchecked")
-            RobotExecutableRowView view = RobotExecutableRowView.buildView(
-                    (RobotExecutableRow<? extends IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>>) linkedElement);
+            RobotExecutableRowView view = RobotExecutableRowView
+                    .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
             if (wasNotUpdatedWithAssignment()) {
                 linkedElement.getDeclaration().setText(view.getTokenRepresentation(linkedElement.getDeclaration()));
             }
@@ -74,8 +74,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     private boolean wasNotUpdatedWithAssignment() {
         final RobotToken declaration = linkedElement.getDeclaration();
-        return !declaration.isDirty()
-                && !linkedElement.getDeclaration().getText().trim().endsWith("=");
+        return !declaration.isDirty() && !linkedElement.getDeclaration().getText().trim().endsWith("=");
     }
 
     public String getLabel() {
@@ -139,8 +138,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
             final ModelType modelType = linkedElement.getModelType();
             if (modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
                 @SuppressWarnings("unchecked")
-                RobotExecutableRowView view = RobotExecutableRowView.buildView(
-                        (RobotExecutableRow<? extends IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>>>) linkedElement);
+                RobotExecutableRowView view = RobotExecutableRowView
+                        .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
                 arguments = newArrayList(transform(tokensWithoutComments, tokenViaExecutableView(view)));
             } else {
                 arguments = newArrayList(transform(tokensWithoutComments, TokenFunctions.tokenToString()));
