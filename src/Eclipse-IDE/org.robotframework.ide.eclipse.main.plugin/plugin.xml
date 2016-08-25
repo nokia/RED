@@ -1333,6 +1333,16 @@
              optional="false">
        </commandParameter>
     </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.runSingleTestFromTable"
+          name="Run single test">
+       <commandParameter
+             id="org.robotframework.red.runSingleTestFromTable.mode"
+             name="Mode"
+             optional="false">
+       </commandParameter>
+    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -1784,6 +1794,15 @@
             </reference>
           </or>
        </enabledWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunTestHandler"
+          commandId="org.robotframework.red.runSingleTestFromTable">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.casesPartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
     </handler>
  </extension>
  <extension
@@ -2832,6 +2851,26 @@
              value="DEBUG">
        </parameter>
     </key>
+    <key
+          commandId="org.robotframework.red.runSingleTestFromTable"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M3+R">
+       <parameter
+             id="org.robotframework.red.runSingleTestFromTable.mode"
+             value="RUN">
+       </parameter>
+    </key>
+    <key
+          commandId="org.robotframework.red.runSingleTestFromTable"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M3+M1+R">
+       <parameter
+             id="org.robotframework.red.runSingleTestFromTable.mode"
+             value="DEBUG">
+       </parameter>
+    </key>
  </extension>
  <extension
        point="org.eclipse.ui.menus">
@@ -3080,6 +3119,36 @@
              </parameter>
           </command>
        </menu>
+       <separator
+             name="run"
+             visible="true">
+       </separator>
+       <dynamic
+               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunTestFromTableDynamicMenuItem"
+               id="org.robotframework.red.menu.dynamic.table.run">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+		</dynamic>
+        <dynamic
+               class="org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.RunTestFromTableInDebugDynamicMenuItem"
+               id="org.robotframework.red.menu.dynamic.table.debug">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+            </visibleWhen>
+		</dynamic>
     </menuContribution>
     <menuContribution
           allPopups="false"

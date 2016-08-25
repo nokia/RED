@@ -3,44 +3,41 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jface.action.IContributionItem;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.CompoundContributionItem;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.services.IServiceLocator;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RunTestDynamicMenuItem;
 
-public class RunTestDynamicMenuItem extends CompoundContributionItem {
+public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
 
-    private static final String RUN_TEST_COMMAND_ID = "org.robotframework.red.runSingleTestFromSource";
+    private static final String RUN_TEST_COMMAND_ID = "org.robotframework.red.runSingleTestFromTable";
 
     static final String RUN_TEST_COMMAND_MODE_PARAMETER = RUN_TEST_COMMAND_ID + ".mode";
 
     private final String id;
 
-    public RunTestDynamicMenuItem() {
-        this("org.robotframework.red.menu.dynamic.source.run");
+    public RunTestFromTableDynamicMenuItem() {
+        this("org.robotframework.red.menu.dynamic.table.run");
     }
 
-    public RunTestDynamicMenuItem(final String id) {
+    public RunTestFromTableDynamicMenuItem(final String id) {
         this.id = id;
     }
-
+    
     @Override
     protected IContributionItem[] getContributionItems() {
         final IWorkbenchWindow activeWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
@@ -48,21 +45,21 @@ public class RunTestDynamicMenuItem extends CompoundContributionItem {
             return new IContributionItem[0];
         }
 
-        final ITextSelection selection = (ITextSelection) activeWindow.getSelectionService().getSelection();
-        final RobotFormEditor suiteEditor = (RobotFormEditor) activeWindow.getActivePage().getActiveEditor();
-        final RobotSuiteFile suiteModel = suiteEditor.provideSuiteModel();
+        final StructuredSelection selection = (StructuredSelection) activeWindow.getSelectionService().getSelection();
 
-        final RobotCase testCase = RunTestHandler.getTestCase(suiteModel, selection.getOffset());
+        RobotCase testCase = null;
+        final Object firstElement = selection.getFirstElement();
+        if(firstElement instanceof RobotKeywordCall) {
+            testCase = (RobotCase) ((RobotKeywordCall) firstElement).getParent();
+        } else if(firstElement instanceof RobotCase) {
+            testCase = (RobotCase) firstElement;
+        }
         final List<IContributionItem> contributedItems = new ArrayList<>();
         if (testCase != null) {
             contributeBefore(contributedItems);
             contributedItems.add(createCurrentCaseItem(activeWindow, testCase));
         }
         return contributedItems.toArray(new IContributionItem[0]);
-    }
-
-    protected void contributeBefore(final List<IContributionItem> contributedItems) {
-        contributedItems.add(new Separator());
     }
 
     protected IContributionItem createCurrentCaseItem(final IServiceLocator serviceLocator, final RobotCase testCase) {
@@ -76,11 +73,4 @@ public class RunTestDynamicMenuItem extends CompoundContributionItem {
         return new CommandContributionItem(contributionParameters);
     }
 
-    protected String getModeName() {
-        return "Run";
-    }
-
-    protected ImageDescriptor getImageDescriptor() {
-        return RedImages.getExecuteRunImage();
-    }
 }
