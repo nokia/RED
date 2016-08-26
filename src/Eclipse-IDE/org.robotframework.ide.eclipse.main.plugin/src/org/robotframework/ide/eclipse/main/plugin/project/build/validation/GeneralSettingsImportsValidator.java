@@ -170,7 +170,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
 
     static class LibraryImportValidator extends GeneralSettingsImportsValidator {
 
-        private Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer;
+        private final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer;
         
         public LibraryImportValidator(final FileValidationContext validationContext, final RobotSuiteFile suiteFile,
                 final List<LibraryImport> imports, final ProblemsReportingStrategy reporter,
@@ -199,7 +199,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         @Override
         protected void validatePathImport(final AImported imported, final String path, final RobotToken pathToken,
                 final boolean isParametrized, final IProgressMonitor monitor) throws CoreException {
-            if (PathsResolver.hasNotEscapedWindowsPathSeparator(path)) {
+            if (PathsResolver.hasNotEscapedWindowsPathSeparator(pathToken.getText())) {
                 final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.INVALID_WINDOWS_LIBRARY_PATH);
                 reporter.handleProblem(problem, validationContext.getFile(), pathToken);
                 return;
