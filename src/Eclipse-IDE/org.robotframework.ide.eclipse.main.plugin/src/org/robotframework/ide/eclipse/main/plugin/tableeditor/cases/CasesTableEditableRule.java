@@ -16,7 +16,7 @@ import org.robotframework.red.nattable.configs.SuiteModelEditableRule;
  */
 public class CasesTableEditableRule extends SuiteModelEditableRule {
 
-    protected CasesTableEditableRule(boolean isEditable) {
+    private CasesTableEditableRule(final boolean isEditable) {
         super(isEditable);
     }
 
@@ -27,6 +27,6 @@ public class CasesTableEditableRule extends SuiteModelEditableRule {
     @Override
     public boolean isEditable(final ILayerCell cell, final IConfigRegistry configRegistry) {
         return super.isEditable(cell, configRegistry) && !cell.getConfigLabels()
-                .hasLabel(CasesElementsLabelAccumulator.CASE_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
+                .hasLabel(CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL);
     }
 }

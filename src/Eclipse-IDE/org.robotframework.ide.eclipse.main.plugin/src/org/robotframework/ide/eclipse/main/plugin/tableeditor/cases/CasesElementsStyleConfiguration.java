@@ -51,22 +51,21 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
         final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
-
         final Style caseStyle = createStyle(preferences, SyntaxHighlightingCategory.DEFINITION);
         final Style settingStyle = createStyle(preferences, SyntaxHighlightingCategory.SETTING);
         // final Style callStyle = createStyle(preferences,
         // SyntaxHighlightingCategory.KEYWORD_CALL);
-
+        
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.SELECT,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
-
+        
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, caseStyle, DisplayMode.SELECT,
                 CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
-
+        
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_SETTING_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, settingStyle, DisplayMode.SELECT,
@@ -77,7 +76,7 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
         // configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_STYLE, callStyle,
         // DisplayMode.SELECT,
         // CasesElementsInTreeLabelAccumulator.CASE_CALL_CONFIG_LABEL);
-
+        
         final ImageDescriptor caseImage = isEditable ? RedImages.getTestCaseImage()
                 : RedImages.getGreyedImage(RedImages.getTestCaseImage());
         final ImageDescriptor templatedCaseImage = isEditable ? RedImages.getTemplatedTestCaseImage()
@@ -87,16 +86,14 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
         final ICellPainter templatedCaseCellPainter = new CellPainterDecorator(
                 new SearchMatchesTextPainter(matchesSupplier, 2), CellEdgeEnum.LEFT,
                 new ImagePainter(ImagesManager.getImage(templatedCaseImage)));
-
+        
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, caseCellPainter, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, templatedCaseCellPainter,
                 DisplayMode.NORMAL, CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
-
-        final ICellPainter inactiveCellPainter = new CellPainterDecorator(new InactiveCellPainter(), CellEdgeEnum.LEFT,
-                new ImagePainter());
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, inactiveCellPainter,
-                DisplayMode.NORMAL, CasesElementsLabelAccumulator.CASE_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
+        
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new InactiveCellPainter(),
+                DisplayMode.NORMAL, CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL);
     }
 
     private Style createStyle(final RedPreferences preferences, final SyntaxHighlightingCategory category) {
