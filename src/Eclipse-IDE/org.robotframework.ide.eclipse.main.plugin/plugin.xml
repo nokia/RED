@@ -1343,6 +1343,16 @@
              optional="false">
        </commandParameter>
     </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.undoInTable"
+          name="Undo">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.redoInTable"
+          name="Redo">
+    </command>
  </extension>
  <extension
        point="org.eclipse.ui.handlers">
@@ -1500,6 +1510,24 @@
          <reference
                definitionId="org.robotframework.editorContextIsActive">
          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.UndoHandler"
+          commandId="org.robotframework.ide.eclipse.undoInTable">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.RedoHandler"
+          commandId="org.robotframework.ide.eclipse.redoInTable">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
        </activeWhen>
     </handler>
  </extension>
@@ -2870,6 +2898,18 @@
              id="org.robotframework.red.runSingleTestFromTable.mode"
              value="DEBUG">
        </parameter>
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.undoInTable"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+Z">
+    </key>
+    <key
+          commandId="org.robotframework.ide.eclipse.redoInTable"
+          contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+Y">
     </key>
  </extension>
  <extension
