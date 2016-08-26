@@ -466,6 +466,7 @@ public class RobotProject extends RobotContainer {
         final Map<String, String> knownVariables = newHashMap();
         knownVariables.put("${/}", File.separator);
         knownVariables.put("${curdir}", ".");
+        knownVariables.put("${space}", " ");
         final IPath projectLocationPath = getProject().getLocation();
         if(projectLocationPath != null) {
             final String projectLocation = projectLocationPath.toPortableString();
