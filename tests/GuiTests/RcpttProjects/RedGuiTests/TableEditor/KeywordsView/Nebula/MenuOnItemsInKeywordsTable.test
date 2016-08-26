@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _46WUAFTXEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/24/16 4:39 PM
+Save-Time: 8/26/16 10:28 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -74,7 +74,6 @@ proc "check-menu-for-kw" [val is_child_kw_row false] [val is_move_enabled true]{
 	    //additional menu Open declaration
 	    with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
 		    get-property "getMenu().getItems().MenuItem[13].isEnabled()" | equals true | verify-true
-		    get-property "getMenu().getItems().MenuItem[13].getToolTipText()" | equals "Open declaration" | verify-true
 		    get-property "getMenu().getItems().MenuItem[13].getText()" | equals "Open Declaration" | verify-true
 		    
 		    get-property "getMenu().getItems().MenuItem[14].getText()" | equals "References" | verify-true
@@ -92,11 +91,9 @@ proc "check-menu-for-kw" [val is_child_kw_row false] [val is_move_enabled true]{
 	}
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
 	    get-property "getMenu().getItems().MenuItem[0].isEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[0].getToolTipText()" | equals "Add new element" | verify-true
 	    get-property "getMenu().getItems().MenuItem[0].getText()" | equals "Add new keyword\\9M1+N" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[1].isEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[1].getToolTipText()" | equals "Add new line" | verify-true
 	    get-property "getMenu().getItems().MenuItem[1].getText()" | equals "Add new line\\9M1+L" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[2].getStyle()" | equals "[SEPARATOR]" | verify-true
@@ -108,19 +105,15 @@ proc "check-menu-for-kw" [val is_child_kw_row false] [val is_move_enabled true]{
 	    get-property "getMenu().getItems().MenuItem[4].getStyle()" | equals "[SEPARATOR]" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[5].isEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[5].getToolTipText()" | equals Cut | verify-true
 	    get-property "getMenu().getItems().MenuItem[5].getText()" | equals "Cut\\9M1+X" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[6].getEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[6].getToolTipText()" | equals Copy | verify-true
 	    get-property "getMenu().getItems().MenuItem[6].getText()" | equals "Copy\\9M1+C" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[7].isEnabled()" | equals false | verify-true
-	    get-property "getMenu().getItems().MenuItem[7].getToolTipText()" | equals Paste | verify-true
 	    get-property "getMenu().getItems().MenuItem[7].getText()" | equals "Paste\\9M1+V" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[8].isEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[8].getToolTipText()" | equals Delete | verify-true
 	    get-property "getMenu().getItems().MenuItem[8].getText()" | equals "Delete\\9Delete" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[9].getStyle()" | equals "[SEPARATOR]" | verify-true
@@ -130,9 +123,16 @@ proc "check-menu-for-kw" [val is_child_kw_row false] [val is_move_enabled true]{
 	    get-property "getMenu().getItems().MenuItem[11].getText()" | equals "Row" | verify-true
 	    
 	     get-property "getMenu().getItems().MenuItem[12].getStyle()" | equals "[SEPARATOR]"  | verify-true
-	 
-	    	
 	}    
+	
+	if [$is_product | eq true]{
+		get-property "getMenu().getItems().MenuItem[0].getToolTipText()" | equals "Add new element" | verify-true
+		get-property "getMenu().getItems().MenuItem[1].getToolTipText()" | equals "Add new line" | verify-true
+		get-property "getMenu().getItems().MenuItem[5].getToolTipText()" | equals Cut | verify-true
+		get-property "getMenu().getItems().MenuItem[6].getToolTipText()" | equals Copy | verify-true
+		get-property "getMenu().getItems().MenuItem[7].getToolTipText()" | equals Paste | verify-true
+		get-property "getMenu().getItems().MenuItem[8].getToolTipText()" | equals Delete | verify-true
+	}
 	check-submenu-for-kw -is_move_enabled $is_move_enabled
 }	
 	
@@ -142,25 +142,20 @@ proc "check-menu-for-buton" [val row_enabled true] {
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
 	    get-property "getMenu().getItemCount()" | equals 12 | verify-true
 	    get-property "getMenu().getItems().MenuItem[0].isEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[0].getToolTipText()" | equals "Add new element" | verify-true
 	    get-property "getMenu().getItems().MenuItem[0].getText()" | equals "Add new keyword\\9M1+N"  | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[1].isEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[1].getToolTipText()" | equals "Add new line" | verify-true
 	    get-property "getMenu().getItems().MenuItem[1].getAccelerator()" | equals 0 | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[2].getStyle()" | equals "[SEPARATOR]" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[3].isEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[3].getToolTipText()" | equals Cut | verify-true
 	    get-property "getMenu().getItems().MenuItem[3].getText()" | equals "Cut\\9M1+X" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[4].isEnabled()" | equals true | verify-true
-	    get-property "getMenu().getItems().MenuItem[4].getToolTipText()" | equals Copy | verify-true
 	    get-property "getMenu().getItems().MenuItem[4].getText()" | equals "Copy\\9M1+C" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[5].isEnabled()" | equals false | verify-true
-	    get-property "getMenu().getItems().MenuItem[5].getToolTipText()" | equals Paste | verify-true
 	    get-property "getMenu().getItems().MenuItem[5].getText()" | equals "Paste\\9M1+V" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[6].isEnabled()" | equals true | verify-true
@@ -177,6 +172,14 @@ proc "check-menu-for-buton" [val row_enabled true] {
 	     get-property "getMenu().getItems().MenuItem[11].getText()" | equals "References" | verify-true
 	    
 	}  
+	
+	if [$is_product | eq true]{
+		get-property "getMenu().getItems().MenuItem[0].getToolTipText()" | equals "Add new element" | verify-true
+		get-property "getMenu().getItems().MenuItem[1].getToolTipText()" | equals "Add new line" | verify-true
+		get-property "getMenu().getItems().MenuItem[3].getToolTipText()" | equals Cut | verify-true
+		get-property "getMenu().getItems().MenuItem[4].getToolTipText()" | equals Copy | verify-true
+		get-property "getMenu().getItems().MenuItem[5].getToolTipText()" | equals Paste | verify-true
+	}
 	check-submenu-for-kw -row_enabled "false" -is_move_enabled false
 }
 
