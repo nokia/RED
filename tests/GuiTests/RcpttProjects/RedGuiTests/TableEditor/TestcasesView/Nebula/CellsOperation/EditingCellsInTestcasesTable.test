@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tPtekGhvEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/24/16 5:46 PM
+Save-Time: 8/26/16 5:04 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -85,9 +85,9 @@ with [get-editor "TestFile.robot"] {
         type-text ""
         key-type Enter
     }
-    //add arg (will disappear)
+    //focus os moved down now
     with [get-editbox -after [get-label "Test Cases"] -index 1] {
-        type-text "${arg}"
+        type-text "Should Be changed"
         key-type Enter
     }
 } 
@@ -124,7 +124,7 @@ check-test_case-row -file "TestFile.robot" -row 3 -tc "log" -c1 "8"
 check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
 
 check-test_case-row -file "TestFile.robot" -row 5 -tc "\\"
-check-test_case-row -file "TestFile.robot" -row 6 -tc "Should Not Match" -c1 "string" -c2 "pattern" -comment "#added comment"
+check-test_case-row -file "TestFile.robot" -row 6 -tc "Should Be changed" -c1 "string" -c2 "pattern" -comment "#added comment"
 check-test_case-row -file "TestFile.robot" -row 7 -tc "" -c1 "new"
 check-test_case-row -file "TestFile.robot" -row 8 -tc "..."
 
