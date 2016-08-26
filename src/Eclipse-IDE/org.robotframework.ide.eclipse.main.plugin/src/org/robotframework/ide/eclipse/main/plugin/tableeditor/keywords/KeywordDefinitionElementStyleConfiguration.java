@@ -81,9 +81,7 @@ public class KeywordDefinitionElementStyleConfiguration extends AbstractRegistry
         final Image imageToUse = ImagesManager
                 .getImage(isEditable ? keywordImage : RedImages.getGreyedImage(keywordImage));
 
-        final ICellPainter inactiveCellPainter = new CellPainterDecorator(new InactiveCellPainter(), CellEdgeEnum.LEFT,
-                new ImagePainter());
-        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, inactiveCellPainter,
+        configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new InactiveCellPainter(),
                 DisplayMode.NORMAL,
                 KeywordElementsInTreeLabelAccumulator.KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
 

@@ -15,18 +15,15 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
 
     public static final String CASE_CONFIG_LABEL = "CASE";
-
     public static final String CASE_WITH_TEMPLATE_CONFIG_LABEL = "TEMPLATED_CASE";
 
     public static final String CASE_SETTING_CONFIG_LABEL = "CASE_SETTING";
-
-    public static final String CASE_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL = "CASE_SETTING_DOCUMENTATION_NOT_EDITABLE";
-
     public static final String CASE_CALL_CONFIG_LABEL = "CASE_CALL";
 
     static final String KEYWORD_ASSIST_REQUIRED = "KEYWORD_ASSIST_REQUIRED";
-
     static final String VARIABLES_ASSIST_REQUIRED = "VARIABLES_ASSIST_REQUIRED";
+
+    public static final String CELL_NOT_EDITABLE_LABEL = "CELL_NOT_EDITABLE";
 
     private final IRowDataProvider<Object> dataProvider;
 
@@ -64,11 +61,17 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
                 } else {
                     configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
                     if (setting.isDocumentation()) {
-                        configLabels.addLabel(CASE_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
+                        configLabels.addLabel(CELL_NOT_EDITABLE_LABEL);
                     }
                 }
             } else if (rowObject instanceof RobotKeywordCall) {
                 configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
+            } else if (rowObject instanceof RobotCase) {
+                configLabels.addLabel(CELL_NOT_EDITABLE_LABEL);
+            }
+        } else {
+            if (rowObject instanceof RobotCase) {
+                configLabels.addLabel(CELL_NOT_EDITABLE_LABEL);
             }
         }
     }
