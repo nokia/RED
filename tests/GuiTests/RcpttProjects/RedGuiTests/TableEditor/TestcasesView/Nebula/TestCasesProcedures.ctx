@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _AXAyAF_dEeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/19/16 10:11 AM
+Save-Time: 8/24/16 5:43 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -25,17 +25,17 @@ proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 		| my-assert-true -expected $tc -row $row -col 1 
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c1 -row $row -col 1 
+	    | my-assert-true -expected $c1 -row $row -col 2
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c2 -row $row -col 1 
+	    | my-assert-true -expected $c2 -row $row -col 3 
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 4 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c3 -row $row -col 1 
+	    | my-assert-true -expected $c3 -row $row -col 4 
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 5 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c4 -row $row -col 1     
+	    | my-assert-true -expected $c4 -row $row -col 5     
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue 
-	    | my-assert-true -expected $c5 -row $row -col 1 
+	    | my-assert-true -expected $c5 -row $row -col 6 
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
-	    | my-assert-true -expected $comment -row $row -col 1 
+	    | my-assert-true -expected $comment -row $row -col 7
 }
 
 //proc "check-markers-in-table"  [val file] [val type ERROR] [val lines]  {
