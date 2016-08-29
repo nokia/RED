@@ -18,7 +18,6 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -407,15 +406,29 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_ADDED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
-        whenSettingIsAddedOrRemoved(section);
     }
 
     @Inject
     @Optional
     private void whenSettingIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_REMOVED) final RobotSuiteFileSection section) {
-        whenSettingIsAddedOrRemoved(section);
+        if (section.getSuiteFile() == fileModel) {
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+
+            final RobotSettingsSection settingsSection = (RobotSettingsSection) section;
+            final List<RobotKeywordCall> importSettings = settingsSection.getImportSettings();
+            SwtThread.asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (importSettings.isEmpty()) {
+                        selectionLayerAccessor.clear();
+                    }
+                }
+            });
+        }
     }
 
     @Inject
@@ -424,18 +437,19 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             @UIEventTopic(RobotModelEvents.ROBOT_SETTING_MOVED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+            selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
         }
-        final ISelection oldSelection = selectionProvider.getSelection();
-        whenSettingIsAddedOrRemoved(section);
-        selectionProvider.setSelection(oldSelection);
     }
 
-    private void whenSettingIsAddedOrRemoved(final RobotSuiteFileSection section) {
-        if (section != null && section.getSuiteFile() == fileModel) {
-            sortModel.clear();
-            refreshTable();
-            setDirty();
-        }
+    private Runnable tableInputIsReplaced() {
+        return new Runnable() {
+
+            @Override
+            public void run() {
+                refreshTable();
+                setDirty();
+            }
+        };
     }
 
     @Inject
