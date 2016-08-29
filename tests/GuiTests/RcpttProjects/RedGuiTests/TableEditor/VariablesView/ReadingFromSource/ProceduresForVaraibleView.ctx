@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _9iuJED04EeaUDrMBSMf5Ag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/25/16 5:57 PM
+Save-Time: 8/29/16 4:33 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -26,9 +26,9 @@ proc "check-variable-row" [val file] [val row] [val var] [val value] [val commen
 	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 		| my-assert-true -expected $var -row $row -col 1 
 	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 2 $row|  invoke getDataValue 
-	    | my-assert-true -expected $value -row $row -col 1 
+	    | my-assert-true -expected $value -row $row -col 2 
 	get-editor $file | get-canvas -after [get-label Variables] -index 1 | get-object | invoke getCellByPosition 3 $row|  invoke getDataValue 
-	    | my-assert-true -expected $comment -row $row -col 1 
+	    | my-assert-true -expected $comment -row $row -col 3 
 }
 
 //rows starts from 0
