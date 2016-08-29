@@ -378,7 +378,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED) final RobotSuiteFileSection section) {
         whenKeywordDefinitionIsAddedOrRemoved(section);
         if (getSection() != null && section.getChildren().isEmpty()) {
-            selectionLayerAccessor.getSelectionLayer().clear();
+            selectionLayerAccessor.clear();
         }
     }
 
@@ -429,7 +429,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED) final RobotKeywordDefinition parent) {
         whenKeywordCallIsAddedOrRemoved(parent);
         if (getSection() != null && parent.getChildren().isEmpty()) {
-            selectionLayerAccessor.getSelectionLayer().clear();
+            selectionLayerAccessor.clear();
         }
     }
 
@@ -495,7 +495,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 activeCellEditor.close();
             }
             dataProvider.setInput(getSection());
-            selectionLayerAccessor.getSelectionLayer().clear();
+            selectionLayerAccessor.clear();
             table.refresh();
 
             setDirty();

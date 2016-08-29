@@ -48,7 +48,7 @@ public class DeleteKeywordsHandler extends DIParameterizedHandler<E4DeleteKeywor
             }
             
             // needed for the same reason as in the cut handler
-            editor.getSelectionLayerAccessor().getSelectionLayer().clear();
+            editor.getSelectionLayerAccessor().clear();
         }
     }
 }

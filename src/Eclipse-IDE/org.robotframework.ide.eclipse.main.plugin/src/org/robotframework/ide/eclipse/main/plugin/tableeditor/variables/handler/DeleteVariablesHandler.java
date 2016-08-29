@@ -35,7 +35,7 @@ public class DeleteVariablesHandler extends DIParameterizedHandler<E4DeleteVaria
             final List<RobotVariable> variables = Selections.getElements(selection, RobotVariable.class);
             commandsStack.execute(new RemoveVariableCommand(variables));
 
-            editor.getSelectionLayerAccessor().getSelectionLayer().clear();
+            editor.getSelectionLayerAccessor().clear();
         }
     }
 }

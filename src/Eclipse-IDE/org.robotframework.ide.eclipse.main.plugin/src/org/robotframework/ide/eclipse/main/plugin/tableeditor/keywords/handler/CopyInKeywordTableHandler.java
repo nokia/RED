@@ -35,8 +35,7 @@ public class CopyInKeywordTableHandler extends DIParameterizedHandler<E4CopyInKe
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
             final PositionCoordinate[] selectedCellPositions = editor.getSelectionLayerAccessor()
-                    .getSelectionLayer()
-                    .getSelectedCellPositions();
+                    .getSelectedPositions();
 
             if (selectedCellPositions.length > 0) {
                

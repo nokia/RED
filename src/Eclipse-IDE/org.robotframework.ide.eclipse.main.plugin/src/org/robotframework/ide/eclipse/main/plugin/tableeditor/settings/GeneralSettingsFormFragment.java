@@ -786,7 +786,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             setInput();
             documentation.setText("");
             if (table.isPresent()) {
-                selectionLayerAccessor.getSelectionLayer().clear();
+                selectionLayerAccessor.clear();
             }
             refreshTable();
 
