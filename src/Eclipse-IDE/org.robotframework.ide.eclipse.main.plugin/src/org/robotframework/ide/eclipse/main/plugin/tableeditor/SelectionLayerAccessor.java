@@ -5,7 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -124,7 +128,17 @@ public class SelectionLayerAccessor {
 
     private void reestablishSelection(final ILayer layer, final PositionCoordinate[] positions) {
         boolean shouldAdd = false;
-        for (final PositionCoordinate coordinate : positions) {
+
+        final List<PositionCoordinate> coordinates = newArrayList(positions);
+        Collections.sort(coordinates, new Comparator<PositionCoordinate>() {
+
+            @Override
+            public int compare(final PositionCoordinate o1, final PositionCoordinate o2) {
+                return Integer.compare(o2.getColumnPosition(), o1.getColumnPosition());
+            }
+        });
+
+        for (final PositionCoordinate coordinate : coordinates) {
             if (coordinate.getColumnPosition() < layer.getColumnCount()) {
                 final int rowToSelect = coordinate.getRowPosition() == layer.getRowCount() - 1
                         ? coordinate.getRowPosition() - 1 : coordinate.getRowPosition();
