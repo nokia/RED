@@ -216,7 +216,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 new EditTraversalStrategy(ITraversalStrategy.AXIS_CYCLE_TRAVERSAL_STRATEGY, table)));
 
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
+        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer, selectionProvider);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
         new KeywordsTableContentTooltip(table, markersContainer, dataProvider);
