@@ -5,7 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -25,10 +27,6 @@ public class SelectionLayerAccessor {
     public SelectionLayerAccessor(final SelectionLayer selectionLayer, final ISelectionProvider selectionProvider) {
         this.selectionLayer = selectionLayer;
         this.selectionProvider = selectionProvider;
-    }
-
-    public SelectionLayer getSelectionLayer() {
-        return selectionLayer;
     }
 
     public int getColumnCount() {
@@ -70,5 +68,25 @@ public class SelectionLayerAccessor {
                 selectionLayer.selectRow(0, rowToSelect, false, true);
             }
         }
+    }
+
+    public int findNextSelectedElementRowIndex(final int initialRowIndex) {
+        final PositionCoordinate[] positions = getSelectedPositions();
+        for (final PositionCoordinate position : positions) {
+            if (position.getRowPosition() > initialRowIndex) {
+                return position.getRowPosition();
+            }
+        }
+        return initialRowIndex;
+    }
+
+    public List<Integer> findSelectedColumnsIndexesByRowIndex(final int rowIndex) {
+        final List<Integer> columnsIndexes = new ArrayList<>();
+        for (final PositionCoordinate position : getSelectedPositions()) {
+            if (position.getRowPosition() == rowIndex) {
+                columnsIndexes.add(position.getColumnPosition());
+            }
+        }
+        return columnsIndexes;
     }
 }

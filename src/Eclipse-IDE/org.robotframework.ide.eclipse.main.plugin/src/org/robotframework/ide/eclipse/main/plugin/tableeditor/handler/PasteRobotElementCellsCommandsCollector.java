@@ -10,9 +10,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 
@@ -22,16 +22,17 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
  */
 public abstract class PasteRobotElementCellsCommandsCollector {
 
-    public List<EditorCommand> collectPasteCommands(final SelectionLayer selectionLayer,
+    public List<EditorCommand> collectPasteCommands(final SelectionLayerAccessor selectionLayerAccessor,
             final List<RobotElement> selectedElements, final RedClipboard clipboard) {
 
         final List<EditorCommand> pasteCommands = new ArrayList<>();
 
-        if (selectionLayer.getSelectedCellPositions().length == 1 && clipboard.hasText() && !selectedElements.isEmpty()) {
+        if (selectionLayerAccessor.getSelectedPositions().length == 1 && clipboard.hasText()
+                && !selectedElements.isEmpty()) {
             final String textToPaste = clipboard.getText();
             pasteCommands.addAll(collectPasteCommandsForSelectedElement(selectedElements.get(0),
-                    newArrayList(textToPaste), selectionLayer.getSelectedCellPositions()[0].getColumnPosition(),
-                    selectionLayer.getColumnCount()));
+                    newArrayList(textToPaste), selectionLayerAccessor.getSelectedPositions()[0].getColumnPosition(),
+                    selectionLayerAccessor.getColumnCount()));
 
         } else if (!selectedElements.isEmpty() && hasRobotElementsInClipboard(clipboard)
                 && hasPositionsCoordinatesInClipboard(clipboard)) {
@@ -42,7 +43,7 @@ public abstract class PasteRobotElementCellsCommandsCollector {
 
             if (robotElementsFromClipboard != null && robotElementsFromClipboard.length > 0
                     && cellPositionsFromClipboard != null && cellPositionsFromClipboard.length > 0) {
-                final int tableColumnsCount = selectionLayer.getColumnCount();
+                final int tableColumnsCount = selectionLayerAccessor.getColumnCount();
                 int clipboardElementsCounter = 0;
                 int currentClipboardElementRowIndex = cellPositionsFromClipboard[0].getRowPosition();
                 int currentSelectedElementRowIndex = 0;
@@ -53,10 +54,10 @@ public abstract class PasteRobotElementCellsCommandsCollector {
                     } else {
                         clipboardElementsCounter = 0;
                     }
-                    currentSelectedElementRowIndex = TableHandlersSupport
-                            .findNextSelectedElementRowIndex(currentSelectedElementRowIndex, selectionLayer);
-                    final List<Integer> selectedElementColumnsIndexes = TableHandlersSupport
-                            .findSelectedColumnsIndexesByRowIndex(currentSelectedElementRowIndex, selectionLayer);
+                    currentSelectedElementRowIndex = selectionLayerAccessor
+                            .findNextSelectedElementRowIndex(currentSelectedElementRowIndex);
+                    final List<Integer> selectedElementColumnsIndexes = selectionLayerAccessor
+                            .findSelectedColumnsIndexesByRowIndex(currentSelectedElementRowIndex);
                     final List<Integer> clipboardElementColumnsIndexes = findCurrentClipboardElementColumnsIndexes(
                             currentClipboardElementRowIndex, cellPositionsFromClipboard);
                     currentClipboardElementRowIndex = calculateNextClipboardElementRowIndex(
@@ -64,7 +65,7 @@ public abstract class PasteRobotElementCellsCommandsCollector {
                     if (!clipboardElementColumnsIndexes.isEmpty()) {
                         int clipboardElementColumnsCounter = 0;
                         for (int i = 0; i < selectedElementColumnsIndexes.size(); i++) {
-                            int clipboardElementColumnIndex = clipboardElementColumnsIndexes.get(clipboardElementColumnsCounter);
+                            final int clipboardElementColumnIndex = clipboardElementColumnsIndexes.get(clipboardElementColumnsCounter);
                             if (clipboardElementColumnsCounter + 1 < clipboardElementColumnsIndexes.size()) {
                                 clipboardElementColumnsCounter++;
                             } else {
