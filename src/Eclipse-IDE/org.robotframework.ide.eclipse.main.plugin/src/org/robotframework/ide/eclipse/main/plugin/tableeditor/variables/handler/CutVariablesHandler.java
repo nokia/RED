@@ -9,9 +9,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.CopyVariablesHandler.E4CopyVariablesHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.CutVariablesHandler.E4CutVariablesHandler;
@@ -28,13 +26,12 @@ public class CutVariablesHandler extends DIParameterizedHandler<E4CutVariablesHa
     public static class E4CutVariablesHandler {
 
         @Execute
-        public void cutVariables(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
-                final RobotEditorCommandsStack commandsStack,
+        public void cutVariables(final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
             final boolean copiedToClipboard = new E4CopyVariablesHandler().copyVariables(selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteVariableHandler().deleteVariables(editor, commandsStack, selection);
+                new E4DeleteVariableHandler().deleteVariables(commandsStack, selection);
             }
         }
     }
