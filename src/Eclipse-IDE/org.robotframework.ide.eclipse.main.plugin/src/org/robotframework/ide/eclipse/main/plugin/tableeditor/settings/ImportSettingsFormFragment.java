@@ -418,16 +418,15 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
             selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
 
             final RobotSettingsSection settingsSection = (RobotSettingsSection) section;
-            final List<RobotKeywordCall> importSettings = settingsSection.getImportSettings();
-            SwtThread.asyncExec(new Runnable() {
+            if (settingsSection.getImportSettings().isEmpty()) {
+                SwtThread.asyncExec(new Runnable() {
 
-                @Override
-                public void run() {
-                    if (importSettings.isEmpty()) {
+                    @Override
+                    public void run() {
                         selectionLayerAccessor.clear();
                     }
-                }
-            });
+                });
+            }
         }
     }
 
