@@ -125,9 +125,14 @@ public class SelectionLayerAccessor {
     private void reestablishSelection(final ILayer layer, final PositionCoordinate[] positions) {
         boolean shouldAdd = false;
         for (final PositionCoordinate coordinate : positions) {
-            layer.doCommand(new SelectCellCommand(selectionLayer, coordinate.getColumnPosition(),
-                    coordinate.getRowPosition(), false, shouldAdd));
-            shouldAdd = true;
+            if (coordinate.getColumnPosition() < layer.getColumnCount()) {
+                final int rowToSelect = coordinate.getRowPosition() == layer.getRowCount() - 1
+                        ? coordinate.getRowPosition() - 1 : coordinate.getRowPosition();
+                layer.doCommand(new SelectCellCommand(selectionLayer, coordinate.getColumnPosition(), rowToSelect,
+                        false, shouldAdd));
+
+                shouldAdd = true;
+            }
         }
     }
 }
