@@ -5,14 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
@@ -31,19 +26,7 @@ public class SelectWholeRowHandler extends DIParameterizedHandler<E4SelectWholeR
         @Execute
         public void selectWholeRows(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor) {
             final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
-            final SelectionLayer selectionLayer = selectionLayerAccessor.getSelectionLayer();
-
-            final Set<Integer> rowsToSelect = new LinkedHashSet<>();
-            for (final PositionCoordinate selectedCellPosition : selectionLayer.getSelectedCellPositions()) {
-                rowsToSelect.add(selectedCellPosition.rowPosition);
-            }
-
-            selectionLayer.clear();
-            for (final int rowToSelect : rowsToSelect) {
-                for (int i = 0; i < selectionLayer.getColumnCount(); i++) {
-                    selectionLayer.selectRow(0, rowToSelect, false, true);
-                }
-            }
+            selectionLayerAccessor.expandSelectionToWholeRows();
         }
     }
 }

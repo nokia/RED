@@ -376,7 +376,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_CASE_REMOVED) final RobotSuiteFileSection section) {
         whenElementIsAddedOrRemoved(section);
         if (getSection() != null && section.getChildren().isEmpty()) {
-            selectionLayerAccessor.getSelectionLayer().clear();
+            selectionLayerAccessor.clear();
         }
     }
 
@@ -469,7 +469,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 activeCellEditor.close();
             }
             dataProvider.setInput(getSection());
-            selectionLayerAccessor.getSelectionLayer().clear();
+            selectionLayerAccessor.clear();
             table.refresh();
 
             setDirty();

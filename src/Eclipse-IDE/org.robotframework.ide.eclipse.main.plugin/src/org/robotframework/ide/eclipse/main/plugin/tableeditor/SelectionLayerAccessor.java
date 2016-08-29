@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 
@@ -24,6 +27,18 @@ public class SelectionLayerAccessor {
         return selectionLayer;
     }
 
+    public int getColumnCount() {
+        return selectionLayer.getColumnCount();
+    }
+
+    public PositionCoordinate[] getSelectedPositions() {
+        return selectionLayer.getSelectedCellPositions();
+    }
+
+    public void clear() {
+        selectionLayer.clear();
+    }
+
     public boolean onlyFullRowsAreSelected() {
         if (selectionLayer.getSelectedCellPositions().length == 0) {
             return false;
@@ -38,5 +53,18 @@ public class SelectionLayerAccessor {
 
     public boolean noFullRowIsSelected() {
         return selectionLayer.getFullySelectedRowPositions().length == 0;
+    }
+
+    public void expandSelectionToWholeRows() {
+        final Set<Integer> rowsToSelect = new LinkedHashSet<>();
+        for (final PositionCoordinate selectedCellPosition : getSelectedPositions()) {
+            rowsToSelect.add(selectedCellPosition.rowPosition);
+        }
+        clear();
+        for (final int rowToSelect : rowsToSelect) {
+            for (int i = 0; i < selectionLayer.getColumnCount(); i++) {
+                selectionLayer.selectRow(0, rowToSelect, false, true);
+            }
+        }
     }
 }
