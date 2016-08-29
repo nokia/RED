@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xbGiMDbxEeaJIKJT0Mv9ow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/16/16 4:31 PM
+Save-Time: 8/29/16 5:37 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -61,11 +61,12 @@ with [get-editor "TestFile.robot"] {
     with [get-section Metadata] {
         //click
         with [get-canvas] {
-            mouse-press 382 32 button1
-            mouse-release 382 32 button1 524288
-            mouse-press 382 32 button1
-            mouse-double-click 368 26 button1
-            mouse-release 382 32 button1 524288
+            mouse-move 461 31
+            mouse-press 461 31 button1
+            mouse-release 461 31 button1 524288
+            mouse-press 461 31 button1
+            mouse-double-click 461 31 button1
+            mouse-release 461 31 button1 524288
         }
         //add 1 to zorro
         with [get-editbox] {
