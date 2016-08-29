@@ -68,9 +68,7 @@ public class SelectionLayerAccessor {
         }
         clear();
         for (final int rowToSelect : rowsToSelect) {
-            for (int i = 0; i < selectionLayer.getColumnCount(); i++) {
-                selectionLayer.selectRow(0, rowToSelect, false, true);
-            }
+            selectionLayer.selectRow(0, rowToSelect, false, true);
         }
     }
 

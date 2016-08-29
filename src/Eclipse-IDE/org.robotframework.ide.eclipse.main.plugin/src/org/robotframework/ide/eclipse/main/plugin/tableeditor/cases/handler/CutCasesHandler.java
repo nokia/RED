@@ -10,9 +10,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CopyCasesHandler.E4CopyCasesHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CutCasesHandler.E4CutCasesHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.DeleteCasesHandler.E4DeleteCasesHandler;
@@ -32,13 +30,12 @@ public class CutCasesHandler extends DIParameterizedHandler<E4CutCasesHandler> {
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public void cutKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
-                @Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void cutKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedClipboard clipboard) {
             
             final boolean copiedToClipboard = new E4CopyCasesHandler().copyCases(selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteCasesHandler().deleteCasesAndCalls(editor, commandsStack, selection);
+                new E4DeleteCasesHandler().deleteCasesAndCalls(commandsStack, selection);
             }
         }
     }
