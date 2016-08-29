@@ -217,7 +217,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
+        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer, selectionProvider);
 
         // tooltips support
         new RedNatTableContentTooltip(table, markersContainer, dataProvider);

@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 
@@ -19,8 +20,11 @@ public class SelectionLayerAccessor {
 
     private final SelectionLayer selectionLayer;
 
-    public SelectionLayerAccessor(final SelectionLayer selectionLayer) {
+    private final ISelectionProvider selectionProvider;
+
+    public SelectionLayerAccessor(final SelectionLayer selectionLayer, final ISelectionProvider selectionProvider) {
         this.selectionLayer = selectionLayer;
+        this.selectionProvider = selectionProvider;
     }
 
     public SelectionLayer getSelectionLayer() {
