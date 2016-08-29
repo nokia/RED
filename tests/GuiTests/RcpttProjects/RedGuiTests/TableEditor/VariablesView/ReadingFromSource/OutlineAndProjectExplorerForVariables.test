@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/20/16 10:57 AM
+Save-Time: 8/29/16 6:05 PM
 Testcase-Type: ecl
 Verifications: _h9dwwETtEeaEVfxTnoQ14g
 
@@ -22,15 +22,19 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
 
 //select element from outlin by click or double click
 get-view Outline | get-tree | select "TestFile.robot/Variables/var1" | double-click
+wait 200
 is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 1
 
 get-view Outline | get-tree | select [get-item "TestFile.robot/Variables" | get-item "" -index 1]
+wait 200
 is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 8
 
-get-view Outline | get-tree | select "TestFile.robot/Variables/multiline"
+get-view Outline | get-tree | select "TestFile.robot/Variables/multiline" | click
+wait 200
 is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 15
 
 get-view Outline | get-tree | select "TestFile.robot/Variables/list" | click
+wait 200
 is-row-fully-selected -file "TestFile.robot" -file "TestFile.robot" -row 7
 
 //select var from Project explorer
@@ -159,7 +163,8 @@ with [get-editor "pipes.robot"] {
         get-tab-item Variables | click
     }
 }
-get-view Outline | get-tree | select "pipes.robot/Variables/var"
+get-view Outline | get-tree | select "pipes.robot/Variables/var" | click
+wait 200
 is-row-fully-selected -file "pipes.robot" -row 0
 
 //set focus on folder
@@ -205,22 +210,26 @@ get-editor "tsv_file.tsv" | get-tab-folder | get-tab-item Variables | click
 
 //use outline
 get-view Outline | get-tree | select "tsv_file.tsv/Variables/after keyword" | double-click
+wait 200
 is-row-fully-selected -file "tsv_file.tsv" -row 3
 
 //move selection to folder
 get-view "Project Explorer" | get-tree | select "RobotProject/TestSuiteFolder"
-get-view Outline | get-tree | select "tsv_file.tsv/Variables/list from tsv"
+get-view Outline | get-tree | select "tsv_file.tsv/Variables/list from tsv" | click
+wait 200
 is-row-fully-selected -file "tsv_file.tsv" -row 2
 
 //click on Keywords in PE and than on Outline
 get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv/Keywords" | double-click
 get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals Keywords | verify-true
-get-view Outline | get-tree | select "tsv_file.tsv/Variables/tsv_arg1"
+get-view Outline | get-tree | select "tsv_file.tsv/Variables/tsv_arg1" | click
+wait 200
 is-row-fully-selected -file "tsv_file.tsv" -row 0
 
 //move selection by arrow
 get-editor "tsv_file.tsv" | get-canvas -after [get-label Variables] -index 1 | key-type Down
-get-view Outline | get-tree | select "tsv_file.tsv/Variables/NEW"
+get-view Outline | get-tree | select "tsv_file.tsv/Variables/NEW" | click
+wait 200
 is-row-fully-selected -file "tsv_file.tsv" -row 1
 
 //
@@ -228,7 +237,8 @@ get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv/Varia
 is-row-fully-selected -file "tsv_file.tsv" -row 3
 
 //set focus on Ouline and select keyword (KW table is shown)
-get-view Outline | get-tree | select "tsv_file.tsv/Keywords/kw"
+get-view Outline | get-tree | select "tsv_file.tsv/Keywords/kw" | click
+wait 200
 get-editor "tsv_file.tsv" | get-tab-folder | get-property activePage | equals "Keywords" | verify-true
 
 //select var
@@ -308,7 +318,7 @@ try -times 5 -delay 1000 -command{
 
 //use Outline and see selection
 get-view Outline | get-tree | select "text_file.txt/Variables/newList" | double-click
-
+wait 200
 //add variable
 with [get-editor "text_file.txt"] {
     get-tab-folder | get-tab-item Source | click
@@ -346,6 +356,7 @@ get-editor "text_file.txt" | get-tab-folder | get-tab-item Variables | click
 
 //click on Ouline and PE
 get-view Outline | get-tree | select "text_file.txt/Variables/newScalar" | double-click
+wait 200
 is-row-fully-selected -file "text_file.txt" -row 1
 
 
