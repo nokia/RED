@@ -6,89 +6,175 @@ Element-Version: 3.0
 External-Reference: 
 Id: _46WUAFTXEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/26/16 10:28 AM
+Save-Time: 8/29/16 3:10 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-	
-proc "check-submenu-for-kw" [val row_enabled true] [val is_move_enabled true]{	
-	//check sub,enu
+proc "check-tooltip" [val is_button false] {
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-	
-	    get-menu "Table/Insert cell" | get-property enablement | equals false | verify-true
-	    get-menu "Table/Insert cell" | get-property index | equals 0 | verify-true
-	    
-	    get-menu "Table/Delete cell" | get-property enablement | equals false | verify-true
-	    get-menu "Table/Delete cell" | get-property index | equals 1 | verify-true
-	    
-	    get-menu "Table/Expand All" | get-property enablement | equals true | verify-true
-	    get-menu "Table/Expand All" | get-property index | equals 3 | verify-true
-	    
-	    get-menu "Table/Collapse All" | get-property enablement | equals true | verify-true
-	    get-menu "Table/Collapse All" | get-property index | equals 4 | verify-true
+			get-property "getMenu().getItems().MenuItem[0].getToolTipText()" | equals "Add new element" | verify-true
+			get-property "getMenu().getItems().MenuItem[1].getToolTipText()" | equals "Add new line" | verify-true
 	}
-	
+	if [$is_button | eq false]{
+		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+			get-property "getMenu().getItems().MenuItem[3].getToolTipText()" | equals "Show in source" | verify-true
+			get-property "getMenu().getItems().MenuItem[5].getToolTipText()" | equals Cut | verify-true
+			get-property "getMenu().getItems().MenuItem[6].getToolTipText()" | equals Copy | verify-true
+			get-property "getMenu().getItems().MenuItem[7].getToolTipText()" | equals Paste | verify-true
+			get-property "getMenu().getItems().MenuItem[8].getToolTipText()" | equals Delete | verify-true			
+		}	
+	}-else{
+		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+			get-property "getMenu().getItems().MenuItem[3].getToolTipText()" | equals Cut | verify-true
+			get-property "getMenu().getItems().MenuItem[4].getToolTipText()" | equals Copy | verify-true
+			get-property "getMenu().getItems().MenuItem[5].getToolTipText()" | equals Paste | verify-true
+			get-property "getMenu().getItems().MenuItem[6].getToolTipText()" | equals Delete | verify-true		
+		}
+	}	
+}		
+
+proc "check-submenu-for-kw" [val row_enabled true] [val is_move_enabled true] [val start_index 10] {	
+	get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Table/Expand All"
 	
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-	    get-menu "Row/Move up" | get-property enablement | equals $is_move_enabled | verify-true
-	    get-menu "Row/Move up" | get-property index | equals 0 | verify-true
-	    get-menu "Row/Move up" | get-property accelerator | equals "M1+Up" | verify-true
+	
+		//table
+		
+		//insert cell
+	    get-property [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().length" $start_index]| equals 5 | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].isEnabled()" $start_index] | equals false 
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].getText()" $start_index ]
+	        | equals "Insert cell\\9M1+I" | verify-true
 	    
-	    get-menu "Row/Move down" | get-property enablement | equals  $is_move_enabled | verify-true
-	    get-menu "Row/Move down" | get-property index | equals 1 | verify-true
-	    get-menu "Row/Move down" | get-property accelerator | equals "M1+Down" | verify-true
+	    //delete cell    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].isEnabled()" $start_index] | equals false 
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].getText()" $start_index ]
+	        | equals "Delete cell\\9M1+D" | verify-true
+	        
+	    //sep    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[2].getStyle()"  $start_index]| equals "[SEPARATOR]" 
+	        | verify-true
+
+		//expand all	        
 	    
-	    get-menu "Row/Cut row" | get-property enablement | equals  $row_enabled | verify-true
-	    get-menu "Row/Cut row" | get-property index | equals 3 | verify-true
-	    get-menu "Row/Cut row" | get-property accelerator | equals "M1+M2+X" | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[3].getText()" $start_index ]| equals "Expand All" 
+	        | verify-true
+	        
+	    //colapse all    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[4].isEnabled()" $start_index] | equals true 
+	        | verify-true
 	    
-	    get-menu "Row/Copy row" | get-property enablement | equals  $row_enabled | verify-true
-	    get-menu "Row/Copy row" | get-property index | equals 4 | verify-true
-	    get-menu "Row/Copy row" | get-property accelerator | equals "M1+M2+C" | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[4].getText()" $start_index ]| equals "Collapse All" 
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getStyle()"  $start_index ]| equals "[CASCADE]" | verify-true
 	    
-	    get-menu "Row/Paste row" | get-property enablement | equals  false| verify-true
-	    get-menu "Row/Paste row" | get-property index | equals 5 | verify-true
-	    get-menu "Row/Paste row" | get-property accelerator | equals "M1+M2+V" | verify-true
 	    
-	    get-menu "Row/Delete row" | get-property enablement | equals  $row_enabled | verify-true
-	    get-menu "Row/Delete row" | get-property index | equals 6 | verify-true
-	    get-menu "Row/Delete row" | get-property accelerator | equals "M1+Delete" | verify-true
+	    //row
+	    get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Row/Select whole row(s)" 
 	    
-	    get-menu "Row/Select whole row(s)" | get-property enablement | equals  true| verify-true
-	    get-menu "Row/Select whole row(s)" | get-property index | equals 8 | verify-true
-	    get-menu "Row/Select whole row(s)" | get-property accelerator | equals "M1+M2+A" | verify-true
+	    //Move up
+	    get-property  [format "getMenu().getItems().MenuItem[%s].isEnabled()" [plus $start_index 1]] | equals true | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().length" [plus $start_index 1]]| equals 9 | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].isEnabled()" [plus $start_index 1]] | equals $is_move_enabled 
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].getText()" [plus $start_index 1] ]
+	        | equals "Move up\\9M1+Up" | verify-true
+	        
+	    //move down    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].isEnabled()" [plus $start_index 1]] | equals $is_move_enabled  
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].getText()" [plus $start_index 1]]
+	        | equals "Move down\\9M1+Down" | verify-true
+	        
+	    // sep   
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[2].getStyle()" [plus $start_index 1]]| equals "[SEPARATOR]" 
+	        | verify-true
+
+	    //cut row    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[3].isEnabled()" [plus $start_index 1]] | equals $row_enabled 
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[3].getText()" [plus $start_index 1] ]
+	        | equals "Cut row\\9M1+M2+X" | verify-true
+	        
+	    //copy row    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[4].isEnabled()" [plus $start_index 1]] | equals $row_enabled 
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[4].getText()" [plus $start_index 1] ]
+	        | equals "Copy row\\9M1+M2+C" | verify-true
+	        
+	    //paste row    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[5].isEnabled()" [plus $start_index 1]] | equals false  
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[5].getText()" [plus $start_index 1] ]
+	        | equals "Paste row\\9M1+M2+V" | verify-true
+	        
+	    //delete row    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[6].isEnabled()" [plus $start_index 1]] | equals $row_enabled  
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[6].getText()" [plus $start_index 1] ]
+	        | equals "Delete row\\9M1+Delete" | verify-true
+	        
+	     //sep   
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[7].getStyle()"  [plus $start_index 1]]| equals "[SEPARATOR]" 
+	        | verify-true
+	    
+	    //select row    
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[8].isEnabled()" [plus $start_index 1]] | equals true 
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[8].getMenu()" [plus $start_index 1]] | equals null 
+	        | verify-true
+	    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[8].getText()"  [plus $start_index 1]]
+	        | equals "Select whole row(s)\\9M1+M2+A" | verify-true
+	        
+	}
+	//chec tooltip
+	if [$is_product | eq true]{
+		
+		get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Table/Expand All"
+		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+			//table
+			get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].getToolTipText()"  $start_index]
+		        | equals "Insert cell" | verify-true
+		    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].getToolTipText()"  $start_index]
+		        | equals "Delete cell" | verify-true    
+		    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[3].getToolTipText()"  $start_index]
+		        | equals "Expand All" | verify-true      
+		    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[4].getToolTipText()"  $start_index]
+		        | equals "Collapse All" | verify-true    
+		}
+		
+		get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Row/Select whole row(s)" 
+		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {	    
+		    //row    
+		    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[0].getToolTipText()"  [plus $start_index 1]]
+		        | equals "Move up" | verify-true       
+			get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[1].getToolTipText()"  [plus $start_index 1]]
+		        | equals "Move down" | verify-true
+		        
+		    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[3].getToolTipText()"  [plus $start_index 1]]
+		        | equals "Cut row" | verify-true 
+		        
+		    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[4].getToolTipText()"  [plus $start_index 1]]
+		        | equals "Copy row" | verify-true     
+		    get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[5].getToolTipText()"  [plus $start_index 1]]
+		        | equals "Paste row" | verify-true    
+		   get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[6].getToolTipText()"  [plus $start_index 1]]
+		        | equals "Delete row" | verify-true
+		        
+		   get-property  [format "getMenu().getItems().MenuItem[%s].getMenu().getItems().MenuItem[8].getToolTipText()"  [plus $start_index 1]]
+		        | equals "Select whole row(s)" | verify-true         
+		  }      
 	}
 }
 
-proc "check-menu-for-kw" [val is_child_kw_row false] [val is_move_enabled true]{
+proc "check-menu-for-kw" [val is_child_kw_row false]{
 	get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu Paste 
 	
-	if [$is_child_kw_row | eq true]{
-		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-	    	get-property "getMenu().getItemCount()" | equals 15 | verify-true
-	    }
-	    
-	    //additional menu Open declaration
-	    with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-		    get-property "getMenu().getItems().MenuItem[13].isEnabled()" | equals true | verify-true
-		    get-property "getMenu().getItems().MenuItem[13].getText()" | equals "Open Declaration" | verify-true
-		    
-		    get-property "getMenu().getItems().MenuItem[14].getText()" | equals "References" | verify-true
-		}
-	    
-	}-else{
-		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-	    	get-property "getMenu().getItemCount()" | equals 14 | verify-true
-	    	
-	   }
-	   
-	    with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-		    get-property "getMenu().getItems().MenuItem[13].getText()" | equals "References" | verify-true
-		}
-	}
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
 	    get-property "getMenu().getItems().MenuItem[0].isEnabled()" | equals true | verify-true
 	    get-property "getMenu().getItems().MenuItem[0].getText()" | equals "Add new keyword\\9M1+N" | verify-true
@@ -124,19 +210,36 @@ proc "check-menu-for-kw" [val is_child_kw_row false] [val is_move_enabled true]{
 	    
 	     get-property "getMenu().getItems().MenuItem[12].getStyle()" | equals "[SEPARATOR]"  | verify-true
 	}    
-	
-	if [$is_product | eq true]{
-		get-property "getMenu().getItems().MenuItem[0].getToolTipText()" | equals "Add new element" | verify-true
-		get-property "getMenu().getItems().MenuItem[1].getToolTipText()" | equals "Add new line" | verify-true
-		get-property "getMenu().getItems().MenuItem[5].getToolTipText()" | equals Cut | verify-true
-		get-property "getMenu().getItems().MenuItem[6].getToolTipText()" | equals Copy | verify-true
-		get-property "getMenu().getItems().MenuItem[7].getToolTipText()" | equals Paste | verify-true
-		get-property "getMenu().getItems().MenuItem[8].getToolTipText()" | equals Delete | verify-true
+	if [$is_child_kw_row | eq true]{
+		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+	    	get-property "getMenu().getItemCount()" | equals 15 | verify-true
+	    }
+	    
+	    //additional menu Open declaration
+	    with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+		    get-property "getMenu().getItems().MenuItem[13].isEnabled()" | equals true | verify-true
+		    get-property "getMenu().getItems().MenuItem[13].getText()" | equals "Open Declaration" | verify-true
+		    
+		    get-property "getMenu().getItems().MenuItem[14].getText()" | equals "References" | verify-true
+		}
+	    
+	}-else{
+		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+	    	get-property "getMenu().getItemCount()" | equals 14 | verify-true
+	    	
+	   }
+	   
+	    with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+		    get-property "getMenu().getItems().MenuItem[13].getText()" | equals "References" | verify-true
+		}
 	}
-	check-submenu-for-kw -is_move_enabled $is_move_enabled
+	if [$is_product | eq true]{
+		check-tooltip
+	}		
 }	
 	
-proc "check-menu-for-buton" [val row_enabled true] {
+
+proc "check-menu-for-buton" {
 	get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu Paste 
 	
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -174,13 +277,8 @@ proc "check-menu-for-buton" [val row_enabled true] {
 	}  
 	
 	if [$is_product | eq true]{
-		get-property "getMenu().getItems().MenuItem[0].getToolTipText()" | equals "Add new element" | verify-true
-		get-property "getMenu().getItems().MenuItem[1].getToolTipText()" | equals "Add new line" | verify-true
-		get-property "getMenu().getItems().MenuItem[3].getToolTipText()" | equals Cut | verify-true
-		get-property "getMenu().getItems().MenuItem[4].getToolTipText()" | equals Copy | verify-true
-		get-property "getMenu().getItems().MenuItem[5].getToolTipText()" | equals Paste | verify-true
-	}
-	check-submenu-for-kw -row_enabled "false" -is_move_enabled false
+		check-tooltip -is_button true
+	}	
 }
 
 
@@ -208,15 +306,23 @@ wait 500
 
 //check menu on first line
 check-menu-for-kw
+check-submenu-for-kw
 
-//set focus on Documentation
+//set focus on kw name
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type Right
     key-type Left
+}
+check-menu-for-kw
+check-submenu-for-kw
+
+//set focus on Documentation
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type Down
 }
 
-check-menu-for-kw -is_child_kw_row true -is_move_enabled false
+check-menu-for-kw -is_child_kw_row true
+check-submenu-for-kw -is_move_enabled false
 
 //set focus on keyword "log"
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -224,19 +330,22 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"
 }
 
 check-menu-for-kw -is_child_kw_row true
+check-submenu-for-kw
 
 //set focus on "..."
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type Down
 }
 
-check-menu-for-buton 
+check-menu-for-buton
+check-submenu-for-kw -start_index 8 -is_move_enabled false -row_enabled false
 
 //set focus on "..add new kw"
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type Down
 }
 check-menu-for-buton
+check-submenu-for-kw -start_index 8 -is_move_enabled false -row_enabled false
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
