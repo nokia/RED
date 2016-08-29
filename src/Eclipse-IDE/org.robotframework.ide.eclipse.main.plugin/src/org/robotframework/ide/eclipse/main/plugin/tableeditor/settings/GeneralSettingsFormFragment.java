@@ -547,7 +547,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer);
+        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer, selectionProvider);
 
         // tooltips support
         new GeneralSettingsTableContentTooltip(table.get(), markersContainer, dataProvider);
