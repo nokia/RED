@@ -39,7 +39,7 @@ public class PasteInVariableTableHandler extends DIParameterizedHandler<E4PasteI
 
             final List<RobotElement> selectedVariables = Selections.getElements(selection, RobotElement.class);
             final List<EditorCommand> pasteCommands = new PasteVariablesCellsCommandsCollector().collectPasteCommands(
-                    editor.getSelectionLayerAccessor().getSelectionLayer(), selectedVariables, clipboard);
+                    editor.getSelectionLayerAccessor(), selectedVariables, clipboard);
 
             for (final EditorCommand command : pasteCommands) {
                 commandsStack.execute(command);

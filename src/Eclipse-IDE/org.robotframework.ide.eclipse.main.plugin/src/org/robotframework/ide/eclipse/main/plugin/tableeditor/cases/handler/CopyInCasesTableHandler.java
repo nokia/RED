@@ -13,7 +13,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.Copy
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.ArraysSerializerDeserializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -41,8 +40,8 @@ public class CopyInCasesTableHandler extends DIParameterizedHandler<E4CopyInCase
                         keywordCalls);
                 final RobotCase[] casesCopy = ArraysSerializerDeserializer.copy(RobotCase.class, cases);
 
-                final PositionCoordinateSerializer[] serializablePositions = TableHandlersSupport
-                        .createSerializablePositionsCoordinates(selectedCellPositions);
+                final PositionCoordinateSerializer[] serializablePositions = PositionCoordinateSerializer
+                        .createFrom(selectedCellPositions);
 
                 if (keywordCallsCopy.length > 0 && casesCopy.length > 0) {
                     clipboard.insertContent(serializablePositions, keywordCallsCopy, casesCopy);

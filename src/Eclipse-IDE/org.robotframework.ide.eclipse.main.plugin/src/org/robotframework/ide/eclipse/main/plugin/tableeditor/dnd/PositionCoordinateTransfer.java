@@ -43,6 +43,14 @@ public class PositionCoordinateTransfer extends RedTransfer<PositionCoordinateSe
 
     public static class PositionCoordinateSerializer implements Serializable {
 
+        public static PositionCoordinateSerializer[] createFrom(final PositionCoordinate[] coordinates) {
+            final PositionCoordinateSerializer[] serializableCoordinates = new PositionCoordinateSerializer[coordinates.length];
+            for (int i = 0; i < coordinates.length; i++) {
+                serializableCoordinates[i] = new PositionCoordinateSerializer(coordinates[i]);
+            }
+            return serializableCoordinates;
+        }
+
         private static final long serialVersionUID = 1L;
 
         private final int columnPosition;

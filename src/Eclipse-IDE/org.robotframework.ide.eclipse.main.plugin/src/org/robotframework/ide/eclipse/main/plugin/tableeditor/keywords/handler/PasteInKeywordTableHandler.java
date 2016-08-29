@@ -11,7 +11,6 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -35,11 +34,10 @@ public class PasteInKeywordTableHandler extends DIParameterizedHandler<E4PasteIn
                 @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 final RobotEditorCommandsStack commandsStack, final RedClipboard clipboard) {
 
-            final SelectionLayer selectionLayer = editor.getSelectionLayerAccessor().getSelectionLayer();
             final List<RobotElement> selectedKeywords = Selections.getElements(selection, RobotElement.class);
 
             final List<EditorCommand> pasteCommands = new PasteKeywordsCellsCommandsCollector()
-                    .collectPasteCommands(selectionLayer, selectedKeywords, clipboard);
+                    .collectPasteCommands(editor.getSelectionLayerAccessor(), selectedKeywords, clipboard);
 
             for (final EditorCommand command : pasteCommands) {
                 commandsStack.execute(command);

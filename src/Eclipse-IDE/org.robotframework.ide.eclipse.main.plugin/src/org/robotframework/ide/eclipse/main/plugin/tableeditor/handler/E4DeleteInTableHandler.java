@@ -14,24 +14,27 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.red.viewers.Selections;
 
 public abstract class E4DeleteInTableHandler {
 
     @Execute
     public void delete(@Named(Selections.SELECTION) final IStructuredSelection selection,
-            @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor, final RobotEditorCommandsStack commandsStack) {
+            @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+            final RobotEditorCommandsStack commandsStack) {
 
         final List<RobotElement> elements = Selections.getElements(selection, RobotElement.class);
         if (!elements.isEmpty()) {
-            final List<EditorCommand> detailsDeletingCommands = createCommandsForDetailsRemoval(elements, editor.getSelectionLayerAccessor().getSelectionLayer());
-            Collections.reverse(detailsDeletingCommands); // deleting must be started from the biggest column index
+            final List<EditorCommand> detailsDeletingCommands = createCommandsForDetailsRemoval(elements,
+                    editor.getSelectionLayerAccessor());
+            Collections.reverse(detailsDeletingCommands); // deleting must be started from the
+                                                          // biggest column index
 
             for (final EditorCommand command : detailsDeletingCommands) {
                 commandsStack.execute(command);
@@ -39,26 +42,28 @@ public abstract class E4DeleteInTableHandler {
         }
     }
 
-    private List<EditorCommand> createCommandsForDetailsRemoval(final List<RobotElement> elements, final SelectionLayer selectionLayer) {
+    private List<EditorCommand> createCommandsForDetailsRemoval(final List<RobotElement> elements,
+            final SelectionLayerAccessor selectionLayerAccessor) {
         final List<EditorCommand> commands = new ArrayList<>();
-        final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
+        final PositionCoordinate[] selectedCellPositions = selectionLayerAccessor.getSelectedPositions();
         if (selectedCellPositions.length == 0) {
             return commands;
         }
-        final int tableColumnCount = selectionLayer.getColumnCount();
-        
+        final int tableColumnCount = selectionLayerAccessor.getColumnCount();
+
         int currentElementRowIndex = 0;
         for (final RobotElement element : elements) {
-            currentElementRowIndex = TableHandlersSupport.findNextSelectedElementRowIndex(currentElementRowIndex, selectionLayer);
-            final List<Integer> selectedColumnsIndexes = TableHandlersSupport.findSelectedColumnsIndexesByRowIndex(currentElementRowIndex, selectionLayer);
+            currentElementRowIndex = selectionLayerAccessor.findNextSelectedElementRowIndex(currentElementRowIndex);
+            final List<Integer> selectedColumnsIndexes = selectionLayerAccessor
+                    .findSelectedColumnsIndexesByRowIndex(currentElementRowIndex);
             for (int i = 0; i < selectedColumnsIndexes.size(); i++) {
-                final EditorCommand command = getCommandForSelectedElement(element, selectedColumnsIndexes.get(i), tableColumnCount);
-                if(command != null) {
+                final EditorCommand command = getCommandForSelectedElement(element, selectedColumnsIndexes.get(i),
+                        tableColumnCount);
+                if (command != null) {
                     commands.add(command);
                 }
             }
         }
-        
         return commands;
     }
 

@@ -14,7 +14,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -70,7 +69,7 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
                     selectedSetting = firstSelected.get();
                 } else {
                     final List<RobotElement> newGeneralSettings = createNewGeneralSettingsIfNotPresentInSection(
-                            fileModel, editor.getSelectionLayerAccessor().getSelectionLayer(), commandsStack);
+                            fileModel, editor.getSelectionLayerAccessor().getSelectedPositions(), commandsStack);
                     if (!newGeneralSettings.isEmpty()) {
                         selectedSetting = (RobotSetting) newGeneralSettings.get(0);
                     }
@@ -107,17 +106,18 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
         }
 
         static List<RobotElement> createNewGeneralSettingsIfNotPresentInSection(final RobotSuiteFile fileModel,
-                final SelectionLayer selectionLayer, final RobotEditorCommandsStack commandsStack) {
+                final PositionCoordinate[] positionCoordinates, final RobotEditorCommandsStack commandsStack) {
 
             final List<RobotElement> newSettings = new ArrayList<>();
             final Optional<RobotSettingsSection> section = fileModel.findSection(RobotSettingsSection.class);
             if (section.isPresent()) {
-                final PositionCoordinate[] selectedCellPositions = selectionLayer.getSelectedCellPositions();
                 final Map<String, RobotElement> settingsMappingBeforeAddition = GeneralSettingsModel
                         .fillSettingsMapping(section.get());
                 final String[] generalSettingsNames = settingsMappingBeforeAddition.keySet().toArray(new String[0]);
+
                 final List<Integer> createdRows = new ArrayList<>();
-                for (final PositionCoordinate position : selectedCellPositions) {
+                for (final PositionCoordinate position : positionCoordinates) {
+
                     final int selectedRowNumber = position.getRowPosition();
                     if (!createdRows.contains(selectedRowNumber) && selectedRowNumber >= 0
                             && selectedRowNumber < generalSettingsNames.length
