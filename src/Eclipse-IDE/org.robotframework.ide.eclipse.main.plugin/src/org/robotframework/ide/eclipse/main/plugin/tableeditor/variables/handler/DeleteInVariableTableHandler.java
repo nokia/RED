@@ -14,7 +14,6 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
@@ -41,12 +40,11 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
         public void delete(final RobotEditorCommandsStack commandsStack,
                 @Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
-            final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
-            final SelectionLayer selectionLayer = selectionLayerAccessor.getSelectionLayer();
 
+            final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
             final RobotVariablesSection section = getSection(selection);
             final Collection<EditorCommand> detailsDeletingCommands = createCommandsForDetailsRemoval(section,
-                    selectionLayer);
+                    selectionLayerAccessor.getSelectedPositions());
 
             for (final EditorCommand command : detailsDeletingCommands) {
                 commandsStack.execute(command);
@@ -61,13 +59,13 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
 
 
         private Collection<EditorCommand> createCommandsForDetailsRemoval(final RobotVariablesSection section,
-                final SelectionLayer selectionLayer) {
+                final PositionCoordinate[] positionCoordinates) {
             final List<RobotVariable> variables = section.getChildren();
 
             // TODO : decide on behavior of fully selected rows; uncomment if change is needed
             // final List<RobotVariable> varsToRemove = new ArrayList<>();
             final List<EditorCommand> commands = new ArrayList<>();
-            for (final PositionCoordinate cellPosition : selectionLayer.getSelectedCellPositions()) {
+            for (final PositionCoordinate cellPosition : positionCoordinates) {
 
                 final RobotVariable variable = variables.get(cellPosition.rowPosition);
 

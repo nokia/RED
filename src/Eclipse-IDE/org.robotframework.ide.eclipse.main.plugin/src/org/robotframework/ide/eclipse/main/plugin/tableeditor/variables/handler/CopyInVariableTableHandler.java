@@ -16,7 +16,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.ArraysSerializerDeserializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.TableHandlersSupport;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler.CopyInVariableTableHandler.E4CopyInVariableTableHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -38,8 +37,8 @@ public class CopyInVariableTableHandler extends DIParameterizedHandler<E4CopyInV
                     .getSelectedPositions();
 
             if (selectedCellPositions.length > 0 && variables.length > 0) {
-                final PositionCoordinateSerializer[] positionsCopy = TableHandlersSupport
-                        .createSerializablePositionsCoordinates(selectedCellPositions);
+                final PositionCoordinateSerializer[] positionsCopy = PositionCoordinateSerializer
+                        .createFrom(selectedCellPositions);
                 final RobotVariable[] variablesCopy = ArraysSerializerDeserializer.copy(RobotVariable.class, variables);
 
                 clipboard.insertContent(positionsCopy, variablesCopy);
