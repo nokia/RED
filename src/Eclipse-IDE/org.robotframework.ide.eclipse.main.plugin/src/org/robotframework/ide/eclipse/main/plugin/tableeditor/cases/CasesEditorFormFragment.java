@@ -16,7 +16,6 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -52,7 +51,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -93,6 +91,7 @@ import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 
@@ -366,18 +365,28 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private void whenCaseIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_CASE_ADDED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
-        whenElementIsAddedOrRemoved(section);
     }
 
     @Inject
     @Optional
     private void whenCaseIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_CASE_REMOVED) final RobotSuiteFileSection section) {
-        whenElementIsAddedOrRemoved(section);
-        if (getSection() != null && section.getChildren().isEmpty()) {
-            selectionLayerAccessor.clear();
+        if (section.getSuiteFile() == fileModel) {
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+
+            if (section.getChildren().isEmpty()) {
+                SwtThread.asyncExec(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        selectionLayerAccessor.clear();
+                    }
+                });
+            }
         }
+
     }
 
     @Inject
@@ -385,10 +394,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private void whenCaseIsMoved(@UIEventTopic(RobotModelEvents.ROBOT_CASE_MOVED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+            selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
         }
-        final ISelection oldSelection = selectionProvider.getSelection();
-        whenElementIsAddedOrRemoved(section);
-        selectionProvider.setSelection(oldSelection);
     }
 
     @Inject
@@ -397,33 +404,39 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final RobotCase testCase) {
         if (testCase.getSuiteFile() == fileModel) {
             sortModel.clear();
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
-        whenElementIsAddedOrRemoved(testCase);
     }
 
     @Inject
     @Optional
     private void whenKeywordCallIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED) final RobotCase testCase) {
-        whenElementIsAddedOrRemoved(testCase);
+        if (testCase.getSuiteFile() == fileModel) {
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+        }
     }
 
     @Inject
     @Optional
     private void whenKeywordCallIsMoved(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED) final RobotCase testCase) {
-        final ISelection oldSelection = selectionProvider.getSelection();
-        whenElementIsAddedOrRemoved(testCase);
-        selectionProvider.setSelection(oldSelection);
+        if (testCase.getSuiteFile() == fileModel) {
+            sortModel.clear();
+            selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
+        }
     }
 
-    private void whenElementIsAddedOrRemoved(final RobotFileInternalElement element) {
-        if (element.getSuiteFile() == fileModel) {
-            sortModel.clear();
-            dataProvider.setInput(getSection());
-            table.refresh();
-            setDirty();
-        }
+    private Runnable tableInputIsReplaced() {
+        return new Runnable() {
+
+            @Override
+            public void run() {
+                dataProvider.setInput(getSection());
+                table.refresh();
+                setDirty();
+            }
+        };
     }
 
     @Inject

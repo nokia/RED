@@ -368,15 +368,15 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         if (section.getSuiteFile() == fileModel) {
             selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
 
-            SwtThread.asyncExec(new Runnable() {
+            if (section.getChildren().isEmpty()) {
+                SwtThread.asyncExec(new Runnable() {
 
-                @Override
-                public void run() {
-                    if (section.getChildren().isEmpty()) {
+                    @Override
+                    public void run() {
                         selectionLayerAccessor.clear();
                     }
-                }
-            });
+                });
+            }
         }
     }
 

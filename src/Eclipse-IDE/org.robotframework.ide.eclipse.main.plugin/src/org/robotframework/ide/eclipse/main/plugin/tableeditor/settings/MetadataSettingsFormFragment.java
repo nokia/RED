@@ -417,16 +417,15 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
 
             final RobotSettingsSection settingsSection = (RobotSettingsSection) section;
-            final List<RobotKeywordCall> metadataSettings = settingsSection.getMetadataSettings();
-            SwtThread.asyncExec(new Runnable() {
+            if (settingsSection.getMetadataSettings().isEmpty()) {
+                SwtThread.asyncExec(new Runnable() {
 
-                @Override
-                public void run() {
-                    if (metadataSettings.isEmpty()) {
+                    @Override
+                    public void run() {
                         selectionLayerAccessor.clear();
                     }
-                }
-            });
+                });
+            }
         }
     }
     
