@@ -35,8 +35,7 @@ public class CopyInVariableTableHandler extends DIParameterizedHandler<E4CopyInV
 
             final RobotVariable[] variables = Selections.getElementsArray(selection, RobotVariable.class);
             final PositionCoordinate[] selectedCellPositions = editor.getSelectionLayerAccessor()
-                    .getSelectionLayer()
-                    .getSelectedCellPositions();
+                    .getSelectedPositions();
 
             if (selectedCellPositions.length > 0 && variables.length > 0) {
                 final PositionCoordinateSerializer[] positionsCopy = TableHandlersSupport

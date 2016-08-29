@@ -35,8 +35,7 @@ public class CopyInSettingsTableHandler extends DIParameterizedHandler<E4CopyInS
 
             final RobotSetting[] settings = Selections.getElementsArray(selection, RobotSetting.class);
             final PositionCoordinate[] selectedCellPositions = editor.getSelectionLayerAccessor()
-                    .getSelectionLayer()
-                    .getSelectedCellPositions();
+                    .getSelectedPositions();
 
             if (selectedCellPositions.length > 0 && settings.length > 0) {
                 final PositionCoordinateSerializer[] serializablePositions = TableHandlersSupport

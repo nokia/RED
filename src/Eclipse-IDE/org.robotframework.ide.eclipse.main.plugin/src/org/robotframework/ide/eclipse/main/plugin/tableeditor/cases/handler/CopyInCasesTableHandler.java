@@ -30,8 +30,7 @@ public class CopyInCasesTableHandler extends DIParameterizedHandler<E4CopyInCase
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
             final PositionCoordinate[] selectedCellPositions = editor.getSelectionLayerAccessor()
-                    .getSelectionLayer()
-                    .getSelectedCellPositions();
+                    .getSelectedPositions();
 
             if (selectedCellPositions.length > 0) {
 

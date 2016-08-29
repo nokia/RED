@@ -38,7 +38,7 @@ public class DeleteSettingsHandler extends DIParameterizedHandler<E4DeleteSettin
 
             // needed when setting is cut/paste and selection remains on the same position,
             // pasting is performed on old, not existing setting
-            editor.getSelectionLayerAccessor().getSelectionLayer().clear();
+            editor.getSelectionLayerAccessor().clear();
         }
     }
 }

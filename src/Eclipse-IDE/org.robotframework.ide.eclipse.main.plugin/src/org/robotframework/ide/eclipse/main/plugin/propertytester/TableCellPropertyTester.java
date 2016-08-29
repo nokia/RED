@@ -51,7 +51,7 @@ public class TableCellPropertyTester extends PropertyTester {
             if (selectionLayerAccessor == null) {
                 return false;
             }
-            return selectionLayerAccessor.getSelectionLayer().getSelectedCellPositions().length == expected;
+            return selectionLayerAccessor.getSelectedPositions().length == expected;
         }
         return false;
     }

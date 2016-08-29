@@ -385,7 +385,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 activeCellEditor.close();
             }
             refreshTable();
-            selectionLayerAccessor.getSelectionLayer().clear();
+            selectionLayerAccessor.clear();
             setDirty();
         }
     }
