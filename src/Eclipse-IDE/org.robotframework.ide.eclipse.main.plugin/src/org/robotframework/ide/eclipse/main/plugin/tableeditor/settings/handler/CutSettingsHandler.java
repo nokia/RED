@@ -9,9 +9,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CopySettingsHandler.E4CopySettingsHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.CutSettingsHandler.E4CutSettingsHandler;
@@ -28,13 +26,12 @@ public class CutSettingsHandler extends DIParameterizedHandler<E4CutSettingsHand
     public static class E4CutSettingsHandler {
 
         @Execute
-        public void cutKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
-                final RobotEditorCommandsStack commandsStack,
+        public void cutKeywords(final RobotEditorCommandsStack commandsStack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
 
             final boolean copiedToClipboard = new E4CopySettingsHandler().copySettings(selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteSettingsHandler().deleteSettings(editor, commandsStack, selection);
+                new E4DeleteSettingsHandler().deleteSettings(commandsStack, selection);
             }
         }
     }

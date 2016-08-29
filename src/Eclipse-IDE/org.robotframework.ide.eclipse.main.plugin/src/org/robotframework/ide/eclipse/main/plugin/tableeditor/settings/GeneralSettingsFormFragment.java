@@ -815,10 +815,23 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             if (sortModel != null) {
                 sortModel.clear();
             }
-            setInput();
-            refreshTable();
-            setDirty();
+            if (section.getSuiteFile() == fileModel) {
+                sortModel.clear();
+                selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+            }
         }
+    }
+
+    private Runnable tableInputIsReplaced() {
+        return new Runnable() {
+
+            @Override
+            public void run() {
+                setInput();
+                refreshTable();
+                setDirty();
+            }
+        };
     }
 
     @Inject
