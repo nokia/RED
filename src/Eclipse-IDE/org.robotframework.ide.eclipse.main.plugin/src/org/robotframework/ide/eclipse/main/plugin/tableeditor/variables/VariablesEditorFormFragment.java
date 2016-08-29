@@ -80,6 +80,7 @@ import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Supplier;
 
@@ -367,9 +368,15 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
         if (section.getSuiteFile() == fileModel) {
             selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
 
-            if (getSection() != null && getSection().getChildren().isEmpty()) {
-                selectionLayerAccessor.clear();
-            }
+            SwtThread.asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (section.getChildren().isEmpty()) {
+                        selectionLayerAccessor.clear();
+                    }
+                }
+            });
         }
     }
 
