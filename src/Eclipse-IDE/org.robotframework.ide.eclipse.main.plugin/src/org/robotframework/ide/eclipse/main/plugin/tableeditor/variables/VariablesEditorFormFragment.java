@@ -332,7 +332,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 activeCellEditor.close();
             }
             dataProvider.setInput(getSection());
-            selectionLayerAccessor.getSelectionLayer().clear();
+            selectionLayerAccessor.clear();
             table.refresh();
 
             setDirty();
@@ -365,7 +365,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_REMOVED) final RobotSuiteFileSection section) {
         whenVariableIsAddedOrRemoved(section);
         if (getSection() != null && section.getChildren().isEmpty()) {
-            selectionLayerAccessor.getSelectionLayer().clear();
+            selectionLayerAccessor.clear();
         }
     }
 
