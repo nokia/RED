@@ -383,7 +383,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
             }
             
             refreshTable();
-            selectionLayerAccessor.getSelectionLayer().clear();
+            selectionLayerAccessor.clear();
             setDirty();
         }
     }

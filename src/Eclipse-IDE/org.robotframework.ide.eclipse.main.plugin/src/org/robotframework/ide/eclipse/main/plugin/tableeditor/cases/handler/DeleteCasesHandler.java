@@ -43,7 +43,7 @@ public class DeleteCasesHandler extends DIParameterizedHandler<E4DeleteCasesHand
             if (!cases.isEmpty()) {
                 commandsStack.execute(new DeleteCasesCommand(cases));
             }
-            editor.getSelectionLayerAccessor().getSelectionLayer().clear();
+            editor.getSelectionLayerAccessor().clear();
         }
     }
 }
