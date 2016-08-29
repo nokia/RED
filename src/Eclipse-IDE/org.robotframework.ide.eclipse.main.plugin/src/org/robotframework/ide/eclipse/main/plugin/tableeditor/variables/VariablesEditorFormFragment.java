@@ -16,7 +16,6 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
@@ -332,8 +331,8 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                 activeCellEditor.close();
             }
             dataProvider.setInput(getSection());
-            selectionLayerAccessor.clear();
             table.refresh();
+            selectionLayerAccessor.clear();
 
             setDirty();
         }
@@ -353,19 +352,24 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void whenVariableIsAdded(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_ADDED) final RobotSuiteFileSection section) {
+
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
-        whenVariableIsAddedOrRemoved(section);
     }
 
     @Inject
     @Optional
     private void whenVariableIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_REMOVED) final RobotSuiteFileSection section) {
-        whenVariableIsAddedOrRemoved(section);
-        if (getSection() != null && section.getChildren().isEmpty()) {
-            selectionLayerAccessor.clear();
+
+        if (section.getSuiteFile() == fileModel) {
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+
+            if (getSection() != null && getSection().getChildren().isEmpty()) {
+                selectionLayerAccessor.clear();
+            }
         }
     }
 
@@ -373,20 +377,23 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void whenVariableIsMoved(
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_MOVED) final RobotSuiteFileSection section) {
+
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+            selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
         }
-        final ISelection oldSelection = selectionProvider.getSelection();
-        whenVariableIsAddedOrRemoved(section);
-        selectionProvider.setSelection(oldSelection);
     }
 
-    private void whenVariableIsAddedOrRemoved(final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
-            dataProvider.setInput(getSection());
-            table.refresh();
-            setDirty();
-        }
+    private Runnable tableInputIsReplaced() {
+        return new Runnable() {
+
+            @Override
+            public void run() {
+                dataProvider.setInput(getSection());
+                table.refresh();
+                setDirty();
+            }
+        };
     }
 
     @Inject
