@@ -81,7 +81,7 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
 
                 elemDumper.dump(model, settingSections, sectionWithHeaderPos, th, sorted, setting, lines);
 
-                if (settingIndex + 1 < lastIndexToDump) {
+                if (settingIndex < lastIndexToDump) {
                     getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(setting,
                             sorted.get(settingIndex + 1), model, lines);
                 } else {

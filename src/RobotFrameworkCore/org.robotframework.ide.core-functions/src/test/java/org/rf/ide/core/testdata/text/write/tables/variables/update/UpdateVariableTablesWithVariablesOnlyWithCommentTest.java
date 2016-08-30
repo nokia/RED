@@ -28,8 +28,8 @@ public class UpdateVariableTablesWithVariablesOnlyWithCommentTest {
     public void test_givenVariableTableWithHashCommentVariable_whenAddNewVariable_thenCheckIfTableIsCorrectlyDumped()
             throws Exception {
         // prepare
-        final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS + "Input_HashInLastLine.robot";
-        final String outputFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS + "Output_HashInLastLine.robot";
+        final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS + "Input_HashInLastLine_addNewVariable.robot";
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS + "Output_HashInLastLine_addNewVariable.robot";
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
@@ -56,6 +56,26 @@ public class UpdateVariableTablesWithVariablesOnlyWithCommentTest {
         final VariableTable variableTable = modelFile.getVariableTable();
         variableTable.addVariable(
                 new ScalarVariable("${var_new}", RobotToken.create("${var_new}"), VariableScope.TEST_SUITE));
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    @Test
+    public void test_givenVariableTableWithHashCommentVariable_whenModifySecondVariable_thenCheckIfTableIsCorrectlyDumped()
+            throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
+                + "Input_HashInLastLine_modifyValueOfVariable.robot";
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
+                + "Output_HashInLastLine_modifyValueOfVariable.robot";
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final VariableTable variableTable = modelFile.getVariableTable();
+        ScalarVariable var2 = (ScalarVariable) variableTable.getVariables().get(1);
+        var2.getValues().get(0).setText("text with space2");
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);

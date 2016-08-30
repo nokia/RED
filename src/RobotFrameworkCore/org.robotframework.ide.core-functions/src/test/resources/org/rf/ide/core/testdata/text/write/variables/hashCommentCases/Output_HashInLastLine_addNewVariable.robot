@@ -8,3 +8,5 @@ ${B}
 #ll
 ${var_new}
 *** Test Cases ***
+test
+    log  7
