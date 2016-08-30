@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qKIwwE3AEeaiR4l81oXgMw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/16 2:33 PM
+Save-Time: 8/30/16 2:36 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -160,7 +160,7 @@ get-editor "TestFile.robot" |  get-canvas -after [get-label Variables] -index 1 
 
 //check Source
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n\n"
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "*** Variables ***\n"
     + "${a1}    6\n"
     + "${second_var}    10\n"
@@ -196,12 +196,12 @@ with [get-editor "TestFile.robot"] {
         }
     }
 }
-//check selection
+//check selection if it is on arg3
 with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
-    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCellPositions().PositionCoordinate[0].columnPosition" 
-        | equals 4 | verify-true
-    get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCellPositions().PositionCoordinate[0].rowPosition" 
-        | equals 0 | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getLastSelectedCellPosition().columnPosition" 
+        | equals 3 | verify-true
+    get-property "getLayer().getBodyLayer().getScrollableLayer().getLastSelectedCellPosition().rowPosition" | equals 0 
+        | verify-true
 }
 
 //go to Metadata and add default value
@@ -218,10 +218,11 @@ with [get-editor "TestFile.robot" | get-section Imports | get-canvas] {
 //    get-canvas | mouse-move 1021 158
 //}
 
+//ad to metadata new item
 with [get-editor "TestFile.robot" | get-section Metadata] {
     click
 }
-
+//add default value
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     mouse-press 101 62 button1
     mouse-release 101 62 button1 524288
@@ -231,6 +232,7 @@ with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     mouse-move 921 7
 }
 
+//check selection
 with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
     get-property "getLayer().getBodyLayer().getScrollableLayer().getSelectedCellPositions().PositionCoordinate[0].columnPosition" 
         | equals 0 | verify-true
