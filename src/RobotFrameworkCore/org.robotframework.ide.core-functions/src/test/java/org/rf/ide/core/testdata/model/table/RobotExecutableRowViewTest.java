@@ -290,6 +290,51 @@ public class RobotExecutableRowViewTest {
 
     }
 
+    @Test
+    public void given_testVariableAndPrettyAlignAtTheEndOfLine_whenTryToSearchEqualitySigns_shouldReturn_emptyView() {
+        // prepare
+        final TestCase testCase = (TestCase) CACHED_UNITS.get("TestVariableAndPrettyAlignAtTheEndOfLine");
+        final RobotExecutableRow<TestCase> execRowOne = testCase.getExecutionContext().get(0);
+
+        // execute
+        final RobotExecutableRowView view = RobotExecutableRowView.buildView(execRowOne);
+
+        // verify
+        final Map<RobotToken, String> views = new HashMap<>();
+        assertExecView(view, execRowOne, views, Arrays.asList("Log", "@{x11}"));
+    }
+
+    @Test
+    public void given_testVariableAndPrettyAlignAndEqualAtTheEndOfLine_whenTryToSearchEqualitySigns_shouldReturn_oneElementView() {
+        // prepare
+        final TestCase testCase = (TestCase) CACHED_UNITS.get("TestVariableAndPrettyAlignAndEqualAtTheEndOfLine");
+        final RobotExecutableRow<TestCase> execRowOne = testCase.getExecutionContext().get(0);
+
+        // execute
+        final RobotExecutableRowView view = RobotExecutableRowView.buildView(execRowOne);
+
+        // verify
+        final Map<RobotToken, String> views = new HashMap<>();
+        views.put(execRowOne.getElementTokens().get(1), " =");
+        assertExecView(view, execRowOne, views, Arrays.asList("Log", "@{x11} ="));
+    }
+
+    @Test
+    public void given_testVariableAndPrettyAlignAndEqualAndSpaceAtTheEndOfLine_whenTryToSearchEqualitySigns_shouldReturn_oneElementView() {
+        // prepare
+        final TestCase testCase = (TestCase) CACHED_UNITS
+                .get("TestVariableAndPrettyAlignAndEqualAndSpaceAtTheEndOfLine");
+        final RobotExecutableRow<TestCase> execRowOne = testCase.getExecutionContext().get(0);
+
+        // execute
+        final RobotExecutableRowView view = RobotExecutableRowView.buildView(execRowOne);
+
+        // verify
+        final Map<RobotToken, String> views = new HashMap<>();
+        views.put(execRowOne.getElementTokens().get(1), " =");
+        assertExecView(view, execRowOne, views, Arrays.asList("Log", "@{x11} ="));
+    }
+
     private void assertExecView(final RobotExecutableRowView view, final RobotExecutableRow<?> execRow,
             final Map<RobotToken, String> additionalTextTokens, final List<String> tokensView) {
         assertThat(view.getTokensWithSuffix().asMap()).hasSameSizeAs(additionalTextTokens);
