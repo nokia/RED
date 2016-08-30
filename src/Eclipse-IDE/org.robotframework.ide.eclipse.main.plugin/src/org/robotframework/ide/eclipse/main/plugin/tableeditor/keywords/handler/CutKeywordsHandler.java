@@ -10,9 +10,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CopyKeywordsHandler.E4CopyKeywordsHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.CutKeywordsHandler.E4CutKeywordsHandler;
@@ -32,12 +30,12 @@ public class CutKeywordsHandler extends DIParameterizedHandler<E4CutKeywordsHand
         private RobotEditorCommandsStack commandsStack;
 
         @Execute
-        public void cutKeywords(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
-                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
+        public void cutKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
+                final RedClipboard clipboard) {
 
             final boolean copiedToClipboard = new E4CopyKeywordsHandler().copyKeywords(selection, clipboard);
             if (copiedToClipboard) {
-                new E4DeleteKeywordsHandler().deleteKeywords(editor, commandsStack, selection);
+                new E4DeleteKeywordsHandler().deleteKeywords(commandsStack, selection);
             }
         }
     }

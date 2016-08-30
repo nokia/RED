@@ -8,6 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 public interface RobotModelEvents {
 
+    public static final String ADDITIONAL_DATA = "osgi.event.additionalData";
+
+
     public static final String ROBOT_SUITE_FILE_ALL = "robot/model/editor/file/structural/*";
 
     public static final String ROBOT_SUITE_STRUCTURAL_SECTION_ALL = "robot/model/editor/file/structural/section/*";

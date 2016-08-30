@@ -5,9 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -15,6 +18,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 
 public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
@@ -35,57 +41,75 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
         RobotDefinitionSetting argumentsSetting = definition.getArgumentsSetting();
-        if (argumentsSetting == null && value.isEmpty()) {
+
+        final Optional<List<String>> arguments = prepareArgumentsList(argumentsSetting);
+
+        if (argumentsSetting == null && !arguments.isPresent()) {
+            // there is no setting and we have no arguments to set
             return;
-        }
-        if (argumentsSetting == null) {
+
+        } else if (argumentsSetting != null && !arguments.isPresent()) {
+            // there is a setting, but we don't have arguments
+            definition.getChildren().remove(argumentsSetting);
+            definition.getLinkedElement()
+                    .removeUnitSettings((AModelElement<UserKeyword>) argumentsSetting.getLinkedElement());
+
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED,
+                    ImmutableMap.<String, Object> of(IEventBroker.DATA, definition, RobotModelEvents.ADDITIONAL_DATA,
+                            argumentsSetting));
+
+        } else if (argumentsSetting == null) {
+            // there is no setting, but we have arguments to set
             argumentsSetting = definition.createSetting(0, "[" + RobotKeywordDefinition.ARGUMENTS + "]",
                     new ArrayList<String>(), "");
+            updateModel(argumentsSetting, arguments.get());
 
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED,
+                    ImmutableMap.<String, Object> of(IEventBroker.DATA, definition, RobotModelEvents.ADDITIONAL_DATA,
+                            argumentsSetting));
+
+        } else if (!arguments.get().equals(argumentsSetting.getArguments())) {
+            // there is a setting and we have arguments which are different than current
+            updateModel(argumentsSetting, arguments.get());
+            argumentsSetting.resetStored();
+
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
         }
+    }
 
-        final List<String> arguments = argumentsSetting.getArguments();
-        boolean changed = false;
+    private Optional<List<String>> prepareArgumentsList(final RobotDefinitionSetting setting) {
+        final List<String> arguments = setting == null ? new ArrayList<String>() : newArrayList(setting.getArguments());
 
         for (int i = arguments.size(); i <= index; i++) {
             arguments.add("\\");
-            changed = true;
         }
-        changed |= index < arguments.size() && !arguments.get(index).equals(value);
-        arguments.set(index, value == null || value.isEmpty() ? "\\" : value);
+        arguments.set(index, value == null || value.trim().isEmpty() ? "\\" : value);
         for (int i = arguments.size() - 1; i >= 0; i--) {
             if (!arguments.get(i).equals("\\")) {
                 break;
             }
             arguments.set(i, null);
         }
-        if (changed) {
-            argumentsSetting.resetStored();
-            final KeywordTableModelUpdater updater = new KeywordTableModelUpdater();
-            if (value != null) {
-                for (int i = arguments.size() - 1; i >= 0; i--) {
-                    updater.update(argumentsSetting.getLinkedElement(), i, arguments.get(i));
-                }
-            } else {
-                updater.update(argumentsSetting.getLinkedElement(), index, value);
-            }
+        return areAllEmpty(arguments) ? Optional.<List<String>> absent() : Optional.of(arguments);
+    }
 
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
-        }
-
-        boolean allAreEmpty = true;
+    private boolean areAllEmpty(final List<String> arguments) {
         for (final String argument : arguments) {
-            if (argument != null) {
-                allAreEmpty &= argument.trim().isEmpty();
+            if (argument != null && !argument.trim().isEmpty()) {
+                return false;
             }
         }
-        if (allAreEmpty) {
-            definition.getChildren().remove(argumentsSetting);
-            definition.getLinkedElement()
-                    .removeUnitSettings((AModelElement<UserKeyword>) argumentsSetting.getLinkedElement());
+        return true;
+    }
 
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, definition);
+    private void updateModel(final RobotDefinitionSetting argumentsSetting, final List<String> arguments) {
+        final KeywordTableModelUpdater updater = new KeywordTableModelUpdater();
+        if (value != null) {
+            for (int i = arguments.size() - 1; i >= 0; i--) {
+                updater.update(argumentsSetting.getLinkedElement(), i, arguments.get(i));
+            }
+        } else {
+            updater.update(argumentsSetting.getLinkedElement(), index, value);
         }
     }
 }
