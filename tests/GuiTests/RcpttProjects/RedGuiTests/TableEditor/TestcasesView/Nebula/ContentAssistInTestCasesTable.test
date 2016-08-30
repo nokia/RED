@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mnMpkGhbEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/26/16 4:59 PM
+Save-Time: 8/30/16 3:49 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -169,20 +169,19 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
     + "${a1}  8    \n"
     + "&{myDict}    key=value\n"
-    + "    \n"
     + "*** Setting ***\n"
     + "*** Test Cases ***\n"
     + "new test\n"
     + "    Continue For Loop    ${EXECDIR}    ${CURDIR}    ${a1}    ${True}    ${SUITE_DOCUMENTATION}" | verify-true
     
 //add kw section with one new kw    
+   
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
-        set-caret-pos 4 4
+        set-caret-pos 4 16
         key-type Enter
-        key-type Left -times 3
         key-type "M1+SPACE"
-        key-type Down -times 3
+    	wait 200
         key-type Enter
         type-text "my_KW"
         key-type Enter
@@ -216,7 +215,7 @@ get-window -class ContentProposalPopup | get-table |  get-property itemCount -ra
 	}
 }
 
-
+//set focu on empty line
 get-view Outline | get-tree | select "TestFile.robot/Test Cases/new test/" | click
 wait 200
 //add kw after writnig part of kw name
