@@ -16,11 +16,11 @@ import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.Persist;
 import org.eclipse.e4.ui.di.UIEventTopic;
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
@@ -47,10 +47,13 @@ import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
+import org.osgi.service.event.Event;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -94,6 +97,7 @@ import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
 
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 
 public class KeywordsEditorFormFragment implements ISectionFormFragment {
@@ -368,17 +372,31 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
-        whenKeywordDefinitionIsAddedOrRemoved(section);
     }
 
     @Inject
     @Optional
     private void whenKeywordDefinitionIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED) final RobotSuiteFileSection section) {
-        whenKeywordDefinitionIsAddedOrRemoved(section);
-        if (getSection() != null && section.getChildren().isEmpty()) {
-            selectionLayerAccessor.clear();
+        if (section.getSuiteFile() == fileModel) {
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
+                    new Function<PositionCoordinate, PositionCoordinate>() {
+
+                        @Override
+                        public PositionCoordinate apply(final PositionCoordinate coordinate) {
+                            if (section.getChildren().isEmpty()) {
+                                return null;
+                            } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                                final RobotFileInternalElement lastCase = section.getChildren()
+                                        .get(section.getChildren().size() - 1);
+                                return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                                        dataProvider.indexOfRowObject(lastCase));
+                            }
+                            return coordinate;
+                        }
+                    });
         }
     }
 
@@ -388,70 +406,89 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_MOVED) final RobotSuiteFileSection section) {
         if (section.getSuiteFile() == fileModel) {
             sortModel.clear();
+            selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
         }
-        final ISelection oldSelection = selectionProvider.getSelection();
-        whenKeywordDefinitionIsAddedOrRemoved(section);
-        selectionProvider.setSelection(oldSelection);
     }
 
-    @Inject
-    @Optional
-    private void whenKeywordDefinitionArgumentChanged(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE) final RobotKeywordDefinition parent) {
-        if (parent.getSuiteFile() == fileModel) {
-            sortModel.clear();
-        }
-        whenKeywordDefinitionIsAddedOrRemoved(parent.getParent());
-    }
-
-    private void whenKeywordDefinitionIsAddedOrRemoved(final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
-            sortModel.clear();
-            dataProvider.setInput(getSection());
-            table.refresh();
-            setDirty();
-        }
-    }
 
     @Inject
     @Optional
     private void whenKeywordCallIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final RobotKeywordDefinition parent) {
-        if (parent.getSuiteFile() == fileModel) {
-            sortModel.clear();
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final Event event) {
+        final Object data = event.getProperty(IEventBroker.DATA);
+        if (data instanceof RobotKeywordDefinition && ((RobotKeywordDefinition) data).getSuiteFile() == fileModel) {
+            final Object additionalData = event.getProperty(RobotModelEvents.ADDITIONAL_DATA);
+
+            if (additionalData instanceof RobotDefinitionSetting
+                    && ((RobotDefinitionSetting) additionalData).isArguments()) {
+                // when arguments were added, we don't need to reload the input for data provider;
+                // this also does not influence selections
+                table.refresh();
+                setDirty();
+            } else {
+                sortModel.clear();
+                selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+            }
         }
-        whenKeywordCallIsAddedOrRemoved(parent);
     }
 
     @Inject
     @Optional
     private void whenKeywordCallIsRemoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED) final RobotKeywordDefinition parent) {
-        whenKeywordCallIsAddedOrRemoved(parent);
-        if (getSection() != null && parent.getChildren().isEmpty()) {
-            selectionLayerAccessor.clear();
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED) final Event event) {
+        final Object data = event.getProperty(IEventBroker.DATA);
+        if (data instanceof RobotKeywordDefinition && ((RobotKeywordDefinition) data).getSuiteFile() == fileModel) {
+            final Object additionalData = event.getProperty(RobotModelEvents.ADDITIONAL_DATA);
+
+            if (additionalData instanceof RobotDefinitionSetting
+                    && ((RobotDefinitionSetting) additionalData).isArguments()) {
+                // when arguments were removed, we don't need to reload the input for data provider;
+                // this also does not influence selections
+                table.refresh();
+                setDirty();
+            } else {
+                final RobotKeywordDefinition definition = (RobotKeywordDefinition) data;
+                selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
+                        new Function<PositionCoordinate, PositionCoordinate>() {
+
+                            @Override
+                            public PositionCoordinate apply(final PositionCoordinate coordinate) {
+                                if (definition.getChildren().isEmpty()) {
+                                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                                            dataProvider.indexOfRowObject(definition));
+                                } else if (dataProvider
+                                        .getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                                    return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                                            coordinate.getRowPosition() - 1);
+                                }
+                                return coordinate;
+                            }
+                        });
+            }
+
         }
     }
 
     @Inject
     @Optional
     private void whenKeywordCallIsMoved(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED) final RobotKeywordDefinition parent) {
-        if (parent.getSuiteFile() == fileModel) {
-            sortModel.clear();
-        }
-        final ISelection oldSelection = selectionProvider.getSelection();
-        whenKeywordCallIsAddedOrRemoved(parent);
-        selectionProvider.setSelection(oldSelection);
-    }
-
-    private void whenKeywordCallIsAddedOrRemoved(final RobotKeywordDefinition definition) {
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED) final RobotKeywordDefinition definition) {
         if (definition.getSuiteFile() == fileModel) {
             sortModel.clear();
-            dataProvider.setInput(getSection());
-            table.refresh();
-            setDirty();
+            selectionLayerAccessor.preserveElementSelectionWhen(tableInputIsReplaced());
         }
+    }
+
+    private Runnable tableInputIsReplaced() {
+        return new Runnable() {
+
+            @Override
+            public void run() {
+                dataProvider.setInput(getSection());
+                table.refresh();
+                setDirty();
+            }
+        };
     }
 
     @Inject
