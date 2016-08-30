@@ -815,20 +815,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             if (sortModel != null) {
                 sortModel.clear();
             }
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+            setInput();
+            refreshTable();
+            setDirty();
         }
-    }
-
-    private Runnable tableInputIsReplaced() {
-        return new Runnable() {
-
-            @Override
-            public void run() {
-                setInput();
-                refreshTable();
-                setDirty();
-            }
-        };
     }
 
     @Inject
