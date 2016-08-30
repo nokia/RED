@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.NatTable;
 import org.eclipse.nebula.widgets.nattable.config.ConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
@@ -49,6 +50,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CreateFreshVariableCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
@@ -80,8 +82,8 @@ import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
-import org.robotframework.red.swt.SwtThread;
 
+import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 
 public class VariablesEditorFormFragment implements ISectionFormFragment {
@@ -366,17 +368,20 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_VARIABLE_REMOVED) final RobotSuiteFileSection section) {
 
         if (section.getSuiteFile() == fileModel) {
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
+                    new Function<PositionCoordinate, PositionCoordinate>() {
 
-            if (section.getChildren().isEmpty()) {
-                SwtThread.asyncExec(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        selectionLayerAccessor.clear();
-                    }
-                });
-            }
+                        @Override
+                        public PositionCoordinate apply(final PositionCoordinate coordinate) {
+                            if (section.getChildren().isEmpty()) {
+                                return null;
+                            } else if (dataProvider.getRowObject(coordinate.getRowPosition()) instanceof AddingToken) {
+                                return new PositionCoordinate(coordinate.getLayer(), coordinate.getColumnPosition(),
+                                        coordinate.getRowPosition() - 1);
+                            }
+                            return coordinate;
+                        }
+                    });
         }
     }
 
