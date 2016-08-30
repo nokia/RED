@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _E0anoDR-Eeat08T3d_ERug
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/16 12:08 PM
+Save-Time: 8/30/16 4:48 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -45,12 +45,10 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "...    doc5    \n"
     + "...    doc6    \n"
     + "...    new line\n"
-    + "Metadata    nothng\n\n"
+    + "Metadata    nothng\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  4\n"
-    + "    \n"
-    + "    \n"
     + "*** Setting ***" | verify-true
     
 //undo    
@@ -78,31 +76,27 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "...    doc4    \n"
     + "...    doc5    \n"
     + "...    doc6\n"
-    + "Metadata    nothng\n\n"
+    + "Metadata    nothng\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  4\n"
-    + "    \n"
-    + "    \n"
     + "*** Setting ***" | verify-true
     
 //add third section    
 get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Setting ***\n"
     + "Documentation    doc1\n"
     + "...              doc2\n"
-    + "...     doc3   \n\n\n"
-    + "Metadata    nothng\n\n"
+    + "...     doc3   \n"
+    + "Metadata    nothng\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  4\n"
-    + "    \n"
-    + "    \n"
     + "*** Setting ***\n"
     + "Documentation    doc4\n"
     + "...              doc5\n"
-    + "...     doc6\n\n"
+    + "...     doc6\n"
     + "*** Variables ***\n"
-    + "${newScalar}    4\n\n"
+    + "${newScalar}    4\n"
     + "*** Setting ***\n"
     + "Documentation    abba1\n"
     + "...              \\\n"
@@ -121,7 +115,6 @@ get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-p
     + "\\\n"
     + "abba2\n"
     + "abba3" | verify-true
-
 
 
 //open tsv file and add second section    
@@ -164,10 +157,11 @@ with [get-editor "tsv_file.tsv"] {
     }
     get-tab-folder | get-tab-item Settings | click
 }
+//workaround - rcptt needs alot of time to update doc winodow
+get-editor "tsv_file.tsv" | close
+get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv" | double-click
 
-get-editor "tsv_file.tsv" | get-section General | get-editbox -index 1 | click
-
-try -times 8 -delay 1000 -command{
+try -times 4 -delay 1000 -command{
 	get-editor "tsv_file.tsv" | get-section General | get-editbox -index 1 | get-property text | equals second | verify-true
 }
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
