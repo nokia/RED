@@ -67,7 +67,7 @@ public class SetCaseKeywordCallNameCommand extends EditorCommand {
 
         testCase.createSetting(index, settingName, call.getArguments(), call.getComment());
 
-        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, testCase);
+        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, testCase);
     }
 
     private void changeToCall(final RobotKeywordCall call, final String name) {
@@ -78,7 +78,7 @@ public class SetCaseKeywordCallNameCommand extends EditorCommand {
 
         testCase.createKeywordCall(index, name, call.getArguments(), call.getComment());
 
-        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, testCase);
+        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, testCase);
     }
 
     private void changeName(final RobotKeywordCall element, final String name) {
