@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.views;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
@@ -59,7 +61,7 @@ public class DocumentationView {
 
     private CurrentlyDisplayedDocElement currentlyDisplayedDocElement;
     
-    private boolean hasShowLibdocEnabled;
+    private AtomicBoolean hasShowLibdocEnabled = new AtomicBoolean();
 
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part) {
@@ -190,7 +192,7 @@ public class DocumentationView {
     }
     
     public boolean hasShowLibdocEnabled() {
-        return hasShowLibdocEnabled;
+        return hasShowLibdocEnabled.get();
     }
 
     private void createToolbarActions(final IToolBarManager toolBarManager) {
@@ -390,7 +392,7 @@ public class DocumentationView {
 
         @Override
         public void run() {
-            hasShowLibdocEnabled = !hasShowLibdocEnabled;
+            hasShowLibdocEnabled.set(!hasShowLibdocEnabled.get());
         }
 
         @Override
