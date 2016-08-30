@@ -47,7 +47,7 @@ import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.RobotFileDumper;
-import org.rf.ide.core.testdata.mapping.FileOutputsMatchUpdater;
+import org.rf.ide.core.testdata.mapping.TwoModelReferencesLinker;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
@@ -93,7 +93,7 @@ public class RobotFormEditor extends FormEditor {
     private boolean isEditable;
 
     private SuiteFileValidationListener validationListener;
-    
+
     private DocumentationViewPartListener documentationViewPartListener;
 
     public RedClipboard getClipboard() {
@@ -107,7 +107,7 @@ public class RobotFormEditor extends FormEditor {
 
             clipboard = new RedClipboard(site.getShell().getDisplay());
             validationListener = new SuiteFileValidationListener();
-            
+
             prepareEclipseContext();
 
             validationListener.init();
@@ -358,7 +358,7 @@ public class RobotFormEditor extends FormEditor {
         }
         return null;
     }
-    
+
     public com.google.common.base.Optional<TreeLayerAccessor> getTreeLayerAccessor() {
         final IEditorPart activeEditor = getActiveEditor();
         if (activeEditor instanceof ISectionEditorPart) {
@@ -401,7 +401,7 @@ public class RobotFormEditor extends FormEditor {
         if (newPageIndex != getCurrentPage() && getActiveEditor() instanceof ISectionEditorPart) {
             ((ISectionEditorPart) getActiveEditor()).aboutToChangeToOtherPage();
         }
-        
+
         super.pageChange(newPageIndex);
 
         updateActivePage();
@@ -453,13 +453,14 @@ public class RobotFormEditor extends FormEditor {
                     .getSeparatorToUse(currentRobotOutputFile.getFileFormat() == FileFormat.TSV);
             final DumpContext ctx = new DumpContext();
             ctx.setPreferedSeparator(separatorFromPreference);
+            ctx.setDirtyFlag(true);
 
             final RobotFileDumper dumper = new RobotFileDumper();
             dumper.setContext(ctx);
             final String content = dumper.dump(currentRobotOutputFile);
             RobotFileOutput alreadyDumpedContent = suiteModel.getProject().getRobotParser().parseEditorContent(content,
                     currentRobotOutputFile.getProcessedFile());
-            new FileOutputsMatchUpdater().update(currentRobotOutputFile, alreadyDumpedContent);
+            new TwoModelReferencesLinker().update(currentRobotOutputFile, alreadyDumpedContent);
             alreadyDumpedContent = null;
             document.set(content);
         }
@@ -569,11 +570,11 @@ public class RobotFormEditor extends FormEditor {
             updateActivePage();
         }
     }
-    
+
     public void setDocumentationViewPartListener(final DocumentationViewPartListener listener) {
         this.documentationViewPartListener = listener;
     }
-    
+
     public void removeDocumentationViewPartListener() {
         this.documentationViewPartListener = null;
     }

@@ -66,12 +66,11 @@ public class EmptyLineDumper {
         }
     }
 
-    private boolean isFirstLineEmpty(final List<RobotLine> fileContent,
-            final int currentLineNumberInDump) {
+    private boolean isFirstLineEmpty(final List<RobotLine> fileContent, final int currentLineNumberInDump) {
         return isEmptyLine(fileContent.get(currentLineNumberInDump));
     }
 
-    private boolean isEmptyLine(final RobotLine line) {
+    public boolean isEmptyLine(final RobotLine line) {
         boolean isEmpty = true;
 
         for (final IRobotLineElement elem : line.getLineElements()) {
