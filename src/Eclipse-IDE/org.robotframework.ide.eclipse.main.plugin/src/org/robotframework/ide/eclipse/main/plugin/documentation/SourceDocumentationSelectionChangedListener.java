@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.documentation;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,9 +33,9 @@ public class SourceDocumentationSelectionChangedListener {
 
     private IRegion currentRegion;
 
-    private boolean isEditing;
+    private AtomicBoolean isEditing = new AtomicBoolean();
 
-    private Pattern possibleKeywordPattern = Pattern.compile("^[A-Za-z].*");
+    private static final Pattern possibleKeywordPattern = Pattern.compile("^[A-Za-z].*");
 
     private DocViewDelayedUpdateJob delayedUpdateJob = new DocViewDelayedUpdateJob(
             "Documentation View Delayed Update Job");
@@ -53,7 +54,7 @@ public class SourceDocumentationSelectionChangedListener {
         this.document = document;
         this.suiteFile = suiteFile;
         this.currentRegion = region;
-        this.isEditing = isEditing;
+        this.isEditing.set(isEditing);
 
         delayedUpdateJob.schedule(DocViewDelayedUpdateJob.DELAY);
     }
@@ -79,7 +80,7 @@ public class SourceDocumentationSelectionChangedListener {
                         .findDocumentationForOffset(currentRegion.getOffset());
 
                 if (docSettingToShow.isPresent()) {
-                    if (isEditing) {
+                    if (isEditing.get()) {
                         view.resetCurrentlyDisplayedElement();
                     }
                     view.showDocumentation(docSettingToShow.get(), suiteFile);
@@ -101,7 +102,7 @@ public class SourceDocumentationSelectionChangedListener {
         }
 
         private boolean shouldTryToFindKeywordDoc() {
-            return currentRegion != null && view.hasShowLibdocEnabled() && !isEditing;
+            return currentRegion != null && view.hasShowLibdocEnabled() && !isEditing.get();
         }
 
         private boolean isPossibleKeyword(final String text) {
