@@ -95,6 +95,8 @@ public interface RobotModelEvents {
     public static final String ROBOT_KEYWORD_CALL_REMOVED = "robot/model/editor/file/structural/cases/keywords/removed";
 
     public static final String ROBOT_KEYWORD_CALL_MOVED = "robot/model/editor/file/structural/cases/keywords/moved";
+
+    public static final String ROBOT_KEYWORD_CALL_CONVERTED = "robot/model/editor/file/structural/cases/keywords/converted";
     
     
     public static final String ROBOT_KEYWORD_CALL_DETAIL_CHANGE_ALL = "robot/model/editor/file/detail/cases/keywords/changed/*";
