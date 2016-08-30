@@ -82,8 +82,10 @@ public class RobotExecutableRowView {
             final RobotLine robotLine) {
         final Optional<Integer> elementPositionInLine = robotLine.getElementPositionInLine(token);
         if (elementPositionInLine.isPresent()) {
+            int lastAssignment = -1;
             final List<IRobotLineElement> lineElements = robotLine.getLineElements();
             int lineElementsSize = lineElements.size();
+            final List<RobotToken> tokensView = specialTokens.get(token);
             for (int i = elementPositionInLine.get() + 1; i < lineElementsSize; i++) {
                 final IRobotLineElement lineElement = lineElements.get(i);
                 final List<IRobotTokenType> elementTypes = lineElement.getTypes();
@@ -92,11 +94,22 @@ public class RobotExecutableRowView {
                     if (elementTypes.contains(RobotTokenType.ASSIGNMENT)
                             || elementTypes.contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
                         specialTokens.put(token, currentToken);
+                        if (elementTypes.contains(RobotTokenType.ASSIGNMENT)) {
+                            lastAssignment = tokensView.size();
+                        }
                     } else {
                         break;
                     }
                 } else {
                     break;
+                }
+            }
+
+            if (lastAssignment == -1) {
+                specialTokens.removeAll(token);
+            } else if (lastAssignment != tokensView.size()) {
+                while (lastAssignment != tokensView.size()) {
+                    tokensView.remove(lastAssignment);
                 }
             }
         }
