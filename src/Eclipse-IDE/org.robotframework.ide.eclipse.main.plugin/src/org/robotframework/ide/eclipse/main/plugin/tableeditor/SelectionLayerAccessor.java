@@ -17,10 +17,12 @@ import java.util.Set;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
-import org.eclipse.nebula.widgets.nattable.layer.ILayer;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.robotframework.red.swt.SwtThread;
+
+import com.google.common.base.Function;
+import com.google.common.base.Functions;
 
 /**
  * @author Michal Anglart
@@ -97,6 +99,11 @@ public class SelectionLayerAccessor {
     }
 
     public void preserveSelectionWhen(final Runnable operation) {
+        preserveSelectionWhen(operation, Functions.<PositionCoordinate> identity());
+    }
+
+    public void preserveSelectionWhen(final Runnable operation,
+            final Function<PositionCoordinate, PositionCoordinate> transform) {
         final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
         operation.run();
         // this has to be done separately, because it will hit locks on
@@ -106,7 +113,7 @@ public class SelectionLayerAccessor {
 
             @Override
             public void run() {
-                reestablishSelection(selectionLayer, positions);
+                reestablishSelection(selectionLayer, positions, transform);
             }
         });
     }
@@ -121,12 +128,15 @@ public class SelectionLayerAccessor {
 
             @Override
             public void run() {
-                reestablishSelection(selectionLayer, positions);
+                reestablishSelection(selectionLayer, positions, Functions.<PositionCoordinate> identity());
             }
         });
     }
 
-    private void reestablishSelection(final ILayer layer, final PositionCoordinate[] positions) {
+    private void reestablishSelection(final SelectionLayer layer, final PositionCoordinate[] positions,
+            final Function<PositionCoordinate, PositionCoordinate> transform) {
+        layer.clear();
+
         boolean shouldAdd = false;
 
         final List<PositionCoordinate> coordinates = newArrayList(positions);
@@ -139,11 +149,10 @@ public class SelectionLayerAccessor {
         });
 
         for (final PositionCoordinate coordinate : coordinates) {
-            if (coordinate.getColumnPosition() < layer.getColumnCount()) {
-                final int rowToSelect = coordinate.getRowPosition() == layer.getRowCount() - 1
-                        ? coordinate.getRowPosition() - 1 : coordinate.getRowPosition();
-                layer.doCommand(new SelectCellCommand(selectionLayer, coordinate.getColumnPosition(), rowToSelect,
-                        false, shouldAdd));
+            final PositionCoordinate transformedCoordinate = transform.apply(coordinate);
+            if (transformedCoordinate != null) {
+                layer.doCommand(new SelectCellCommand(selectionLayer, transformedCoordinate.getColumnPosition(),
+                        transformedCoordinate.getRowPosition(), false, shouldAdd));
 
                 shouldAdd = true;
             }
