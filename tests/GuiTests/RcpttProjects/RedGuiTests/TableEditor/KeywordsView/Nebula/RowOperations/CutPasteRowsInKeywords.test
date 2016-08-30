@@ -6,7 +6,8 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OPRvEF18EeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/9/16 2:44 PM
+Save-Time: 8/30/16 3:31 PM
+Tags: Bugs
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -65,7 +66,7 @@ with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Down -times 2
         key-type Enter
-        //remove this after bug JIRA-459
+        //remove this after bug RED-459
         key-type Right
     }
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -74,7 +75,7 @@ with [get-editor "TestFile.robot"] {
 }
 
 //
-get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4"
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4" | click
 wait 500
 with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -103,28 +104,25 @@ get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4" | click
 wait 300
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type Down
-    
-    wait 5000
     key-type "M1+M2+v"
-    wait 2000
 }
 
 //blad tu jest doc powinen byc na koncu kw matki
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+
+//bug created here
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "*** Keywords ***\n"
     + "kw1\n"
     + "    log  1\n"
     + "    [return]  9\n"
-    + "   \n"
     + "kw3\n"
     + "    a1\n"
     + "    a2\n"
     + "    a3\n"
-    + "       \n"
     + "kw4\n"
-    + "    Set Log Level    5\n"
     + "    [Documentation]    doc\n"
+    + "    Set Log Level    5\n"
     + "    this was empty line\n"
     + "kw-2\n"
     + "    Should Be Empty    item\n"
