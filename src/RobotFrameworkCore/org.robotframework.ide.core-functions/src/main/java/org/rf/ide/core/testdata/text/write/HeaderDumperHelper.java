@@ -46,7 +46,8 @@ public class HeaderDumperHelper {
             IRobotLineElement endOfLine = lastLine.getEndOfLine();
             if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
                     || endOfLine.getTypes().contains(EndOfLineTypes.NON)
-                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF)) && !lastLine.getLineElements().isEmpty()) {
+                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
+                    && !dumperHelper.getEmptyLineDumper().isEmptyLine(lastLine)) {
                 final IRobotLineElement lineSeparator = dumperHelper.getLineSeparator(model);
                 getDumpLineUpdater().updateLine(model, lines, lineSeparator);
             }

@@ -1,5 +1,4 @@
 *** Settings ***
-
 Default Tags
 Force Tags	t3	t2			#a
 Suite Setup
@@ -7,7 +6,6 @@ Test Setup    xyz
 Test Setup	z    123
 Test Template	tem
 Test Timeout	6
-
 Metadata	key1updated	value1updated
 #comment1
 Library    PLib.MFile
@@ -23,9 +21,5 @@ T1
     #ok_b
     ab_k
     Ab K
-
 *** Variables ***
 ${var}  2
-
-    
-    
