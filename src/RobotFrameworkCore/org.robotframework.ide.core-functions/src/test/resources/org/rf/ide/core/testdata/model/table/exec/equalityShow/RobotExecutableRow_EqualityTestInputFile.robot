@@ -44,3 +44,12 @@ TestTwoVariablesAllCombinationOfEqualityAndAssignment_andPipeLineSeparated
 |	|	${err} 	|	${out} =	|	Execute Command	|	getOut	|	both
 |	|	${err} =	|	${out} =	|	Execute Command	|	getOut	|	both
 |	|	${err}  =	|	${out}  =	|	Execute Command	|	getOut	|	both
+
+TestVariableAndPrettyAlignAtTheEndOfLine
+	Log	@{x11} 
+	
+TestVariableAndPrettyAlignAndEqualAtTheEndOfLine
+	Log	@{x11} =
+
+TestVariableAndPrettyAlignAndEqualAndSpaceAtTheEndOfLine
+	Log	@{x11} = 
