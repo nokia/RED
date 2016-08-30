@@ -26,16 +26,16 @@ import com.google.common.collect.ListMultimap;
 /**
  * @author wypych
  */
-public class FileOutputsMatchUpdater {
+public class TwoModelReferencesLinker {
 
     private final RobotTokensCollector tokenCollector;
 
-    public FileOutputsMatchUpdater() {
+    public TwoModelReferencesLinker() {
         this(new RobotTokensCollector());
     }
 
     @VisibleForTesting
-    protected FileOutputsMatchUpdater(final RobotTokensCollector tokenCollector) {
+    protected TwoModelReferencesLinker(final RobotTokensCollector tokenCollector) {
         this.tokenCollector = tokenCollector;
     }
 

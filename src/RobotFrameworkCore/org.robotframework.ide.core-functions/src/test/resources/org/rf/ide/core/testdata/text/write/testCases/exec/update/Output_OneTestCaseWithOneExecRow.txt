@@ -1,0 +1,4 @@
+*** Test Case ***
+Test1
+	Log	ok
+	LogMe	arg1
