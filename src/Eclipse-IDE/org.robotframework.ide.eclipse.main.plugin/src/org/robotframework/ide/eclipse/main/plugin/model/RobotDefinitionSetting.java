@@ -66,6 +66,10 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
         return arguments;
     }
     
+    public boolean isArguments() {
+        return getLinkedElement().getModelType() == ModelType.USER_KEYWORD_ARGUMENTS;
+    }
+
     public boolean isDocumentation() {
         final ModelType modelType = getLinkedElement().getModelType();
         return modelType == ModelType.TEST_CASE_DOCUMENTATION || modelType == ModelType.USER_KEYWORD_DOCUMENTATION;
