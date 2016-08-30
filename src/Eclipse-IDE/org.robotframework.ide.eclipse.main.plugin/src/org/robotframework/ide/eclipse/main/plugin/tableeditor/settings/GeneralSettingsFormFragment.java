@@ -815,10 +815,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
             if (sortModel != null) {
                 sortModel.clear();
             }
-            if (section.getSuiteFile() == fileModel) {
-                sortModel.clear();
-                selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
-            }
+            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
         }
     }
 
