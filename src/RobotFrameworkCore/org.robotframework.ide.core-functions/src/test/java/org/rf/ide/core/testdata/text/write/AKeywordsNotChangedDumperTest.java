@@ -11,6 +11,7 @@ import java.nio.file.Path;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
+import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
@@ -44,6 +45,10 @@ public abstract class AKeywordsNotChangedDumperTest {
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(fileContent, getFormat(),
                 RobotModelTestProvider.getParser());
         final RobotFileDumper dumper = new RobotFileDumper();
+        final DumpContext ctx = new DumpContext();
+        ctx.setDirtyFlag(false);
+        dumper.setContext(ctx);
+
         // execute
         final String dumpResult = dumper.dump(modelFile.getParent());
         // verify

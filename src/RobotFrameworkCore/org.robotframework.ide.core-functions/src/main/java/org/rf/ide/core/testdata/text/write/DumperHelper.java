@@ -77,6 +77,10 @@ public class DumperHelper {
         return this.aCommentHashDumper;
     }
 
+    public boolean isCurrentFileDirty() {
+        return this.currentDumper.isFileDirty();
+    }
+
     public void addEOFinCaseIsMissing(final RobotFile model, final List<RobotLine> lines) {
         IRobotLineElement buildEOL = new EndOfLineBuilder()
                 .setEndOfLines(Arrays.asList(new Constant[] { Constant.EOF })).buildEOL();

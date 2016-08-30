@@ -42,6 +42,10 @@ public class DumpLineUpdater {
                 line.setEndOfLine(Constant.get(elem), pos.getOffset(), pos.getColumn());
             }
 
+            if (aDumperHelper.isCurrentFileDirty() && !outLines.isEmpty()
+                    && aDumperHelper.getEmptyLineDumper().isEmptyLine(outLines.get(outLines.size() - 1))) {
+                outLines.remove(outLines.size() - 1);
+            }
             if (!elem.getTypes().contains(EndOfLineTypes.EOF)) {
                 outLines.add(new RobotLine(outLines.size() + 1, model));
             }
@@ -53,6 +57,11 @@ public class DumpLineUpdater {
                 line = new RobotLine(1, model);
                 outLines.add(line);
             } else {
+                final int outLineSize = outLines.size();
+                final RobotLine prevLine = outLines.get(outLineSize - 1);
+                if (!prevLine.getEndOfLine().getTypes().contains(EndOfLineTypes.NON)) {
+                    outLines.add(new RobotLine(prevLine.getLineNumber() + 1, model));
+                }
                 line = outLines.get(outLines.size() - 1);
             }
 
@@ -111,7 +120,7 @@ public class DumpLineUpdater {
     }
 
     private void replaceEOFbyEOL(final RobotFile model, final List<RobotLine> outLines) {
-        if (outLines.isEmpty()) {
+        if (!aDumperHelper.isCurrentFileDirty() || outLines.isEmpty()) {
             return;
         }
 

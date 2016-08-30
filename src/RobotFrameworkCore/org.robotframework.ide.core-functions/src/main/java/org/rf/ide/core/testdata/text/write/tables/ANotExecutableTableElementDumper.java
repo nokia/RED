@@ -98,6 +98,10 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
             }
         }
 
+        if (!lines.isEmpty() && !getDumperHelper().getEmptyLineDumper().isEmptyLine(lines.get(lines.size() - 1))) {
+            getDumperHelper().getDumpLineUpdater().updateLine(model, lines, getDumperHelper().getLineSeparator(model));
+        }
+
         IRobotLineElement lastToken = elemDeclaration;
         if (!elemDeclaration.isDirty() && currentLine != null) {
             getDumperHelper().getDumpLineUpdater().updateLine(model, lines, elemDeclaration);

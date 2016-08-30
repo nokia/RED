@@ -544,5 +544,9 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
         this.dumpContext = ctx;
     }
 
+    public boolean isFileDirty() {
+        return this.dumpContext.isDirty();
+    }
+
     protected abstract Separator getSeparatorDefault();
 }

@@ -9,11 +9,21 @@ public class DumpContext {
 
     private String preferedSeparator = null;
 
+    private boolean isDirty = true;
+
     public void setPreferedSeparator(final String preferedSeparator) {
         this.preferedSeparator = preferedSeparator;
     }
 
     public String getPreferedSeparator() {
         return this.preferedSeparator;
+    }
+
+    public void setDirtyFlag(final boolean isDirty) {
+        this.isDirty = isDirty;
+    }
+
+    public boolean isDirty() {
+        return this.isDirty;
     }
 }

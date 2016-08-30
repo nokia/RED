@@ -19,7 +19,7 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.testdata.RobotParser;
-import org.rf.ide.core.testdata.mapping.FileOutputsMatchUpdater.DifferentOutputFile;
+import org.rf.ide.core.testdata.mapping.TwoModelReferencesLinker.DifferentOutputFile;
 import org.rf.ide.core.testdata.mapping.collect.RobotTokensCollector;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
@@ -54,7 +54,7 @@ public class FileOutputsMatchUpdaterTest {
                 .extractRobotTokens(newContent);
 
         // execute
-        new FileOutputsMatchUpdater().replaceNewReferenceByCorrespondingOld(oldContent, oldViewAboutTokens, newContent,
+        new TwoModelReferencesLinker().replaceNewReferenceByCorrespondingOld(oldContent, oldViewAboutTokens, newContent,
                 newViewAboutTokens);
 
         // verify
@@ -140,7 +140,7 @@ public class FileOutputsMatchUpdaterTest {
         newViewAboutTokens.put(typeOne, RobotToken.create("ok2"));
 
         // execute & verify
-        new FileOutputsMatchUpdater().validateThatTheSameTokensInView(oldViewAboutTokens, newViewAboutTokens);
+        new TwoModelReferencesLinker().validateThatTheSameTokensInView(oldViewAboutTokens, newViewAboutTokens);
     }
 
     @Test
@@ -160,7 +160,7 @@ public class FileOutputsMatchUpdaterTest {
         newViewAboutTokens.put(typeOne, RobotToken.create("ok2"));
 
         // execute & verify
-        new FileOutputsMatchUpdater().validateThatTheSameTokensInView(oldViewAboutTokens, newViewAboutTokens);
+        new TwoModelReferencesLinker().validateThatTheSameTokensInView(oldViewAboutTokens, newViewAboutTokens);
     }
 
     @Test
@@ -180,7 +180,7 @@ public class FileOutputsMatchUpdaterTest {
         newViewAboutTokens.put(typeOne, RobotToken.create("d"));
 
         // execute & verify
-        new FileOutputsMatchUpdater().validateThatTheSameTokensInView(oldViewAboutTokens, newViewAboutTokens);
+        new TwoModelReferencesLinker().validateThatTheSameTokensInView(oldViewAboutTokens, newViewAboutTokens);
     }
 
     @Test
@@ -198,7 +198,7 @@ public class FileOutputsMatchUpdaterTest {
         newViewAboutTokens.put(typeOne, RobotToken.create("ok3"));
 
         // execute & verify
-        new FileOutputsMatchUpdater().validateThatTheSameTokensInView(oldViewAboutTokens, newViewAboutTokens);
+        new TwoModelReferencesLinker().validateThatTheSameTokensInView(oldViewAboutTokens, newViewAboutTokens);
     }
 
     @Test
@@ -213,7 +213,7 @@ public class FileOutputsMatchUpdaterTest {
         when(newOutput.getProcessedFile()).thenReturn(fNew);
 
         // execute && verify
-        new FileOutputsMatchUpdater().validateBasicThatOutputFromSameFile(oldModifiedOutput, newOutput);
+        new TwoModelReferencesLinker().validateBasicThatOutputFromSameFile(oldModifiedOutput, newOutput);
     }
 
     @Test(expected = DifferentOutputFile.class)
@@ -228,7 +228,7 @@ public class FileOutputsMatchUpdaterTest {
         when(newOutput.getProcessedFile()).thenReturn(fNew);
 
         // execute & verify
-        new FileOutputsMatchUpdater().validateBasicThatOutputFromSameFile(oldModifiedOutput, newOutput);
+        new TwoModelReferencesLinker().validateBasicThatOutputFromSameFile(oldModifiedOutput, newOutput);
     }
 
     @Test
@@ -251,7 +251,7 @@ public class FileOutputsMatchUpdaterTest {
         ListMultimap<RobotTokenType, RobotToken> newView = ArrayListMultimap.create();
         when(collector.extractRobotTokens(alreadyDumpedContent)).thenReturn(newView);
 
-        final FileOutputsMatchUpdater tested = spy(new FileOutputsMatchUpdater(collector));
+        final TwoModelReferencesLinker tested = spy(new TwoModelReferencesLinker(collector));
 
         doNothing().when(tested).validateBasicThatOutputFromSameFile(oldModifiedOutput, alreadyDumpedContent);
         doNothing().when(tested).replaceNewReferenceByCorrespondingOld(oldModifiedOutput, oldView, alreadyDumpedContent,

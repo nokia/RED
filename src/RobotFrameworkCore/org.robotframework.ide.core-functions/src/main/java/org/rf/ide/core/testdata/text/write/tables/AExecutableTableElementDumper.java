@@ -93,15 +93,20 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             }
         }
 
-        if (currentLine != null) {
-            getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine, elemDeclaration,
-                    lines);
-        }
-
         if (!lines.isEmpty()) {
             if (lines.get(lines.size() - 1).getEndOfLine().getTypes().contains(EndOfLineTypes.EOF)) {
                 lines.get(lines.size() - 1).setEndOfLine(null, -1, -1);
             }
+        }
+
+        if (getDumperHelper().isCurrentFileDirty() && !lines.isEmpty()
+                && !getDumperHelper().getEmptyLineDumper().isEmptyLine(lines.get(lines.size() - 1))) {
+            getDumperHelper().getDumpLineUpdater().updateLine(model, lines, getDumperHelper().getLineSeparator(model));
+        }
+
+        if (currentLine != null) {
+            getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine, elemDeclaration,
+                    lines);
         }
 
         final RobotElementsComparatorWithPositionChangedPresave sorter = getSorter(currentElement);
@@ -146,6 +151,11 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             }
 
             if (shouldDumpDeclaration) {
+                if (!lines.isEmpty()
+                        && !getDumperHelper().getEmptyLineDumper().isEmptyLine(lines.get(lines.size() - 1))) {
+                    getDumperHelper().getDumpLineUpdater().updateLine(model, lines,
+                            getDumperHelper().getLineSeparator(model));
+                }
                 if (!wasSeparatorBefore(lines)) {
                     getDumperHelper().getDumpLineUpdater().updateLine(model, lines,
                             getDumperHelper().getSeparator(model, lines, lastToken, lastToken));

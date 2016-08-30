@@ -1,0 +1,7 @@
+*** Variable ***
+${var1}	c
+${var2}	d
+*** Test Cases ***
+T1
+	Log_first	ok_f
+	Log_second	ok_s

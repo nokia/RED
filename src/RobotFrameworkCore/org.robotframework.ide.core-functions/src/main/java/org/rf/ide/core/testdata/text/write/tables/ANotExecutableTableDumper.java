@@ -24,13 +24,10 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
 
     private final DumperHelper aDumpHelper;
 
-    private final EmptyLineDumper anEmptyLineDumper;
-
     private final List<ISectionElementDumper> dumpers;
 
     public ANotExecutableTableDumper(final DumperHelper aDumpHelper, final List<ISectionElementDumper> dumpers) {
         this.aDumpHelper = aDumpHelper;
-        this.anEmptyLineDumper = new EmptyLineDumper(aDumpHelper);
         this.dumpers = dumpers;
     }
 
@@ -39,7 +36,7 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
     }
 
     protected EmptyLineDumper getEmptyDumperHelper() {
-        return this.anEmptyLineDumper;
+        return getDumperHelper().getEmptyLineDumper();
     }
 
     @SuppressWarnings("unchecked")
