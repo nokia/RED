@@ -20,7 +20,9 @@ import org.rf.ide.core.testdata.text.read.IRobotLineElement;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.RobotLine.PositionCheck;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.write.SectionBuilder.Section;
 
@@ -175,7 +177,8 @@ public class DumperHelper {
                     }
 
                 } else if (startPosForElements.contains(pos.getOffset())
-                        || containsOneOfElementOffset(e, startPosForElements)) {
+                        || containsOneOfElementOffset(e, startPosForElements)
+                        || isFollowPrettyAlign(startPosForElements, pos, model)) {
                     index = elemIndex;
                     nextFound = 0;
                     nextStartFoundIndex = -1;
@@ -220,6 +223,25 @@ public class DumperHelper {
         }
 
         return index;
+    }
+
+    private boolean isFollowPrettyAlign(final Set<Integer> startPosForElements, final FilePosition pos,
+            final RobotFile model) {
+        if (startPosForElements.contains(pos.getOffset() - 1)) {
+            Optional<Integer> line = model.getRobotLineIndexBy(pos.getOffset() - 1);
+            if (line.isPresent()) {
+                RobotLine robotLine = model.getFileContent().get(line.get());
+                Optional<Integer> elementPos = robotLine.getElementPositionInLine(pos.getOffset() - 1,
+                        PositionCheck.STARTS);
+                if (elementPos.isPresent()) {
+                    IRobotLineElement elem = robotLine.getLineElements().get(elementPos.get());
+                    if (elem.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public <T extends ARobotSectionTable> boolean containsOneOfElementOffset(final AModelElement<T> e,

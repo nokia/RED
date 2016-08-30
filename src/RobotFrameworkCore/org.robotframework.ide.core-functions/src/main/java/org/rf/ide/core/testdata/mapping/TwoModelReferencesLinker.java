@@ -158,17 +158,20 @@ public class TwoModelReferencesLinker {
     }
 
     private boolean isAcceptableContent(final RobotToken rtOld, final RobotToken rtNew) {
-        if ((rtOld.getText().trim().isEmpty() && rtNew.getText().trim().equals("\\"))) {
+        final String oldTrimmed = rtOld.getText().trim();
+        final String newTrimmed = rtNew.getText().trim();
+
+        if ((oldTrimmed.isEmpty() && newTrimmed.equals("\\"))) {
             return true;
         }
 
-        if (rtOld.getText().trim().equals("...") && rtNew.getText().trim().equals("...")) {
+        if (oldTrimmed.equals("...") && newTrimmed.equals("...")) {
             return true;
         }
 
         if (rtOld.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
-            String oldText = rtOld.getText().trim();
-            String newText = rtNew.getText().trim();
+            String oldText = oldTrimmed;
+            String newText = newTrimmed;
 
             if (newText.endsWith("=")) {
                 if (oldText.equals(newText.substring(0, newText.length() - 1).trim())) {
@@ -178,14 +181,18 @@ public class TwoModelReferencesLinker {
         }
 
         if (rtNew.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
-            String oldText = rtOld.getText().trim();
-            String newText = rtNew.getText().trim();
+            String oldText = oldTrimmed;
+            String newText = newTrimmed;
 
             if (oldText.endsWith("=")) {
                 if (newText.equals(oldText.substring(0, oldText.length() - 1).trim())) {
                     return true;
                 }
             }
+        }
+
+        if (!newTrimmed.isEmpty() && newTrimmed.equals(oldTrimmed)) {
+            return true;
         }
 
         return false;
