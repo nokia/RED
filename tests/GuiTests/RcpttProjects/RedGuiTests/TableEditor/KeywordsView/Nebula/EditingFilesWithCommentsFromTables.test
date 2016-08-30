@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-SZoMF_XEeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/25/16 12:09 PM
+Save-Time: 8/30/16 2:56 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -38,25 +38,21 @@ with [get-editor "res.robot"] {
 
 //bug - usuwa komantarz
 get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Library   OperatingSystem \n\n"
+    + "Library   OperatingSystem \n"
     + " *** Keyword ***\n"
     + "kw1\n"
     + "    [Documentation]    doc1    \n"
     + "    Import Resource    new path\n"
     + "    None Shall Pass    who\n"
     + "    Repeat Keyword    repeat    name    \n"
-    + "    \n"
     + "kw2\n"
     + "    [Arguments]    ${a}  ${b}\n"
     + "    [Tags]    new    \n"
     + "    Catenate    a  b  c\n"
-    + "    \n"
     + "# kw3\n"
     + "    # Log  4\n"
     + "    # log  5\n"
-    + "    \n"
     + "    # log  7" | verify-true
- 
  
  
 //-----------------------------------------------------------------------------------------------------------
@@ -82,7 +78,7 @@ with [get-editor "comment_at_the_end.robot"] {
 //remove "keyword 1" 
 with [get-editor "comment_at_the_end.robot"] {
     with [get-text-viewer] {
-        set-caret-pos 14 10
+        set-caret-pos 13 10
         key-type BackSpace -times 9
         key-type "M1+s"
         wait 500
@@ -138,13 +134,12 @@ with [get-editor "settings.robot"] {
 get-editor "settings.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "*** Settings ***\n"
     + "Resource    ${/}\n"
-    + "Metadata    new\n\n"
+    + "Metadata    new\n"
     + "Metadata    data\n"
     + " *** Keyword ***\n"
     + "# Keyword\n"
     + "    # log  12\n"
     + "    # Should Be Equal    11    11\n"
-    + "    \n"
     + "# kw2\n"
     + "    # Catenate    1    2    3    4    5    6\n"
     + "    # Get Time\n"
@@ -158,29 +153,38 @@ get-editor "settings.robot" | get-text-viewer | get-property text | equals "*** 
 get-view "Project Explorer" | get-tree | select "RobotProject/variables.robot" | select "RobotProject/variables.robot" 
     | double-click
 get-editor "variables.robot" | get-tab-folder | get-tab-item Variables | click
-get-view Outline | get-tree | select "variables.robot/Variables/"
+
+get-view Outline | get-tree | select "variables.robot/Variables/path" | click
+wait 200
+
+//changed value when in variables section is comment
 with [get-editor "variables.robot"] {
     with [get-canvas -after [get-label Variables] -index 1] {
         key-type Right
-        key-type Left
-        key-type Down
         key-type Enter
     }
-    get-tab-folder | get-tab-item Source | click
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text "new path"
+        key-type Enter
+    }
 }
+
+get-editor "variables.robot" | get-editbox -after [get-label Variables] -index 1 | key-type "M1+s"
+
+get-editor "variables.robot" | get-tab-folder | get-tab-item Source | click
+
+//here is bug - expeption is shown
 get-editor "variables.robot" | get-text-viewer | get-property text | equals "*** Variable ***\n"
     + "${var}    1\n"
     + "${var1}    text with space\n"
-    + "${path}  C:\\n"
-    + "ew\\file.txt\n"
+    + "${path}  new path\n"
     + "${ref}    /ref/ref/file.jpg    #image\n"
     + "${a}    ${a}\n"
     + "${B}\n\n\n"
     + "#ll\n\n"
-    + "${var2}\n"
     + "*** Test Cases ***\n"
     + "test\n"
-    + "    log  7" | verify-true    
-    
+    + "    log  7" | verify-true
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
