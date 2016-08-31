@@ -477,4 +477,9 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
     public RobotToken getName() {
         return getTestName();
     }
+
+    @Override
+    public FilePosition getEndPosition() {
+        return findEndPosition(getParent().getParent());
+    }
 }
