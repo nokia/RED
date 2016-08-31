@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _8TAF0G6JEeaFMpJxhF5ZTQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/30/16 11:10 AM
+Save-Time: 8/31/16 2:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -109,7 +109,7 @@ get-view "Message Log" | get-editbox | get-property text | equals "Starting test
     + "Ending test: RobotProject.TestFile.TEST_1" | verify-true
     
 get-view Console | get-text-viewer | get-property text 
-    | contains "[ WARN ] Multiple test cases with name 'TEST_1' executed in test suite 'RobotProject.TestFile'.\n"
+    | contains "Multiple test cases with name 'TEST_1' executed in test suite 'RobotProject.TestFile'.\n"
     | verify-true
 
 //eset focus on "this wil fail" and use shortcut
