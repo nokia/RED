@@ -34,7 +34,7 @@ public class RunTestHandler extends DIParameterizedHandler<E4RunTestHandler> {
     public static class E4RunTestHandler {
 
         @Execute
-        public Object runSingleTest(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
+        public void runSingleTest(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
                 @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile suiteModel,
                 @Named(RunTestFromTableDynamicMenuItem.RUN_TEST_COMMAND_MODE_PARAMETER) final String mode) {
 
@@ -58,7 +58,6 @@ public class RunTestHandler extends DIParameterizedHandler<E4RunTestHandler> {
                 }
             }
 
-            return null;
         }
     }
 
