@@ -10,7 +10,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -18,9 +17,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 
 public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
@@ -54,9 +53,9 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             definition.getLinkedElement()
                     .removeUnitSettings((AModelElement<UserKeyword>) argumentsSetting.getLinkedElement());
 
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED,
-                    ImmutableMap.<String, Object> of(IEventBroker.DATA, definition, RobotModelEvents.ADDITIONAL_DATA,
-                            argumentsSetting));
+            RedEventBroker.using(eventBroker)
+                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(argumentsSetting)
+                    .send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, definition);
 
         } else if (argumentsSetting == null) {
             // there is no setting, but we have arguments to set
@@ -64,9 +63,9 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
                     new ArrayList<String>(), "");
             updateModel(argumentsSetting, arguments.get());
 
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED,
-                    ImmutableMap.<String, Object> of(IEventBroker.DATA, definition, RobotModelEvents.ADDITIONAL_DATA,
-                            argumentsSetting));
+            RedEventBroker.using(eventBroker)
+                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(argumentsSetting)
+                    .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
 
         } else if (!arguments.get().equals(argumentsSetting.getArguments())) {
             // there is a setting and we have arguments which are different than current
