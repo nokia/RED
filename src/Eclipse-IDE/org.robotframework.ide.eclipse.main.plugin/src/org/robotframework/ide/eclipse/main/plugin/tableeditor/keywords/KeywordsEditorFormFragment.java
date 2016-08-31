@@ -185,8 +185,8 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(glazedListsEventLayer);
         final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
 
-        final TreeLayer treeLayer = new TreeLayer(bodySelectionLayer, treeRowModel);
-        final ViewportLayer bodyViewportLayer = new ViewportLayer(treeLayer);
+        final TreeLayer treeLayer = factory.createTreeLayer(bodySelectionLayer, treeRowModel);
+        final ViewportLayer bodyViewportLayer = factory.createViewportLayer(treeLayer);
 
         // column header layers
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider);
