@@ -39,6 +39,11 @@ public class SelectionLayerAccessor {
         this.selectionProvider = selectionProvider;
     }
 
+    public int getLastSelectedRowPosition() {
+        final PositionCoordinate lastSelectedCellPosition = selectionLayer.getLastSelectedCellPosition();
+        return lastSelectedCellPosition != null ? lastSelectedCellPosition.getRowPosition() : -1;
+    }
+
     public int getColumnCount() {
         return selectionLayer.getColumnCount();
     }
