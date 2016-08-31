@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -484,9 +485,16 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
             @Override
             public void run() {
+                final int rowCountBeforeChange = dataProvider.getTreeList().size();
+                final List<Integer> expandedRowIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
+                int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
+                
                 dataProvider.setInput(getSection());
                 table.refresh();
                 setDirty();
+                
+                final int rowCountChange = dataProvider.getTreeList().size() - rowCountBeforeChange;
+                treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
             }
         };
     }
