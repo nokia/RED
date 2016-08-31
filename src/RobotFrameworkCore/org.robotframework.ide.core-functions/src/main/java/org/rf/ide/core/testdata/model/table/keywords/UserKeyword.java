@@ -402,4 +402,9 @@ public class UserKeyword extends AModelElement<KeywordTable>
     public RobotToken getName() {
         return getKeywordName();
     }
+
+    @Override
+    public FilePosition getEndPosition() {
+        return findEndPosition(getParent().getParent());
+    }
 }
