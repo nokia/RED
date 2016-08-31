@@ -1,0 +1,146 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _AXAyAF_dEeaRBaqqj0N1Gg
+Element-Name: MoveUpDownRowsInTestCases
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _pEYlwG6SEeaFMpJxhF5ZTQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 8/31/16 2:54 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    Catenate    1    2    3    4    5\n"
+    + "    Should Be True    ${True}\n"
+    + "    [Teardown]    Convert To Hex    555 \n\n"
+    + "my test 2\n"
+    + "    Fail    \"this wil fail\"\n"
+    + "    my kw\n"
+    + "       \n"
+    + " test 3\n"
+    + "    : FOR    ${x}  IN RANGE   5\n"
+    + "    \\  log  ${x}\n"
+    + "    Evaluate    expression    No Operation\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    Convert To Hex    855"
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+wait 200
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/my test 2"
+wait 200
+
+
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+	//move up second test case
+    get-menu "Row/Move up" | click
+    //go down and try move up first KW - no changes
+    key-type Down
+    get-menu "Row/Move up" | click
+    
+    //go down and try to move down last KW - no changes
+    key-type Down
+    get-menu "Row/Move down" | click
+  
+}
+
+//set focus on teardown
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down -times 3
+
+//check tah it cannot be moved
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    get-menu "Row/Move up" | get-property enablement | equals false | verify-true
+    get-menu "Row/Move down" | get-property enablement | equals false | verify-true
+}
+//go down to Catenate
+get-eclipse-window | key-type Down
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Down
+    key-type Right
+    //move catenate down
+    get-menu "Row/Move down" | click
+    
+    //go to Should be tru and try to move up - no result
+    key-type Up
+    get-menu "Row/Move up" | click
+}
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 3" | click
+wait 200
+
+//set focus on :FOR and move dow 2 times
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Right
+    key-type Left
+    key-type Down
+    key-type "M1+ARROW_DOWN" -times 2
+}
+//add new Kw
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "new item"
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type Left
+    
+    //move this new items 4 times up to the top
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+ARROW_UP" -times 4
+    }
+    
+}
+
+check-test_case-row -file  "TestFile.robot" -row 1 -tc "my test 2" 
+check-test_case-row -file  "TestFile.robot" -row 2 -tc "Fail"  -c1 "\"this wil fail\""
+check-test_case-row -file  "TestFile.robot" -row 3 -tc "my kw" 
+check-test_case-row -file  "TestFile.robot" -row 4 -tc "..." 
+
+check-test_case-row -file  "TestFile.robot" -row 5 -tc "test 1" 
+check-test_case-row -file  "TestFile.robot" -row 6 -tc "[Teardown]" -c1 "Convert To Hex" -c2 555
+check-test_case-row -file  "TestFile.robot" -row 7 -tc "Should Be True" -c1 "${True}"
+check-test_case-row -file  "TestFile.robot" -row 8 -tc "Catenate" -c1 1 -c2 2 -c3 3 -c4 4 -c5 5
+check-test_case-row -file  "TestFile.robot" -row 9 -tc "..."
+
+check-test_case-row -file  "TestFile.robot" -row 10 -tc "test 3"
+check-test_case-row -file  "TestFile.robot" -row 11 -tc "new item"
+check-test_case-row -file  "TestFile.robot" -row 12 -tc "\\" -c1 "log" -c2 "${x}"
+check-test_case-row -file  "TestFile.robot" -row 13 -tc "Evaluate" -c1 "expression" -c2 "No Operation"
+check-test_case-row -file  "TestFile.robot" -row 14 -tc ": FOR" -c1 "${x}" -c2 "IN RANGE" -c3 5
+check-test_case-row -file  "TestFile.robot" -row 15 -tc "..." 
+
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "my test 2\n"
+    + "    Fail    \"this wil fail\"\n"
+    + "    my kw\n"
+    + "test 1\n"
+    + "    Should Be True    ${True}\n"
+    + "    Catenate    1    2    3    4    5\n"
+    + "    [Teardown]    Convert To Hex    555 \n"
+    + " test 3\n"
+    + "    new item\n"
+    + "    \\  log  ${x}\n"
+    + "    Evaluate    expression    No Operation\n"
+    + "    : FOR    ${x}  IN RANGE   5\n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "    Convert To Hex    855" | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
