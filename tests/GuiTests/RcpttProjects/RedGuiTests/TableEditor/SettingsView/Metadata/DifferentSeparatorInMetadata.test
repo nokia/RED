@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xbGiMDbxEeaJIKJT0Mv9ow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/29/16 5:37 PM
+Save-Time: 8/31/16 11:41 AM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -81,13 +81,13 @@ with [get-editor "TestFile.robot"] {
 //check Source (value with pipe should be added)
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
-    + "| Resource | res.robot    \n\n"
+    + "| Resource | res.robot    \n"
     + "| Force Tags |  music | #this is tag\n"
-    + "| Suite Setup | Convert To Binary | 58    \n\n"
-    + "| Metadata | zorro | 1\n\n"
+    + "| Suite Setup | Convert To Binary | 58    \n"
+    + "| Metadata | zorro | 1\n"
     + "| Test Timeout | 5s\n"
     + " Test Setup    Catenate  text   2\n"
-    + "Metadata  abc\n\n"
+    + "Metadata  abc\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  7" | verify-true
@@ -115,152 +115,169 @@ with [get-editor "TestFile.robot"] {
     }
     get-tab-folder | get-tab-item Source | click
 }
-////check Source (no pipes)
-//get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-//    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
-//    + "| Resource | res.robot    \n\n"
-//    + "| Force Tags |  music | #this is tag\n"
-//    + "| Suite Setup | Convert To Binary | 58    \n\n"
-//    + "| Metadata | zorro | 1\n\n"
-//    + "| Test Timeout | 5s\n"
-//    + " Test Setup    Catenate  text   2\n"
-//    + "Metadata  abc    2    #comment\n\n"
-//    + "*** Test Cases ***\n"
-//    + "test\n"
-//    + "    log  7" | verify-true
-//    
-////add new Metadata
+//check Source (no pipes)
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
+    + "| Resource | res.robot    \n"
+    + "| Force Tags |  music | #this is tag\n"
+    + "| Suite Setup | Convert To Binary | 58    \n"
+    + "| Metadata | zorro | 1\n"
+    + "| Test Timeout | 5s\n"
+    + " Test Setup    Catenate  text   2\n"
+    + "Metadata  abc    2    #comment\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+//add new Metadata
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
+wait 500
+with [get-editor "TestFile.robot" | get-section Metadata] {
+    with [get-canvas] {
+    	//data
+        mouse-press 136 74 button1
+        mouse-release 136 74 button1 524288
+        mouse-press 136 74 button1
+        mouse-double-click 136 74 button1
+        mouse-release 136 74 button1 524288
+        mouse-move 406 78
+        mouse-press 406 78 button1
+        mouse-release 406 78 button1 524288
+        mouse-press 406 78 button1
+        mouse-double-click 406 78 button1
+        mouse-release 406 78 button1 524288
+    }
+    with [get-editbox] {
+        type-text 3
+        key-type Enter
+    }
+    get-canvas | mouse-move 961 126
+}
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+
+//check that in Source default separator is added
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
+    + "| Resource | res.robot    \n"
+    + "| Force Tags |  music | #this is tag\n"
+    + "| Suite Setup | Convert To Binary | 58    \n"
+    + "| Metadata | zorro | 1\n"
+    + "| Test Timeout | 5s\n"
+    + " Test Setup    Catenate  text   2\n"
+    + "Metadata  abc    2    #comment\n"
+    + "Metadata    data    3\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+//change preference to  pipe    
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor"
+    with [get-group "General settings"] {
+        get-button "user defined separator should be used" | click
+        get-editbox -after [get-label "user defined separator (use '|', 's' for space or 't' for tab)"] | set-text "s|s"
+    }
+    get-button Apply | click
+    get-button OK | click
+}
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
+
+////add next Matadata
 //with [get-editor "TestFile.robot"] {
-//    get-tab-folder | get-tab-item Settings | click
-//    with [get-section Metadata | get-canvas] {
-//    	//data
-//        mouse-press 109 77 button1
-//        mouse-release 109 77 button1 524288
-//        mouse-press 109 77 button1
-//        mouse-double-click 109 77 button1
-//        mouse-release 109 77 button1 524288
-//        mouse-move 352 70
-//        mouse-press 352 70 button1
-//        mouse-release 352 70 button1 524288
-//        
-//        //with value=3
-//        type-text 3
-//        key-type Enter
-//        mouse-move 361 407
+//    with [get-section Metadata] {
+//        with [get-canvas] {
+//            mouse-press 89 98 button1
+//            mouse-release 89 98 button1 524288
+//            mouse-press 89 98 button1
+//            mouse-double-click 89 98 button1
+//            mouse-release 89 98 button1 524288
+//        }
+//        get-editbox | set-text meta
+//        with [get-canvas] {
+//            mouse-move 332 105
+//            mouse-press 332 105 button1
+//            mouse-release 332 105 button1 524288
+//            type-text 4
+//        }
+//        get-editbox | set-text 55
+//        with [get-canvas] {
+//            mouse-move 640 102
+//            mouse-press 640 102 button1
+//            mouse-release 640 102 button1 524288
+//            type-text text
+//        }
+//        get-editbox | set-text text
+//        get-canvas | mouse-move 398 422
 //    }
-//    get-tab-folder | get-tab-item Source | click
 //}
-//
-////check that in Source default separator is added
-//get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-//    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
-//    + "| Resource | res.robot    \n\n"
-//    + "| Force Tags |  music | #this is tag\n"
-//    + "| Suite Setup | Convert To Binary | 58    \n\n"
-//    + "| Metadata | zorro | 1\n\n"
-//    + "| Test Timeout | 5s\n"
-//    + " Test Setup    Catenate  text   2\n"
-//    + "Metadata  abc    2    #comment\n\n"
-//    + "Metadata    data    3\n"
-//    + "*** Test Cases ***\n"
-//    + "test\n"
-//    + "    log  7" | verify-true
-//    
-////change preference to  pipe    
-//get-preferences-menu | click
-//with [get-window Preferences] {
-//    get-tree | select "Robot Framework/Editor"
-//    with [get-group "General settings"] {
-//        get-button "user defined separator should be used" | click
-//        get-editbox -after [get-label "user defined separator (use '|', 's' for space or 't' for tab)"] | set-text "s|s"
-//    }
-//    get-button Apply | click
-//    get-button OK | click
-//}
-//
-//get-editor "TestFile.robot" | get-tab-folder | get-tab-item Settings | click
-//
-//////add next Matadata
-////with [get-editor "TestFile.robot"] {
-////    with [get-section Metadata] {
-////        with [get-canvas] {
-////            mouse-press 89 98 button1
-////            mouse-release 89 98 button1 524288
-////            mouse-press 89 98 button1
-////            mouse-double-click 89 98 button1
-////            mouse-release 89 98 button1 524288
-////        }
-////        get-editbox | set-text meta
-////        with [get-canvas] {
-////            mouse-move 332 105
-////            mouse-press 332 105 button1
-////            mouse-release 332 105 button1 524288
-////            type-text 4
-////        }
-////        get-editbox | set-text 55
-////        with [get-canvas] {
-////            mouse-move 640 102
-////            mouse-press 640 102 button1
-////            mouse-release 640 102 button1 524288
-////            type-text text
-////        }
-////        get-editbox | set-text text
-////        get-canvas | mouse-move 398 422
-////    }
-////}
-//
-//
-////workaround
-//with [get-editor "TestFile.robot" | get-section Metadata] {
-//    with [get-canvas] {
-//        mouse-move 79 98
-//        mouse-press 79 98 button1
-//        mouse-release 79 98 button1 524288
-//        mouse-press 79 98 button1
-//        mouse-double-click 79 98 button1
-//        mouse-release 79 98 button1 524288
-//        mouse-press 79 98 button1
-//        mouse-release 79 98 button1 524288
-//    }
-//    get-editbox | set-text meta
-//    with [get-canvas] {
-//        mouse-move 438 100
-//        mouse-press 438 100 button1
-//        mouse-release 438 100 button1 524288
-//        mouse-press 438 100 button1
-//        mouse-double-click 438 100 button1
-//        mouse-release 438 100 button1 524288
-//    }
-//    get-editbox | set-text 55
-//    with [get-canvas] {
-//        mouse-move 623 99
-//        mouse-press 623 99 button1
-//        mouse-release 623 99 button1 524288
-//        mouse-press 623 99 button1
-//        mouse-double-click 623 99 button1
-//        mouse-release 623 99 button1 524288
-//    }
-//    get-editbox | set-text text
-//    get-canvas | mouse-move 1039 24
-//}
-//
-//get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
-//
-////check if was added with pipes
-//get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-//    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
-//    + "| Resource | res.robot    \n\n"
-//    + "| Force Tags |  music | #this is tag\n"
-//    + "| Suite Setup | Convert To Binary | 58    \n\n"
-//    + "| Metadata | zorro | 1\n\n"
-//    + "| Test Timeout | 5s\n"
-//    + " Test Setup    Catenate  text   2\n"
-//    + "Metadata  abc    2    #comment\n\n"
-//    + "Metadata    data    3\n"
-//    + "| Metadata | meta | 55 | #text\n"
-//    + "*** Test Cases ***\n"
-//    + "test\n"
-//    + "    log  7" | verify-true
-//    
-//    
+
+
+//workaround
+with [get-editor "TestFile.robot" | get-section Metadata] {
+    with [get-canvas] {
+    	//add new metadata
+        mouse-press 132 99 button1
+        mouse-release 132 99 button1 524288
+        mouse-press 132 99 button1
+        mouse-double-click 132 99 button1
+        mouse-release 132 99 button1 524288
+        mouse-press 132 99 button1
+        mouse-release 132 99 button1 524288
+        mouse-press 132 99 button1
+        mouse-double-click 132 99 button1
+        mouse-release 132 99 button1 524288
+    }
+    //chane value to meta
+    get-editbox | set-text meta
+    
+    //add value
+    with [get-canvas] {
+        mouse-move 405 96
+        mouse-press 405 96 button1
+        mouse-release 405 96 button1 524288
+        mouse-press 405 96 button1
+        mouse-double-click 405 96 button1
+        mouse-release 405 96 button1 524288
+    }
+    get-editbox | set-text 55
+    with [get-canvas] {
+        mouse-move 741 95
+        mouse-press 741 95 button1
+        mouse-release 741 95 button1 524288
+        mouse-press 741 95 button1
+        mouse-double-click 741 95 button1
+        mouse-release 741 95 button1 524288
+    }
+    //set comment and click on Valu cell
+    get-editbox | set-text text
+    with [get-canvas] {
+        mouse-move 546 90
+        mouse-press 546 90 button1
+        mouse-release 546 90 button1 524288
+        mouse-move 1035 196
+    }
+}
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+
+//check if was added with pipes
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "| Library | relative/path/PythonDirLib/file.py  | possible | arguments\n"
+    + "| Resource | res.robot    \n"
+    + "| Force Tags |  music | #this is tag\n"
+    + "| Suite Setup | Convert To Binary | 58    \n"
+    + "| Metadata | zorro | 1\n"
+    + "| Test Timeout | 5s\n"
+    + " Test Setup    Catenate  text   2\n"
+    + "Metadata  abc    2    #comment\n"
+    + "Metadata    data    3\n"
+    + "| Metadata | meta | 55 | #text\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log  7" | verify-true
+    
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
