@@ -97,6 +97,7 @@ import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.services.event.Events;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -411,17 +412,16 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         }
     }
 
-
     @Inject
     @Optional
     private void whenKeywordCallIsAdded(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final Event event) {
-        final Object data = event.getProperty(IEventBroker.DATA);
-        if (data instanceof RobotKeywordDefinition && ((RobotKeywordDefinition) data).getSuiteFile() == fileModel) {
-            final Object additionalData = event.getProperty(RobotModelEvents.ADDITIONAL_DATA);
+        final RobotKeywordDefinition def = Events.get(event, IEventBroker.DATA, RobotKeywordDefinition.class);
+        final RobotDefinitionSetting setting = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
+                RobotDefinitionSetting.class);
 
-            if (additionalData instanceof RobotDefinitionSetting
-                    && ((RobotDefinitionSetting) additionalData).isArguments()) {
+        if (def != null && def.getSuiteFile() == fileModel) {
+            if (setting != null && setting.isArguments()) {
                 // when arguments were added, we don't need to reload the input for data provider;
                 // this also does not influence selections
                 table.refresh();
@@ -437,18 +437,17 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void whenKeywordCallIsRemoved(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED) final Event event) {
-        final Object data = event.getProperty(IEventBroker.DATA);
-        if (data instanceof RobotKeywordDefinition && ((RobotKeywordDefinition) data).getSuiteFile() == fileModel) {
-            final Object additionalData = event.getProperty(RobotModelEvents.ADDITIONAL_DATA);
+        final RobotKeywordDefinition definition = Events.get(event, IEventBroker.DATA, RobotKeywordDefinition.class);
+        final RobotDefinitionSetting setting = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
+                RobotDefinitionSetting.class);
 
-            if (additionalData instanceof RobotDefinitionSetting
-                    && ((RobotDefinitionSetting) additionalData).isArguments()) {
+        if (definition != null && definition.getSuiteFile() == fileModel) {
+            if (setting != null && setting.isArguments()) {
                 // when arguments were removed, we don't need to reload the input for data provider;
                 // this also does not influence selections
                 table.refresh();
                 setDirty();
             } else {
-                final RobotKeywordDefinition definition = (RobotKeywordDefinition) data;
                 selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced(),
                         new Function<PositionCoordinate, PositionCoordinate>() {
 
@@ -466,7 +465,6 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                             }
                         });
             }
-
         }
     }
 
@@ -487,7 +485,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             public void run() {
                 final int rowCountBeforeChange = dataProvider.getTreeList().size();
                 final List<Integer> expandedRowIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
-                int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
+                final int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
                 
                 dataProvider.setInput(getSection());
                 table.refresh();
