@@ -181,8 +181,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(glazedListsEventLayer);
         final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
 
-        final TreeLayer treeLayer = new TreeLayer(bodySelectionLayer, treeRowModel);
-        final ViewportLayer bodyViewportLayer = new ViewportLayer(treeLayer);
+        final TreeLayer treeLayer = factory.createTreeLayer(bodySelectionLayer, treeRowModel);
+        final ViewportLayer bodyViewportLayer = factory.createViewportLayer(treeLayer);
 
         // column header layers
         final DataLayer columnHeaderDataLayer = factory.createColumnHeaderDataLayer(columnHeaderDataProvider);
@@ -465,7 +465,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             public void run() {
                 final int rowCountBeforeChange = dataProvider.getRowCount();
                 final List<Integer> expandedRowIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
-                int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
+                final int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
                 
                 dataProvider.setInput(getSection());
                 table.refresh();
