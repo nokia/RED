@@ -8,7 +8,6 @@ package org.robotframework.red.nattable.edit;
 import java.util.List;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
-import org.eclipse.jface.viewers.IContentProposingSupport;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
@@ -28,6 +27,7 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
+import org.robotframework.ide.eclipse.main.plugin.assist.IContentProposingSupport;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 import org.robotframework.red.swt.SwtThread;

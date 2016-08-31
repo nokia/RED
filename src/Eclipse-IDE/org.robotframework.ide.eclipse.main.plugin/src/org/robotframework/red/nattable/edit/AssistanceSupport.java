@@ -7,11 +7,11 @@ package org.robotframework.red.nattable.edit;
 
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.jface.viewers.IContentProposingSupport;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Text;
+import org.robotframework.ide.eclipse.main.plugin.assist.IContentProposingSupport;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 
