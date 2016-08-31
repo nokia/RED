@@ -12,6 +12,7 @@ import org.eclipse.jface.viewers.IContentProposingSupport;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
+import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.eclipse.nebula.widgets.nattable.style.CellStyleAttributes;
 import org.eclipse.nebula.widgets.nattable.widget.EditModeEnum;
 import org.eclipse.swt.SWT;
@@ -99,6 +100,7 @@ public class RedTextCellEditor extends TextCellEditor {
         textControl.setCursor(new Cursor(Display.getDefault(), SWT.CURSOR_IBEAM));
 
         textControl.addKeyListener(new TextKeyListener(parent));
+        validationJobScheduler.armRevalidationOn(textControl);
 
         return textControl;
     }
@@ -111,7 +113,6 @@ public class RedTextCellEditor extends TextCellEditor {
 
         final Text text = (Text) super.activateCell(parent, originalCanonicalValue);
 
-        validationJobScheduler.armRevalidationOn(text);
 
         final RedContentProposalListener assistListener = new ContentProposalsListener(
                 (InlineFocusListener) focusListener);
@@ -135,7 +136,13 @@ public class RedTextCellEditor extends TextCellEditor {
     public boolean commit(final MoveDirectionEnum direction, final boolean closeAfterCommit,
             final boolean skipValidation) {
         if (validationJobScheduler.canCloseCellEditor()) {
-            return super.commit(direction, closeAfterCommit, skipValidation);
+            removeEditorControlListeners();
+            final boolean commited = super.commit(direction, closeAfterCommit, skipValidation);
+            if (direction == MoveDirectionEnum.NONE) {
+                layerCell.getLayer().doCommand(new SelectCellCommand(layerCell.getLayer(),
+                        layerCell.getColumnPosition(), layerCell.getRowPosition(), false, false));
+            }
+            return commited;
         } else {
             return false;
         }

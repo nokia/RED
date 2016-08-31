@@ -454,7 +454,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED) final RobotCase testCase) {
         if (testCase.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+            tableInputIsReplaced().run();
         }
     }
 
