@@ -11,6 +11,8 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
+import com.google.common.base.Optional;
+
 public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
 
     private T parent;
@@ -58,6 +60,29 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
                     FilePosition fp = robotToken.getFilePosition();
                     pos = new FilePosition(fp.getLine(), robotToken.getEndColumn(), fp.getOffset() + length);
                     break;
+                }
+            }
+        }
+
+        return pos;
+    }
+
+    public FilePosition findEndPosition(final RobotFile fileModel) {
+        FilePosition pos = FilePosition.createNotSet();
+        if (isPresent()) {
+            for (final RobotToken tok : getElementTokens()) {
+                final FilePosition tokFilePosition = tok.getFilePosition();
+                if (tokFilePosition.getOffset() >= 0) {
+                    if (pos.getOffset() < tokFilePosition.getOffset()) {
+                        pos = tokFilePosition.copy();
+                    }
+                }
+            }
+
+            if (pos.getOffset() >= 0) {
+                Optional<Integer> line = fileModel.getRobotLineIndexBy(pos.getOffset());
+                if (line.isPresent()) {
+                    pos = fileModel.getFileContent().get(line.get()).getEndOfLine().getFilePosition().copy();
                 }
             }
         }
