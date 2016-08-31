@@ -47,7 +47,7 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
         }
         final List<IContributionItem> contributedItems = new ArrayList<>();
         final ISelection selection = activeWindow.getSelectionService().getSelection();
-        if (selection != null && selection instanceof StructuredSelection && !selection.isEmpty()) {
+        if (selection instanceof StructuredSelection && !selection.isEmpty()) {
             final StructuredSelection structuredSelection = (StructuredSelection) selection;
 
             RobotCase testCase = null;
