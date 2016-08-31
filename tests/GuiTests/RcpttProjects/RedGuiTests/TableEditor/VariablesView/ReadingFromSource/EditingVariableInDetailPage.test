@@ -7,8 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OBHP4EKkEeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/18/16 3:29 PM
-Tags: Unstable
+Save-Time: 8/31/16 1:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -25,8 +24,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text "*** Setting ***\n"
     + "&{second_dict}=    here=equals\n"
     + "${A 1}    ${VAR}    \n"
     + "@{empty list}        \n"
-    + "&{empty dictionary}   \n\n"
-    + "    \n"
+    + "&{empty dictionary}   \n"
     + "*** Test Cases ***\n"
     + "test \n"
     + "    log  7"
@@ -40,6 +38,7 @@ with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
         set-caret-pos 4 6
         key-type F4
+        wait 2000
     }
     //set focus on value
     with [get-canvas -after [get-label Variables] -index 1] {
@@ -145,8 +144,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "&{second_dict}=    here=equals\n"
     + "${A 1}    ${VAR}    \n"
     + "@{empty list}\n"
-    + "&{empty dictionary}\n\n"
-    + "    \n"
+    + "&{empty dictionary}\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  7" | verify-true
@@ -160,13 +158,13 @@ get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | 
     
 //edit empty list
 
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+wait 500
+get-view Outline | get-tree | select "TestFile.robot/Variables/empty list" | click
+wait 200
+
 //set focus on @{empty list}
 with [get-editor "TestFile.robot"] {
-    with [get-text-viewer] {
-        set-caret-pos 8 7
-        key-type F4
-      
-    }
     //move to value
     with [get-canvas -after [get-label Variables] -index 1] {
         key-type Right
@@ -237,8 +235,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "${A 1}    ${VAR}    \n"
     + "@{empty list}    item1    ${A 1}    &{newDict}    @{empty list}    ${\\n"
     + "}    @{empty list}    &{second_dict}\n"
-    + "&{empty dictionary}\n\n"
-    + "    \n"
+    + "&{empty dictionary}\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  7" | verify-true
@@ -247,14 +244,13 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
 get-editor "TestFile.robot" | close
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click  
 
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Variables | click
+wait 500
+get-view Outline | get-tree | select "TestFile.robot/Variables/empty dictionary" | click
+wait 200
 
 // adding values to dictionary
 with [get-editor "TestFile.robot"] {
-    with [get-text-viewer] {
-        set-caret-pos 9 13
-        key-type F4
-    }
-    
     //open editor on value
     with [get-canvas -after [get-label Variables] -index 1] {
         key-type Right
@@ -319,11 +315,22 @@ with [get-editor "TestFile.robot"] {
 }
 
 //select  "${EXECDIR}"
-get-window -class ContentProposalPopup | get-table | select "${EXECDIR}" | double-click
+with [get-editor "TestFile.robot"] {
+
+    with [get-editbox -after [get-label Variables] -index 1] {
+    	type-text "$"
+        key-type "M1+SPACE"
+        wait 200
+        key-type Down -times 10
+        wait 100
+        key-type Enter
+        wait 200
+        key-type Enter
+    }
+}
 
 //go back to value
 with [get-editor "TestFile.robot"] {
-    get-editbox -after [get-label Variables] -index 1 | key-type "NUMPAD_ENTER" "\\u000D"
     get-editbox -after [get-label Variables] -index 1 | key-type "TRAVERSE_ESCAPE"
     with [get-canvas -after [get-label Variables] -index 1] {
         key-type Left
@@ -367,8 +374,7 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "&{second_dict}=    here=equals\n"
     + "${A 1}    ${VAR}    \n"
     + "@{empty list}    item1    ${A 1}    &{newDict}    @{empty list}    ${\\n}    @{empty list}    &{second_dict}\n"
-    + "&{empty dictionary}    item=value    only item    =only value    ${True}=false\n\n"
-    + "    \n"
+    + "&{empty dictionary}    item=value    only item    =only value    ${True}=false\n"
     + "*** Test Cases ***\n"
     + "test\n"
     + "    log  7" | verify-true    
