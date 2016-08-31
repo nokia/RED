@@ -33,6 +33,8 @@ import org.eclipse.nebula.widgets.nattable.selection.SelectionLayerPainter;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionModel;
 import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
+import org.eclipse.nebula.widgets.nattable.tree.ITreeRowModel;
+import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Event;
@@ -41,6 +43,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableT
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.nattable.configs.RedTableEditBindingsConfiguration;
 import org.robotframework.red.nattable.configs.SelectionLayerConfiguration;
+import org.robotframework.red.nattable.configs.TreeLayerConfiguration;
 
 import ca.odell.glazedlists.SortedList;
 
@@ -88,8 +91,15 @@ public class RedNattableLayersFactory {
         return selectionLayer;
     }
 
-    public ViewportLayer createViewportLayer(final SelectionLayer selectionLayer) {
-        return new ViewportLayer(selectionLayer);
+    public ViewportLayer createViewportLayer(final IUniqueIndexLayer layer) {
+        return new ViewportLayer(layer);
+    }
+
+    public TreeLayer createTreeLayer(final SelectionLayer bodySelectionLayer,
+            final ITreeRowModel<Object> treeRowModel) {
+        final TreeLayer treeLayer = new TreeLayer(bodySelectionLayer, treeRowModel, false);
+        treeLayer.addConfiguration(new TreeLayerConfiguration(treeLayer));
+        return treeLayer;
     }
 
     public ColumnHeaderLayer createColumnHeaderLayer(final SelectionLayer selectionLayer,
@@ -230,5 +240,4 @@ public class RedNattableLayersFactory {
             }
         };
     }
-
 }
