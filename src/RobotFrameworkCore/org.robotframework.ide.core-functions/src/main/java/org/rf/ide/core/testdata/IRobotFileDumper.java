@@ -6,10 +6,9 @@
 package org.rf.ide.core.testdata;
 
 import java.io.File;
-import java.util.List;
 
+import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.model.RobotFile;
-import org.rf.ide.core.testdata.text.read.RobotLine;
 
 public interface IRobotFileDumper {
 
@@ -20,9 +19,7 @@ public interface IRobotFileDumper {
 
     String dump(final RobotFile model);
 
-    String dump(final List<RobotLine> lines);
-
-    List<RobotLine> dumpToLines(final RobotFile model);
+    DumpedResult dumpToResultObject(final RobotFile model);
 
     void setContext(final DumpContext ctx);
 }
