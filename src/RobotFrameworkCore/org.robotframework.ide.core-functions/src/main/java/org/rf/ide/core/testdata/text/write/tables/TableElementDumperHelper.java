@@ -193,7 +193,12 @@ public class TableElementDumperHelper {
         }
 
         while (meatTokens < tokSize) {
-            lastLine = model.getFileContent().get(model.getRobotLineIndexBy(offset).get());
+            Optional<Integer> line = model.getRobotLineIndexBy(offset);
+            if (!line.isPresent()) {
+                removeUpdated = true;
+                break;
+            }
+            lastLine = model.getFileContent().get(line.get());
             List<IRobotLineElement> lastToks = lastLine.getLineElements();
             final int lastToksSize = lastToks.size();
 
