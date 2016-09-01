@@ -206,7 +206,12 @@ public class TableElementDumperHelper {
                     elementPositionInLine = -1;
                 }
             } else {
-                elementPositionInLine = lastLine.getElementPositionInLine(lastToken).get() + 1;
+                Optional<Integer> elemPosInLine = lastLine.getElementPositionInLine(lastToken);
+                if (elemPosInLine.isPresent()) {
+                    elementPositionInLine = lastLine.getElementPositionInLine(lastToken).get() + 1;
+                } else {
+                    elementPositionInLine = -1;
+                }
             }
             currentSize = dumps.size();
             removeUpdated = false;
