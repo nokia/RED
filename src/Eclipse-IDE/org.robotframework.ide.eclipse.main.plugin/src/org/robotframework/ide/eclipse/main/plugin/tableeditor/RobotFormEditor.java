@@ -44,9 +44,12 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
+import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.DumpContext;
+import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.RobotFileDumper;
+import org.rf.ide.core.testdata.mapping.QuickTokenListenerBaseTwoModelReferencesLinker;
 import org.rf.ide.core.testdata.mapping.TwoModelReferencesLinker;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -457,11 +460,21 @@ public class RobotFormEditor extends FormEditor {
 
             final RobotFileDumper dumper = new RobotFileDumper();
             dumper.setContext(ctx);
-            final String content = dumper.dump(currentRobotOutputFile);
-            RobotFileOutput alreadyDumpedContent = suiteModel.getProject().getRobotParser().parseEditorContent(content,
-                    currentRobotOutputFile.getProcessedFile());
-            new TwoModelReferencesLinker().update(currentRobotOutputFile, alreadyDumpedContent);
-            alreadyDumpedContent = null;
+
+            final String content;
+            if (RedSystemProperties.shouldUseOldReparsedLinkMode()) {
+                content = dumper.dump(currentRobotOutputFile);
+                RobotFileOutput alreadyDumpedContent = suiteModel.getProject()
+                        .getRobotParser()
+                        .parseEditorContent(content, currentRobotOutputFile.getProcessedFile());
+                new TwoModelReferencesLinker().update(currentRobotOutputFile, alreadyDumpedContent);
+                alreadyDumpedContent = null;
+            } else {
+                final DumpedResult dumpResult = dumper.dumpToResultObject(currentRobotOutputFile);
+                content = dumpResult.newContent();
+                new QuickTokenListenerBaseTwoModelReferencesLinker().update(currentRobotOutputFile, dumpResult);
+            }
+
             document.set(content);
         }
     }

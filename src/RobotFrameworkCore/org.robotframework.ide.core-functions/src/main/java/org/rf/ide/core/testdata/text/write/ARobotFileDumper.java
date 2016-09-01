@@ -13,6 +13,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.rf.ide.core.testdata.DumpContext;
+import org.rf.ide.core.testdata.DumpedResultBuilder;
+import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.IRobotFileDumper;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
@@ -67,35 +69,19 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     @Override
-    public List<RobotLine> dumpToLines(final RobotFile model) {
-        return newLines(model);
-    }
-
-    @Override
-    public String dump(final List<RobotLine> lines) {
-        final StringBuilder strLine = new StringBuilder();
-
-        final int nrOfLines = lines.size();
-        for (int i = 0; i < nrOfLines; i++) {
-            final RobotLine line = lines.get(i);
-            for (final IRobotLineElement elem : line.getLineElements()) {
-                strLine.append(elem.getRaw());
-            }
-
-            strLine.append(line.getEndOfLine().getRaw());
-        }
-
-        return strLine.toString();
+    public DumpedResult dumpToResultObject(final RobotFile model) {
+        return newLines(model, new DumpedResultBuilder());
     }
 
     @Override
     public String dump(final RobotFile model) {
-        final List<RobotLine> lines = dumpToLines(model);
-        return dump(lines);
+        return dumpToResultObject(model).newContent();
     }
 
-    private List<RobotLine> newLines(final RobotFile model) {
+    private DumpedResult newLines(final RobotFile model, final DumpedResultBuilder builder) {
         final List<RobotLine> lines = new ArrayList<>(0);
+        builder.producedLines(lines);
+        this.aDumpHelper.setTokenDumpListener(builder);
 
         final SectionBuilder sectionBuilder = new SectionBuilder();
         final List<Section> sections = sectionBuilder.build(model);
@@ -167,7 +153,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
 
         aDumpHelper.addEOFinCaseIsMissing(model, lines);
 
-        return lines;
+        return builder.build();
     }
 
     @SuppressWarnings("unchecked")
