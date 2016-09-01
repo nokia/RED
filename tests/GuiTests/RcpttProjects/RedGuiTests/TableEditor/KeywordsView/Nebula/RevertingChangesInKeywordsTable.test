@@ -1,0 +1,105 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YI1vUFJyEea8WJ7bbC6OBw
+Element-Name: RevertingChangesInKeywordsTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _lZlkgHA-Eeas5uogJbgGYA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/1/16 3:24 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//set kw in Source
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "t1\n"
+    + "    log  4" 
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+    
+//create new file    
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Test Suite" 
+    | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text new
+    get-button Finish | click
+}
+
+//add Kw section with kw name
+with [get-editor "new.robot"] {
+    get-tab-folder | get-tab-item Source | click
+    with [get-text-viewer] {
+        set-caret-pos 1 19
+        key-type Enter
+        type-text "*** Keywords ***"
+        key-type Enter
+        type-text kw
+        key-type "M1+s"
+        wait 1000
+    }
+    get-tab-folder | get-tab-item Keywords | click
+}
+
+try -times 4 -delay 1000 -command{
+	get-editor "new.robot" | get-canvas -after [get-label "User Keywords"] -index 1 
+    | get-property "getLayer().getBodyLayer().getRowCount()" | equals 3 | verify-true
+}
+//add child kw
+get-view Outline | get-tree | select "new.robot/Keywords/kw" | click
+wait 200
+
+with [get-editor "new.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter -times 2
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text log
+        key-type Enter
+    }
+    //add value
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text 44
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+    	//save and revert
+        key-type "M1+s"
+        key-type "M1+z"
+    }
+}
+//check that nothing was revereted in table
+check-keyword-row -file  "new.robot" -row  1 -kw "kw"
+check-keyword-row -file  "new.robot" -row  2 -kw "log" -c1 "44"
+check-keyword-row -file  "new.robot" -row  3 -kw "..."
+
+//check that no file is dirty
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+    get-property "pages[1]" | equals "new.robot" | verify-true
+    get-property activePage | equals "new.robot" | verify-true
+    get-property tabCount | equals 2 | verify-true
+}
+
+//check source of edited file
+get-editor "new.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "new.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    log    44" | verify-true
+    
+//check file in background    
+get-editor "TestFile.robot" | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "t1\n"
+    + "    log  4" | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
