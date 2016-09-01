@@ -27,6 +27,7 @@ import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsSortModel;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeData;
+import org.eclipse.nebula.widgets.nattable.extension.glazedlists.tree.GlazedListTreeRowModel;
 import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
@@ -43,7 +44,6 @@ import org.eclipse.nebula.widgets.nattable.sort.ISortModel;
 import org.eclipse.nebula.widgets.nattable.sort.SortHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.tree.ITreeRowModel;
 import org.eclipse.nebula.widgets.nattable.tree.TreeLayer;
-import org.eclipse.nebula.widgets.nattable.tree.TreeRowModel;
 import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -176,7 +176,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
                 dataProvider.getTreeList());
         final GlazedListTreeData<Object> treeData = new GlazedListTreeData<>(dataProvider.getTreeList());
-        final ITreeRowModel<Object> treeRowModel = new TreeRowModel<>(treeData);
+        final ITreeRowModel<Object> treeRowModel = new GlazedListTreeRowModel<>(treeData);
 
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(glazedListsEventLayer);
         final SelectionLayer bodySelectionLayer = factory.createSelectionLayer(theme, bodyHoverLayer);
@@ -463,15 +463,15 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
             @Override
             public void run() {
-                final int rowCountBeforeChange = dataProvider.getRowCount();
-                final List<Integer> expandedRowIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
                 final int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
+                final int rowCountBeforeChange = dataProvider.getSortedList().size();
+                final List<Integer> expandedRowIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
                 
                 dataProvider.setInput(getSection());
                 table.refresh();
                 setDirty();
                 
-                final int rowCountChange = dataProvider.getRowCount() - rowCountBeforeChange;
+                final int rowCountChange = dataProvider.getSortedList().size() - rowCountBeforeChange;
                 treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
             }
         };
