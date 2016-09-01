@@ -77,7 +77,9 @@ public class DumpLineUpdater {
                 }
             }
 
+            boolean isRobotToken = false;
             if (elem instanceof RobotToken) {
+                isRobotToken = true;
                 if (artToken.isDirty()) {
                     if (artToken.getRaw().isEmpty()) {
                         if (artToken instanceof RobotToken) {
@@ -115,7 +117,11 @@ public class DumpLineUpdater {
                 }
             }
 
-            line.addLineElement(cloneWithPositionRecalculate(artToken, line, outLines));
+            final IRobotLineElement recalculated = cloneWithPositionRecalculate(artToken, line, outLines);
+            if (isRobotToken) {
+                aDumperHelper.notifyTokenDumpListener((RobotToken) elem, (RobotToken) recalculated);
+            }
+            line.addLineElement(recalculated);
         }
     }
 

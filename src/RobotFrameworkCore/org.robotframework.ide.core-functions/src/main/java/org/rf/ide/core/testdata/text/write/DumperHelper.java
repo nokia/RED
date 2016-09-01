@@ -35,6 +35,7 @@ public class DumperHelper {
     // private static final int MAX_NUMBER_OF_COLUMN_IN_LINE = 7;
     //
     // private static final int MAX_NUMBER_OF_CHARS_IN_LINE = 120;
+    private Optional<ILineDumpTokenListener> dumpTokenListeners = Optional.absent();
 
     private static final String EMPTY = "\\";
 
@@ -81,6 +82,16 @@ public class DumperHelper {
 
     public boolean isCurrentFileDirty() {
         return this.currentDumper.isFileDirty();
+    }
+
+    public void setTokenDumpListener(final ILineDumpTokenListener listener) {
+        this.dumpTokenListeners = Optional.fromNullable(listener);
+    }
+
+    public void notifyTokenDumpListener(final RobotToken oldToken, final RobotToken newToken) {
+        if (this.dumpTokenListeners.isPresent()) {
+            this.dumpTokenListeners.get().tokenDumped(oldToken, newToken);
+        }
     }
 
     public void addEOFinCaseIsMissing(final RobotFile model, final List<RobotLine> lines) {

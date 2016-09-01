@@ -12,7 +12,6 @@ import com.google.common.base.Splitter;
 
 /**
  * @author Michal Anglart
- *
  */
 public class RedSystemProperties {
 
@@ -21,6 +20,8 @@ public class RedSystemProperties {
     public static final String RED_SHOW_SESSION_CONSOLE = "red.showSessionConsole";
 
     public static final String RED_CONNECT_TO_SERVER_AT = "red.connectToServerAt";
+
+    public static final String RED_USE_OLD_REPARSED_LINK_MODE = "red.useOldReparsedLinkMode";
 
     public static boolean shouldConnectToRunningServer() {
         return System.getProperty("red.connectToServerAt") != null;
@@ -36,6 +37,10 @@ public class RedSystemProperties {
 
     public static boolean shouldShowSessionConsole() {
         return Boolean.valueOf(System.getProperty("red.showSessionConsole")).booleanValue();
+    }
+
+    public static boolean shouldUseOldReparsedLinkMode() {
+        return Boolean.valueOf(System.getProperty(RED_USE_OLD_REPARSED_LINK_MODE)).booleanValue();
     }
 
     public static boolean isWindowsPlatform() {

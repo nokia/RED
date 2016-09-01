@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.testdata.DumpedResultBuilder.DumpedResult;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.text.read.separators.TokenSeparatorBuilder.FileFormat;
 import org.rf.ide.core.testdata.text.write.TsvRobotFileDumper;
@@ -37,6 +38,17 @@ public class RobotFileDumper {
     }
 
     public String dump(final RobotFileOutput output) {
+        final IRobotFileDumper dumper = prepareDumper(output);
+
+        return dumper.dump(output.getFileModel());
+    }
+
+    public DumpedResult dumpToResultObject(final RobotFileOutput output) {
+        final IRobotFileDumper dumper = prepareDumper(output);
+        return dumper.dumpToResultObject(output.getFileModel());
+    }
+
+    private IRobotFileDumper prepareDumper(final RobotFileOutput output) {
         File fake = null;
         if (output.getFileFormat() == FileFormat.TSV) {
             fake = new File("fake.tsv");
@@ -49,8 +61,7 @@ public class RobotFileDumper {
             dumper = new TxtRobotFileDumper();
         }
         dumper.setContext(ctx);
-
-        return dumper.dump(output.getFileModel());
+        return dumper;
     }
 
     private IRobotFileDumper getDumper(final File file) {
