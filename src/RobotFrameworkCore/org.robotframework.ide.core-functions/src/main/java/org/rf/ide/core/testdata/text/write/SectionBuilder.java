@@ -19,6 +19,7 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 import com.google.common.base.Optional;
 
@@ -353,7 +354,10 @@ public class SectionBuilder {
     private boolean isCorrectPlace(final RobotLine line, int elementIndex, final PositionExpected posExpected) {
         boolean result = false;
         RobotLine lineFake = new RobotLine(line.getLineNumber(), line.getParent());
-        lineFake.setSeparatorType(line.getSeparatorForLine().get());
+        Optional<SeparatorType> separatorForLine = line.getSeparatorForLine();
+        if (separatorForLine.isPresent()) {
+            lineFake.setSeparatorType(line.getSeparatorForLine().get());
+        }
         lineFake.setLineElements(line.getLineElements().subList(0, elementIndex));
         if (posResolver.isCorrectPosition(posExpected, line.getParent(), lineFake,
                 (RobotToken) line.getLineElements().get(elementIndex))) {
