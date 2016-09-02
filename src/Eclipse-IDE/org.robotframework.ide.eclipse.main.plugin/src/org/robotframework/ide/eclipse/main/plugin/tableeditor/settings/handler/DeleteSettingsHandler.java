@@ -12,7 +12,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteSettingsHandler.E4DeleteSettingsHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
@@ -31,7 +31,7 @@ public class DeleteSettingsHandler extends DIParameterizedHandler<E4DeleteSettin
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
             
             final List<RobotSetting> settings = Selections.getElements(selection, RobotSetting.class);
-            commandsStack.execute(new DeleteSettingKeywordCallCommand(settings));
+            commandsStack.execute(new DeleteSettingCommand(settings));
         }
     }
 }
