@@ -1,0 +1,132 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _AXAyAF_dEeaRBaqqj0N1Gg
+Element-Name: AddingNewLineInTestCaseTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _RviRIHEBEeas5uogJbgGYA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/2/16 3:35 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Case ***\n"
+    + "case\n"
+    + "    log    1    2    3    #log command\n"
+    + "    Call Method    my_method\n"
+    + "    Convert To Bytes    8    #cov to bytes\n"
+    + "case 1\n"
+    + "case 2\n"
+    + "    None Shall Pass" 
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/case/Convert To Bytes" |click
+wait 200
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+    	//add new empty line above Convert
+        get-menu "Add new line" | click
+        
+        //set focus om Call method 3 column and add new line
+        key-type Up
+        key-type Right -times 3
+        get-menu "Add new line" | click
+        key-type Enter
+    }
+    //add arg3 
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "arg 3"
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+    	//set focus on TC name and add new line (it will be below)
+        key-type Up -times 2
+        get-menu "Add new line" | click
+        //go to first columna and add kw name
+        key-type Down
+        key-type Left -times 4
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "1 line"
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+    	//set focus on "..." in case 1
+        key-type Left
+        key-type Down -times 8
+        //add new line using shortcut
+        key-type "M1+l"
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    //add kw name
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "kw for case 1"
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+    	//ser focus on None shall pass - col 3
+        key-type Down -times 3
+        key-type Right
+        get-menu "Add new line" | click
+        key-type Enter
+    }
+    //add only arg
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "arg 2 case 2"
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+}
+//use two times shortcut
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type "M1+l" -times 2
+
+}
+//check cell selection
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+		| invoke getUnderlyingLayerByPosition 0 0 | invoke getLastSelectedCellPosition  | invoke  columnPosition | eq 3 | verify-true
+		
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
+	| invoke getUnderlyingLayerByPosition 0 0 | invoke getLastSelectedCellPosition  | invoke  rowPosition | eq 12 | verify-true
+	
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    //go down on "..add" button - nothing should happen
+    key-type Down -times 5
+    get-menu "Add new line" | click
+}
+
+check-test_case-row -file  "TestFile.robot" -row 1 -tc "case"
+check-test_case-row -file  "TestFile.robot" -row 2 -tc "1 line"
+check-test_case-row -file  "TestFile.robot" -row 3 -tc "log" -c1 1 -c2 2 -c3 3 -c4 "" -c5 "" -comment "#log command"
+check-test_case-row -file  "TestFile.robot" -row 4 -tc "" -c1 "\\" -c2 "\\" -c3 "arg 3"
+check-test_case-row -file  "TestFile.robot" -row 5 -tc "Call Method" -c1 "my_method"
+check-test_case-row -file  "TestFile.robot" -row 6 -tc ""
+check-test_case-row -file  "TestFile.robot" -row 7 -tc "Convert To Bytes" -c1 8 -comment "#cov to bytes"
+check-test_case-row -file  "TestFile.robot" -row 8 -tc "..."
+
+
+check-test_case-row -file  "TestFile.robot" -row 9 -tc "case 1"
+check-test_case-row -file  "TestFile.robot" -row 10 -tc "kw for case 1"
+check-test_case-row -file  "TestFile.robot" -row 11 -tc "..."
+
+
+check-test_case-row -file  "TestFile.robot" -row 12 -tc "case 2"
+check-test_case-row -file  "TestFile.robot" -row 13 -tc ""
+check-test_case-row -file  "TestFile.robot" -row 14 -tc ""
+check-test_case-row -file  "TestFile.robot" -row 15 -tc "" -c1 "\\" -c2 "arg 2 case 2"
+check-test_case-row -file  "TestFile.robot" -row 16 -tc "None Shall Pass"
+check-test_case-row -file  "TestFile.robot" -row 17 -tc "..."
+check-test_case-row -file  "TestFile.robot" -row 18 -tc "...add new case"
+
+
+	
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
