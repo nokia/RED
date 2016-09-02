@@ -189,8 +189,8 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
             commandsStack.execute(new DeleteKeywordCallCommand(newArrayList(keywordSetting)));
 
             if (tokenType == RobotTokenType.UNKNOWN) {
-                commandsStack.execute(new CreateFreshKeywordCallCommand(parent, value, keywordSetting.getArguments(),
-                        keywordSetting.getComment(), index));
+                commandsStack.execute(new CreateFreshKeywordCallCommand(parent, index, value,
+                        keywordSetting.getArguments(), keywordSetting.getComment()));
             } else {
                 commandsStack.execute(
                         new CreateFreshCodeHolderSettingCommand(parent, index, value, keywordSetting.getArguments()));
