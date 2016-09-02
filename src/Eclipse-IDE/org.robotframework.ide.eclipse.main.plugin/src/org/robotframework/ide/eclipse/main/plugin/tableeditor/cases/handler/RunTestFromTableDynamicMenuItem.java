@@ -67,6 +67,7 @@ public class RunTestFromTableDynamicMenuItem extends RunTestDynamicMenuItem {
         return contributedItems.toArray(new IContributionItem[0]);
     }
 
+    @Override
     protected IContributionItem createCurrentCaseItem(final IServiceLocator serviceLocator, final RobotCase testCase) {
         final CommandContributionItemParameter contributionParameters = new CommandContributionItemParameter(
                 serviceLocator, id, RUN_TEST_COMMAND_ID, SWT.PUSH);

@@ -141,11 +141,11 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
         return Lists.<Position> newArrayList();
     }
 
-    private static Function<RobotCodeHoldingElement, Position> toPositions() {
-        return new Function<RobotCodeHoldingElement, Position>() {
+    private static Function<RobotCodeHoldingElement<?>, Position> toPositions() {
+        return new Function<RobotCodeHoldingElement<?>, Position>() {
 
             @Override
-            public Position apply(final RobotCodeHoldingElement element) {
+            public Position apply(final RobotCodeHoldingElement<?> element) {
                 return element.getPosition();
             }
         };

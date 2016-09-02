@@ -51,8 +51,8 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
     }
 
     @Override
-    protected List<String> findValuesToPaste(RobotElement elementFromClipboard, int clipboardElementColumnIndex,
-            int tableColumnsCount) {
+    protected List<String> findValuesToPaste(final RobotElement elementFromClipboard, final int clipboardElementColumnIndex,
+            final int tableColumnsCount) {
         if (elementFromClipboard instanceof RobotKeywordCall) {
             return getValuesFromKeywordCall((RobotKeywordCall) elementFromClipboard, clipboardElementColumnIndex,
                     tableColumnsCount);
@@ -108,7 +108,7 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
     }
 
     private List<String> getValuesFromKeywordDefinition(final RobotKeywordDefinition keywordDef,
-            int clipboardElementColumnIndex, int tableColumnsCount) {
+            final int clipboardElementColumnIndex, final int tableColumnsCount) {
         if (clipboardElementColumnIndex == 0) {
             return newArrayList(keywordDef.getName());
         } else if (clipboardElementColumnIndex > 0 && clipboardElementColumnIndex < tableColumnsCount - 1) {
@@ -157,7 +157,7 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
         final IRobotCodeHoldingElement parent = ((RobotKeywordCall) selectedElement).getParent();
         if (parent != null) {
             commands.add(new DeleteKeywordCallCommand(newArrayList((RobotKeywordCall) selectedElement)));
-            commands.add(new CreateFreshCodeHolderSettingCommand((RobotCodeHoldingElement) parent,
+            commands.add(new CreateFreshCodeHolderSettingCommand((RobotCodeHoldingElement<?>) parent,
                     parent.getChildren().indexOf(selectedElement), valueToPaste,
                     ((RobotKeywordCall) selectedElement).getArguments()));
         }

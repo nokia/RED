@@ -16,6 +16,7 @@ import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
@@ -38,7 +39,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecifi
 
 import com.google.common.base.Splitter;
 
-public class RobotKeywordDefinition extends RobotCodeHoldingElement {
+public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword> {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,6 +55,11 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement {
     public RobotKeywordDefinition(final RobotKeywordsSection parent, final UserKeyword keyword) {
         super(parent);
         this.keyword = keyword;
+    }
+
+    @Override
+    public IExecutablesTableModelUpdater<UserKeyword> getModelUpdater() {
+        return new KeywordTableModelUpdater();
     }
 
     @Override
