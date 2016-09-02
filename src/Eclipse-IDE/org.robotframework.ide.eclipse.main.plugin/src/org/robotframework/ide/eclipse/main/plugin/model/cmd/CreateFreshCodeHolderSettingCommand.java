@@ -14,7 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshCodeHolderSettingCommand extends EditorCommand {
 
-    private final RobotCodeHoldingElement codeHolder;
+    private final RobotCodeHoldingElement<?> codeHolder;
 
     private final String settingName;
 
@@ -22,7 +22,7 @@ public class CreateFreshCodeHolderSettingCommand extends EditorCommand {
 
     private final int index;
 
-    public CreateFreshCodeHolderSettingCommand(final RobotCodeHoldingElement codeHolder, final int index,
+    public CreateFreshCodeHolderSettingCommand(final RobotCodeHoldingElement<?> codeHolder, final int index,
             final String settingName, final List<String> args) {
         this.codeHolder = codeHolder;
         this.index = index;

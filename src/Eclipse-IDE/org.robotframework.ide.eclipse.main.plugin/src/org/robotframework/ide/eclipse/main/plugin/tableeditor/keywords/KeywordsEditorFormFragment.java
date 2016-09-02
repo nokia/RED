@@ -49,7 +49,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -324,9 +323,9 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 final RobotElement createdElement;
                 final AddingToken token = (AddingToken) dataProvider.getRowObject(addingTokenRowIndex);
                 if (token.isNested()) {
-                    final RobotCodeHoldingElement testCase = (RobotCodeHoldingElement) token.getParent();
-                    commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
-                    createdElement = testCase.getChildren().get(testCase.getChildren().size() - 1);
+                    final RobotKeywordDefinition keyword = (RobotKeywordDefinition) token.getParent();
+                    commandsStack.execute(new CreateFreshKeywordCallCommand(keyword));
+                    createdElement = keyword.getChildren().get(keyword.getChildren().size() - 1);
 
                 } else {
                     final RobotKeywordsSection section = dataProvider.getInput();
@@ -484,7 +483,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @Override
             public void run() {
                 final int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
-                int rowCountBeforeChange = dataProvider.getSortedList().size();
+                final int rowCountBeforeChange = dataProvider.getSortedList().size();
                 final List<Integer> expandedRowIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
                 
                 dataProvider.setInput(getSection());

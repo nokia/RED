@@ -14,7 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshKeywordCallCommand extends EditorCommand {
 
-    private final RobotCodeHoldingElement parent;
+    private final RobotCodeHoldingElement<?> parent;
 
     private final String name;
 
@@ -24,15 +24,15 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
 
     private final int codeHoldingElementIndex;
 
-    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent) {
+    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent) {
         this(parent, parent.getChildren().size());
     }
 
-    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent, final int codeHoldingElementIndex) {
+    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final int codeHoldingElementIndex) {
         this(parent, "", new ArrayList<String>(), "", codeHoldingElementIndex);
     }
 
-    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement parent, final String name,
+    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final String name,
             final List<String> args, final String comment, final int codeHoldingElementIndex) {
         this.parent = parent;
         this.name = name;

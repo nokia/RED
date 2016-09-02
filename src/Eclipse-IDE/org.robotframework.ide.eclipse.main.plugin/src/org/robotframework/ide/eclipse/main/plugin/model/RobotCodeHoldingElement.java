@@ -12,11 +12,14 @@ import java.util.List;
 
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 
 import com.google.common.base.Optional;
 
-public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElement, Serializable {
+public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
+        implements IRobotCodeHoldingElement, Serializable {
 
     private static final long serialVersionUID = -3138118535388297030L;
 
@@ -27,6 +30,8 @@ public abstract class RobotCodeHoldingElement implements IRobotCodeHoldingElemen
     RobotCodeHoldingElement(final RobotSuiteFileSection parent) {
         this.parent = parent;
     }
+
+    public abstract IExecutablesTableModelUpdater<T> getModelUpdater();
 
     public abstract RobotKeywordCall createKeywordCall(final int index, final String name, final List<String> args,
             final String comment);
