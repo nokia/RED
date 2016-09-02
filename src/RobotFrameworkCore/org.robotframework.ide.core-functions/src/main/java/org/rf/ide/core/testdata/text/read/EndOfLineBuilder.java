@@ -222,6 +222,34 @@ public class EndOfLineBuilder {
 
             return var;
         }
+
+        public AEndOfLine copyWithoutPosition() {
+            return copy(false);
+        }
+
+        public AEndOfLine copy() {
+            return copy(true);
+        }
+
+        private AEndOfLine copy(final boolean posInclude) {
+            EndOfLineBuilder builder = EndOfLineBuilder.newInstance().setEndOfLines(LineReader.Constant.get(this));
+            if (posInclude) {
+                builder.setLineNumber(this.getLineNumber());
+                builder.setStartColumn(this.getStartColumn());
+                builder.setStartOffset(this.getStartOffset());
+            }
+            return (AEndOfLine) builder.buildEOL();
+        }
+
+        @Override
+        public final int hashCode() {
+            return super.hashCode();
+        }
+
+        @Override
+        public final boolean equals(final Object obj) {
+            return super.equals(obj);
+        }
     }
 
     public static enum EndOfLineTypes implements IRobotTokenType {
