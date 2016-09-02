@@ -11,4 +11,6 @@ public interface IRobotCodeHoldingElement extends RobotFileInternalElement {
 
     @Override
     public List<RobotKeywordCall> getChildren();
+
+    public void removeChild(RobotKeywordCall call);
 }
