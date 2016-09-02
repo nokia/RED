@@ -176,5 +176,26 @@ public class TokensSource {
         public VersionAvailabilityInfo getVersionInformation() {
             return VersionAvailabilityInfoBuilder.create().build();
         }
+
+        @Override
+        public LineElement copyWithoutPosition() {
+            return copy(false);
+        }
+
+        @Override
+        public LineElement copy() {
+            return copy(true);
+        }
+
+        private LineElement copy(final boolean posInclude) {
+            final FilePosition fp;
+            if (posInclude) {
+                fp = this.getFilePosition();
+            } else {
+                fp = FilePosition.createNotSet();
+            }
+
+            return new LineElement(fp.getLine(), fp.getColumn(), fp.getOffset(), this.getText());
+        }
     }
 }
