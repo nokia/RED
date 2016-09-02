@@ -43,59 +43,68 @@ public class TestCaseTableModelUpdater {
             new UserKeywordArgumentsMorphOperation(), new UserKeywordReturnMorphOperation(),
             new UserKeywordUnknownSettingMorphOperation());
 
-    public AModelElement<?> createSetting(final TestCase testCase, final String settingName,
-            final String comment, final List<String> args) {
-        if (testCase == null) {
-            return null;
-        }
+    public AModelElement<?> createSetting(final TestCase testCase, final String settingName, final String comment,
+            final List<String> args) {
         final ITestCaseTableElementOperation operationHandler = getOperationHandler(settingName);
-        return operationHandler == null ? null : operationHandler.create(testCase, settingName, args, comment);
+        if (operationHandler == null || testCase == null) {
+            throw new IllegalArgumentException(
+                    "Unable to create " + settingName + " setting. Operation handler is missing");
+        }
+        return operationHandler.create(testCase, settingName, args, comment);
     }
 
     @SuppressWarnings("unchecked")
     public AModelElement<?> createExecutableRow(final TestCase testCase, final int index, final String action,
             final String comment, final List<String> args) {
-        if (testCase == null) {
-            return null;
-        }
         final ITestCaseTableElementOperation operationHandler = getOperationHandler(ModelType.TEST_CASE_EXECUTABLE_ROW);
+        if (operationHandler == null || testCase == null) {
+            throw new IllegalArgumentException(
+                    "Unable to create " + action + " executable row. Operation handler is missing");
+        }
         final AModelElement<?> row = operationHandler.create(testCase, action, args, comment);
         testCase.addTestExecutionRow((RobotExecutableRow<TestCase>) row, index);
         return row;
     }
 
     public void updateArgument(final AModelElement<?> modelElement, final int index, final String value) {
-        if (modelElement != null) {
-            final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
-            if (operationHandler != null) {
-                operationHandler.update(modelElement, index, value);
-            }
+        final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        if (operationHandler == null) {
+            throw new IllegalArgumentException(
+                    "Unable to update arguments of " + modelElement + ". Operation handler is missing");
         }
+        operationHandler.update(modelElement, index, value);
+    }
+
+    public void setArguments(final AModelElement<?> modelElement, final List<String> arguments) {
+        final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        if (operationHandler == null) {
+            throw new IllegalArgumentException(
+                    "Unable to set arguments of " + modelElement + ". Operation handler is missing");
+        }
+        operationHandler.update(modelElement, arguments);
     }
 
     public void updateComment(final AModelElement<?> modelElement, final String value) {
-        if (modelElement != null) {
-            CommentServiceHandler.update((ICommentHolder) modelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, value);
-        }
+        CommentServiceHandler.update((ICommentHolder) modelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, value);
     }
 
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        if (modelElement != null) {
-            final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
-            if (operationHandler != null) {
-                operationHandler.remove(testCase, modelElement);
-            }
+        final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        if (operationHandler == null) {
+            throw new IllegalArgumentException("Unable to remove " + modelElement + " from "
+                    + testCase.getName().getText() + " test case. Operation handler is missing");
         }
+        operationHandler.remove(testCase, modelElement);
     }
 
     public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         // morph operations enables inserting settings taken from keywords elements
-        if (modelElement != null) {
-            final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
-            if (operationHandler != null) {
-                operationHandler.insert(testCase, index, modelElement);
-            }
+        final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        if (operationHandler == null) {
+            throw new IllegalArgumentException("Unable to insert " + modelElement + " into "
+                    + testCase.getName().getText() + " test case. Operation handler is missing");
         }
+        operationHandler.insert(testCase, index, modelElement);
     }
 
     @VisibleForTesting

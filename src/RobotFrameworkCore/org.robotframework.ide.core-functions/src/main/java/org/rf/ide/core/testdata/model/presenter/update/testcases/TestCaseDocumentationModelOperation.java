@@ -42,6 +42,11 @@ public class TestCaseDocumentationModelOperation implements ITestCaseTableElemen
     }
 
     @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        testCase.addDocumentation(0, (TestDocumentation) modelElement);
+    }
+
+    @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestDocumentation testDoc = (TestDocumentation) modelElement;
         if (value != null) {
@@ -53,14 +58,20 @@ public class TestCaseDocumentationModelOperation implements ITestCaseTableElemen
         }
     }
 
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+        final TestDocumentation testDoc = (TestDocumentation) modelElement;
+
+        if (newValues.isEmpty()) {
+            testDoc.clearDocumentation();
+        } else {
+            DocumentationServiceHandler.update(testDoc, newValues.get(0));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
         testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
-    }
-
-    @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addDocumentation(0, (TestDocumentation) modelElement);
     }
 }

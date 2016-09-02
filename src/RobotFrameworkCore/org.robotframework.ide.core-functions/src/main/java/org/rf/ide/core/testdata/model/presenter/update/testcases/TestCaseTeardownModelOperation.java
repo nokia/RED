@@ -44,6 +44,11 @@ public class TestCaseTeardownModelOperation implements ITestCaseTableElementOper
     }
 
     @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        testCase.addTeardown(0, (TestCaseTeardown) modelElement);
+    }
+
+    @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestCaseTeardown teardown = (TestCaseTeardown) modelElement;
 
@@ -58,14 +63,22 @@ public class TestCaseTeardownModelOperation implements ITestCaseTableElementOper
         }
     }
 
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+        final TestCaseTeardown teardown = (TestCaseTeardown) modelElement;
+
+        teardown.setKeywordName(newValues.isEmpty() ? "" : newValues.get(0));
+        for (int i = 0; i < teardown.getArguments().size(); i++) {
+            teardown.removeElementToken(0);
+        }
+        for (int i = 1; i < newValues.size(); i++) {
+            teardown.setArgument(i - 1, newValues.get(i));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
         testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
-    }
-
-    @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addTeardown(0, (TestCaseTeardown) modelElement);
     }
 }

@@ -16,10 +16,11 @@ public interface ITestCaseTableElementOperation {
     AModelElement<?> create(final TestCase testCase, String action, final List<String> args,
             final String comment);
 
-    void update(final AModelElement<?> modelElement, final int index, final String value);
-
-    void remove(TestCase testCase, AModelElement<?> modelElement);
-
     void insert(TestCase testCase, int index, AModelElement<?> modelElement);
 
+    void update(final AModelElement<?> modelElement, final int index, final String value);
+
+    void update(final AModelElement<?> modelElement, final List<String> newValues);
+
+    void remove(TestCase testCase, AModelElement<?> modelElement);
 }

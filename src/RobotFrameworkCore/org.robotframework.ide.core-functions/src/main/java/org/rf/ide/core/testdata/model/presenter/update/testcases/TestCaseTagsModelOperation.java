@@ -39,6 +39,11 @@ public class TestCaseTagsModelOperation implements ITestCaseTableElementOperatio
         }
         return tags;
     }
+
+    @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        testCase.addTag(0, (TestCaseTags) modelElement);
+    }
     
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
@@ -50,14 +55,21 @@ public class TestCaseTagsModelOperation implements ITestCaseTableElementOperatio
         }
     }
 
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+        final TestCaseTags tags = (TestCaseTags) modelElement;
+
+        for (int i = 0; i < tags.getTags().size(); i++) {
+            tags.removeElementToken(0);
+        }
+        for (int i = 0; i < newValues.size(); i++) {
+            tags.setTag(i, newValues.get(i));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
         testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
-    }
-
-    @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addTag(0, (TestCaseTags) modelElement);
     }
 }

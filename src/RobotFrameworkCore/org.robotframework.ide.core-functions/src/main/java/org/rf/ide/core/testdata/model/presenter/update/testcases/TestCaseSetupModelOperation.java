@@ -44,6 +44,11 @@ public class TestCaseSetupModelOperation implements ITestCaseTableElementOperati
     }
 
     @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        testCase.addSetup(0, (TestCaseSetup) modelElement);
+    }
+
+    @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestCaseSetup setup = (TestCaseSetup) modelElement;
         if (index == 0) {
@@ -57,14 +62,22 @@ public class TestCaseSetupModelOperation implements ITestCaseTableElementOperati
         }
     }
 
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+        final TestCaseSetup setup = (TestCaseSetup) modelElement;
+
+        setup.setKeywordName(newValues.isEmpty() ? "" : newValues.get(0));
+        for (int i = 0; i < setup.getArguments().size(); i++) {
+            setup.removeElementToken(0);
+        }
+        for (int i = 1; i < newValues.size(); i++) {
+            setup.setArgument(i - 1, newValues.get(i));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
         testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
-    }
-
-    @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addSetup(0, (TestCaseSetup) modelElement);
     }
 }
