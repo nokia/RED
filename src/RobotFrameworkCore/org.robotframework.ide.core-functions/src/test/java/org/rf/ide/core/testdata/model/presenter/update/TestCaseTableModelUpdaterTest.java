@@ -192,9 +192,7 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIsThrown_whenCreatingExecutableRowForNullCase() {
-        final AModelElement<?> row = updater.createExecutableRow(null, 0, "some action", "comment",
-                newArrayList("a", "b", "c"));
-        assertThat(row).isNull();
+        updater.createExecutableRow(null, 0, "some action", "comment", newArrayList("a", "b", "c"));
     }
 
     @Test(expected = IndexOutOfBoundsException.class)
@@ -207,8 +205,7 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void exceptionIsThrown_whenCreatingSettingForNullCase() {
-        final AModelElement<?> setting = updater.createSetting(null, "Setup", "comment", newArrayList("a", "b", "c"));
-        assertThat(setting).isNull();
+        updater.createSetting(null, "Setup", "comment", newArrayList("a", "b", "c"));
     }
 
     @Test
@@ -599,7 +596,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordArgumentsSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final KeywordArguments keywordSetting = (KeywordArguments) new KeywordTableModelUpdater()
-                .create(createKeyword(), "[Arguments]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), "[Arguments]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
@@ -623,7 +620,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordReturnSettingIsProperlyMorphedIntoUnknownSetting_whenInserted() {
         final KeywordReturn keywordSetting = (KeywordReturn) new KeywordTableModelUpdater()
-                .create(createKeyword(), "[Return]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), "[Return]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
@@ -646,7 +643,7 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordTagsSettingIsProperlyMorphedIntoTagsSetting_whenInserted() {
-        final KeywordTags keywordSetting = (KeywordTags) new KeywordTableModelUpdater().create(createKeyword(),
+        final KeywordTags keywordSetting = (KeywordTags) new KeywordTableModelUpdater().createSetting(createKeyword(),
                 "[Tags]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
@@ -670,8 +667,8 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordTeardownSettingIsProperlyMorphedIntoTeardownSetting_whenInserted() {
-        final KeywordTeardown keywordSetting = (KeywordTeardown) new KeywordTableModelUpdater().create(createKeyword(),
-                "[Teardown]", "comment", newArrayList("a", "b", "c"));
+        final KeywordTeardown keywordSetting = (KeywordTeardown) new KeywordTableModelUpdater()
+                .createSetting(createKeyword(), "[Teardown]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
@@ -694,8 +691,8 @@ public class TestCaseTableModelUpdaterTest {
 
     @Test
     public void keywordTimeoutSettingIsProperlyMorphedIntoTimeoutSetting_whenInserted() {
-        final KeywordTimeout keywordSetting = (KeywordTimeout) new KeywordTableModelUpdater().create(createKeyword(),
-                "[Timeout]", "comment", newArrayList("a", "b", "c"));
+        final KeywordTimeout keywordSetting = (KeywordTimeout) new KeywordTableModelUpdater()
+                .createSetting(createKeyword(), "[Timeout]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 
@@ -719,7 +716,7 @@ public class TestCaseTableModelUpdaterTest {
     @Test
     public void keywordDocumentationSettingIsProperlyMorphedIntoDocumentationSetting_whenInserted() {
         final KeywordDocumentation keywordSetting = (KeywordDocumentation) new KeywordTableModelUpdater()
-                .create(createKeyword(), "[Documentation]", "comment", newArrayList("a", "b", "c"));
+                .createSetting(createKeyword(), "[Documentation]", "comment", newArrayList("a", "b", "c"));
 
         final TestCase testCase = createCase();
 

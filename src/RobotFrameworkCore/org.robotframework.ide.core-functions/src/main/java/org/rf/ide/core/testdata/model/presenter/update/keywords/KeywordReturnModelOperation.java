@@ -18,7 +18,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 public class KeywordReturnModelOperation implements IKeywordTableElementOperation {
 
     @Override
-    public boolean isApplicable(ModelType elementType) {
+    public boolean isApplicable(final ModelType elementType) {
         return elementType == ModelType.USER_KEYWORD_RETURN;
     }
     
@@ -28,7 +28,8 @@ public class KeywordReturnModelOperation implements IKeywordTableElementOperatio
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment) {
+    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
+            final String comment) {
         final KeywordReturn keywordReturn = userKeyword.newReturn();
         for (int i = 0; i < args.size(); i++) {
             keywordReturn.addReturnValue(i, args.get(i));
@@ -37,6 +38,11 @@ public class KeywordReturnModelOperation implements IKeywordTableElementOperatio
             keywordReturn.setComment(comment);
         }
         return keywordReturn;
+    }
+
+    @Override
+    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+        userKeyword.addReturn(0, (KeywordReturn) modelElement);
     }
 
     @Override
@@ -49,9 +55,9 @@ public class KeywordReturnModelOperation implements IKeywordTableElementOperatio
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.addReturn((KeywordReturn) modelElement);
+    public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
+        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
     }
-
 }

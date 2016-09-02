@@ -28,7 +28,8 @@ public class KeywordTimeoutModelOperation implements IKeywordTableElementOperati
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment) {
+    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
+            final String comment) {
         final KeywordTimeout keywordTimeout = userKeyword.newTimeout();
         if (!args.isEmpty()) {
             keywordTimeout.setTimeout(args.get(0));
@@ -40,6 +41,11 @@ public class KeywordTimeoutModelOperation implements IKeywordTableElementOperati
             keywordTimeout.setComment(comment);
         }
         return keywordTimeout;
+    }
+
+    @Override
+    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+        userKeyword.addTimeout(0, (KeywordTimeout) modelElement);
     }
 
     @Override
@@ -57,8 +63,9 @@ public class KeywordTimeoutModelOperation implements IKeywordTableElementOperati
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.addTimeout((KeywordTimeout) modelElement);
+    public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
+        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
     }
 }
