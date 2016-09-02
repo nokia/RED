@@ -22,18 +22,18 @@ public class SetKeywordSettingArgumentCommand extends SetKeywordCallArgumentComm
     @Override
     protected void updateModelElement(final List<String> arguments) {
 
-        final AModelElement<?> linkedElement = getKeywordCall().getLinkedElement();
+        final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
         final KeywordTableModelUpdater updater = new KeywordTableModelUpdater();
-        if (getValue() != null) {
+        if (value != null) {
             for (int i = arguments.size() - 1; i >= 0; i--) {
                 updater.updateArgument(linkedElement, i, arguments.get(i));
             }
         } else {
-            updater.updateArgument(linkedElement, getIndex(), getValue());
+            updater.updateArgument(linkedElement, index, value);
         }
 
         if (linkedElement.getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION) {
-            eventBroker.post(DocumentationView.REFRESH_DOC_EVENT_TOPIC, getKeywordCall());
+            eventBroker.post(DocumentationView.REFRESH_DOC_EVENT_TOPIC, keywordCall);
         }
     }
 

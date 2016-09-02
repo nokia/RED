@@ -59,9 +59,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
@@ -453,7 +453,7 @@ public class ImportLibraryComposite {
                 }
                 args.add(host);
             }
-            commandsStack.execute(new CreateFreshGeneralSettingCommand(section.get(), "Library", args));
+            commandsStack.execute(new CreateFreshSettingCommand(section.get(), "Library", args));
         }
 
         leftViewer.refresh();
@@ -470,7 +470,7 @@ public class ImportLibraryComposite {
 
         final Optional<RobotSettingsSection> section = fileModel.findSection(RobotSettingsSection.class);
         final List<RobotSetting> settingsToRemove = getSettingsToRemove(section.get(), specs);
-        commandsStack.execute(new DeleteSettingKeywordCallCommand(settingsToRemove));
+        commandsStack.execute(new DeleteSettingCommand(settingsToRemove));
 
         leftViewer.refresh();
         rightViewer.refresh();
@@ -478,7 +478,7 @@ public class ImportLibraryComposite {
 
     private void handleEditLibraryArgs(final RobotSetting setting, final List<String> newArgs) {
         for (int i = 0; i < newArgs.size(); i++) {
-            commandsStack.execute(new SetSettingKeywordCallArgumentCommand(setting, i + 1, newArgs.get(i))); // set arg after keyword name
+            commandsStack.execute(new SetSettingArgumentCommand(setting, i + 1, newArgs.get(i))); // set arg after keyword name
         }
     }
 

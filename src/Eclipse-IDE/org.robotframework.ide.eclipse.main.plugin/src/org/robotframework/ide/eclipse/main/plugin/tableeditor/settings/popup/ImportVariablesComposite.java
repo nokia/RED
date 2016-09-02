@@ -54,9 +54,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile.ImportedVariablesFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
@@ -270,7 +270,7 @@ public class ImportVariablesComposite {
         for (final String newPathString : paths) {
             if (!newPathString.isEmpty()) {
                 final ArrayList<String> args = newArrayList(newPathString);
-                commandsStack.execute(new CreateFreshGeneralSettingCommand(settingsSection, "Variables", args));
+                commandsStack.execute(new CreateFreshSettingCommand(settingsSection, "Variables", args));
                 currentVariables.add(new ImportedVariablesFile(args));
             }
         }
@@ -291,7 +291,7 @@ public class ImportVariablesComposite {
             }
         }
         importedSettings.getImportedVariables().removeAll(resourcesToRemove);
-        commandsStack.execute(new DeleteSettingKeywordCallCommand(settingsToRemove));
+        commandsStack.execute(new DeleteSettingCommand(settingsToRemove));
         variablesViewer.refresh();
     }
 
@@ -303,7 +303,7 @@ public class ImportVariablesComposite {
             final List<String> args = setting.getArguments();
             if (!args.isEmpty() && args.equals(variablesFile.getArgs())) {
                 args.set(0, newPath);
-                commandsStack.execute(new SetSettingKeywordCallArgumentCommand(setting, 0, newPath));
+                commandsStack.execute(new SetSettingArgumentCommand(setting, 0, newPath));
                 variablesFile.setArgs(args);
                 break;
             }
@@ -321,7 +321,7 @@ public class ImportVariablesComposite {
                 final List<String> newVariablesArguments = newArrayList(args.get(0));
                 newVariablesArguments.addAll(newArgs);
                 for (int i = 0; i < newArgs.size(); i++) {
-                    commandsStack.execute(new SetSettingKeywordCallArgumentCommand(setting, i + 1, newArgs.get(i))); // set arg after variable file path
+                    commandsStack.execute(new SetSettingArgumentCommand(setting, i + 1, newArgs.get(i))); // set arg after variable file path
                 }
                 variablesFile.setArgs(newVariablesArguments);
                 break;

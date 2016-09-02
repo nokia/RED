@@ -54,9 +54,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
@@ -232,7 +232,7 @@ public class ImportResourcesComposite {
             final IPath newPath = new Path(newPathString);
             if (!currentPaths.contains(newPath) && !newPathString.isEmpty()) {
                 final ArrayList<String> args = newArrayList(newPathString);
-                commandsStack.execute(new CreateFreshGeneralSettingCommand(settingsSection, "Resource", args));
+                commandsStack.execute(new CreateFreshSettingCommand(settingsSection, "Resource", args));
                 currentPaths.add(newPath);
             }
         }
@@ -250,7 +250,7 @@ public class ImportResourcesComposite {
             }
         }
         importedSettings.getImportedResources().removeAll(resourcesToRemove);
-        commandsStack.execute(new DeleteSettingKeywordCallCommand(settingsToRemove));
+        commandsStack.execute(new DeleteSettingCommand(settingsToRemove));
         resourcesViewer.refresh();
     }
     
@@ -260,7 +260,7 @@ public class ImportResourcesComposite {
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
             if(!args.isEmpty() && oldPath.equals(new Path(args.get(0)))) {
-                commandsStack.execute(new SetSettingKeywordCallArgumentCommand(setting, 0, newPath));
+                commandsStack.execute(new SetSettingArgumentCommand(setting, 0, newPath));
                 break;
             }
         }

@@ -16,9 +16,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class SetKeywordCallArgumentCommand extends EditorCommand {
 
-    private final RobotKeywordCall keywordCall;
-    private final int index;
-    private final String value;
+    protected final RobotKeywordCall keywordCall;
+    protected final int index;
+    protected final String value;
 
     public SetKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value) {
         this.keywordCall = keywordCall;
@@ -65,17 +65,5 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
                 ((RobotExecutableRow<?>) linkedElement).removeElementToken(index);
             }
         }
-    }
-
-    public int getIndex() {
-        return index;
-    }
-
-    protected RobotKeywordCall getKeywordCall() {
-        return keywordCall;
-    }
-
-    protected String getValue() {
-        return value;
     }
 }

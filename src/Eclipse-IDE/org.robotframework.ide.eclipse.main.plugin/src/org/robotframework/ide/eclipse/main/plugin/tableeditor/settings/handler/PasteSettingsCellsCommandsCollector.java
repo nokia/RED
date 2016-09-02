@@ -15,7 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobotElementCellsCommandsCollector;
@@ -79,18 +79,18 @@ public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsC
                 pasteCommands.add(new SetKeywordCallCommentCommand(selectedSetting, valueToPaste));
             } else {
                 if (selectedSetting.getGroup() == SettingsGroup.METADATA) {
-                    pasteCommands.add(new SetSettingKeywordCallArgumentCommand(selectedSetting, selectedElementColumnIndex,
+                    pasteCommands.add(new SetSettingArgumentCommand(selectedSetting, selectedElementColumnIndex,
                             valueToPaste));
                 } else if (selectedSetting.getGroup() == SettingsGroup.NO_GROUP) {
                     if (selectedElementColumnIndex > 0) {
-                        pasteCommands.add(new SetSettingKeywordCallArgumentCommand(selectedSetting,
+                        pasteCommands.add(new SetSettingArgumentCommand(selectedSetting,
                                 selectedElementColumnIndex - 1, valueToPaste));
                     }
                 } else {
                     if (selectedElementColumnIndex == 0) {
                         pasteCommands.add(new SetKeywordCallNameCommand(selectedSetting, valueToPaste));
                     } else {
-                        pasteCommands.add(new SetSettingKeywordCallArgumentCommand(selectedSetting,
+                        pasteCommands.add(new SetSettingArgumentCommand(selectedSetting,
                                 selectedElementColumnIndex - 1, valueToPaste));
                     }
                 }

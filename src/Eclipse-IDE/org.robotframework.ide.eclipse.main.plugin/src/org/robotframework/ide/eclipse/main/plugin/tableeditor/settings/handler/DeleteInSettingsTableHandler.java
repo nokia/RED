@@ -9,7 +9,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.E4DeleteInTableHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.DeleteInSettingsTableHandler.E4DeleteInSettingsTableHandler;
@@ -29,9 +29,9 @@ public class DeleteInSettingsTableHandler extends DIParameterizedHandler<E4Delet
             final RobotSetting selectedSetting = (RobotSetting) selectedElement;
             if (columnIndex < tableColumnCount - 1) {
                 if (selectedSetting.getGroup() == SettingsGroup.METADATA) {
-                    return new SetSettingKeywordCallArgumentCommand(selectedSetting, columnIndex, null);
+                    return new SetSettingArgumentCommand(selectedSetting, columnIndex, null);
                 } else if (columnIndex > 0) {
-                    return new SetSettingKeywordCallArgumentCommand(selectedSetting, columnIndex - 1, null);
+                    return new SetSettingArgumentCommand(selectedSetting, columnIndex - 1, null);
                 }
             } else if (columnIndex == tableColumnCount - 1) {
                 return new SetKeywordCallCommentCommand(selectedSetting, null);
