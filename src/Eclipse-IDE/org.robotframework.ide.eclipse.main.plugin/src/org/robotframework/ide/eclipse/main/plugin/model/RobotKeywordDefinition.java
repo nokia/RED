@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ObjectStreamException;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -323,6 +324,28 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         keywordSpecification.setFormat("ROBOT");
         keywordSpecification.setDocumentation(getDocumentation());
         return keywordSpecification;
+    }
+
+    @Override
+    public void moveChildDown(final RobotKeywordCall keywordCall) {
+        final int index = keywordCall.getIndex();
+        Collections.swap(getChildren(), index, index + 1);
+
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<UserKeyword> linkedCall = (RobotExecutableRow<UserKeyword>) keywordCall
+                .getLinkedElement();
+        getLinkedElement().moveDownExecutableRow(linkedCall);
+    }
+
+    @Override
+    public void moveChildUp(final RobotKeywordCall keywordCall) {
+        final int index = keywordCall.getIndex();
+        Collections.swap(getChildren(), index, index - 1);
+
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<UserKeyword> linkedCall = (RobotExecutableRow<UserKeyword>) keywordCall
+                .getLinkedElement();
+        getLinkedElement().moveUpExecutableRow(linkedCall);
     }
 
     @SuppressWarnings("unchecked")

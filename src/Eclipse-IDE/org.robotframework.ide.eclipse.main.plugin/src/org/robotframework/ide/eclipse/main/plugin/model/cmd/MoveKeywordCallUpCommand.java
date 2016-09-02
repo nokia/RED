@@ -5,12 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.Collections;
-
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
@@ -22,29 +18,22 @@ public class MoveKeywordCallUpCommand extends EditorCommand {
         this.keywordCall = keywordCall;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
-
         if (!keywordCall.isExecutable()) {
             throw new IllegalStateException("Unable to move non-executable rows");
         }
 
-        final RobotKeywordDefinition keywordDefinition = (RobotKeywordDefinition) keywordCall.getParent();
+        final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
         final int index = keywordCall.getIndex();
 
-        if (index == 0 || !keywordDefinition.getChildren().get(index - 1).isExecutable()) {
+        if (index == 0 || !parent.getChildren().get(index - 1).isExecutable()) {
             // no place to move it further up
             return;
         } else {
-            Collections.swap(keywordDefinition.getChildren(), index, index - 1);
+            parent.moveChildUp(keywordCall);
 
-            final UserKeyword linkedElement = keywordDefinition.getLinkedElement();
-            final RobotExecutableRow<UserKeyword> linkedCall = (RobotExecutableRow<UserKeyword>) keywordCall
-                    .getLinkedElement();
-            linkedElement.moveUpExecutableRow(linkedCall);
-
-            eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, keywordDefinition);
+            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, parent);
         }
     }
 }
