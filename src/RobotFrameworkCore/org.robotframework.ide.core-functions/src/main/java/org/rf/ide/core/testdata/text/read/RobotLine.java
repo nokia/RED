@@ -148,4 +148,18 @@ public class RobotLine implements IChildElement<RobotFile> {
         return String.format("RobotLine [lineNumber=%s, lineElements=%s, endOfLine=%s]", lineNumber, lineElements, eol);
     }
 
+    public RobotLine deepCopy() {
+        final RobotLine copy = new RobotLine(this.getLineNumber(), this.getParent());
+        for (final IRobotLineElement elem : this.getLineElements()) {
+            copy.addLineElement(elem.copy());
+        }
+
+        final IRobotLineElement endOfLine = this.getEndOfLine();
+        if (endOfLine != null) {
+            copy.setEndOfLine(LineReader.Constant.get(endOfLine), endOfLine.getStartOffset(),
+                    endOfLine.getStartColumn());
+        }
+
+        return copy;
+    }
 }

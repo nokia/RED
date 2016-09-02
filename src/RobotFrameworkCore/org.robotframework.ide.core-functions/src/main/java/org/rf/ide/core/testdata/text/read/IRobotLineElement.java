@@ -9,38 +9,31 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.FilePosition;
 
-
 public interface IRobotLineElement {
 
     public static final int NOT_SET = -1;
 
-
     int getLineNumber();
-
 
     int getStartColumn();
 
-
     int getEndColumn();
-
 
     int getStartOffset();
 
-
     FilePosition getFilePosition();
-
 
     String getText();
 
-
     String getRaw();
-
 
     List<IRobotTokenType> getTypes();
 
-
     boolean isDirty();
 
-
     VersionAvailabilityInfo getVersionInformation();
+
+    IRobotLineElement copyWithoutPosition();
+
+    IRobotLineElement copy();
 }
