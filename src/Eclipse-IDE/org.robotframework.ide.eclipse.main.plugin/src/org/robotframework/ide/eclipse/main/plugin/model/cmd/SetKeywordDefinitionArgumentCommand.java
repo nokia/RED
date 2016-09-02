@@ -105,10 +105,10 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         final KeywordTableModelUpdater updater = new KeywordTableModelUpdater();
         if (value != null) {
             for (int i = arguments.size() - 1; i >= 0; i--) {
-                updater.update(argumentsSetting.getLinkedElement(), i, arguments.get(i));
+                updater.updateArgument(argumentsSetting.getLinkedElement(), i, arguments.get(i));
             }
         } else {
-            updater.update(argumentsSetting.getLinkedElement(), index, value);
+            updater.updateArgument(argumentsSetting.getLinkedElement(), index, value);
         }
     }
 }
