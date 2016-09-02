@@ -5,13 +5,10 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -21,8 +18,15 @@ public class DeleteKeywordCallCommand extends EditorCommand {
 
     private final List<? extends RobotKeywordCall> callsToDelete;
 
+    private final String eventTopic;
+
     public DeleteKeywordCallCommand(final List<? extends RobotKeywordCall> callsToDelete) {
+        this(callsToDelete, RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED);
+    }
+
+    protected DeleteKeywordCallCommand(final List<? extends RobotKeywordCall> callsToDelete, final String topic) {
         this.callsToDelete = callsToDelete;
+        this.eventTopic = topic;
     }
 
     @Override
@@ -30,27 +34,16 @@ public class DeleteKeywordCallCommand extends EditorCommand {
         if (callsToDelete.isEmpty()) {
             return;
         }
-        IRobotCodeHoldingElement parent = callsToDelete.get(0).getParent();
+        final Set<IRobotCodeHoldingElement> parentsWhereRemovalWasPerformed = new HashSet<>();
 
-        parent.getChildren().removeAll(callsToDelete);
+        for (final RobotKeywordCall call : callsToDelete) {
+            final IRobotCodeHoldingElement parent = call.getParent();
+            parent.removeChild(call);
 
-        removeModelElements(parent);
-
-        eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, parent);
-    }
-
-    private void removeModelElements(IRobotCodeHoldingElement parent) {
-        final Object linkedElement = parent.getLinkedElement();
-        if (linkedElement != null && linkedElement instanceof UserKeyword) {
-            final UserKeyword userKeyword = (UserKeyword) linkedElement;
-            for (RobotKeywordCall robotKeywordCall : callsToDelete) {
-                final AModelElement<?> modelElement = robotKeywordCall.getLinkedElement();
-                if (modelElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
-                    userKeyword.removeExecutableRow((RobotExecutableRow<UserKeyword>) modelElement);
-                } else {
-                    new KeywordTableModelUpdater().remove(userKeyword, modelElement);
-                }
-            }
+            parentsWhereRemovalWasPerformed.add(parent);
+        }
+        for (final IRobotCodeHoldingElement parent : parentsWhereRemovalWasPerformed) {
+            eventBroker.send(eventTopic, parent);
         }
     }
 }

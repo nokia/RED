@@ -42,6 +42,12 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
             final String comment);
 
     @Override
+    public void removeChild(final RobotKeywordCall child) {
+        getChildren().remove(child);
+        getModelUpdater().remove(getLinkedElement(), child.getLinkedElement());
+    }
+
+    @Override
     public String getComment() {
         return "";
     }
@@ -54,6 +60,9 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
     public void setParent(final RobotSuiteFileSection parent) {
         this.parent = parent;
     }
+
+    @Override
+    public abstract T getLinkedElement();
 
     @Override
     public List<RobotKeywordCall> getChildren() {
