@@ -26,10 +26,10 @@ public class SetKeywordSettingArgumentCommand extends SetKeywordCallArgumentComm
         final KeywordTableModelUpdater updater = new KeywordTableModelUpdater();
         if (getValue() != null) {
             for (int i = arguments.size() - 1; i >= 0; i--) {
-                updater.update(linkedElement, i, arguments.get(i));
+                updater.updateArgument(linkedElement, i, arguments.get(i));
             }
         } else {
-            updater.update(linkedElement, getIndex(), getValue());
+            updater.updateArgument(linkedElement, getIndex(), getValue());
         }
 
         if (linkedElement.getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION) {
