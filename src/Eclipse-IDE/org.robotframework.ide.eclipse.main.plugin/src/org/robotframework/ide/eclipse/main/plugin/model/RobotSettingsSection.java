@@ -144,6 +144,12 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return setting;
     }
 
+    @Override
+    public void removeChild(final RobotKeywordCall child) {
+        getChildren().remove(child);
+        new SettingTableModelUpdater().remove(getLinkedElement(), child.getLinkedElement());
+    }
+
     public List<RobotKeywordCall> getMetadataSettings() {
         return getSettingsFromGroup(SettingsGroup.METADATA);
     }
