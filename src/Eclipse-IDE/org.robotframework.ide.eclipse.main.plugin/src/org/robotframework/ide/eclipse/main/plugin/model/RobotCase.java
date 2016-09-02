@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ObjectStreamException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -128,6 +129,7 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
         new TestCaseTableModelUpdater().insert(testCase, modelIndex, call.getLinkedElement());
     }
 
+    @Override
     public void removeChild(final RobotKeywordCall child) {
         getChildren().remove(child);
         new TestCaseTableModelUpdater().remove(testCase, child.getLinkedElement());
@@ -164,6 +166,26 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
 
     public Optional<String> getTemplateInUse() {
         return Optional.fromNullable(testCase.getTemplateKeywordName());
+    }
+
+    @Override
+    public void moveChildDown(final RobotKeywordCall keywordCall) {
+        final int index = keywordCall.getIndex();
+        Collections.swap(getChildren(), index, index + 1);
+
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<TestCase> linkedCall = (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement();
+        getLinkedElement().moveDownExecutableRow(linkedCall);
+    }
+
+    @Override
+    public void moveChildUp(final RobotKeywordCall keywordCall) {
+        final int index = keywordCall.getIndex();
+        Collections.swap(getChildren(), index, index - 1);
+
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<TestCase> linkedCall = (RobotExecutableRow<TestCase>) keywordCall.getLinkedElement();
+        getLinkedElement().moveUpExecutableRow(linkedCall);
     }
 
     @Override
