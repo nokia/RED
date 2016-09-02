@@ -16,7 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordCallsCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertKeywordDefinitionsCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.InsertKeywordDefinitionsCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;

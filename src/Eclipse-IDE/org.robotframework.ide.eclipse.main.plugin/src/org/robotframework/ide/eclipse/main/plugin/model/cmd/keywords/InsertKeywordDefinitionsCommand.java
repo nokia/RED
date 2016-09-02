@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords;
 
 import static com.google.common.collect.Iterables.any;
 
@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.NamesGenerator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.base.Predicate;
@@ -38,7 +39,7 @@ public class InsertKeywordDefinitionsCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final KeywordTable keywordTable = (KeywordTable) keywordsSection.getLinkedElement();
+        final KeywordTable keywordTable = keywordsSection.getLinkedElement();
 
         int counter = index;
         for (final RobotKeywordDefinition keyword : definitionsToInsert) {
