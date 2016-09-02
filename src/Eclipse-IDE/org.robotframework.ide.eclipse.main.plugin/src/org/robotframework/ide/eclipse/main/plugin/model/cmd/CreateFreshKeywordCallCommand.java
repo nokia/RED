@@ -22,29 +22,28 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
 
     private final String comment;
 
-    private final int codeHoldingElementIndex;
+    private final int index;
 
     public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent) {
         this(parent, parent.getChildren().size());
     }
 
-    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final int codeHoldingElementIndex) {
-        this(parent, "", new ArrayList<String>(), "", codeHoldingElementIndex);
+    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final int index) {
+        this(parent, index, "", new ArrayList<String>(), "");
     }
 
-    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final String name,
-            final List<String> args, final String comment, final int codeHoldingElementIndex) {
+    private CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final int index,
+            final String name, final List<String> args, final String comment) {
         this.parent = parent;
         this.name = name;
         this.args = args;
         this.comment = comment;
-        this.codeHoldingElementIndex = codeHoldingElementIndex;
+        this.index = index;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-
-        parent.createKeywordCall(codeHoldingElementIndex, name, args, comment);
+        parent.createKeywordCall(index, name, args, comment);
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
