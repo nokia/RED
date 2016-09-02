@@ -41,6 +41,14 @@ public class TestCaseExecutableRowModelOperation implements ITestCaseTableElemen
     }
 
     @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        @SuppressWarnings("unchecked")
+        final RobotExecutableRow<TestCase> executableRow = (RobotExecutableRow<TestCase>) modelElement;
+
+        testCase.addTestExecutionRow(executableRow, index);
+    }
+
+    @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final RobotExecutableRow<?> row = (RobotExecutableRow<?>) modelElement;
 
@@ -51,17 +59,21 @@ public class TestCaseExecutableRowModelOperation implements ITestCaseTableElemen
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        testCase.removeExecutableRow((RobotExecutableRow<TestCase>) modelElement);
+    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+        final RobotExecutableRow<?> row = (RobotExecutableRow<?>) modelElement;
+
+        for (int i = 0; i < row.getArguments().size(); i++) {
+            row.removeElementToken(0);
+        }
+        for (int i = 0; i < newValues.size(); i++) {
+            row.setArgument(i, newValues.get(i));
+        }
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        final RobotExecutableRow<TestCase> executableRow = (RobotExecutableRow<TestCase>) modelElement;
-
-        testCase.addTestExecutionRow(executableRow, index);
+    public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
+        testCase.removeExecutableRow((RobotExecutableRow<TestCase>) modelElement);
     }
 }

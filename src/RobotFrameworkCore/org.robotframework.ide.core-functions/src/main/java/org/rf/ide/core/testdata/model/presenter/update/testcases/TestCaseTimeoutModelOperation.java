@@ -44,6 +44,11 @@ public class TestCaseTimeoutModelOperation implements ITestCaseTableElementOpera
     }
 
     @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        testCase.addTimeout(0, (TestCaseTimeout) modelElement);
+    }
+
+    @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestCaseTimeout timeout = (TestCaseTimeout) modelElement;
 
@@ -58,14 +63,22 @@ public class TestCaseTimeoutModelOperation implements ITestCaseTableElementOpera
         }
     }
 
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+        final TestCaseTimeout timeout = (TestCaseTimeout) modelElement;
+
+        timeout.setTimeout(newValues.isEmpty() ? "" : newValues.get(0));
+        for (int i = 0; i < timeout.getMessage().size(); i++) {
+            timeout.removeElementToken(0);
+        }
+        for (int i = 1; i < newValues.size(); i++) {
+            timeout.addMessagePart(i - 1, newValues.get(i));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
         testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
-    }
-
-    @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addTimeout(0, (TestCaseTimeout) modelElement);
     }
 }
