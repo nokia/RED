@@ -33,6 +33,14 @@ public class KeywordUnknownSettings extends AModelElement<UserKeyword> implement
         fixForTheType(declaration, RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION);
     }
 
+    public void addArgument(final String argument) {
+        addArgument(arguments.size(), argument);
+    }
+
+    public void addArgument(final int index, final String argument) {
+        updateOrCreateTokenInside(arguments, index, argument, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS);
+    }
+
     public void addArgument(final RobotToken arg) {
         fixForTheType(arg, RobotTokenType.KEYWORD_SETTING_UNKNOWN_ARGUMENTS);
         this.arguments.add(arg);
@@ -54,6 +62,7 @@ public class KeywordUnknownSettings extends AModelElement<UserKeyword> implement
 
     @Override
     public void addCommentPart(final RobotToken rt) {
+        fixComment(getComment(), rt);
         this.comment.add(rt);
     }
 

@@ -28,7 +28,8 @@ public class KeywordTagsModelOperation implements IKeywordTableElementOperation 
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment) {
+    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
+            final String comment) {
         final KeywordTags keywordTags = userKeyword.newTags();
         for (final String tag : args) {
             keywordTags.addTag(tag);
@@ -37,6 +38,11 @@ public class KeywordTagsModelOperation implements IKeywordTableElementOperation 
             keywordTags.setComment(comment);
         }
         return keywordTags;
+    }
+
+    @Override
+    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+        userKeyword.addTag(0, (KeywordTags) modelElement);
     }
     
     @Override
@@ -49,9 +55,9 @@ public class KeywordTagsModelOperation implements IKeywordTableElementOperation 
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.addTag((KeywordTags) modelElement);
+    public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
+        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
     }
-
 }

@@ -18,10 +18,13 @@ public interface IKeywordTableElementOperation {
     
     boolean isApplicable(final IRobotTokenType elementType);
 
-    AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment);
+    AModelElement<?> create(final UserKeyword userKeyword, String actionName, final List<String> args,
+            final String comment);
+
+    void insert(final UserKeyword userKeyword, int index, final AModelElement<?> modelElement);
 
     void update(final AModelElement<?> modelElement, final int index, final String value);
-    
-    void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement);
 
+    void remove(UserKeyword userKeyword, AModelElement<?> modelElement);
+    
 }

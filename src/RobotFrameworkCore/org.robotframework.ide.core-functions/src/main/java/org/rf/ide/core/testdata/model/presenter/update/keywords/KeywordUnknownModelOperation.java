@@ -1,60 +1,54 @@
-/*
- * Copyright 2016 Nokia Solutions and Networks
- * Licensed under the Apache License, Version 2.0,
- * see license.txt file for details.
- */
 package org.rf.ide.core.testdata.model.presenter.update.keywords;
 
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IKeywordTableElementOperation;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class KeywordDocumentationModelOperation implements IKeywordTableElementOperation {
+public class KeywordUnknownModelOperation implements IKeywordTableElementOperation {
 
     @Override
     public boolean isApplicable(final ModelType elementType) {
-        return elementType == ModelType.USER_KEYWORD_DOCUMENTATION;
+        return elementType == ModelType.USER_KEYWORD_SETTING_UNKNOWN;
     }
 
     @Override
     public boolean isApplicable(final IRobotTokenType elementType) {
-        return elementType == RobotTokenType.KEYWORD_SETTING_DOCUMENTATION;
+        return elementType == RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION;
     }
 
     @Override
     public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
             final String comment) {
-        final KeywordDocumentation keywordDoc = userKeyword.newDocumentation();
-        for (int i = 0; i < args.size(); i++) {
-            keywordDoc.addDocumentationText(i, args.get(i));
+        final KeywordUnknownSettings unknown = userKeyword.newUnknownSettings();
+        unknown.getDeclaration().setText(settingName);
+        for (final String arg : args) {
+            unknown.addArgument(arg);
         }
         if (comment != null && !comment.isEmpty()) {
-            keywordDoc.setComment(comment);
+            unknown.setComment(comment);
         }
-        return keywordDoc;
+        return unknown;
     }
 
     @Override
     public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
-        userKeyword.addDocumentation(0, (KeywordDocumentation) modelElement);
+        userKeyword.addUnknownSettings(0, (KeywordUnknownSettings) modelElement);
     }
 
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
-        final KeywordDocumentation keywordDocumentation = (KeywordDocumentation) modelElement;
+        final KeywordUnknownSettings unknown = (KeywordUnknownSettings) modelElement;
+
         if (value != null) {
-            if (index == 0) {
-                DocumentationServiceHandler.update(keywordDocumentation, value);
-            }
+            unknown.addArgument(index, value);
         } else {
-            keywordDocumentation.clearDocumentation();
+            unknown.removeElementToken(index);
         }
     }
 
