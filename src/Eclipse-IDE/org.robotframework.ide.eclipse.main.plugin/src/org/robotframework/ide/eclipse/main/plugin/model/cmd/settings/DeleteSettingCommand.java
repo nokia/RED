@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.settings;
 
 import java.util.List;
 
@@ -13,11 +13,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-public class DeleteSettingKeywordCallCommand extends EditorCommand {
+public class DeleteSettingCommand extends EditorCommand {
 
     private final List<RobotSetting> settingsToRemove;
 
-    public DeleteSettingKeywordCallCommand(final List<RobotSetting> settingsToRemove) {
+    public DeleteSettingCommand(final List<RobotSetting> settingsToRemove) {
         this.settingsToRemove = settingsToRemove;
     }
 

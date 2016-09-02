@@ -11,7 +11,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveSettingUpCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.MoveSettingUpCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler.MoveSettingUpHandler.E4MoveSettingUpHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;

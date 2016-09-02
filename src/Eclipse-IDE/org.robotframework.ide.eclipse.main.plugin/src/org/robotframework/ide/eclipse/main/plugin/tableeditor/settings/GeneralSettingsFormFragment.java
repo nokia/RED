@@ -98,9 +98,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGro
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteSettingKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
@@ -475,12 +475,12 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 final RobotSetting docSetting = settingsSection.getSetting("Documentation");
 
                 if (docSetting == null && !newDocumentation.isEmpty()) {
-                    commandsStack.execute(new CreateFreshGeneralSettingCommand(settingsSection, "Documentation",
+                    commandsStack.execute(new CreateFreshSettingCommand(settingsSection, "Documentation",
                             newArrayList(newDocumentation)));
                 } else if (docSetting != null && newDocumentation.isEmpty()) {
-                    commandsStack.execute(new DeleteSettingKeywordCallCommand(newArrayList(docSetting)));
+                    commandsStack.execute(new DeleteSettingCommand(newArrayList(docSetting)));
                 } else if (docSetting != null) {
-                    commandsStack.execute(new SetSettingKeywordCallArgumentCommand(docSetting, 0, newDocumentation));
+                    commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
                 }
 
                 return Status.OK_STATUS;
