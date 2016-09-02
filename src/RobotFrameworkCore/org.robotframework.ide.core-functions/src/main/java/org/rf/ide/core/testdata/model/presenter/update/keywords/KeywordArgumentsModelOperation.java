@@ -28,7 +28,8 @@ public class KeywordArgumentsModelOperation implements IKeywordTableElementOpera
     }
     
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment) {
+    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
+            final String comment) {
         final KeywordArguments keywordArgs = userKeyword.newArguments();
         for (int i = 0; i < args.size(); i++) {
             keywordArgs.addArgument(i, args.get(i));
@@ -37,6 +38,11 @@ public class KeywordArgumentsModelOperation implements IKeywordTableElementOpera
             keywordArgs.setComment(comment);
         }
         return keywordArgs;
+    }
+
+    @Override
+    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+        userKeyword.addArguments(0, (KeywordArguments) modelElement);
     }
 
     @Override
@@ -49,9 +55,9 @@ public class KeywordArgumentsModelOperation implements IKeywordTableElementOpera
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.addArguments((KeywordArguments) modelElement);
+    public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
+        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
     }
-
 }

@@ -28,7 +28,8 @@ public class KeywordTeardownModelOperation implements IKeywordTableElementOperat
     }
 
     @Override
-    public AModelElement<?> create(final UserKeyword userKeyword, final List<String> args, final String comment) {
+    public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
+            final String comment) {
         final KeywordTeardown keywordTeardown = userKeyword.newTeardown();
         if (!args.isEmpty()) {
             keywordTeardown.setKeywordName(args.get(0));
@@ -40,6 +41,11 @@ public class KeywordTeardownModelOperation implements IKeywordTableElementOperat
             keywordTeardown.setComment(comment);
         }
         return keywordTeardown;
+    }
+
+    @Override
+    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+        userKeyword.addTeardown(0, (KeywordTeardown) modelElement);
     }
 
     @Override
@@ -55,11 +61,11 @@ public class KeywordTeardownModelOperation implements IKeywordTableElementOperat
                 keywordTeardown.removeElementToken(index - 1);
             }
         }
-
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public void updateParent(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        userKeyword.addTeardown((KeywordTeardown) modelElement);
+    public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
+        userKeyword.removeUnitSettings((AModelElement<UserKeyword>) modelElement);
     }
 }

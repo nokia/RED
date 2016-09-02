@@ -31,7 +31,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.annotations.VisibleForTesting;
 
-public class TestCaseTableModelUpdater {
+public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<TestCase> {
 
     private static final List<ITestCaseTableElementOperation> elementOparations = Arrays.asList(
             new TestCaseExecutableRowModelOperation(), new TestCaseDocumentationModelOperation(),
@@ -43,6 +43,7 @@ public class TestCaseTableModelUpdater {
             new UserKeywordArgumentsMorphOperation(), new UserKeywordReturnMorphOperation(),
             new UserKeywordUnknownSettingMorphOperation());
 
+    @Override
     public AModelElement<?> createSetting(final TestCase testCase, final String settingName, final String comment,
             final List<String> args) {
         final ITestCaseTableElementOperation operationHandler = getOperationHandler(settingName);
@@ -53,6 +54,7 @@ public class TestCaseTableModelUpdater {
         return operationHandler.create(testCase, settingName, args, comment);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public AModelElement<?> createExecutableRow(final TestCase testCase, final int index, final String action,
             final String comment, final List<String> args) {
@@ -66,6 +68,7 @@ public class TestCaseTableModelUpdater {
         return row;
     }
 
+    @Override
     public void updateArgument(final AModelElement<?> modelElement, final int index, final String value) {
         final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
         if (operationHandler == null) {
@@ -84,10 +87,12 @@ public class TestCaseTableModelUpdater {
         operationHandler.update(modelElement, arguments);
     }
 
+    @Override
     public void updateComment(final AModelElement<?> modelElement, final String value) {
         CommentServiceHandler.update((ICommentHolder) modelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, value);
     }
 
+    @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
         final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
         if (operationHandler == null) {
@@ -97,6 +102,7 @@ public class TestCaseTableModelUpdater {
         operationHandler.remove(testCase, modelElement);
     }
 
+    @Override
     public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         // morph operations enables inserting settings taken from keywords elements
         final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
