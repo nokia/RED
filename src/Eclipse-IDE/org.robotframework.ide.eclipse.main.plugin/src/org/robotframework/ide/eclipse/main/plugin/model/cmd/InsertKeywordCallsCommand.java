@@ -35,7 +35,6 @@ public class InsertKeywordCallsCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-
         final RobotCodeHoldingElement<?> parentElement = (RobotCodeHoldingElement<?>) parent;
         int shift = 0;
         for (final RobotKeywordCall call : callsToInsert) {
@@ -44,7 +43,6 @@ public class InsertKeywordCallsCommand extends EditorCommand {
             }
             shift++;
         }
-
         eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
 }
