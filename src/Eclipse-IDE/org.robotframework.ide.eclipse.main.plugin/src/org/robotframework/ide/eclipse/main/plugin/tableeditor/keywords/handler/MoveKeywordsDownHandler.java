@@ -13,7 +13,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveKeywordCallDownCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.MoveKeywordDefinitionDownCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.MoveKeywordDefinitionDownCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler.MoveKeywordsDownHandler.E4MoveKeywordDownHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
