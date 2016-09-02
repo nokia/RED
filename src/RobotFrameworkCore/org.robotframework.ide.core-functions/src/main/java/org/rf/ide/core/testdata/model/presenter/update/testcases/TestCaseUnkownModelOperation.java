@@ -47,6 +47,11 @@ public class TestCaseUnkownModelOperation implements ITestCaseTableElementOperat
     }
 
     @Override
+    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+        testCase.addUnknownSettings(0, (TestCaseUnknownSettings) modelElement);
+    }
+
+    @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         final TestCaseUnknownSettings unknown = (TestCaseUnknownSettings) modelElement;
 
@@ -57,14 +62,21 @@ public class TestCaseUnkownModelOperation implements ITestCaseTableElementOperat
         }
     }
 
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+        final TestCaseUnknownSettings unknown = (TestCaseUnknownSettings) modelElement;
+
+        for (int i = 0; i < unknown.getArguments().size(); i++) {
+            unknown.removeElementToken(0);
+        }
+        for (int i = 0; i < newValues.size(); i++) {
+            unknown.addArgument(i, newValues.get(i));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
         testCase.removeUnitSettings((AModelElement<TestCase>) modelElement);
-    }
-
-    @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
-        testCase.addUnknownSettings(0, (TestCaseUnknownSettings) modelElement);
     }
 }

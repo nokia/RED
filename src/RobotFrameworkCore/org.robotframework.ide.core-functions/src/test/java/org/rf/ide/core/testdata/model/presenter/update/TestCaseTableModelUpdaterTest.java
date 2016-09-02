@@ -9,7 +9,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
@@ -111,6 +110,22 @@ public class TestCaseTableModelUpdaterTest {
     }
 
     @Test
+    public void handlersForKeywordCannotBulkUpdateAnything() {
+        final AModelElement<?> element = mock(AModelElement.class);
+        for (final ModelType kwModelType : keywordModelTypes) {
+            final ITestCaseTableElementOperation handler = updater.getOperationHandler(kwModelType);
+
+            try {
+                handler.update(element, newArrayList("a", "b", "c"));
+                fail("Expected exception");
+            } catch (final IllegalStateException e) {
+                // we expected that
+            }
+        }
+        verifyZeroInteractions(element);
+    }
+
+    @Test
     public void handlersForKeywordCannotRemoveAnything() {
         final TestCase testCase = mock(TestCase.class);
         final AModelElement<?> element = mock(AModelElement.class);
@@ -163,6 +178,10 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedRow.getElementTokens(), toText())).containsExactly("some action", "a", "b", "x", "",
                 "z", "#new comment");
 
+        updater.setArguments(addedRow, newArrayList("1", "2", "3"));
+        assertThat(transform(addedRow.getElementTokens(), toText())).containsExactly("some action", "1", "2", "3",
+                "#new comment");
+
         updater.remove(testCase, addedRow);
         assertThat(testCase.getTestExecutionRows()).isEmpty();
 
@@ -171,8 +190,8 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedRow).isSameAs(testCase.getTestExecutionRows().get(0));
     }
 
-    @Test
-    public void noExecutableRowIsCreated_whenNullCaseIsProvided() {
+    @Test(expected = IllegalArgumentException.class)
+    public void exceptionIsThrown_whenCreatingExecutableRowForNullCase() {
         final AModelElement<?> row = updater.createExecutableRow(null, 0, "some action", "comment",
                 newArrayList("a", "b", "c"));
         assertThat(row).isNull();
@@ -186,8 +205,8 @@ public class TestCaseTableModelUpdaterTest {
         updater.createExecutableRow(testCase, 2, "some action", "comment", newArrayList("a", "b", "c"));
     }
 
-    @Test
-    public void noSettingIsCreated_whenNullCaseIsProvided() {
+    @Test(expected = IllegalArgumentException.class)
+    public void exceptionIsThrown_whenCreatingSettingForNullCase() {
         final AModelElement<?> setting = updater.createSetting(null, "Setup", "comment", newArrayList("a", "b", "c"));
         assertThat(setting).isNull();
     }
@@ -230,6 +249,10 @@ public class TestCaseTableModelUpdaterTest {
         updater.updateArgument(addedSetting, 3, null);
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "kw", "b", "x", "",
                 "z", "#new comment");
+
+        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Setup]", "1", "2", "3",
+                "#new comment");
 
         updater.remove(testCase, addedSetting);
         assertThat(testCase.getSetups()).isEmpty();
@@ -278,6 +301,10 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "x", "b", "x", "",
                 "z", "#new comment");
 
+        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Tags]", "1", "2", "3",
+                "#new comment");
+
         updater.remove(testCase, addedSetting);
         assertThat(testCase.getTags()).isEmpty();
 
@@ -324,6 +351,10 @@ public class TestCaseTableModelUpdaterTest {
         updater.updateArgument(addedSetting, 3, null);
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "x", "b", "x", "",
                 "z", "#new comment");
+
+        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Timeout]", "1", "2", "3",
+                "#new comment");
 
         updater.remove(testCase, addedSetting);
         assertThat(testCase.getTags()).isEmpty();
@@ -372,6 +403,10 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "x", "b", "x",
                 "", "z", "#new comment");
 
+        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Teardown]", "1", "2", "3",
+                "#new comment");
+
         updater.remove(testCase, addedSetting);
         assertThat(testCase.getTeardowns()).isEmpty();
 
@@ -418,6 +453,10 @@ public class TestCaseTableModelUpdaterTest {
         updater.updateArgument(addedSetting, 3, null);
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "x", "b", "x",
                 "", "z", "#new comment");
+
+        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Template]", "1", "2", "3",
+                "#new comment");
 
         updater.remove(testCase, addedSetting);
         assertThat(testCase.getTemplates()).isEmpty();
@@ -466,6 +505,10 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "x", "b", "x",
                 "", "z", "#new comment");
 
+        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[unknown]", "1", "2", "3",
+                "#new comment");
+
         updater.remove(testCase, addedSetting);
         assertThat(testCase.getUnknownSettings()).isEmpty();
 
@@ -474,7 +517,6 @@ public class TestCaseTableModelUpdaterTest {
         assertThat(addedSetting).isSameAs(testCase.getUnknownSettings().get(0));
     }
 
-    @Ignore
     @Test
     public void documentationSettingOperationsTest() {
         final TestCase testCase = createCase();
@@ -499,20 +541,24 @@ public class TestCaseTableModelUpdaterTest {
                 "c", "#new comment");
 
         updater.updateArgument(addedSetting, 0, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x", "b",
-                "c", "#new comment");
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x",
+                "#new comment");
 
         updater.updateArgument(addedSetting, 2, "x");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x", "b",
-                "x", "#new comment");
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x",
+                "#new comment");
 
         updater.updateArgument(addedSetting, 5, "z");
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x", "b",
-                "x", "", "", "z", "#new comment");
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x",
+                "#new comment");
 
         updater.updateArgument(addedSetting, 3, null);
-        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "x", "b",
-                "x", "", "z", "#new comment");
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]",
+                "#new comment");
+
+        updater.setArguments(addedSetting, newArrayList("1", "2", "3"));
+        assertThat(transform(addedSetting.getElementTokens(), toText())).containsExactly("[Documentation]", "1",
+                "#new comment");
 
         updater.remove(testCase, addedSetting);
         assertThat(testCase.getDocumentation()).isEmpty();
