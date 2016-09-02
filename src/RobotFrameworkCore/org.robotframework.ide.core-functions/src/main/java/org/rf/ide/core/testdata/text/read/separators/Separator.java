@@ -126,7 +126,7 @@ public class Separator implements IRobotLineElement {
     public void setText(final String text) {
         if (!Objects.equals(this.text, text)) {
             if (wasFirstInit) {
-                isDirty = true;
+                markAsDirty();
             }
         }
         wasFirstInit = true;
@@ -168,6 +168,14 @@ public class Separator implements IRobotLineElement {
         return isDirty;
     }
 
+    private void markAsDirty() {
+        isDirty = true;
+    }
+
+    public void clearDirtyFlag() {
+        isDirty = false;
+    }
+
     public static Separator matchSeparator(final String text) {
         String toCheck = text;
         if (text != null && text.length() >= 2) {
@@ -203,5 +211,38 @@ public class Separator implements IRobotLineElement {
             type.getVersionAvailabilityInfos();
         }
         return vai;
+    }
+
+    public Separator copyWithoutPosition() {
+        return copy(false);
+    }
+
+    public Separator copy() {
+        return copy(true);
+    }
+
+    private Separator copy(final boolean posInclude) {
+        Separator t = new Separator();
+        t.setText(getText());
+        t.setRaw(getRaw());
+        t.type = this.type;
+        if (posInclude) {
+            t.fp = this.fp.copy();
+        } else {
+            t.fp = FilePosition.createNotSet();
+        }
+        t.clearDirtyFlag();
+
+        return t;
+    }
+
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public final boolean equals(final Object obj) {
+        return super.equals(obj);
     }
 }
