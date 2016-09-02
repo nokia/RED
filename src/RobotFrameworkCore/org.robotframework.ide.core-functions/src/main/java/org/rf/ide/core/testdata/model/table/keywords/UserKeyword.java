@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.model.table.keywords;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -56,15 +58,6 @@ public class UserKeyword extends AModelElement<KeywordTable>
     public void setKeywordName(final RobotToken keywordName) {
         fixForTheType(keywordName, RobotTokenType.KEYWORD_NAME, true);
         this.keywordName = keywordName;
-    }
-
-    public void addUnknownSettings(final KeywordUnknownSettings unknownSetting) {
-        unknownSetting.setParent(this);
-        this.unknownSettings.add(unknownSetting);
-    }
-
-    public List<KeywordUnknownSettings> getUnknownSettings() {
-        return Collections.unmodifiableList(unknownSettings);
     }
 
     public void addKeywordExecutionRow(final RobotExecutableRow<UserKeyword> executionRow) {
@@ -121,8 +114,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     public void addDocumentation(final KeywordDocumentation doc) {
+        addDocumentation(documentation.size(), doc);
+    }
+
+    public void addDocumentation(final int index, final KeywordDocumentation doc) {
         doc.setParent(this);
-        this.documentation.add(doc);
+        this.documentation.add(index, doc);
         getParent().getParent().getParent().getDocumentationCacher().register(doc);
     }
 
@@ -145,8 +142,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     public void addTag(final KeywordTags tag) {
+        addTag(tags.size(), tag);
+    }
+
+    public void addTag(final int index, final KeywordTags tag) {
         tag.setParent(this);
-        tags.add(tag);
+        tags.add(index, tag);
     }
 
     public List<KeywordTags> getTags() {
@@ -168,8 +169,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     public void addArguments(final KeywordArguments arguments) {
+        addArguments(keywordArguments.size(), arguments);
+    }
+
+    public void addArguments(final int index, final KeywordArguments arguments) {
         arguments.setParent(this);
-        keywordArguments.add(arguments);
+        keywordArguments.add(index, arguments);
     }
 
     public List<KeywordArguments> getArguments() {
@@ -191,8 +196,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     public void addReturn(final KeywordReturn keywordReturn) {
+        addReturn(keywordReturns.size(), keywordReturn);
+    }
+
+    public void addReturn(final int index, final KeywordReturn keywordReturn) {
         keywordReturn.setParent(this);
-        keywordReturns.add(keywordReturn);
+        keywordReturns.add(index, keywordReturn);
     }
 
     public List<KeywordReturn> getReturns() {
@@ -214,8 +223,12 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     public void addTeardown(final KeywordTeardown teardown) {
+        addTeardown(teardowns.size(), teardown);
+    }
+
+    public void addTeardown(final int index, final KeywordTeardown teardown) {
         teardown.setParent(this);
-        teardowns.add(teardown);
+        teardowns.add(index, teardown);
     }
 
     public List<KeywordTeardown> getTeardowns() {
@@ -237,12 +250,39 @@ public class UserKeyword extends AModelElement<KeywordTable>
     }
 
     public void addTimeout(final KeywordTimeout timeout) {
+        addTimeout(timeouts.size(), timeout);
+    }
+
+    public void addTimeout(final int index, final KeywordTimeout timeout) {
         timeout.setParent(this);
-        timeouts.add(timeout);
+        timeouts.add(index, timeout);
     }
 
     public List<KeywordTimeout> getTimeouts() {
         return Collections.unmodifiableList(timeouts);
+    }
+
+    public KeywordUnknownSettings newUnknownSettings() {
+        final RobotToken dec = RobotToken.create("[]",
+                newArrayList(RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION));
+
+        final KeywordUnknownSettings unknown = new KeywordUnknownSettings(dec);
+        addUnknownSettings(unknown);
+
+        return unknown;
+    }
+
+    public void addUnknownSettings(final KeywordUnknownSettings unknownSetting) {
+        addUnknownSettings(unknownSettings.size(), unknownSetting);
+    }
+
+    public void addUnknownSettings(final int index, final KeywordUnknownSettings unknownSetting) {
+        unknownSetting.setParent(this);
+        this.unknownSettings.add(index, unknownSetting);
+    }
+
+    public List<KeywordUnknownSettings> getUnknownSettings() {
+        return Collections.unmodifiableList(unknownSettings);
     }
 
     @Override

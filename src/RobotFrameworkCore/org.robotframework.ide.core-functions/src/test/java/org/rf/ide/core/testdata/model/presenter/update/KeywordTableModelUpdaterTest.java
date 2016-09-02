@@ -6,11 +6,12 @@
 package org.rf.ide.core.testdata.model.presenter.update;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
@@ -20,12 +21,14 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.NewRobotFileTestHelper;
@@ -40,7 +43,7 @@ public class KeywordTableModelUpdaterTest {
 
     @BeforeClass
     public static void setupModel() {
-        RobotFile model = NewRobotFileTestHelper.getModelFileToModify("2.9");
+        final RobotFile model = NewRobotFileTestHelper.getModelFileToModify("2.9");
         model.includeKeywordTableSection();
         keywordTable = model.getKeywordTable();
 
@@ -53,16 +56,45 @@ public class KeywordTableModelUpdaterTest {
     }
 
     @Test
+    public void testExecutableRowCRUD() {
+        final ArrayList<String> execArgs = newArrayList("arg1", "arg2");
+        final String comment = "comment";
+        final String keywordName = "call";
+
+        final AModelElement<?> modelElement = modelUpdater.createExecutableRow(userKeyword, 0, keywordName, comment,
+                execArgs);
+
+        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW);
+        final RobotExecutableRow<?> executable = (RobotExecutableRow<?>) modelElement;
+
+        checkSetting(executable.getArguments(), execArgs, executable.getComment(), comment);
+
+        final String newArg3 = "arg3";
+        execArgs.set(1, newArg3);
+        final String newArg4 = "arg4";
+        execArgs.add(newArg4);
+        final String newComment = "new comment";
+
+        modelUpdater.updateArgument(executable, 1, newArg3);
+        modelUpdater.updateArgument(executable, 2, newArg4);
+        modelUpdater.updateComment(executable, newComment);
+
+        checkSetting(executable.getArguments(), execArgs, executable.getComment(), newComment);
+
+        checkRemoveMethod(userKeyword.getKeywordExecutionRows(), modelElement);
+    }
+
+    @Test
     public void testArgumentsCRUD() {
         final String keywordSettingName = "[Arguments]";
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
                 settingArgs);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_ARGUMENTS);
-        KeywordArguments setting = (KeywordArguments) modelElement;
+        final KeywordArguments setting = (KeywordArguments) modelElement;
 
         checkSetting(setting.getArguments(), settingArgs, setting.getComment(), comment);
 
@@ -72,8 +104,8 @@ public class KeywordTableModelUpdaterTest {
         settingArgs.add(newArg4);
         final String newComment = "new comment";
 
-        modelUpdater.update(setting, 1, newArg3);
-        modelUpdater.update(setting, 2, newArg4);
+        modelUpdater.updateArgument(setting, 1, newArg3);
+        modelUpdater.updateArgument(setting, 2, newArg4);
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getArguments(), settingArgs, setting.getComment(), newComment);
@@ -87,11 +119,11 @@ public class KeywordTableModelUpdaterTest {
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
                 settingArgs);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_DOCUMENTATION);
-        KeywordDocumentation setting = (KeywordDocumentation) modelElement;
+        final KeywordDocumentation setting = (KeywordDocumentation) modelElement;
 
         checkSetting(setting.getDocumentationText(), settingArgs, setting.getComment(), comment);
 
@@ -100,7 +132,7 @@ public class KeywordTableModelUpdaterTest {
         settingArgs.add(newArg3);
         final String newComment = "new comment";
 
-        modelUpdater.update(setting, 0, newArg3);
+        modelUpdater.updateArgument(setting, 0, newArg3);
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getDocumentationText(), newArrayList(newArg3), setting.getComment(), newComment);
@@ -114,11 +146,11 @@ public class KeywordTableModelUpdaterTest {
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
                 settingArgs);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TAGS);
-        KeywordTags setting = (KeywordTags) modelElement;
+        final KeywordTags setting = (KeywordTags) modelElement;
 
         checkSetting(setting.getTags(), settingArgs, setting.getComment(), comment);
 
@@ -128,8 +160,8 @@ public class KeywordTableModelUpdaterTest {
         settingArgs.add(newArg4);
         final String newComment = "new comment";
 
-        modelUpdater.update(setting, 1, newArg3);
-        modelUpdater.update(setting, 2, newArg4);
+        modelUpdater.updateArgument(setting, 1, newArg3);
+        modelUpdater.updateArgument(setting, 2, newArg4);
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getTags(), settingArgs, setting.getComment(), newComment);
@@ -146,10 +178,11 @@ public class KeywordTableModelUpdaterTest {
         args.addAll(settingArgs);
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment, args);
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+                args);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TIMEOUT);
-        KeywordTimeout setting = (KeywordTimeout) modelElement;
+        final KeywordTimeout setting = (KeywordTimeout) modelElement;
 
         checkSetting(setting.getTimeout(), timeout, setting.getMessage(), settingArgs, setting.getComment(), comment);
 
@@ -160,9 +193,9 @@ public class KeywordTableModelUpdaterTest {
         settingArgs.add(newArg4);
         final String newComment = "new comment";
 
-        modelUpdater.update(setting, 0, newTimeout);
-        modelUpdater.update(setting, 2, newArg3);
-        modelUpdater.update(setting, 3, newArg4);
+        modelUpdater.updateArgument(setting, 0, newTimeout);
+        modelUpdater.updateArgument(setting, 2, newArg3);
+        modelUpdater.updateArgument(setting, 3, newArg4);
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getTimeout(), newTimeout, setting.getMessage(), settingArgs, setting.getComment(),
@@ -180,10 +213,11 @@ public class KeywordTableModelUpdaterTest {
         args.addAll(settingArgs);
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment, args);
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+                args);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_TEARDOWN);
-        KeywordTeardown setting = (KeywordTeardown) modelElement;
+        final KeywordTeardown setting = (KeywordTeardown) modelElement;
 
         checkSetting(setting.getKeywordName(), teardown, setting.getArguments(), settingArgs, setting.getComment(),
                 comment);
@@ -195,9 +229,9 @@ public class KeywordTableModelUpdaterTest {
         settingArgs.add(newArg4);
         final String newComment = "new comment";
 
-        modelUpdater.update(setting, 0, newTeardown);
-        modelUpdater.update(setting, 2, newArg3);
-        modelUpdater.update(setting, 3, newArg4);
+        modelUpdater.updateArgument(setting, 0, newTeardown);
+        modelUpdater.updateArgument(setting, 2, newArg3);
+        modelUpdater.updateArgument(setting, 3, newArg4);
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getKeywordName(), newTeardown, setting.getArguments(), settingArgs, setting.getComment(),
@@ -212,11 +246,11 @@ public class KeywordTableModelUpdaterTest {
         final List<String> settingArgs = newArrayList("arg1", "arg2");
         final String comment = "comment";
 
-        final AModelElement<?> modelElement = modelUpdater.create(userKeyword, keywordSettingName, comment,
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
                 settingArgs);
 
         assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_RETURN);
-        KeywordReturn setting = (KeywordReturn) modelElement;
+        final KeywordReturn setting = (KeywordReturn) modelElement;
 
         checkSetting(setting.getReturnValues(), settingArgs, setting.getComment(), comment);
 
@@ -226,8 +260,8 @@ public class KeywordTableModelUpdaterTest {
         settingArgs.add(newArg4);
         final String newComment = "new comment";
 
-        modelUpdater.update(setting, 1, newArg3);
-        modelUpdater.update(setting, 2, newArg4);
+        modelUpdater.updateArgument(setting, 1, newArg3);
+        modelUpdater.updateArgument(setting, 2, newArg4);
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getReturnValues(), settingArgs, setting.getComment(), newComment);
@@ -235,33 +269,69 @@ public class KeywordTableModelUpdaterTest {
         checkRemoveMethod(userKeyword.getReturns(), modelElement);
     }
 
-    @Test
-    public void testCreateWhenNoUserKeywordExists() {
-        assertNull(modelUpdater.create(null, "Arguments", "", newArrayList("")));
+    @Test(expected = IllegalArgumentException.class)
+    public void exceptionIsThrown_whenCreatingExecutableRowForNullCase() {
+        modelUpdater.createExecutableRow(null, 0, "some action", "comment", newArrayList("a", "b", "c"));
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)
+    public void outOfBoundsExceptionIsThrown_whenTryingToCreateExecutableRowWithMismatchingIndex() {
+        assertThat(userKeyword.getKeywordExecutionRows()).isEmpty();
+
+        modelUpdater.createExecutableRow(userKeyword, 2, "some action", "comment", newArrayList("a", "b", "c"));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void exceptionIsThrown_whenCreatingSettingForNullCase() {
+        modelUpdater.createSetting(null, "Setup", "comment", newArrayList("a", "b", "c"));
     }
 
     @Test
-    public void testCreateWithUnknownSetting() {
-        assertNull(modelUpdater.create(userKeyword, "[Unknown]", "", newArrayList("")));
+    public void testUnknownCRUD() {
+        final ArrayList<String> settingArgs = newArrayList("arg1", "arg2");
+        final String comment = "comment";
+        final String keywordSettingName = "[Unknown]";
+
+        final AModelElement<?> modelElement = modelUpdater.createSetting(userKeyword, keywordSettingName, comment,
+                settingArgs);
+
+        assertTrue(modelElement.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN);
+        final KeywordUnknownSettings setting = (KeywordUnknownSettings) modelElement;
+
+        checkSetting(setting.getArguments(), settingArgs, setting.getComment(), comment);
+
+        final String newArg3 = "arg3";
+        settingArgs.set(1, newArg3);
+        final String newArg4 = "arg4";
+        settingArgs.add(newArg4);
+        final String newComment = "new comment";
+
+        modelUpdater.updateArgument(setting, 1, newArg3);
+        modelUpdater.updateArgument(setting, 2, newArg4);
+        modelUpdater.updateComment(setting, newComment);
+
+        checkSetting(setting.getArguments(), settingArgs, setting.getComment(), newComment);
+
+        checkRemoveMethod(userKeyword.getUnknownSettings(), modelElement);
     }
 
     @Test
     public void testUpdateParent() {
-        RobotToken declaration = new RobotToken();
+        final RobotToken declaration = new RobotToken();
 
-        KeywordArguments args = new KeywordArguments(declaration);
-        KeywordDocumentation doc = new KeywordDocumentation(declaration);
-        KeywordTags tags = new KeywordTags(declaration);
-        KeywordTimeout timeout = new KeywordTimeout(declaration);
-        KeywordTeardown teardown = new KeywordTeardown(declaration);
-        KeywordReturn returnValue = new KeywordReturn(declaration);
+        final KeywordArguments args = new KeywordArguments(declaration);
+        final KeywordDocumentation doc = new KeywordDocumentation(declaration);
+        final KeywordTags tags = new KeywordTags(declaration);
+        final KeywordTimeout timeout = new KeywordTimeout(declaration);
+        final KeywordTeardown teardown = new KeywordTeardown(declaration);
+        final KeywordReturn returnValue = new KeywordReturn(declaration);
 
-        modelUpdater.updateParent(userKeyword, args);
-        modelUpdater.updateParent(userKeyword, doc);
-        modelUpdater.updateParent(userKeyword, tags);
-        modelUpdater.updateParent(userKeyword, timeout);
-        modelUpdater.updateParent(userKeyword, teardown);
-        modelUpdater.updateParent(userKeyword, returnValue);
+        modelUpdater.insert(userKeyword, 0, args);
+        modelUpdater.insert(userKeyword, 0, doc);
+        modelUpdater.insert(userKeyword, 0, tags);
+        modelUpdater.insert(userKeyword, 0, timeout);
+        modelUpdater.insert(userKeyword, 0, teardown);
+        modelUpdater.insert(userKeyword, 0, returnValue);
 
         assertTrue(userKeyword.getArguments().contains(args));
         assertTrue(userKeyword.getDocumentation().contains(doc));
