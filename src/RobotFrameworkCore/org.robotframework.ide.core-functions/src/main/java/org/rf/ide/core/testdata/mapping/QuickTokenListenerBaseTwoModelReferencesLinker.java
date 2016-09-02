@@ -69,7 +69,7 @@ public class QuickTokenListenerBaseTwoModelReferencesLinker {
     }
 
     private <T, P> Map<P, T> reverseValuesWithKeys(final Map<T, P> toReverse) {
-        final Map<P, T> reversed = new IdentityHashMap<>();
+        final Map<P, T> reversed = new IdentityHashMap<>(toReverse.size());
         for (T key : toReverse.keySet()) {
             reversed.put(toReverse.get(key), key);
         }
