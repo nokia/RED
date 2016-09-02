@@ -22,6 +22,6 @@ public class CreateFreshSectionCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
         suite.createRobotSection(sectionName);
-        eventBroker.post(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED, suite);
+        eventBroker.send(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED, suite);
     }
 }
