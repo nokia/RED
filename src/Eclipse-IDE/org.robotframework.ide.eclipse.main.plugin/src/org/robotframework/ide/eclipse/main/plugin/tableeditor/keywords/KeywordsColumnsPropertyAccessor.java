@@ -95,7 +95,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
     @Override
     public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
 
-        String value = newValue != null ? (String) newValue : "";
+        final String value = newValue != null ? (String) newValue : "";
 
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
@@ -184,7 +184,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
     private void createNewElementAndRemoveOldSetting(final String value, final RobotKeywordCall keywordSetting) {
         final RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(value);
         if (!value.isEmpty() && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS) {
-            final RobotCodeHoldingElement parent = (RobotCodeHoldingElement) keywordSetting.getParent();
+            final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordSetting.getParent();
             final int index = keywordSetting.getIndex();
             commandsStack.execute(new DeleteKeywordCallCommand(newArrayList(keywordSetting)));
 

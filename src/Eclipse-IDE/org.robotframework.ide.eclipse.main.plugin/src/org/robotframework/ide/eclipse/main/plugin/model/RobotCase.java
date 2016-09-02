@@ -17,6 +17,7 @@ import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -32,7 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
-public class RobotCase extends RobotCodeHoldingElement {
+public class RobotCase extends RobotCodeHoldingElement<TestCase> {
 
     private static final long serialVersionUID = 1L;
 
@@ -41,6 +42,11 @@ public class RobotCase extends RobotCodeHoldingElement {
     RobotCase(final RobotCasesSection parent, final TestCase testCase) {
         super(parent);
         this.testCase = testCase;
+    }
+
+    @Override
+    public IExecutablesTableModelUpdater<TestCase> getModelUpdater() {
+        return new TestCaseTableModelUpdater();
     }
 
     @Override

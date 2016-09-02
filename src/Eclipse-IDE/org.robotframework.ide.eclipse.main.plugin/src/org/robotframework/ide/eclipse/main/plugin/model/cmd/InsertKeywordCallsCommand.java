@@ -36,7 +36,7 @@ public class InsertKeywordCallsCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
 
-        final RobotCodeHoldingElement parentElement = (RobotCodeHoldingElement) parent;
+        final RobotCodeHoldingElement<?> parentElement = (RobotCodeHoldingElement<?>) parent;
         int shift = 0;
         for (final RobotKeywordCall call : callsToInsert) {
             if (call.getLinkedElement() != null) {

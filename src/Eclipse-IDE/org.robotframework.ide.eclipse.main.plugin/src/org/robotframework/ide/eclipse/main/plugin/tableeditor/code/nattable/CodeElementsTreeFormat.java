@@ -95,8 +95,8 @@ public class CodeElementsTreeFormat implements TreeList.Format<Object> {
 
         @Override
         public int compare(final Object o1, final Object o2) {
-            final RobotCodeHoldingElement elem1 = (RobotCodeHoldingElement) o1;
-            final RobotCodeHoldingElement elem2 = (RobotCodeHoldingElement) o2;
+            final RobotCodeHoldingElement<?> elem1 = (RobotCodeHoldingElement<?>) o1;
+            final RobotCodeHoldingElement<?> elem2 = (RobotCodeHoldingElement<?>) o2;
             return elem1.getName().compareToIgnoreCase(elem2.getName());
         }
     }
