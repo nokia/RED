@@ -23,7 +23,7 @@ public class RobotDefinitionSetting extends RobotKeywordCall {
 
     private static final long serialVersionUID = 1L;
 
-    public RobotDefinitionSetting(final RobotCodeHoldingElement robotCodeHoldingElement,
+    public RobotDefinitionSetting(final RobotCodeHoldingElement<?> robotCodeHoldingElement,
             final AModelElement<?> linkedElement) {
         super(robotCodeHoldingElement, linkedElement);
     }

@@ -25,9 +25,9 @@ import com.google.common.base.Optional;
 
 public class TableDocumentationSelectionChangedListener implements ISelectionChangedListener {
 
-    private DocumentationView view;
+    private final DocumentationView view;
 
-    private DocViewUpdateJob updateJob = new DocViewUpdateJob("Documentation View Update Job");
+    private final DocViewUpdateJob updateJob = new DocViewUpdateJob("Documentation View Update Job");
 
     private RobotElement currentElementParent;
 
@@ -111,7 +111,7 @@ public class TableDocumentationSelectionChangedListener implements ISelectionCha
             } else if (docViewUpdateType == DocViewUpdateType.LIBDOC) {
                 view.showLibdoc(robotFileInternalElement);
             } else if (docViewUpdateType == DocViewUpdateType.PARENT && currentElementParent != null) {
-                final RobotCodeHoldingElement codeHoldingElement = (RobotCodeHoldingElement) currentElementParent;
+                final RobotCodeHoldingElement<?> codeHoldingElement = (RobotCodeHoldingElement<?>) currentElementParent;
                 final RobotDefinitionSetting docSettingFromParent = codeHoldingElement.findSetting("Documentation");
                 view.showDocumentation(docSettingFromParent);
             }

@@ -16,7 +16,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateCaseFreshKeywordCallCommand;
@@ -50,20 +49,20 @@ public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLine
 
             EditorCommand newLineCommand = null;
 
-            RobotCodeHoldingElement codeHoldingElement = null;
+            RobotCodeHoldingElement<?> codeHoldingElement = null;
             int index = -1;
             if (selectedElement.isPresent() && selectedElement.get() instanceof RobotKeywordCall) {
-                codeHoldingElement = (RobotCodeHoldingElement) selectedElement.get().getParent();
+                codeHoldingElement = (RobotCodeHoldingElement<?>) selectedElement.get().getParent();
                 index = selectedElement.get().getIndex();
             } else if (selectedElement.isPresent() && selectedElement.get() instanceof RobotCodeHoldingElement) {
-                codeHoldingElement = (RobotCodeHoldingElement) selectedElement.get();
+                codeHoldingElement = (RobotCodeHoldingElement<?>) selectedElement.get();
                 index = 0;
             }
 
             if (codeHoldingElement != null && index >= 0) {
                 final AModelElement<?> modelElement = (AModelElement<?>) codeHoldingElement.getLinkedElement();
                 if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
-                    newLineCommand = new CreateFreshKeywordCallCommand((RobotKeywordDefinition) codeHoldingElement,
+                    newLineCommand = new CreateFreshKeywordCallCommand(codeHoldingElement,
                             index);
                 } else if (modelElement.getModelType() == ModelType.TEST_CASE) {
                     newLineCommand = new CreateCaseFreshKeywordCallCommand((RobotCase) codeHoldingElement, index);
@@ -71,10 +70,10 @@ public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLine
             } else {
                 final Optional<AddingToken> token = Selections.getOptionalFirstElement(selection, AddingToken.class);
                 if (token.isPresent() && token.get().isNested()) {
-                    final RobotCodeHoldingElement parent = (RobotCodeHoldingElement) token.get().getParent();
+                    final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) token.get().getParent();
                     final AModelElement<?> modelElement = (AModelElement<?>) parent.getLinkedElement();
                     if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
-                        newLineCommand = new CreateFreshKeywordCallCommand((RobotKeywordDefinition) parent);
+                        newLineCommand = new CreateFreshKeywordCallCommand(parent);
                     } else if (modelElement.getModelType() == ModelType.TEST_CASE) {
                         newLineCommand = new CreateCaseFreshKeywordCallCommand((RobotCase) parent);
                     }

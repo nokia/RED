@@ -11,7 +11,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.PasteInCasesTableHandler.E4PasteInCasesTableHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.commands.DIParameterizedHandler;
