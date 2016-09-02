@@ -32,7 +32,7 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
         this(parent, index, "", new ArrayList<String>(), "");
     }
 
-    private CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final int index,
+    public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent, final int index,
             final String name, final List<String> args, final String comment) {
         this.parent = parent;
         this.name = name;
