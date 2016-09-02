@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-SZoMF_XEeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/31/16 11:28 AM
+Save-Time: 9/2/16 3:27 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -153,6 +153,7 @@ get-editor "settings.robot" | get-text-viewer | get-property text | equals "*** 
 get-view "Project Explorer" | get-tree | select "RobotProject/variables.robot" | select "RobotProject/variables.robot" 
     | double-click
 get-editor "variables.robot" | get-tab-folder | get-tab-item Variables | click
+wait 1000
 
 get-view Outline | get-tree | select "variables.robot/Variables/path" | click
 wait 200
