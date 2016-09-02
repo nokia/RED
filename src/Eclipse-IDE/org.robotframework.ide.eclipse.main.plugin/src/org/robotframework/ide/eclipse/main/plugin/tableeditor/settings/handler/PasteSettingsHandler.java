@@ -21,10 +21,10 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.InsertSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.InsertSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -91,7 +91,7 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
             if (settingsFromClipboard.length > 0) {
                 final List<String> arguments = settingsFromClipboard[0].getArguments();
                 for (int i = 0; i < arguments.size(); i++) {
-                    commandsStack.execute(new SetSettingKeywordCallArgumentCommand(firstSelectedSetting, i, arguments.get(i)));
+                    commandsStack.execute(new SetSettingArgumentCommand(firstSelectedSetting, i, arguments.get(i)));
                 }
                 final String comment = settingsFromClipboard[0].getComment();
                 if (comment != null && !comment.isEmpty()) {
@@ -122,7 +122,7 @@ public class PasteSettingsHandler extends DIParameterizedHandler<E4PasteSettings
                     if (!createdRows.contains(selectedRowNumber) && selectedRowNumber >= 0
                             && selectedRowNumber < generalSettingsNames.length
                             && settingsMappingBeforeAddition.get(generalSettingsNames[selectedRowNumber]) == null) {
-                        commandsStack.execute(new CreateFreshGeneralSettingCommand(section.get(),
+                        commandsStack.execute(new CreateFreshSettingCommand(section.get(),
                                 generalSettingsNames[selectedRowNumber], new ArrayList<String>()));
                         final Map<String, RobotElement> settingsMappingAfterAddition = GeneralSettingsModel
                                 .fillSettingsMapping(section.get());

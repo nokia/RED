@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.cmd;
+package org.robotframework.ide.eclipse.main.plugin.model.cmd.settings;
 
 import java.util.Collections;
 import java.util.EnumSet;
@@ -20,11 +20,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGro
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
-public class MoveSettingUpCommand extends EditorCommand {
+public class MoveSettingDownCommand extends EditorCommand {
 
     private final RobotSetting setting;
 
-    public MoveSettingUpCommand(final RobotSetting setting) {
+    public MoveSettingDownCommand(final RobotSetting setting) {
         this.setting = setting;
     }
 
@@ -32,33 +32,33 @@ public class MoveSettingUpCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         final RobotSettingsSection section = setting.getParent();
         final int currentIndex = section.getChildren().indexOf(setting);
-        final int upIndex = findNextIndexUp(currentIndex, setting);
-        if (upIndex < 0) {
+        final int downIndex = findNextIndexDown(currentIndex, setting);
+        if (downIndex >= section.getChildren().size()) {
             return;
         }
-        Collections.swap(section.getChildren(), currentIndex, upIndex);
+        Collections.swap(section.getChildren(), currentIndex, downIndex);
         
         ARobotSectionTable linkedElement = section.getLinkedElement();
         if (linkedElement != null && linkedElement instanceof SettingTable) {
             if (setting.getGroup() == SettingsGroup.METADATA) {
-                ((SettingTable) linkedElement).moveUpMetadata((Metadata) setting.getLinkedElement());
+                ((SettingTable) linkedElement).moveDownMetadata((Metadata) setting.getLinkedElement());
             } else {
-                ((SettingTable) linkedElement).moveUpImported((AImported) setting.getLinkedElement());
+                ((SettingTable) linkedElement).moveDownImported((AImported) setting.getLinkedElement());
             }
         }
 
         eventBroker.post(RobotModelEvents.ROBOT_SETTING_MOVED, section);
     }
 
-    private int findNextIndexUp(final int currentIndex, final RobotSetting setting) {
+    private int findNextIndexDown(final int currentIndex, final RobotSetting setting) {
         final List<RobotKeywordCall> children = setting.getParent().getChildren();
-        for (int i = currentIndex - 1; i >= 0; i--) {
+        for (int i = currentIndex + 1; i < children.size(); i++) {
             if (getSettingsGroupSet(((RobotSetting) children.get(i)).getGroup()).equals(
                     getSettingsGroupSet(setting.getGroup()))) {
                 return i;
             }
         }
-        return -1;
+        return children.size();
     }
 
     private EnumSet<SettingsGroup> getSettingsGroupSet(final SettingsGroup group) {

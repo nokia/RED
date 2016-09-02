@@ -16,9 +16,9 @@ import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshGeneralSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetSettingKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -68,7 +68,7 @@ public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAc
             if (robotElement != null) {
                 final RobotSetting setting = (RobotSetting) robotElement;
                 if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetSettingKeywordCallArgumentCommand(setting, columnIndex - 1, newStringValue));
+                    commandsStack.execute(new SetSettingArgumentCommand(setting, columnIndex - 1, newStringValue));
                 } else if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordCallCommentCommand(setting, newStringValue));
                 }
@@ -76,10 +76,10 @@ public class GeneralSettingsColumnsPropertyAccessor implements IColumnPropertyAc
                 final List<String> args = newArrayList(Collections.nCopies(columnIndex - 1, "\\"));
                 if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(
-                            new CreateFreshGeneralSettingCommand(section, rowObject.getKey(), args, newStringValue));
+                            new CreateFreshSettingCommand(section, rowObject.getKey(), args, newStringValue));
                 } else {
                     args.add((String) newValue);
-                    commandsStack.execute(new CreateFreshGeneralSettingCommand(section, rowObject.getKey(), args));
+                    commandsStack.execute(new CreateFreshSettingCommand(section, rowObject.getKey(), args));
                 }
             }
         }
