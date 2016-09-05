@@ -16,7 +16,7 @@ public interface ITestCaseTableElementOperation {
     AModelElement<?> create(final TestCase testCase, String action, final List<String> args,
             final String comment);
 
-    void insert(TestCase testCase, int index, AModelElement<?> modelElement);
+    AModelElement<?> insert(TestCase testCase, int index, AModelElement<?> modelElement);
 
     void update(final AModelElement<?> modelElement, final int index, final String value);
 

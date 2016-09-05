@@ -44,8 +44,9 @@ public class TestCaseSetupModelOperation implements ITestCaseTableElementOperati
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         testCase.addSetup(0, (TestCaseSetup) modelElement);
+        return modelElement;
     }
 
     @Override

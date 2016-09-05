@@ -41,8 +41,10 @@ public class KeywordTagsModelOperation implements IKeywordTableElementOperation 
     }
 
     @Override
-    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+            final AModelElement<?> modelElement) {
         userKeyword.addTag(0, (KeywordTags) modelElement);
+        return modelElement;
     }
     
     @Override

@@ -16,7 +16,8 @@ public class UserKeywordReturnMorphOperation extends UserKeywordElementMorphOper
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public TestCaseUnknownSettings insert(final TestCase testCase, final int index,
+            final AModelElement<?> modelElement) {
         final KeywordReturn returnToken = (KeywordReturn) modelElement;
         
         final TestCaseUnknownSettings unkownSetting = testCase.newUnknownSettings();
@@ -27,5 +28,6 @@ public class UserKeywordReturnMorphOperation extends UserKeywordElementMorphOper
         for (final RobotToken comment : returnToken.getComment()) {
             unkownSetting.addCommentPart(comment);
         }
+        return unkownSetting;
     }
 }
