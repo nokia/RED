@@ -37,8 +37,10 @@ public class KeywordUnknownModelOperation implements IKeywordTableElementOperati
     }
 
     @Override
-    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+            final AModelElement<?> modelElement) {
         userKeyword.addUnknownSettings(0, (KeywordUnknownSettings) modelElement);
+        return modelElement;
     }
 
     @Override

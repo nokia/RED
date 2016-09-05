@@ -47,8 +47,9 @@ public class TestCaseUnkownModelOperation implements ITestCaseTableElementOperat
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         testCase.addUnknownSettings(0, (TestCaseUnknownSettings) modelElement);
+        return modelElement;
     }
 
     @Override

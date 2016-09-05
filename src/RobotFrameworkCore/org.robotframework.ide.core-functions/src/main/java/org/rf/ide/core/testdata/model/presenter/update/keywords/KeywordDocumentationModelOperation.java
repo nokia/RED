@@ -42,8 +42,10 @@ public class KeywordDocumentationModelOperation implements IKeywordTableElementO
     }
 
     @Override
-    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+            final AModelElement<?> modelElement) {
         userKeyword.addDocumentation(0, (KeywordDocumentation) modelElement);
+        return modelElement;
     }
 
     @Override

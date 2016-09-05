@@ -16,7 +16,7 @@ public class UserKeywordTeardownMorphOperation extends UserKeywordElementMorphOp
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public TestCaseTeardown insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         final KeywordTeardown kwTeardown = (KeywordTeardown) modelElement;
         
         final TestCaseTeardown caseTeardown = testCase.newTeardown();
@@ -28,5 +28,6 @@ public class UserKeywordTeardownMorphOperation extends UserKeywordElementMorphOp
         for (final RobotToken comment : kwTeardown.getComment()) {
             caseTeardown.addCommentPart(comment);
         }
+        return caseTeardown;
     }
 }

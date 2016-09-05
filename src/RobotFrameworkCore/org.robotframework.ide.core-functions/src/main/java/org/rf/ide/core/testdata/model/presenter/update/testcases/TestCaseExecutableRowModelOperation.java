@@ -41,11 +41,12 @@ public class TestCaseExecutableRowModelOperation implements ITestCaseTableElemen
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         @SuppressWarnings("unchecked")
         final RobotExecutableRow<TestCase> executableRow = (RobotExecutableRow<TestCase>) modelElement;
 
         testCase.addTestExecutionRow(executableRow, index);
+        return modelElement;
     }
 
     @Override

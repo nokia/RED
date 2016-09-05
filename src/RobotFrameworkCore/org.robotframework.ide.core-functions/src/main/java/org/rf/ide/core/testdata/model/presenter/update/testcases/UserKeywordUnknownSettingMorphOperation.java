@@ -19,7 +19,8 @@ public class UserKeywordUnknownSettingMorphOperation extends UserKeywordElementM
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final TestCase testCase, final int index,
+            final AModelElement<?> modelElement) {
         final KeywordUnknownSettings kwSetting = (KeywordUnknownSettings) modelElement;
         
         final RobotTokenType possibleSettingType = RobotTokenType
@@ -37,6 +38,7 @@ public class UserKeywordUnknownSettingMorphOperation extends UserKeywordElementM
             for (final RobotToken comment : kwSetting.getComment()) {
                 template.addCommentPart(comment);
             }
+            return template;
 
         } else if (possibleSettingType == RobotTokenType.TEST_CASE_SETTING_SETUP) {
             final TestCaseSetup setup = testCase.newSetup();
@@ -50,6 +52,7 @@ public class UserKeywordUnknownSettingMorphOperation extends UserKeywordElementM
             for (final RobotToken comment : kwSetting.getComment()) {
                 setup.addCommentPart(comment);
             }
+            return setup;
 
         } else {
             final TestCaseUnknownSettings unkownSetting = testCase.newUnknownSettings();
@@ -60,6 +63,7 @@ public class UserKeywordUnknownSettingMorphOperation extends UserKeywordElementM
             for (final RobotToken comment : kwSetting.getComment()) {
                 unkownSetting.addCommentPart(comment);
             }
+            return unkownSetting;
         }
     }
 }

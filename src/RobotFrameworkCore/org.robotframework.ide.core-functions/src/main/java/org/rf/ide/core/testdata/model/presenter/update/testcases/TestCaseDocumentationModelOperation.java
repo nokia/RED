@@ -42,8 +42,9 @@ public class TestCaseDocumentationModelOperation implements ITestCaseTableElemen
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         testCase.addDocumentation(0, (TestDocumentation) modelElement);
+        return modelElement;
     }
 
     @Override
