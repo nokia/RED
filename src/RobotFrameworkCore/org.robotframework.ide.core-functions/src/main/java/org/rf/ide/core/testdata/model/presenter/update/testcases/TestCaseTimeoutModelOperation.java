@@ -44,8 +44,9 @@ public class TestCaseTimeoutModelOperation implements ITestCaseTableElementOpera
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         testCase.addTimeout(0, (TestCaseTimeout) modelElement);
+        return modelElement;
     }
 
     @Override

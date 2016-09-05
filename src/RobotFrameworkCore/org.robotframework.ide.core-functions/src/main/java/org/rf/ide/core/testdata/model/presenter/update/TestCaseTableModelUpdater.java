@@ -103,14 +103,14 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         // morph operations enables inserting settings taken from keywords elements
         final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException("Unable to insert " + modelElement + " into "
                     + testCase.getName().getText() + " test case. Operation handler is missing");
         }
-        operationHandler.insert(testCase, index, modelElement);
+        return operationHandler.insert(testCase, index, modelElement);
     }
 
     @VisibleForTesting

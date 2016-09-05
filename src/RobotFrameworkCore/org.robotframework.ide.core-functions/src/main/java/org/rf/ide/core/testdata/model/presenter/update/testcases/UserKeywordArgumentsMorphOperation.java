@@ -16,7 +16,8 @@ public class UserKeywordArgumentsMorphOperation extends UserKeywordElementMorphO
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public TestCaseUnknownSettings insert(final TestCase testCase, final int index,
+            final AModelElement<?> modelElement) {
         final KeywordArguments arguments = (KeywordArguments) modelElement;
         
         final TestCaseUnknownSettings unkownSetting = testCase.newUnknownSettings();
@@ -27,5 +28,6 @@ public class UserKeywordArgumentsMorphOperation extends UserKeywordElementMorphO
         for (final RobotToken comment : arguments.getComment()) {
             unkownSetting.addCommentPart(comment);
         }
+        return unkownSetting;
     }
 }

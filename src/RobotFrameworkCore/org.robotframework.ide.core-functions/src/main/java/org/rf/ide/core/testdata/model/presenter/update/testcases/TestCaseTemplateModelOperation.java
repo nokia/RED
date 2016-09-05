@@ -44,8 +44,9 @@ public class TestCaseTemplateModelOperation implements ITestCaseTableElementOper
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         testCase.addTemplate(0, (TestCaseTemplate) modelElement);
+        return modelElement;
     }
 
     @Override

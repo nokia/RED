@@ -89,15 +89,14 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
     }
 
     @Override
-    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+            final AModelElement<?> modelElement) {
         final IKeywordTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException("Unable to insert " + modelElement + " into "
                     + userKeyword.getName().getText() + " keyword. Operation handler is missing");
         }
-        if (operationHandler != null) {
-            operationHandler.insert(userKeyword, index, modelElement);
-        }
+        return operationHandler.insert(userKeyword, index, modelElement);
     }
 
     private IKeywordTableElementOperation getOperationHandler(final ModelType elementModelType) {

@@ -44,8 +44,10 @@ public class KeywordTimeoutModelOperation implements IKeywordTableElementOperati
     }
 
     @Override
-    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+            final AModelElement<?> modelElement) {
         userKeyword.addTimeout(0, (KeywordTimeout) modelElement);
+        return modelElement;
     }
 
     @Override

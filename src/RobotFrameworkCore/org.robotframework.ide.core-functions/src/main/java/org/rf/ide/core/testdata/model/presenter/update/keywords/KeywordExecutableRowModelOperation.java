@@ -40,11 +40,13 @@ public class KeywordExecutableRowModelOperation implements IKeywordTableElementO
     }
 
     @Override
-    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+            final AModelElement<?> modelElement) {
         @SuppressWarnings("unchecked")
         final RobotExecutableRow<UserKeyword> executableRow = (RobotExecutableRow<UserKeyword>) modelElement;
         
         userKeyword.addKeywordExecutionRow(executableRow, index);
+        return modelElement;
     }
 
     @Override
