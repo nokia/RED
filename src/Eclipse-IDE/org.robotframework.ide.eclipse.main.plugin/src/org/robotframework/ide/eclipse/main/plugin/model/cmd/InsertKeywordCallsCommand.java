@@ -18,7 +18,7 @@ public class InsertKeywordCallsCommand extends EditorCommand {
 
     private final IRobotCodeHoldingElement parent;
 
-    private final int codeHoldingElementIndex;
+    private final int index;
 
     private final List<RobotKeywordCall> callsToInsert;
 
@@ -26,23 +26,24 @@ public class InsertKeywordCallsCommand extends EditorCommand {
         this(parent, parent.getChildren().size(), callsToInsert);
     }
 
-    public InsertKeywordCallsCommand(final IRobotCodeHoldingElement parent, final int codeHoldingElementIndex,
+    public InsertKeywordCallsCommand(final IRobotCodeHoldingElement parent, final int index,
             final RobotKeywordCall[] callsToInsert) {
         this.parent = parent;
-        this.codeHoldingElementIndex = codeHoldingElementIndex;
+        this.index = index;
         this.callsToInsert = Arrays.asList(callsToInsert);
     }
 
     @Override
     public void execute() throws CommandExecutionException {
+        // FIXME : we currently keep all settings before executable rows, so this condition
+        // should be also fulfilled after command is executed
+
         final RobotCodeHoldingElement<?> parentElement = (RobotCodeHoldingElement<?>) parent;
         int shift = 0;
         for (final RobotKeywordCall call : callsToInsert) {
-            if (call.getLinkedElement() != null) {
-                parentElement.insertKeywordCall(codeHoldingElementIndex + shift, call);
-            }
+            parentElement.insertKeywordCall(index + shift, call);
             shift++;
         }
-        eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
+        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
 }

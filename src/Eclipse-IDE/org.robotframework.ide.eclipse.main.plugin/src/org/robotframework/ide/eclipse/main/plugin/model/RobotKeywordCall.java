@@ -41,7 +41,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     private transient IRobotCodeHoldingElement parent;
 
-    private final AModelElement<?> linkedElement;
+    private AModelElement<?> linkedElement;
 
     protected transient List<String> arguments;
 
@@ -57,13 +57,17 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         return linkedElement;
     }
 
+    void setLinkedElement(final AModelElement<?> linkedElement) {
+        this.linkedElement = linkedElement;
+    }
+
     @Override
     public String getName() {
         final ModelType modelType = linkedElement.getModelType();
         if ((modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW)
                 && linkedElement.getClass() == RobotExecutableRow.class) {
             @SuppressWarnings("unchecked")
-            RobotExecutableRowView view = RobotExecutableRowView
+            final RobotExecutableRowView view = RobotExecutableRowView
                     .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
             if (wasNotUpdatedWithAssignment()) {
                 linkedElement.getDeclaration().setText(view.getTokenRepresentation(linkedElement.getDeclaration()));
@@ -138,7 +142,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
             final ModelType modelType = linkedElement.getModelType();
             if (modelType == ModelType.TEST_CASE_EXECUTABLE_ROW || modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
                 @SuppressWarnings("unchecked")
-                RobotExecutableRowView view = RobotExecutableRowView
+                final RobotExecutableRowView view = RobotExecutableRowView
                         .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
                 arguments = newArrayList(transform(tokensWithoutComments, tokenViaExecutableView(view)));
             } else {
@@ -154,7 +158,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
             @Override
             public String apply(final RobotToken token) {
                 if (wasAlreadyUpdatedWithAssignment(token)) {
-                    String text = view.getTokenRepresentation(token);
+                    final String text = view.getTokenRepresentation(token);
                     token.setText(text);
                 }
                 return token.getText();
