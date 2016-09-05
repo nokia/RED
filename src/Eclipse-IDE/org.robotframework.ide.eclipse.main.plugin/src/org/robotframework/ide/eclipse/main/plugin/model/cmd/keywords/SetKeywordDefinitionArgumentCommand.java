@@ -5,21 +5,18 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
+import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.services.event.RedEventBroker;
-
-import com.google.common.base.Optional;
 
 public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
@@ -39,57 +36,44 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
-        RobotDefinitionSetting argumentsSetting = definition.getArgumentsSetting();
+        RobotDefinitionSetting setting = definition.getArgumentsSetting();
 
-        final Optional<List<String>> arguments = prepareArgumentsList(argumentsSetting);
+        final List<String> arguments = SetKeywordCallArgumentCommand.prepareArgumentsList(setting, value, index);
+        final boolean areAllEmpty = areAllEmpty(arguments);
 
-        if (argumentsSetting == null && !arguments.isPresent()) {
+        if (setting == null && areAllEmpty) {
             // there is no setting and we have no arguments to set
             return;
 
-        } else if (argumentsSetting != null && !arguments.isPresent()) {
+        } else if (setting != null && areAllEmpty) {
             // there is a setting, but we don't have arguments
-            definition.getChildren().remove(argumentsSetting);
+            definition.getChildren().remove(setting);
             definition.getLinkedElement()
-                    .removeUnitSettings((AModelElement<UserKeyword>) argumentsSetting.getLinkedElement());
+                    .removeUnitSettings((AModelElement<UserKeyword>) setting.getLinkedElement());
 
             RedEventBroker.using(eventBroker)
-                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(argumentsSetting)
+                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
+                    .to(setting)
                     .send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, definition);
 
-        } else if (argumentsSetting == null) {
+        } else if (setting == null) {
             // there is no setting, but we have arguments to set
-            argumentsSetting = definition.createSetting(0, "[" + RobotKeywordDefinition.ARGUMENTS + "]",
+            setting = definition.createSetting(0, "[" + RobotKeywordDefinition.ARGUMENTS + "]",
                     new ArrayList<String>(), "");
-            updateModel(argumentsSetting, arguments.get());
+            updateModel(setting, arguments);
 
             RedEventBroker.using(eventBroker)
-                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(argumentsSetting)
+                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
+                    .to(setting)
                     .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
 
-        } else if (!arguments.get().equals(argumentsSetting.getArguments())) {
+        } else if (!arguments.equals(setting.getArguments())) {
             // there is a setting and we have arguments which are different than current
-            updateModel(argumentsSetting, arguments.get());
-            argumentsSetting.resetStored();
+            updateModel(setting, arguments);
+            setting.resetStored();
 
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
         }
-    }
-
-    private Optional<List<String>> prepareArgumentsList(final RobotDefinitionSetting setting) {
-        final List<String> arguments = setting == null ? new ArrayList<String>() : newArrayList(setting.getArguments());
-
-        for (int i = arguments.size(); i <= index; i++) {
-            arguments.add("\\");
-        }
-        arguments.set(index, value == null || value.trim().isEmpty() ? "\\" : value);
-        for (int i = arguments.size() - 1; i >= 0; i--) {
-            if (!arguments.get(i).equals("\\")) {
-                break;
-            }
-            arguments.set(i, null);
-        }
-        return areAllEmpty(arguments) ? Optional.<List<String>> absent() : Optional.of(arguments);
     }
 
     private boolean areAllEmpty(final List<String> arguments) {
@@ -102,7 +86,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     }
 
     private void updateModel(final RobotDefinitionSetting argumentsSetting, final List<String> arguments) {
-        final KeywordTableModelUpdater updater = new KeywordTableModelUpdater();
+        final IExecutablesTableModelUpdater<UserKeyword> updater = definition.getModelUpdater();
         if (value != null) {
             for (int i = arguments.size() - 1; i >= 0; i--) {
                 updater.updateArgument(argumentsSetting.getLinkedElement(), i, arguments.get(i));
