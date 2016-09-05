@@ -27,7 +27,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgume
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -122,7 +121,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
                 } else if (columnIndex == (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetKeywordSettingCommentCommand(keywordCall, value));
+                    commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
                 }
             }
         } else if (rowObject instanceof RobotKeywordDefinition) {
