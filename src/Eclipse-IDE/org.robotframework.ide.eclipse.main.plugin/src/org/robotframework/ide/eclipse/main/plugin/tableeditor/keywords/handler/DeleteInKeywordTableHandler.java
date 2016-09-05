@@ -13,7 +13,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -44,7 +43,7 @@ public class DeleteInKeywordTableHandler extends DIParameterizedHandler<E4Delete
                     }
                 } else {
                     if (columnIndex > 0 && columnIndex < tableColumnCount - 1) {
-                        return new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, null);
+                        return new SetKeywordCallArgumentCommand(keywordCall, columnIndex - 1, null);
                     } else if (columnIndex == tableColumnCount - 1) {
                         return new SetKeywordCallCommentCommand(keywordCall, null);
                     }
