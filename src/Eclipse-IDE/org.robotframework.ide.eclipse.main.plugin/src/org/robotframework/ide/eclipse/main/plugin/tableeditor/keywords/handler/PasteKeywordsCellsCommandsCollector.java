@@ -19,7 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgume
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -135,7 +134,7 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
             if (selectedElementColumnIndex > 0 && selectedElementColumnIndex < (tableColumnsCount - 1)) {
                 return new SetKeywordSettingArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
             } else if (selectedElementColumnIndex == (tableColumnsCount - 1)) {
-                return new SetKeywordSettingCommentCommand(keywordCall, valueToPaste);
+                return new SetKeywordCallCommentCommand(keywordCall, valueToPaste);
             }
         }
         return null;
