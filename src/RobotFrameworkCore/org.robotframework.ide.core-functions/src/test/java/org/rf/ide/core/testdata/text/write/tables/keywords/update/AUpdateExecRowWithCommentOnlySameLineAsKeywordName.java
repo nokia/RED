@@ -11,7 +11,9 @@ import java.util.List;
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.RobotFile;
+import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordExecutableRowModelOperation;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.write.DumperTestHelper;
@@ -80,6 +82,47 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         // execute & verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordWithTheFirstCommentLineInTheNameLine"),
                 modelFile);
+    }
+
+    @Test
+    public void updateTheFirstExecLineWithPrettyAlignBeforeTheFirstActionVariable_then_updateArgumentOfKeyword()
+            throws Exception {
+        // prepare
+        final String filePath = convert("InKeywordsWithPrettyAlign");
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(filePath);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test prepare
+        KeywordTable table = modelFile.getKeywordTable();
+        List<UserKeyword> keywords = table.getKeywords();
+        UserKeyword userKeyword = keywords.get(0);
+        userKeyword.getKeywordExecutionRows().get(0).getArguments().get(1).setText("d_new");
+
+        // execute & verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign"), modelFile);
+    }
+
+    @Test
+    public void updateTheFirstExecLineWithPrettyAlignBeforeTheFirstActionVariable_then_updateArgumentOfKeyword_usingModelUpdater()
+            throws Exception {
+        // prepare
+        final String filePath = convert("InKeywordsWithPrettyAlign");
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(filePath);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test prepare
+        KeywordTable table = modelFile.getKeywordTable();
+        List<UserKeyword> keywords = table.getKeywords();
+        UserKeyword userKeyword = keywords.get(0);
+
+        KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
+
+        final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getKeywordExecutionRows().get(0);
+        execOneRow.getAction().setText("${c} =");
+        execKeyUpdater.update(execOneRow, 1, "d_new");
+
+        // execute & verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign"), modelFile);
     }
 
     public String convert(final String fileName) {
