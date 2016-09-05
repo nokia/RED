@@ -23,7 +23,7 @@ public class VariablesSectionTableDumper extends ANotExecutableTableDumper {
     private final static ModelType MY_TYPE = ModelType.VARIABLES_TABLE_HEADER;
 
     public VariablesSectionTableDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, getDumpers(aDumpHelper));
+        super(aDumpHelper, getDumpers(aDumpHelper), false);
     }
 
     private static List<ISectionElementDumper> getDumpers(final DumperHelper aDumpHelper) {

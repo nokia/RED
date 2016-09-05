@@ -6,11 +6,14 @@
 package org.rf.ide.core.testdata.text.write.tables.variables.update;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -79,5 +82,43 @@ public class UpdateVariableTablesWithVariablesOnlyWithCommentTest {
 
         // verify
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    @Test
+    public void test_givenVariableTableWithHashCommentAtTheBeginning_whenModifyScalarCorrectVariables_thenCheckIfTableIsCorrectlyDumped()
+            throws Exception {
+        // prepare
+        final String inFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
+                + "Input_HashIsTheFirstLineAfterVariableTable.robot";
+        final String outputFileName = PRETTY_NEW_DIR_LOCATION_NEW_UNITS
+                + "Output_HashIsTheFirstLineAfterVariableTable.robot";
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test data prepare
+        final VariableTable variableTable = modelFile.getVariableTable();
+        final List<ScalarVariable> varsC = findVariables(variableTable, "c");
+        ScalarVariable scalarC = varsC.get(0);
+        scalarC.getValues().get(0).setText("a2");
+
+        final List<ScalarVariable> varsD = findVariables(variableTable, "d");
+        ScalarVariable scalarD = varsD.get(0);
+        scalarD.getValues().get(0).setText("h2");
+
+        // verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(outputFileName, modelFile);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends AVariable> List<T> findVariables(final VariableTable variableTable, final String variableName) {
+        List<T> matched = new ArrayList<>(0);
+
+        for (final AVariable v : variableTable.getVariables()) {
+            if (variableName.equals(v.getName())) {
+                matched.add((T) v);
+            }
+        }
+
+        return matched;
     }
 }
