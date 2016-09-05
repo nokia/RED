@@ -151,12 +151,25 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
             }
 
             if (shouldDumpDeclaration) {
-                if (!lines.isEmpty()
-                        && !getDumperHelper().getEmptyLineDumper().isEmptyLine(lines.get(lines.size() - 1))) {
-                    getDumperHelper().getDumpLineUpdater().updateLine(model, lines,
-                            getDumperHelper().getLineSeparator(model));
+                boolean wasPrettyAlign = false;
+                if (!lines.isEmpty()) {
+                    final RobotLine lastLine = lines.get(lines.size() - 1);
+                    if (getDumperHelper().getEmptyLineDumper().isEmptyLine(lastLine)) {
+                        final List<IRobotLineElement> lineElements = lastLine.getLineElements();
+                        if (!lineElements.isEmpty()) {
+                            final IRobotLineElement lastElement = lineElements.get(lineElements.size() - 1);
+                            if (lastElement.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
+                                wasPrettyAlign = (lastElement.getStartOffset()
+                                        + lastElement.getText().length()) == lastToken.getStartOffset();
+                            }
+                        }
+                    } else {
+                        getDumperHelper().getDumpLineUpdater().updateLine(model, lines,
+                                getDumperHelper().getLineSeparator(model));
+                    }
                 }
-                if (!wasSeparatorBefore(lines)) {
+
+                if (!wasSeparatorBefore(lines) && !wasPrettyAlign) {
                     getDumperHelper().getDumpLineUpdater().updateLine(model, lines,
                             getDumperHelper().getSeparator(model, lines, lastToken, lastToken));
                 }
