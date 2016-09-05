@@ -117,8 +117,19 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return setting;
     }
 
-    public void insertSetting(final String name, final String comment, final List<String> args, final int tableIndex,
+    public RobotSetting insertSetting(final String name, final String comment, final List<String> args,
             final int allSettingsElementsIndex) {
+
+        int tableIndex = -1;
+        if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex <= elements.size()) {
+            RobotFileInternalElement currentElement = elements.get(allSettingsElementsIndex);
+            if (currentElement.getName().equals(SettingsGroup.METADATA.getName())) {
+                tableIndex = getMetadataSettings().indexOf(currentElement);
+            } else {
+                tableIndex = getImportSettings().indexOf(currentElement);
+            }
+        }
+        
         final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), tableIndex, name,
                 comment, args);
         final RobotSetting setting = newSetting(name, newModelElement);
@@ -126,6 +137,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex <= elements.size()) {
             elements.add(allSettingsElementsIndex, setting);
         }
+        
+        return setting;
     }
 
     private RobotSetting newSetting(final String name, final AModelElement<?> newModelElement) {

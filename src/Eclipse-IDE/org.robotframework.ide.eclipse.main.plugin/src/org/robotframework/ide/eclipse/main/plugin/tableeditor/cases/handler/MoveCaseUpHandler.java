@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -29,11 +28,9 @@ public class MoveCaseUpHandler extends DIParameterizedHandler<E4MoveCaseUpHandle
 
     public static class E4MoveCaseUpHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
-        public void moveCaseUp(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void moveCaseUp(@Named(Selections.SELECTION) final IStructuredSelection selection,
+                final RobotEditorCommandsStack commandsStack) {
             final Optional<RobotKeywordCall> maybeKeywordCall = Selections.getOptionalFirstElement(selection,
                     RobotKeywordCall.class);
             final Optional<RobotCase> maybeTestCase = Selections.getOptionalFirstElement(selection, RobotCase.class);

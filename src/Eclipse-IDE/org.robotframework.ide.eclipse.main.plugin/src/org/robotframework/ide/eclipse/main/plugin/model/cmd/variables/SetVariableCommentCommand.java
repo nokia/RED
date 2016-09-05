@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -15,6 +17,7 @@ public class SetVariableCommentCommand extends EditorCommand {
 
     private final RobotVariable variable;
     private final String newComment;
+    private String previousComment;
 
     public SetVariableCommentCommand(final RobotVariable variable, final String newComment) {
         this.variable = variable;
@@ -23,11 +26,17 @@ public class SetVariableCommentCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (variable.getComment().equals(newComment)) {
+        previousComment = variable.getComment();
+        if (previousComment.equals(newComment)) {
             return;
         }
         CommentServiceHandler.update(variable.getLinkedElement(), ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, newComment);
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_COMMENT_CHANGE, variable);
+    }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetVariableCommentCommand(variable, previousComment));
     }
 }

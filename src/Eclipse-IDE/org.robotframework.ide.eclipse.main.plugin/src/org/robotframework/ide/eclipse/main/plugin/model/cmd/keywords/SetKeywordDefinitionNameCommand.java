@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -14,6 +16,7 @@ public class SetKeywordDefinitionNameCommand extends EditorCommand {
 
     private final RobotKeywordDefinition definition;
     private final String name;
+    private String previousName;
 
     public SetKeywordDefinitionNameCommand(final RobotKeywordDefinition definition, final String name) {
         this.definition = definition;
@@ -22,7 +25,8 @@ public class SetKeywordDefinitionNameCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (definition.getName().equals(name)) {
+        previousName = definition.getName();
+        if (previousName.equals(name)) {
             return;
         }
 
@@ -30,5 +34,10 @@ public class SetKeywordDefinitionNameCommand extends EditorCommand {
         definition.getLinkedElement().setKeywordName(nameToken);
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_NAME_CHANGE, definition);
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetKeywordDefinitionNameCommand(definition, previousName));
     }
 }

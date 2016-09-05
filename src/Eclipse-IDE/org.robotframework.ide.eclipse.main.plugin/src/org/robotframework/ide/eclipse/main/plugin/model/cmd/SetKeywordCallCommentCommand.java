@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.rf.ide.core.testdata.model.ICommentHolder;
@@ -17,7 +18,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class SetKeywordCallCommentCommand extends EditorCommand {
 
     private final RobotKeywordCall keywordCall;
+
     private final String newComment;
+
+    private String previousComment;
 
     public SetKeywordCallCommentCommand(final RobotKeywordCall keywordCall, final String comment) {
         this.keywordCall = keywordCall;
@@ -26,13 +30,19 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (Objects.equals(keywordCall.getComment(), newComment)) {
+        previousComment = keywordCall.getComment();
+        if (Objects.equals(previousComment, newComment)) {
             return;
         }
         CommentServiceHandler.update((ICommentHolder) keywordCall.getLinkedElement(),
                 ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, newComment);
         keywordCall.resetStored();
-        
+
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordCall);
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetKeywordCallCommentCommand(keywordCall, previousComment));
     }
 }

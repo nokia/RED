@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -29,11 +28,9 @@ public class MoveKeywordsUpHandler extends DIParameterizedHandler<E4MoveKeywordU
 
     public static class E4MoveKeywordUpHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
-        public void moveUp(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void moveUp(@Named(Selections.SELECTION) final IStructuredSelection selection,
+                final RobotEditorCommandsStack commandsStack) {
             final Optional<RobotKeywordCall> maybeKeywordCall = Selections.getOptionalFirstElement(selection,
                     RobotKeywordCall.class);
             final Optional<RobotKeywordDefinition> maybeKeywordDef = Selections.getOptionalFirstElement(selection,

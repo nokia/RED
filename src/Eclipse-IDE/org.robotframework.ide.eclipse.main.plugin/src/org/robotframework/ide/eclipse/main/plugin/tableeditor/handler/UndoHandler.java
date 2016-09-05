@@ -26,7 +26,7 @@ public class UndoHandler extends DIParameterizedHandler<E4UndoHandler> {
         public void undo(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 final RobotEditorCommandsStack commandsStack) {
 
-            // TODO: implement undo action
+            commandsStack.undo();
         }
     }
 }

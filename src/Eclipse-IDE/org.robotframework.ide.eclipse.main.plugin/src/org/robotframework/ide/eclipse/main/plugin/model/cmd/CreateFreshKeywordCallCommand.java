@@ -5,10 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
@@ -23,6 +26,8 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
     private final String comment;
 
     private final int index;
+    
+    private RobotKeywordCall newKeywordCall;
 
     public CreateFreshKeywordCallCommand(final RobotCodeHoldingElement<?> parent) {
         this(parent, parent.getChildren().size());
@@ -43,8 +48,13 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        parent.createKeywordCall(index, name, args, comment);
+        newKeywordCall = parent.createKeywordCall(index, name, args, comment);
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
+    }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteKeywordCallCommand(newArrayList(newKeywordCall)));
     }
 }

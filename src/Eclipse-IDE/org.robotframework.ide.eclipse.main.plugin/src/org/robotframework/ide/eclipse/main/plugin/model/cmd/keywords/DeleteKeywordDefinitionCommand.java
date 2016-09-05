@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
@@ -17,6 +19,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class DeleteKeywordDefinitionCommand extends EditorCommand {
 
     private final List<RobotKeywordDefinition> definitionsToDelete;
+    
+    private List<Integer> deletedDefinitionsIndexes = newArrayList();
 
     public DeleteKeywordDefinitionCommand(final List<RobotKeywordDefinition> definitionsToDelete) {
         this.definitionsToDelete = definitionsToDelete;
@@ -27,6 +31,10 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
         if (definitionsToDelete.isEmpty()) {
             return;
         }
+        for (final RobotKeywordDefinition def : definitionsToDelete) {
+            deletedDefinitionsIndexes.add(def.getIndex());
+        }
+       
         final RobotSuiteFileSection keywordsSection = definitionsToDelete.get(0).getParent();
         keywordsSection.getChildren().removeAll(definitionsToDelete);
         
@@ -43,5 +51,22 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
                 keywordsTable.removeKeyword(robotKeywordDefinition.getLinkedElement());
             }
         }
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(setupUndoCommandsForDeletedDefinitions());
+    }
+
+    private List<EditorCommand> setupUndoCommandsForDeletedDefinitions() {
+        final List<EditorCommand> commands = newArrayList();
+        if (definitionsToDelete.size() == deletedDefinitionsIndexes.size()) {
+            for (int i = 0; i < definitionsToDelete.size(); i++) {
+                final RobotKeywordDefinition def = definitionsToDelete.get(i);
+                commands.add(new InsertKeywordDefinitionsCommand(def.getParent(), deletedDefinitionsIndexes.get(i),
+                        new RobotKeywordDefinition[] { def }));
+            }
+        }
+        return commands;
     }
 }
