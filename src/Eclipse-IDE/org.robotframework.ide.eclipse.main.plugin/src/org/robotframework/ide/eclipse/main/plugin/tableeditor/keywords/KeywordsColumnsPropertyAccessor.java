@@ -26,7 +26,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCom
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -119,7 +118,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                 if (columnIndex == 0) {
                     createNewElementAndRemoveOldSetting(value, keywordCall);
                 } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, value));
+                    commandsStack.execute(new SetKeywordCallArgumentCommand(keywordCall, columnIndex - 1, value));
                 } else if (columnIndex == (numberOfColumns - 1)) {
                     commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
                 }
