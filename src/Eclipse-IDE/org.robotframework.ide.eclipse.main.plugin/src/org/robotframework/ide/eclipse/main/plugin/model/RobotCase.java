@@ -5,18 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
-import static com.google.common.collect.Iterables.filter;
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.io.ObjectStreamException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
@@ -29,20 +23,17 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 public class RobotCase extends RobotCodeHoldingElement<TestCase> {
 
     private static final long serialVersionUID = 1L;
 
-    private final TestCase testCase;
-
     RobotCase(final RobotCasesSection parent, final TestCase testCase) {
-        super(parent);
-        this.testCase = testCase;
+        super(parent, testCase);
     }
 
     @Override
@@ -51,16 +42,17 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     }
 
     @Override
-    public TestCase getLinkedElement() {
-        return testCase;
+    protected ModelType getExecutableRowModelType() {
+        return ModelType.TEST_CASE_EXECUTABLE_ROW;
     }
 
     @Override
-    public String getName() {
-        return testCase.getDeclaration().getText();
+    public RobotTokenType getSettingDeclarationTokenTypeFor(final String name) {
+        return RobotTokenType.findTypeOfDeclarationForTestCaseSettingTable(name);
     }
 
     public void link() {
+        final TestCase testCase = getLinkedElement();
         // settings
         for (final TestDocumentation documentation : testCase.getDocumentation()) {
             getChildren().add(new RobotDefinitionSetting(this, documentation));
@@ -90,58 +82,13 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     }
 
     @Override
-    public RobotKeywordCall createKeywordCall(final int index, final String name, final List<String> args,
-            final String comment) {
-        final int modelIndex = countRowsOfTypeUpTo(ModelType.TEST_CASE_EXECUTABLE_ROW, index);
-
-        @SuppressWarnings("unchecked")
-        final RobotExecutableRow<TestCase> robotExecutableRow = (RobotExecutableRow<TestCase>) new TestCaseTableModelUpdater()
-                .createExecutableRow(getLinkedElement(), modelIndex, name, comment, args);
-
-        final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
-        getChildren().add(index, call);
-        return call;
-    }
-
-    @Override
-    public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
-            final String comment) {
-        final AModelElement<?> newModelElement = new TestCaseTableModelUpdater().createSetting(getLinkedElement(),
-                settingName, comment, args);
-
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, newModelElement);
-
-        getChildren().add(index, setting);
-
-        return setting;
-    }
-
-    @Override
-    public void insertKeywordCall(final int index, final RobotKeywordCall call) {
-        call.setParent(this);
-
-        final int modelIndex = countRowsOfTypeUpTo(ModelType.TEST_CASE_EXECUTABLE_ROW, index);
-        if (index == -1) {
-            getChildren().add(call);
-        } else {
-            getChildren().add(index, call);
-        }
-        new TestCaseTableModelUpdater().insert(testCase, modelIndex, call.getLinkedElement());
-    }
-
-    @Override
-    public void removeChild(final RobotKeywordCall child) {
-        getChildren().remove(child);
-        new TestCaseTableModelUpdater().remove(testCase, child.getLinkedElement());
-    }
-
-    @Override
     public RobotCasesSection getParent() {
         return (RobotCasesSection) super.getParent();
     }
 
     @Override
     public ImageDescriptor getImage() {
+        final TestCase testCase = getLinkedElement();
         return testCase != null && testCase.isDataDrivenTestCase() ? RedImages.getTemplatedTestCaseImage()
                 : RedImages.getTestCaseImage();
     }
@@ -150,22 +97,8 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
         return findSettings(ModelType.TEST_CASE_TAGS);
     }
     
-    public List<RobotDefinitionSetting> getDocumentationSetting() {
-        return findSettings(ModelType.TEST_CASE_DOCUMENTATION);
-    }
-
-    private List<RobotDefinitionSetting> findSettings(final ModelType modelType) {
-        final List<RobotDefinitionSetting> matchingSettings = new ArrayList<>();
-        for (final RobotKeywordCall call : getChildren()) {
-            if (call instanceof RobotDefinitionSetting && call.getLinkedElement().getModelType() == modelType) {
-                matchingSettings.add((RobotDefinitionSetting) call);
-            }
-        }
-        return matchingSettings;
-    }
-
     public Optional<String> getTemplateInUse() {
-        return Optional.fromNullable(testCase.getTemplateKeywordName());
+        return Optional.fromNullable(getLinkedElement().getTemplateKeywordName());
     }
 
     @Override
@@ -188,40 +121,11 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
         getLinkedElement().moveUpExecutableRow(linkedCall);
     }
 
-    @Override
-    public DefinitionPosition getDefinitionPosition() {
-        return new DefinitionPosition(testCase.getTestName().getFilePosition(),
-                testCase.getTestName().getText().length());
-    }
-
-    @Override
-    public Position getPosition() {
-        if (testCase != null) {
-            final FilePosition begin = testCase.getBeginPosition();
-            final FilePosition end = testCase.getEndPosition();
-            return new Position(begin.getOffset(), end.getOffset() - begin.getOffset());
-        }
-        return new Position(0);
-    }
-
-    public int findExecutableRowIndex(final RobotKeywordCall call) {
-        return getExecutableRows(0, getChildren().size()).indexOf(call);
-    }
-
-    public List<RobotKeywordCall> getExecutableRows(final int from, final int to) {
-        return newArrayList(filter(getChildren().subList(from, to), new Predicate<RobotKeywordCall>() {
-            @Override
-            public boolean apply(final RobotKeywordCall call) {
-                return call.getLinkedElement().getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW;
-            }
-        }));
-    }
-
     @SuppressWarnings("unchecked")
     private Object readResolve() throws ObjectStreamException {
         // after deserialization we fix parent relationship in direct children
         for (final RobotKeywordCall call : getChildren()) {
-            ((AModelElement<TestCase>) call.getLinkedElement()).setParent(testCase);
+            ((AModelElement<TestCase>) call.getLinkedElement()).setParent(getLinkedElement());
             call.setParent(this);
         }
         return this;
