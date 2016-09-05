@@ -58,7 +58,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateCaseFreshKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateFreshCaseCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
@@ -320,7 +320,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                 final AddingToken token = (AddingToken) dataProvider.getRowObject(addingTokenRowIndex);
                 if (token.isNested()) {
                     final RobotCase testCase = (RobotCase) token.getParent();
-                    commandsStack.execute(new CreateCaseFreshKeywordCallCommand(testCase));
+                    commandsStack.execute(new CreateFreshKeywordCallCommand(testCase));
                     createdElement = testCase.getChildren().get(testCase.getChildren().size() - 1);
 
                 } else {
