@@ -10,8 +10,6 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -55,31 +53,18 @@ public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLine
             }
 
             if (codeHoldingElement != null && index >= 0) {
-                final AModelElement<?> modelElement = codeHoldingElement.getLinkedElement();
-                if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
-                    newLineCommand = new CreateFreshKeywordCallCommand(codeHoldingElement,
-                            index);
-                } else if (modelElement.getModelType() == ModelType.TEST_CASE) {
-                    newLineCommand = new CreateFreshKeywordCallCommand(codeHoldingElement, index);
-                }
+                newLineCommand = new CreateFreshKeywordCallCommand(codeHoldingElement, index);
             } else {
                 final Optional<AddingToken> token = Selections.getOptionalFirstElement(selection, AddingToken.class);
                 if (token.isPresent() && token.get().isNested()) {
                     final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) token.get().getParent();
-                    final AModelElement<?> modelElement = parent.getLinkedElement();
-                    if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
-                        newLineCommand = new CreateFreshKeywordCallCommand(parent);
-                    } else if (modelElement.getModelType() == ModelType.TEST_CASE) {
-                        newLineCommand = new CreateFreshKeywordCallCommand(parent);
-                    }
+                    newLineCommand = new CreateFreshKeywordCallCommand(parent);
                 }
             }
 
             if (newLineCommand != null) {
                 stack.execute(newLineCommand);
             }
-
         }
-
     }
 }
