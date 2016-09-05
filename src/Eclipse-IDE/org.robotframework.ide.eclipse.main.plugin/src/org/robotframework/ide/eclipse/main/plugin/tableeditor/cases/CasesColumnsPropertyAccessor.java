@@ -13,8 +13,8 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -84,7 +84,7 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
             } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
                 commandsStack.execute(new SetCaseKeywordCallArgumentCommand(call, columnIndex - 1, value));
             } else {
-                commandsStack.execute(new SetCaseKeywordCallCommentCommand(call, value));
+                commandsStack.execute(new SetKeywordCallCommentCommand(call, value));
             }
         }
     }
