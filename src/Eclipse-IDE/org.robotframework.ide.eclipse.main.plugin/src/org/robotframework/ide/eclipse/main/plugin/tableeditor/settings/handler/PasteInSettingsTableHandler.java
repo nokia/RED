@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -36,14 +35,11 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
 
     public static class E4PasteInSettingsTableHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
         public void paste(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
                 @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard,
-                final IContextService contextService) {
+                final IContextService contextService, final RobotEditorCommandsStack commandsStack) {
 
             final SelectionLayerAccessor selectionLayerAccessor = editor.getSelectionLayerAccessor();
             final List<RobotElement> selectedSettings = Selections.getElements(selection, RobotElement.class);

@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -29,11 +28,9 @@ public class MoveKeywordsDownHandler extends DIParameterizedHandler<E4MoveKeywor
 
     public static class E4MoveKeywordDownHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
-        public void moveDown(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void moveDown(@Named(Selections.SELECTION) final IStructuredSelection selection,
+                final RobotEditorCommandsStack commandsStack) {
             final Optional<RobotKeywordCall> maybeKeywordCall = Selections.getOptionalFirstElement(selection,
                     RobotKeywordCall.class);
             final Optional<RobotKeywordDefinition> maybeKeywordDef = Selections.getOptionalFirstElement(selection,

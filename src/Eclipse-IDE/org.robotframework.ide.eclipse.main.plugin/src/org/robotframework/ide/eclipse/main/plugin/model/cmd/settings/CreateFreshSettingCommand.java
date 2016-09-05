@@ -5,18 +5,26 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.settings;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshSettingCommand extends EditorCommand {
 
     private final RobotSettingsSection settingsSection;
+
     private final String keywordName;
+
     private final List<String> args;
+
     private final String comment;
+
+    private RobotSetting newSetting;
 
     public CreateFreshSettingCommand(final RobotSettingsSection settingsSection, final String keywordName,
             final List<String> args) {
@@ -33,8 +41,13 @@ public class CreateFreshSettingCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        settingsSection.createSetting(keywordName, comment, args.toArray(new String[0]));
+        newSetting = settingsSection.createSetting(keywordName, comment, args.toArray(new String[0]));
 
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_ADDED, settingsSection);
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteSettingCommand(newArrayList(newSetting)));
     }
 }

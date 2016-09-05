@@ -43,4 +43,9 @@ public class InsertVariablesCommand extends EditorCommand {
         }
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_ADDED, variablesSection);
     }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new RemoveVariableCommand(variablesToInsert));
+    }
 }

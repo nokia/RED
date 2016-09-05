@@ -74,4 +74,9 @@ public class InsertKeywordDefinitionsCommand extends EditorCommand {
                     }
                 });
     }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteKeywordDefinitionCommand(definitionsToInsert));
+    }
 }

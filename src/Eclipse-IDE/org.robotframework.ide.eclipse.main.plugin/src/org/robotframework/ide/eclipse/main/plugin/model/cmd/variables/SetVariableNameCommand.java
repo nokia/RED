@@ -32,6 +32,7 @@ public class SetVariableNameCommand extends EditorCommand {
 
     private final RobotVariable variable;
     private final String newName;
+    private String previousName;
 
     public SetVariableNameCommand(final RobotVariable variable, final String newName) {
         this.variable = variable;
@@ -155,7 +156,8 @@ public class SetVariableNameCommand extends EditorCommand {
 
     private Optional<RobotToken> modifyToken() {
         final RobotToken declaringToken = variable.getLinkedElement().getDeclaration();
-        if (declaringToken.getText().equals(newName)) {
+        previousName = declaringToken.getText();
+        if (previousName.equals(newName)) {
             return Optional.absent();
         }
         declaringToken.setRaw(newName);
@@ -192,5 +194,10 @@ public class SetVariableNameCommand extends EditorCommand {
 
     private String getNewHolderName() {
         return getProjectedType() == VariableType.INVALID ? newName : newName.substring(2, newName.length() - 1);
+    }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetVariableNameCommand(variable, previousName));
     }
 }

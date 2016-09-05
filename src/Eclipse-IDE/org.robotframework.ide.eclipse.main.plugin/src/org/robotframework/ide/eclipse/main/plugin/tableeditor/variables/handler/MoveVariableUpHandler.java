@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -25,11 +24,9 @@ public class MoveVariableUpHandler extends DIParameterizedHandler<E4MoveVariable
 
     public static class E4MoveVariableUpHandler {
 
-        @Inject
-        private RobotEditorCommandsStack stack;
-
         @Execute
-        public void moveVariableUp(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void moveVariableUp(@Named(Selections.SELECTION) final IStructuredSelection selection,
+                final RobotEditorCommandsStack stack) {
 
             final RobotVariable selectedVariable = Selections.getSingleElement(selection, RobotVariable.class);
             stack.execute(new MoveVariableUpCommand(selectedVariable));

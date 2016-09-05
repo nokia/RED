@@ -38,4 +38,9 @@ public class MoveVariableDownCommand extends EditorCommand {
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_MOVED, variablesSection);
     }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new MoveVariableUpCommand(variable));
+    }
 }

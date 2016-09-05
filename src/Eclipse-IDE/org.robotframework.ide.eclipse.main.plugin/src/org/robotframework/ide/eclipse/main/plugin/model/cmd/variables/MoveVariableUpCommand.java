@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -34,5 +35,10 @@ public class MoveVariableUpCommand extends EditorCommand {
         table.moveUpVariable(variable.getLinkedElement());
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_MOVED, variablesSection);
+    }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new MoveVariableDownCommand(variable));
     }
 }

@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -27,11 +26,9 @@ public class InsertNewVariableHandler extends DIParameterizedHandler<E4InsertNew
 
     public static class E4InsertNewHandler {
 
-        @Inject
-        private RobotEditorCommandsStack stack;
-
         @Execute
         public void addNewVariable(@Named(Selections.SELECTION) final IStructuredSelection selection,
+                final RobotEditorCommandsStack stack,
                 @Named("org.robotframework.ide.eclipse.insertNew.variableType") final String place) {
             final RobotVariable selectedVariable = Selections.getSingleElement(selection, RobotVariable.class);
             final RobotVariablesSection variablesSection = selectedVariable.getParent();

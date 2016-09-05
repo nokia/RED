@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpd
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
@@ -26,6 +27,8 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     private final int index;
 
     private final String value;
+    
+    private String previousValue;
 
     public SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
             final String value) {
@@ -39,7 +42,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         RobotDefinitionSetting setting = definition.getArgumentsSetting();
 
-        final List<String> arguments = SetKeywordCallArgumentCommand.prepareArgumentsList(setting, value, index);
+        final List<String> arguments = prepareArgumentsList(setting, value, index);
         final boolean areAllEmpty = areAllEmpty(arguments);
 
         if (setting == null && areAllEmpty) {
@@ -76,6 +79,15 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
         }
     }
+    
+    private List<String> prepareArgumentsList(final RobotKeywordCall call, final String value, final int index) {
+        final List<String> arguments = SetKeywordCallArgumentCommand.createArgumentsList(call, index);
+        
+        previousValue = index >= 0 && index < arguments.size() ? arguments.get(index) : value;
+
+        SetKeywordCallArgumentCommand.fillArgumentsList(value, index, arguments);
+        return arguments;
+    }
 
     private boolean areAllEmpty(final List<String> arguments) {
         for (final String argument : arguments) {
@@ -95,5 +107,10 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         } else {
             updater.updateArgument(argumentsSetting.getLinkedElement(), index, value);
         }
+    }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetKeywordDefinitionArgumentCommand(definition, index, previousValue));
     }
 }
