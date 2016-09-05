@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -26,12 +25,9 @@ public class CutCasesHandler extends DIParameterizedHandler<E4CutCasesHandler> {
 
     public static class E4CutCasesHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
         public void cutKeywords(@Named(Selections.SELECTION) final IStructuredSelection selection,
-                final RedClipboard clipboard) {
+                final RedClipboard clipboard, final RobotEditorCommandsStack commandsStack) {
             
             final boolean copiedToClipboard = new E4CopyCasesHandler().copyCases(selection, clipboard);
             if (copiedToClipboard) {

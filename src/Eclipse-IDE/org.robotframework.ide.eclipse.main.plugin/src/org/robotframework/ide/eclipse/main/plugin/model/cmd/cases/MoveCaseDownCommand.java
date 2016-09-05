@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
@@ -35,5 +36,10 @@ public class MoveCaseDownCommand extends EditorCommand {
         linkedElement.moveDownTest(testCase.getLinkedElement());
 
         eventBroker.send(RobotModelEvents.ROBOT_CASE_MOVED, section);
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new MoveCaseUpCommand(testCase));
     }
 }

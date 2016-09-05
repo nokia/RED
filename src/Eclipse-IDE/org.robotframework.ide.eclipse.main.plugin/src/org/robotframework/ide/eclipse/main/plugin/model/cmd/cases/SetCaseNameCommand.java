@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -15,6 +17,8 @@ public class SetCaseNameCommand extends EditorCommand {
     private final RobotCase testCase;
 
     private final String name;
+    
+    private String previousName;
 
     public SetCaseNameCommand(final RobotCase testCase, final String name) {
         this.testCase = testCase;
@@ -23,12 +27,18 @@ public class SetCaseNameCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (name.equals(testCase.getName())) {
+        previousName = testCase.getName();
+        if (name.equals(previousName)) {
             return;
         }
         final RobotToken nameToken = RobotToken.create(name);
         testCase.getLinkedElement().setTestName(nameToken);
 
         eventBroker.send(RobotModelEvents.ROBOT_CASE_NAME_CHANGE, testCase);
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetCaseNameCommand(testCase, previousName));
     }
 }

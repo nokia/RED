@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -28,12 +27,10 @@ public class CutInSettingsTableHandler extends DIParameterizedHandler<E4CutInSet
 
     public static class E4CutInSettingsTableHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
         public void cut(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
-                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard,
+                final RobotEditorCommandsStack commandsStack) {
 
             final boolean copiedToClipboard = new E4CopyInSettingsTableHandler().copy(editor, selection, clipboard);
             if (copiedToClipboard) {

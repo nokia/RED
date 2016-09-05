@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -34,12 +33,9 @@ public class InsertNewCaseHandler extends DIParameterizedHandler<E4InsertNewCase
 
     public static class E4InsertNewCaseHandler {
 
-        @Inject
-        private RobotEditorCommandsStack stack;
-
         @Execute
         public void addNewTestCase(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
-                @Named(Selections.SELECTION) final IStructuredSelection selection) {
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RobotEditorCommandsStack stack) {
 
             if (selection.size() > 1) {
                 throw new IllegalArgumentException("Given selection should contain at most one element, but have "

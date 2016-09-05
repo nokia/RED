@@ -5,6 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.NamesGenerator;
@@ -16,6 +21,7 @@ public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
     private final RobotKeywordsSection keywordsSection;
     private final int index;
     private final boolean notifySync;
+    private RobotKeywordDefinition newKeywordDefinition;
 
     public CreateFreshKeywordDefinitionCommand(final RobotKeywordsSection keywordsSection,
             final boolean notifySynchronously) {
@@ -37,12 +43,17 @@ public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         final String name = NamesGenerator.generateUniqueName(keywordsSection, DEFAULT_NAME);
 
-        keywordsSection.createKeywordDefinition(index, name);
+        newKeywordDefinition = keywordsSection.createKeywordDefinition(index, name);
 
         if (notifySync) {
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);
         } else {
             eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);
         }
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteKeywordDefinitionCommand(newArrayList(newKeywordDefinition)));
     }
 }

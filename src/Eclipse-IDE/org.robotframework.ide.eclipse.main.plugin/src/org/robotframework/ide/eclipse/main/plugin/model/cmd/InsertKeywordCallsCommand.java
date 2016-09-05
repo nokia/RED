@@ -46,4 +46,9 @@ public class InsertKeywordCallsCommand extends EditorCommand {
         }
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteKeywordCallCommand(callsToInsert));
+    }
 }

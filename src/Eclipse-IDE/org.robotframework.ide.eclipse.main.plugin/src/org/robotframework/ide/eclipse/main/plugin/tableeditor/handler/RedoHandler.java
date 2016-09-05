@@ -26,7 +26,7 @@ public class RedoHandler extends DIParameterizedHandler<E4RedoHandler> {
         public void redo(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
                 final RobotEditorCommandsStack commandsStack) {
 
-            // TODO: implement redo action
+            commandsStack.redo();
         }
     }
 }

@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.VariableTable;
@@ -17,6 +20,8 @@ public class RemoveVariableCommand extends EditorCommand {
 
     private final List<RobotVariable> variablesToDelete;
 
+    private List<Integer> deletedVariablesIndexes = newArrayList();
+
     public RemoveVariableCommand(final List<RobotVariable> variablesToDelete) {
         this.variablesToDelete = variablesToDelete;
     }
@@ -26,6 +31,10 @@ public class RemoveVariableCommand extends EditorCommand {
         if (variablesToDelete.isEmpty()) {
             return;
         }
+        for (final RobotVariable var : variablesToDelete) {
+            deletedVariablesIndexes.add(var.getIndex());
+        }
+
         final RobotSuiteFileSection variablesSection = variablesToDelete.get(0).getParent();
         variablesSection.getChildren().removeAll(variablesToDelete);
 
@@ -35,5 +44,22 @@ public class RemoveVariableCommand extends EditorCommand {
 
         }
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_REMOVED, variablesSection);
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(setupUndoCommandsForDeletedVariables());
+    }
+
+    private List<EditorCommand> setupUndoCommandsForDeletedVariables() {
+        final List<EditorCommand> commands = new ArrayList<>();
+        if (variablesToDelete.size() == deletedVariablesIndexes.size()) {
+            for (int i = 0; i < variablesToDelete.size(); i++) {
+                final RobotVariable var = variablesToDelete.get(i);
+                commands.add(new InsertVariablesCommand(var.getParent(), deletedVariablesIndexes.get(i),
+                        new RobotVariable[] { var }));
+            }
+        }
+        return commands;
     }
 }

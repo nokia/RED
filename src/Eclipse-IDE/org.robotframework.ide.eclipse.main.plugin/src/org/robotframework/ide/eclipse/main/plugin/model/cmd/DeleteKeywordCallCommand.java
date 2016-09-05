@@ -5,20 +5,25 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteKeywordCallCommand extends EditorCommand {
 
-    private final List<? extends RobotKeywordCall> callsToDelete;
+    protected final List<? extends RobotKeywordCall> callsToDelete;
 
     private final String eventTopic;
+
+    protected List<Integer> deletedCallsIndexes = newArrayList();
 
     public DeleteKeywordCallCommand(final List<? extends RobotKeywordCall> callsToDelete) {
         this(callsToDelete, RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED);
@@ -34,6 +39,10 @@ public class DeleteKeywordCallCommand extends EditorCommand {
         if (callsToDelete.isEmpty()) {
             return;
         }
+        for (final RobotKeywordCall call : callsToDelete) {
+            deletedCallsIndexes.add(call.getIndex());
+        }
+        
         final Set<IRobotCodeHoldingElement> parentsWhereRemovalWasPerformed = new HashSet<>();
 
         for (final RobotKeywordCall call : callsToDelete) {
@@ -46,4 +55,22 @@ public class DeleteKeywordCallCommand extends EditorCommand {
             eventBroker.send(eventTopic, parent);
         }
     }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(setupUndoCommandsForDeletedCalls());
+    }
+
+    private List<EditorCommand> setupUndoCommandsForDeletedCalls() {
+        final List<EditorCommand> commands = newArrayList();
+        if (callsToDelete.size() == deletedCallsIndexes.size()) {
+            for (int i = 0; i < callsToDelete.size(); i++) {
+                final RobotKeywordCall call = callsToDelete.get(i);
+                commands.add(new CreateFreshKeywordCallCommand((RobotCodeHoldingElement<?>) call.getParent(),
+                        deletedCallsIndexes.get(i), call.getName(), call.getArguments(), call.getComment()));
+            }
+        }
+        return commands;
+    }
+
 }

@@ -11,11 +11,11 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class SetSettingArgumentCommand extends SetKeywordCallArgumentCommand {
 
-    public SetSettingArgumentCommand(final RobotKeywordCall keywordCall, final int index,
-            final String value) {
+    public SetSettingArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value) {
         super(keywordCall, index, value);
     }
 
@@ -25,4 +25,8 @@ public class SetSettingArgumentCommand extends SetKeywordCallArgumentCommand {
         new SettingTableModelUpdater().update(linkedElement, index, value);
     }
 
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetSettingArgumentCommand(keywordCall, index, previousValue));
+    }
 }

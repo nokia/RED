@@ -5,6 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
+import static com.google.common.collect.Lists.newArrayList;
+
+import java.util.List;
+
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.NamesGenerator;
@@ -16,6 +21,7 @@ public class CreateFreshCaseCommand extends EditorCommand {
 
     private final RobotCasesSection casesSection;
     private final int index;
+    private RobotCase newTestCase;
 
     public CreateFreshCaseCommand(final RobotCasesSection casesSection) {
         this(casesSection, -1);
@@ -31,11 +37,16 @@ public class CreateFreshCaseCommand extends EditorCommand {
         final String name = NamesGenerator.generateUniqueName(casesSection, DEFAULT_NAME);
 
         if (index == -1) {
-            casesSection.createTestCase(name);
+            newTestCase = casesSection.createTestCase(name);
         } else {
-            casesSection.createTestCase(index, name);
+            newTestCase = casesSection.createTestCase(index, name);
         }
 
         eventBroker.send(RobotModelEvents.ROBOT_CASE_ADDED, casesSection);
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteCasesCommand(newArrayList(newTestCase)));
     }
 }
