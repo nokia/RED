@@ -14,7 +14,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgume
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -47,7 +46,7 @@ public class DeleteInKeywordTableHandler extends DIParameterizedHandler<E4Delete
                     if (columnIndex > 0 && columnIndex < tableColumnCount - 1) {
                         return new SetKeywordSettingArgumentCommand(keywordCall, columnIndex - 1, null);
                     } else if (columnIndex == tableColumnCount - 1) {
-                        return new SetKeywordSettingCommentCommand(keywordCall, null);
+                        return new SetKeywordCallCommentCommand(keywordCall, null);
                     }
                 }
             } else if (selectedElement instanceof RobotKeywordDefinition) {

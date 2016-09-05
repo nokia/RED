@@ -10,8 +10,8 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -40,8 +40,8 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
     }
 
     @Override
-    protected List<String> findValuesToPaste(RobotElement elementFromClipboard, int clipboardElementColumnIndex,
-            int tableColumnsCount) {
+    protected List<String> findValuesToPaste(final RobotElement elementFromClipboard, final int clipboardElementColumnIndex,
+            final int tableColumnsCount) {
         if (elementFromClipboard instanceof RobotKeywordCall) {
             return getValuesFromKeywordCall((RobotKeywordCall) elementFromClipboard, clipboardElementColumnIndex,
                     tableColumnsCount);
@@ -92,8 +92,8 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
         return newArrayList();
     }
 
-    private List<String> getValuesFromTestCase(final RobotCase testCase, int clipboardElementColumnIndex,
-            int tableColumnsCount) {
+    private List<String> getValuesFromTestCase(final RobotCase testCase, final int clipboardElementColumnIndex,
+            final int tableColumnsCount) {
         if (clipboardElementColumnIndex == 0) {
             return newArrayList(testCase.getName());
         }
@@ -107,7 +107,7 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
         } else if (selectedElementColumnIndex > 0 && selectedElementColumnIndex < (tableColumnsCount - 1)) {
             return new SetCaseKeywordCallArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
         } else if (selectedElementColumnIndex == (tableColumnsCount - 1)) {
-            return new SetCaseKeywordCallCommentCommand(keywordCall, valueToPaste);
+            return new SetKeywordCallCommentCommand(keywordCall, valueToPaste);
         }
 
         return null;
