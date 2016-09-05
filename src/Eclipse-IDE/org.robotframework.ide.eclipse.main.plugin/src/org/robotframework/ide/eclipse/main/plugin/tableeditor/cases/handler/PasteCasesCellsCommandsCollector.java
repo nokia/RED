@@ -10,11 +10,8 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallNameCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesTableValuesChangingCommandsCollector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobotElementCellsCommandsCollector;
 
@@ -46,8 +43,7 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
             return getValuesFromKeywordCall((RobotKeywordCall) elementFromClipboard, clipboardElementColumnIndex,
                     tableColumnsCount);
         } else if (elementFromClipboard instanceof RobotCase) {
-            return getValuesFromTestCase((RobotCase) elementFromClipboard, clipboardElementColumnIndex,
-                    tableColumnsCount);
+            return getValuesFromTestCase((RobotCase) elementFromClipboard, clipboardElementColumnIndex);
         }
         return newArrayList();
     }
@@ -58,19 +54,11 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
 
         final List<EditorCommand> pasteCommands = newArrayList();
 
-        EditorCommand command = null;
         final String valueToPaste = valuesToPaste.isEmpty() ? "" : valuesToPaste.get(0);
-        if (selectedElement instanceof RobotKeywordCall) {
-            command = getCommandForKeywordCall((RobotKeywordCall) selectedElement, valueToPaste,
-                    selectedElementColumnIndex, tableColumnsCount);
-        } else if (selectedElement instanceof RobotCase && !valueToPaste.isEmpty()) {
-            command = getCommandForTestCase((RobotCase) selectedElement, valueToPaste, selectedElementColumnIndex,
-                    tableColumnsCount);
-        }
+        final List<? extends EditorCommand> commands = new CasesTableValuesChangingCommandsCollector()
+                .collectForChange(selectedElement, valueToPaste, selectedElementColumnIndex, tableColumnsCount);
+        pasteCommands.addAll(commands);
 
-        if (command != null) {
-            pasteCommands.add(command);
-        }
         return pasteCommands;
     }
 
@@ -92,32 +80,10 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
         return newArrayList();
     }
 
-    private List<String> getValuesFromTestCase(final RobotCase testCase, final int clipboardElementColumnIndex,
-            final int tableColumnsCount) {
+    private List<String> getValuesFromTestCase(final RobotCase testCase, final int clipboardElementColumnIndex) {
         if (clipboardElementColumnIndex == 0) {
             return newArrayList(testCase.getName());
         }
         return newArrayList();
-    }
-
-    private EditorCommand getCommandForKeywordCall(final RobotKeywordCall keywordCall, final String valueToPaste,
-            final int selectedElementColumnIndex, final int tableColumnsCount) {
-        if (selectedElementColumnIndex == 0) {
-            return new SetCaseKeywordCallNameCommand(keywordCall, valueToPaste);
-        } else if (selectedElementColumnIndex > 0 && selectedElementColumnIndex < (tableColumnsCount - 1)) {
-            return new SetKeywordCallArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
-        } else if (selectedElementColumnIndex == (tableColumnsCount - 1)) {
-            return new SetKeywordCallCommentCommand(keywordCall, valueToPaste);
-        }
-
-        return null;
-    }
-
-    private EditorCommand getCommandForTestCase(final RobotCase testCase, final String valueToPaste,
-            final int selectedElementColumnIndex, final int tableColumnsCount) {
-        if (selectedElementColumnIndex == 0) {
-            return new SetCaseNameCommand(testCase, valueToPaste);
-        }
-        return null;
     }
 }
