@@ -12,17 +12,13 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.CreateCaseFreshKeywordCallCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.InsertNewLineHandler.E4InsertNewLineHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -41,8 +37,7 @@ public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLine
         private RobotEditorCommandsStack stack;
 
         @Execute
-        public void addNewLine(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
-                @Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void addNewLine(@Named(Selections.SELECTION) final IStructuredSelection selection) {
 
             final Optional<RobotElement> selectedElement = Selections.getOptionalFirstElement(selection,
                     RobotElement.class);
@@ -60,22 +55,22 @@ public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLine
             }
 
             if (codeHoldingElement != null && index >= 0) {
-                final AModelElement<?> modelElement = (AModelElement<?>) codeHoldingElement.getLinkedElement();
+                final AModelElement<?> modelElement = codeHoldingElement.getLinkedElement();
                 if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
                     newLineCommand = new CreateFreshKeywordCallCommand(codeHoldingElement,
                             index);
                 } else if (modelElement.getModelType() == ModelType.TEST_CASE) {
-                    newLineCommand = new CreateCaseFreshKeywordCallCommand((RobotCase) codeHoldingElement, index);
+                    newLineCommand = new CreateFreshKeywordCallCommand(codeHoldingElement, index);
                 }
             } else {
                 final Optional<AddingToken> token = Selections.getOptionalFirstElement(selection, AddingToken.class);
                 if (token.isPresent() && token.get().isNested()) {
                     final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) token.get().getParent();
-                    final AModelElement<?> modelElement = (AModelElement<?>) parent.getLinkedElement();
+                    final AModelElement<?> modelElement = parent.getLinkedElement();
                     if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
                         newLineCommand = new CreateFreshKeywordCallCommand(parent);
                     } else if (modelElement.getModelType() == ModelType.TEST_CASE) {
-                        newLineCommand = new CreateCaseFreshKeywordCallCommand((RobotCase) parent);
+                        newLineCommand = new CreateFreshKeywordCallCommand(parent);
                     }
                 }
             }
