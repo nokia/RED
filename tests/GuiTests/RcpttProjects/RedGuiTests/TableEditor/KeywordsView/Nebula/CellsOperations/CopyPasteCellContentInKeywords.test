@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4TCM4GB-EeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/12/16 1:39 PM
+Save-Time: 9/5/16 2:36 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -130,7 +130,6 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    who    who    \n"
     + "    None Shall Pass    who\n"
     + "    [Return]    6\n"
-    + "        \n"
     + "kw3\n"
     + "    Call Method    object    method_name\n"
     + "Keyword\n"
