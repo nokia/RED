@@ -13,19 +13,20 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class SetCaseNameCommand extends EditorCommand {
 
     private final RobotCase testCase;
-    private final String newName;
 
-    public SetCaseNameCommand(final RobotCase testCase, final String newName) {
+    private final String name;
+
+    public SetCaseNameCommand(final RobotCase testCase, final String name) {
         this.testCase = testCase;
-        this.newName = newName;
+        this.name = name == null || name.isEmpty() ? "\\" : name;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (newName.equals(testCase.getName())) {
+        if (name.equals(testCase.getName())) {
             return;
         }
-        final RobotToken nameToken = RobotToken.create(newName);
+        final RobotToken nameToken = RobotToken.create(name);
         testCase.getLinkedElement().setTestName(nameToken);
 
         eventBroker.send(RobotModelEvents.ROBOT_CASE_NAME_CHANGE, testCase);

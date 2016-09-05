@@ -477,6 +477,16 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         }
     }
 
+    @Inject
+    @Optional
+    private void whenKeywordCallIsConverted(
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED) final RobotKeywordDefinition definition) {
+        if (definition.getSuiteFile() == fileModel) {
+            sortModel.clear();
+            tableInputIsReplaced().run();
+        }
+    }
+
     private Runnable tableInputIsReplaced() {
         return new Runnable() {
 

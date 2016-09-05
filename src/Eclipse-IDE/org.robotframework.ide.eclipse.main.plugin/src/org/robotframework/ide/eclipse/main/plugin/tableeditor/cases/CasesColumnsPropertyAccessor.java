@@ -12,11 +12,9 @@ import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallNameCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -60,8 +58,6 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
 
             if (columnIndex == 0) {
                 return robotCase.getName();
-            } else if (columnIndex == (numberOfColumns - 1)) {
-                return robotCase.getComment();
             }
         }
         return "";
@@ -69,22 +65,11 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
 
     @Override
     public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
-        final String value = newValue != null ? (String) newValue : "";
-
-        if (rowObject instanceof RobotCase) {
-            final RobotCase testCase = (RobotCase) rowObject;
-            if (columnIndex == 0) {
-                commandsStack.execute(new SetCaseNameCommand(testCase, value.isEmpty() ? "\\" : value));
-            }
-        } else if (rowObject instanceof RobotKeywordCall) {
-            final RobotKeywordCall call = (RobotKeywordCall) rowObject;
-
-            if (columnIndex == 0) {
-                commandsStack.execute(new SetCaseKeywordCallNameCommand(call, value));
-            } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                commandsStack.execute(new SetKeywordCallArgumentCommand(call, columnIndex - 1, value));
-            } else {
-                commandsStack.execute(new SetKeywordCallCommentCommand(call, value));
+        if (rowObject instanceof RobotElement) {
+            final List<? extends EditorCommand> commands = new CasesTableValuesChangingCommandsCollector()
+                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex, numberOfColumns);
+            for (final EditorCommand command : commands) {
+                commandsStack.execute(command);
             }
         }
     }
