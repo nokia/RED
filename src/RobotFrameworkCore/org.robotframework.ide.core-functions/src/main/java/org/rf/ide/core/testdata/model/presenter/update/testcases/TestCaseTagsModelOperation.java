@@ -41,8 +41,9 @@ public class TestCaseTagsModelOperation implements ITestCaseTableElementOperatio
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         testCase.addTag(0, (TestCaseTags) modelElement);
+        return modelElement;
     }
     
     @Override

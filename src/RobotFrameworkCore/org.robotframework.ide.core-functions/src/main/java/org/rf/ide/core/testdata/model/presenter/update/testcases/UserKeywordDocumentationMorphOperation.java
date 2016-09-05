@@ -16,7 +16,7 @@ public class UserKeywordDocumentationMorphOperation extends UserKeywordElementMo
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public TestDocumentation insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         final KeywordDocumentation kwDocumentation = (KeywordDocumentation) modelElement;
         
         final TestDocumentation caseDocumentation = testCase.newDocumentation();
@@ -26,5 +26,6 @@ public class UserKeywordDocumentationMorphOperation extends UserKeywordElementMo
         for (final RobotToken comment : kwDocumentation.getComment()) {
             caseDocumentation.addCommentPart(comment);
         }
+        return caseDocumentation;
     }
 }

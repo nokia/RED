@@ -41,8 +41,10 @@ public class KeywordArgumentsModelOperation implements IKeywordTableElementOpera
     }
 
     @Override
-    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+            final AModelElement<?> modelElement) {
         userKeyword.addArguments(0, (KeywordArguments) modelElement);
+        return modelElement;
     }
 
     @Override

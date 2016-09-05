@@ -16,7 +16,7 @@ public class UserKeywordTimeoutMorphOperation extends UserKeywordElementMorphOpe
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public TestCaseTimeout insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         final KeywordTimeout kwTimeout = (KeywordTimeout) modelElement;
         
         final TestCaseTimeout caseTimeout = testCase.newTimeout();
@@ -28,5 +28,6 @@ public class UserKeywordTimeoutMorphOperation extends UserKeywordElementMorphOpe
         for (final RobotToken comment : kwTimeout.getComment()) {
             caseTimeout.addCommentPart(comment);
         }
+        return caseTimeout;
     }
 }

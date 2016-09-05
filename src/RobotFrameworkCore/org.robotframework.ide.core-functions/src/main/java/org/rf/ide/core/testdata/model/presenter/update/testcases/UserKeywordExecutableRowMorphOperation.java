@@ -16,7 +16,8 @@ public class UserKeywordExecutableRowMorphOperation extends UserKeywordElementMo
 
     @SuppressWarnings("unchecked")
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public RobotExecutableRow<TestCase> insert(final TestCase testCase, final int index,
+            final AModelElement<?> modelElement) {
         final RobotExecutableRow<TestCase> executableRow = (RobotExecutableRow<TestCase>) modelElement;
         executableRow.setParent(testCase);
 
@@ -33,5 +34,7 @@ public class UserKeywordExecutableRowMorphOperation extends UserKeywordElementMo
         }
 
         testCase.addTestExecutionRow(executableRow, index);
+
+        return executableRow;
     }
 }

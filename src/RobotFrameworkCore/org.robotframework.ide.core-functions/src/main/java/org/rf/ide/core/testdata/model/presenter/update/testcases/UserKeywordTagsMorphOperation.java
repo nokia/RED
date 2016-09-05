@@ -16,7 +16,7 @@ public class UserKeywordTagsMorphOperation extends UserKeywordElementMorphOperat
     }
 
     @Override
-    public void insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
+    public TestCaseTags insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         final KeywordTags kwTags = (KeywordTags) modelElement;
         
         final TestCaseTags caseTags = testCase.newTags();
@@ -26,5 +26,6 @@ public class UserKeywordTagsMorphOperation extends UserKeywordElementMorphOperat
         for (final RobotToken comment : kwTags.getComment()) {
             caseTags.addCommentPart(comment);
         }
+        return caseTags;
     }
 }

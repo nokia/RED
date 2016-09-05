@@ -41,8 +41,10 @@ public class KeywordReturnModelOperation implements IKeywordTableElementOperatio
     }
 
     @Override
-    public void insert(final UserKeyword userKeyword, final int index, final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
+            final AModelElement<?> modelElement) {
         userKeyword.addReturn(0, (KeywordReturn) modelElement);
+        return modelElement;
     }
 
     @Override
