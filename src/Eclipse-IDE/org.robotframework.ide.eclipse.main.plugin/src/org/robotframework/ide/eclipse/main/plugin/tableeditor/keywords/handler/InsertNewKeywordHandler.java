@@ -15,7 +15,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.CreateFreshKeywordDefinitionCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -60,10 +59,10 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
             }
 
             if (definition != null) {
-                final RobotSuiteFileSection section = definition.getParent();
+                final RobotKeywordsSection section = definition.getParent();
                 if (section != null) {
                     final int index = section.getChildren().indexOf(definition);
-                    stack.execute(new CreateFreshKeywordDefinitionCommand((RobotKeywordsSection) section, index));
+                    stack.execute(new CreateFreshKeywordDefinitionCommand(section, index));
                 }
             } else {
                 final RobotKeywordsSection section = fileModel.findSection(RobotKeywordsSection.class).get();
