@@ -18,7 +18,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCom
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -122,18 +121,18 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
 
     private EditorCommand getCommandForKeywordCall(final RobotKeywordCall keywordCall, final String valueToPaste,
             final int selectedElementColumnIndex, final int tableColumnsCount) {
-        if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+        if (keywordCall.isExecutable()) {
             if (selectedElementColumnIndex == 0) {
                 return new SetKeywordCallNameCommand(keywordCall, valueToPaste);
             } else if (selectedElementColumnIndex > 0 && selectedElementColumnIndex < (tableColumnsCount - 1)) {
                 return new SetKeywordCallArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
-            } else if (selectedElementColumnIndex == (tableColumnsCount - 1)) {
+            } else if (selectedElementColumnIndex == tableColumnsCount - 1) {
                 return new SetKeywordCallCommentCommand(keywordCall, valueToPaste);
             }
         } else {
             if (selectedElementColumnIndex > 0 && selectedElementColumnIndex < (tableColumnsCount - 1)) {
-                return new SetKeywordSettingArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
-            } else if (selectedElementColumnIndex == (tableColumnsCount - 1)) {
+                return new SetKeywordCallArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
+            } else if (selectedElementColumnIndex == tableColumnsCount - 1) {
                 return new SetKeywordCallCommentCommand(keywordCall, valueToPaste);
             }
         }
