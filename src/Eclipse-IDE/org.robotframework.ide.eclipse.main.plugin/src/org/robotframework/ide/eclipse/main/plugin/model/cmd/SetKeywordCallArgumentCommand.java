@@ -24,6 +24,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     protected final RobotKeywordCall keywordCall;
     protected final int index;
     protected final String value;
+    protected String previousValue;
 
     public SetKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value) {
         this.keywordCall = keywordCall;
@@ -47,12 +48,24 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         }
     }
 
-    public static List<String> prepareArgumentsList(final RobotKeywordCall call, final String value, final int index) {
-        final List<String> arguments = call == null ? new ArrayList<String>() : newArrayList(call.getArguments());
+    private List<String> prepareArgumentsList(final RobotKeywordCall call, final String value, final int index) {
+        final List<String> arguments = createArgumentsList(call, index);
+        
+        previousValue = index >= 0 && index < arguments.size() ? arguments.get(index) : value;
 
+        fillArgumentsList(value, index, arguments);
+        return arguments;
+    }
+
+    public static List<String> createArgumentsList(final RobotKeywordCall call, final int index) {
+        final List<String> arguments = call == null ? new ArrayList<String>() : newArrayList(call.getArguments());
         for (int i = arguments.size(); i <= index; i++) {
             arguments.add("\\");
         }
+        return arguments;
+    }
+    
+    public static void fillArgumentsList(final String value, final int index, final List<String> arguments) {
         arguments.set(index, value == null || value.trim().isEmpty() ? "\\" : value);
         for (int i = arguments.size() - 1; i >= 0; i--) {
             if (!arguments.get(i).equals("\\")) {
@@ -60,7 +73,6 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
             }
             arguments.set(i, null);
         }
-        return arguments;
     }
 
     protected void updateModelElement(final List<String> arguments) {
@@ -75,5 +87,10 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         } else {
             updater.updateArgument(linkedElement, index, value);
         }
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetKeywordCallArgumentCommand(keywordCall, index, previousValue));
     }
 }

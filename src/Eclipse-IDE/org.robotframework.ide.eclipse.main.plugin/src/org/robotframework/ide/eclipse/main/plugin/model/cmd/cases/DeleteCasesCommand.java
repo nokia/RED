@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
@@ -16,6 +18,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class DeleteCasesCommand extends EditorCommand {
 
     private final List<RobotCase> casesToDelete;
+    
+    private List<Integer> deletedCasesIndexes = newArrayList();
 
     public DeleteCasesCommand(final List<RobotCase> casesToDelete) {
         this.casesToDelete = casesToDelete;
@@ -26,6 +30,10 @@ public class DeleteCasesCommand extends EditorCommand {
         if (casesToDelete.isEmpty()) {
             return;
         }
+        for (final RobotCase caseToDelete : casesToDelete) {
+            deletedCasesIndexes.add(caseToDelete.getIndex());
+        }
+        
         final RobotSuiteFileSection casesSection = casesToDelete.get(0).getParent();
         casesSection.getChildren().removeAll(casesToDelete);
         
@@ -35,5 +43,22 @@ public class DeleteCasesCommand extends EditorCommand {
         }
 
         eventBroker.send(RobotModelEvents.ROBOT_CASE_REMOVED, casesSection);
+    }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(setupUndoCommandsForDeletedCases());
+    }
+
+    private List<EditorCommand> setupUndoCommandsForDeletedCases() {
+        final List<EditorCommand> commands = newArrayList();
+        if (casesToDelete.size() == deletedCasesIndexes.size()) {
+            for (int i = 0; i < casesToDelete.size(); i++) {
+                final RobotCase robotCase = casesToDelete.get(i);
+                commands.add(new InsertCasesCommand(robotCase.getParent(), deletedCasesIndexes.get(i),
+                        new RobotCase[] { robotCase }));
+            }
+        }
+        return commands;
     }
 }

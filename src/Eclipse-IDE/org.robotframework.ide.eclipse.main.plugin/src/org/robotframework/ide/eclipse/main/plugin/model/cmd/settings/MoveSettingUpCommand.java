@@ -69,4 +69,9 @@ public class MoveSettingUpCommand extends EditorCommand {
         }
         return EnumSet.of(group);
     }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new MoveSettingDownCommand(setting));
+    }
 }

@@ -52,4 +52,9 @@ public class InsertCasesCommand extends EditorCommand {
             eventBroker.send(RobotModelEvents.ROBOT_CASE_ADDED, casesSection);
         }
     }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteCasesCommand(casesToInsert));
+    }
 }

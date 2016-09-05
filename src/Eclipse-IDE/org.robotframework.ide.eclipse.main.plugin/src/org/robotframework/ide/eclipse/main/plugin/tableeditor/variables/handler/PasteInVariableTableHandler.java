@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.handler
 
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -30,12 +29,10 @@ public class PasteInVariableTableHandler extends DIParameterizedHandler<E4PasteI
 
     public static class E4PasteInVariableTableHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
-        public void paste(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor, @Named(Selections.SELECTION) final IStructuredSelection selection,
-                final RedClipboard clipboard) {
+        public void paste(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard,
+                final RobotEditorCommandsStack commandsStack) {
 
             final List<RobotElement> selectedVariables = Selections.getElements(selection, RobotElement.class);
             final List<EditorCommand> pasteCommands = new PasteVariablesCellsCommandsCollector().collectPasteCommands(

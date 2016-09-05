@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -33,13 +32,10 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
 
     public static class E4InsertNewKeywordHandler {
 
-        @Inject
-        private RobotEditorCommandsStack stack;
-
         @Execute
         public void insertNewUserDefinedKeyword(
                 @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
-                @Named(Selections.SELECTION) final IStructuredSelection selection) {
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RobotEditorCommandsStack stack) {
 
             final Optional<RobotElement> selectedElement = Selections.getOptionalFirstElement(selection,
                     RobotElement.class);

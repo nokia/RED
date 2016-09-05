@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -35,27 +34,25 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
 
     public static class E4PasteKeywordsHandler {
 
-        @Inject
-        private RobotEditorCommandsStack commandsStack;
-
         @Execute
         public void pasteKeywords(@Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel,
-                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard) {
+                @Named(Selections.SELECTION) final IStructuredSelection selection, final RedClipboard clipboard,
+                final RobotEditorCommandsStack commandsStack) {
 
             final RobotKeywordDefinition[] keywordDefs = clipboard.getKeywordDefinitions();
             if (keywordDefs != null) {
-                insertDefinitions(fileModel, selection, keywordDefs);
+                insertDefinitions(fileModel, selection, keywordDefs, commandsStack);
                 return;
             }
 
             final RobotKeywordCall[] keywordCalls = clipboard.getKeywordCalls();
             if (keywordCalls != null) {
-                insertCalls(selection, keywordCalls);
+                insertCalls(selection, keywordCalls, commandsStack);
             }
         }
 
         private void insertDefinitions(final RobotSuiteFile fileModel, final IStructuredSelection selection,
-                final RobotKeywordDefinition[] definitions) {
+                final RobotKeywordDefinition[] definitions, final RobotEditorCommandsStack commandsStack) {
             final Optional<RobotKeywordDefinition> firstSelected = Selections.getOptionalFirstElement(selection,
                     RobotKeywordDefinition.class);
 
@@ -71,7 +68,8 @@ public class PasteKeywordsHandler extends DIParameterizedHandler<E4PasteKeywords
             }
         }
 
-        private void insertCalls(final IStructuredSelection selection, final RobotKeywordCall[] calls) {
+        private void insertCalls(final IStructuredSelection selection, final RobotKeywordCall[] calls,
+                final RobotEditorCommandsStack commandsStack) {
             final Optional<RobotKeywordCall> firstSelected = Selections.getOptionalFirstElement(selection,
                     RobotKeywordCall.class);
 

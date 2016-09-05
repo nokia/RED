@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
@@ -16,6 +18,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
     private final RobotKeywordCall keywordCall;
     private final String name;
+    private String previousName;
 
     public SetKeywordCallNameCommand(final RobotKeywordCall keywordCall, final String name) {
         this.keywordCall = keywordCall;
@@ -25,7 +28,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
     @Override
     public void execute() throws CommandExecutionException {
         // FIXME : look how settings uses this command
-        if (keywordCall.getName().equals(name)) {
+        previousName = keywordCall.getName();
+        if (previousName.equals(name)) {
             return;
         }
 
@@ -83,5 +87,10 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         linkedElement.getDeclaration().setText(name);
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_NAME_CHANGE, keywordCall);
+    }
+
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetKeywordCallNameCommand(keywordCall, previousName));
     }
 }
