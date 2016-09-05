@@ -74,7 +74,12 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         } else {
             getChildren().add(index, call);
         }
-        getModelUpdater().insert(getLinkedElement(), modelIndex, call.getLinkedElement());
+        final AModelElement<?> insertedElement = getModelUpdater().insert(getLinkedElement(), modelIndex,
+                call.getLinkedElement());
+        if (insertedElement != call.getLinkedElement()) {
+            call.setLinkedElement(insertedElement);
+            call.resetStored();
+        }
     }
 
     @Override
