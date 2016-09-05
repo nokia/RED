@@ -17,7 +17,7 @@ public class SetKeywordDefinitionNameCommand extends EditorCommand {
 
     public SetKeywordDefinitionNameCommand(final RobotKeywordDefinition definition, final String name) {
         this.definition = definition;
-        this.name = name;
+        this.name = name == null || name.isEmpty() ? "\\" : name;
     }
 
     @Override
@@ -25,9 +25,8 @@ public class SetKeywordDefinitionNameCommand extends EditorCommand {
         if (definition.getName().equals(name)) {
             return;
         }
-        
-        final RobotToken nameToken = new RobotToken();
-        nameToken.setText(name);
+
+        final RobotToken nameToken = RobotToken.create(name);
         definition.getLinkedElement().setKeywordName(nameToken);
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_NAME_CHANGE, definition);

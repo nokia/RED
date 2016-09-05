@@ -5,29 +5,17 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords;
 
-import static com.google.common.collect.Lists.newArrayList;
-
 import java.util.List;
 
 import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
-import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshCodeHolderSettingCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionNameCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 
 import com.google.common.collect.ImmutableBiMap;
@@ -82,8 +70,6 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
                         return arguments.get(columnIndex - 1);
                     }
                 }
-            } else if (columnIndex == (numberOfColumns - 1)) {
-                return keywordDef.getComment();
             }
         }
 
@@ -92,52 +78,13 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
     @Override
     public void setDataValue(final Object rowObject, final int columnIndex, final Object newValue) {
-
-        final String value = newValue != null ? (String) newValue : "";
-
-        if (rowObject instanceof RobotKeywordCall) {
-            final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
-
-            if (isCandidateForNewKeywordSetting(keywordCall, value, columnIndex)) {
-                final boolean isKeywordSettingCreated = createNewKeywordSettingAndRemoveOldExeRow(value, keywordCall);
-                if (isKeywordSettingCreated) {
-                    return;
-                }
-            }
-
-            final ModelType modelType = keywordCall.getLinkedElement().getModelType();
-            if (modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW || modelType == ModelType.UNKNOWN) {
-                if (columnIndex == 0) {
-                    commandsStack.execute(new SetKeywordCallNameCommand(keywordCall, value));
-                } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetKeywordCallArgumentCommand(keywordCall, columnIndex - 1, value));
-                } else if (columnIndex == (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
-                }
-            } else {
-                if (columnIndex == 0) {
-                    createNewElementAndRemoveOldSetting(value, keywordCall);
-                } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetKeywordCallArgumentCommand(keywordCall, columnIndex - 1, value));
-                } else if (columnIndex == (numberOfColumns - 1)) {
-                    commandsStack.execute(new SetKeywordCallCommentCommand(keywordCall, value));
-                }
-            }
-        } else if (rowObject instanceof RobotKeywordDefinition) {
-            final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
-            if (columnIndex == 0) {
-                commandsStack.execute(new SetKeywordDefinitionNameCommand(keywordDef, value.isEmpty() ? "\\" : value));
-            } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                commandsStack.execute(new SetKeywordDefinitionArgumentCommand(keywordDef, columnIndex - 1, value));
+        if (rowObject instanceof RobotElement) {
+            final List<? extends EditorCommand> commands = new KeywordsTableValuesChangingCommandsCollector()
+                    .collectForChange((RobotElement) rowObject, (String) newValue, columnIndex, numberOfColumns);
+            for (final EditorCommand command : commands) {
+                commandsStack.execute(command);
             }
         }
-
-    }
-
-    private boolean isCandidateForNewKeywordSetting(final RobotKeywordCall keywordCall, final String value,
-            final int columnIndex) {
-        return value.startsWith("[") && value.endsWith("]") && columnIndex == 0
-                && keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
     }
 
     @Override
@@ -158,42 +105,6 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
 
     public void setNumberOfColumns(final int numberOfColumns) {
         this.numberOfColumns = numberOfColumns;
-    }
-
-    @SuppressWarnings("unchecked")
-    private boolean createNewKeywordSettingAndRemoveOldExeRow(final String value, final RobotKeywordCall keywordCall) {
-        final RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(value);
-        if (tokenType != RobotTokenType.UNKNOWN && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS) {
-            final RobotKeywordDefinition keywordDefinition = (RobotKeywordDefinition) keywordCall.getParent();
-            keywordDefinition.getLinkedElement()
-                    .removeExecutableRow((RobotExecutableRow<UserKeyword>) keywordCall.getLinkedElement());
-
-            final List<RobotKeywordCall> children = keywordDefinition.getChildren();
-            final int index = children.indexOf(keywordCall);
-            children.remove(keywordCall);
-
-            commandsStack.execute(new CreateFreshCodeHolderSettingCommand(keywordDefinition, index, value,
-                    keywordCall.getArguments()));
-            return true;
-        }
-        return false;
-    }
-    
-    private void createNewElementAndRemoveOldSetting(final String value, final RobotKeywordCall keywordSetting) {
-        final RobotTokenType tokenType = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(value);
-        if (!value.isEmpty() && tokenType != RobotTokenType.KEYWORD_SETTING_ARGUMENTS) {
-            final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordSetting.getParent();
-            final int index = keywordSetting.getIndex();
-            commandsStack.execute(new DeleteKeywordCallCommand(newArrayList(keywordSetting)));
-
-            if (tokenType == RobotTokenType.UNKNOWN) {
-                commandsStack.execute(new CreateFreshKeywordCallCommand(parent, index, value,
-                        keywordSetting.getArguments(), keywordSetting.getComment()));
-            } else {
-                commandsStack.execute(
-                        new CreateFreshCodeHolderSettingCommand(parent, index, value, keywordSetting.getArguments()));
-            }
-        }
     }
 
     private String getDocumentationText(final RobotKeywordCall keywordCall) {
