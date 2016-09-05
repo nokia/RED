@@ -11,6 +11,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -58,7 +59,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
         } else if (setting == null) {
             // there is no setting, but we have arguments to set
-            setting = definition.createSetting(0, "[" + RobotKeywordDefinition.ARGUMENTS + "]",
+            setting = definition.createSetting(0, RobotTokenType.KEYWORD_SETTING_ARGUMENTS.getRepresentation().get(0),
                     new ArrayList<String>(), "");
             updateModel(setting, arguments);
 

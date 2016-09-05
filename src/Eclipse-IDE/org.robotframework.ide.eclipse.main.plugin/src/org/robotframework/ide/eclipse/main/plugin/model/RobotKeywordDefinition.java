@@ -13,9 +13,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.text.Position;
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
@@ -44,18 +42,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
 
     private static final long serialVersionUID = 1L;
 
-    public static final String ARGUMENTS = "Arguments";
-    public static final String DOCUMENTATION = "Documentation";
-    public static final String TAGS = "Tags";
-    public static final String TIMEOUT = "Timeout";
-    public static final String TEARDOWN = "Teardown";
-    public static final String RETURN = "Return";
-
-    private final UserKeyword keyword;
-    
     public RobotKeywordDefinition(final RobotKeywordsSection parent, final UserKeyword keyword) {
-        super(parent);
-        this.keyword = keyword;
+        super(parent, keyword);
     }
 
     @Override
@@ -64,89 +52,17 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     }
 
     @Override
-    public UserKeyword getLinkedElement() {
-        return keyword;
+    protected ModelType getExecutableRowModelType() {
+        return ModelType.USER_KEYWORD_EXECUTABLE_ROW;
     }
 
     @Override
-    public String getName() {
-        return keyword.getDeclaration().getText();
-    }
-
-    @Override
-    public RobotKeywordCall createKeywordCall(final int codeHoldingElementIndex, final String name,
-            final List<String> args, final String comment) {
-        final RobotExecutableRow<UserKeyword> robotExecutableRow = new RobotExecutableRow<>();
-        robotExecutableRow.setParent(getLinkedElement());
-        robotExecutableRow.setAction(RobotToken.create(name));
-        for (int i = 0; i < args.size(); i++) {
-            robotExecutableRow.setArgument(i, args.get(i));
-        }
-
-        final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
-
-        final int modelTableIndex = countRowsOfTypeUpTo(ModelType.USER_KEYWORD_EXECUTABLE_ROW, codeHoldingElementIndex);
-        if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
-            getLinkedElement().addKeywordExecutionRow(robotExecutableRow, modelTableIndex);
-        } else {
-            getLinkedElement().addKeywordExecutionRow(robotExecutableRow);
-        }
-
-        if (codeHoldingElementIndex >= 0 && codeHoldingElementIndex < getChildren().size()) {
-            getChildren().add(codeHoldingElementIndex, call);
-        } else {
-            getChildren().add(call);
-        }
-        return call;
-    }
-    
-    @Override
-    public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
-            final String comment) {
-        final AModelElement<?> newModelElement = new KeywordTableModelUpdater().createSetting(getLinkedElement(),
-                settingName, comment, args);
-        final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, newModelElement);
-
-        if (newModelElement != null) {
-            if (newModelElement.getModelType() == ModelType.USER_KEYWORD_SETTING_UNKNOWN) {
-                newModelElement.getDeclaration().setText(settingName);
-            }
-
-            getChildren().add(index, setting);
-        }
-        return setting;
-    }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    public void insertKeywordCall(final int codeHoldingElementIndex, final RobotKeywordCall keywordCall) {
-
-        RobotKeywordCall newCall = null;
-
-        if (keywordCall.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW
-                || keywordCall.getLinkedElement().getModelType() == ModelType.UNKNOWN) {    // unknown when copy/paste empty lines
-            newCall = new RobotKeywordCall(this, keywordCall.getLinkedElement());
-            final RobotExecutableRow<UserKeyword> robotExecutableRow = (RobotExecutableRow<UserKeyword>) keywordCall
-                    .getLinkedElement();
-            final int modelTableIndex = countRowsOfTypeUpTo(ModelType.USER_KEYWORD_EXECUTABLE_ROW, codeHoldingElementIndex);
-            if (modelTableIndex >= 0 && modelTableIndex < keyword.getKeywordExecutionRows().size()) {
-                keyword.addKeywordExecutionRow(robotExecutableRow, modelTableIndex);
-            } else {
-                keyword.addKeywordExecutionRow(robotExecutableRow);
-            }
-        } else {
-            newCall = new RobotDefinitionSetting(this, keywordCall.getLinkedElement());
-            new KeywordTableModelUpdater().insert(keyword, 0, keywordCall.getLinkedElement());
-        }
-
-        if (codeHoldingElementIndex >= 0 && codeHoldingElementIndex < getChildren().size()) {
-            getChildren().add(codeHoldingElementIndex, newCall);
-        } else {
-            getChildren().add(newCall);
-        }
+    public RobotTokenType getSettingDeclarationTokenTypeFor(final String name) {
+        return RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(name);
     }
 
     public void link() {
+        final UserKeyword keyword = getLinkedElement();
         // settings
         for (final KeywordArguments argument : keyword.getArguments()) {
             getChildren().add(new RobotDefinitionSetting(this, argument));
@@ -183,56 +99,12 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         return RedImages.getUserKeywordImage();
     }
 
-    public boolean hasArguments() {
-        return getArgumentsSetting() != null;
-    }
-
     public RobotDefinitionSetting getArgumentsSetting() {
-        return findSetting(ARGUMENTS);
-    }
-
-    public boolean hasReturnValue() {
-        return getReturnValueSetting() != null;
-    }
-
-    public RobotDefinitionSetting getReturnValueSetting() {
-        return findSetting(RETURN);
-    }
-
-    public boolean hasDocumentation() {
-        return getDocumentationSetting() != null;
-    }
-
-    public RobotDefinitionSetting getDocumentationSetting() {
-        return findSetting(DOCUMENTATION);
-    }
-
-    public boolean hasTags() {
-        return getTagsSetting() != null;
-    }
-
-    public RobotDefinitionSetting getTagsSetting() {
-        return findSetting(TAGS);
-    }
-
-    public boolean hasTeardownValue() {
-        return getTeardownSetting() != null;
-    }
-
-    public RobotDefinitionSetting getTeardownSetting() {
-        return findSetting(TEARDOWN);
-    }
-
-    public boolean hasTimeoutValue() {
-        return getTimeoutSetting() != null;
-    }
-
-    public RobotDefinitionSetting getTimeoutSetting() {
-        return findSetting(TIMEOUT);
+        return findSetting(ModelType.USER_KEYWORD_ARGUMENTS);
     }
 
     public String getDocumentation() {
-        final RobotDefinitionSetting documentationSetting = getDocumentationSetting();
+        final RobotDefinitionSetting documentationSetting = findSetting(ModelType.USER_KEYWORD_DOCUMENTATION);
         if (documentationSetting != null) {
             final KeywordDocumentation documentation = (KeywordDocumentation) documentationSetting.getLinkedElement();
             final StringBuilder docBuilder = new StringBuilder();
@@ -289,32 +161,11 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         return Pattern.compile("^\\*deprecated[^\\n\\r]*\\*.*").matcher(getDocumentation().toLowerCase()).find();
     }
 
-    @Override
-    public Position getPosition() {
-        final FilePosition begin = keyword.getBeginPosition();
-        final FilePosition end = keyword.getEndPosition();
-
-        if(begin.isNotSet() || end.isNotSet()) {
-            return new Position(0, 0);
-        }
-        
-        return new Position(begin.getOffset(), end.getOffset() - begin.getOffset());
-    }
-
-    @Override
-    public DefinitionPosition getDefinitionPosition() {
-        return new DefinitionPosition(keyword.getKeywordName().getFilePosition(),
-                keyword.getKeywordName().getText().length());
-    }
-
     public List<VariableDeclaration> getEmbeddedArguments() {
         final VariableExtractor extractor = new VariableExtractor();
-        final MappingResult extractedVars = extractor.extract(keyword.getKeywordName(), getSuiteFile().getName());
+        final MappingResult extractedVars = extractor.extract(getLinkedElement().getDeclaration(),
+                getSuiteFile().getName());
         return extractedVars.getCorrectVariables();
-    }
-
-    public boolean hasEmbeddedArguments() {
-        return !getEmbeddedArguments().isEmpty();
     }
 
     public KeywordSpecification createSpecification() {
@@ -353,7 +204,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         // after deserialization we fix parent relationship in direct children
         for (final RobotKeywordCall call : getChildren()) {
             call.setParent(this);
-            ((AModelElement<UserKeyword>) call.getLinkedElement()).setParent(keyword);
+            ((AModelElement<UserKeyword>) call.getLinkedElement()).setParent(getLinkedElement());
         }
         return this;
     }
