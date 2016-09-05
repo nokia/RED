@@ -10,8 +10,8 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -105,7 +105,7 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
         if (selectedElementColumnIndex == 0) {
             return new SetCaseKeywordCallNameCommand(keywordCall, valueToPaste);
         } else if (selectedElementColumnIndex > 0 && selectedElementColumnIndex < (tableColumnsCount - 1)) {
-            return new SetCaseKeywordCallArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
+            return new SetKeywordCallArgumentCommand(keywordCall, selectedElementColumnIndex - 1, valueToPaste);
         } else if (selectedElementColumnIndex == (tableColumnsCount - 1)) {
             return new SetKeywordCallCommentCommand(keywordCall, valueToPaste);
         }

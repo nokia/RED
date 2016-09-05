@@ -4,8 +4,8 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -30,7 +30,7 @@ public class DeleteInCasesTableHandler extends DIParameterizedHandler<E4DeleteIn
                         && keywordCall.getLinkedElement().getModelType() == ModelType.TEST_CASE_EXECUTABLE_ROW) {
                     return new SetCaseKeywordCallNameCommand(keywordCall, "");
                 } else if (columnIndex > 0 && columnIndex < tableColumnCount - 1) {
-                    return new SetCaseKeywordCallArgumentCommand(keywordCall, columnIndex - 1, null);
+                    return new SetKeywordCallArgumentCommand(keywordCall, columnIndex - 1, null);
                 } else if (columnIndex == tableColumnCount - 1) {
                     return new SetKeywordCallCommentCommand(keywordCall, null);
                 }
