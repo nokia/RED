@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-SZoMF_XEeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/2/16 3:27 PM
+Save-Time: 9/5/16 2:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -118,6 +118,7 @@ with [get-editor "settings.robot"] {
     get-section General | click
     get-section Metadata | click
 }
+wait 1000
 get-view Outline | get-tree | select "settings.robot/Settings/Metadata/new" | click
 wait 300
 with [get-editor "settings.robot"] {
