@@ -26,9 +26,13 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
 
     private final List<ISectionElementDumper> dumpers;
 
-    public ANotExecutableTableDumper(final DumperHelper aDumpHelper, final List<ISectionElementDumper> dumpers) {
+    private final boolean shouldDumpHashCommentAfterHeader;
+
+    public ANotExecutableTableDumper(final DumperHelper aDumpHelper, final List<ISectionElementDumper> dumpers,
+            final boolean shouldDumpHashCommentAfterHeader) {
         this.aDumpHelper = aDumpHelper;
         this.dumpers = dumpers;
+        this.shouldDumpHashCommentAfterHeader = shouldDumpHashCommentAfterHeader;
     }
 
     protected DumperHelper getDumperHelper() {
@@ -46,7 +50,9 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
             final List<RobotLine> lines) {
         getDumperHelper().getHeaderDumpHelper().dumpHeader(model, th, lines);
 
-        getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
+        if (this.shouldDumpHashCommentAfterHeader) {
+            getDumperHelper().getHashCommentDumper().dumpHashCommentsIfTheyExists(th, null, model, lines);
+        }
 
         getEmptyDumperHelper().dumpEmptyLines(model, lines, (AModelElement<ARobotSectionTable>) th, sorted.isEmpty());
 

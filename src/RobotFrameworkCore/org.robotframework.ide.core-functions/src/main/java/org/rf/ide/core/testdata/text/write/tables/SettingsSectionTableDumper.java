@@ -33,7 +33,7 @@ public class SettingsSectionTableDumper extends ANotExecutableTableDumper {
     private final static ModelType MY_TYPE = ModelType.SETTINGS_TABLE_HEADER;
 
     public SettingsSectionTableDumper(final DumperHelper aDumpHelper) {
-        super(aDumpHelper, getDumpers(aDumpHelper));
+        super(aDumpHelper, getDumpers(aDumpHelper), true);
     }
 
     private static List<ISectionElementDumper> getDumpers(final DumperHelper aDumpHelper) {
