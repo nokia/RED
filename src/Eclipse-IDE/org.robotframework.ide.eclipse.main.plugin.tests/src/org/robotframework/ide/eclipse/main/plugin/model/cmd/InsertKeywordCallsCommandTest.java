@@ -5,12 +5,15 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCallConditions.properlySetParent;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -46,6 +49,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 
 public class InsertKeywordCallsCommandTest {
@@ -75,8 +79,10 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(2).getArguments()).containsExactly("arg1", "arg2");
         assertThat(testCase.getChildren().get(2).getComment()).isEqualTo("#comment");
         assertThat(testCase.getChildren().get(2)).has(properlySetParent());
-        
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, testCase);
+
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
+                        Arrays.asList(callsToInsert))));
     }
 
     @Test
@@ -106,7 +112,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(1).getComment()).isEqualTo("#comment");
         assertThat(testCase.getChildren().get(1)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, testCase);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
+                        Arrays.asList(callsToInsert))));
     }
 
     @Test
@@ -128,13 +136,16 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(0).getComment()).isEqualTo("#comment");
         assertThat(testCase.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, testCase);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
+                        Arrays.asList(callsToInsert))));
     }
 
     @Test
     public void keywordExecutableRowIsProperlyInsertedIntoKeyword() {
         final RobotKeywordDefinition keyword = createKeywordForInsertions();
-        final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createKeywordExecutableRow("call") };
+        final RobotKeywordCall executableRow = createKeywordExecutableRow("call");
+        final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { executableRow };
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -150,7 +161,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(2).getComment()).isEqualTo("#comment");
         assertThat(keyword.getChildren().get(2)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, keyword);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
+                        newArrayList(executableRow))));
     }
 
     @Test
@@ -180,13 +193,16 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(1).getComment()).isEqualTo("#comment");
         assertThat(keyword.getChildren().get(1)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, keyword);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
+                        Arrays.asList(callsToInsert))));
     }
 
     @Test
     public void testCaseExecutableRowIsProperlyInsertedIntoKeyword() {
         final RobotKeywordDefinition keyword = createKeywordForInsertions();
-        final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createKeywordExecutableRow("call") };
+        final RobotKeywordCall executableRow = createKeywordExecutableRow("call");
+        final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { executableRow };
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
@@ -202,7 +218,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(0).getComment()).isEqualTo("#comment");
         assertThat(keyword.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, keyword);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
+                        newArrayList(executableRow))));
     }
 
     @Test
@@ -335,7 +353,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(0).getComment()).isEqualTo(expectedComment);
         assertThat(testCase.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, testCase);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
+                        newArrayList(setting))));
     }
 
     private void testCaseSettingIsProperlyInsertedIntoKeyword(final RobotDefinitionSetting setting,
@@ -357,7 +377,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(0).getComment()).isEqualTo(expectedComment);
         assertThat(keyword.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, keyword);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
+                        newArrayList(setting))));
     }
 
     // TODO : write tests here
@@ -482,7 +504,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(0).getComment()).isEqualTo(expectedComment);
         assertThat(keyword.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, keyword);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
+                        newArrayList(setting))));
     }
 
     private void keywordSettingIsProperlyInsertedIntoTestCase(final RobotDefinitionSetting setting,
@@ -504,7 +528,9 @@ public class InsertKeywordCallsCommandTest {
         assertThat(testCase.getChildren().get(0).getComment()).isEqualTo(expectedComment);
         assertThat(testCase.getChildren().get(0)).has(properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, testCase);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
+                        newArrayList(setting))));
     }
     
     private static RobotCase createTestCaseForInsertions() {
