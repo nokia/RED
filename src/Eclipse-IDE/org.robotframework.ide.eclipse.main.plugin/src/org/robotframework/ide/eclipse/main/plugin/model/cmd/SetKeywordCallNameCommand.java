@@ -107,6 +107,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetKeywordCallNameCommand(keywordCall, oldName));
+        return newUndoCommands(keywordCall.isExecutable() && !looksLikeSetting()
+                ? new SetKeywordCallNameCommand(keywordCall, oldName) : new EmptyCommand());
     }
 }
