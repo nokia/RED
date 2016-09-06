@@ -28,6 +28,11 @@ public class ListVariable extends AVariable {
         items.add(item);
     }
 
+    public void addNewItem(final int position, final RobotToken item) {
+        fixForTheType(item, RobotTokenType.VARIABLES_VARIABLE_VALUE);
+        items.add(position, item);
+    }
+
     public void addItem(final RobotToken item, final int position) {
         updateOrCreateTokenInside(items, position, item, RobotTokenType.VARIABLES_VARIABLE_VALUE);
     }
