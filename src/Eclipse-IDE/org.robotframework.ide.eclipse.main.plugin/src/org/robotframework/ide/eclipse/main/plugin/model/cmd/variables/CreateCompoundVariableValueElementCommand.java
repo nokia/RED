@@ -5,7 +5,12 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
@@ -25,10 +30,21 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
     private final RobotVariable variable;
 
     private final String newElementContent;
+    
+    private final int index;
+    
+    private RobotToken newToken;
+    
+    private DictionaryKeyValuePair newKeyValuePair;
 
     public CreateCompoundVariableValueElementCommand(final RobotVariable variable, final String newElementContent) {
+        this(variable, newElementContent, -1);
+    }
+    
+    public CreateCompoundVariableValueElementCommand(final RobotVariable variable, final String newElementContent, final int index) {
         this.variable = variable;
         this.newElementContent = newElementContent;
+        this.index = index;
     }
 
     @Override
@@ -36,20 +52,23 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
 
         if (variable.getType() == VariableType.SCALAR_AS_LIST) {
             final ScalarVariable var = (ScalarVariable) variable.getLinkedElement();
-            var.addValue(RobotToken.create(newElementContent));
+            newToken = RobotToken.create(newElementContent);
+            var.addNewValue(index < 0 ? var.getValues().size() : index, newToken);
 
         } else if (variable.getType() == VariableType.LIST) {
             final ListVariable var = (ListVariable) variable.getLinkedElement();
-            var.addItem(RobotToken.create(newElementContent));
+            newToken = RobotToken.create(newElementContent);
+            var.addNewItem(index < 0 ? var.getItems().size() : index, newToken);
 
         } else if (variable.getType() == VariableType.INVALID) {
             final UnknownVariable var = (UnknownVariable) variable.getLinkedElement();
-            var.addItem(RobotToken.create(newElementContent));
+            newToken = RobotToken.create(newElementContent);
+            var.addNewItem(index < 0 ? var.getItems().size() : index, newToken);
 
         } else if (variable.getType() == VariableType.DICTIONARY) {
             final DictionaryVariable var = (DictionaryVariable) variable.getLinkedElement();
-            final DictionaryKeyValuePair keyValuePair = DictionaryKeyValuePair.createFromRaw(newElementContent);
-            var.put(keyValuePair.getRaw(), keyValuePair.getKey(), keyValuePair.getValue());
+            newKeyValuePair = DictionaryKeyValuePair.createFromRaw(newElementContent);
+            var.addKeyValuePair(index < 0 ? var.getItems().size() : index, newKeyValuePair);
 
         } else {
             throw new CommandExecutionException("Variables of type " + variable.getType()
@@ -57,5 +76,15 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
         }
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
     }
-
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        EditorCommand command = null;
+        if (variable.getType() == VariableType.DICTIONARY) {
+            command = new RemoveDictVariableValueElementsCommand(variable, newArrayList(newKeyValuePair));
+        } else {
+            command = new RemoveListVariableValueElementsCommand(variable, newArrayList(newToken));
+        }
+        return newUndoCommands(command);
+    }
 }

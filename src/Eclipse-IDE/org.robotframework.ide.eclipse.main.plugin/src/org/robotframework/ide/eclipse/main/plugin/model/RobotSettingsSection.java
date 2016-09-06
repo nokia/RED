@@ -121,7 +121,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             final int allSettingsElementsIndex) {
 
         int tableIndex = -1;
-        if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex <= elements.size()) {
+        if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex < elements.size()) {
             RobotFileInternalElement currentElement = elements.get(allSettingsElementsIndex);
             if (currentElement.getName().equals(SettingsGroup.METADATA.getName())) {
                 tableIndex = getMetadataSettings().indexOf(currentElement);

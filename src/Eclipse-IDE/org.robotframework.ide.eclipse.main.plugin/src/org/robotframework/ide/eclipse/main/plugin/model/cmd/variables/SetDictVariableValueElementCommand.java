@@ -28,6 +28,7 @@ public class SetDictVariableValueElementCommand extends EditorCommand {
 
     private final String newValue;
 
+    private String previousValue;
 
     public SetDictVariableValueElementCommand(final RobotVariable variable,
             final DictionaryKeyValuePair oldElement, final String newValue) {
@@ -42,8 +43,10 @@ public class SetDictVariableValueElementCommand extends EditorCommand {
         final String key = splittedContent.get(0);
         final String value = Joiner.on('=').join(splittedContent.subList(1, splittedContent.size()));
 
+        previousValue = oldElement.getRaw().getText();
+        
         boolean thereIsAChange = false;
-        if (!oldElement.getRaw().getText().equals(newValue)) {
+        if (!previousValue.equals(newValue)) {
             oldElement.setRaw(RobotToken.create(newValue));
 
             thereIsAChange = true;
@@ -62,5 +65,10 @@ public class SetDictVariableValueElementCommand extends EditorCommand {
         if (thereIsAChange) {
             eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
         }
+    }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetDictVariableValueElementCommand(variable, oldElement, previousValue));
     }
 }
