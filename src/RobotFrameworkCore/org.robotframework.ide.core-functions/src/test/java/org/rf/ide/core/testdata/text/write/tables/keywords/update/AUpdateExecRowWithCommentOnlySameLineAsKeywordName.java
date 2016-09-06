@@ -125,6 +125,29 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign"), modelFile);
     }
 
+    @Test
+    public void givenKeywordTableAndThenThreeEmptyLines_then_updateTheFirstExecLineWithPrettyAlignBeforeTheFirstActionVariable_then_updateArgumentOfKeyword_usingModelUpdater()
+            throws Exception {
+        // prepare
+        final String filePath = convert("InKeywordsWithPrettyAlignWithThreeEmptyLinesBefore");
+        final Path inputFile = DumperTestHelper.getINSTANCE().getFile(filePath);
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+
+        // test prepare
+        KeywordTable table = modelFile.getKeywordTable();
+        List<UserKeyword> keywords = table.getKeywords();
+        UserKeyword userKeyword = keywords.get(0);
+
+        KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
+
+        final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getKeywordExecutionRows().get(0);
+        execOneRow.getAction().setText("${c} =");
+        execKeyUpdater.update(execOneRow, 1, "d_new");
+
+        // execute & verify
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign"), modelFile);
+    }
+
     public String convert(final String fileName) {
         return PRETTY_NEW_DIR_LOCATION + fileName + "." + getExtension();
     }
