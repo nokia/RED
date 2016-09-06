@@ -1,6 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,6 +22,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+
+import com.google.common.collect.ImmutableMap;
 
 @RunWith(Theories.class)
 public class CreateFreshKeywordCallCommandTest {
@@ -51,7 +54,8 @@ public class CreateFreshKeywordCallCommandTest {
         assertThat(addedCall.getChildren()).isEmpty();
         assertThat(addedCall).has(RobotKeywordCallConditions.properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, codeHolder);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .<String, Object> of(IEventBroker.DATA, codeHolder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
     }
 
     @Theory
@@ -71,7 +75,8 @@ public class CreateFreshKeywordCallCommandTest {
         assertThat(addedCall.getArguments()).isEmpty();
         assertThat(addedCall).has(RobotKeywordCallConditions.properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, codeHolder);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
+                .<String, Object> of(IEventBroker.DATA, codeHolder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
     }
 
     private static RobotCase createTestCase() {
