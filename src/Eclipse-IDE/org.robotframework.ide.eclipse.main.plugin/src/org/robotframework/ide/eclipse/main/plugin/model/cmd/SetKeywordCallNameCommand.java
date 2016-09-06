@@ -66,10 +66,11 @@ public class SetKeywordCallNameCommand extends EditorCommand {
     private void changeToSetting(final RobotKeywordCall call, final String settingName) {
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) call.getParent();
 
+        final int lastSettingIndex = calculateIndexOfLastSetting(parent);
+
         final int index = call.getIndex();
         parent.removeChild(call);
 
-        final int lastSettingIndex = calculateIndexOfLastSetting(parent);
         parent.createSetting(Math.min(index, lastSettingIndex), settingName, call.getArguments(), call.getComment());
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
@@ -78,11 +79,12 @@ public class SetKeywordCallNameCommand extends EditorCommand {
     private void changeToCall(final RobotKeywordCall call, final String name) {
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) call.getParent();
 
+        final int lastSettingIndex = calculateIndexOfLastSetting(parent);
+
         final int index = call.getIndex();
         parent.removeChild(call);
 
-        final int lastSettingIndex = calculateIndexOfLastSetting(parent);
-        parent.createKeywordCall(Math.max(index, lastSettingIndex + 1), name, call.getArguments(), call.getComment());
+        parent.createKeywordCall(Math.max(index, lastSettingIndex), name, call.getArguments(), call.getComment());
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
     }
