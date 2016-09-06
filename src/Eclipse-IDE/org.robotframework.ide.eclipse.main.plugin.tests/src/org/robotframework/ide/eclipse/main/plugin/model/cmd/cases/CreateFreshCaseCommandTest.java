@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,6 +20,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCaseConditions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+
+import com.google.common.collect.ImmutableMap;
 
 public class CreateFreshCaseCommandTest {
 
@@ -39,7 +42,8 @@ public class CreateFreshCaseCommandTest {
         assertThat(addedCase.getChildren()).isEmpty();
         assertThat(addedCase).has(RobotCaseConditions.properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_ADDED, section);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
+                .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedCase)));
     }
 
     @Test
@@ -59,7 +63,8 @@ public class CreateFreshCaseCommandTest {
         assertThat(addedCase.getChildren()).isEmpty();
         assertThat(addedCase).has(RobotCaseConditions.properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_ADDED, section);
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
+                .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedCase)));
     }
 
     private static RobotCasesSection createTestCasesSection() {
