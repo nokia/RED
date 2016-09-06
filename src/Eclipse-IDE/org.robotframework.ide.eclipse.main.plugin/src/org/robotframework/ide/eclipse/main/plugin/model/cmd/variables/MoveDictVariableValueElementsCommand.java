@@ -37,7 +37,7 @@ public class MoveDictVariableValueElementsCommand extends EditorCommand {
     }
 
     @Override
-    protected void execute() throws CommandExecutionException {
+    public void execute() throws CommandExecutionException {
         if (variable.getType() != VariableType.DICTIONARY) {
             throw new CommandExecutionException("Variables of type " + variable.getType()
                     + " cannot have their value elements moved with this command");

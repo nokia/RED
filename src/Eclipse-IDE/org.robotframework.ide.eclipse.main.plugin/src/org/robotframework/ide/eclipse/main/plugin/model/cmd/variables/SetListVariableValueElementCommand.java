@@ -34,7 +34,7 @@ public class SetListVariableValueElementCommand extends EditorCommand {
     }
 
     @Override
-    protected void execute() throws CommandExecutionException {
+    public void execute() throws CommandExecutionException {
         previousValue = oldElement.getText();
         if (previousValue.equals(newValue)) {
             return;

@@ -37,7 +37,7 @@ public class RemoveDictVariableValueElementsCommand extends EditorCommand {
     }
 
     @Override
-    protected void execute() throws CommandExecutionException {
+    public void execute() throws CommandExecutionException {
         if (variable.getType() != VariableType.DICTIONARY) {
             throw new CommandExecutionException("Variables of type " + variable.getType()
                     + " cannot have value elements removed with this command");
