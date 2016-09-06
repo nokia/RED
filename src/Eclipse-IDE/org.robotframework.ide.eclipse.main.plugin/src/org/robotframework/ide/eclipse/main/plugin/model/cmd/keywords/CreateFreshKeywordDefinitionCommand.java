@@ -14,29 +14,22 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.NamesGenerator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
 
     private static final String DEFAULT_NAME = "Keyword";
     private final RobotKeywordsSection keywordsSection;
     private final int index;
-    private final boolean notifySync;
     private RobotKeywordDefinition newKeywordDefinition;
 
-    public CreateFreshKeywordDefinitionCommand(final RobotKeywordsSection keywordsSection,
-            final boolean notifySynchronously) {
-        this(keywordsSection, -1, notifySynchronously);
+    public CreateFreshKeywordDefinitionCommand(final RobotKeywordsSection keywordsSection) {
+        this(keywordsSection, -1);
     }
 
     public CreateFreshKeywordDefinitionCommand(final RobotKeywordsSection keywordsSection, final int index) {
-        this(keywordsSection, index, false);
-    }
-
-    private CreateFreshKeywordDefinitionCommand(final RobotKeywordsSection keywordsSection, final int index,
-            final boolean notifySynchronously) {
         this.keywordsSection = keywordsSection;
         this.index = index;
-        this.notifySync = notifySynchronously;
     }
 
     @Override
@@ -45,11 +38,10 @@ public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
 
         newKeywordDefinition = keywordsSection.createKeywordDefinition(index, name);
 
-        if (notifySync) {
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);
-        } else {
-            eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);
-        }
+        RedEventBroker.using(eventBroker)
+                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
+                .to(newKeywordDefinition)
+                .send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);
     }
 
     @Override

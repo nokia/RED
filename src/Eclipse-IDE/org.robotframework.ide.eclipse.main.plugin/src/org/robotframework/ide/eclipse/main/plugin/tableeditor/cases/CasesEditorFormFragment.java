@@ -48,6 +48,7 @@ import org.eclipse.nebula.widgets.nattable.viewport.ViewportLayer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
+import org.osgi.service.event.Event;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -94,6 +95,7 @@ import org.robotframework.red.nattable.configs.TableMenuConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.services.event.Events;
 
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
@@ -365,10 +367,14 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenCaseIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_CASE_ADDED) final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
+    private void whenCaseIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_CASE_ADDED) final Event event) {
+        final RobotCasesSection section = Events.get(event, IEventBroker.DATA, RobotCasesSection.class);
+        final RobotCase testCase = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, RobotCase.class);
+        
+        if (section != null && section.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+
+            selectionLayerAccessor.selectElementAfter(testCase, tableInputIsReplaced());
         }
     }
 
