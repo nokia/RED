@@ -30,6 +30,11 @@ public class DictionaryVariable extends AVariable {
         super(VariableType.DICTIONARY, name, declaration, scope);
     }
 
+    public void put(final DictionaryKeyValuePair pair) {
+        pair.fixTypes();
+        items.add(pair);
+    }
+
     public void put(final RobotToken raw, final RobotToken key, final RobotToken value) {
         fixForTheType(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE);
         fixForTheType(key, RobotTokenType.VARIABLES_DICTIONARY_KEY);
@@ -140,6 +145,12 @@ public class DictionaryVariable extends AVariable {
             }
 
             fixForTheType(token, expectedMainType);
+        }
+
+        protected void fixTypes() {
+            fixForTheType(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE);
+            fixForTheType(key, RobotTokenType.VARIABLES_DICTIONARY_KEY);
+            fixForTheType(value, RobotTokenType.VARIABLES_DICTIONARY_VALUE);
         }
     }
 
