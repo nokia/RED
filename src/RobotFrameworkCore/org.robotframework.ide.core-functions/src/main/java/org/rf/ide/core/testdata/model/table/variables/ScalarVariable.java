@@ -28,6 +28,11 @@ public class ScalarVariable extends AVariable {
         values.add(value);
     }
 
+    public void addNewValue(final int position, final RobotToken value) {
+        fixForTheType(value, RobotTokenType.VARIABLES_VARIABLE_VALUE);
+        values.add(position, value);
+    }
+
     public void addValue(final RobotToken value, final int position) {
         updateOrCreateTokenInside(values, position, value, RobotTokenType.VARIABLES_VARIABLE_VALUE);
     }
