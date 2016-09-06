@@ -5,7 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler;
 
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -31,11 +30,8 @@ public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLine
 
     public static class E4InsertNewLineHandler {
 
-        @Inject
-        private RobotEditorCommandsStack stack;
-
         @Execute
-        public void addNewLine(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void addNewLine(@Named(Selections.SELECTION) final IStructuredSelection selection, final RobotEditorCommandsStack stack) {
 
             final Optional<RobotElement> selectedElement = Selections.getOptionalFirstElement(selection,
                     RobotElement.class);
