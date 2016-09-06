@@ -13,6 +13,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class InsertKeywordCallsCommand extends EditorCommand {
 
@@ -44,7 +45,10 @@ public class InsertKeywordCallsCommand extends EditorCommand {
             parentElement.insertKeywordCall(index + shift, call);
             shift++;
         }
-        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
+
+        RedEventBroker.using(eventBroker)
+            .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(callsToInsert)
+            .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
     
     @Override

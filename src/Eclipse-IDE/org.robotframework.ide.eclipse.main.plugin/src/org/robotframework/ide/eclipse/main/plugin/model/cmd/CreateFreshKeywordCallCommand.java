@@ -14,6 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class CreateFreshKeywordCallCommand extends EditorCommand {
 
@@ -50,7 +51,9 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
         newKeywordCall = parent.createKeywordCall(index, name, args, comment);
 
-        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
+        RedEventBroker.using(eventBroker)
+            .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newKeywordCall)
+            .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
     
     @Override
