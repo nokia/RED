@@ -161,6 +161,9 @@ public abstract class AExecutableTableElementDumper implements IExecutableSectio
                             if (lastElement.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)) {
                                 wasPrettyAlign = (lastElement.getStartOffset()
                                         + lastElement.getText().length()) == lastToken.getStartOffset();
+                                if (!wasPrettyAlign && lastElement.getLineNumber() != lastToken.getLineNumber()) {
+                                    wasPrettyAlign = true;
+                                }
                             }
                         }
                     } else {
