@@ -5,7 +5,11 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import static com.google.common.base.Predicates.notNull;
+import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +28,6 @@ import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
-import com.google.common.primitives.Ints;
 
 /**
  * @author Michal Anglart
@@ -142,7 +145,6 @@ public class SelectionLayerAccessor {
 
     public void selectElementAfter(final Object elementToSelect, final Runnable operation) {
         operation.run();
-        final List<Integer> selectedColumns = Ints.asList(selectionLayer.getSelectedColumnPositions());
         SwtThread.asyncExec(new Runnable() {
 
             @Override
@@ -155,10 +157,7 @@ public class SelectionLayerAccessor {
 
                             @Override
                             public PositionCoordinate apply(final PositionCoordinate coordinate) {
-                                if (selectedColumns.contains(coordinate.getColumnPosition())) {
-                                    return coordinate;
-                                }
-                                return null;
+                                return new PositionCoordinate(selectionLayer, 0, coordinate.getRowPosition());
                             }
                         });
             }
@@ -166,13 +165,13 @@ public class SelectionLayerAccessor {
     }
 
     private void reestablishSelection(final SelectionLayer layer, final PositionCoordinate[] positions,
-            final Function<PositionCoordinate, PositionCoordinate> transform) {
+            final Function<PositionCoordinate, PositionCoordinate> mapping) {
         layer.clear();
 
-        boolean shouldAdd = false;
-
-        final List<PositionCoordinate> coordinates = newArrayList(positions);
-        Collections.sort(coordinates, new Comparator<PositionCoordinate>() {
+        // transform, remove nulls, remove duplicates, sort
+        final List<PositionCoordinate> transformedCoordinates = newArrayList(
+                newHashSet(filter(transform(newArrayList(positions), mapping), notNull())));
+        Collections.sort(transformedCoordinates, new Comparator<PositionCoordinate>() {
 
             @Override
             public int compare(final PositionCoordinate o1, final PositionCoordinate o2) {
@@ -180,14 +179,11 @@ public class SelectionLayerAccessor {
             }
         });
 
-        for (final PositionCoordinate coordinate : coordinates) {
-            final PositionCoordinate transformedCoordinate = transform.apply(coordinate);
-            if (transformedCoordinate != null) {
-                layer.doCommand(new SelectCellCommand(selectionLayer, transformedCoordinate.getColumnPosition(),
-                        transformedCoordinate.getRowPosition(), false, shouldAdd));
-
-                shouldAdd = true;
-            }
+        boolean shouldAdd = false;
+        for (final PositionCoordinate coordinate : transformedCoordinates) {
+            layer.doCommand(new SelectCellCommand(selectionLayer, coordinate.getColumnPosition(),
+                    coordinate.getRowPosition(), false, shouldAdd));
+            shouldAdd = true;
         }
     }
 }

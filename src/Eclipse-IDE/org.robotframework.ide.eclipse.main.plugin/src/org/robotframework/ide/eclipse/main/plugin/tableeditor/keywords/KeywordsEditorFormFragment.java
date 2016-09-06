@@ -420,18 +420,23 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     private void whenKeywordCallIsAdded(
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final Event event) {
         final RobotKeywordDefinition def = Events.get(event, IEventBroker.DATA, RobotKeywordDefinition.class);
-        final RobotDefinitionSetting setting = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
-                RobotDefinitionSetting.class);
+        final RobotKeywordCall keywordCall = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
+                RobotKeywordCall.class);
 
         if (def != null && def.getSuiteFile() == fileModel) {
-            if (setting != null && setting.isArguments()) {
+            if (keywordCall instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) keywordCall).isArguments()) {
                 // when arguments were added, we don't need to reload the input for data provider;
                 // this also does not influence selections
                 table.refresh();
                 setDirty();
+            } else if (keywordCall != null) {
+                sortModel.clear();
+                selectionLayerAccessor.selectElementAfter(keywordCall, tableInputIsReplaced());
             } else {
                 sortModel.clear();
-                selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+                @SuppressWarnings("unchecked")
+                final List<RobotKeywordCall> calls = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, List.class);
+                selectionLayerAccessor.selectElementAfter(calls.get(calls.size() - 1), tableInputIsReplaced());
             }
         }
     }
