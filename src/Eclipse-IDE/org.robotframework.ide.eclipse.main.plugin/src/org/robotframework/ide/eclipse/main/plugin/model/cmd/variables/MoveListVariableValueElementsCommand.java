@@ -39,7 +39,7 @@ public class MoveListVariableValueElementsCommand extends EditorCommand {
     }
 
     @Override
-    protected void execute() throws CommandExecutionException {
+    public void execute() throws CommandExecutionException {
         final List<RobotToken> elements = direction == MoveDirection.UP ? elementsToMove
                 : Lists.reverse(elementsToMove);
 

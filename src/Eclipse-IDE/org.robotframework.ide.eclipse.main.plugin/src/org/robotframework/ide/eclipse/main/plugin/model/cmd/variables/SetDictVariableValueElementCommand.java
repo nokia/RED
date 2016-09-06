@@ -38,7 +38,7 @@ public class SetDictVariableValueElementCommand extends EditorCommand {
     }
 
     @Override
-    protected void execute() throws CommandExecutionException {
+    public void execute() throws CommandExecutionException {
         final List<String> splittedContent = Splitter.on('=').splitToList(newValue);
         final String key = splittedContent.get(0);
         final String value = Joiner.on('=').join(splittedContent.subList(1, splittedContent.size()));
