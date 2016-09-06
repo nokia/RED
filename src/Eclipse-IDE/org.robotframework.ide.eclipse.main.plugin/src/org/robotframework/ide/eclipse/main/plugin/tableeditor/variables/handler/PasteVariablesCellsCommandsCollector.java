@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.presenter.update.variables.VariablesValueC
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetDictItemsCommand;
@@ -52,10 +53,10 @@ public class PasteVariablesCellsCommandsCollector extends PasteRobotElementCells
                 return newArrayList(variableFromClipboard.getValue());
             } else if (variableFromClipboard.getType() == VariableType.LIST) {
                 final ListVariable listVariable = (ListVariable) variableFromClipboard.getLinkedElement();
-                return VariablesValueConverter.convert(listVariable.getItems(), String.class);
+                return extractVariableValues(listVariable.getItems());
             } else if (variableFromClipboard.getType() == VariableType.DICTIONARY) {
                 final DictionaryVariable dictVariable = (DictionaryVariable) variableFromClipboard.getLinkedElement();
-                return VariablesValueConverter.convert(dictVariable.getItems(), String.class);
+                return extractVariableValues(dictVariable.getItems());
             }
         } else {
             return newArrayList(variableFromClipboard.getComment());
@@ -86,5 +87,13 @@ public class PasteVariablesCellsCommandsCollector extends PasteRobotElementCells
             }
         }
         return pasteCommands;
+    }
+
+    private List<String> extractVariableValues(final List<?> values) {
+        final List<String> txtValues = newArrayList();
+        for (final RobotToken token : VariablesValueConverter.convert(values, RobotToken.class)) {
+            txtValues.add(token.getText());
+        }
+        return txtValues;
     }
 }

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -22,6 +24,7 @@ public class SetListVariableValueElementCommand extends EditorCommand {
 
     private final String newValue;
 
+    private String previousValue;
 
     public SetListVariableValueElementCommand(final RobotVariable variable,
             final RobotToken oldElement, final String newValue) {
@@ -32,12 +35,18 @@ public class SetListVariableValueElementCommand extends EditorCommand {
 
     @Override
     protected void execute() throws CommandExecutionException {
-        if (oldElement.getText().equals(newValue)) {
+        previousValue = oldElement.getText();
+        if (previousValue.equals(newValue)) {
             return;
         }
         oldElement.setText(newValue);
         oldElement.setRaw(newValue);
 
         eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
+    }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetListVariableValueElementCommand(variable, oldElement, previousValue));
     }
 }
