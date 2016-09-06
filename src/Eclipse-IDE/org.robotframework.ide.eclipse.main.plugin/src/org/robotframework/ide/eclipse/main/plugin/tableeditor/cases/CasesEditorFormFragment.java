@@ -413,11 +413,19 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenKeywordCallIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final RobotCase testCase) {
-        if (testCase.getSuiteFile() == fileModel) {
+    private void whenKeywordCallIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final Event event) {
+        final RobotCase testCase = Events.get(event, IEventBroker.DATA, RobotCase.class);
+        final RobotKeywordCall keywordCall = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
+                RobotKeywordCall.class);
+        if (testCase != null && testCase.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+            if (keywordCall != null) {
+                selectionLayerAccessor.selectElementAfter(keywordCall, tableInputIsReplaced());
+            } else {
+                @SuppressWarnings("unchecked")
+                final List<RobotKeywordCall> calls = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, List.class);
+                selectionLayerAccessor.selectElementAfter(calls.get(calls.size() - 1), tableInputIsReplaced());
+            }
         }
     }
 
