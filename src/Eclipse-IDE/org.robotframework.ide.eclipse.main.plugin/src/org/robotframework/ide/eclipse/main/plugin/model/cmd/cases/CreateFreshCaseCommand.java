@@ -14,6 +14,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.NamesGenerator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class CreateFreshCaseCommand extends EditorCommand {
 
@@ -42,7 +43,9 @@ public class CreateFreshCaseCommand extends EditorCommand {
             newTestCase = casesSection.createTestCase(index, name);
         }
 
-        eventBroker.send(RobotModelEvents.ROBOT_CASE_ADDED, casesSection);
+        RedEventBroker.using(eventBroker)
+            .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newTestCase)
+            .send(RobotModelEvents.ROBOT_CASE_ADDED, casesSection);
     }
 
     @Override

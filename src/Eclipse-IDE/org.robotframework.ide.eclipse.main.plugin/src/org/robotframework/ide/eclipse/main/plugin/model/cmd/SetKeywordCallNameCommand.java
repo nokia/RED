@@ -10,6 +10,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -17,47 +18,49 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class SetKeywordCallNameCommand extends EditorCommand {
 
     private final RobotKeywordCall keywordCall;
-    private final String name;
-    private String previousName;
+
+    private final String newName;
+
+    private final String oldName;
 
     public SetKeywordCallNameCommand(final RobotKeywordCall keywordCall, final String name) {
         this.keywordCall = keywordCall;
-        this.name = name == null ? "" : name;
+        this.newName = name == null ? "" : name;
+        this.oldName = keywordCall.getName();
     }
 
     @Override
     public void execute() throws CommandExecutionException {
         // FIXME : look how settings uses this command
-        previousName = keywordCall.getName();
-        if (previousName.equals(name)) {
+        if (oldName.equals(newName)) {
             return;
         }
 
         if (keywordCall.isExecutable()) {
             if (looksLikeSetting()) {
-                changeToSetting(keywordCall, name);
+                changeToSetting(keywordCall, newName);
             } else {
-                changeName(keywordCall, name);
+                changeName(keywordCall, newName);
             }
         } else {
             if (looksLikeSetting() && !isDifferentSetting()) {
-                changeName(keywordCall, name);
+                changeName(keywordCall, newName);
             } else if (looksLikeSetting() && isDifferentSetting()) {
-                changeToSetting(keywordCall, name);
+                changeToSetting(keywordCall, newName);
             } else {
-                changeToCall(keywordCall, name);
+                changeToCall(keywordCall, newName);
             }
         }
     }
 
     private boolean isDifferentSetting() {
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
-        final RobotTokenType tokenType = parent.getSettingDeclarationTokenTypeFor(name);
+        final RobotTokenType tokenType = parent.getSettingDeclarationTokenTypeFor(newName);
         return !keywordCall.getLinkedElement().getDeclaration().getTypes().contains(tokenType);
     }
 
     private boolean looksLikeSetting() {
-        return name.startsWith("[") && name.endsWith("]");
+        return newName.startsWith("[") && newName.endsWith("]");
     }
 
     private void changeToSetting(final RobotKeywordCall call, final String settingName) {
@@ -66,7 +69,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         final int index = call.getIndex();
         parent.removeChild(call);
 
-        parent.createSetting(index, settingName, call.getArguments(), call.getComment());
+        final int lastSettingIndex = calculateIndexOfLastSetting(parent);
+        parent.createSetting(Math.min(index, lastSettingIndex), settingName, call.getArguments(), call.getComment());
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
     }
@@ -77,9 +81,19 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         final int index = call.getIndex();
         parent.removeChild(call);
 
-        parent.createKeywordCall(index, name, call.getArguments(), call.getComment());
+        final int lastSettingIndex = calculateIndexOfLastSetting(parent);
+        parent.createKeywordCall(Math.max(index, lastSettingIndex + 1), name, call.getArguments(), call.getComment());
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
+    }
+
+    private int calculateIndexOfLastSetting(final RobotCodeHoldingElement<?> parent) {
+        for (int i = parent.getChildren().size() - 1; i >= 0; i--) {
+            if (parent.getChildren().get(i) instanceof RobotDefinitionSetting) {
+                return i;
+            }
+        }
+        return 0;
     }
 
     private void changeName(final RobotKeywordCall element, final String name) {
@@ -91,6 +105,6 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetKeywordCallNameCommand(keywordCall, previousName));
+        return newUndoCommands(new SetKeywordCallNameCommand(keywordCall, oldName));
     }
 }

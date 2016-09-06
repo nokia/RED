@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
@@ -23,6 +24,7 @@ import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.primitives.Ints;
 
 /**
  * @author Michal Anglart
@@ -134,6 +136,31 @@ public class SelectionLayerAccessor {
             @Override
             public void run() {
                 reestablishSelection(selectionLayer, positions, Functions.<PositionCoordinate> identity());
+            }
+        });
+    }
+
+    public void selectElementAfter(final Object elementToSelect, final Runnable operation) {
+        operation.run();
+        final List<Integer> selectedColumns = Ints.asList(selectionLayer.getSelectedColumnPositions());
+        SwtThread.asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                selectionProvider.setSelection(new StructuredSelection(elementToSelect));
+                final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
+
+                reestablishSelection(selectionLayer, newlySelected,
+                        new Function<PositionCoordinate, PositionCoordinate>() {
+
+                            @Override
+                            public PositionCoordinate apply(final PositionCoordinate coordinate) {
+                                if (selectedColumns.contains(coordinate.getColumnPosition())) {
+                                    return coordinate;
+                                }
+                                return null;
+                            }
+                        });
             }
         });
     }
