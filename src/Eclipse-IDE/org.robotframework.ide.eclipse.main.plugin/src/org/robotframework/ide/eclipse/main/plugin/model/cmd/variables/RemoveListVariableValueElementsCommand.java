@@ -38,7 +38,7 @@ public class RemoveListVariableValueElementsCommand extends EditorCommand {
     }
 
     @Override
-    protected void execute() throws CommandExecutionException {
+    public void execute() throws CommandExecutionException {
 
         if (variable.getType() == VariableType.SCALAR_AS_LIST) {
             final ScalarVariable var = (ScalarVariable) variable.getLinkedElement();
