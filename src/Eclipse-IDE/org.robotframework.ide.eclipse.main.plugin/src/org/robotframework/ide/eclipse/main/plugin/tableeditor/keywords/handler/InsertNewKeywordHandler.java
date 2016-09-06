@@ -62,7 +62,7 @@ public class InsertNewKeywordHandler extends DIParameterizedHandler<E4InsertNewK
                 }
             } else {
                 final RobotKeywordsSection section = fileModel.findSection(RobotKeywordsSection.class).get();
-                stack.execute(new CreateFreshKeywordDefinitionCommand(section, true));
+                stack.execute(new CreateFreshKeywordDefinitionCommand(section));
             }
         }
     }

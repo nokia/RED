@@ -329,7 +329,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
                 } else {
                     final RobotKeywordsSection section = dataProvider.getInput();
-                    commandsStack.execute(new CreateFreshKeywordDefinitionCommand(section, true));
+                    commandsStack.execute(new CreateFreshKeywordDefinitionCommand(section));
                     createdElement = section.getChildren().get(section.getChildren().size() - 1);
                 }
                 return createdElement;
@@ -370,10 +370,14 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenKeywordDefinitionIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED) final RobotSuiteFileSection section) {
-        if (section.getSuiteFile() == fileModel) {
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED) final Event event) {
+
+        final RobotKeywordsSection section = Events.get(event, IEventBroker.DATA, RobotKeywordsSection.class);
+        final RobotKeywordDefinition keyword = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
+                RobotKeywordDefinition.class);
+        if (section != null && section.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.preserveSelectionWhen(tableInputIsReplaced());
+            selectionLayerAccessor.selectElementAfter(keyword, tableInputIsReplaced());
         }
     }
 
