@@ -42,12 +42,9 @@ public class DictionaryVariable extends AVariable {
         items.add(new DictionaryKeyValuePair(raw, key, value));
     }
 
-    public void addKeyValuePair(final RobotToken raw, final RobotToken key, final RobotToken value,
-            final int position) {
-        fixForTheType(raw, RobotTokenType.VARIABLES_VARIABLE_VALUE);
-        fixForTheType(key, RobotTokenType.VARIABLES_DICTIONARY_KEY);
-        fixForTheType(value, RobotTokenType.VARIABLES_DICTIONARY_VALUE);
-        items.set(position, new DictionaryKeyValuePair(raw, key, value));
+    public void addKeyValuePair(final int position, final DictionaryKeyValuePair pair) {
+        pair.fixTypes();
+        items.add(position, pair);
     }
 
     public void removeKeyValuePair(final DictionaryKeyValuePair pair) {
