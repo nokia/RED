@@ -7,13 +7,102 @@ Element-Version: 3.0
 External-Reference: 
 Id: _-SZoMF_XEeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/5/16 2:18 PM
+Save-Time: 9/6/16 4:20 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+//-------------------------------------- adding settings ---------------------------------------------------------------------
+//add new metadata
+get-view "Project Explorer" | get-tree | select "RobotProject/settings.robot" | double-click
+wait 1000
+
+with [get-editor "settings.robot"] {
+    get-tab-folder | get-tab-item Source | click
+    with [get-text-viewer] {
+        set-caret-pos 4 5
+        key-type F4
+    }
+}
+wait 2000
+
+get-view Outline | get-tree | select "settings.robot/Settings/Metadata/new" | double-click
+wait 500
+
+with [get-editor "settings.robot"] {
+    with [get-section Metadata | get-canvas] {
+        key-type Right
+        key-type Left
+        key-type Down
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+//check if comments were not deleted
+get-editor "settings.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Settings ***\n"
+    + "Resource    ${/}\n"
+    + "Metadata    new\n"
+    + "Metadata    data\n"
+    + " *** Keyword ***\n"
+    + "# Keyword\n"
+    + "    # log  12\n"
+    + "    # Should Be Equal    11    11\n"
+    + "# kw2\n"
+    + "    # Catenate    1    2    3    4    5    6\n"
+    + "    # Get Time\n"
+    + "# # kw3\n"
+    + "    # # log  45\n"
+    + "    # # log  78\n"
+    + "    # # log  90" | verify-true
+    
+
+    
+//==================================== variables and comments  ===========================================================
+
+get-view "Project Explorer" | get-tree | select "RobotProject/variables.robot" | select "RobotProject/variables.robot" 
+    | double-click
+get-editor "variables.robot" | get-tab-folder | get-tab-item Variables | click
+wait 2000
+
+get-view Outline | get-tree | select "variables.robot/Variables/path" | click
+wait 200
+
+//changed value when in variables section is comment
+with [get-editor "variables.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text "new path"
+        key-type Enter
+    }
+}
+
+get-editor "variables.robot" | get-editbox -after [get-label Variables] -index 1 | key-type "M1+s"
+
+get-editor "variables.robot" | get-tab-folder | get-tab-item Source | click
+
+//here is bug - expeption is shown
+with [get-editor "variables.robot" | get-text-viewer] {
+    get-property text | equals "*** Variable ***\n"
+        + "${var}    1\n"
+        + "${var1}    text with space\n"
+        + "${path}  new path\n"
+        + "${ref}    /ref/ref/file.jpg    #image\n"
+        + "${a}    ${a}\n"
+        + "${B}\n"
+        + "#ll\n"
+        + "*** Test Cases ***\n"
+        + "test\n"
+        + "    log  7" | verify-true
+}
+
+//======================================= changing value in resurce file==============================================
 get-view "Project Explorer" | get-tree | select "RobotProject/res.robot" | select "RobotProject/res.robot" 
     | double-click
 get-editor "res.robot" | get-tab-folder | get-tab-item Keywords | click
@@ -36,7 +125,6 @@ with [get-editor "res.robot"] {
     get-tab-folder | get-tab-item Source | click
 }
 
-//bug - usuwa komantarz
 get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
     + "Library   OperatingSystem \n"
     + " *** Keyword ***\n"
@@ -74,7 +162,6 @@ with [get-editor "comment_at_the_end.robot"] {
 }
 
 
-
 //remove "keyword 1" 
 with [get-editor "comment_at_the_end.robot"] {
     with [get-text-viewer] {
@@ -110,85 +197,6 @@ get-editor "comment_at_the_end.robot" | get-text-viewer | get-property text | eq
     + "    # log  78\n"
     + "    # log  90" | verify-true
  
-//-------------------------------------- adding settings ---------------------------------------------------------------------
-//add new metadata
-get-view "Project Explorer" | get-tree | select "RobotProject/settings.robot" | double-click
-with [get-editor "settings.robot"] {
-    get-tab-folder | get-tab-item Settings | click
-    get-section General | click
-    get-section Metadata | click
-}
-wait 1000
-get-view Outline | get-tree | select "settings.robot/Settings/Metadata/new" | click
-wait 300
-with [get-editor "settings.robot"] {
-    with [get-section Metadata | get-canvas] {
-        key-type Right
-        key-type Left
-        key-type Down
-        key-type Enter
-    }
-    get-tab-folder | get-tab-item Source | click
-}
-
-//check if comments were not deleted
-get-editor "settings.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
-    + "*** Settings ***\n"
-    + "Resource    ${/}\n"
-    + "Metadata    new\n"
-    + "Metadata    data\n"
-    + " *** Keyword ***\n"
-    + "# Keyword\n"
-    + "    # log  12\n"
-    + "    # Should Be Equal    11    11\n"
-    + "# kw2\n"
-    + "    # Catenate    1    2    3    4    5    6\n"
-    + "    # Get Time\n"
-    + "# # kw3\n"
-    + "    # # log  45\n"
-    + "    # # log  78\n"
-    + "    # # log  90" | verify-true
-    
-//==================================== variables and comments  ===========================================================
-
-get-view "Project Explorer" | get-tree | select "RobotProject/variables.robot" | select "RobotProject/variables.robot" 
-    | double-click
-get-editor "variables.robot" | get-tab-folder | get-tab-item Variables | click
-wait 1000
-
-get-view Outline | get-tree | select "variables.robot/Variables/path" | click
-wait 200
-
-//changed value when in variables section is comment
-with [get-editor "variables.robot"] {
-    with [get-canvas -after [get-label Variables] -index 1] {
-        key-type Right
-        key-type Enter
-    }
-    with [get-editbox -after [get-label Variables] -index 1] {
-        type-text "new path"
-        key-type Enter
-    }
-}
-
-get-editor "variables.robot" | get-editbox -after [get-label Variables] -index 1 | key-type "M1+s"
-
-get-editor "variables.robot" | get-tab-folder | get-tab-item Source | click
-
-//here is bug - expeption is shown
-with [get-editor "variables.robot" | get-text-viewer] {
-    get-property text | equals "*** Variable ***\n"
-        + "${var}    1\n"
-        + "${var1}    text with space\n"
-        + "${path}  new path\n"
-        + "${ref}    /ref/ref/file.jpg    #image\n"
-        + "${a}    ${a}\n"
-        + "${B}\n"
-        + "#ll\n"
-        + "*** Test Cases ***\n"
-        + "test\n"
-        + "    log  7" | verify-true
-}
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
