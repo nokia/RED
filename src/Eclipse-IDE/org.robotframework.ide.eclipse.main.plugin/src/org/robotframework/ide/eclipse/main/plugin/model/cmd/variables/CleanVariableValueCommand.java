@@ -36,7 +36,7 @@ public class CleanVariableValueCommand extends EditorCommand {
     }
 
     @Override
-    protected void execute() throws CommandExecutionException {
+    public void execute() throws CommandExecutionException {
         boolean modified = false;
         switch (variable.getType()) {
             case SCALAR:
