@@ -7,246 +7,196 @@ Element-Version: 3.0
 External-Reference: 
 Id: _6U5P0FsAEearwpaEcDJbag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/30/16 5:13 PM
+Save-Time: 9/6/16 2:09 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
-get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
-    + "*** Keywords ***\n"
-    + "Wait for ${timeDuration} seconds\n"
-    + "    ${timeInterval}=    Set Variable    ${1}\n"
-    + "\tLog\tWaiting ${timeDuration} seconds and display the progress...\n"
-    + "\t: FOR\tddd\tIN RANGE\t${timeDuration}\n"
-    + "\t\\\tLog\t. loop index=${idx}\n"
-    + "\t\\\tSleep\t${timeInterval}\n"
-    + "\t[Return]    ${timeInterval}\n"
-    + "    \\  \\   text  text2\n"
-    + "Print output\n"
-    + "    [Arguments]   ${teObj}\n"
-    + "    [Timeout]    69s\n"
-    + "    ${output1}=   Catenate      ${teObj}   ${0}\n"
-    + "    ${output2}=  Catenate    ${teObj}   ${2}\n"
-    + "    Log   Show: ${output1}\n"
-    + "    Log   Show detailed view: : ${output2}\n"
-    + "Doc here\n"
-    + "    [Documentation]    Create txt file with path to 'resultDir'.\n"
-    + "    [Teardown]    Print output    teObj\n"
-    + "    [Teardown]    Convert To Hex    899\n"
-    + "    Should Be Equal As Strings      ${OUTPUT_DIR}${/}robotReportTargetDir.txt    ${result}" 
-    
-get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+//-------------------------------------- adding settings ---------------------------------------------------------------------
+//add new metadata
+get-view "Project Explorer" | get-tree | select "RobotProject/settings.robot" | double-click
+wait 1000
 
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
-get-view Outline | get-tree | select "TestFile.robot/Keywords/Wait for ${timeDuration} seconds" | click
+with [get-editor "settings.robot"] {
+    get-tab-folder | get-tab-item Source | click
+    with [get-text-viewer] {
+        set-caret-pos 4 5
+        key-type F4
+    }
+}
+wait 2000
 
-//change [Return] setting to normal text (should not be changed)
-with [get-editor "TestFile.robot"] {
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+get-view Outline | get-tree | select "settings.robot/Settings/Metadata/new" | double-click
+wait 500
+
+with [get-editor "settings.robot"] {
+    with [get-section Metadata | get-canvas] {
         key-type Right
         key-type Left
         key-type Down
         key-type Enter
     }
-    //change param to normal text
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "not return"
-        key-type Enter
-    }
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "arg for return"
-        key-type Enter
-    }
-    //go to :FOR
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Down -times 2
-        key-type Left -times 2
-        key-type Down
-        key-type Enter
-    }
-    //change :FOR to text
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "I changed for"
-        key-type Enter
-    }
-    //:FOR arg is select for edition, go down and selecion will go down too
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type Down
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-    	//change KW name
-        type-text Log2
-        key-type Enter
-    }
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Down
-        key-type Left -times 2
-        key-type Enter
-    }
-    //remove one "\" and add "space"
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "space"
-        key-type Enter
-    }
-    //go down and remove second backslash - kw are shifted left
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Down
-        key-type Del
-    }
-}
-
-
-with [get-editor "TestFile.robot"] {
-    get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
     get-tab-folder | get-tab-item Source | click
 }
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
-    + "*** Keywords ***\n"
-    + "Wait for ${timeDuration} seconds\n"
-    + "    not return    arg for return\n"
-    + "    ${timeInterval}=    Set Variable    ${1}\n"
-    + "\tLog\tWaiting ${timeDuration} seconds and display the progress...\n"
-    + "\tI changed for\tddd\tIN RANGE\t${timeDuration}\n"
-    + "\t\\\tLog2\t. loop index=${idx}\n"
-    + "\tspace\tSleep\t${timeInterval}\n"
-    + "    \\   text  text2\n"
-    + "Print output\n"
-    + "    [Arguments]   ${teObj}\n"
-    + "    [Timeout]    69s\n"
-    + "    ${output1}=   Catenate      ${teObj}   ${0}\n"
-    + "    ${output2}=  Catenate    ${teObj}   ${2}\n"
-    + "    Log   Show: ${output1}\n"
-    + "    Log   Show detailed view: : ${output2}\n"
-    + "Doc here\n"
-    + "    [Documentation]    Create txt file with path to 'resultDir'.\n"
-    + "    [Teardown]    Print output    teObj    Convert To Hex    899\n"
-    + "    [Teardown]\n"
-    + "    Should Be Equal As Strings      ${OUTPUT_DIR}${/}robotReportTargetDir.txt    ${result}" | verify-true
- 
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
-wait 1000    
-get-view Outline | get-tree | select "TestFile.robot/Keywords/Print output"
-with [get-editor "TestFile.robot"] {
-	//add 2 arguments
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Right -times 2
-        key-type Enter
-    }
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "${arg2}"
-        key-type Enter
-    }
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "normal text"
-        key-type Enter
-    }
-    //go to kw name
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Left -times 2
-        key-type Down -times 7
-        key-type Left -times 2
-        key-type Enter
-    }
-    //change kw name
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text "Last kw"
-        key-type Enter
-    }
+
+//check if comments were not deleted
+get-editor "settings.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Settings ***\n"
+    + "Resource    ${/}\n"
+    + "Metadata    new\n"
+    + "Metadata    data\n"
+    + " *** Keyword ***\n"
+    + "# Keyword\n"
+    + "    # log  12\n"
+    + "    # Should Be Equal    11    11\n"
+    + "# kw2\n"
+    + "    # Catenate    1    2    3    4    5    6\n"
+    + "    # Get Time\n"
+    + "# # kw3\n"
+    + "    # # log  45\n"
+    + "    # # log  78\n"
+    + "    # # log  90" | verify-true
     
-    //change second teardown
-    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
-    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down
-    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down
+
+    
+//==================================== variables and comments  ===========================================================
+
+get-view "Project Explorer" | get-tree | select "RobotProject/variables.robot" | select "RobotProject/variables.robot" 
+    | double-click
+get-editor "variables.robot" | get-tab-folder | get-tab-item Variables | click
+wait 2000
+
+get-view Outline | get-tree | select "variables.robot/Variables/path" | click
+wait 200
+
+//changed value when in variables section is comment
+with [get-editor "variables.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Right
+        key-type Enter
+    }
+    with [get-editbox -after [get-label Variables] -index 1] {
+        type-text "new path"
+        key-type Enter
+    }
+}
+
+get-editor "variables.robot" | get-editbox -after [get-label Variables] -index 1 | key-type "M1+s"
+
+get-editor "variables.robot" | get-tab-folder | get-tab-item Source | click
+
+//here is bug - expeption is shown
+with [get-editor "variables.robot" | get-text-viewer] {
+    get-property text | equals "*** Variable ***\n"
+        + "${var}    1\n"
+        + "${var1}    text with space\n"
+        + "${path}  new path\n"
+        + "${ref}    /ref/ref/file.jpg    #image\n"
+        + "${a}    ${a}\n"
+        + "${B}\n"
+        + "#ll\n"
+        + "*** Test Cases ***\n"
+        + "test\n"
+        + "    log  7" | verify-true
+}
+
+//======================================= changing value in resurce file==============================================
+get-view "Project Explorer" | get-tree | select "RobotProject/res.robot" | select "RobotProject/res.robot" 
+    | double-click
+get-editor "res.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 500
+get-view Outline | get-tree | select "res.robot/Keywords/kw1/Import Resource"
+wait 500
+
+//change path to "new path"
+with [get-editor "res.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Right
         key-type Enter
     }
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text abc
+        type-text "new path"
         key-type Enter
     }
+    //save and go to source
     get-editbox -after [get-label "User Keywords"] -index 1 | key-type "M1+s"
+    get-tab-folder | get-tab-item Source | click
 }
+
+get-editor "res.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library   OperatingSystem \n"
+    + " *** Keyword ***\n"
+    + "kw1\n"
+    + "    [Documentation]    doc1    \n"
+    + "    Import Resource    new path\n"
+    + "    None Shall Pass    who\n"
+    + "    Repeat Keyword    repeat    name    \n"
+    + "kw2\n"
+    + "    [Arguments]    ${a}  ${b}\n"
+    + "    [Tags]    new    \n"
+    + "    Catenate    a  b  c\n"
+    + "# kw3\n"
+    + "    # Log  4\n"
+    + "    # log  5\n"
+    + "    # log  7" | verify-true
  
-get-editor "TestFile.robot" | maximize   
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 1 -ref_table [list  "Wait for ${timeDuration} seconds"  ""  ""  ""  ""  ""  ""  ] 
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 2 -ref_table [list  "not return"  "arg for return"  ""  ""  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 3 -ref_table [list "${timeInterval}="  "Set Variable"  "${1}"  ""  ""  ""  "" ]   
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 4 -ref_table [list "Log"  "Waiting ${timeDuration} seconds and display the progress..."  ""  ""  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 5 -ref_table [list "I changed for"  "ddd"  "IN RANGE"  "${timeDuration}"  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 6 -ref_table [list "\\"  "Log2"  ". loop index=${idx}"  ""  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 7 -ref_table [list "space"  "Sleep"  "${timeInterval}"  ""  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 8 -ref_table [list "\\"  "text"  "text2"  ""  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 9 -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 10 -ref_table [list "Print output"  "${teObj}"  "${arg2}"  "normal text"  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 11 -ref_table [list "[Timeout]"  "69s"  ""  ""  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 12 -ref_table [list "${output1}="  "Catenate"  "${teObj}"  "${0}"  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 13 -ref_table [list "${output2}="  "Catenate"  "${teObj}"  "${2}"  ""  ""  "" ]  
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 14 -ref_table [list "Log"  "Show: ${output1}"  ""  ""  ""  ""  "" ]    
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 15 -ref_table [list "Log"  "Show detailed view: : ${output2}"  ""  ""  ""  ""  "" ]
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 16 -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 17 -ref_table [list  "Last kw"  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 18 -ref_table [list "[Documentation]"  "Create txt file with path to 'resultDir'."  ""  ""  ""  ""  "" ]
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 19 -ref_table [list "[Teardown]"  "Print output"  "abc"  "Convert To Hex"  "899"  ""  "" ]
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 20 -ref_table [list "Should Be Equal As Strings"  "${OUTPUT_DIR}${/}robotReportTargetDir.txt"  "${result}"  ""  ""  ""  "" ]
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 21 -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row  22 -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""  "" ]
+ 
+//-----------------------------------------------------------------------------------------------------------
 
+get-view "Project Explorer" | get-tree | select "RobotProject/comment_at_the_end.robot" | double-click
+get-editor "comment_at_the_end.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 500
+get-view Outline | get-tree | select "comment_at_the_end.robot/Keywords/kw2/Get Time"
 
-get-editor "TestFile.robot" | restore
-
-
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
-
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
-    + "*** Keywords ***\n"
-    + "Wait for ${timeDuration} seconds\n"
-    + "    not return    arg for return\n"
-    + "    ${timeInterval}=    Set Variable    ${1}\n"
-    + "\tLog\tWaiting ${timeDuration} seconds and display the progress...\n"
-    + "\tI changed for\tddd\tIN RANGE\t${timeDuration}\n"
-    + "\t\\\tLog2\t. loop index=${idx}\n"
-    + "\tspace\tSleep\t${timeInterval}\n"
-    + "    \\   text  text2\n"
-    + "Print output\n"
-    + "    [Arguments]   ${teObj}    ${arg2}    normal text\n"
-    + "    [Timeout]    69s\n"
-    + "    ${output1}=   Catenate      ${teObj}   ${0}\n"
-    + "    ${output2}=  Catenate    ${teObj}   ${2}\n"
-    + "    Log   Show: ${output1}\n"
-    + "    Log   Show detailed view: : ${output2}\n"
-    + "Last kw\n"
-    + "    [Documentation]    Create txt file with path to 'resultDir'.\n"
-    + "    [Teardown]    Print output    abc    Convert To Hex    899\n"
-    + "    [Teardown]\n"
-    + "    Should Be Equal As Strings      ${OUTPUT_DIR}${/}robotReportTargetDir.txt    ${result}" | verify-true
-
-
-//deleting kw name
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
-wait 200
-get-view Outline | get-tree | select "TestFile.robot/Keywords/Print output" | click
-wait 200
-
-with [get-editor "TestFile.robot"] {
+//add new default keyword
+with [get-editor "comment_at_the_end.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Right
+        key-type Down -times 2
         key-type Left
         key-type Enter
     }
-    
-    //delete antire name
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        type-text ""
-        key-type Enter
-    }
+    get-tab-folder | get-tab-item Source | click
 }
 
-compare-row-with-list -file  "TestFile.robot" -col_amount 7 -row 10 -ref_table [list "\\"  "${teObj}"  "${arg2}"  "normal text"  ""  ""  "" ]  
+
+//remove "keyword 1" 
+with [get-editor "comment_at_the_end.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 13 10
+        key-type BackSpace -times 9
+        key-type "M1+s"
+        wait 500
+    }
+    //add new section
+    get-tab-folder | get-tab-item Settings | click
+    wait 500
+    get-link "Section is not yet defined, do you want to create it?" | click
+}
+
+try -times 8 -delay 1000 -command{
+ 	get-editor "comment_at_the_end.robot" | verify-error {get-link "Section is not yet defined, do you want to create it?" 
+    	| get-property caption | equals "Section is not yet defined, do you want to create it?" | verify-true}
+}
+
+get-editor "comment_at_the_end.robot" | get-tab-folder | get-tab-item Source | click
+
+get-editor "comment_at_the_end.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
+    + "*** Test Cases ***\n"
+    + "*** Keyword ***\n"
+    + "Keyword\n"
+    + "    log  12\n"
+    + "    Should Be Equal    11    11\n"
+    + "kw2\n"
+    + "    Catenate    1    2    3    4    5    6\n"
+    + "    Get Time\n"
+    + "# kw3\n"
+    + "    # log  45\n"
+    + "    # log  78\n"
+    + "    # log  90" | verify-true
+ 
+
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
