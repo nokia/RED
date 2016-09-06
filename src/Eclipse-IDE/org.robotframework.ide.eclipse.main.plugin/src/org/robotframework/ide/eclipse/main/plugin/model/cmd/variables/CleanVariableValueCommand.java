@@ -7,6 +7,9 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.List;
+
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
@@ -25,6 +28,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class CleanVariableValueCommand extends EditorCommand {
 
     private final RobotVariable variable;
+    
+    private List<RobotToken> previousValues = newArrayList();
 
     public CleanVariableValueCommand(final RobotVariable variable) {
         this.variable = variable;
@@ -40,6 +45,7 @@ public class CleanVariableValueCommand extends EditorCommand {
                 if (!scalar.getValues().isEmpty()) {
                     modified = true;
                     for (final RobotToken value : newArrayList(scalar.getValues())) {
+                        previousValues.add(value);
                         scalar.removeValue(value);
                     }
                 }
@@ -49,6 +55,7 @@ public class CleanVariableValueCommand extends EditorCommand {
                 if (!list.getItems().isEmpty()) {
                     modified = true;
                     for (final RobotToken value : newArrayList(list.getItems())) {
+                        previousValues.add(value);
                         list.removeItem(value);
                     }
                 }
@@ -58,6 +65,7 @@ public class CleanVariableValueCommand extends EditorCommand {
                 if (!dict.getItems().isEmpty()) {
                     modified = true;
                     for (final DictionaryKeyValuePair pair : newArrayList(dict.getItems())) {
+                        previousValues.add(pair.getRaw());
                         dict.removeKeyValuePair(pair);
                     }
                 }
@@ -67,6 +75,7 @@ public class CleanVariableValueCommand extends EditorCommand {
                 if (!unknown.getItems().isEmpty()) {
                     modified = true;
                     for (final RobotToken value : newArrayList(unknown.getItems())) {
+                        previousValues.add(value);
                         unknown.removeItem(value);
                     }
                 }
@@ -79,5 +88,24 @@ public class CleanVariableValueCommand extends EditorCommand {
         if (modified) {
             eventBroker.send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
         }
+    }
+    
+    @Override
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(setupUndoCommandsForRemovedValues());
+    }
+
+    private List<EditorCommand> setupUndoCommandsForRemovedValues() {
+        final List<EditorCommand> commands = newArrayList();
+        if (variable.getType() == VariableType.SCALAR) {
+            if (!previousValues.isEmpty()) {
+                commands.add(new SetScalarValueCommand(variable, previousValues.get(0).getText()));
+            }
+        } else {
+            for (final RobotToken value : previousValues) {
+                commands.add(new CreateCompoundVariableValueElementCommand(variable, value.getText()));
+            }
+        }
+        return commands;
     }
 }

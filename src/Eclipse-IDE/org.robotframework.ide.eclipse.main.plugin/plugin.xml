@@ -3993,6 +3993,17 @@
                    value="org.robotframework.ide.eclipse.tableeditor.context">
              </equals>
           </iterate>
+          <and>
+             <not>
+                <iterate
+                      ifEmpty="false"
+                      operator="or">
+                   <equals
+                         value="org.robotframework.ide.eclipse.details.context">
+                   </equals>
+                </iterate>
+             </not>
+          </and>
        </with>
     </definition>
     
