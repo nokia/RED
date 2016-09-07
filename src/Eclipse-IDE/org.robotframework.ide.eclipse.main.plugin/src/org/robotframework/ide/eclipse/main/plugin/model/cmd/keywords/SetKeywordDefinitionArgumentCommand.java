@@ -28,13 +28,21 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
     private final String value;
     
+    private boolean shouldReplaceValue;
+    
     private String previousValue;
 
     public SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
             final String value) {
+        this(definition, index, value, true);
+    }
+    
+    public SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
+            final String value, final boolean shouldReplaceValue) {
         this.definition = definition;
         this.index = index;
         this.value = value;
+        this.shouldReplaceValue = shouldReplaceValue;
     }
 
     @SuppressWarnings("unchecked")
@@ -85,8 +93,26 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         
         previousValue = index >= 0 && index < arguments.size() ? arguments.get(index) : value;
 
-        SetKeywordCallArgumentCommand.fillArgumentsList(value, index, arguments);
+        SetKeywordCallArgumentCommand.fillArgumentsList(value, index, arguments, shouldReplaceValue);
+        
+        checkIfPreviousCommandWasAddingNewValue();
+        checkIfUndoCommandShouldAddArgument(arguments.get(index));
+        
         return arguments;
+    }
+    
+    private void checkIfPreviousCommandWasAddingNewValue() {
+        if(!shouldReplaceValue) {
+            previousValue = null; // when new value was not replaced but added by undo command, then redo command should remove this value
+        }
+    }
+    
+    private void checkIfUndoCommandShouldAddArgument(final String currentArgValue) {
+        if(currentArgValue != null && currentArgValue.equals("\\") && value == null) {
+            shouldReplaceValue = false; // when arg is deleted not on last position, undo command will add new arg on this position and shifts other args to the right
+        } else {
+            shouldReplaceValue = true; // reset the flag for future undo commands
+        }
     }
 
     private boolean areAllEmpty(final List<String> arguments) {
@@ -111,6 +137,6 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetKeywordDefinitionArgumentCommand(definition, index, previousValue));
+        return newUndoCommands(new SetKeywordDefinitionArgumentCommand(definition, index, previousValue, shouldReplaceValue));
     }
 }

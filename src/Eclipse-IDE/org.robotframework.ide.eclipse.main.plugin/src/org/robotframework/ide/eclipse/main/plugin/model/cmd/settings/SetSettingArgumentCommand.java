@@ -14,19 +14,30 @@ import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgume
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class SetSettingArgumentCommand extends SetKeywordCallArgumentCommand {
-
+    
     public SetSettingArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value) {
         super(keywordCall, index, value);
+    }
+
+    public SetSettingArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value, final boolean shouldReplaceValue) {
+        super(keywordCall, index, value, shouldReplaceValue);
     }
 
     @Override
     protected void updateModelElement(final List<String> arguments) {
         final AModelElement<?> linkedElement = keywordCall.getLinkedElement();
-        new SettingTableModelUpdater().update(linkedElement, index, value);
+        final SettingTableModelUpdater updater = new SettingTableModelUpdater();
+        if (value != null) {
+            for (int i = arguments.size() - 1; i >= 0; i--) {
+                updater.update(linkedElement, i, arguments.get(i));
+            }
+        } else {
+            updater.update(linkedElement, index, value);
+        }
     }
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetSettingArgumentCommand(keywordCall, index, previousValue));
+        return newUndoCommands(new SetSettingArgumentCommand(keywordCall, index, previousValue, index == 0 ? true : shouldReplaceValue));
     }
 }
