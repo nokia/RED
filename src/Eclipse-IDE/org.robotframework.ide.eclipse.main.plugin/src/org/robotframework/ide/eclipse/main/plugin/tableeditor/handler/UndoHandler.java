@@ -5,12 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
-import javax.inject.Named;
-
 import org.eclipse.e4.core.di.annotations.Execute;
-import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.UndoHandler.E4UndoHandler;
 import org.robotframework.red.commands.DIParameterizedHandler;
 
@@ -23,8 +19,7 @@ public class UndoHandler extends DIParameterizedHandler<E4UndoHandler> {
     public static class E4UndoHandler {
 
         @Execute
-        public void undo(@Named(ISources.ACTIVE_EDITOR_NAME) final RobotFormEditor editor,
-                final RobotEditorCommandsStack commandsStack) {
+        public void undo(final RobotEditorCommandsStack commandsStack) {
 
             commandsStack.undo();
         }
