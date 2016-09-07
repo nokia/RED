@@ -36,9 +36,17 @@ public class SelectionsPropertyTester extends PropertyTester {
             if (elements.isEmpty()) {
                 return expected;
             }
-            final Class<? extends Object> classOfFirst = elements.get(0).getClass();
+            Class<?> mostGeneralType = elements.get(0).getClass();
             for (final Object element : elements) {
-                if (!classOfFirst.isInstance(element)) {
+                if (element.getClass().isAssignableFrom(mostGeneralType)) {
+                    mostGeneralType = element.getClass();
+                }
+            }
+            if (mostGeneralType == Object.class) {
+                return !expected;
+            }
+            for (final Object element : elements) {
+                if (!mostGeneralType.isInstance(element)) {
                     return !expected;
                 }
             }
