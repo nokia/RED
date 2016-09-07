@@ -10,13 +10,13 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
-import org.rf.ide.core.testdata.model.presenter.update.ITestCaseTableElementOperation;
+import org.rf.ide.core.testdata.model.presenter.update.IExecutablesStepsHolderElementOperation;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestCaseDocumentationModelOperation implements ITestCaseTableElementOperation {
+public class TestCaseDocumentationModelOperation implements IExecutablesStepsHolderElementOperation<TestCase> {
 
     @Override
     public boolean isApplicable(final ModelType elementType) {

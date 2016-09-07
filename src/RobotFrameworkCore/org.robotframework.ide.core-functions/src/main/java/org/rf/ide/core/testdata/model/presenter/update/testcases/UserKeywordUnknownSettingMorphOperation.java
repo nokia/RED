@@ -2,6 +2,7 @@ package org.rf.ide.core.testdata.model.presenter.update.testcases;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.update.ExecutablesStepsHolderMorphOperation;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
@@ -11,7 +12,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 
-public class UserKeywordUnknownSettingMorphOperation extends UserKeywordElementMorphOperation {
+public class UserKeywordUnknownSettingMorphOperation extends ExecutablesStepsHolderMorphOperation<TestCase> {
 
     @Override
     public boolean isApplicable(final ModelType elementType) {

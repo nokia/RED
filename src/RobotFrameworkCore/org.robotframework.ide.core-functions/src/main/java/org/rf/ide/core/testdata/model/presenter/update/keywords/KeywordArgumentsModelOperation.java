@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.update.IKeywordTableElementOperation;
+import org.rf.ide.core.testdata.model.presenter.update.IExecutablesStepsHolderElementOperation;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class KeywordArgumentsModelOperation implements IKeywordTableElementOperation {
+public class KeywordArgumentsModelOperation implements IExecutablesStepsHolderElementOperation<UserKeyword> {
 
     @Override
     public boolean isApplicable(final ModelType elementType) {

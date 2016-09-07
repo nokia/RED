@@ -1,28 +1,32 @@
-package org.rf.ide.core.testdata.model.presenter.update.testcases;
+/*
+ * Copyright 2016 Nokia Solutions and Networks
+ * Licensed under the Apache License, Version 2.0,
+ * see license.txt file for details.
+ */
+package org.rf.ide.core.testdata.model.presenter.update.keywords;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.ExecutablesStepsHolderMorphOperation;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
-import org.rf.ide.core.testdata.model.table.testcases.TestCase;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
-public class UserKeywordExecutableRowMorphOperation extends ExecutablesStepsHolderMorphOperation<TestCase> {
+public class TestCaseExecutableRowMorphOperation extends ExecutablesStepsHolderMorphOperation<UserKeyword> {
 
     @Override
     public boolean isApplicable(final ModelType elementType) {
-        return elementType == ModelType.USER_KEYWORD_EXECUTABLE_ROW;
+        return elementType == ModelType.TEST_CASE_EXECUTABLE_ROW;
     }
 
     @Override
-    public RobotExecutableRow<TestCase> insert(final TestCase testCase, final int index,
-            final AModelElement<?> modelElement) {
+    public AModelElement<?> insert(final UserKeyword keyword, final int index, final AModelElement<?> modelElement) {
         @SuppressWarnings("unchecked")
-        final RobotExecutableRow<TestCase> executableRow = (RobotExecutableRow<TestCase>) modelElement;
-        executableRow.setParent(testCase);
+        final RobotExecutableRow<UserKeyword> executableRow = (RobotExecutableRow<UserKeyword>) modelElement;
+        executableRow.setParent(keyword);
 
-        // executable row could be taken from some keyword originally, so we need to fix types in
+        // executable row could be taken from some test case originally, so we need to fix types in
         // its tokens
         final RobotToken action = executableRow.getAction();
         action.getTypes().clear();
@@ -34,8 +38,9 @@ public class UserKeywordExecutableRowMorphOperation extends ExecutablesStepsHold
             executableRow.setArgument(i, arg);
         }
 
-        testCase.addTestExecutionRow(executableRow, index);
+        keyword.addKeywordExecutionRow(executableRow, index);
 
         return executableRow;
     }
+
 }
