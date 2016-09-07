@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5zRY8GVSEeayWasF5RXANg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/22/16 3:34 PM
+Save-Time: 9/7/16 11:47 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -34,6 +34,7 @@ with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
         key-type Down -times 2
         key-type Enter
+        //go down and add Log
         key-type Down
         key-type Enter -times 2
     }
@@ -42,16 +43,14 @@ with [get-editor "TestFile.robot"] {
         key-type Enter
     }
     
-    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Down
     //add empty line
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Down
+    //focus is set at the begging of line
     with [get-canvas -after [get-label "Test Cases"] -index 1] {
-        //key-type Left
-        key-type Down
-     
-     	//go down and add KW
-        key-type Left
-        key-type Down
+    	//add bew TC
+        key-type Down -times 2
         key-type Enter
+        //add new kw
         key-type Down
         key-type Enter -times 2
     }
