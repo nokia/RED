@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -229,7 +228,6 @@ public class InsertKeywordCallsCommandTest {
                 Lists.<String> newArrayList("arg1", "arg2"), "#comment");
     }
 
-    @Ignore("It should be possible to insert row copied from test case into keyword. Implement core morph operations")
     @Test
     public void testCaseTagsSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseTagsSetting(), ModelType.USER_KEYWORD_TAGS, "Tags",
@@ -242,7 +240,6 @@ public class InsertKeywordCallsCommandTest {
                 Lists.<String> newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
-    @Ignore("It should be possible to insert row copied from test case into keyword. Implement core morph operations")
     @Test
     public void testCaseSetupSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseSetupSetting(),
@@ -256,7 +253,6 @@ public class InsertKeywordCallsCommandTest {
                 "Teardown", Lists.<String> newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
-    @Ignore("It should be possible to insert row copied from test case into keyword. Implement core morph operations")
     @Test
     public void testCaseTeardownSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseTeadownSetting(), ModelType.USER_KEYWORD_TEARDOWN,
@@ -269,7 +265,6 @@ public class InsertKeywordCallsCommandTest {
                 "Template", Lists.<String> newArrayList("call", "arg1", "arg2"), "#comment");
     }
 
-    @Ignore("It should be possible to insert row copied from test case into keyword. Implement core morph operations")
     @Test
     public void testCaseTemplateSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseTemplateSetting(),
@@ -283,7 +278,6 @@ public class InsertKeywordCallsCommandTest {
                 "Timeout", Lists.<String> newArrayList("10", "arg1", "arg2"), "#comment");
     }
 
-    @Ignore("It should be possible to insert row copied from test case into keyword. Implement core morph operations")
     @Test
     public void testCaseTimeoutSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseTimeoutSetting(), ModelType.USER_KEYWORD_TIMEOUT,
@@ -297,7 +291,6 @@ public class InsertKeywordCallsCommandTest {
                 "#comment");
     }
 
-    @Ignore("It should be possible to insert row copied from test case into keyword. Implement core morph operations")
     @Test
     public void testCaseDocumentationSettingIsProperlyInsertedIntoKeyword() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseDocumentationSetting(),
@@ -312,7 +305,6 @@ public class InsertKeywordCallsCommandTest {
                 "#comment");
     }
 
-    @Ignore("It should be possible to insert row copied from test case into keyword. Implement core morph operations")
     @Test
     public void testCaseUnknownSettingIsProperlyInsertedIntoKeyword_1() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseUnknownSetting("unknown"),
@@ -320,14 +312,12 @@ public class InsertKeywordCallsCommandTest {
                 "#comment");
     }
 
-    @Ignore("It should be possible to insert row copied from test case into keyword. Implement core morph operations")
     @Test
     public void testCaseUnknownSettingIsProperlyInsertedIntoKeyword_2() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseUnknownSetting("Arguments"),
                 ModelType.USER_KEYWORD_ARGUMENTS, "Arguments", Lists.<String> newArrayList("arg1", "arg2"), "#comment");
     }
 
-    @Ignore("It should be possible to insert row copied from test case into keyword. Implement core morph operations")
     @Test
     public void testCaseUnknownSettingIsProperlyInsertedIntoKeyword_3() {
         testCaseSettingIsProperlyInsertedIntoKeyword(createTestCaseUnknownSetting("Return"),
