@@ -24,6 +24,9 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.ISources;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor.ERowType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -128,19 +131,15 @@ public class RobotOutlineContentProvider extends TreeContentProvider {
 
             @Override
             public boolean apply(final RobotElement element) {
-                return true;
-                // return element != null && element.getClass() == RobotKeywordCall.class;
-                // if (element instanceof RobotKeywordCall) {
-                // final AModelElement<?> linkedElement = ((RobotKeywordCall)
-                // element).getLinkedElement();
-                // if (linkedElement != null && linkedElement instanceof RobotExecutableRow<?>) {
-                // final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
-                // //TODO: checking row type should be done without building line description
-                // return row.isExecutable() && row.buildLineDescription().getRowType() !=
-                // ERowType.FOR_CONTINUE;
-                // }
-                // }
-                // return false;
+                if (element instanceof RobotKeywordCall) {
+                    final AModelElement<?> linkedElement = ((RobotKeywordCall) element).getLinkedElement();
+                    if (linkedElement != null && linkedElement instanceof RobotExecutableRow<?>) {
+                        final RobotExecutableRow<?> row = (RobotExecutableRow<?>) linkedElement;
+                        // TODO: checking row type should be done without building line description
+                        return row.isExecutable() && row.buildLineDescription().getRowType() != ERowType.FOR_CONTINUE;
+                    }
+                }
+                return false;
             }
         }));
     }
