@@ -44,9 +44,9 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         }
         executedCommands = new ArrayList<>();
 
-        final boolean shouldShiftNameFromArguments = newName == null;
-        final String nameToSet = shouldShiftNameFromArguments ? extractNameFromArguments(keywordCall.getArguments())
-                : newName;
+        final boolean shouldShiftNameFromArgs = newName == null;
+        String nameToSet = shouldShiftNameFromArgs ? extractNameFromArguments(keywordCall.getArguments()) : newName;
+        nameToSet = nameToSet.isEmpty() && !keywordCall.getArguments().isEmpty() ? "\\" : nameToSet;
 
         final RobotKeywordCall actualCall;
         if (keywordCall.isExecutable()) {
@@ -65,7 +65,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             }
         }
 
-        if (shouldShiftNameFromArguments) {
+        if (shouldShiftNameFromArgs) {
             removeFirstArgument(actualCall);
         }
     }
