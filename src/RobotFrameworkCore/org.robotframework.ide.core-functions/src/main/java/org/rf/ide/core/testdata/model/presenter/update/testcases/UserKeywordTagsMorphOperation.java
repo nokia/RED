@@ -2,13 +2,14 @@ package org.rf.ide.core.testdata.model.presenter.update.testcases;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.update.ExecutablesStepsHolderMorphOperation;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 
-public class UserKeywordTagsMorphOperation extends UserKeywordElementMorphOperation {
+public class UserKeywordTagsMorphOperation extends ExecutablesStepsHolderMorphOperation<TestCase> {
 
     @Override
     public boolean isApplicable(final ModelType elementType) {

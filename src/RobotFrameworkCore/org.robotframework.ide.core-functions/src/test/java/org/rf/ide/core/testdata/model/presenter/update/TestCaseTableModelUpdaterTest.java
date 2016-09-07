@@ -81,12 +81,12 @@ public class TestCaseTableModelUpdaterTest {
     public void handlersForKeywordCannotCreateAnything() {
         final TestCase testCase = mock(TestCase.class);
         for (final ModelType kwModelType : keywordModelTypes) {
-            final ITestCaseTableElementOperation handler = updater.getOperationHandler(kwModelType);
+            final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
 
             try {
                 handler.create(testCase, "action", newArrayList("1", "2"), "");
                 fail("Expected exception");
-            } catch (final IllegalStateException e) {
+            } catch (final UnsupportedOperationException e) {
                 // we expected that
             }
         }
@@ -97,12 +97,12 @@ public class TestCaseTableModelUpdaterTest {
     public void handlersForKeywordCannotUpdateAnything() {
         final AModelElement<?> element = mock(AModelElement.class);
         for (final ModelType kwModelType : keywordModelTypes) {
-            final ITestCaseTableElementOperation handler = updater.getOperationHandler(kwModelType);
+            final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
 
             try {
                 handler.update(element, 1, "value");
                 fail("Expected exception");
-            } catch (final IllegalStateException e) {
+            } catch (final UnsupportedOperationException e) {
                 // we expected that
             }
         }
@@ -113,12 +113,12 @@ public class TestCaseTableModelUpdaterTest {
     public void handlersForKeywordCannotBulkUpdateAnything() {
         final AModelElement<?> element = mock(AModelElement.class);
         for (final ModelType kwModelType : keywordModelTypes) {
-            final ITestCaseTableElementOperation handler = updater.getOperationHandler(kwModelType);
+            final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
 
             try {
                 handler.update(element, newArrayList("a", "b", "c"));
                 fail("Expected exception");
-            } catch (final IllegalStateException e) {
+            } catch (final UnsupportedOperationException e) {
                 // we expected that
             }
         }
@@ -130,12 +130,12 @@ public class TestCaseTableModelUpdaterTest {
         final TestCase testCase = mock(TestCase.class);
         final AModelElement<?> element = mock(AModelElement.class);
         for (final ModelType kwModelType : keywordModelTypes) {
-            final ITestCaseTableElementOperation handler = updater.getOperationHandler(kwModelType);
+            final IExecutablesStepsHolderElementOperation<TestCase> handler = updater.getOperationHandler(kwModelType);
 
             try {
                 handler.remove(testCase, element);
                 fail("Expected exception");
-            } catch (final IllegalStateException e) {
+            } catch (final UnsupportedOperationException e) {
                 // we expected that
             }
         }
