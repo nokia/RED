@@ -27,6 +27,7 @@ import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -81,6 +82,9 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         }
         for (final KeywordReturn returnSetting : keyword.getReturns()) {
             getChildren().add(new RobotDefinitionSetting(this, returnSetting));
+        }
+        for (final KeywordUnknownSettings unknownSettings : keyword.getUnknownSettings()) {
+            getChildren().add(new RobotDefinitionSetting(this, unknownSettings));
         }
         
         // body

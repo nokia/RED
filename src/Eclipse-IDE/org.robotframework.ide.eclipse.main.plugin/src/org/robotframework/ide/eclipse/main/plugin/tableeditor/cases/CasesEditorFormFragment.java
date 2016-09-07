@@ -465,10 +465,14 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     @Inject
     @Optional
     private void whenKeywordCallIsConverted(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED) final RobotCase testCase) {
-        if (testCase.getSuiteFile() == fileModel) {
+            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED) final Event event) {
+
+        final RobotCase testCase = Events.get(event, IEventBroker.DATA, RobotCase.class);
+        final RobotKeywordCall call = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, RobotKeywordCall.class);
+
+        if (testCase != null && testCase.getSuiteFile() == fileModel) {
             sortModel.clear();
-            tableInputIsReplaced().run();
+            selectionLayerAccessor.selectElementAfter(call, tableInputIsReplaced());
         }
     }
 
