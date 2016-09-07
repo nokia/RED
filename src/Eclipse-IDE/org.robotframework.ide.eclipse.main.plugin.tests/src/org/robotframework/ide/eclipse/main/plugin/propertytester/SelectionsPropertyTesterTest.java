@@ -40,22 +40,35 @@ public class SelectionsPropertyTesterTest {
 
     @Test
     public void testAllElementsHaveSameTypeProperty() {
-        final IStructuredSelection selectionWithSameTypeElements = new StructuredSelection(
+        final IStructuredSelection selectionWithSameTypeElements_1 = new StructuredSelection(
                 new Object[] { "abc", "def", "ghi" });
-        final IStructuredSelection selectionWithDifferentTypeElements = new StructuredSelection(
+        final IStructuredSelection selectionWithSameTypeElements_2 = new StructuredSelection(
+                new Object[] { new B(), new A(), new B() });
+        final IStructuredSelection selectionWithDifferentTypeElements_1 = new StructuredSelection(
                 new Object[] { "abc", 10, new Object() });
+        final IStructuredSelection selectionWithDifferentTypeElements_2 = new StructuredSelection(
+                new Object[] { new B(), new A(), new Object() });
         
         assertThat(allElementsHaveSameType(StructuredSelection.EMPTY, true)).isTrue();
         assertThat(allElementsHaveSameType(StructuredSelection.EMPTY, false)).isFalse();
 
-        assertThat(allElementsHaveSameType(selectionWithSameTypeElements, true)).isTrue();
-        assertThat(allElementsHaveSameType(selectionWithSameTypeElements, false)).isFalse();
+        assertThat(allElementsHaveSameType(selectionWithSameTypeElements_1, true)).isTrue();
+        assertThat(allElementsHaveSameType(selectionWithSameTypeElements_1, false)).isFalse();
 
-        assertThat(allElementsHaveSameType(selectionWithDifferentTypeElements, true)).isFalse();
-        assertThat(allElementsHaveSameType(selectionWithDifferentTypeElements, false)).isTrue();
+        assertThat(allElementsHaveSameType(selectionWithSameTypeElements_2, true)).isTrue();
+        assertThat(allElementsHaveSameType(selectionWithSameTypeElements_2, false)).isFalse();
+
+        assertThat(allElementsHaveSameType(selectionWithDifferentTypeElements_1, true)).isFalse();
+        assertThat(allElementsHaveSameType(selectionWithDifferentTypeElements_1, false)).isTrue();
+
+        assertThat(allElementsHaveSameType(selectionWithDifferentTypeElements_2, true)).isFalse();
+        assertThat(allElementsHaveSameType(selectionWithDifferentTypeElements_2, false)).isTrue();
     }
 
     private boolean allElementsHaveSameType(final IStructuredSelection selection, final boolean expected) {
         return tester.test(selection, SelectionsPropertyTester.ALL_ELEMENTS_HAVE_SAME_TYPE, null, expected);
     }
+    
+    private static class A {}
+    private static class B extends A {}
 }
