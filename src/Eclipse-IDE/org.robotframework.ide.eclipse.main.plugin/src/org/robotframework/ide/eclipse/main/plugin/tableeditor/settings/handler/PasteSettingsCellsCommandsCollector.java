@@ -14,8 +14,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobotElementCellsCommandsCollector;
@@ -88,7 +88,7 @@ public class PasteSettingsCellsCommandsCollector extends PasteRobotElementCellsC
                     }
                 } else {
                     if (selectedElementColumnIndex == 0) {
-                        pasteCommands.add(new SetKeywordCallNameCommand(selectedSetting, valueToPaste));
+                        pasteCommands.add(new SetSettingNameCommand(selectedSetting, valueToPaste));
                     } else {
                         pasteCommands.add(new SetSettingArgumentCommand(selectedSetting,
                                 selectedElementColumnIndex - 1, valueToPaste));
