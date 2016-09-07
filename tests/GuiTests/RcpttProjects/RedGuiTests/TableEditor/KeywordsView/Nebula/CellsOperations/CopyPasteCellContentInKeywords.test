@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4TCM4GB-EeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/5/16 2:36 PM
+Save-Time: 9/7/16 1:04 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -78,8 +78,8 @@ get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESC
     get-editbox -after [get-label "User Keywords"] -index 1 | key-type Up
     get-editbox -after [get-label "User Keywords"] -index 1 | key-type Up
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Up -times 8
-        key-type Down
+        key-type Right
+        key-type Up -times 7
         key-type Enter
     }
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
