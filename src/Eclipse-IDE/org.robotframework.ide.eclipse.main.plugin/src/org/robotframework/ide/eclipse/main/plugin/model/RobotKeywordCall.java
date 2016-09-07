@@ -57,7 +57,7 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
         return linkedElement;
     }
 
-    void setLinkedElement(final AModelElement<?> linkedElement) {
+    public void setLinkedElement(final AModelElement<?> linkedElement) {
         this.linkedElement = linkedElement;
     }
 

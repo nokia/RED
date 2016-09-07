@@ -26,7 +26,7 @@ public class RobotSetting extends RobotKeywordCall {
 
     private static final long serialVersionUID = 1L;
 
-    private final SettingsGroup group;
+    private SettingsGroup group;
 
     RobotSetting(final RobotSettingsSection section, final AModelElement<?> linkedElement) {
         this(section, SettingsGroup.NO_GROUP, linkedElement);
@@ -45,6 +45,10 @@ public class RobotSetting extends RobotKeywordCall {
 
     public SettingsGroup getGroup() {
         return group;
+    }
+
+    public void setGroup(final SettingsGroup group) {
+        this.group = group;
     }
 
     public String getNameInGroup() {
