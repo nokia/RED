@@ -30,6 +30,8 @@ public interface IExecutablesTableModelUpdater<T> {
 
     public void updateArgument(final AModelElement<?> modelElement, final int index, final String value);
 
+    public void setArguments(final AModelElement<?> modelElement, final List<String> arguments);
+
     public void remove(final T executablesHolder, final AModelElement<?> modelElement);
 
     public void updateComment(final AModelElement<?> modelElement, final String value);

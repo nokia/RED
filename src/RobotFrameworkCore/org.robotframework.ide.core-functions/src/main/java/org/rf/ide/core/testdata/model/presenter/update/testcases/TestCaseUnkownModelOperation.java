@@ -37,6 +37,8 @@ public class TestCaseUnkownModelOperation implements ITestCaseTableElementOperat
             final String comment) {
         final TestCaseUnknownSettings unknown = testCase.newUnknownSettings();
         unknown.getDeclaration().setText(settingName);
+        unknown.getDeclaration().setRaw(settingName);
+
         for (final String arg : args) {
             unknown.addArgument(arg);
         }
@@ -64,14 +66,14 @@ public class TestCaseUnkownModelOperation implements ITestCaseTableElementOperat
     }
 
     @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final TestCaseUnknownSettings unknown = (TestCaseUnknownSettings) modelElement;
 
         for (int i = 0; i < unknown.getArguments().size(); i++) {
             unknown.removeElementToken(0);
         }
-        for (int i = 0; i < newValues.size(); i++) {
-            unknown.addArgument(i, newValues.get(i));
+        for (int i = 0; i < newArguments.size(); i++) {
+            unknown.addArgument(i, newArguments.get(i));
         }
     }
 

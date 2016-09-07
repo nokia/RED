@@ -72,6 +72,16 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
         }
         operationHandler.update(modelElement, index, value);
     }
+
+    @Override
+    public void setArguments(final AModelElement<?> modelElement, final List<String> arguments) {
+        final IKeywordTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        if (operationHandler == null) {
+            throw new IllegalArgumentException(
+                    "Unable to set arguments of " + modelElement + ". Operation handler is missing");
+        }
+        operationHandler.update(modelElement, arguments);
+    }
     
     @Override
     public void updateComment(final AModelElement<?> modelElement, final String value) {

@@ -31,6 +31,9 @@ public class KeywordReturnModelOperation implements IKeywordTableElementOperatio
     public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
             final String comment) {
         final KeywordReturn keywordReturn = userKeyword.newReturn();
+        keywordReturn.getDeclaration().setText(settingName);
+        keywordReturn.getDeclaration().setRaw(settingName);
+
         for (int i = 0; i < args.size(); i++) {
             keywordReturn.addReturnValue(i, args.get(i));
         }
@@ -54,6 +57,18 @@ public class KeywordReturnModelOperation implements IKeywordTableElementOperatio
             keywordReturn.addReturnValue(index, value);
         } else {
             keywordReturn.removeElementToken(index);
+        }
+    }
+
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
+        final KeywordReturn keywordReturn = (KeywordReturn) modelElement;
+
+        for (int i = 0; i < keywordReturn.getReturnValues().size(); i++) {
+            keywordReturn.removeElementToken(0);
+        }
+        for (int i = 0; i < newArguments.size(); i++) {
+            keywordReturn.addReturnValue(i, newArguments.get(i));
         }
     }
 

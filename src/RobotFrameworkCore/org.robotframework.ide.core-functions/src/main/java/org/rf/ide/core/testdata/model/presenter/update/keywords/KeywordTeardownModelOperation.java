@@ -31,6 +31,9 @@ public class KeywordTeardownModelOperation implements IKeywordTableElementOperat
     public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
             final String comment) {
         final KeywordTeardown keywordTeardown = userKeyword.newTeardown();
+        keywordTeardown.getDeclaration().setText(settingName);
+        keywordTeardown.getDeclaration().setRaw(settingName);
+
         if (!args.isEmpty()) {
             keywordTeardown.setKeywordName(args.get(0));
             for (int i = 1; i < args.size(); i++) {
@@ -62,6 +65,19 @@ public class KeywordTeardownModelOperation implements IKeywordTableElementOperat
             } else {
                 keywordTeardown.removeElementToken(index - 1);
             }
+        }
+    }
+
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
+        final KeywordTeardown teardown = (KeywordTeardown) modelElement;
+
+        teardown.setKeywordName(newArguments.isEmpty() ? "" : newArguments.get(0));
+        for (int i = 0; i < teardown.getArguments().size(); i++) {
+            teardown.removeElementToken(0);
+        }
+        for (int i = 1; i < newArguments.size(); i++) {
+            teardown.setArgument(i - 1, newArguments.get(i));
         }
     }
 

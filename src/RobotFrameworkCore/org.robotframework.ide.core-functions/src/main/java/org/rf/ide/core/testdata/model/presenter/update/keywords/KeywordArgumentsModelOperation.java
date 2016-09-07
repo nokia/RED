@@ -31,6 +31,9 @@ public class KeywordArgumentsModelOperation implements IKeywordTableElementOpera
     public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
             final String comment) {
         final KeywordArguments keywordArgs = userKeyword.newArguments();
+        keywordArgs.getDeclaration().setText(settingName);
+        keywordArgs.getDeclaration().setRaw(settingName);
+
         for (int i = 0; i < args.size(); i++) {
             keywordArgs.addArgument(i, args.get(i));
         }
@@ -54,6 +57,18 @@ public class KeywordArgumentsModelOperation implements IKeywordTableElementOpera
             keywordArguments.addArgument(index, value);
         } else {
             keywordArguments.removeElementToken(index);
+        }
+    }
+
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
+        final KeywordArguments keywordArguments = (KeywordArguments) modelElement;
+
+        for (int i = 0; i < keywordArguments.getArguments().size(); i++) {
+            keywordArguments.removeElementToken(0);
+        }
+        for (int i = 0; i < newArguments.size(); i++) {
+            keywordArguments.addArgument(i, newArguments.get(i));
         }
     }
 
