@@ -445,6 +445,7 @@ public class RobotFormEditor extends FormEditor {
     }
 
     private void updateSourceFromModel() {
+        waitForPendingEditorJobs();
         final SuiteSourceEditor editor = getSourceEditor();
 
         if (!getDirtyEditors().isEmpty()) {
@@ -460,7 +461,6 @@ public class RobotFormEditor extends FormEditor {
 
             final RobotFileDumper dumper = new RobotFileDumper();
             dumper.setContext(ctx);
-
             final String content;
             if (RedSystemProperties.shouldUseOldReparsedLinkMode()) {
                 content = dumper.dump(currentRobotOutputFile);
