@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _1a2hUFVmEeaLgpF-R5GRxw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/29/16 7:23 PM
+Save-Time: 9/7/16 12:04 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -218,8 +218,12 @@ with [get-editor "TestFile.robot"] {
     //turn off editing mode, go down and press enter - new line will be added
     get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        //new line is added and focus i set to fist cell
         key-type Down
         key-type Enter
+        
+        //go to to 3rd column
+        key-type Right -times 2
     }
     get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
     //add 2. arg
@@ -235,9 +239,14 @@ with [get-editor "TestFile.robot"] {
         key-type Enter
     }
     //press Down arrow when cell is in edit mode - new line is added
-    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
+    //get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
     get-editbox -after [get-label "User Keywords"] -index 1 | key-type Down
-    get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
+    //focu is set of first cell - go to comment column
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Left
+        key-type Down
+        key-type Enter
+    }
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
     	//add comment to new line
         type-text "only comment"
@@ -279,15 +288,6 @@ with [get-editor "TestFile.robot"] {
     //go down and add new kw
     get-editbox -after [get-label "User Keywords"] -index 1 | key-type Down
     get-canvas -after [get-label "User Keywords"] -index 1 | key-type Enter
-    with [get-editbox -after [get-label "User Keywords"] -index 1] {
-        key-type Left -times 6
-        key-type "TRAVERSE_ESCAPE"
-    }
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        key-type Left -times 7
-        key-type Right
-        key-type Enter
-    }
     //add log
     with [get-editbox -after [get-label "User Keywords"] -index 1] {
         type-text Log
