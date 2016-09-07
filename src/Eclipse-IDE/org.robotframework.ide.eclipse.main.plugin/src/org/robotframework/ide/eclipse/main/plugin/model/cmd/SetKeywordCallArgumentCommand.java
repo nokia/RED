@@ -24,12 +24,18 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     protected final RobotKeywordCall keywordCall;
     protected final int index;
     protected final String value;
+    protected boolean shouldReplaceValue;
     protected String previousValue;
 
     public SetKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value) {
+        this(keywordCall, index, value, true);
+    }
+    
+    public SetKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value, final boolean shouldReplaceValue) {
         this.keywordCall = keywordCall;
         this.index = index;
         this.value = value;
+        this.shouldReplaceValue = shouldReplaceValue;
     }
 
     @Override
@@ -53,7 +59,11 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         
         previousValue = index >= 0 && index < arguments.size() ? arguments.get(index) : value;
 
-        fillArgumentsList(value, index, arguments);
+        fillArgumentsList(value, index, arguments, shouldReplaceValue);
+        
+        checkIfPreviousCommandWasAddingNewValue();
+        checkIfUndoCommandShouldAddArgument(arguments.get(index));
+
         return arguments;
     }
 
@@ -65,13 +75,33 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         return arguments;
     }
     
-    public static void fillArgumentsList(final String value, final int index, final List<String> arguments) {
-        arguments.set(index, value == null || value.trim().isEmpty() ? "\\" : value);
+    public static void fillArgumentsList(final String value, final int index, final List<String> arguments,
+            final boolean shouldReplaceValue) {
+        final String newValue = value == null || value.trim().isEmpty() ? "\\" : value;
+        if (shouldReplaceValue) {
+            arguments.set(index, newValue);
+        } else {
+            arguments.add(index, newValue);
+        }
         for (int i = arguments.size() - 1; i >= 0; i--) {
             if (!arguments.get(i).equals("\\")) {
                 break;
             }
             arguments.set(i, null);
+        }
+    }
+    
+    private void checkIfPreviousCommandWasAddingNewValue() {
+        if(!shouldReplaceValue) {
+            previousValue = null; // when new value was not replaced but added by undo command, then redo command should remove this value
+        }
+    }
+    
+    private void checkIfUndoCommandShouldAddArgument(final String currentArgValue) {
+        if(currentArgValue != null && currentArgValue.equals("\\") && value == null) {
+            shouldReplaceValue = false; // when arg is deleted not on last position, undo command will add new arg on this position and shifts other args to the right
+        } else {
+            shouldReplaceValue = true; // reset the flag for future undo commands
         }
     }
 
@@ -91,6 +121,6 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetKeywordCallArgumentCommand(keywordCall, index, previousValue));
+        return newUndoCommands(new SetKeywordCallArgumentCommand(keywordCall, index, previousValue, shouldReplaceValue));
     }
 }
