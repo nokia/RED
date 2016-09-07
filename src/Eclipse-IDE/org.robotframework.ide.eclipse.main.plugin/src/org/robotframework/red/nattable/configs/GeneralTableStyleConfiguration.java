@@ -5,7 +5,10 @@
  */
 package org.robotframework.red.nattable.configs;
 
+import org.eclipse.nebula.widgets.nattable.config.CellConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.config.DefaultNatTableStyleConfiguration;
+import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.data.convert.DefaultDisplayConverter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.TextPainter;
 import org.eclipse.nebula.widgets.nattable.painter.cell.decorator.PaddingDecorator;
 import org.eclipse.nebula.widgets.nattable.style.HorizontalAlignmentEnum;
@@ -25,5 +28,17 @@ public class GeneralTableStyleConfiguration extends DefaultNatTableStyleConfigur
         this.hAlign = HorizontalAlignmentEnum.LEFT;
         this.vAlign = VerticalAlignmentEnum.TOP;
         this.cellPainter = new PaddingDecorator(textPainter, 2, 2, 2, 5);
+    }
+
+    @Override
+    public void configureRegistry(final IConfigRegistry configRegistry) {
+        super.configureRegistry(configRegistry);
+
+        configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new DefaultDisplayConverter() {
+            @Override
+            public Object displayToCanonicalValue(final Object destinationValue) {
+                return destinationValue.toString();
+            }
+        });
     }
 }
