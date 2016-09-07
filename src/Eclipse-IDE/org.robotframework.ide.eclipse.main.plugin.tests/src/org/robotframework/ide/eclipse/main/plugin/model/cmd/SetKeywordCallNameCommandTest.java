@@ -126,7 +126,7 @@ public class SetKeywordCallNameCommandTest {
         command.execute();
         
         final RobotKeywordCall callAfterNameChange = executablesHolder.getChildren().get(callIndexAfterCommand);
-        assertThat(constructRow(callAfterNameChange)).containsExactly("", "arg1", "arg2", "arg3", "# comment");
+        assertThat(constructRow(callAfterNameChange)).containsExactly("\\", "arg1", "arg2", "arg3", "# comment");
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
         
