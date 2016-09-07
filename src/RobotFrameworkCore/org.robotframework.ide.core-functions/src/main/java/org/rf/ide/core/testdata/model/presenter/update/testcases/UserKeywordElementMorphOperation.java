@@ -26,7 +26,7 @@ abstract class UserKeywordElementMorphOperation implements ITestCaseTableElement
     }
 
     @Override
-    public final void update(final AModelElement<?> modelElement, final List<String> newValues) {
+    public final void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         throw new IllegalStateException();
     }
 

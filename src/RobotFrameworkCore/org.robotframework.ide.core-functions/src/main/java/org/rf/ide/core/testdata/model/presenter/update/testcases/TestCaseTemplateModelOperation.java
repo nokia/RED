@@ -31,6 +31,9 @@ public class TestCaseTemplateModelOperation implements ITestCaseTableElementOper
     public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
             final String comment) {
         final TestCaseTemplate template = testCase.newTemplate();
+        template.getDeclaration().setText(settingName);
+        template.getDeclaration().setRaw(settingName);
+
         if (!args.isEmpty()) {
             template.setKeywordName(args.get(0));
             for (int i = 1; i < args.size(); i++) {
@@ -64,15 +67,15 @@ public class TestCaseTemplateModelOperation implements ITestCaseTableElementOper
     }
 
     @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final TestCaseTemplate template = (TestCaseTemplate) modelElement;
 
-        template.setKeywordName(newValues.isEmpty() ? "" : newValues.get(0));
+        template.setKeywordName(newArguments.isEmpty() ? "" : newArguments.get(0));
         for (int i = 0; i < template.getUnexpectedTrashArguments().size(); i++) {
             template.removeElementToken(0);
         }
-        for (int i = 1; i < newValues.size(); i++) {
-            template.setUnexpectedTrashArguments(i - 1, newValues.get(i));
+        for (int i = 1; i < newArguments.size(); i++) {
+            template.setUnexpectedTrashArguments(i - 1, newArguments.get(i));
         }
     }
 

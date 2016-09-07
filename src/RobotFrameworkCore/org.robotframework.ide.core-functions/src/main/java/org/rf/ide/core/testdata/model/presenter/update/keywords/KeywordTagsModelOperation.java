@@ -31,6 +31,9 @@ public class KeywordTagsModelOperation implements IKeywordTableElementOperation 
     public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
             final String comment) {
         final KeywordTags keywordTags = userKeyword.newTags();
+        keywordTags.getDeclaration().setText(settingName);
+        keywordTags.getDeclaration().setRaw(settingName);
+
         for (final String tag : args) {
             keywordTags.addTag(tag);
         }
@@ -54,6 +57,18 @@ public class KeywordTagsModelOperation implements IKeywordTableElementOperation 
             keywordTags.setTag(index, value);
         } else {
             keywordTags.removeElementToken(index);
+        }
+    }
+
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
+        final KeywordTags tags = (KeywordTags) modelElement;
+
+        for (int i = 0; i < tags.getTags().size(); i++) {
+            tags.removeElementToken(0);
+        }
+        for (int i = 0; i < newArguments.size(); i++) {
+            tags.setTag(i, newArguments.get(i));
         }
     }
 

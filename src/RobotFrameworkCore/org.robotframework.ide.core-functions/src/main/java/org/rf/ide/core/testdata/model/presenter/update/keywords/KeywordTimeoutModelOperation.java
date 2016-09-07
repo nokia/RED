@@ -31,6 +31,9 @@ public class KeywordTimeoutModelOperation implements IKeywordTableElementOperati
     public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
             final String comment) {
         final KeywordTimeout keywordTimeout = userKeyword.newTimeout();
+        keywordTimeout.getDeclaration().setText(settingName);
+        keywordTimeout.getDeclaration().setRaw(settingName);
+
         if (!args.isEmpty()) {
             keywordTimeout.setTimeout(args.get(0));
             for (int i = 1; i < args.size(); i++) {
@@ -62,6 +65,19 @@ public class KeywordTimeoutModelOperation implements IKeywordTableElementOperati
             } else {
                 keywordTimeout.removeElementToken(index - 1);
             }
+        }
+    }
+
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
+        final KeywordTimeout timeout = (KeywordTimeout) modelElement;
+
+        timeout.setTimeout(newArguments.isEmpty() ? "" : newArguments.get(0));
+        for (int i = 0; i < timeout.getMessage().size(); i++) {
+            timeout.removeElementToken(0);
+        }
+        for (int i = 1; i < newArguments.size(); i++) {
+            timeout.addMessagePart(i - 1, newArguments.get(i));
         }
     }
 
