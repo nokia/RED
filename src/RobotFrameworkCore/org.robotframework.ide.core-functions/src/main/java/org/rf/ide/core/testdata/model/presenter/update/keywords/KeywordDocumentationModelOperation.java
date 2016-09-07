@@ -32,6 +32,9 @@ public class KeywordDocumentationModelOperation implements IKeywordTableElementO
     public AModelElement<?> create(final UserKeyword userKeyword, final String settingName, final List<String> args,
             final String comment) {
         final KeywordDocumentation keywordDoc = userKeyword.newDocumentation();
+        keywordDoc.getDeclaration().setText(settingName);
+        keywordDoc.getDeclaration().setRaw(settingName);
+
         for (int i = 0; i < args.size(); i++) {
             keywordDoc.addDocumentationText(i, args.get(i));
         }
@@ -57,6 +60,17 @@ public class KeywordDocumentationModelOperation implements IKeywordTableElementO
             }
         } else {
             keywordDocumentation.clearDocumentation();
+        }
+    }
+
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
+        final KeywordDocumentation keywordDocumentation = (KeywordDocumentation) modelElement;
+
+        if (newArguments.isEmpty()) {
+            keywordDocumentation.clearDocumentation();
+        } else {
+            DocumentationServiceHandler.update(keywordDocumentation, newArguments.get(0));
         }
     }
 

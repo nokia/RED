@@ -31,6 +31,9 @@ public class TestCaseSetupModelOperation implements ITestCaseTableElementOperati
     public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
             final String comment) {
         final TestCaseSetup setup = testCase.newSetup();
+        setup.getDeclaration().setText(settingName);
+        setup.getDeclaration().setRaw(settingName);
+
         if (!args.isEmpty()) {
             setup.setKeywordName(args.get(0));
             for (int i = 1; i < args.size(); i++) {
@@ -64,15 +67,15 @@ public class TestCaseSetupModelOperation implements ITestCaseTableElementOperati
     }
 
     @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final TestCaseSetup setup = (TestCaseSetup) modelElement;
 
-        setup.setKeywordName(newValues.isEmpty() ? "" : newValues.get(0));
+        setup.setKeywordName(newArguments.isEmpty() ? "" : newArguments.get(0));
         for (int i = 0; i < setup.getArguments().size(); i++) {
             setup.removeElementToken(0);
         }
-        for (int i = 1; i < newValues.size(); i++) {
-            setup.setArgument(i - 1, newValues.get(i));
+        for (int i = 1; i < newArguments.size(); i++) {
+            setup.setArgument(i - 1, newArguments.get(i));
         }
     }
 

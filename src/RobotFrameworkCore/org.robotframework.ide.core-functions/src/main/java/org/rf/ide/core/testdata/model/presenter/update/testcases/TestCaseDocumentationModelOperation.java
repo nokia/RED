@@ -32,6 +32,9 @@ public class TestCaseDocumentationModelOperation implements ITestCaseTableElemen
     public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
             final String comment) {
         final TestDocumentation testDoc = testCase.newDocumentation();
+        testDoc.getDeclaration().setText(settingName);
+        testDoc.getDeclaration().setRaw(settingName);
+
         for (int i = 0; i < args.size(); i++) {
             testDoc.addDocumentationText(i, args.get(i));
         }
@@ -60,13 +63,13 @@ public class TestCaseDocumentationModelOperation implements ITestCaseTableElemen
     }
 
     @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final TestDocumentation testDoc = (TestDocumentation) modelElement;
 
-        if (newValues.isEmpty()) {
+        if (newArguments.isEmpty()) {
             testDoc.clearDocumentation();
         } else {
-            DocumentationServiceHandler.update(testDoc, newValues.get(0));
+            DocumentationServiceHandler.update(testDoc, newArguments.get(0));
         }
     }
 

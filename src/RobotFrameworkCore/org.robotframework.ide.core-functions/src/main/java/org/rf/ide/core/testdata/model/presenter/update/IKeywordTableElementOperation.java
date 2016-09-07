@@ -25,6 +25,8 @@ public interface IKeywordTableElementOperation {
 
     void update(final AModelElement<?> modelElement, final int index, final String value);
 
+    void update(final AModelElement<?> modelElement, final List<String> newArguments);
+
     void remove(UserKeyword userKeyword, AModelElement<?> modelElement);
     
 }

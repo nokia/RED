@@ -31,6 +31,9 @@ public class TestCaseTagsModelOperation implements ITestCaseTableElementOperatio
     public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
             final String comment) {
         final TestCaseTags tags = testCase.newTags();
+        tags.getDeclaration().setText(settingName);
+        tags.getDeclaration().setRaw(settingName);
+
         for (final String tag : args) {
             tags.addTag(tag);
         }
@@ -57,14 +60,14 @@ public class TestCaseTagsModelOperation implements ITestCaseTableElementOperatio
     }
 
     @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final TestCaseTags tags = (TestCaseTags) modelElement;
 
         for (int i = 0; i < tags.getTags().size(); i++) {
             tags.removeElementToken(0);
         }
-        for (int i = 0; i < newValues.size(); i++) {
-            tags.setTag(i, newValues.get(i));
+        for (int i = 0; i < newArguments.size(); i++) {
+            tags.setTag(i, newArguments.get(i));
         }
     }
 
