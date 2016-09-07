@@ -21,26 +21,40 @@ import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordTagsModel
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordTeardownModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordTimeoutModelOperation;
 import org.rf.ide.core.testdata.model.presenter.update.keywords.KeywordUnknownModelOperation;
+import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseDocumentationMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseExecutableRowMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseSetupMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseTagsMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseTeardownMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseTemplateMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseTimeoutMorphOperation;
+import org.rf.ide.core.testdata.model.presenter.update.keywords.TestCaseUnknownSettingMorphOperation;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author mmarzec
  */
 public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<UserKeyword> {
 
-    private static final List<IKeywordTableElementOperation> elementOparations = Arrays.asList(
+    private static final List<IExecutablesStepsHolderElementOperation<UserKeyword>> elementOparations = Arrays.asList(
             new KeywordExecutableRowModelOperation(), new KeywordArgumentsModelOperation(),
             new KeywordDocumentationModelOperation(), new KeywordTagsModelOperation(),
             new KeywordReturnModelOperation(), new KeywordTeardownModelOperation(), new KeywordTimeoutModelOperation(),
-            new KeywordUnknownModelOperation());
+            new KeywordUnknownModelOperation(), new TestCaseDocumentationMorphOperation(),
+            new TestCaseExecutableRowMorphOperation(), new TestCaseSetupMorphOperation(),
+            new TestCaseTagsMorphOperation(), new TestCaseTeardownMorphOperation(),
+            new TestCaseTemplateMorphOperation(), new TestCaseTimeoutMorphOperation(),
+            new TestCaseUnknownSettingMorphOperation());
 
     @Override
     public AModelElement<?> createSetting(final UserKeyword userKeyword, final String settingName,
             final String comment, final List<String> args) {
-        final IKeywordTableElementOperation operationHandler = getOperationHandler(settingName);
+        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(settingName);
         if (operationHandler == null || userKeyword == null) {
             throw new IllegalArgumentException(
                     "Unable to create " + settingName + " setting. Operation handler is missing");
@@ -52,7 +66,7 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
     @Override
     public AModelElement<?> createExecutableRow(final UserKeyword userKeyword, final int index,
             final String action, final String comment, final List<String> args) {
-        final IKeywordTableElementOperation operationHandler = getOperationHandler(
+        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
                 ModelType.USER_KEYWORD_EXECUTABLE_ROW);
         if (operationHandler == null || userKeyword == null) {
             throw new IllegalArgumentException(
@@ -65,7 +79,8 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
 
     @Override
     public void updateArgument(final AModelElement<?> modelElement, final int index, final String value) {
-        final IKeywordTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
+                modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException(
                     "Unable to update arguments of " + modelElement + ". Operation handler is missing");
@@ -75,7 +90,8 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
 
     @Override
     public void setArguments(final AModelElement<?> modelElement, final List<String> arguments) {
-        final IKeywordTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
+                modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException(
                     "Unable to set arguments of " + modelElement + ". Operation handler is missing");
@@ -90,7 +106,8 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
     
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {
-        final IKeywordTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
+                modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException("Unable to remove " + modelElement + " from "
                     + userKeyword.getName().getText() + " keyword. Operation handler is missing");
@@ -101,7 +118,8 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
     @Override
     public AModelElement<?> insert(final UserKeyword userKeyword, final int index,
             final AModelElement<?> modelElement) {
-        final IKeywordTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        final IExecutablesStepsHolderElementOperation<UserKeyword> operationHandler = getOperationHandler(
+                modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException("Unable to insert " + modelElement + " into "
                     + userKeyword.getName().getText() + " keyword. Operation handler is missing");
@@ -109,8 +127,9 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
         return operationHandler.insert(userKeyword, index, modelElement);
     }
 
-    private IKeywordTableElementOperation getOperationHandler(final ModelType elementModelType) {
-        for (final IKeywordTableElementOperation operation : elementOparations) {
+    @VisibleForTesting
+    IExecutablesStepsHolderElementOperation<UserKeyword> getOperationHandler(final ModelType elementModelType) {
+        for (final IExecutablesStepsHolderElementOperation<UserKeyword> operation : elementOparations) {
             if (operation.isApplicable(elementModelType)) {
                 return operation;
             }
@@ -118,14 +137,15 @@ public class KeywordTableModelUpdater implements IExecutablesTableModelUpdater<U
         return null;
     }
 
-    private IKeywordTableElementOperation getOperationHandler(final String settingName) {
+    private IExecutablesStepsHolderElementOperation<UserKeyword> getOperationHandler(final String settingName) {
         final RobotTokenType type = RobotTokenType.findTypeOfDeclarationForKeywordSettingTable(settingName);
         return getOperationHandler(
                 type == RobotTokenType.UNKNOWN ? RobotTokenType.KEYWORD_SETTING_UNKNOWN_DECLARATION : type);
     }
 
-    private IKeywordTableElementOperation getOperationHandler(final IRobotTokenType type) {
-        for (final IKeywordTableElementOperation operation : elementOparations) {
+    @VisibleForTesting
+    IExecutablesStepsHolderElementOperation<UserKeyword> getOperationHandler(final IRobotTokenType type) {
+        for (final IExecutablesStepsHolderElementOperation<UserKeyword> operation : elementOparations) {
             if (operation.isApplicable(type)) {
                 return operation;
             }
