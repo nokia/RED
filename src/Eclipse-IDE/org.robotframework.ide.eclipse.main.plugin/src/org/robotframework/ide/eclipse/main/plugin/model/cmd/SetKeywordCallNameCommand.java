@@ -21,7 +21,9 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
     private final String newName;
 
-    private final String oldName;
+    private String oldName;
+    
+    private RobotKeywordCall newElement;
 
     public SetKeywordCallNameCommand(final RobotKeywordCall keywordCall, final String name) {
         this.keywordCall = keywordCall;
@@ -71,7 +73,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         final int index = call.getIndex();
         parent.removeChild(call);
 
-        parent.createSetting(Math.min(index, lastSettingIndex), settingName, call.getArguments(), call.getComment());
+        newElement = parent.createSetting(Math.min(index, lastSettingIndex), settingName, call.getArguments(), call.getComment());
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
     }
@@ -84,7 +86,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         final int index = call.getIndex();
         parent.removeChild(call);
 
-        parent.createKeywordCall(Math.max(index, lastSettingIndex), name, call.getArguments(), call.getComment());
+        newElement = parent.createKeywordCall(Math.max(index, lastSettingIndex), name, call.getArguments(), call.getComment());
+        oldName = "[" + oldName + "]";
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
     }
@@ -107,7 +110,6 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(keywordCall.isExecutable() && !looksLikeSetting()
-                ? new SetKeywordCallNameCommand(keywordCall, oldName) : new EmptyCommand());
+        return newUndoCommands(new SetKeywordCallNameCommand(newElement != null ? newElement : keywordCall, oldName));
     }
 }
