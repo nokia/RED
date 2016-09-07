@@ -33,7 +33,7 @@ import com.google.common.annotations.VisibleForTesting;
 
 public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<TestCase> {
 
-    private static final List<ITestCaseTableElementOperation> elementOparations = Arrays.asList(
+    private static final List<IExecutablesStepsHolderElementOperation<TestCase>> elementOparations = Arrays.asList(
             new TestCaseExecutableRowModelOperation(), new TestCaseDocumentationModelOperation(),
             new TestCaseSetupModelOperation(), new TestCaseTagsModelOperation(), new TestCaseTeardownModelOperation(),
             new TestCaseTemplateModelOperation(), new TestCaseTimeoutModelOperation(),
@@ -46,7 +46,7 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
     @Override
     public AModelElement<?> createSetting(final TestCase testCase, final String settingName, final String comment,
             final List<String> args) {
-        final ITestCaseTableElementOperation operationHandler = getOperationHandler(settingName);
+        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(settingName);
         if (operationHandler == null || testCase == null) {
             throw new IllegalArgumentException(
                     "Unable to create " + settingName + " setting. Operation handler is missing");
@@ -58,7 +58,8 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
     @SuppressWarnings("unchecked")
     public AModelElement<?> createExecutableRow(final TestCase testCase, final int index, final String action,
             final String comment, final List<String> args) {
-        final ITestCaseTableElementOperation operationHandler = getOperationHandler(ModelType.TEST_CASE_EXECUTABLE_ROW);
+        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
+                ModelType.TEST_CASE_EXECUTABLE_ROW);
         if (operationHandler == null || testCase == null) {
             throw new IllegalArgumentException(
                     "Unable to create " + action + " executable row. Operation handler is missing");
@@ -70,7 +71,8 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
 
     @Override
     public void updateArgument(final AModelElement<?> modelElement, final int index, final String value) {
-        final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
+                modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException(
                     "Unable to update arguments of " + modelElement + ". Operation handler is missing");
@@ -80,7 +82,8 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
 
     @Override
     public void setArguments(final AModelElement<?> modelElement, final List<String> arguments) {
-        final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
+                modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException(
                     "Unable to set arguments of " + modelElement + ". Operation handler is missing");
@@ -95,7 +98,8 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
 
     @Override
     public void remove(final TestCase testCase, final AModelElement<?> modelElement) {
-        final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
+                modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException("Unable to remove " + modelElement + " from "
                     + testCase.getName().getText() + " test case. Operation handler is missing");
@@ -106,7 +110,8 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
     @Override
     public AModelElement<?> insert(final TestCase testCase, final int index, final AModelElement<?> modelElement) {
         // morph operations enables inserting settings taken from keywords elements
-        final ITestCaseTableElementOperation operationHandler = getOperationHandler(modelElement.getModelType());
+        final IExecutablesStepsHolderElementOperation<TestCase> operationHandler = getOperationHandler(
+                modelElement.getModelType());
         if (operationHandler == null) {
             throw new IllegalArgumentException("Unable to insert " + modelElement + " into "
                     + testCase.getName().getText() + " test case. Operation handler is missing");
@@ -115,8 +120,8 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
     }
 
     @VisibleForTesting
-    ITestCaseTableElementOperation getOperationHandler(final ModelType elementModelType) {
-        for (final ITestCaseTableElementOperation operation : elementOparations) {
+    IExecutablesStepsHolderElementOperation<TestCase> getOperationHandler(final ModelType elementModelType) {
+        for (final IExecutablesStepsHolderElementOperation<TestCase> operation : elementOparations) {
             if (operation.isApplicable(elementModelType)) {
                 return operation;
             }
@@ -124,15 +129,15 @@ public class TestCaseTableModelUpdater implements IExecutablesTableModelUpdater<
         return null;
     }
 
-    private ITestCaseTableElementOperation getOperationHandler(final String settingName) {
+    private IExecutablesStepsHolderElementOperation<TestCase> getOperationHandler(final String settingName) {
         final RobotTokenType type = RobotTokenType.findTypeOfDeclarationForTestCaseSettingTable(settingName);
         return getOperationHandler(
                 type == RobotTokenType.UNKNOWN ? RobotTokenType.TEST_CASE_SETTING_UNKNOWN_DECLARATION : type);
     }
 
     @VisibleForTesting
-    ITestCaseTableElementOperation getOperationHandler(final IRobotTokenType type) {
-        for (final ITestCaseTableElementOperation operation : elementOparations) {
+    IExecutablesStepsHolderElementOperation<TestCase> getOperationHandler(final IRobotTokenType type) {
+        for (final IExecutablesStepsHolderElementOperation<TestCase> operation : elementOparations) {
             if (operation.isApplicable(type)) {
                 return operation;
             }

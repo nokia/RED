@@ -9,13 +9,13 @@ import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
-import org.rf.ide.core.testdata.model.presenter.update.ITestCaseTableElementOperation;
+import org.rf.ide.core.testdata.model.presenter.update.IExecutablesStepsHolderElementOperation;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
-public class TestCaseTimeoutModelOperation implements ITestCaseTableElementOperation {
+public class TestCaseTimeoutModelOperation implements IExecutablesStepsHolderElementOperation<TestCase> {
 
     @Override
     public boolean isApplicable(final ModelType elementType) {
