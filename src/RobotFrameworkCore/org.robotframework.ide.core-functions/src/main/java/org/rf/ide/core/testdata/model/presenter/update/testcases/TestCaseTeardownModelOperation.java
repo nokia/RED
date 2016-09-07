@@ -31,6 +31,9 @@ public class TestCaseTeardownModelOperation implements ITestCaseTableElementOper
     public AModelElement<?> create(final TestCase testCase, final String settingName, final List<String> args,
             final String comment) {
         final TestCaseTeardown teardown = testCase.newTeardown();
+        teardown.getDeclaration().setText(settingName);
+        teardown.getDeclaration().getRaw();
+
         if (!args.isEmpty()) {
             teardown.setKeywordName(args.get(0));
             for (int i = 1; i < args.size(); i++) {
@@ -65,15 +68,15 @@ public class TestCaseTeardownModelOperation implements ITestCaseTableElementOper
     }
 
     @Override
-    public void update(final AModelElement<?> modelElement, final List<String> newValues) {
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final TestCaseTeardown teardown = (TestCaseTeardown) modelElement;
 
-        teardown.setKeywordName(newValues.isEmpty() ? "" : newValues.get(0));
+        teardown.setKeywordName(newArguments.isEmpty() ? "" : newArguments.get(0));
         for (int i = 0; i < teardown.getArguments().size(); i++) {
             teardown.removeElementToken(0);
         }
-        for (int i = 1; i < newValues.size(); i++) {
-            teardown.setArgument(i - 1, newValues.get(i));
+        for (int i = 1; i < newArguments.size(); i++) {
+            teardown.setArgument(i - 1, newArguments.get(i));
         }
     }
 

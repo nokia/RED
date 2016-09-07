@@ -81,6 +81,11 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(executable.getArguments(), execArgs, executable.getComment(), newComment);
 
+        final ArrayList<String> newArgs = newArrayList("1", "2", "3");
+        modelUpdater.setArguments(executable, newArgs);
+
+        checkSetting(executable.getArguments(), newArgs, executable.getComment(), newComment);
+
         checkRemoveMethod(userKeyword.getKeywordExecutionRows(), modelElement);
     }
 
@@ -110,6 +115,11 @@ public class KeywordTableModelUpdaterTest {
 
         checkSetting(setting.getArguments(), settingArgs, setting.getComment(), newComment);
 
+        final ArrayList<String> newArgs = newArrayList("1", "2", "3");
+        modelUpdater.setArguments(setting, newArgs);
+
+        checkSetting(setting.getArguments(), newArgs, setting.getComment(), newComment);
+
         checkRemoveMethod(userKeyword.getArguments(), modelElement);
     }
 
@@ -136,6 +146,10 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getDocumentationText(), newArrayList(newArg3), setting.getComment(), newComment);
+
+        modelUpdater.setArguments(setting, newArrayList("1", "2", "3"));
+
+        checkSetting(setting.getDocumentationText(), newArrayList("1"), setting.getComment(), newComment);
 
         checkRemoveMethod(userKeyword.getDocumentation(), modelElement);
     }
@@ -165,6 +179,11 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getTags(), settingArgs, setting.getComment(), newComment);
+
+        final ArrayList<String> newArgs = newArrayList("1", "2", "3");
+        modelUpdater.setArguments(setting, newArgs);
+
+        checkSetting(setting.getTags(), newArgs, setting.getComment(), newComment);
 
         checkRemoveMethod(userKeyword.getTags(), modelElement);
     }
@@ -199,6 +218,11 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getTimeout(), newTimeout, setting.getMessage(), settingArgs, setting.getComment(),
+                newComment);
+
+        modelUpdater.setArguments(setting, newArrayList("1", "2", "3"));
+
+        checkSetting(setting.getTimeout(), "1", setting.getMessage(), newArrayList("2", "3"), setting.getComment(),
                 newComment);
 
         checkRemoveMethod(userKeyword.getTimeouts(), modelElement);
@@ -237,6 +261,11 @@ public class KeywordTableModelUpdaterTest {
         checkSetting(setting.getKeywordName(), newTeardown, setting.getArguments(), settingArgs, setting.getComment(),
                 newComment);
 
+        modelUpdater.setArguments(setting, newArrayList("1", "2", "3"));
+
+        checkSetting(setting.getKeywordName(), "1", setting.getArguments(), newArrayList("2", "3"),
+                setting.getComment(), newComment);
+
         checkRemoveMethod(userKeyword.getTeardowns(), modelElement);
     }
 
@@ -265,6 +294,11 @@ public class KeywordTableModelUpdaterTest {
         modelUpdater.updateComment(setting, newComment);
 
         checkSetting(setting.getReturnValues(), settingArgs, setting.getComment(), newComment);
+
+        final ArrayList<String> newArgs = newArrayList("1", "2", "3");
+        modelUpdater.setArguments(setting, newArgs);
+
+        checkSetting(setting.getReturnValues(), newArgs, setting.getComment(), newComment);
 
         checkRemoveMethod(userKeyword.getReturns(), modelElement);
     }

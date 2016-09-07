@@ -27,6 +27,8 @@ public class KeywordUnknownModelOperation implements IKeywordTableElementOperati
             final String comment) {
         final KeywordUnknownSettings unknown = userKeyword.newUnknownSettings();
         unknown.getDeclaration().setText(settingName);
+        unknown.getDeclaration().setRaw(settingName);
+
         for (final String arg : args) {
             unknown.addArgument(arg);
         }
@@ -51,6 +53,18 @@ public class KeywordUnknownModelOperation implements IKeywordTableElementOperati
             unknown.addArgument(index, value);
         } else {
             unknown.removeElementToken(index);
+        }
+    }
+
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
+        final KeywordUnknownSettings unknown = (KeywordUnknownSettings) modelElement;
+
+        for (int i = 0; i < unknown.getArguments().size(); i++) {
+            unknown.removeElementToken(0);
+        }
+        for (int i = 0; i < newArguments.size(); i++) {
+            unknown.addArgument(i, newArguments.get(i));
         }
     }
 

@@ -60,6 +60,18 @@ public class KeywordExecutableRowModelOperation implements IKeywordTableElementO
         }
     }
 
+    @Override
+    public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
+        final RobotExecutableRow<?> row = (RobotExecutableRow<?>) modelElement;
+
+        for (int i = 0; i < row.getArguments().size(); i++) {
+            row.removeElementToken(0);
+        }
+        for (int i = 0; i < newArguments.size(); i++) {
+            row.setArgument(i, newArguments.get(i));
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void remove(final UserKeyword userKeyword, final AModelElement<?> modelElement) {

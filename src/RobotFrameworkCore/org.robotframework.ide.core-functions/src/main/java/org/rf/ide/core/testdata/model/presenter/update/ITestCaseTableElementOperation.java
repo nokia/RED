@@ -20,7 +20,7 @@ public interface ITestCaseTableElementOperation {
 
     void update(final AModelElement<?> modelElement, final int index, final String value);
 
-    void update(final AModelElement<?> modelElement, final List<String> newValues);
+    void update(final AModelElement<?> modelElement, final List<String> newArguments);
 
     void remove(TestCase testCase, AModelElement<?> modelElement);
 }
