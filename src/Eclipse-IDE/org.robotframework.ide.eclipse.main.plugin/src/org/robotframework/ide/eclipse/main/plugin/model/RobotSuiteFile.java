@@ -363,11 +363,10 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
     }
 
-    @SuppressWarnings("unchecked")
     public <T extends RobotElement> Optional<T> findSection(final Class<T> sectionClass) {
         for (final RobotElement elem : getSections()) {
             if (sectionClass.isInstance(elem)) {
-                return (Optional<T>) Optional.of(elem);
+                return Optional.of(sectionClass.cast(elem));
             }
         }
         return Optional.absent();
