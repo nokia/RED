@@ -760,7 +760,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // to wait for it to
         // end in order to proceed with saving
         try {
-            jobGroup.get().join(2L, TimeUnit.MILLISECONDS);
+            jobGroup.get().join(2L, TimeUnit.SECONDS);
         } catch (final InterruptedException e) {
             RedPlugin.logError("Documentation change job was interrupted", e);
         }
