@@ -759,12 +759,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // user could just typed something into documentation box, so the job was scheduled, we need
         // to wait for it to
         // end in order to proceed with saving
-        if (!documenationChangeJob.compareAndSet(null, null)) {
-            try {
-                jobGroup.get().join(2L, TimeUnit.MILLISECONDS);
-            } catch (final InterruptedException e) {
-                RedPlugin.logError("Documentation change job was interrupted", e);
-            }
+        try {
+            jobGroup.get().join(2L, TimeUnit.MILLISECONDS);
+        } catch (final InterruptedException e) {
+            RedPlugin.logError("Documentation change job was interrupted", e);
         }
     }
 
