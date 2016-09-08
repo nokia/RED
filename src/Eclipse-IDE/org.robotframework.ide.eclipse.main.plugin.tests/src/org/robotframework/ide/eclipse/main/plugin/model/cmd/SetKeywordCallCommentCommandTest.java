@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.List;
 
@@ -22,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class SetKeywordCallCommentCommandTest {
 
@@ -69,14 +71,24 @@ public class SetKeywordCallCommentCommandTest {
 
     private void changeAndVerify(final RobotKeywordCall keywordExecutable, final String newComment,
             final String expected) {
+        final Object oldComment = keywordExecutable.getComment();
+
         final IEventBroker eventBroker = mock(IEventBroker.class);
-        ContextInjector.prepareContext()
+        final SetKeywordCallCommentCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new SetKeywordCallCommentCommand(keywordExecutable, newComment))
-                .execute();
+                .isInjectedInto(new SetKeywordCallCommentCommand(keywordExecutable, newComment));
+        command.execute();
 
         assertThat(keywordExecutable.getComment()).isEqualTo(expected);
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordExecutable);
+
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(keywordExecutable.getComment()).isEqualTo(oldComment);
+
+        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordExecutable);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     private static List<RobotKeywordCall> createSettingsKeywordCalls() {
