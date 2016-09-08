@@ -377,7 +377,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 RobotKeywordDefinition.class);
         if (section != null && section.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.selectElementAfter(keyword, tableInputIsReplaced());
+            selectionLayerAccessor.selectElementInFirstCellAfterOperation(keyword, tableInputIsReplaced());
         }
     }
 
@@ -431,12 +431,12 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 setDirty();
             } else if (keywordCall != null) {
                 sortModel.clear();
-                selectionLayerAccessor.selectElementAfter(keywordCall, tableInputIsReplaced());
+                selectionLayerAccessor.selectElementInFirstCellAfterOperation(keywordCall, tableInputIsReplaced());
             } else {
                 sortModel.clear();
                 @SuppressWarnings("unchecked")
                 final List<RobotKeywordCall> calls = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, List.class);
-                selectionLayerAccessor.selectElementAfter(calls.get(calls.size() - 1), tableInputIsReplaced());
+                selectionLayerAccessor.selectElementInFirstCellAfterOperation(calls.get(calls.size() - 1), tableInputIsReplaced());
             }
         }
     }
@@ -496,7 +496,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         if (definition != null && definition.getSuiteFile() == fileModel) {
             sortModel.clear();
-            selectionLayerAccessor.selectElementAfter(call, tableInputIsReplaced());
+            selectionLayerAccessor.selectElementPreservingSelectedColumnsAfterOperation(call, tableInputIsReplaced());
         }
     }
 
