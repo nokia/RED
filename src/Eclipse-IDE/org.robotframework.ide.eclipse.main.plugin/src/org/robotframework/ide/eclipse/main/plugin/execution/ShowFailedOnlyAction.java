@@ -8,17 +8,21 @@ package org.robotframework.ide.eclipse.main.plugin.execution;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class ShowFailedOnlyAction extends Action implements IWorkbenchAction {
 
     private static final String ID = "org.robotframework.action.executionView.ShowFailedOnlyAction";
 
-    private TreeViewer viewer;
+    private final TreeViewer viewer;
     
-    private ExecutionViewContentProvider executionViewContentProvider;
+    private final ExecutionViewContentProvider executionViewContentProvider;
     
     public ShowFailedOnlyAction(final TreeViewer viewer, final ExecutionViewContentProvider executionViewContentProvider) {
+        super("Show Failures Only", RedImages.getFailuresImage());
         setId(ID);
+        setChecked(false);
+
         this.viewer = viewer;
         this.executionViewContentProvider = executionViewContentProvider;
     }

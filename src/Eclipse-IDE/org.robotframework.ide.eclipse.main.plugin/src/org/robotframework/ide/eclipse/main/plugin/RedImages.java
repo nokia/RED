@@ -54,6 +54,10 @@ public class RedImages {
         return RedPlugin.getImageDescriptor("resources/refresh.png");
     }
 
+    public static ImageDescriptor getLinkImage() {
+        return RedPlugin.getImageDescriptor("resources/link_with_editor.png");
+    }
+
     public static ImageDescriptor getRobotImage() {
         return RedPlugin.getImageDescriptor("resources/robot.png");
     }
