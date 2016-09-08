@@ -37,7 +37,7 @@ public class GeneralTableStyleConfiguration extends DefaultNatTableStyleConfigur
         configRegistry.registerConfigAttribute(CellConfigAttributes.DISPLAY_CONVERTER, new DefaultDisplayConverter() {
             @Override
             public Object displayToCanonicalValue(final Object destinationValue) {
-                return destinationValue.toString();
+                return destinationValue == null ? null : destinationValue.toString();
             }
         });
     }
