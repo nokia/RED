@@ -10,10 +10,10 @@ import org.rf.ide.core.testdata.text.write.tables.keywords.update.AUpdateExecRow
 /**
  * @author wypych
  */
-public class UpdateExecRowWithCommentOnlySameLineAsKeywordName
+public class UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest
         extends AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
 
-    public UpdateExecRowWithCommentOnlySameLineAsKeywordName() {
+    public UpdateExecRowWithCommentOnlySameLineAsKeywordNameTest() {
         super("tsv");
     }
 }

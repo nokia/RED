@@ -145,7 +145,8 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         execKeyUpdater.update(execOneRow, 1, "d_new");
 
         // execute & verify
-        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(convert("OutKeywordsWithPrettyAlign"), modelFile);
+        NewRobotFileTestHelper.assertNewModelTheSameAsInFile(
+                convert("OutKeywordsWithPrettyAlignWithThreeEmptyLinesBefore"), modelFile);
     }
 
     public String convert(final String fileName) {
