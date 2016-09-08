@@ -7,8 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.settings;
 
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
@@ -40,7 +40,11 @@ public class SetSettingArgumentCommand extends SetKeywordCallArgumentCommand {
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(new SetSettingArgumentCommand(keywordCall, index, previousValue,
-                index == 0 && keywordCall.getLinkedElement() instanceof AKeywordBaseSetting<?> ? true
-                        : shouldReplaceValue));
+                isFirstArgAndShouldAlwaysReplaceValue() ? true : shouldReplaceValue));
+    }
+
+    private boolean isFirstArgAndShouldAlwaysReplaceValue() {
+        return index == 0 && keywordCall.getLinkedElement().getModelType() != ModelType.DEFAULT_TAGS_SETTING
+                && keywordCall.getLinkedElement().getModelType() != ModelType.FORCE_TAGS_SETTING;
     }
 }
