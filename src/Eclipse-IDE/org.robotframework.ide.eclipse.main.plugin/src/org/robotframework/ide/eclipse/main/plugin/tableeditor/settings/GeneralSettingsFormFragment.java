@@ -803,7 +803,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // end in order to proceed with saving
         if (!documenationChangeJob.compareAndSet(null, null)) {
             try {
-                waitForDocumentationJobGroup(1L, TimeUnit.SECONDS);
+                waitForDocumentationJobGroup(2L, TimeUnit.SECONDS);
                 documenationChangeJob.get().join();
             } catch (final InterruptedException e) {
                 RedPlugin.logError("Documentation change job was interrupted", e);
@@ -812,7 +812,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     }
 
     private boolean waitForDocumentationJobGroup(long timeout, TimeUnit unit) {
-        final DocumentationJobWaiter waiter = new DocumentationJobWaiter(timeout, unit);
+        final DocumentationJobWaiter waiter = new DocumentationJobWaiter();
         this.documentationJobGroupFinishWaiter.set(waiter);
         try {
             waiter.start();
@@ -827,19 +827,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private class DocumentationJobWaiter extends Thread {
 
-        private final long timeoutAsEpoch;
-
-        public DocumentationJobWaiter(final long timeout, final TimeUnit unit) {
-            this.timeoutAsEpoch = unit.toMillis(timeout);
-        }
-
         @Override
         public void run() {
-            long startTime = System.currentTimeMillis();
             while (!documentationJobCounter.compareAndSet(0, 0)) {
-                if ((System.currentTimeMillis() - startTime) >= timeoutAsEpoch) {
-                    break;
-                }
             }
         }
     }
