@@ -290,7 +290,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     if (!documenationChangeJob.compareAndSet(null, null)
                             && documenationChangeJob.get().getState() == Job.SLEEPING) {
                         documenationChangeJob.get().cancel();
-                        documentationJobCounter.decrementAndGet();
                     }
 
                     final Job newDocJob = createDocumentationChangeJob(documentation.getText());
