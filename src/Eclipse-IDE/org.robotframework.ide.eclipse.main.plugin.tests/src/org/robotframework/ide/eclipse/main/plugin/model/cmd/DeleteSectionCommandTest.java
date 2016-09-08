@@ -5,12 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
-
-import java.util.ArrayList;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
@@ -25,13 +22,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 
 public class DeleteSectionCommandTest {
 
-    @Test
-    public void nothingHappensWhenThereAreNoSectionsToRemove() {
+    @Test(expected = IllegalStateException.class)
+    public void exceptionIsThrown_whenNullSectionIsGivenForRemoval() {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new DeleteSectionCommand(new ArrayList<RobotSuiteFileSection>()))
+                .isInjectedInto(new DeleteSectionCommand(null))
                 .execute();
 
         verifyZeroInteractions(eventBroker);
@@ -65,33 +62,13 @@ public class DeleteSectionCommandTest {
         assertThat(model.getLinkedElement().getKeywordTable().isEmpty()).isTrue();
     }
 
-    @Test
-    public void multipleSectionsAreProperlyRemoved() {
-        final RobotSuiteFile model = createModel();
-        final RobotSuiteFileSection section1 = model.findSection(RobotSettingsSection.class).get();
-        final RobotSuiteFileSection section2 = model.findSection(RobotKeywordsSection.class).get();
-
-        final IEventBroker eventBroker = mock(IEventBroker.class);
-
-        ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new DeleteSectionCommand(newArrayList(section1, section2)))
-                .execute();
-
-        assertThat(model.findSection(RobotSettingsSection.class).isPresent()).isFalse();
-        assertThat(model.getLinkedElement().getSettingTable().isEmpty()).isTrue();
-        assertThat(model.findSection(RobotKeywordsSection.class).isPresent()).isFalse();
-        assertThat(model.getLinkedElement().getKeywordTable().isEmpty()).isTrue();
-    }
-
     private void testSectionRemoval(final RobotSuiteFile model,
             final Class<? extends RobotSuiteFileSection> sectionClass) {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new DeleteSectionCommand(
-                        newArrayList((RobotSuiteFileSection) model.findSection(sectionClass).get())))
+                .isInjectedInto(new DeleteSectionCommand(model.findSection(sectionClass).get()))
                 .execute();
 
         assertThat(model.findSection(sectionClass).isPresent()).isFalse();
