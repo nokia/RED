@@ -474,6 +474,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
     private void whenReconcilationWasDone(
             @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
+            commandsStack.clear();
             refreshTable();
         }
     }
