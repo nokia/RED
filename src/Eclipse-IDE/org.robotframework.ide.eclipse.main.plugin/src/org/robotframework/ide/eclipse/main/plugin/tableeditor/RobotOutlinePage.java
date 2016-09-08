@@ -31,10 +31,12 @@ import org.eclipse.jface.viewers.ViewerColumnsFactory;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.views.contentoutline.ContentOutlinePage;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.execution.ExpandAllAction;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotContainer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -61,6 +63,8 @@ class RobotOutlinePage extends ContentOutlinePage {
     private ISelectionChangedListener outlineSelectionListener;
     private ISelectionChangedListener editorSelectionListener;
 
+    private CaretListener caretListener;
+
     private final AtomicBoolean shouldUpdateEditorSelection = new AtomicBoolean(true);
 
     private Job modelQueryJob;
@@ -85,15 +89,22 @@ class RobotOutlinePage extends ContentOutlinePage {
         getTreeViewer().setInput(new Object[] { suiteModel });
         getTreeViewer().expandToLevel(3);
 
+        final ISelectionProvider editorSelectionProvider = editor.getSite().getSelectionProvider();
+        final StyledText editorSourceWidget = editor.getSourceEditor().getViewer().getTextWidget();
+
         editorSelectionListener = createEditorSelectionListener();
-        // editor.getSite().getSelectionProvider().addSelectionChangedListener(editorSelectionListener);
+        editorSelectionProvider.addSelectionChangedListener(editorSelectionListener);
 
         outlineSelectionListener = createOutlineSelectionListener();
         getTreeViewer().addSelectionChangedListener(outlineSelectionListener);
 
-        // editor.getSourceEditor().getViewer().getTextWidget().addCaretListener(createCaretListener());
+        caretListener = createCaretListener();
+        editorSourceWidget.addCaretListener(caretListener);
 
+        getSite().getActionBars().getToolBarManager().add(
+                new LinkWithEditorAction(editorSelectionProvider, editorSourceWidget));
         getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
+        getSite().getActionBars().getToolBarManager().add(new ExpandAllAction(getTreeViewer()));
     }
 
     private CaretListener createCaretListener() {
@@ -223,6 +234,33 @@ class RobotOutlinePage extends ContentOutlinePage {
         getTreeViewer().removeSelectionChangedListener(outlineSelectionListener);
 
         super.dispose();
+    }
+
+    private class LinkWithEditorAction extends Action {
+
+        private final ISelectionProvider editorSelectionProvider;
+
+        private final StyledText editorSourceWidget;
+
+        public LinkWithEditorAction(final ISelectionProvider editorSelectionProvider,
+                final StyledText editorSourceWidget) {
+            super("Link with Editor", IAction.AS_CHECK_BOX);
+            setImageDescriptor(RedImages.getLinkImage());
+            this.editorSelectionProvider = editorSelectionProvider;
+            this.editorSourceWidget = editorSourceWidget;
+            setChecked(true);
+        }
+
+        @Override
+        public void run() {
+            if (isChecked()) {
+                editorSelectionProvider.addSelectionChangedListener(editorSelectionListener);
+                editorSourceWidget.addCaretListener(caretListener);
+            } else {
+                editorSelectionProvider.removeSelectionChangedListener(editorSelectionListener);
+                editorSourceWidget.removeCaretListener(caretListener);
+            }
+        }
     }
 
     private class SortOutlineAction extends Action {
