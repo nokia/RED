@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.List;
-
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -18,32 +16,35 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteSectionCommand extends EditorCommand {
 
-    private final List<RobotSuiteFileSection> sectionsToDelete;
+    private final RobotSuiteFileSection sectionToDelete;
 
-    public DeleteSectionCommand(final List<RobotSuiteFileSection> sections) {
-        this.sectionsToDelete = sections;
+    public DeleteSectionCommand(final RobotSuiteFileSection section) {
+        this.sectionToDelete = section;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (sectionsToDelete.isEmpty()) {
-            return;
-        }
-        final RobotSuiteFile suiteFile = sectionsToDelete.get(0).getSuiteFile();
-        suiteFile.getChildren().removeAll(sectionsToDelete);
-
-        for (final RobotSuiteFileSection section : sectionsToDelete) {
-            if (section instanceof RobotVariablesSection) {
-                suiteFile.getLinkedElement().excludeVariableTableSection();
-            } else if (section instanceof RobotCasesSection) {
-                suiteFile.getLinkedElement().excludeTestCaseTableSection();
-            } else if (section instanceof RobotKeywordsSection) {
-                suiteFile.getLinkedElement().excludeKeywordTableSection();
-            } else if (section instanceof RobotSettingsSection) {
-                suiteFile.getLinkedElement().excludeSettingTableSection();
-            }
+        if (sectionToDelete == null) {
+            throw new IllegalStateException("Unable to delete section <null> has been given");
         }
 
-        eventBroker.post(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED, suiteFile);
+        final RobotSuiteFile suiteFile = sectionToDelete.getSuiteFile();
+        suiteFile.getChildren().remove(sectionToDelete);
+
+        if (sectionToDelete instanceof RobotVariablesSection) {
+            suiteFile.getLinkedElement().excludeVariableTableSection();
+        } else if (sectionToDelete instanceof RobotCasesSection) {
+            suiteFile.getLinkedElement().excludeTestCaseTableSection();
+        } else if (sectionToDelete instanceof RobotKeywordsSection) {
+            suiteFile.getLinkedElement().excludeKeywordTableSection();
+        } else if (sectionToDelete instanceof RobotSettingsSection) {
+            suiteFile.getLinkedElement().excludeSettingTableSection();
+        } else {
+            throw new IllegalStateException("Unable to delete unrecognized section <" + sectionToDelete + ">");
+        }
+
+        eventBroker.send(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED, suiteFile);
     }
+
+    // TODO : requires proper undo which will insert section again and build on core model side
 }
