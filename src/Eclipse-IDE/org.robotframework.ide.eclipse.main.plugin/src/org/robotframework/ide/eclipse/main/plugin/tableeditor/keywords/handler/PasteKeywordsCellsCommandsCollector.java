@@ -71,7 +71,7 @@ public class PasteKeywordsCellsCommandsCollector extends PasteRobotElementCellsC
             final int clipboardElementColumnIndex, final int tableColumnsCount) {
         if (clipboardElementColumnIndex == 0) {
             final ModelType modelType = keywordCall.getLinkedElement().getModelType();
-            return modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW || modelType == ModelType.UNKNOWN
+            return keywordCall.isExecutable() || modelType == ModelType.UNKNOWN
                     ? newArrayList(keywordCall.getName()) : newArrayList("[" + keywordCall.getName() + "]");
         } else if (clipboardElementColumnIndex > 0 && clipboardElementColumnIndex < tableColumnsCount - 1) {
             final List<String> arguments = keywordCall.getArguments();
