@@ -37,7 +37,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         this(definition, index, value, true);
     }
     
-    public SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
+    protected SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
             final String value, final boolean shouldReplaceValue) {
         this.definition = definition;
         this.index = index;
