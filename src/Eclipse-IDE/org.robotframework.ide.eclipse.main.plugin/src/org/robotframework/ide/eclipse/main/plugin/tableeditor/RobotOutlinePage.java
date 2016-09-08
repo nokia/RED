@@ -86,12 +86,12 @@ class RobotOutlinePage extends ContentOutlinePage {
         getTreeViewer().expandToLevel(3);
 
         editorSelectionListener = createEditorSelectionListener();
-        editor.getSite().getSelectionProvider().addSelectionChangedListener(editorSelectionListener);
+        // editor.getSite().getSelectionProvider().addSelectionChangedListener(editorSelectionListener);
 
         outlineSelectionListener = createOutlineSelectionListener();
         getTreeViewer().addSelectionChangedListener(outlineSelectionListener);
 
-        editor.getSourceEditor().getViewer().getTextWidget().addCaretListener(createCaretListener());
+        // editor.getSourceEditor().getViewer().getTextWidget().addCaretListener(createCaretListener());
 
         getSite().getActionBars().getToolBarManager().add(new SortOutlineAction(labelProvider));
     }
