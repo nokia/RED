@@ -16,12 +16,14 @@ import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
 public class RerunAction extends Action implements IWorkbenchAction {
 
     private static final String ID = "org.robotframework.action.executionView.RerunAction";
 
     public RerunAction() {
+        super("Rerun Tests", RedImages.getRelaunchImage());
         setId(ID);
     }
 
