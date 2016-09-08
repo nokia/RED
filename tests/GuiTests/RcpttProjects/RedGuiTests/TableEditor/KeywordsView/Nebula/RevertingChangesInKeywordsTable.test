@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _lZlkgHA-Eeas5uogJbgGYA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/6/16 11:46 AM
+Save-Time: 9/8/16 1:07 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -77,9 +77,9 @@ with [get-editor "new.robot"] {
         key-type "M1+z"
     }
 }
-//check that nothing was revereted in table
+//check that value was revereted in table
 check-keyword-row -file  "new.robot" -row  1 -kw "kw"
-check-keyword-row -file  "new.robot" -row  2 -kw "log" -c1 "44"
+check-keyword-row -file  "new.robot" -row  2 -kw "log"
 check-keyword-row -file  "new.robot" -row  3 -kw "..."
 
 //check that file is dirty
