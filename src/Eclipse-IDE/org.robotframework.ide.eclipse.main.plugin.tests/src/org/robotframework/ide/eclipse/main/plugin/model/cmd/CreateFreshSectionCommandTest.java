@@ -9,6 +9,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
@@ -20,6 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshSectionCommandTest {
 
@@ -42,13 +45,22 @@ public class CreateFreshSectionCommandTest {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***").build();
         final RobotVariablesSection currentSection = model.findSection(RobotVariablesSection.class).get();
 
-        ContextInjector.prepareContext()
+        final CreateFreshSectionCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshSectionCommand(model, RobotVariablesSection.SECTION_NAME))
-                .execute();
+                .isInjectedInto(new CreateFreshSectionCommand(model, RobotVariablesSection.SECTION_NAME));
+        command.execute();
 
         assertThat(model.getChildren()).hasSize(1);
         assertThat(model.getChildren().get(0)).isSameAs(currentSection);
+
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(model.getChildren()).hasSize(1);
+        assertThat(model.getChildren().get(0)).isSameAs(currentSection);
+
+        verifyZeroInteractions(eventBroker);
     }
 
     @Test
@@ -56,18 +68,27 @@ public class CreateFreshSectionCommandTest {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
-        ContextInjector.prepareContext()
+        final CreateFreshSectionCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshSectionCommand(model, RobotVariablesSection.SECTION_NAME))
-                .execute();
+                .isInjectedInto(new CreateFreshSectionCommand(model, RobotVariablesSection.SECTION_NAME));
+        command.execute();
 
         assertThat(model.getChildren()).hasSize(1);
         assertThat(model.getChildren().get(0)).isInstanceOf(RobotVariablesSection.class);
         assertThat(model.getChildren().get(0).getParent()).isSameAs(model);
-        assertThat(model.getLinkedElement().getVariableTable()).isNotNull();
+        assertThat(model.getLinkedElement().getVariableTable().isPresent()).isTrue();
         assertThat(model.getLinkedElement().getVariableTable().getParent()).isSameAs(model.getLinkedElement());
 
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(model.getChildren()).isEmpty();
+        assertThat(model.getLinkedElement().getVariableTable().isPresent()).isFalse();
+
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED, model);
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED, model);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -75,18 +96,27 @@ public class CreateFreshSectionCommandTest {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
-        ContextInjector.prepareContext()
+        final CreateFreshSectionCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshSectionCommand(model, RobotSettingsSection.SECTION_NAME))
-                .execute();
+                .isInjectedInto(new CreateFreshSectionCommand(model, RobotSettingsSection.SECTION_NAME));
+        command.execute();
 
         assertThat(model.getChildren()).hasSize(1);
         assertThat(model.getChildren().get(0)).isInstanceOf(RobotSettingsSection.class);
         assertThat(model.getChildren().get(0).getParent()).isSameAs(model);
-        assertThat(model.getLinkedElement().getSettingTable()).isNotNull();
+        assertThat(model.getLinkedElement().getSettingTable().isPresent()).isTrue();
         assertThat(model.getLinkedElement().getSettingTable().getParent()).isSameAs(model.getLinkedElement());
 
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(model.getChildren()).isEmpty();
+        assertThat(model.getLinkedElement().getSettingTable().isPresent()).isFalse();
+
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED, model);
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED, model);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -94,18 +124,27 @@ public class CreateFreshSectionCommandTest {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
-        ContextInjector.prepareContext()
+        final CreateFreshSectionCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshSectionCommand(model, RobotKeywordsSection.SECTION_NAME))
-                .execute();
+                .isInjectedInto(new CreateFreshSectionCommand(model, RobotKeywordsSection.SECTION_NAME));
+        command.execute();
 
         assertThat(model.getChildren()).hasSize(1);
         assertThat(model.getChildren().get(0)).isInstanceOf(RobotKeywordsSection.class);
         assertThat(model.getChildren().get(0).getParent()).isSameAs(model);
-        assertThat(model.getLinkedElement().getKeywordTable()).isNotNull();
+        assertThat(model.getLinkedElement().getKeywordTable().isPresent()).isTrue();
         assertThat(model.getLinkedElement().getKeywordTable().getParent()).isSameAs(model.getLinkedElement());
 
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(model.getChildren()).isEmpty();
+        assertThat(model.getLinkedElement().getKeywordTable().isPresent()).isFalse();
+
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED, model);
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED, model);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -113,18 +152,27 @@ public class CreateFreshSectionCommandTest {
         final IEventBroker eventBroker = mock(IEventBroker.class);
 
         final RobotSuiteFile model = new RobotSuiteFileCreator().build();
-        ContextInjector.prepareContext()
+        final CreateFreshSectionCommand command = ContextInjector.prepareContext()
                 .inWhich(eventBroker)
-                .isInjectedInto(new CreateFreshSectionCommand(model, RobotCasesSection.SECTION_NAME))
-                .execute();
+                .isInjectedInto(new CreateFreshSectionCommand(model, RobotCasesSection.SECTION_NAME));
+        command.execute();
 
         assertThat(model.getChildren()).hasSize(1);
         assertThat(model.getChildren().get(0)).isInstanceOf(RobotCasesSection.class);
         assertThat(model.getChildren().get(0).getParent()).isSameAs(model);
-        assertThat(model.getLinkedElement().getTestCaseTable()).isNotNull();
+        assertThat(model.getLinkedElement().getTestCaseTable().isPresent()).isTrue();
         assertThat(model.getLinkedElement().getTestCaseTable().getParent()).isSameAs(model.getLinkedElement());
 
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(model.getChildren()).isEmpty();
+        assertThat(model.getLinkedElement().getTestCaseTable().isPresent()).isFalse();
+
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_SUITE_SECTION_ADDED, model);
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_SUITE_SECTION_REMOVED, model);
+        verifyNoMoreInteractions(eventBroker);
     }
 
 }
