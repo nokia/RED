@@ -1,0 +1,145 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _AXAyAF_dEeaRBaqqj0N1Gg
+Element-Name: CopyPasteCellsInTestCasesTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _qc8gsHXQEeaTdNH0nRm1gg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/8/16 5:04 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot"    | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Case ***\n"
+    + "test 1\n"
+    + "    log    1    2    3    #log command\n"
+    + "    Call Method    my_method    2\n"
+    + "    Convert To Bytes    8    #cov to bytes\n"
+    + "test 22\n"
+    + "    [Setup]    Catenate    1    5\n"
+    + "    Convert To Hex    33    44\n"
+    + "last test\n"
+    + "    None Shall Pass    who\n"
+    + "    \\"
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 22" | click
+wait 200
+
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+	//copy TC name
+    key-type Right
+    key-type Left
+    key-type "M1+c"
+    
+    //paste on Catenate
+    key-type Down
+    key-type Right
+    key-type "M1+v"
+    
+    //copy [Setup]
+    key-type Left
+    key-type "M1+c"
+    
+    //paste on "none shall pass"
+    key-type Down -times 4
+    key-type "M1+v"
+    
+    //copy "\" using menu
+    key-type Down
+    get-menu Copy | click
+    
+    //paste on "Convert to hex"
+    key-type Up -times 4
+    key-type "M1+v"
+    
+    //paste on arg: 33 - using menu
+    key-type Right
+    get-menu Paste | click
+    
+    //paste on empty cell
+    key-type Right -times 2
+    key-type "M1+v"
+    
+    //copy cell with value "5"
+    key-type Up
+    key-type "M1+c"
+    
+    //paste as TC name
+    key-type Left -times 3
+    key-type Up -times 6
+    key-type "M1+v"
+    
+    //copy comment "#log command"
+    key-type Down
+    key-type Left
+    key-type Down
+    key-type "M1+c"
+    
+    //paste in comment col
+    key-type Down
+    key-type "M1+v"
+    
+    //copy empty cell
+    key-type Down
+    key-type Left
+    key-type "M1+c"
+    
+    //paste on value "1" in [Setup]
+    key-type Down -times 2
+    key-type Left -times 2
+    key-type Down
+    key-type Left
+    key-type "M1+v"
+}
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/last test" | click
+wait 200
+
+//paste empty cell on TC name
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Right
+    key-type Left
+    key-type "M1+v"
+}
+
+check-test_case-row -file "TestFile.robot"  -row 1 -tc "5"
+check-test_case-row -file "TestFile.robot"  -row 2 -tc "log" -c1 1 -c2 2 -c3 3 -comment "#log command"
+check-test_case-row -file "TestFile.robot"  -row 3 -tc "Call Method" -c1 "my_method" -c2 "2" -comment "#log command"
+check-test_case-row -file "TestFile.robot"  -row 4 -tc "Convert To Bytes" -c1 8 -comment "#cov to bytes"
+check-test_case-row -file "TestFile.robot"  -row 5 -tc "..."
+
+check-test_case-row -file "TestFile.robot"  -row 6 -tc "test 22"
+check-test_case-row -file "TestFile.robot"  -row 7 -tc "[Setup]" -c1 "test 22" -c2 "\\" -c3 5
+check-test_case-row -file "TestFile.robot"  -row 8 -tc "\\" -c1 "\\" -c2 44
+check-test_case-row -file "TestFile.robot"  -row 9 -tc "..."
+
+
+check-test_case-row -file "TestFile.robot"  -row 10 -tc "\\"
+check-test_case-row -file "TestFile.robot"  -row 11 -tc "[Setup]" -c1 who
+check-test_case-row -file "TestFile.robot"  -row 12 -tc "\\"
+check-test_case-row -file "TestFile.robot"  -row 13 -tc "..."
+
+//check source
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Case ***\n5\n"
+    + "    log    1    2    3    #log command\n"
+    + "    Call Method    my_method    2    #log command\n"
+    + "    Convert To Bytes    8    #cov to bytes\n"
+    + "test 22\n"
+    + "    [Setup]    test 22    \\    5\n"
+    + "    \\    \\    44\n"
+    + "\\\n"
+    + "    \\\n"
+    + "    [Setup]    who" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
