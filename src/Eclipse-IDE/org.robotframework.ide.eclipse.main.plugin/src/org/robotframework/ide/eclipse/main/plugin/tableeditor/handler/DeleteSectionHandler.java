@@ -5,9 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.handler;
 
-import java.util.Arrays;
-import java.util.List;
-
 import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -41,9 +38,7 @@ public class DeleteSectionHandler extends DIParameterizedHandler<E4DeleteSection
                 final Optional<? extends RobotSuiteFileSection> section = part
                         .provideSection(editor.provideSuiteModel());
                 if (section.isPresent()) {
-                    final List<RobotSuiteFileSection> sectionsToRemove = Arrays
-                            .asList((RobotSuiteFileSection) section.get());
-                    stack.execute(new DeleteSectionCommand(sectionsToRemove));
+                    stack.execute(new DeleteSectionCommand(section.get()));
                 }
             }
         }
