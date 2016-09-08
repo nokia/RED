@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _tPtekGhvEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/26/16 5:04 PM
+Save-Time: 9/8/16 2:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -125,7 +125,7 @@ check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
 
 check-test_case-row -file "TestFile.robot" -row 5 -tc "\\"
 check-test_case-row -file "TestFile.robot" -row 6 -tc "Should Be changed" -c1 "string" -c2 "pattern" -comment "#added comment"
-check-test_case-row -file "TestFile.robot" -row 7 -tc "" -c1 "new"
+check-test_case-row -file "TestFile.robot" -row 7 -tc "\\" -c1 "new"
 check-test_case-row -file "TestFile.robot" -row 8 -tc "..."
 
 check-test_case-row -file "TestFile.robot" -row 9 -tc "case"
@@ -134,4 +134,5 @@ check-test_case-row -file "TestFile.robot" -row 10 -tc "[Documentation]" -c1 "i 
 check-test_case-row -file "TestFile.robot" -row 12 -tc "Log" -c1 "67"
 check-test_case-row -file "TestFile.robot" -row 13 -tc "..."
 check-test_case-row -file "TestFile.robot" -row 14 -tc "...add new case"
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
