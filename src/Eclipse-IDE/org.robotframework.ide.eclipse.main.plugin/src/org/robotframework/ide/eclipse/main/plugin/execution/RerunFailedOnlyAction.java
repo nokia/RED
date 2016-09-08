@@ -17,6 +17,7 @@ import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.action.Action;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
+import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfiguration;
 
 public class RerunFailedOnlyAction extends Action implements IWorkbenchAction {
@@ -26,6 +27,7 @@ public class RerunFailedOnlyAction extends Action implements IWorkbenchAction {
     private String outputFilePath;
 
     public RerunFailedOnlyAction() {
+        super("Rerun Failed Tests Only", RedImages.getRelaunchFailedImage());
         setId(ID);
     }
 
@@ -41,7 +43,7 @@ public class RerunFailedOnlyAction extends Action implements IWorkbenchAction {
                     if (outputFilePath != null) {
                         final ILaunchConfiguration launchConfig = launches[0].getLaunchConfiguration();
                         if (launchConfig != null) {
-                            ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig.copy(launchConfig.getName());
+                            final ILaunchConfigurationWorkingCopy launchConfigCopy = launchConfig.copy(launchConfig.getName());
                             RobotLaunchConfiguration.prepareRerunFailedTestsConfiguration(launchConfigCopy, outputFilePath);
                             if (launchConfigCopy != null) {
                                 launchConfigCopy.launch(ILaunchManager.RUN_MODE, monitor);
@@ -60,7 +62,7 @@ public class RerunFailedOnlyAction extends Action implements IWorkbenchAction {
     public void dispose() {
     }
 
-    public void setOutputFilePath(String outputFilePath) {
+    public void setOutputFilePath(final String outputFilePath) {
         this.outputFilePath = outputFilePath;
     }
 }

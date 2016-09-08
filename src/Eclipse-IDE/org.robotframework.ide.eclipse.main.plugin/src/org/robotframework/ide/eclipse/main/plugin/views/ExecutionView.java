@@ -318,26 +318,12 @@ public class ExecutionView {
     }
     
     private void createToolbarActions(final IToolBarManager toolBarManager) {
-        final ExpandAllAction expandAction = new ExpandAllAction(executionViewer);
-        expandAction.setText("Expand All");
-        expandAction.setImageDescriptor(RedImages.getExpandAllImage());
-        toolBarManager.add(expandAction);
-        final CollapseAllAction collapseAction = new CollapseAllAction(executionViewer);
-        collapseAction.setText("Collapse All");
-        collapseAction.setImageDescriptor(RedImages.getCollapseAllImage());
-        toolBarManager.add(collapseAction);
+        toolBarManager.add(new ExpandAllAction(executionViewer));
+        toolBarManager.add(new CollapseAllAction(executionViewer));
         showFailedAction = new ShowFailedOnlyAction(executionViewer, executionViewContentProvider);
-        showFailedAction.setText("Show Failures Only");
-        showFailedAction.setImageDescriptor(RedImages.getFailuresImage());
-        showFailedAction.setChecked(false);
         toolBarManager.add(showFailedAction);
-        final RerunAction rerunAction = new RerunAction();
-        rerunAction.setText("Rerun Tests");
-        rerunAction.setImageDescriptor(RedImages.getRelaunchImage());
-        toolBarManager.add(rerunAction);
+        toolBarManager.add(new RerunAction());
         rerunFailedOnlyAction = new RerunFailedOnlyAction();
-        rerunFailedOnlyAction.setText("Rerun Failed Tests Only");
-        rerunFailedOnlyAction.setImageDescriptor(RedImages.getRelaunchFailedImage());
         toolBarManager.add(rerunFailedOnlyAction);
     }
     
