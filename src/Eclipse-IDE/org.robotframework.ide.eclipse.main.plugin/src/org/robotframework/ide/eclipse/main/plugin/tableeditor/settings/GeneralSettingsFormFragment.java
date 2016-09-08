@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -183,12 +182,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private final AtomicBoolean hasEditDocRepresentation = new AtomicBoolean(false);
 
-    private final AtomicReference<Job> documenationChangeJob = new AtomicReference<>();
+    private final AtomicReference<Job> documenationChangeJob = new AtomicReference<>(null);
 
-    private final AtomicInteger documentationJobCounter = new AtomicInteger(0);
-
-    private final AtomicReference<Runnable> documentationJobGroupFinishWaiter = new AtomicReference<>(
-            (Runnable) new Thread());
+    private final AtomicReference<IJobGroup> jobGroup = new AtomicReference<IJobGroup>(new IJobGroup());
 
     private GeneralSettingsDataProvider dataProvider;
 
@@ -281,17 +277,16 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
                         return;
                     }
-                    documentationJobCounter.incrementAndGet();
                     setDirty();
                     isDocumentationModified.set(true);
 
                     if (!documenationChangeJob.compareAndSet(null, null)
                             && documenationChangeJob.get().getState() == Job.SLEEPING) {
                         documenationChangeJob.get().cancel();
-                        documentationJobCounter.decrementAndGet();
                     }
 
                     final Job newDocJob = createDocumentationChangeJob(documentation.getText());
+                    jobGroup.get().addJob(newDocJob);
                     documenationChangeJob.set(newDocJob);
                     documenationChangeJob.get().schedule(300);
                 }
@@ -496,7 +491,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
                 }
 
-                documentationJobCounter.decrementAndGet();
                 return Status.OK_STATUS;
             }
         };
@@ -767,33 +761,9 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // end in order to proceed with saving
         if (!documenationChangeJob.compareAndSet(null, null)) {
             try {
-                waitForDocumentationJobGroup(2L, TimeUnit.SECONDS);
-                documenationChangeJob.get().join();
+                jobGroup.get().join(2L, TimeUnit.MILLISECONDS);
             } catch (final InterruptedException e) {
                 RedPlugin.logError("Documentation change job was interrupted", e);
-            }
-        }
-    }
-
-    private boolean waitForDocumentationJobGroup(long timeout, TimeUnit unit) {
-        final DocumentationJobWaiter waiter = new DocumentationJobWaiter();
-        this.documentationJobGroupFinishWaiter.set(waiter);
-        try {
-            waiter.start();
-            waiter.join(unit.toMillis(timeout));
-        } catch (Exception e) {
-            RedPlugin.logError("Documentation Waiter Thread change job was interrupted", e);
-            return false;
-        }
-
-        return true;
-    }
-
-    private class DocumentationJobWaiter extends Thread {
-
-        @Override
-        public void run() {
-            while (!documentationJobCounter.compareAndSet(0, 0)) {
             }
         }
     }
