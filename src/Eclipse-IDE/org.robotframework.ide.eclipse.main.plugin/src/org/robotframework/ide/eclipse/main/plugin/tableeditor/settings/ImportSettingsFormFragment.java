@@ -476,6 +476,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     private void whenReconcilationWasDone(
             @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
+            commandsStack.clear();
             refreshTable();
         }
     }

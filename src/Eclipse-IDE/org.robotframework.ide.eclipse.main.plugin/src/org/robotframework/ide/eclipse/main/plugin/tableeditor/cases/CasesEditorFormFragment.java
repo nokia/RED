@@ -564,6 +564,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     private void whenReconcilationWasDone(
             @UIEventTopic(RobotModelEvents.REPARSING_DONE) final RobotSuiteFile fileModel) {
         if (fileModel == this.fileModel) {
+            commandsStack.clear();
             dataProvider.setInput(getSection());
             table.refresh();
         }
