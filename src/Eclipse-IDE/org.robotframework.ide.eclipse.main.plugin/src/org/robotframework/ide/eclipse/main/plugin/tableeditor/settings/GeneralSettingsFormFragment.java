@@ -790,18 +790,19 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private class DocumentationJobWaiter extends Thread {
 
-        private final long timeout;
-
-        private final TimeUnit unit;
+        private final long timeoutAsEpoch;
 
         public DocumentationJobWaiter(final long timeout, final TimeUnit unit) {
-            this.timeout = timeout;
-            this.unit = unit;
+            this.timeoutAsEpoch = unit.toMillis(timeout);
         }
 
         @Override
         public void run() {
+            long startTime = System.currentTimeMillis();
             while (!documentationJobGroup.get().getActiveJobs().isEmpty()) {
+                if ((System.currentTimeMillis() - startTime) >= timeoutAsEpoch) {
+                    break;
+                }
             }
         }
     }
