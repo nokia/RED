@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,6 +23,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobGroup;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
@@ -173,13 +177,19 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private StyledText documentation;
 
-    private boolean hasFocusOnDocumentation;
+    private final AtomicBoolean hasFocusOnDocumentation = new AtomicBoolean(false);
 
-    private boolean isDocumentationModified;
+    private final AtomicBoolean isDocumentationModified = new AtomicBoolean(false);
 
-    private boolean hasEditDocRepresentation;
+    private final AtomicBoolean hasEditDocRepresentation = new AtomicBoolean(false);
 
-    private Job documenationChangeJob;
+    private final AtomicReference<Job> documenationChangeJob = new AtomicReference<>();
+
+    private final AtomicReference<JobGroup> documentationJobGroup = new AtomicReference<JobGroup>(
+            new JobGroup("SettingDocumentation", 1, 1));
+
+    private final AtomicReference<Runnable> documentationJobGroupFinishWaiter = new AtomicReference<>(
+            (Runnable) new Thread());
 
     private GeneralSettingsDataProvider dataProvider;
 
@@ -252,12 +262,12 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             public void focusGained(final FocusEvent e) {
-                hasFocusOnDocumentation = true;
+                hasFocusOnDocumentation.set(true);
             }
 
             @Override
             public void focusLost(final FocusEvent e) {
-                hasFocusOnDocumentation = false;
+                hasFocusOnDocumentation.set(false);
             }
         });
         toolkit.adapt(documentation, true, false);
@@ -267,20 +277,23 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 @Override
                 public void modifyText(final ModifyEvent e) {
-                    if (!hasFocusOnDocumentation || (hasFocusOnDocumentation
+                    if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
                             && (documentation.getText().equals(getDocumentation(getSection(), true))
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
                         return;
                     }
                     setDirty();
-                    isDocumentationModified = true;
+                    isDocumentationModified.set(true);
 
-                    if (documenationChangeJob != null && documenationChangeJob.getState() == Job.SLEEPING) {
-                        documenationChangeJob.cancel();
+                    if (!documenationChangeJob.compareAndSet(null, null)
+                            && documenationChangeJob.get().getState() == Job.SLEEPING) {
+                        documenationChangeJob.get().cancel();
                     }
 
-                    documenationChangeJob = createDocumentationChangeJob(documentation.getText());
-                    documenationChangeJob.schedule(300);
+                    final Job newDocJob = createDocumentationChangeJob(documentation.getText());
+                    newDocJob.setJobGroup(documentationJobGroup.get());
+                    documenationChangeJob.set(newDocJob);
+                    documenationChangeJob.get().schedule(300);
                 }
             });
         }
@@ -356,7 +369,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         final MenuItem modeItem = new MenuItem(docMenu, SWT.NONE);
         modeItem.setText("&View mode");
         modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
-        if (hasEditDocRepresentation) {
+        if (hasEditDocRepresentation.get()) {
             modeItem.setText("&Edit mode");
             modeItem.setImage(ImagesManager.getImage(RedImages.getEditImage()));
             documentation.setEditable(false);
@@ -366,8 +379,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             public void mouseUp(final MouseEvent e) {
-                if (!hasEditDocRepresentation && e.button == 1) {
-                    hasEditDocRepresentation = true;
+                if (!hasEditDocRepresentation.get() && e.button == 1) {
+                    hasEditDocRepresentation.set(true);
                     final RobotSettingsSection section = getSection();
                     documentation.setText(getDocumentation(section, true));
                     if (section != null && section.getLinkedElement().isPresent()) {
@@ -388,19 +401,19 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             public void widgetSelected(final SelectionEvent e) {
-                if (!hasEditDocRepresentation) {
-                    hasEditDocRepresentation = true;
+                if (!hasEditDocRepresentation.get()) {
+                    hasEditDocRepresentation.set(true);
                     modeItem.setText("&View mode");
                     modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
                 } else {
-                    hasEditDocRepresentation = false;
+                    hasEditDocRepresentation.set(false);
                     modeItem.setImage(ImagesManager.getImage(RedImages.getEditImage()));
                     modeItem.setText("&Edit mode");
                 }
                 final RobotSettingsSection section = getSection();
-                documentation.setText(getDocumentation(section, hasEditDocRepresentation));
+                documentation.setText(getDocumentation(section, hasEditDocRepresentation.get()));
                 if (section != null && section.getLinkedElement().isPresent()) {
-                    documentation.setEditable(hasEditDocRepresentation);
+                    documentation.setEditable(hasEditDocRepresentation.get());
                 }
             }
         });
@@ -571,7 +584,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                         theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
-        
+
         // calculate columns width
         table.addListener(SWT.Paint,
                 factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer, 120, 200));
@@ -653,13 +666,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
     private void setInput() {
         final RobotSettingsSection section = getSection();
 
-        if (fileModel.isEditable() && section != null && hasEditDocRepresentation) {
+        if (fileModel.isEditable() && section != null && hasEditDocRepresentation.get()) {
             documentation.setEditable(true);
         } else {
             documentation.setEditable(false);
         }
-        if (!hasFocusOnDocumentation) {
-            documentation.setText(getDocumentation(section, hasEditDocRepresentation));
+        if (!hasFocusOnDocumentation.get()) {
+            documentation.setText(getDocumentation(section, hasEditDocRepresentation.get()));
         }
 
         if (table.isPresent()) {
@@ -741,7 +754,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     @Persist
     public void onSave() {
-        isDocumentationModified = false;
+        isDocumentationModified.set(false);
         if (table.isPresent()) {
             CellEditorCloser.closeForcibly(table.get());
         }
@@ -751,11 +764,44 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // user could just typed something into documentation box, so the job was scheduled, we need
         // to wait for it to
         // end in order to proceed with saving
-        if (documenationChangeJob != null && isDocumentationModified) {
+        if (!documenationChangeJob.compareAndSet(null, null)) {
             try {
-                documenationChangeJob.join();
+                waitForDocumentationJobGroup(1L, TimeUnit.SECONDS);
+                documenationChangeJob.get().join();
             } catch (final InterruptedException e) {
                 RedPlugin.logError("Documentation change job was interrupted", e);
+            }
+        }
+    }
+
+    private boolean waitForDocumentationJobGroup(long timeout, TimeUnit unit) {
+        final DocumentationJobWaiter waiter = new DocumentationJobWaiter(timeout, unit);
+        this.documentationJobGroupFinishWaiter.set(waiter);
+        try {
+            waiter.start();
+            waiter.join(unit.toMillis(timeout));
+        } catch (Exception e) {
+            RedPlugin.logError("Documentation Waiter Thread change job was interrupted", e);
+            return false;
+        }
+
+        return true;
+    }
+
+    private class DocumentationJobWaiter extends Thread {
+
+        private final long timeout;
+
+        private final TimeUnit unit;
+
+        public DocumentationJobWaiter(final long timeout, final TimeUnit unit) {
+            this.timeout = timeout;
+            this.unit = unit;
+        }
+
+        @Override
+        public void run() {
+            while (!documentationJobGroup.get().getActiveJobs().isEmpty()) {
             }
         }
     }
