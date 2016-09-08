@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 import java.util.Deque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
@@ -24,6 +25,16 @@ public class IJobGroup implements IJobChangeListener {
     private final Deque<Job> jobs = new LinkedBlockingDeque<>();
 
     private final AtomicReference<Thread> waitThread = new AtomicReference<>(new Thread());
+
+    private final AtomicInteger modifyTextCount = new AtomicInteger(0);
+
+    public void modifyEventIncrease() {
+        modifyTextCount.incrementAndGet();
+    }
+
+    public void modifyEventDecrease() {
+        modifyTextCount.decrementAndGet();
+    }
 
     public void addJob(final Job job) {
         synchronized (job) {
@@ -48,6 +59,7 @@ public class IJobGroup implements IJobChangeListener {
     public void done(IJobChangeEvent event) {
         // TODO Auto-generated method stub
         jobs.remove(event.getJob());
+        modifyTextCount.decrementAndGet();
     }
 
     @Override
@@ -74,9 +86,9 @@ public class IJobGroup implements IJobChangeListener {
 
                 @Override
                 public void run() {
-                    while (!jobs.isEmpty()) {
+                    while (!jobs.isEmpty() && !modifyTextCount.compareAndSet(0, 0)) {
                         try {
-                            Thread.sleep(1);
+                            Thread.sleep(10L);
                         } catch (InterruptedException e) {
 
                         }
