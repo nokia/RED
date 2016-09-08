@@ -5,6 +5,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.experimental.theories.DataPoints;
@@ -22,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -54,8 +56,16 @@ public class CreateFreshKeywordCallCommandTest {
         assertThat(addedCall.getChildren()).isEmpty();
         assertThat(addedCall).has(RobotKeywordCallConditions.properlySetParent());
 
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(codeHolder.getChildren().size()).isEqualTo(3);
+
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
                 .<String, Object> of(IEventBroker.DATA, codeHolder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Theory
@@ -75,8 +85,16 @@ public class CreateFreshKeywordCallCommandTest {
         assertThat(addedCall.getArguments()).isEmpty();
         assertThat(addedCall).has(RobotKeywordCallConditions.properlySetParent());
 
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(codeHolder.getChildren().size()).isEqualTo(3);
+
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED), eq(ImmutableMap
                 .<String, Object> of(IEventBroker.DATA, codeHolder, RobotModelEvents.ADDITIONAL_DATA, addedCall)));
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     private static RobotCase createTestCase() {
