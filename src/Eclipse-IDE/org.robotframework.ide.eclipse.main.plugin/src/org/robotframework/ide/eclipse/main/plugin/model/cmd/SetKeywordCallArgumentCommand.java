@@ -31,7 +31,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         this(keywordCall, index, value, true);
     }
     
-    public SetKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value, final boolean shouldReplaceValue) {
+    protected SetKeywordCallArgumentCommand(final RobotKeywordCall keywordCall, final int index, final String value, final boolean shouldReplaceValue) {
         this.keywordCall = keywordCall;
         this.index = index;
         this.value = value;
@@ -40,21 +40,21 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        final List<String> arguments = prepareArgumentsList(keywordCall, value, index);
+        final boolean isSetting = keywordCall instanceof RobotDefinitionSetting;
+        final List<String> arguments = prepareArgumentsList(keywordCall, value, index, isSetting);
 
         if (!arguments.equals(keywordCall.getArguments())) {
             updateModelElement(arguments);
             keywordCall.resetStored();
 
-            if (keywordCall instanceof RobotDefinitionSetting
-                    && ((RobotDefinitionSetting) keywordCall).isDocumentation()) {
+            if (isSetting && ((RobotDefinitionSetting) keywordCall).isDocumentation()) {
                 eventBroker.post(DocumentationView.REFRESH_DOC_EVENT_TOPIC, keywordCall);
             }
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, keywordCall);
         }
     }
 
-    private List<String> prepareArgumentsList(final RobotKeywordCall call, final String value, final int index) {
+    private List<String> prepareArgumentsList(final RobotKeywordCall call, final String value, final int index, final boolean isSetting) {
         final List<String> arguments = createArgumentsList(call, index);
         
         previousValue = index >= 0 && index < arguments.size() ? arguments.get(index) : value;
@@ -62,7 +62,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         fillArgumentsList(value, index, arguments, shouldReplaceValue);
         
         checkIfPreviousCommandWasAddingNewValue();
-        checkIfUndoCommandShouldAddArgument(arguments.get(index));
+        checkIfUndoCommandShouldAddArgument(arguments.get(index), isSetting);
 
         return arguments;
     }
@@ -97,12 +97,19 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
         }
     }
     
-    private void checkIfUndoCommandShouldAddArgument(final String currentArgValue) {
-        if(currentArgValue != null && currentArgValue.equals("\\") && value == null) {
+    private void checkIfUndoCommandShouldAddArgument(final String currentArgValue, final boolean isSetting) {
+        if(currentArgValue != null && currentArgValue.equals("\\") && value == null && !isFirstArgumentInKeywordBasedSetting(isSetting)) {
             shouldReplaceValue = false; // when arg is deleted not on last position, undo command will add new arg on this position and shifts other args to the right
         } else {
             shouldReplaceValue = true; // reset the flag for future undo commands
         }
+    }
+    
+    private boolean isFirstArgumentInKeywordBasedSetting(final boolean isSetting) {
+        if (isSetting && ((RobotDefinitionSetting) keywordCall).isKeywordBased()) {
+            return index == 0;
+        }
+        return false;
     }
 
     protected void updateModelElement(final List<String> arguments) {

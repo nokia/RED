@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.settings;
 
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -38,6 +39,8 @@ public class SetSettingArgumentCommand extends SetKeywordCallArgumentCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetSettingArgumentCommand(keywordCall, index, previousValue, index == 0 ? true : shouldReplaceValue));
+        return newUndoCommands(new SetSettingArgumentCommand(keywordCall, index, previousValue,
+                index == 0 && keywordCall.getLinkedElement() instanceof AKeywordBaseSetting<?> ? true
+                        : shouldReplaceValue));
     }
 }
