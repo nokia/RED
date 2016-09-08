@@ -23,8 +23,6 @@ import javax.inject.Named;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.IJobChangeListener;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -290,44 +288,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     if (!documenationChangeJob.compareAndSet(null, null)
                             && documenationChangeJob.get().getState() == Job.SLEEPING) {
                         documenationChangeJob.get().cancel();
+                        documentationJobCounter.decrementAndGet();
                     }
 
                     final Job newDocJob = createDocumentationChangeJob(documentation.getText());
-                    newDocJob.addJobChangeListener(new IJobChangeListener() {
-
-                        @Override
-                        public void sleeping(IJobChangeEvent event) {
-                            // nothing to do
-                        }
-
-                        @Override
-                        public void scheduled(IJobChangeEvent event) {
-                            // nothing to do
-                        }
-
-                        @Override
-                        public void running(IJobChangeEvent event) {
-                            // nothing to do
-                        }
-
-                        @Override
-                        public void done(IJobChangeEvent event) {
-                            documentationJobCounter.decrementAndGet();
-
-                        }
-
-                        @Override
-                        public void awake(IJobChangeEvent event) {
-                            // nothing to do
-
-                        }
-
-                        @Override
-                        public void aboutToRun(IJobChangeEvent event) {
-                            // nothing to do
-
-                        }
-                    });
                     documenationChangeJob.set(newDocJob);
                     documenationChangeJob.get().schedule(300);
                 }
@@ -532,6 +496,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
                 }
 
+                documentationJobCounter.decrementAndGet();
                 return Status.OK_STATUS;
             }
         };
