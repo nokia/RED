@@ -14,6 +14,7 @@ import static com.google.common.collect.Sets.newHashSet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +29,7 @@ import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
+import com.google.common.primitives.Ints;
 
 /**
  * @author Michal Anglart
@@ -143,21 +145,43 @@ public class SelectionLayerAccessor {
         });
     }
 
-    public void selectElementAfter(final Object elementToSelect, final Runnable operation) {
+    public void selectElementInFirstCellAfterOperation(final Object elementToSelect, final Runnable operation) {
         operation.run();
         SwtThread.asyncExec(new Runnable() {
-
             @Override
             public void run() {
                 selectionProvider.setSelection(new StructuredSelection(elementToSelect));
                 final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
-
-                reestablishSelection(selectionLayer, newlySelected,
-                        new Function<PositionCoordinate, PositionCoordinate>() {
-
+                reestablishSelection(selectionLayer, newlySelected, new Function<PositionCoordinate, PositionCoordinate>() {
+                
                             @Override
                             public PositionCoordinate apply(final PositionCoordinate coordinate) {
                                 return new PositionCoordinate(selectionLayer, 0, coordinate.getRowPosition());
+                            }
+                        });
+            }
+        });
+    }
+
+    public void selectElementPreservingSelectedColumnsAfterOperation(final Object elementToSelect,
+            final Runnable operation) {
+        operation.run();
+        SwtThread.asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                final HashSet<Integer> columns = newHashSet(Ints.asList(selectionLayer.getSelectedColumnPositions()));
+                selectionProvider.setSelection(new StructuredSelection(elementToSelect));
+                final PositionCoordinate[] newlySelected = selectionLayer.getSelectedCellPositions();
+        
+                reestablishSelection(selectionLayer, newlySelected, new Function<PositionCoordinate, PositionCoordinate>() {
+                
+                            @Override
+                            public PositionCoordinate apply(final PositionCoordinate coordinate) {
+                                if (columns.contains(coordinate.getColumnPosition())) {
+                                    return new PositionCoordinate(selectionLayer, coordinate.getColumnPosition(),
+                                        coordinate.getRowPosition());
+                                }
+                                return null;
                             }
                         });
             }
