@@ -12,12 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -186,9 +181,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private final AtomicBoolean hasEditDocRepresentation = new AtomicBoolean(false);
 
-    private final AtomicReference<Job> documenationChangeJob = new AtomicReference<>(null);
-
-    private final AtomicInteger modifyEvents = new AtomicInteger(0);
+    private final AtomicReference<Job> documentationChangeJob = new AtomicReference<>(null);
 
     private GeneralSettingsDataProvider dataProvider;
 
@@ -276,7 +269,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 @Override
                 public void modifyText(final ModifyEvent e) {
-                    modifyEvents.incrementAndGet();
                     if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
                             && (documentation.getText().equals(getDocumentation(getSection(), true))
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
@@ -285,15 +277,14 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     setDirty();
                     isDocumentationModified.set(true);
 
-                    if (!documenationChangeJob.compareAndSet(null, null)
-                            && documenationChangeJob.get().getState() == Job.SLEEPING) {
-                        documenationChangeJob.get().cancel();
-                        modifyEvents.decrementAndGet();
+                    if (!documentationChangeJob.compareAndSet(null, null)
+                            && documentationChangeJob.get().getState() == Job.SLEEPING) {
+                        documentationChangeJob.get().cancel();
                     }
 
                     final Job newDocJob = createDocumentationChangeJob(documentation.getText());
-                    documenationChangeJob.set(newDocJob);
-                    documenationChangeJob.get().schedule(300);
+                    documentationChangeJob.set(newDocJob);
+                    documentationChangeJob.get().schedule(300);
                 }
             });
         }
@@ -496,7 +487,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
                 }
 
-                modifyEvents.decrementAndGet();
                 return Status.OK_STATUS;
             }
         };
@@ -766,32 +756,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // to wait for it to
         // end in order to proceed with saving
         try {
-            waitForAllDocumentationJobs(2L, TimeUnit.SECONDS);
+            if (!documentationChangeJob.compareAndSet(null, null)) {
+                Job.getJobManager().join(documentationChangeJob.get(), null);
+            }
         } catch (final InterruptedException e) {
             RedPlugin.logError("Documentation change job was interrupted", e);
-        }
-    }
-
-    private void waitForAllDocumentationJobs(final long time, final TimeUnit unit) throws InterruptedException {
-        Thread t = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                while (!modifyEvents.compareAndSet(0, 0) || isDocumentationModified.get()) {
-
-                }
-            }
-        });
-        ExecutorService newSingleThreadExecutor = Executors.newSingleThreadExecutor();
-        try {
-            Future<?> submit = newSingleThreadExecutor.submit(t);
-            submit.get(time, unit);
-        } catch (Exception e) {
-            InterruptedException excp = new InterruptedException();
-            excp.addSuppressed(e);
-            throw excp;
-        } finally {
-            newSingleThreadExecutor.shutdownNow();
         }
     }
 
