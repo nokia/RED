@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.nattable.CodeElementsTreeFormat;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTreeFormat;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsMatchesCollection.KeywordsFilter;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
