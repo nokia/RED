@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -277,7 +280,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
                             && (documentation.getText().equals(getDocumentation(getSection(), true))
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
-                        modifyEvents.decrementAndGet();
                         return;
                     }
                     setDirty();
@@ -780,7 +782,17 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 }
             }
         });
-        t.join(unit.toMillis(time));
+        ExecutorService newSingleThreadExecutor = Executors.newSingleThreadExecutor();
+        try {
+            Future<?> submit = newSingleThreadExecutor.submit(t);
+            submit.get(time, unit);
+        } catch (Exception e) {
+            InterruptedException excp = new InterruptedException();
+            excp.addSuppressed(e);
+            throw excp;
+        } finally {
+            newSingleThreadExecutor.shutdownNow();
+        }
     }
 
     @Inject
