@@ -87,18 +87,12 @@ public class IJobGroup implements IJobChangeListener {
                 @Override
                 public void run() {
                     while (!jobs.isEmpty() && !modifyTextCount.compareAndSet(0, 0)) {
-                        try {
-                            Thread.sleep(10L);
-                        } catch (InterruptedException e) {
-
-                        }
                     }
                 }
             });
             waitThread.set(t);
             t.start();
+            waitThread.get().join(timeUnit.toMillis(timeout));
         }
-
-        waitThread.get().join(timeUnit.toMillis(timeout));
     }
 }
