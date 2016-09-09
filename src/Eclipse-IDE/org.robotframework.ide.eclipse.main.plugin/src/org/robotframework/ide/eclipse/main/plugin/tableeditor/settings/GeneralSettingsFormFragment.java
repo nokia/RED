@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import javax.inject.Inject;
@@ -184,7 +185,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private final AtomicReference<Job> documenationChangeJob = new AtomicReference<>(null);
 
-    private final AtomicReference<IJobGroup> jobGroup = new AtomicReference<IJobGroup>(new IJobGroup());
+    private final AtomicInteger modifyEvents = new AtomicInteger(0);
 
     private GeneralSettingsDataProvider dataProvider;
 
@@ -272,11 +273,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 @Override
                 public void modifyText(final ModifyEvent e) {
-                    jobGroup.get().modifyEventIncrease();
+                    modifyEvents.incrementAndGet();
                     if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
                             && (documentation.getText().equals(getDocumentation(getSection(), true))
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
-                        jobGroup.get().modifyEventDecrease();
+                        modifyEvents.decrementAndGet();
                         return;
                     }
                     setDirty();
@@ -285,10 +286,10 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     if (!documenationChangeJob.compareAndSet(null, null)
                             && documenationChangeJob.get().getState() == Job.SLEEPING) {
                         documenationChangeJob.get().cancel();
+                        modifyEvents.decrementAndGet();
                     }
 
                     final Job newDocJob = createDocumentationChangeJob(documentation.getText());
-                    jobGroup.get().addJob(newDocJob);
                     documenationChangeJob.set(newDocJob);
                     documenationChangeJob.get().schedule(300);
                 }
@@ -493,6 +494,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
                 }
 
+                modifyEvents.decrementAndGet();
                 return Status.OK_STATUS;
             }
         };
@@ -762,10 +764,23 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // to wait for it to
         // end in order to proceed with saving
         try {
-            jobGroup.get().join(2L, TimeUnit.SECONDS);
+            waitForAllDocumentationJobs(2L, TimeUnit.SECONDS);
         } catch (final InterruptedException e) {
             RedPlugin.logError("Documentation change job was interrupted", e);
         }
+    }
+
+    private void waitForAllDocumentationJobs(final long time, final TimeUnit unit) throws InterruptedException {
+        Thread t = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                while (!modifyEvents.compareAndSet(0, 0) || isDocumentationModified.get()) {
+
+                }
+            }
+        });
+        t.join(unit.toMillis(time));
     }
 
     @Inject
