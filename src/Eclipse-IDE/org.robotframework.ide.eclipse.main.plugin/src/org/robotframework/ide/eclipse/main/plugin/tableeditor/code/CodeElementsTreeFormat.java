@@ -1,4 +1,4 @@
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.code.nattable;
+package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
 import java.util.Comparator;
 import java.util.List;
