@@ -193,6 +193,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private final Object DOCUMENTATION_LOCK = new Object();
 
+    private final Object FAMILY = new Object();
+
     @Override
     public ISelectionProvider getSelectionProvider() {
         return selectionProvider;
@@ -489,6 +491,11 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 return Status.OK_STATUS;
             }
+
+            @Override
+            public boolean belongsTo(Object family) {
+                return FAMILY == family;
+            }
         };
     }
 
@@ -757,7 +764,19 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // end in order to proceed with saving
         try {
             if (!documentationChangeJob.compareAndSet(null, null)) {
-                Job.getJobManager().join(documentationChangeJob.get(), null);
+                if (documentationChangeJob.get().getState() == Job.SLEEPING
+                        || documentationChangeJob.get().getState() == Job.NONE) {
+                    Thread.sleep(300);
+                }
+                documentationChangeJob.get().join();
+                System.out.println("enter");
+                // Job.getJobManager().cancel(FAMILY);
+                // if (documentationChangeJob.get().getState() == Job.NONE) {
+                // System.out.println("jrob");
+                // documentationChangeJob.get().schedule();
+                // }
+                // documentationChangeJob.get().join(TimeUnit.SECONDS.toMillis(2L), null);
+                // Job.getJobManager().join(FAMILY, null);
             }
         } catch (final InterruptedException e) {
             RedPlugin.logError("Documentation change job was interrupted", e);
