@@ -21,7 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatchesCollection.CasesFilter;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.nattable.CodeElementsTreeFormat;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTreeFormat;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
 import ca.odell.glazedlists.FilterList;
