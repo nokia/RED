@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
-import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
@@ -157,7 +156,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         if (!newArguments.isEmpty()) {
             newArguments.remove(0);
         }
-        final SetKeywordCallArguments command = new SetKeywordCallArguments(eventBroker, actualCall, newArguments);
+        final SetSimpleKeywordCallArguments command = new SetSimpleKeywordCallArguments(eventBroker, actualCall, newArguments);
         executedCommands.add(command);
         command.execute();
     }
@@ -171,71 +170,6 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         return newUndoCommands(undoCommands);
     }
 
-    private static class SetSimpleKeywordCallName extends EditorCommand {
-
-        private final RobotKeywordCall call;
-
-        private String oldName;
-
-        private final String newName;
-
-        public SetSimpleKeywordCallName(final IEventBroker eventBroker, final RobotKeywordCall call,
-                final String newName) {
-            this.eventBroker = eventBroker;
-            this.call = call;
-            this.newName = newName;
-        }
-
-        @Override
-        public void execute() {
-            oldName = call.isExecutable() ? call.getName() : "[" + call.getName() + "]";
-
-            final AModelElement<?> linkedElement = call.getLinkedElement();
-            linkedElement.getDeclaration().setText(newName);
-
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_NAME_CHANGE, call);
-        }
-
-        @Override
-        public List<EditorCommand> getUndoCommands() {
-            return newUndoCommands(new SetSimpleKeywordCallName(eventBroker, call, oldName));
-        }
-    }
-
-    private static class SetKeywordCallArguments extends EditorCommand {
-
-        private final RobotKeywordCall call;
-
-        private List<String> oldArguments;
-
-        private final List<String> newArguments;
-
-        SetKeywordCallArguments(final IEventBroker eventBroker, final RobotKeywordCall call,
-                final List<String> newArguments) {
-            this.eventBroker = eventBroker;
-            this.call = call;
-            this.newArguments = newArguments;
-        }
-
-        @Override
-        public void execute() {
-            oldArguments = call.getArguments();
-            if (oldArguments.equals(newArguments)) {
-                return;
-            }
-            final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) call.getParent();
-            parent.getModelUpdater().setArguments(call.getLinkedElement(), newArguments);
-            call.resetStored();
-
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, call);
-        }
-
-        @Override
-        public List<EditorCommand> getUndoCommands() {
-            return newUndoCommands(new SetKeywordCallArguments(eventBroker, call, oldArguments));
-        }
-    }
-    
     private static class ConvertCallToSetting extends EditorCommand {
 
         private final IEventBroker eventBroker;
