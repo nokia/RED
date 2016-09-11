@@ -25,27 +25,27 @@ public class SetKeywordDefinitionArgumentCommandTest {
 
     @Test
     public void testUndoRedoOnFirstArgumentInKeywordDefinition() {
-        RobotKeywordDefinition def = createKeywordDef();
-        SetKeywordDefinitionArgumentCommand command = new SetKeywordDefinitionArgumentCommand(def, 0, null);
+        final RobotKeywordDefinition def = createKeywordDef();
+        final SetKeywordDefinitionArgumentCommand command = new SetKeywordDefinitionArgumentCommand(def, 0, null);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command).execute();
 
         verifyArguments(def, 2, 0, "2");
 
-        EditorCommand undoCommand = command.getUndoCommands().get(0);
+        final EditorCommand undoCommand = command.getUndoCommands().get(0);
         undoCommand.execute();
         verifyArguments(def, 3, 0, "1");
 
-        EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+        final EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
         redoCommand.execute();
         verifyArguments(def, 2, 0, "2");
 
-        verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, def);
+        verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, def);
     }
 
-    private void verifyArguments(RobotKeywordDefinition def, int expectedSize, int indexToVerify,
-            String expectedValue) {
+    private void verifyArguments(final RobotKeywordDefinition def, final int expectedSize, final int indexToVerify,
+            final String expectedValue) {
         assertTrue(def.getArgumentsSetting().getArguments().size() == expectedSize);
         assertThat(def.getArgumentsSetting().getArguments().get(indexToVerify)).isEqualTo(expectedValue);
     }
