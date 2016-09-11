@@ -21,6 +21,10 @@ public abstract class EditorCommand {
 
     private EditorCommand parent;
 
+    public void setEventBroker(final IEventBroker eventBroker) {
+        this.eventBroker = eventBroker;
+    }
+
     public abstract void execute() throws CommandExecutionException;
 
     public List<EditorCommand> getUndoCommands() {

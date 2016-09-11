@@ -10,12 +10,9 @@ import java.util.List;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.cases.SetCaseNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.KeywordCallsTableValuesChangingCommandsCollector;
 
 /**
  * @author Michal Anglart
@@ -42,18 +39,11 @@ public class CasesTableValuesChangingCommandsCollector {
             if (column == 0) {
                 commands.add(new SetCaseNameCommand(testCase, value));
             }
-        } else if (element instanceof RobotKeywordCall) {
-            final RobotKeywordCall call = (RobotKeywordCall) element;
-
-            if (column == 0) {
-                commands.add(new SetKeywordCallNameCommand(call, value));
-            } else if (column > 0 && column < (numberOfColumns - 1)) {
-                commands.add(new SetKeywordCallArgumentCommand(call, column - 1, value));
-            } else {
-                commands.add(new SetKeywordCallCommentCommand(call, value));
-            }
+        } else {
+            final List<? extends EditorCommand> callCommands = new KeywordCallsTableValuesChangingCommandsCollector()
+                    .collect(element, value, column, numberOfColumns);
+            commands.addAll(callCommands);
         }
         return commands;
     }
-    
 }

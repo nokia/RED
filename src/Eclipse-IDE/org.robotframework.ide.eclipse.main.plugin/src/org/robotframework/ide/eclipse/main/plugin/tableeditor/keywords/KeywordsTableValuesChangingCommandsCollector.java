@@ -9,14 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords.SetKeywordDefinitionNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.KeywordCallsTableValuesChangingCommandsCollector;
 
 /**
  * @author Michal Anglart
@@ -38,17 +35,7 @@ public class KeywordsTableValuesChangingCommandsCollector {
             final int numberOfColumns) {
         final List<EditorCommand> commands = new ArrayList<>();
 
-        if (element instanceof RobotKeywordCall) {
-            final RobotKeywordCall keywordCall = (RobotKeywordCall) element;
-
-            if (column == 0) {
-                commands.add(new SetKeywordCallNameCommand(keywordCall, value));
-            } else if (column > 0 && column < numberOfColumns - 1) {
-                commands.add(new SetKeywordCallArgumentCommand(keywordCall, column - 1, value));
-            } else {
-                commands.add(new SetKeywordCallCommentCommand(keywordCall, value));
-            }
-        } else if (element instanceof RobotKeywordDefinition) {
+        if (element instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) element;
 
             if (column == 0) {
@@ -56,6 +43,10 @@ public class KeywordsTableValuesChangingCommandsCollector {
             } else if (column > 0 && column < numberOfColumns - 1) {
                 commands.add(new SetKeywordDefinitionArgumentCommand(keywordDef, column - 1, value));
             }
+        } else {
+            final List<? extends EditorCommand> callCommands = new KeywordCallsTableValuesChangingCommandsCollector()
+                    .collect(element, value, column, numberOfColumns);
+            commands.addAll(callCommands);
         }
         return commands;
     }
