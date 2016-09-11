@@ -63,7 +63,8 @@ public class TestCaseTagsModelOperation implements IExecutablesStepsHolderElemen
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final TestCaseTags tags = (TestCaseTags) modelElement;
 
-        for (int i = 0; i < tags.getTags().size(); i++) {
+        final int elementsToRemove = tags.getTags().size();
+        for (int i = 0; i < elementsToRemove; i++) {
             tags.removeElementToken(0);
         }
         for (int i = 0; i < newArguments.size(); i++) {

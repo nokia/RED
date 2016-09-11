@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.presenter.update.IExecutablesStepsHolderEl
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class KeywordTimeoutModelOperation implements IExecutablesStepsHolderElementOperation<UserKeyword> {
@@ -72,8 +73,9 @@ public class KeywordTimeoutModelOperation implements IExecutablesStepsHolderElem
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final KeywordTimeout timeout = (KeywordTimeout) modelElement;
 
-        timeout.setTimeout(newArguments.isEmpty() ? "" : newArguments.get(0));
-        for (int i = 0; i < timeout.getMessage().size(); i++) {
+        timeout.setTimeout(newArguments.isEmpty() ? null : RobotToken.create(newArguments.get(0)));
+        int elementsToRemove = timeout.getMessage().size();
+        for (int i = 0; i < elementsToRemove; i++) {
             timeout.removeElementToken(0);
         }
         for (int i = 1; i < newArguments.size(); i++) {

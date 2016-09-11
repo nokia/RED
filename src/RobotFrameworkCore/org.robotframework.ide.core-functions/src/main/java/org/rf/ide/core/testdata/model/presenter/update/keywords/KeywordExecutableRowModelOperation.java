@@ -64,7 +64,8 @@ public class KeywordExecutableRowModelOperation implements IExecutablesStepsHold
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final RobotExecutableRow<?> row = (RobotExecutableRow<?>) modelElement;
 
-        for (int i = 0; i < row.getArguments().size(); i++) {
+        int elementsToRemove = row.getArguments().size();
+        for (int i = 0; i < elementsToRemove; i++) {
             row.removeElementToken(0);
         }
         for (int i = 0; i < newArguments.size(); i++) {
