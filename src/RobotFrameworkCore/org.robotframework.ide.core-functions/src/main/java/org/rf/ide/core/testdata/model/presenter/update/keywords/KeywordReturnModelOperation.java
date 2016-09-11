@@ -64,7 +64,8 @@ public class KeywordReturnModelOperation implements IExecutablesStepsHolderEleme
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final KeywordReturn keywordReturn = (KeywordReturn) modelElement;
 
-        for (int i = 0; i < keywordReturn.getReturnValues().size(); i++) {
+        int elementsToRemove = keywordReturn.getReturnValues().size();
+        for (int i = 0; i < elementsToRemove; i++) {
             keywordReturn.removeElementToken(0);
         }
         for (int i = 0; i < newArguments.size(); i++) {
