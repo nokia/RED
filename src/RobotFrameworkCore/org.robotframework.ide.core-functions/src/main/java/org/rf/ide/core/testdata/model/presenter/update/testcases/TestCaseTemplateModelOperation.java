@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.presenter.update.IExecutablesStepsHolderEl
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 public class TestCaseTemplateModelOperation implements IExecutablesStepsHolderElementOperation<TestCase> {
@@ -70,8 +71,9 @@ public class TestCaseTemplateModelOperation implements IExecutablesStepsHolderEl
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final TestCaseTemplate template = (TestCaseTemplate) modelElement;
 
-        template.setKeywordName(newArguments.isEmpty() ? "" : newArguments.get(0));
-        for (int i = 0; i < template.getUnexpectedTrashArguments().size(); i++) {
+        template.setKeywordName(newArguments.isEmpty() ? null : RobotToken.create(newArguments.get(0)));
+        int elementsToRemove = template.getUnexpectedTrashArguments().size();
+        for (int i = 0; i < elementsToRemove; i++) {
             template.removeElementToken(0);
         }
         for (int i = 1; i < newArguments.size(); i++) {
