@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _wBhPoFsNEearwpaEcDJbag
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/8/16 2:50 PM
+Save-Time: 9/11/16 10:57 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -131,14 +131,14 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    ${timeInterval}=    Set Variable    ${1}\n"
     + "\tLog\tWaiting ${timeDuration} seconds and display the progress...\n"
     + "\t${d}\tIN RANGE    ${timeDuration}\n"
-    + "\t\\\tLog\t\n"
+    + "\t\\\tLog\n"
     + "\t\\\tSleep\t${timeInterval}\n"
     + "    \\  \\   text  text2\n"
     + "Print output\n"
     + "    [Arguments]   ${teObj}\n"
     + "    [Timeout]    69s\n"
     + "    ${output1}=   Catenate      ${teObj}   ${0}    \n"
-    + "    ${output2}=    ${teObj}   ${2}\n"
+    + "    ${output2}=    ${teObj}    ${2}\n"
     + "    Log   Show: ${output1}\n"
     + "    Show detailed view: : ${output2}\n"
     + "Doc here\n"
