@@ -15,6 +15,7 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -26,6 +27,7 @@ public class SetKeywordDefinitionArgumentCommandTest {
     @Test
     public void testUndoRedoOnFirstArgumentInKeywordDefinition() {
         final RobotKeywordDefinition def = createKeywordDef();
+        final RobotKeywordCall args = def.getChildren().get(0);
         final SetKeywordDefinitionArgumentCommand command = new SetKeywordDefinitionArgumentCommand(def, 0, null);
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
@@ -41,7 +43,7 @@ public class SetKeywordDefinitionArgumentCommandTest {
         redoCommand.execute();
         verifyArguments(def, 2, 0, "2");
 
-        verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, def);
+        verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, args);
     }
 
     private void verifyArguments(final RobotKeywordDefinition def, final int expectedSize, final int indexToVerify,
