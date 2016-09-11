@@ -9,14 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.AModelElement;
-import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand2;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.services.event.RedEventBroker;
 
@@ -28,30 +26,23 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
     private final String value;
     
-    private boolean shouldReplaceValue;
-    
-    private String previousValue;
+    private final List<EditorCommand> undoCommands = new ArrayList<>();
 
     public SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
             final String value) {
-        this(definition, index, value, true);
-    }
-    
-    protected SetKeywordDefinitionArgumentCommand(final RobotKeywordDefinition definition, final int index,
-            final String value, final boolean shouldReplaceValue) {
         this.definition = definition;
         this.index = index;
         this.value = value;
-        this.shouldReplaceValue = shouldReplaceValue;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void execute() throws CommandExecutionException {
-        RobotDefinitionSetting setting = definition.getArgumentsSetting();
+        final RobotDefinitionSetting setting = definition.getArgumentsSetting();
 
-        final List<String> arguments = prepareArgumentsList(setting, value, index);
-        final boolean areAllEmpty = areAllEmpty(arguments);
+        final List<String> currentArguments = setting == null ? new ArrayList<String>() : setting.getArguments();
+        final List<String> newArguments = SetKeywordCallArgumentCommand2.prepareArgumentsList(currentArguments, index,
+                value);
+        final boolean areAllEmpty = areAllEmpty(newArguments);
 
         if (setting == null && areAllEmpty) {
             // there is no setting and we have no arguments to set
@@ -59,59 +50,27 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
 
         } else if (setting != null && areAllEmpty) {
             // there is a setting, but we don't have arguments
-            definition.getChildren().remove(setting);
-            definition.getLinkedElement()
-                    .removeUnitSettings((AModelElement<UserKeyword>) setting.getLinkedElement());
+            final DeleteArgumentSettingCommand command = new DeleteArgumentSettingCommand(setting);
+            command.setEventBroker(eventBroker);
+            command.execute();
 
-            RedEventBroker.using(eventBroker)
-                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
-                    .to(setting)
-                    .send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, definition);
+            undoCommands.addAll(command.getUndoCommands());
 
         } else if (setting == null) {
             // there is no setting, but we have arguments to set
-            setting = definition.createSetting(0, RobotTokenType.KEYWORD_SETTING_ARGUMENTS.getRepresentation().get(0),
-                    new ArrayList<String>(), "");
-            updateModel(setting, arguments);
+            final CreateArgumentSettingCommand command = new CreateArgumentSettingCommand(definition, newArguments);
+            command.setEventBroker(eventBroker);
+            command.execute();
 
-            RedEventBroker.using(eventBroker)
-                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
-                    .to(setting)
-                    .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
+            undoCommands.addAll(command.getUndoCommands());
 
-        } else if (!arguments.equals(setting.getArguments())) {
+        } else if (!newArguments.equals(setting.getArguments())) {
             // there is a setting and we have arguments which are different than current
-            updateModel(setting, arguments);
-            setting.resetStored();
+            final SetKeywordCallArgumentCommand2 command = new SetKeywordCallArgumentCommand2(setting, index, value);
+            command.setEventBroker(eventBroker);
+            command.execute();
 
-            eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ARGUMENT_CHANGE, definition);
-        }
-    }
-    
-    private List<String> prepareArgumentsList(final RobotKeywordCall call, final String value, final int index) {
-        final List<String> arguments = SetKeywordCallArgumentCommand.createArgumentsList(call, index);
-        
-        previousValue = index >= 0 && index < arguments.size() ? arguments.get(index) : value;
-
-        SetKeywordCallArgumentCommand.fillArgumentsList(value, index, arguments, shouldReplaceValue);
-        
-        checkIfPreviousCommandWasAddingNewValue();
-        checkIfUndoCommandShouldAddArgument(arguments.get(index));
-        
-        return arguments;
-    }
-    
-    private void checkIfPreviousCommandWasAddingNewValue() {
-        if(!shouldReplaceValue) {
-            previousValue = null; // when new value was not replaced but added by undo command, then redo command should remove this value
-        }
-    }
-    
-    private void checkIfUndoCommandShouldAddArgument(final String currentArgValue) {
-        if(currentArgValue != null && currentArgValue.equals("\\") && value == null) {
-            shouldReplaceValue = false; // when arg is deleted not on last position, undo command will add new arg on this position and shifts other args to the right
-        } else {
-            shouldReplaceValue = true; // reset the flag for future undo commands
+            undoCommands.addAll(command.getUndoCommands());
         }
     }
 
@@ -124,19 +83,69 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         return true;
     }
 
-    private void updateModel(final RobotDefinitionSetting argumentsSetting, final List<String> arguments) {
-        final IExecutablesTableModelUpdater<UserKeyword> updater = definition.getModelUpdater();
-        if (value != null) {
-            for (int i = arguments.size() - 1; i >= 0; i--) {
-                updater.updateArgument(argumentsSetting.getLinkedElement(), i, arguments.get(i));
-            }
-        } else {
-            updater.updateArgument(argumentsSetting.getLinkedElement(), index, value);
-        }
-    }
-    
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetKeywordDefinitionArgumentCommand(definition, index, previousValue, shouldReplaceValue));
+        return undoCommands;
+    }
+    
+    private static class CreateArgumentSettingCommand extends EditorCommand {
+
+        private final RobotKeywordDefinition definition;
+
+        private final List<String> arguments;
+
+        private RobotDefinitionSetting setting;
+
+        public CreateArgumentSettingCommand(final RobotKeywordDefinition definition, final List<String> arguments) {
+            this.definition = definition;
+            this.arguments = arguments;
+        }
+
+        @Override
+        public void execute() throws CommandExecutionException {
+            setting = definition.createSetting(0, RobotTokenType.KEYWORD_SETTING_ARGUMENTS.getRepresentation().get(0),
+                    arguments, "");
+
+            RedEventBroker.using(eventBroker)
+                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(setting)
+                .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, definition);
+        }
+
+        @Override
+        public List<EditorCommand> getUndoCommands() {
+            return newUndoCommands(new DeleteArgumentSettingCommand(setting));
+        }
+    }
+
+    private static class DeleteArgumentSettingCommand extends EditorCommand {
+
+        private RobotKeywordDefinition keyword;
+        private final RobotDefinitionSetting argSetting;
+
+        private List<String> oldArguments;
+
+        public DeleteArgumentSettingCommand(final RobotDefinitionSetting argSetting) {
+            this.argSetting = argSetting;
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public void execute() throws CommandExecutionException {
+            keyword = (RobotKeywordDefinition) argSetting.getParent();
+
+            oldArguments = argSetting.getArguments();
+
+            keyword.getChildren().remove(argSetting);
+            keyword.getLinkedElement().removeUnitSettings((AModelElement<UserKeyword>) argSetting.getLinkedElement());
+
+            RedEventBroker.using(eventBroker)
+                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(argSetting)
+                .send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, keyword);
+        }
+
+        @Override
+        public List<EditorCommand> getUndoCommands() {
+            return newUndoCommands(new CreateArgumentSettingCommand(keyword, oldArguments));
+        }
     }
 }
