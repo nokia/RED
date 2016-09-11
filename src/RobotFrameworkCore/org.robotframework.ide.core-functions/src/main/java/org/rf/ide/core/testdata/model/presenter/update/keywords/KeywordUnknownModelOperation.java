@@ -60,7 +60,8 @@ public class KeywordUnknownModelOperation implements IExecutablesStepsHolderElem
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final KeywordUnknownSettings unknown = (KeywordUnknownSettings) modelElement;
 
-        for (int i = 0; i < unknown.getArguments().size(); i++) {
+        int elementsToRemove = unknown.getArguments().size();
+        for (int i = 0; i < elementsToRemove; i++) {
             unknown.removeElementToken(0);
         }
         for (int i = 0; i < newArguments.size(); i++) {

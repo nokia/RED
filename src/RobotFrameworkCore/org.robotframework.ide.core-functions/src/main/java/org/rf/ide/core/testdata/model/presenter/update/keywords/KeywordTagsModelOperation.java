@@ -64,7 +64,8 @@ public class KeywordTagsModelOperation implements IExecutablesStepsHolderElement
     public void update(final AModelElement<?> modelElement, final List<String> newArguments) {
         final KeywordTags tags = (KeywordTags) modelElement;
 
-        for (int i = 0; i < tags.getTags().size(); i++) {
+        int elementsToRemove = tags.getTags().size();
+        for (int i = 0; i < elementsToRemove; i++) {
             tags.removeElementToken(0);
         }
         for (int i = 0; i < newArguments.size(); i++) {
