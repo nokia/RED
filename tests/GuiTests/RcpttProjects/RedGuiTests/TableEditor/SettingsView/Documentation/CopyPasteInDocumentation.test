@@ -147,6 +147,8 @@ get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-p
     
 //check Source    
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+// waits for documentation job update
+wait 500
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
     + "Documentation    line1    \n"
     + "...    line2line2line2    \n"
