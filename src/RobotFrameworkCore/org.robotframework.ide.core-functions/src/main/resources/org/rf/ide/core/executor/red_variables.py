@@ -4,6 +4,8 @@
 # see license.txt file for details.
 #
 
+from copy import copy
+
 def get_global_variables():
     import robot
     import tempfile
@@ -109,7 +111,7 @@ def get_variables(dir, arguments):
     return filtered_vars
 
 def _extract_dot_dict(dict):
-    return {k : _escape_unicode(v) for k, v in dict.items()}
+    return {_escape_unicode(k) : _escape_unicode(v) for k, v in dict.items()}
 
 
 def _escape_unicode(data):
@@ -120,7 +122,10 @@ def _escape_unicode(data):
         import unicodedata
         return unicodedata.normalize('NFKD', data).encode('ascii','ignore') # for XML-RPC problems with unicode characters
     if py_version >= (3,0,0) and isinstance(data, str):
-        return data.encode('unicode_escape')
+        escaped_data = data.encode('unicode_escape')
+        if isinstance(escaped_data, bytes):
+            escaped_data = escaped_data.decode()
+        return escaped_data
     if py_version < (3,0,0) and isinstance(data, basestring):
         return data.encode('unicode_escape')
     if py_version < (3,0,0) and isinstance(data, long):  # for OverflowError in XML-RPC
@@ -135,8 +140,10 @@ def _escape_unicode(data):
             data_result[_escape_unicode(str(key))] = _escape_unicode(val)
         return data_result
     if isinstance(data, list):
-        for index, item in enumerate(data):
-            data[index] = _escape_unicode(item)
+        data_result = copy(data)
+        for index, item in enumerate(data_result):
+            data_result[index] = _escape_unicode(item)
+        return data_result
     if isinstance(data, tuple):   
         tuple_data = ()
         for item in data:
