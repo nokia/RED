@@ -65,14 +65,20 @@ class SuiteSourceEditorFoldingSupport {
         }
 
         try {
-            textControl.setRedraw(false);
+            if (textControl != null && !textControl.isDisposed()) {
+                textControl.setRedraw(false);
+            }
             annotationsModel.modifyAnnotations(annotationsToRemove.toArray(new Annotation[0]), annotationsToAdd,
                     annotationsToChange.toArray(new Annotation[0]));
             // workaround : without this the horizontal scrollbar is reset to 0 position when
             // writing at the end of long line
-            textControl.showSelection();
+            if (textControl != null && !textControl.isDisposed()) {
+                textControl.showSelection();
+            }
         } finally {
-            textControl.setRedraw(true);
+            if (textControl != null && !textControl.isDisposed()) {
+                textControl.setRedraw(true);
+            }
             oldFoldingAnnotations = newFoldingAnnotations;
         }
 
