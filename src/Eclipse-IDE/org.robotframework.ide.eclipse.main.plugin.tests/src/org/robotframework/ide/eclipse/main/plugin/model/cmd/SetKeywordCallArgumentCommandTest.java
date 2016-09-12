@@ -106,6 +106,47 @@ public class SetKeywordCallArgumentCommandTest {
 
         verify(eventBroker, times(3)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_ARGUMENT_CHANGE, call);
     }
+    
+    @Test
+    public void testUndoRedoOnAllArgumentsOneByOne() {
+        RobotKeywordCall call = createKeywordCall();
+        SetKeywordCallArgumentCommand command1 = new SetKeywordCallArgumentCommand(call, 0, null);
+        SetKeywordCallArgumentCommand command2 = new SetKeywordCallArgumentCommand(call, 0, null);
+        SetKeywordCallArgumentCommand command3 = new SetKeywordCallArgumentCommand(call, 0, null);
+
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+        ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command1).execute();
+        ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command2).execute();
+        ContextInjector.prepareContext().inWhich(eventBroker).isInjectedInto(command3).execute();
+        
+        assertTrue(call.getArguments().isEmpty());
+        
+        EditorCommand undoCommand1 = command3.getUndoCommands().get(0);
+        undoCommand1.execute();
+        verifyArguments(call, 1, 0, "3");
+        
+        EditorCommand undoCommand2 = command2.getUndoCommands().get(0);
+        undoCommand2.execute();
+        verifyArguments(call, 2, 0, "2");
+        
+        EditorCommand undoCommand3 = command1.getUndoCommands().get(0);
+        undoCommand3.execute();
+        verifyArguments(call, 3, 0, "1");
+        verifyArguments(call, 3, 1, "2");
+        verifyArguments(call, 3, 2, "3");
+        
+        EditorCommand redoCommand1 = undoCommand3.getUndoCommands().get(0);
+        redoCommand1.execute();
+        verifyArguments(call, 2, 0, "2");
+        
+        EditorCommand redoCommand2 = undoCommand2.getUndoCommands().get(0);
+        redoCommand2.execute();
+        verifyArguments(call, 1, 0, "3");
+        
+        EditorCommand redoCommand3 = undoCommand1.getUndoCommands().get(0);
+        redoCommand3.execute();
+        assertTrue(call.getArguments().isEmpty());
+    }
 
     private void verifyArguments(RobotKeywordCall call, int expectedSize, int indexToVerify, String expectedValue) {
         assertTrue(call.getArguments().size() == expectedSize);
