@@ -1,0 +1,8 @@
+ *** Testcases ***
+*** Setting ***
+*** Keyword ***
+k1
+	\	dsd	ds	ds	d	ds	#dsd
+	log	\	#test	#ds
+	\
+	Log	ok
