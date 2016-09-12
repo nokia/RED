@@ -342,7 +342,11 @@ public class ElementPositionResolver {
                     result = posInfo.isFirstSeparator();
                 }
             } else {
-                result = (currentToken.getStartColumn() == 0)
+                boolean meetFirstColumnPosition = (currentToken.getStartColumn() == 0
+                        || (!posInfo.getPrettyAlignPosIndexes().isEmpty()
+                                && posInfo.getPrettyAlignPosIndexes().get(0) == 0));
+
+                result = meetFirstColumnPosition
                         && (posInfo.getRobotTokensPosIndexes().size() == 1
                                 || posInfo.getPreviousLineContinuePosIndexes().size() == 1)
                         && posInfo.getSeparatorsPosIndexes().isEmpty() && !posInfo.isFirstSeparator();
