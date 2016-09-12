@@ -268,13 +268,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 @Override
                 public void modifyText(final ModifyEvent e) {
+                    isDocumentationModified.set(true);
                     if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
                             && (documentation.getText().equals(getDocumentation(getSection(), true))
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
                         return;
                     }
                     setDirty();
-                    isDocumentationModified.set(true);
 
                     if (documentationChangeJob != null && documentationChangeJob.getState() == Job.SLEEPING) {
                         documentationChangeJob.cancel();
