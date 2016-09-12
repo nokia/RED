@@ -145,7 +145,8 @@ public class SuiteSourceEditor extends TextEditor {
         // turn projection mode on
         new ProjectionSupport(viewer, getAnnotationAccess(), getSharedColors()).install();
         viewer.doOperation(ProjectionViewer.TOGGLE);
-        foldingSupport = new SuiteSourceEditorFoldingSupport(viewer.getProjectionAnnotationModel());
+        foldingSupport = new SuiteSourceEditorFoldingSupport(viewer.getTextWidget(),
+                viewer.getProjectionAnnotationModel());
     }
 
     private void installStatusBarUpdater(final ProjectionViewer viewer) {
