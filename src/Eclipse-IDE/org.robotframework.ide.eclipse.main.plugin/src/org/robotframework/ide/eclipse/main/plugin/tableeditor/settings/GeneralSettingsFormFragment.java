@@ -268,18 +268,17 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 @Override
                 public void modifyText(final ModifyEvent e) {
+                    isDocumentationModified.set(true);
                     if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
                             && (documentation.getText().equals(getDocumentation(getSection(), true))
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
                         return;
                     }
-                    isDocumentationModified.set(true);
                     setDirty();
 
                     if (documentationChangeJob != null && documentationChangeJob.getState() == Job.SLEEPING) {
                         documentationChangeJob.cancel();
                     }
-
                     documentationChangeJob = createDocumentationChangeJob(documentation.getText());
                     documentationChangeJob.schedule(300);
                 }
@@ -483,7 +482,6 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 } else if (docSetting != null) {
                     commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
                 }
-
                 return Status.OK_STATUS;
             }
         };
@@ -754,22 +752,20 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // end in order to proceed with saving
         try {
             if (isDocumentationModified.get()) {
-                synchronized (documentation) {
-                    if (documentationChangeJob != null) {
-                        documentationChangeJob.cancel();
-                    }
-                    if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
-                            && (documentation.getText().equals(getDocumentation(getSection(), true))
-                                    || documentation.getText().equals(getDocumentation(getSection(), false))))) {
-                        return;
-                    }
-                    documentationChangeJob = createDocumentationChangeJob(documentation.getText());
-                    documentationChangeJob.schedule();
-                    while (documentationChangeJob.getState() != Job.RUNNING) {
-                    }
-                    documentationChangeJob.join();
-                    documentationChangeJob = null;
+                if (documentationChangeJob != null) {
+                    documentationChangeJob.cancel();
                 }
+                if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
+                        && (documentation.getText().equals(getDocumentation(getSection(), true))
+                                || documentation.getText().equals(getDocumentation(getSection(), false))))) {
+                    return;
+                }
+                documentationChangeJob = createDocumentationChangeJob(documentation.getText());
+                documentationChangeJob.schedule();
+                while (documentationChangeJob.getState() != Job.RUNNING) {
+                }
+                documentationChangeJob.join();
+                documentationChangeJob = null;
             }
         } catch (final InterruptedException e) {
             RedPlugin.logError("Documentation change job was interrupted", e);
