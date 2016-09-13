@@ -755,18 +755,18 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         try {
             if (isDocumentationModified.get()) {
                 synchronized (documentation) {
-                    if (documentationChangeJob == null) {
-                        if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
-                                && (documentation.getText().equals(getDocumentation(getSection(), true))
-                                        || documentation.getText().equals(getDocumentation(getSection(), false))))) {
-                            return;
-                        }
-                        documentationChangeJob = createDocumentationChangeJob(documentation.getText());
-                    }
-                    if (documentationChangeJob.getState() == Job.SLEEPING) {
+                    if (documentationChangeJob != null) {
                         documentationChangeJob.cancel();
                     }
+                    if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
+                            && (documentation.getText().equals(getDocumentation(getSection(), true))
+                                    || documentation.getText().equals(getDocumentation(getSection(), false))))) {
+                        return;
+                    }
+                    documentationChangeJob = createDocumentationChangeJob(documentation.getText());
                     documentationChangeJob.schedule();
+                    while (documentationChangeJob.getState() != Job.RUNNING) {
+                    }
                     documentationChangeJob.join();
                     documentationChangeJob = null;
                 }
