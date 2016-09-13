@@ -754,20 +754,22 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // end in order to proceed with saving
         try {
             if (isDocumentationModified.get()) {
-                if (documentationChangeJob == null) {
-                    if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
-                            && (documentation.getText().equals(getDocumentation(getSection(), true))
-                                    || documentation.getText().equals(getDocumentation(getSection(), false))))) {
-                        return;
+                synchronized (documentation) {
+                    if (documentationChangeJob == null) {
+                        if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
+                                && (documentation.getText().equals(getDocumentation(getSection(), true))
+                                        || documentation.getText().equals(getDocumentation(getSection(), false))))) {
+                            return;
+                        }
+                        documentationChangeJob = createDocumentationChangeJob(documentation.getText());
                     }
-                    documentationChangeJob = createDocumentationChangeJob(documentation.getText());
+                    if (documentationChangeJob.getState() == Job.SLEEPING) {
+                        documentationChangeJob.cancel();
+                    }
+                    documentationChangeJob.schedule();
+                    documentationChangeJob.join();
+                    documentationChangeJob = null;
                 }
-                if (documentationChangeJob.getState() == Job.SLEEPING) {
-                    documentationChangeJob.cancel();
-                }
-                documentationChangeJob.schedule();
-                documentationChangeJob.join();
-                documentationChangeJob = null;
             }
         } catch (final InterruptedException e) {
             RedPlugin.logError("Documentation change job was interrupted", e);
