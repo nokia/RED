@@ -1245,6 +1245,11 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.ide.eclipse.showInDocView"
+          name="Show in Doc View">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.renameKeyword"
           name="Rename">
     </command>
@@ -1462,6 +1467,15 @@
              </and>
           </with>
        </enabledWhen>
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.editorContextIsActive">
+          </reference>
+       </activeWhen>
+    </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ShowInDocViewHandler"
+          commandId="org.robotframework.ide.eclipse.showInDocView">
        <activeWhen>
           <reference
                 definitionId="org.robotframework.editorContextIsActive">
@@ -3013,6 +3027,15 @@
                 checkEnabled="true">
           </visibleWhen>
        </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInDocView"
+             icon="resources/book.png"
+             label="Show in Doc View"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
        <separator
              name="globals"
              visible="true">
@@ -3209,6 +3232,15 @@
              commandId="org.robotframework.ide.eclipse.showInSource"
              icon="resources/source.png"
              label="Show in source"
+             style="push">
+          <visibleWhen
+                checkEnabled="true">
+          </visibleWhen>
+       </command>
+       <command
+             commandId="org.robotframework.ide.eclipse.showInDocView"
+             icon="resources/book.png"
+             label="Show in Doc View"
              style="push">
           <visibleWhen
                 checkEnabled="true">
@@ -3839,6 +3871,21 @@
                commandId="org.robotframework.ide.eclipse.showInTable"
                icon="resources/section.png"
                label="Show in table"
+               style="push">
+            <visibleWhen
+                  checkEnabled="false">
+               <with
+                     variable="activeEditor">
+                  <instanceof
+                        value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                  </instanceof>
+               </with>
+      		</visibleWhen>
+         </command>
+         <command
+               commandId="org.robotframework.ide.eclipse.showInDocView"
+               icon="resources/book.png"
+               label="Show in Doc View"
                style="push">
             <visibleWhen
                   checkEnabled="false">

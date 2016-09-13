@@ -588,6 +588,10 @@ public class RobotFormEditor extends FormEditor {
         this.documentationViewPartListener = listener;
     }
 
+    public DocumentationViewPartListener getDocumentationViewPartListener() {
+        return documentationViewPartListener;
+    }
+
     public void removeDocumentationViewPartListener() {
         this.documentationViewPartListener = null;
     }

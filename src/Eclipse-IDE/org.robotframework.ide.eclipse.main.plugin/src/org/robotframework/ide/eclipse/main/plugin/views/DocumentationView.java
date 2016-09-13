@@ -62,6 +62,8 @@ public class DocumentationView {
     private CurrentlyDisplayedDocElement currentlyDisplayedDocElement;
     
     private AtomicBoolean hasShowLibdocEnabled = new AtomicBoolean();
+    
+    private ShowLibdocAction showLibdocAction;
 
     @PostConstruct
     public void postConstruct(final Composite parent, final IViewPart part) {
@@ -194,6 +196,11 @@ public class DocumentationView {
     public boolean hasShowLibdocEnabled() {
         return hasShowLibdocEnabled.get();
     }
+    
+    public void setShowLibdocEnabled() {
+        hasShowLibdocEnabled.set(true);
+        showLibdocAction.setChecked(true);
+    }
 
     private void createToolbarActions(final IToolBarManager toolBarManager) {
         final ShowInSourceAction showInSourceAction = new ShowInSourceAction();
@@ -205,7 +212,7 @@ public class DocumentationView {
         toggleWordWrapAction.setText("Word Wrap");
         toggleWordWrapAction.setImageDescriptor(RedImages.getWordwrapImage());
         toolBarManager.add(toggleWordWrapAction);
-        final ShowLibdocAction showLibdocAction = new ShowLibdocAction();
+        showLibdocAction = new ShowLibdocAction();
         showLibdocAction.setChecked(false);
         showLibdocAction.setText("Show Libdoc");
         showLibdocAction.setImageDescriptor(RedImages.getBookImage());
