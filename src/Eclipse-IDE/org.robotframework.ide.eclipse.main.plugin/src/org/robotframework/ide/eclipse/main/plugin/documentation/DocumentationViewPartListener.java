@@ -19,10 +19,13 @@ public class DocumentationViewPartListener implements IPartListener {
     private SourceDocumentationSelectionChangedListener sourceDocSelectionChangedListener;
 
     private TableDocumentationSelectionChangedListener tableDocSelectionChangedListener;
+    
+    private DocumentationView view;
 
     private IEditorPart currentlyActiveEditor;
 
     public DocumentationViewPartListener(final DocumentationView view) {
+        this.view = view;
         this.sourceDocSelectionChangedListener = new SourceDocumentationSelectionChangedListener(view);
         this.tableDocSelectionChangedListener = new TableDocumentationSelectionChangedListener(view);
     }
@@ -93,6 +96,10 @@ public class DocumentationViewPartListener implements IPartListener {
                     .getSelectionProvider()
                     .removeSelectionChangedListener(tableDocSelectionChangedListener);
         }
+    }
+
+    public DocumentationView getView() {
+        return view;
     }
 
 }
