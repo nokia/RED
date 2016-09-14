@@ -8,7 +8,7 @@ https://github.com/nokia/RED/releases
 ### Product
 Product zip is ready to use RED installation bundled with Eclipse Neon. 
 There is no need to install RED feature into it. 
-Choose proper OS version from **Downloads** section.
+Choose proper OS version from **Downloads** section in Release section in RED GitHub page.
 
 ### Feature
 Please refer to First Steps doc under https://github.com/nokia/RED/blob/master/First_steps.md
