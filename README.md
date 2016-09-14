@@ -3,11 +3,11 @@
 
 RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow quick and comfortable work with Robot testware.
 
-**Latest release - RED 0.6.5 (2016-07-07): https://github.com/nokia/RED/releases/latest**
+**Latest release - RED 0.7.0 (2016-09-14): https://github.com/nokia/RED/releases/latest**
 
 ## What RED provides:
 * text editor with validation and code colouring
-* table editors like in Ride (currently read-only)
+* table editors like in Ride fully synced with source
 * debug&remote debug with:
 	* breakpoints
 	* testcase stepping (step into, step over)
@@ -18,18 +18,15 @@ RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow q
 * support for plugins via Eclipse mechanisms
 
 ## Binaries distribution:
-RED is distributed as independent binary (Eclipse product) and Eclipse feature to be installed on existing Eclipse binary. 
-
+RED is distributed as independent binary (Eclipse product) and Eclipse feature to be installed on existing Eclipse binary.
+Binaries can be found under Release folder:  https://github.com/nokia/RED/releases/latest
+Installation instructions can be found [here](https://github.com/nokia/RED/blob/master/installation.md)
 ###Install form Marketplace/Update Site
 
 Marketpalce: Click Help -> Eclipse Marketplace -> and type into Find field "RED"
 
 Update Site: Click Help -> Install New Software -> Add and set address in Location to:
 http://master.dl.sourceforge.net/project/red-robot-editor/repository
-
-### Update existing RED installation
-We recommend to not to do direct update of newer version, instead perform unistall old RED and install new RED after Eclipse restart.
-Open Help -> Installation Details, select old RED feature and perform unistall, restart Eclipse
 
 ## RED Help
 ![RED Robot Editor's application help](Red_Help.md)
