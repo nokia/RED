@@ -123,8 +123,8 @@ public class RedTokenScannerTest {
     public void tokenAreProperlyReturned_whenRulesMatchesSomeOfThem() throws Exception {
         final List<RobotLine> lines = lines(
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")),
-                line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
-                line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
+                line(1, new LineElement(1, 0, 13, "dddd"), new LineElement(1, 4, 17, "eeee"), new LineElement(1, 8, 21, "ffff")),
+                line(2, new LineElement(2, 0, 26, "gggg"), new LineElement(2, 4, 30, "hhhh"), new LineElement(2, 8, 34, "iiii")));
 
         final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
             @Override
@@ -147,7 +147,7 @@ public class RedTokenScannerTest {
                 if (nextToken.getData().equals("b_token")) {
                     assertThat(scanner.getTokenOffset()).isEqualTo(4);
                 } else if (nextToken.getData().equals("e_token")) {
-                    assertThat(scanner.getTokenOffset()).isEqualTo(16);
+                    assertThat(scanner.getTokenOffset()).isEqualTo(17);
                 }
                 assertThat(scanner.getTokenLength()).isEqualTo(4);
             }
@@ -160,8 +160,8 @@ public class RedTokenScannerTest {
     public void tokenAreProperlyReturned_whenRulesMatchesOnlyPartsOfTokens() throws Exception {
         final List<RobotLine> lines = lines(
                 line(0, new LineElement(0, 0, 0, "aaaa"), new LineElement(0, 4, 4, "bbbb"), new LineElement(0, 8, 8, "cccc")),
-                line(1, new LineElement(1, 0, 12, "dddd"), new LineElement(1, 4, 16, "eeee"), new LineElement(1, 8, 20, "ffff")),
-                line(2, new LineElement(2, 0, 24, "gggg"), new LineElement(2, 4, 28, "hhhh"), new LineElement(2, 8, 32, "iiii")));
+                line(1, new LineElement(1, 0, 13, "dddd"), new LineElement(1, 4, 17, "eeee"), new LineElement(1, 8, 21, "ffff")),
+                line(2, new LineElement(2, 0, 26, "gggg"), new LineElement(2, 4, 30, "hhhh"), new LineElement(2, 8, 34, "iiii")));
 
         final Supplier<Deque<IRobotLineElement>> supplier = new Supplier<Deque<IRobotLineElement>>() {
             @Override
@@ -180,7 +180,7 @@ public class RedTokenScannerTest {
                 matchingTokens++;
 
                 assertThat(nextToken.getData()).isEqualTo("g_token");
-                assertThat(scanner.getTokenOffset()).isIn(25, 26);
+                assertThat(scanner.getTokenOffset()).isIn(27, 28);
                 assertThat(scanner.getTokenLength()).isEqualTo(1);
             }
             nextToken = scanner.nextToken(supplier);
