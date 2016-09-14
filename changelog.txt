@@ -1,36 +1,53 @@
-RED 0.6.5 - 2016/07/07
+RED 0.7.0 - 2016/07/14
 
-Bug
-	#21 - Editor do not open when separator is pipe and for-item text after \ is like ${a} s
-	#23 - RED run of of memory during debugging StackOverflowException happens 
-	#29 - Missing suite file for execution during debug caused by __init__.py file 
-    Not refreshing decorator for Exclude/Include options
-    Removing by right click entries from red.xml (variable files, referenced libs) does not work under mint
-    NP when path in Library is windows on Linux machine
-    Jython server process do not close own subprocesses
-    Cannot debug Suite Setup inside __init__ file on RF ver > 3.0
-    Error after deleting project with Libs
-    Referenced libs are not generated after removing second project
-    adding ${} in path to lib produces annoying popup
-    Editor do not open when separator is pipe and for-item text after `\` is like `${a} s`
-    RED run of of memory during debugging StackOverflowException happens often
-	Elements order in navigator is different than in outline view
+** Feature
+    Documentation view
+	Testcase view on Nebula
+    Keywords table on Nebula
+	
+** Enhancement
+    Setting order in Outline
+    It should be possible to add/remove RED project nature without editing project file
+    Elements order in navigator is different than in outline view
+    PREFERENCES - cell selection can stay in same cell after commiting editor
+    [table] disable space as first and last char in cell
+    [table] resize column width
+    Possibility to remove settings from keyword and test cases
+    [docs] add how to install and use red with pydev & pylint
+    [table] run testcase by rightclick
+    [table] Keyword and testcase issue list
+    Documentation view - mode to show current libdoc instead of parent tc/kw
+    Documentation view - show docs from kw/tc body without need on clicking on [Doc] section
+    [table] Removing/implementing option in menu: Open Declaration
+	GitHub #33 #34 enhencments covered 
 
-Enhancement
-	It should be possible to add/remove RED project nature without editing project file
-    Use eclipse refactoring API to reflect project changes in excluded paths
-    Provide initial infrastructure for Search feature
-    Create Join View for Setting section multiple declaration elements
-    Common documentation controller
-    Common comment controller
-    Create variable operation helper inside RED core
-	PREFERENCES - cell selection can stay in same cell after commiting editor
+	
+	** Bug
+    Error when path has  ${/} on Windows
+    Selecting variable in Outline when selection is moving in variable table
+    When keyword name starts with digits than those digits are not bold as rest of keyword
+    Model errors
+    GitHub #30 - Very slow performance of RED addon for many TestCases
+    GitHub #31 - Failed to create the part's controls 'Revalidating model' has encountered a problem
+    For Loop Parsing problem in case Line Continue, Comment Hash and Empty Cells
+    GitHub #32 - Listener errors in console: selenium.webdriver.chrome.webdriver.WebDriver is not JSON serializable 
+    Variables from python file are not recognize in test
+    Problem with ExecutableRowView when argument of keyword is variable with space
+    GitHub #38 - horizontal slider dance in Souce when testcase is too wide
+	
+** Task
+    Add to docs debug python&robot - Breakpoints set in Python keywords definition not taken into account when launched by Robot testcase
 
-Feature
-    Variable view on Nebula - sync with model
-    Settings table on Nebula
-
-Task
-    Dumper for testcases & keywords
-    Merge Nebula from branch to trunk
+** Sub-task
+    Adding Documentation to menu: Window->Show view
+    Error when in line only comment is added 
+    No backslash in first column after adding arguments to column greater than 2
+    Showing equal sign when is used as assigmant in KW table
+    Shifting arguments KW/TC table after removing cell
+    Adding backslach when TC/KW name will be removed
+    Settings section should be first in Source
+    Adding all main items to menu in TC
+    Removing all empty lines after editing table
+    Disabling cells next to test case name
+    Removig second duplicated setting line
 
