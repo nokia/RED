@@ -57,18 +57,13 @@ public class CodeElementsTreeFormat implements TreeList.Format<Object> {
             final IRobotCodeHoldingElement holder1 = getHolder(o1);
             final IRobotCodeHoldingElement holder2 = getHolder(o2);
             if (holder1 != holder2) {
-                // final int index1 = holder1.getParent().getChildren().indexOf(holder1);
-                // final int index2 = holder2.getParent().getChildren().indexOf(holder2);
-                // return index1 < index2 ? -1 : 1;
                 return comparator.compare(holder1, holder2);
             }
 
             if (o1 instanceof RobotKeywordCall && o2 instanceof RobotKeywordCall) {
                 final RobotKeywordCall call1 = (RobotKeywordCall) o1;
                 final RobotKeywordCall call2 = (RobotKeywordCall) o2;
-                final int index1 = call1.getParent().getChildren().indexOf(call1);
-                final int index2 = call2.getParent().getChildren().indexOf(call2);
-                return o1 == o2 ? 0 : (index1 < index2 ? -1 : 1);
+                return call1 == call2 ? 0 : call1.getIndex() - call2.getIndex();
             } else if (o1 instanceof RobotKeywordCall && o2 instanceof AddingToken) {
                 return -1;
             } else if (o1 instanceof AddingToken && o2 instanceof RobotKeywordCall) {
@@ -97,7 +92,10 @@ public class CodeElementsTreeFormat implements TreeList.Format<Object> {
         public int compare(final Object o1, final Object o2) {
             final RobotCodeHoldingElement<?> elem1 = (RobotCodeHoldingElement<?>) o1;
             final RobotCodeHoldingElement<?> elem2 = (RobotCodeHoldingElement<?>) o2;
-            return elem1.getName().compareToIgnoreCase(elem2.getName());
+
+            final int result = elem1.getName().compareToIgnoreCase(elem2.getName());
+            // if there are two different elements with same name we compare them using indexes
+            return result != 0 || o1 == o2 ? result : elem1.getIndex() - elem2.getIndex();
         }
     }
 
