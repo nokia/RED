@@ -133,7 +133,7 @@ with [get-editor "TestFile.robot"] {
         key-type "NUMPAD_ENTER" "\\u000D"
         key-type "M1+v"
     }
-    wait 500
+    wait 5000
 }
 
 //new line is added at the end
