@@ -17,6 +17,7 @@ import org.eclipse.nebula.widgets.nattable.ui.action.IMouseAction;
 import org.eclipse.nebula.widgets.nattable.ui.action.NoOpMouseAction;
 import org.eclipse.nebula.widgets.nattable.ui.binding.UiBindingRegistry;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.IMouseEventMatcher;
+import org.eclipse.nebula.widgets.nattable.ui.matcher.KeyEventMatcher;
 import org.eclipse.nebula.widgets.nattable.ui.matcher.MouseEventMatcher;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
@@ -33,6 +34,15 @@ public class SelectionLayerConfiguration extends DefaultSelectionLayerConfigurat
     }
 
     private static class SelectionBindings extends DefaultSelectionBindings {
+
+        @Override
+        public void configureUiBindings(final UiBindingRegistry uiBindingRegistry) {
+            super.configureUiBindings(uiBindingRegistry);
+
+            // we're having handlers for cut/copy/paste; we don't want this
+            // action to run when our handler is not enabled
+            uiBindingRegistry.unregisterKeyBinding(new KeyEventMatcher(SWT.MOD1, 'c'));
+        }
 
         @Override
         protected void configureBodyMouseClickBindings(final UiBindingRegistry uiBindingRegistry) {
