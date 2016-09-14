@@ -30,15 +30,15 @@ with [get-editor "TestFile.robot"] {
  		click
  		set-focus
         type-text "This is documentation."
-        wait 1000
+        wait 5000
+		get-property text | equals "This is documentation." | verify-true
+		wait 2000
 		key-type "M1+s"
 		wait 3000
     }
 }
-get-editor "TestFile.robot" | get-section General | get-editbox -index 1 | get-property text 
-    | equals "This is documentation." | verify-true
-
-//save changes and close editor
+wait 1000
+//close editor
 with [get-editor "TestFile.robot"] {
     wait 3000 // wait for documentation update
     close
