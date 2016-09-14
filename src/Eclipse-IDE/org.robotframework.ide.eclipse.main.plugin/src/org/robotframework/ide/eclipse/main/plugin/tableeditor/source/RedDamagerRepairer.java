@@ -13,10 +13,10 @@ import org.eclipse.jface.text.rules.DefaultDamagerRepairer;
 import org.eclipse.jface.text.rules.ITokenScanner;
 import org.eclipse.swt.custom.StyleRange;
 
-public class RedDamagerRepairer extends DefaultDamagerRepairer {
+class RedDamagerRepairer extends DefaultDamagerRepairer {
 
 
-    public RedDamagerRepairer(final ITokenScanner scanner) {
+    RedDamagerRepairer(final ITokenScanner scanner) {
         super(scanner);
     }
 
