@@ -1,22 +1,22 @@
-# RED - Robot Editor v0.6.5
+# RED - Robot Editor v0.7.0
 ## Introduction
 RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
 Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
 
 ## Requirements 
 *  Oracle Java 1.7+, preferably 1.8+  https://www.java.com/
-*  RED feature only: Eclipse Mars (v 4.5) or Luna (v 4.4), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  RED feature only: Eclipse Neon (v 4.6),Eclipse Mars (v 4.5) or Luna (v 4.4), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
 *  Python/Jython & RobotFramework installed
 
 ## How to install
 ### Product
-Product zip is ready to use RED installation bundled with Eclipse Mars. There is no need to install RED feature into it. Choose proper OS version from **Downloads** section.
+Product zip is ready to use RED installation bundled with Eclipse Neon. There is no need to install RED feature into it. Choose proper OS version from **Downloads** section.
 
 ### Feature
 Please refer to First Steps doc under https://github.com/nokia/RED/blob/master/First_steps.md
 
 #### Install form Marketplace/Update Site
-Click Help -> Eclipse Marketplace -> and type into Find field "RED"
+Click Help -> Eclipse Marketplace -> and type into Find field "RED robot"
 
 Click Help -> Install New Software -> Add and set address in Location to:
 http://master.dl.sourceforge.net/project/red-robot-editor/repository
@@ -24,32 +24,33 @@ http://master.dl.sourceforge.net/project/red-robot-editor/repository
 
 
 #### Install on clean Eclipse 
-Download RED eclipse feature zip: https://github.com/nokia/RED/releases/download/0.6.5/RED_feature_0.6.5.201607071101.zip
+Download RED eclipse feature zip: https://github.com/nokia/RED/releases/download/0.7.0/RED_feature_0.7.0.201609141150.zip
 In short:
 - GUI: Help -> Install New software -> Add -> Archive and continue with prompts (unselect "Contact all update sites) 
 - CLI: by issuing command: 
 
 ```eclipse -application org.eclipse.equinox.p2.director -nosplash -consoleLog --launcher.suppressErrors -repository jar:file:<PATH_TO_ZIP>\!/,http://download.eclipse.org/releases/mars/   -installIU org.robotframework.ide.eclipse.main.feature.feature.group ```
 
-#### Update existing RED installation
-We recommend to not to do direct update of newer version, instead perform uninstall old RED and install new RED after Eclipse restart.
-Uninstall:
-Open Help -> Installation Details, select old RED feature and perform uninstall
+#### Update existing RED feature
+Update can be done in the same way as installation on clean Eclipse.
+If RED update site is present in Eclipse Check For Updates from Help menu will provide information about new version avaliable.
+
+
 
 ## Updates
-- Variables and Settings Table sync with Source
-- It should be possible to add/remove RED project nature without editing project file
-- PREFERENCES - cell selection can stay in same cell after commiting editor
-- #21 - Editor do not open when separator is pipe and for-item text after \ is like ${a} s
-- #23 - RED run of of memory during debugging StackOverflowException happens 
-- #29 - Missing suite file for execution during debug caused by \_\_init\_\_.py file 
-- #11 - Source code release
+- Testcases and Keywords table editors fully funcitonal - now you can edit test suites in RIDE style as well.
+- Preferences - what to do after pressing Enter in cell during edit - check section Robot Framework\Editor
+- Documentation View - new view to show current Keyword documentation or libdoc of selected keyword. View can be opened from Window -> Show View -> Other -> Robot -> Documentation View
+- Fixes for #30 #31 #32 #33 #34 #38
+- Fixes for processing variable files with Python3
+- Added to help how to debug with PyDev 
+- Many more small but important changes
 - Check **[changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)** for details
 
 ## What's in the package
 - Robot Perspective & Robot nature (Project,files and other file artefacts)
 - Text Source editor with syntax coloring, code assistance and real-time validation
-- Table editors - Variables&Settings synced with Source, Testcases&Keywords non persistent yet
+- Table editors synced with Source
 - Debug Perspective for test case debugging with breakpoints, stepping, variable watch
 - Remote debug
 - Support for dictionaries & lists
@@ -61,11 +62,9 @@ Open Help -> Installation Details, select old RED feature and perform uninstall
 - Cannot delete library by right click of mouse in red.xml under Ubuntu/Mint. Use Delete key as workaround
 - GTK3 seems to mess up with Eclipse under Linux. Force usage of GTK2 by executing command in terminal: export SWT_GTK3=0
 - Eclipse does not have UTF-8 support in editors by default. Check Preferences and RED help to get how to change it. 
-- Keywords and Testcases Table editors are not persistent, changes done will not be visible in source nor saved to file. 
-- Due to difficult to comprehend and countless exceptions in RF syntax, validation can show false positive errors. In such case please provide us sample test case for us to have a look at.
 
 ## Short term plans
-- Table Editor persistency in Keywords and Testcases Table editors
+- Usability improvments
 
 
 
