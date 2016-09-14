@@ -19,7 +19,9 @@ RED is modern editor based on Java IDEs (Eclipse, IntelliJ in future) to allow q
 
 ## Binaries distribution:
 RED is distributed as independent binary (Eclipse product) and Eclipse feature to be installed on existing Eclipse binary.
+
 Binaries can be found under Release folder:  https://github.com/nokia/RED/releases/latest
+
 Installation instructions can be found [here](https://github.com/nokia/RED/blob/master/installation.md)
 ###Install form Marketplace/Update Site
 
