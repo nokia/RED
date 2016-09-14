@@ -75,12 +75,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.K
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.MatchEverythingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedCachingScanner;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokenScanner;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokensStore;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SectionHeaderRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.SettingsCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsCallRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.RedTokensStore;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToFilesDetector;
@@ -421,8 +421,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final boolean useDirectScanner = Boolean.valueOf(System.getProperty("red.tmp.useDirectScanner")).booleanValue();
         final RedTokenScanner tokenScanner = new RedTokenScanner(rules);
         final ITokenScanner scanner = useDirectScanner ? tokenScanner : new RedCachingScanner(tokenScanner, store);
-
-        final DefaultDamagerRepairer damagerRepairer = new DefaultDamagerRepairer(scanner);
+        final DefaultDamagerRepairer damagerRepairer = useDirectScanner ? new DefaultDamagerRepairer(scanner)
+                : new RedDamagerRepairer(scanner);
         reconciler.setDamager(damagerRepairer, contentType);
         reconciler.setRepairer(damagerRepairer, contentType);
     }
