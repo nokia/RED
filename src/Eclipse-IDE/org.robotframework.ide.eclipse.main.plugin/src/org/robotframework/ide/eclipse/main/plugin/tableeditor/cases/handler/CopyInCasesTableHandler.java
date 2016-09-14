@@ -43,7 +43,9 @@ public class CopyInCasesTableHandler extends DIParameterizedHandler<E4CopyInCase
                 final PositionCoordinateSerializer[] serializablePositions = PositionCoordinateSerializer
                         .createFrom(selectedCellPositions);
 
-                if (keywordCallsCopy.length > 0 && casesCopy.length > 0) {
+                if (keywordCallsCopy.length == 0 && casesCopy.length == 0) {
+                    return false;
+                } else if (keywordCallsCopy.length > 0 && casesCopy.length > 0) {
                     clipboard.insertContent(serializablePositions, keywordCallsCopy, casesCopy);
                 } else if (keywordCallsCopy.length > 0) {
                     clipboard.insertContent(serializablePositions, keywordCallsCopy);

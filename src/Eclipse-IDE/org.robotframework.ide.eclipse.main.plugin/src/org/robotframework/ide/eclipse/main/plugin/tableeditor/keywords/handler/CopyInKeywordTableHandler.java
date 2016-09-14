@@ -50,7 +50,9 @@ public class CopyInKeywordTableHandler extends DIParameterizedHandler<E4CopyInKe
                 final PositionCoordinateSerializer[] serializablePositions = PositionCoordinateSerializer
                         .createFrom(selectedCellPositions);
                 
-                if (keywordCallsCopy.length > 0 && keywordDefinitionsCopy.length > 0) {
+                if (keywordCallsCopy.length == 0 && keywordDefinitionsCopy.length == 0) {
+                    return false;
+                } else if (keywordCallsCopy.length > 0 && keywordDefinitionsCopy.length > 0) {
                     clipboard.insertContent(serializablePositions, keywordCallsCopy, keywordDefinitionsCopy);
                 } else if (keywordCallsCopy.length > 0) {
                     clipboard.insertContent(serializablePositions, keywordCallsCopy);
