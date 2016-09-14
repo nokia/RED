@@ -137,7 +137,7 @@ public class RobotDocument extends Document {
 
     private void reparseInSeparateThread() {
         if (scheduledOperation != null) {
-            scheduledOperation.cancel(false);
+            scheduledOperation.cancel(true);
         }
         final Runnable parsingRunnable = new Runnable() {
             @Override
