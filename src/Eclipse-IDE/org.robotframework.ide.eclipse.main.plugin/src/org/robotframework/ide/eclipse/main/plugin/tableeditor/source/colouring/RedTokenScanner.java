@@ -114,7 +114,8 @@ public class RedTokenScanner implements IRedTokenScanner {
                 return textToken.getToken();
             }
         }
-        lastTokenPosition = new Position(nextToken.getStartOffset(), nextToken.getText().length());
+        lastTokenPosition = new Position(nextToken.getStartOffset() + currentOffsetInToken,
+                nextToken.getText().length() - currentOffsetInToken);
         currentOffsetInToken = 0;
         analyzedTokens.add(nextToken);
         return ISyntaxColouringRule.DEFAULT_TOKEN;

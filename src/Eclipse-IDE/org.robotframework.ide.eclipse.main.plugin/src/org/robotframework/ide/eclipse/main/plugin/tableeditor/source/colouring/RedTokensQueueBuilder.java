@@ -36,7 +36,7 @@ class RedTokensQueueBuilder {
 
     private boolean processElement(final IRobotLineElement lineElement, final Deque<IRobotLineElement> tokens,
             final int offset, final int length) {
-        if (shouldOmitElement(lineElement)) {
+        if (shouldOmitElement(tokens, lineElement)) {
             return false;
         } else if (lineElement.getStartOffset() >= offset
                 && lineElement.getStartOffset() + lineElement.getText().length() <= offset + length) {
@@ -61,8 +61,22 @@ class RedTokensQueueBuilder {
         return false;
     }
 
-    private boolean shouldOmitElement(final IRobotLineElement lineElement) {
-        return lineElement.getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN)
-                || lineElement.getText().isEmpty();
+    private boolean shouldOmitElement(final Deque<IRobotLineElement> tokens, final IRobotLineElement lineElement) {
+        return isEmpty(lineElement) || isArtificialForLoopElement(lineElement)
+                || overlapsWithPreviousToken(tokens, lineElement);
+    }
+
+    private boolean isEmpty(final IRobotLineElement lineElement) {
+        return lineElement.getText().isEmpty();
+    }
+
+    private boolean isArtificialForLoopElement(final IRobotLineElement lineElement) {
+        return lineElement.getTypes().contains(RobotTokenType.FOR_CONTINUE_ARTIFICIAL_TOKEN);
+    }
+
+    private boolean overlapsWithPreviousToken(final Deque<IRobotLineElement> tokens,
+            final IRobotLineElement lineElement) {
+        return !tokens.isEmpty() && tokens.getLast().getStartOffset()
+                + tokens.getLast().getText().length() != lineElement.getStartOffset();
     }
 }
