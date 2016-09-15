@@ -1,10 +1,15 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.childrens;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.name;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
@@ -15,6 +20,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCaseConditions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+
+import com.google.common.collect.ImmutableMap;
 
 public class InsertCasesCommandTest {
 
@@ -28,7 +35,9 @@ public class InsertCasesCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new InsertCasesCommand(section, casesToInsert));
         command.execute();
+        assertThat(section.getChildren().size()).isEqualTo(3);
 
+        command.getUndoCommand().execute();
         assertThat(section.getChildren().size()).isEqualTo(3);
 
         verifyZeroInteractions(eventBroker);
@@ -53,7 +62,19 @@ public class InsertCasesCommandTest {
         assertCase(section.getChildren().get(3), "inserted case 1");
         assertCase(section.getChildren().get(4), "inserted case 2");
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_ADDED, section);
+        command.getUndoCommand().execute();
+
+        assertThat(section.getChildren().size()).isEqualTo(3);
+
+        assertCase(section.getChildren().get(0), "case 1");
+        assertCase(section.getChildren().get(1), "case 2");
+        assertCase(section.getChildren().get(2), "case 3");
+
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(
+                ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
+                        newArrayList(casesToInsert))));
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -75,13 +96,23 @@ public class InsertCasesCommandTest {
         assertCase(section.getChildren().get(3), "case 2");
         assertCase(section.getChildren().get(4), "case 3");
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_ADDED, section);
+        command.getUndoCommand().execute();
+
+        assertThat(section.getChildren().size()).isEqualTo(3);
+
+        assertCase(section.getChildren().get(0), "case 1");
+        assertCase(section.getChildren().get(1), "case 2");
+        assertCase(section.getChildren().get(2), "case 3");
+
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(
+                ImmutableMap.<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA,
+                        newArrayList(casesToInsert))));
+        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     private static void assertCase(final RobotCase testCase, final String expectedName) {
-        assertThat(testCase.getName()).isEqualTo(expectedName);
-        assertThat(testCase.getChildren()).isNotEmpty();
-        assertThat(testCase).has(RobotCaseConditions.properlySetParent());
+        assertThat(testCase).has(RobotCaseConditions.properlySetParent()).has(name(expectedName)).has(childrens());
     }
 
     private static RobotCasesSection createTestCasesSection() {
