@@ -67,4 +67,14 @@ public class ModelConditions {
             }
         };
     }
+
+    public static Condition<RobotElement> childrens() {
+        return new Condition<RobotElement>("non empty children list") {
+
+            @Override
+            public boolean matches(final RobotElement element) {
+                return !element.getChildren().isEmpty();
+            }
+        };
+    }
 }
