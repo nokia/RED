@@ -11,9 +11,9 @@ import org.eclipse.swt.graphics.Point;
 /**
  * @author wypych
  */
-public class StyledTextCaretPositionProvider {
+class StyledTextCaretPositionProvider {
 
-    public static int getOffset(final StyledText text, final Point point) {
+    static int getOffset(final StyledText text, final Point point) {
         final int charCount = text.getCharCount();
         if (charCount > 0 && text.getTextBounds(0, charCount - 1).contains(point)) {
             try {
