@@ -52,7 +52,7 @@ public class InsertKeywordCallsCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new DeleteKeywordCallCommand(callsToInsert));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new DeleteKeywordCallCommand(callsToInsert));
     }
 }

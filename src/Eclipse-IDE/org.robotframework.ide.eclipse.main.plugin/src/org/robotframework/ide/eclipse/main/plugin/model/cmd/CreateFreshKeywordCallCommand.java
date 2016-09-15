@@ -57,7 +57,7 @@ public class CreateFreshKeywordCallCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new DeleteKeywordCallCommand(newArrayList(newKeywordCall)));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new DeleteKeywordCallCommand(newArrayList(newKeywordCall)));
     }
 }

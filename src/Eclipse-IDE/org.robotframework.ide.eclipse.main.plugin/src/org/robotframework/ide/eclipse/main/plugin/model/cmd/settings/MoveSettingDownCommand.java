@@ -71,7 +71,7 @@ public class MoveSettingDownCommand extends EditorCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new MoveSettingUpCommand(setting));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new MoveSettingUpCommand(setting));
     }
 }
