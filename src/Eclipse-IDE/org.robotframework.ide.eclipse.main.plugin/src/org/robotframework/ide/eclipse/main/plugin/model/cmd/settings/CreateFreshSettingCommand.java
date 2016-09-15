@@ -47,7 +47,7 @@ public class CreateFreshSettingCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new DeleteSettingCommand(newArrayList(newSetting)));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteSettingCommand(newArrayList(newSetting)));
     }
 }

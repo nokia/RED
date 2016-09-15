@@ -81,7 +81,7 @@ public class InsertKeywordDefinitionsCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new DeleteKeywordDefinitionCommand(definitionsToInsert));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteKeywordDefinitionCommand(definitionsToInsert));
     }
 }

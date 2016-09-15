@@ -17,7 +17,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.services.event.RedEventBroker;
 
@@ -163,12 +162,12 @@ public class SetKeywordCallNameCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
+    public List<EditorCommand> getUndoCommands() {
         final List<EditorCommand> undoCommands = newArrayList();
         for (final EditorCommand executedCommand : executedCommands) {
-            undoCommands.add(0, executedCommand.getUndoCommand());
+            undoCommands.addAll(0, executedCommand.getUndoCommands());
         }
-        return new CompoundEditorCommand(this, undoCommands);
+        return newUndoCommands(undoCommands);
     }
 
     private static class ConvertCallToSetting extends EditorCommand {
@@ -202,8 +201,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         }
 
         @Override
-        public EditorCommand getUndoCommand() {
-            return newUndoCommand(new ConvertSettingToCall(eventBroker, newSetting, call.getName()));
+        public List<EditorCommand> getUndoCommands() {
+            return newUndoCommands(new ConvertSettingToCall(eventBroker, newSetting, call.getName()));
         }
     }
 
@@ -238,8 +237,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         }
 
         @Override
-        public EditorCommand getUndoCommand() {
-            return newUndoCommand(new ConvertSettingToSetting(eventBroker, newSetting, "[" + call.getName() + "]"));
+        public List<EditorCommand> getUndoCommands() {
+            return newUndoCommands(new ConvertSettingToSetting(eventBroker, newSetting, "[" + call.getName() + "]"));
         }
     }
     
@@ -274,8 +273,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         }
 
         @Override
-        public EditorCommand getUndoCommand() {
-            return newUndoCommand(new ConvertCallToSetting(eventBroker, newCall, "[" + setting.getName() + "]"));
+        public List<EditorCommand> getUndoCommands() {
+            return newUndoCommands(new ConvertCallToSetting(eventBroker, newCall, "[" + setting.getName() + "]"));
         }
     }
 
@@ -303,8 +302,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         }
 
         @Override
-        public EditorCommand getUndoCommand() {
-            return newUndoCommand(new MoveKeywordCall(parent, targetIndex, index));
+        public List<EditorCommand> getUndoCommands() {
+            return newUndoCommands(new MoveKeywordCall(parent, targetIndex, index));
         }
     }
 }

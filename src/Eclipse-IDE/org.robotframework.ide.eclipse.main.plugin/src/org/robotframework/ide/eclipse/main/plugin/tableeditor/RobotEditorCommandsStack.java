@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.List;
 
 import org.eclipse.e4.core.contexts.ContextInjectionFactory;
 import org.eclipse.e4.core.contexts.IEclipseContext;
@@ -42,7 +43,8 @@ public class RobotEditorCommandsStack {
     public void undo() {
         if (isUndoPossible()) {
             final EditorCommand commandToUndo = _executedCommands.pop();
-            executeUndoCommand(commandToUndo.getUndoCommand(), _toRedoCommands);
+            executeUndoCommands(commandToUndo.getUndoCommands(), _toRedoCommands);
+            findAndExecuteUndoCommandsWithTheSameParent(commandToUndo, _executedCommands, _toRedoCommands);
         }
     }
 
@@ -53,7 +55,8 @@ public class RobotEditorCommandsStack {
     public void redo() {
         if (isRedoPossible()) {
             final EditorCommand commandToRedo = _toRedoCommands.pop();
-            executeUndoCommand(commandToRedo.getUndoCommand(), _executedCommands);
+            executeUndoCommands(commandToRedo.getUndoCommands(), _executedCommands);
+            findAndExecuteUndoCommandsWithTheSameParent(commandToRedo, _toRedoCommands, _executedCommands);
         }
     }
 
@@ -71,8 +74,26 @@ public class RobotEditorCommandsStack {
         }
     }
 
-    private void executeUndoCommand(final EditorCommand command, final Deque<EditorCommand> commandsDestinationStack) {
-        command.execute();
-        commandsDestinationStack.push(command);
+    private void executeUndoCommands(final List<EditorCommand> commands,
+            final Deque<EditorCommand> commandsDestinationStack) {
+        for (final EditorCommand command : commands) {
+            command.execute();
+            commandsDestinationStack.push(command);
+        }
+    }
+
+    private void findAndExecuteUndoCommandsWithTheSameParent(final EditorCommand executedCommand,
+            final Deque<EditorCommand> commandsSourceStack, final Deque<EditorCommand> commandsDestinationStack) {
+        boolean hasCommandsWithTheSameParent = true;
+        while (hasCommandsWithTheSameParent) {
+            final EditorCommand nextCommand = commandsSourceStack.peek();
+            if (nextCommand != null && nextCommand.getParent() != null && executedCommand.getParent() != null
+                    && nextCommand.getParent() == executedCommand.getParent()) {
+                commandsSourceStack.pop();
+                executeUndoCommands(nextCommand.getUndoCommands(), commandsDestinationStack);
+            } else {
+                hasCommandsWithTheSameParent = false;
+            }
+        }
     }
 }

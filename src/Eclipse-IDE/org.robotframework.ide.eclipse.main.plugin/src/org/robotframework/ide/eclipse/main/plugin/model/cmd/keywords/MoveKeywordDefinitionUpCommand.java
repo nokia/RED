@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords;
 
 import java.util.Collections;
+import java.util.List;
 
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -40,7 +41,7 @@ public class MoveKeywordDefinitionUpCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new MoveKeywordDefinitionDownCommand(keywordDef));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new MoveKeywordDefinitionDownCommand(keywordDef));
     }
 }

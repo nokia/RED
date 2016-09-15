@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.rf.ide.core.testdata.model.ICommentHolder;
@@ -41,7 +42,7 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new SetKeywordCallCommentCommand(keywordCall, previousComment));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetKeywordCallCommentCommand(keywordCall, previousComment));
     }
 }

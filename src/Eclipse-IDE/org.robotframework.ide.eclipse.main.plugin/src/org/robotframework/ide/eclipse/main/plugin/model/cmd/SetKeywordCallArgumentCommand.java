@@ -127,7 +127,7 @@ public class SetKeywordCallArgumentCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new SetKeywordCallArgumentCommand(keywordCall, index, previousValue, shouldReplaceValue));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetKeywordCallArgumentCommand(keywordCall, index, previousValue, shouldReplaceValue));
     }
 }
