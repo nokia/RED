@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.List;
-
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
@@ -43,9 +41,9 @@ public class CreateFreshSectionCommand extends EditorCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
+    public EditorCommand getUndoCommand() {
         final EditorCommand undo = createdSection == null ? new EmptyCommand()
                 : new DeleteSectionCommand(createdSection);
-        return newUndoCommands(undo);
+        return newUndoCommand(undo);
     }
 }

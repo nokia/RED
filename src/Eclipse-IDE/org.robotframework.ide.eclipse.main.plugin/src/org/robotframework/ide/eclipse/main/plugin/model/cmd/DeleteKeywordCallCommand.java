@@ -15,6 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteKeywordCallCommand extends EditorCommand {
@@ -39,6 +40,7 @@ public class DeleteKeywordCallCommand extends EditorCommand {
         if (callsToDelete.isEmpty()) {
             return;
         }
+        deletedCallsIndexes.clear();
         for (final RobotKeywordCall call : callsToDelete) {
             deletedCallsIndexes.add(call.getIndex());
         }
@@ -57,18 +59,18 @@ public class DeleteKeywordCallCommand extends EditorCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(setupUndoCommandsForDeletedCalls());
+    public EditorCommand getUndoCommand() {
+        return newUndoCompoundCommand(new CompoundEditorCommand(this, setupUndoCommandsForDeletedCalls()));
     }
 
     private List<EditorCommand> setupUndoCommandsForDeletedCalls() {
         final List<EditorCommand> commands = newArrayList();
-        if (callsToDelete.size() == deletedCallsIndexes.size()) {
-            for (int i = 0; i < callsToDelete.size(); i++) {
-                final RobotKeywordCall call = callsToDelete.get(i);
-                commands.add(new CreateFreshKeywordCallCommand((RobotCodeHoldingElement<?>) call.getParent(),
-                        deletedCallsIndexes.get(i), call.getName(), call.getArguments(), call.getComment()));
-            }
+        if(callsToDelete.size() == deletedCallsIndexes.size()) {
+        for (int i = 0; i < callsToDelete.size(); i++) {
+            final RobotKeywordCall call = callsToDelete.get(i);
+            commands.add(new InsertKeywordCallsCommand((RobotCodeHoldingElement<?>) call.getParent(),
+                    deletedCallsIndexes.get(i), new RobotKeywordCall[] { call }));
+        }
         }
         return commands;
     }

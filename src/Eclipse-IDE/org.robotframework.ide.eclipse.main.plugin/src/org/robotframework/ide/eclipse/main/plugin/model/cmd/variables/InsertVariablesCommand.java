@@ -45,7 +45,7 @@ public class InsertVariablesCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new RemoveVariableCommand(variablesToInsert));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new RemoveVariableCommand(variablesToInsert));
     }
 }

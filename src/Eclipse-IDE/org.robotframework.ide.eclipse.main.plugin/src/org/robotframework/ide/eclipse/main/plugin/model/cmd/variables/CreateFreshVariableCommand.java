@@ -7,8 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.List;
-
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -50,7 +48,7 @@ public class CreateFreshVariableCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new RemoveVariableCommand(newArrayList(newVariable)));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new RemoveVariableCommand(newArrayList(newVariable)));
     }
 }

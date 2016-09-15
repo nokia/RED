@@ -45,7 +45,7 @@ public class SetListItemsCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetListItemsCommand(variable, previousValue));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new SetListItemsCommand(variable, previousValue));
     }
 }

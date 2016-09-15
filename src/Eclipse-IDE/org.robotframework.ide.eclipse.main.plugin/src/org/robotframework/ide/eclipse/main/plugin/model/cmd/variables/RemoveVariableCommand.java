@@ -14,6 +14,7 @@ import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class RemoveVariableCommand extends EditorCommand {
@@ -31,6 +32,7 @@ public class RemoveVariableCommand extends EditorCommand {
         if (variablesToDelete.isEmpty()) {
             return;
         }
+        deletedVariablesIndexes = newArrayList();
         for (final RobotVariable var : variablesToDelete) {
             deletedVariablesIndexes.add(var.getIndex());
         }
@@ -47,8 +49,8 @@ public class RemoveVariableCommand extends EditorCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(setupUndoCommandsForDeletedVariables());
+    public EditorCommand getUndoCommand() {
+        return newUndoCompoundCommand(new CompoundEditorCommand(this, setupUndoCommandsForDeletedVariables()));
     }
 
     private List<EditorCommand> setupUndoCommandsForDeletedVariables() {
