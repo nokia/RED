@@ -46,7 +46,7 @@ public class SetDictItemsCommand extends EditorCommand {
     }
     
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new SetDictItemsCommand(variable, previousValue));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetDictItemsCommand(variable, previousValue));
     }
 }

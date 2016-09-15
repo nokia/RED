@@ -14,7 +14,6 @@ import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpd
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.base.Optional;
@@ -47,7 +46,7 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
             final SetSimpleKeywordCallName changeNameCommand = new SetSimpleKeywordCallName(eventBroker, keywordCall, newName.get());
             changeNameCommand.execute();
 
-            undoOperations.add(changeNameCommand.getUndoCommand());
+            undoOperations.addAll(changeNameCommand.getUndoCommands());
         }
         if (!arguments.equals(oldArguments)) {
             undoOperations.add(new SetSimpleKeywordCallArguments(eventBroker, keywordCall, oldArguments));
@@ -102,7 +101,7 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCompoundCommand(new CompoundEditorCommand(this, undoOperations));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(undoOperations);
     }
 }

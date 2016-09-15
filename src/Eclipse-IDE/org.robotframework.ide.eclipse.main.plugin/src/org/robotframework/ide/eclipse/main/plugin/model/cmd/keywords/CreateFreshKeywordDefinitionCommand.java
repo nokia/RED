@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.List;
+
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -43,7 +45,7 @@ public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new DeleteKeywordDefinitionCommand(newArrayList(newKeywordDefinition)));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteKeywordDefinitionCommand(newArrayList(newKeywordDefinition)));
     }
 }
