@@ -375,12 +375,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     if (section != null && section.getLinkedElement().isPresent()) {
                         documentation.setEditable(true);
                     }
-                    if (documentation.getCharCount() > 0 && documentation
-                            .getTextBounds(0, documentation.getCharCount() - 1).contains(new Point(e.x, e.y))) {
-                        documentation.setCaretOffset(documentation.getOffsetAtLocation(new Point(e.x, e.y)));
-                    } else {
-                        documentation.setCaretOffset(documentation.getCharCount());
-                    }
+                    documentation.setCaretOffset(
+                            StyledTextCaretPositionProvider.getOffset(documentation, new Point(e.x, e.y)));
                     modeItem.setText("&View mode");
                     modeItem.setImage(ImagesManager.getImage(RedImages.getResourceImage()));
                 }
