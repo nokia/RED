@@ -57,4 +57,14 @@ public class ModelConditions {
             }
         };
     }
+
+    public static Condition<RobotElement> name(final String name) {
+        return new Condition<RobotElement>("name set to " + name) {
+
+            @Override
+            public boolean matches(final RobotElement element) {
+                return element.getName().equals(name);
+            }
+        };
+    }
 }

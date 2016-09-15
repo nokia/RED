@@ -23,6 +23,11 @@ public class RedClipboardMock extends RedClipboard {
         super();
     }
 
+    public boolean isEmpty() {
+        return !hasText() && !hasCases() && !hasKeywordDefinitions() && !hasKeywordCalls() && !hasVariables()
+                && !hasPositionsCoordinates();
+    }
+
     @Override
     public boolean hasPositionsCoordinates() {
         return positions != null;
