@@ -111,9 +111,4 @@ public class SelectionsTest {
         assertThat(optionalFirst.isPresent()).isTrue();
         assertThat(optionalFirst.get()).isEqualTo("1");
     }
-
-    @SafeVarargs
-    private static <T> T[] createArray(final T... objects) {
-        return objects;
-    }
 }
