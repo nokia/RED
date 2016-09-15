@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinitionCo
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -42,7 +43,9 @@ public class InsertKeywordDefinitionsCommandTest {
         command.execute();
         assertThat(section.getChildren().size()).isEqualTo(3);
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
         assertThat(section.getChildren().size()).isEqualTo(3);
 
         verifyZeroInteractions(eventBroker);
@@ -67,7 +70,9 @@ public class InsertKeywordDefinitionsCommandTest {
         assertKeyword(section.getChildren().get(3), "inserted kw 1");
         assertKeyword(section.getChildren().get(4), "inserted kw 2");
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(section.getChildren().size()).isEqualTo(3);
 
@@ -101,7 +106,9 @@ public class InsertKeywordDefinitionsCommandTest {
         assertKeyword(section.getChildren().get(3), "kw 2");
         assertKeyword(section.getChildren().get(4), "kw 3");
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(section.getChildren().size()).isEqualTo(3);
 
@@ -134,7 +141,9 @@ public class InsertKeywordDefinitionsCommandTest {
         assertKeyword(section.getChildren().get(2), "kw 3");
         assertKeyword(section.getChildren().get(3), "kw 1 1");
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(section.getChildren().size()).isEqualTo(3);
 
