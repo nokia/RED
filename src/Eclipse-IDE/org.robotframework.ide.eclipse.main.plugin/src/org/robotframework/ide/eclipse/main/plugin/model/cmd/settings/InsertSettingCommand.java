@@ -54,7 +54,7 @@ public class InsertSettingCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new DeleteSettingCommand(insertedSettings));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new DeleteSettingCommand(insertedSettings));
     }
 }

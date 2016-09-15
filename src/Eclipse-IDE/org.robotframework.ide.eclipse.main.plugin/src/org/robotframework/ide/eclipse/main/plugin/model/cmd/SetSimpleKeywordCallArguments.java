@@ -42,7 +42,7 @@ class SetSimpleKeywordCallArguments extends EditorCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetSimpleKeywordCallArguments(eventBroker, call, oldArguments));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new SetSimpleKeywordCallArguments(eventBroker, call, oldArguments));
     }
 }

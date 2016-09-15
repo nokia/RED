@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
-import java.util.List;
-
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -39,7 +37,7 @@ class SetSimpleKeywordCallName extends EditorCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetSimpleKeywordCallName(eventBroker, call, oldName));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new SetSimpleKeywordCallName(eventBroker, call, oldName));
     }
 }

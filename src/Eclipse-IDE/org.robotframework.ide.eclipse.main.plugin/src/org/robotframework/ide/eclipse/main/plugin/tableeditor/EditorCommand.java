@@ -5,10 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
-import static com.google.common.collect.Lists.newArrayList;
-
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -19,34 +15,26 @@ public abstract class EditorCommand {
     @Inject
     protected IEventBroker eventBroker;
 
-    private EditorCommand parent;
-
     public void setEventBroker(final IEventBroker eventBroker) {
         this.eventBroker = eventBroker;
     }
 
     public abstract void execute() throws CommandExecutionException;
 
-    public List<EditorCommand> getUndoCommands() {
-        final List<EditorCommand> commands = newArrayList();
-        commands.add(new EmptyCommand());
-        return commands;
-    }
-    
-    public EditorCommand getParent() {
-        return parent;
+    public EditorCommand getUndoCommand() {
+        return new EmptyCommand();
     }
 
-    protected List<EditorCommand> newUndoCommands(final EditorCommand newUndoCommand) {
-        return newUndoCommands(newArrayList(newUndoCommand));
+    protected EditorCommand newUndoCommand(final EditorCommand newUndoCommand) {
+        newUndoCommand.eventBroker = this.eventBroker;
+        return newUndoCommand;
     }
 
-    protected List<EditorCommand> newUndoCommands(final List<EditorCommand> newUndoCommands) {
-        for (final EditorCommand newUndoCommand : newUndoCommands) {
-            newUndoCommand.eventBroker = this.eventBroker;
-            newUndoCommand.parent = parent != null ? parent : this;
+    protected EditorCommand newUndoCompoundCommand(final CompoundEditorCommand newUndoCommand) {
+        for (final EditorCommand command : newUndoCommand.getCommands()) {
+            command.eventBroker = this.eventBroker;
         }
-        return newUndoCommands;
+        return newUndoCommand;
     }
 
     public class CommandExecutionException extends RuntimeException {

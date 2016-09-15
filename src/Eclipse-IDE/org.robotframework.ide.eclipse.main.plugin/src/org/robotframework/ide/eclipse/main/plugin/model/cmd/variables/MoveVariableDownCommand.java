@@ -40,7 +40,7 @@ public class MoveVariableDownCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new MoveVariableUpCommand(variable));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new MoveVariableUpCommand(variable));
     }
 }

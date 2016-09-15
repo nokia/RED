@@ -12,6 +12,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.DeleteKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteSettingCommand extends DeleteKeywordCallCommand {
@@ -21,8 +22,8 @@ public class DeleteSettingCommand extends DeleteKeywordCallCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(setupUndoCommandsForDeletedSettings());
+    public EditorCommand getUndoCommand() {
+        return newUndoCompoundCommand(new CompoundEditorCommand(this, setupUndoCommandsForDeletedSettings()));
     }
 
     private List<EditorCommand> setupUndoCommandsForDeletedSettings() {
