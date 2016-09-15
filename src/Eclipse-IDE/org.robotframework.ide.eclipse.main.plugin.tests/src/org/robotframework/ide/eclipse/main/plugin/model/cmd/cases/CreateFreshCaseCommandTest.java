@@ -8,8 +8,8 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCaseConditions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -42,8 +43,16 @@ public class CreateFreshCaseCommandTest {
         assertThat(addedCase.getChildren()).isEmpty();
         assertThat(addedCase).has(RobotCaseConditions.properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(section.getChildren().size()).isEqualTo(3);
+
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
                 .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedCase)));
+        verify(eventBroker).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -63,8 +72,16 @@ public class CreateFreshCaseCommandTest {
         assertThat(addedCase.getChildren()).isEmpty();
         assertThat(addedCase).has(RobotCaseConditions.properlySetParent());
 
-        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+
+        assertThat(section.getChildren().size()).isEqualTo(3);
+
+        verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
                 .<String, Object> of(IEventBroker.DATA, section, RobotModelEvents.ADDITIONAL_DATA, addedCase)));
+        verify(eventBroker).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     private static RobotCasesSection createTestCasesSection() {

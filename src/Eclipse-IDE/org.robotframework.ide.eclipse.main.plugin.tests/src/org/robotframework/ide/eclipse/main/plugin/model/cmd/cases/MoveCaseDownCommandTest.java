@@ -1,10 +1,13 @@
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
+import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.toNames;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
@@ -15,6 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCaseConditions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveCaseDownCommandTest {
 
@@ -28,11 +32,12 @@ public class MoveCaseDownCommandTest {
                 .inWhich(eventBroker)
                 .isInjectedInto(new MoveCaseDownCommand(caseToMove));
         command.execute();
+        assertThat(transform(section.getChildren(), toNames())).containsExactly("case 1", "case 2", "case 3");
 
-        assertThat(section.getChildren().size()).isEqualTo(3);
-        assertThat(section.getChildren().get(0).getName()).isEqualTo("case 1");
-        assertThat(section.getChildren().get(1).getName()).isEqualTo("case 2");
-        assertThat(section.getChildren().get(2).getName()).isEqualTo("case 3");
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(transform(section.getChildren(), toNames())).containsExactly("case 1", "case 2", "case 3");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -48,15 +53,17 @@ public class MoveCaseDownCommandTest {
                 .isInjectedInto(new MoveCaseDownCommand(caseToMove));
         command.execute();
 
-        assertThat(section.getChildren().size()).isEqualTo(3);
-        assertThat(section.getChildren().get(0).getName()).isEqualTo("case 1");
-        assertThat(section.getChildren().get(0)).has(RobotCaseConditions.properlySetParent());
-        assertThat(section.getChildren().get(1).getName()).isEqualTo("case 3");
-        assertThat(section.getChildren().get(1)).has(RobotCaseConditions.properlySetParent());
-        assertThat(section.getChildren().get(2).getName()).isEqualTo("case 2");
-        assertThat(section.getChildren().get(2)).has(RobotCaseConditions.properlySetParent());
+        assertThat(transform(section.getChildren(), toNames())).containsExactly("case 1", "case 3", "case 2");
+        assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent());
 
-        verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_CASE_MOVED, section);
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(transform(section.getChildren(), toNames())).containsExactly("case 1", "case 2", "case 3");
+        assertThat(section.getChildren()).have(RobotCaseConditions.properlySetParent());
+
+        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_CASE_MOVED, section);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     private static RobotCasesSection createTestCasesSection() {
