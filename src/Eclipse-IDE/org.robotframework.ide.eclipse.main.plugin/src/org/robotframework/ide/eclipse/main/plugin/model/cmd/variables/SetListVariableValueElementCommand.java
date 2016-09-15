@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -44,7 +46,7 @@ public class SetListVariableValueElementCommand extends EditorCommand {
     }
     
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new SetListVariableValueElementCommand(variable, oldElement, previousValue));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetListVariableValueElementCommand(variable, oldElement, previousValue));
     }
 }

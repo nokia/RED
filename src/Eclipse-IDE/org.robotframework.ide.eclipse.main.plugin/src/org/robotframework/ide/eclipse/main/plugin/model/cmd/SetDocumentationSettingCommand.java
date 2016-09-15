@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
@@ -42,7 +43,7 @@ public class SetDocumentationSettingCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new SetDocumentationSettingCommand(docSetting, oldDoc));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetDocumentationSettingCommand(docSetting, oldDoc));
     }
 }

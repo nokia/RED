@@ -57,7 +57,7 @@ public class InsertCasesCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new DeleteCasesCommand(casesToInsert));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteCasesCommand(casesToInsert));
     }
 }

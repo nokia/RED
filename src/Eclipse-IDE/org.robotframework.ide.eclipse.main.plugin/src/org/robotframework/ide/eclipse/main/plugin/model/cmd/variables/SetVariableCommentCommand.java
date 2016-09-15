@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -34,7 +36,7 @@ public class SetVariableCommentCommand extends EditorCommand {
     }
     
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new SetVariableCommentCommand(variable, previousComment));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetVariableCommentCommand(variable, previousComment));
     }
 }

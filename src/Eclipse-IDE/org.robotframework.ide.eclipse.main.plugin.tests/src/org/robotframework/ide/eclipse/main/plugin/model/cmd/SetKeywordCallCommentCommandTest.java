@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class SetKeywordCallCommentCommandTest {
 
@@ -80,7 +81,9 @@ public class SetKeywordCallCommentCommandTest {
 
         assertThat(keywordExecutable.getComment()).isEqualTo(expected);
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(keywordExecutable.getComment()).isEqualTo(oldComment);
 

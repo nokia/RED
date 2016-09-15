@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.presenter.update.VariableTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -39,7 +41,7 @@ public class SetScalarValueCommand extends EditorCommand {
     }
     
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new SetScalarValueCommand(variable, previousValue));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetScalarValueCommand(variable, previousValue));
     }
 }

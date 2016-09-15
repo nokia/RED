@@ -23,6 +23,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -55,7 +56,9 @@ public class CreateFreshKeywordCallCommandTest {
         assertThat(addedCall.getChildren()).isEmpty();
         assertThat(addedCall).has(RobotKeywordCallConditions.properlySetParent());
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(codeHolder.getChildren().size()).isEqualTo(3);
 
@@ -82,7 +85,9 @@ public class CreateFreshKeywordCallCommandTest {
         assertThat(addedCall.getArguments()).isEmpty();
         assertThat(addedCall).has(RobotKeywordCallConditions.properlySetParent());
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(codeHolder.getChildren().size()).isEqualTo(3);
 

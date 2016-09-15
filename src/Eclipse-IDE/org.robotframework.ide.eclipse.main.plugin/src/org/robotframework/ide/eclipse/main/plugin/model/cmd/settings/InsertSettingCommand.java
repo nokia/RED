@@ -45,6 +45,7 @@ public class InsertSettingCommand extends EditorCommand {
     public void execute() throws CommandExecutionException {
 
         int shift = 0;
+        insertedSettings.clear();
         for (final RobotKeywordCall call : settingsToInsert) {
             insertedSettings.add(section.insertSetting(call, index + shift));
             shift++;
@@ -54,7 +55,7 @@ public class InsertSettingCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new DeleteSettingCommand(insertedSettings));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new DeleteSettingCommand(insertedSettings));
     }
 }
