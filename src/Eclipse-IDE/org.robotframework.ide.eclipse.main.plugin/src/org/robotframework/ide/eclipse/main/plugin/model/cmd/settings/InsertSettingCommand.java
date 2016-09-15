@@ -24,7 +24,7 @@ public class InsertSettingCommand extends EditorCommand {
     private int index;
 
     private final List<RobotKeywordCall> settingsToInsert;
-    
+
     final List<RobotSetting> insertedSettings = new ArrayList<>();
 
     public InsertSettingCommand(final RobotSettingsSection parent, final Optional<RobotSetting> firstSelectedSetting,
@@ -46,13 +46,13 @@ public class InsertSettingCommand extends EditorCommand {
 
         int shift = 0;
         for (final RobotKeywordCall call : settingsToInsert) {
-            insertedSettings.add(section.insertSetting(call.getName(), call.getComment(), call.getArguments(), index + shift));
+            insertedSettings.add(section.insertSetting(call, index + shift));
             shift++;
         }
 
         eventBroker.post(RobotModelEvents.ROBOT_SETTING_ADDED, section);
     }
-    
+
     @Override
     public EditorCommand getUndoCommand() {
         return newUndoCommand(new DeleteSettingCommand(insertedSettings));

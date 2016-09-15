@@ -85,6 +85,11 @@ public class LibraryImportModelOperation implements ISettingTableElementOperatio
 
         return aliasDecIndex;
     }
+    
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addImported((AImported) modelElement, index);
+    }
 
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {

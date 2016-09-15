@@ -36,10 +36,14 @@ public class TestTeardownModelOperation extends KeywordBaseModelOperations imple
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         super.update((TestTeardown) modelElement, index, value);
     }
+    
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addTestTeardown((TestTeardown) modelElement);
+    }
 
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElements) {
         settingsTable.removeTestTeardown();
-        ;
     }
 }
