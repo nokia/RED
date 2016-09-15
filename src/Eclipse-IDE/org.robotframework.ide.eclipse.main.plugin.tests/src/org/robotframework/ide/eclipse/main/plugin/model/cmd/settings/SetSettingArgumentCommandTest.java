@@ -35,11 +35,11 @@ public class SetSettingArgumentCommandTest {
 
             verifyArguments(call, 3, 0, "");
 
-            EditorCommand undoCommand = command.getUndoCommands().get(0);
+            EditorCommand undoCommand = command.getUndoCommand();
             undoCommand.execute();
             verifyArguments(call, 3, 0, "1");
 
-            EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+            EditorCommand redoCommand = undoCommand.getUndoCommand();
             redoCommand.execute();
             verifyArguments(call, 3, 0, "\\");
 
@@ -57,11 +57,11 @@ public class SetSettingArgumentCommandTest {
 
             verifyArguments(call, 2, 1, "3");
 
-            EditorCommand undoCommand = command.getUndoCommands().get(0);
+            EditorCommand undoCommand = command.getUndoCommand();
             undoCommand.execute();
             verifyArguments(call, 3, 1, "2");
 
-            EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+            EditorCommand redoCommand = undoCommand.getUndoCommand();
             redoCommand.execute();
             verifyArguments(call, 2, 1, "3");
 
@@ -79,11 +79,11 @@ public class SetSettingArgumentCommandTest {
 
             verifyArguments(call, 2, 0, "2");
 
-            EditorCommand undoCommand = command.getUndoCommands().get(0);
+            EditorCommand undoCommand = command.getUndoCommand();
             undoCommand.execute();
             verifyArguments(call, 3, 0, "1");
 
-            EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+            EditorCommand redoCommand = undoCommand.getUndoCommand();
             redoCommand.execute();
             verifyArguments(call, 2, 0, "2");
 
