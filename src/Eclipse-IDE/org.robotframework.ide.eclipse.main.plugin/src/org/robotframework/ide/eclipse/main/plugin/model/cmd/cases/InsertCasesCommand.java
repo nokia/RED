@@ -13,6 +13,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 public class InsertCasesCommand extends EditorCommand {
 
@@ -48,8 +49,10 @@ public class InsertCasesCommand extends EditorCommand {
             }
         }
 
-        if (casesToInsert.size() > 0) {
-            eventBroker.send(RobotModelEvents.ROBOT_CASE_ADDED, casesSection);
+        if (!casesToInsert.isEmpty()) {
+            RedEventBroker.using(eventBroker)
+                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(casesToInsert)
+                    .send(RobotModelEvents.ROBOT_CASE_ADDED, casesSection);
         }
     }
 
