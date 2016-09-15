@@ -15,6 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 public class MoveKeywordCallDownCommand extends EditorCommand {
 
     private final RobotKeywordCall keywordCall;
+    private boolean wasMoved = false;
 
     public MoveKeywordCallDownCommand(final RobotKeywordCall keywordCall) {
         this.keywordCall = keywordCall;
@@ -35,6 +36,7 @@ public class MoveKeywordCallDownCommand extends EditorCommand {
             // no place to move it further down
             return;
         } else {
+            wasMoved = true;
             parent.moveChildDown(keywordCall);
 
             eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_CALL_MOVED, parent);
@@ -43,6 +45,6 @@ public class MoveKeywordCallDownCommand extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new MoveKeywordCallUpCommand(keywordCall));
+        return newUndoCommands(wasMoved ? new MoveKeywordCallUpCommand(keywordCall) : new EmptyCommand());
     }
 }
