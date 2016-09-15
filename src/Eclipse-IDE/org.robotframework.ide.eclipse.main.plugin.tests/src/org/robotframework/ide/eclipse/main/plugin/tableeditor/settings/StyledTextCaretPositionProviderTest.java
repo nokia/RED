@@ -113,14 +113,4 @@ public class StyledTextCaretPositionProviderTest {
         shell.setSize(360, 120);
         shell.open();
     }
-
-    @SuppressWarnings("unused")
-    private void waitForWindowCloseForDebugPropose() {
-        while (!shell.isDisposed()) {
-            if (!shell.getDisplay().readAndDispatch()) {
-                // If no more entries in event queue
-                shell.getDisplay().sleep();
-            }
-        }
-    }
 }
