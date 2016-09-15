@@ -32,7 +32,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 @RunWith(Theories.class)
 public class SetKeywordCallArgumentCommand2Test {
@@ -186,9 +185,7 @@ public class SetKeywordCallArgumentCommand2Test {
         assertThat(call.getArguments()).containsExactlyElementsOf(newArrayList("\\", "\\", "\\", "arg"));
         assertThat(call.getComment()).isEqualTo("# comment");
 
-        for (final EditorCommand undo : command.getUndoCommands()) {
-            undo.execute();
-        }
+        command.getUndoCommand().execute();
 
         assertThat(call.getName()).isEqualTo("");
         assertThat(call.getArguments()).isEmpty();
@@ -243,9 +240,7 @@ public class SetKeywordCallArgumentCommand2Test {
         assertThat(call.getArguments()).containsExactlyElementsOf(expectedArgs);
         assertThat(call.getComment()).isEqualTo(oldComment);
 
-        for (final EditorCommand undo : command.getUndoCommands()) {
-            undo.execute();
-        }
+        command.getUndoCommand().execute();
 
         assertThat(call.getName()).isEqualTo(oldName);
         assertThat(call.getArguments()).containsExactlyElementsOf(oldArgs);
