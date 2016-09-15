@@ -36,6 +36,11 @@ public class SuiteSetupModelOperation extends KeywordBaseModelOperations impleme
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         super.update((SuiteSetup) modelElement, index, value);
     }
+    
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addSuiteSetup((SuiteSetup) modelElement);
+    }
 
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElements) {

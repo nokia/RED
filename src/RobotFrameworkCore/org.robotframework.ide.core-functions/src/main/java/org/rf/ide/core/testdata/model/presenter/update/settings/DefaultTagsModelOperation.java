@@ -56,4 +56,9 @@ public class DefaultTagsModelOperation implements ISettingTableElementOperation 
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElements) {
         settingsTable.removeDefaultTags();
     }
+
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addDefaultTags((DefaultTags) modelElement);;
+    }
 }

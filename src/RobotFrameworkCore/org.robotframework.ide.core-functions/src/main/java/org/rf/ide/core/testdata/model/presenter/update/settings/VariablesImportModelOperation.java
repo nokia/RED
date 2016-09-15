@@ -57,6 +57,11 @@ public class VariablesImportModelOperation implements ISettingTableElementOperat
             }
         }
     }
+    
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addImported((AImported) modelElement, index);
+    }
 
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElement) {

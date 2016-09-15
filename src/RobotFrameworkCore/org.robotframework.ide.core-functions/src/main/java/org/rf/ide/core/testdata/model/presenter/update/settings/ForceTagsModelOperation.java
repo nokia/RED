@@ -39,6 +39,11 @@ public class ForceTagsModelOperation implements ISettingTableElementOperation {
         }
         return newForceTags;
     }
+    
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addForceTags((ForceTags) modelElement);
+    }
 
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
