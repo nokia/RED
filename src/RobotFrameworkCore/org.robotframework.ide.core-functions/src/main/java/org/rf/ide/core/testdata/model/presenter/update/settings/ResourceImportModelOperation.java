@@ -59,6 +59,11 @@ public class ResourceImportModelOperation implements ISettingTableElementOperati
     }
 
     @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addImported((AImported) modelElement, index);
+    }
+    
+    @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElement) {
         settingsTable.removeImported((AImported) modelElement);
     }

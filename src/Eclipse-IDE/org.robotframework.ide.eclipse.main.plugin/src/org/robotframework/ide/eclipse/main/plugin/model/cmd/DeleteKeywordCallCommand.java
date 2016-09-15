@@ -65,12 +65,12 @@ public class DeleteKeywordCallCommand extends EditorCommand {
 
     private List<EditorCommand> setupUndoCommandsForDeletedCalls() {
         final List<EditorCommand> commands = newArrayList();
-        if(callsToDelete.size() == deletedCallsIndexes.size()) {
-        for (int i = 0; i < callsToDelete.size(); i++) {
-            final RobotKeywordCall call = callsToDelete.get(i);
-            commands.add(new InsertKeywordCallsCommand((RobotCodeHoldingElement<?>) call.getParent(),
-                    deletedCallsIndexes.get(i), new RobotKeywordCall[] { call }));
-        }
+        if (callsToDelete.size() == deletedCallsIndexes.size()) {
+            for (int i = 0; i < callsToDelete.size(); i++) {
+                final RobotKeywordCall call = callsToDelete.get(i);
+                commands.add(new InsertKeywordCallsCommand((RobotCodeHoldingElement<?>) call.getParent(),
+                        deletedCallsIndexes.get(i), new RobotKeywordCall[] { call }));
+            }
         }
         return commands;
     }

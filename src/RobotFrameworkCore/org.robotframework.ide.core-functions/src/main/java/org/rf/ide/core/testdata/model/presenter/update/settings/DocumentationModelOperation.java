@@ -41,6 +41,11 @@ public class DocumentationModelOperation implements ISettingTableElementOperatio
         }
         return newSuiteDocumentation;
     }
+    
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addDocumentation((SuiteDocumentation) modelElement);
+    }
 
     @Override
     public void update(final AModelElement<?> modelElement, final int index, final String value) {

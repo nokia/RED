@@ -36,6 +36,11 @@ public class TestSetupModelOperation extends KeywordBaseModelOperations implemen
     public void update(final AModelElement<?> modelElement, final int index, final String value) {
         super.update((TestSetup) modelElement, index, value);
     }
+    
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addTestSetup((TestSetup) modelElement);
+    }
 
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElements) {

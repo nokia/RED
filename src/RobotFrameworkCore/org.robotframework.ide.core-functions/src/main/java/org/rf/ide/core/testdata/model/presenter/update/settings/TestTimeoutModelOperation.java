@@ -55,6 +55,11 @@ public class TestTimeoutModelOperation implements ISettingTableElementOperation 
             }
         }
     }
+    
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addTestTimeout((TestTimeout) modelElement);
+    }
 
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElements) {

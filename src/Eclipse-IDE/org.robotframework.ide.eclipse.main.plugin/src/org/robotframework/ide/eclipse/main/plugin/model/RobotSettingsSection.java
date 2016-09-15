@@ -117,22 +117,11 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return setting;
     }
 
-    public RobotSetting insertSetting(final String name, final String comment, final List<String> args,
-            final int allSettingsElementsIndex) {
+    public RobotSetting insertSetting(final RobotKeywordCall call, final int allSettingsElementsIndex) {
 
-        int tableIndex = -1;
-        if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex < elements.size()) {
-            RobotFileInternalElement currentElement = elements.get(allSettingsElementsIndex);
-            if (currentElement.getName().equals(SettingsGroup.METADATA.getName())) {
-                tableIndex = getMetadataSettings().indexOf(currentElement);
-            } else {
-                tableIndex = getImportSettings().indexOf(currentElement);
-            }
-        }
-
-        final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), tableIndex, name,
-                comment, args);
-        final RobotSetting setting = newSetting(name, newModelElement);
+        final RobotSetting setting = (RobotSetting) call;
+        final int tableIndex = countRowsOfGroupUpTo(setting.getGroup(), allSettingsElementsIndex);
+        settingTableModelUpdater.insert(getLinkedElement(), tableIndex, setting.getLinkedElement());
 
         if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex <= elements.size()) {
             elements.add(allSettingsElementsIndex, setting);
@@ -266,5 +255,24 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             elements.add(defaultTags.get());
         }
         return elements;
+    }
+    
+    private int countRowsOfGroupUpTo(final SettingsGroup group, final int toIndex) {
+        int index = 0;
+        int count = 0;
+        for (final RobotKeywordCall call : getChildren()) {
+            if (index >= toIndex) {
+                break;
+            }
+            final String name = call.getName();
+            if ((SettingsGroup.getImportsGroupsSet().contains(group)
+                    && (name.equals(SettingsGroup.LIBRARIES.getName()) || name.equals(SettingsGroup.RESOURCES.getName())
+                            || name.equals(SettingsGroup.VARIABLES.getName())))
+                    || name.equals(group.getName())) {
+                count++;
+            }
+            index++;
+        }
+        return count;
     }
 }

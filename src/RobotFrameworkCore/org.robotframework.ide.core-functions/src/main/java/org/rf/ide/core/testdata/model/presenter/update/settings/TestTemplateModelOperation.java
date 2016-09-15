@@ -55,6 +55,11 @@ public class TestTemplateModelOperation implements ISettingTableElementOperation
             }
         }
     }
+    
+    @Override
+    public void insert(final SettingTable settingsTable, final int index, final AModelElement<?> modelElement) {
+        settingsTable.addTestTemplate((TestTemplate) modelElement);
+    }
 
     @Override
     public void remove(final SettingTable settingsTable, final AModelElement<?> modelElements) {

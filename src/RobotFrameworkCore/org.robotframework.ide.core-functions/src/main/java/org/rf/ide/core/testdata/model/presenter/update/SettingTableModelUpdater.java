@@ -66,6 +66,15 @@ public class SettingTableModelUpdater {
         }
         return null;
     }
+    
+    public void insert(final ARobotSectionTable sectionTable, int index, AModelElement<?> modelElement) {
+        if (sectionTable != null && sectionTable instanceof SettingTable) {
+            final ISettingTableElementOperation operationHandler = getOperationHandler(modelElement);
+            if (operationHandler != null) {
+                operationHandler.insert((SettingTable) sectionTable, index, modelElement);
+            }
+        }
+    }
 
     public void remove(final ARobotSectionTable sectionTable, final AModelElement<?> modelElement) {
 
