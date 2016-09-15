@@ -292,7 +292,7 @@ public class PasteSettingsCellsCommandsCollectorTest {
         }
         when(selectionLayer.getSelectedCellPositions()).thenReturn(selectedPositions);
 
-        return new SelectionLayerAccessor(selectionLayer, null);
+        return new SelectionLayerAccessor(null, selectionLayer, null);
     }
 
     private PositionCoordinateSerializer[] createPositionsToCopy(final int[] columnsToCopy, final int[] rowsToCopy) {
