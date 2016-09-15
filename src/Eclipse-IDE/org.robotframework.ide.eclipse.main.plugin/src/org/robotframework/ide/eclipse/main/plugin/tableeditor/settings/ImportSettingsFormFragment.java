@@ -216,7 +216,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer, selectionProvider);
+        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
 
         // tooltips support
         new RedNatTableContentTooltip(table, markersContainer, dataProvider);

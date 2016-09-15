@@ -10,9 +10,9 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.handler.CopyCasesHandler.E4CopyCasesHandler;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.ArraysSerializerDeserializer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.E4CopyCodeHoldersHandler;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -23,25 +23,17 @@ public class CopyCasesHandler extends DIParameterizedHandler<E4CopyCasesHandler>
         super(E4CopyCasesHandler.class);
     }
 
-    public static class E4CopyCasesHandler {
+    public static class E4CopyCasesHandler extends E4CopyCodeHoldersHandler {
 
         @Execute
         public boolean copyCases(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedClipboard clipboard) {
+            return copyCodeHolders(selection, clipboard);
+        }
 
-            final RobotCase[] cases = Selections.getElementsArray(selection, RobotCase.class);
-            final RobotKeywordCall[] calls = Selections.getElementsArray(selection, RobotKeywordCall.class);
-            if (cases.length > 0) {
-                final Object data = ArraysSerializerDeserializer.copy(RobotCase.class, cases);
-                clipboard.insertContent(data);
-                return true;
-
-            } else if (calls.length > 0) {
-                final Object data = ArraysSerializerDeserializer.copy(RobotKeywordCall.class, calls);
-                clipboard.insertContent(data);
-                return true;
-            }
-            return false;
+        @Override
+        protected Class<? extends RobotCodeHoldingElement<?>> getCodeHolderClass() {
+            return RobotCase.class;
         }
     }
 }
