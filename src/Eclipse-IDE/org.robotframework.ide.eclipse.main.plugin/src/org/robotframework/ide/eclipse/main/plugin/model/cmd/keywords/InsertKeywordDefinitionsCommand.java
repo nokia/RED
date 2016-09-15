@@ -16,6 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.NamesGenerator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
+import org.robotframework.services.event.RedEventBroker;
 
 import com.google.common.base.Predicate;
 
@@ -61,7 +62,11 @@ public class InsertKeywordDefinitionsCommand extends EditorCommand {
             }
         }
 
-        eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);
+        if (!definitionsToInsert.isEmpty()) {
+            RedEventBroker.using(eventBroker)
+                    .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(definitionsToInsert)
+                    .send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);
+        }
     }
 
     private boolean nameChangeIsRequired(final RobotKeywordDefinition definition) {

@@ -373,10 +373,15 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED) final Event event) {
 
         final RobotKeywordsSection section = Events.get(event, IEventBroker.DATA, RobotKeywordsSection.class);
-        final RobotKeywordDefinition keyword = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
-                RobotKeywordDefinition.class);
         if (section != null && section.getSuiteFile() == fileModel) {
             sortModel.clear();
+
+            RobotKeywordDefinition keyword = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
+                    RobotKeywordDefinition.class);
+            if (keyword == null) {
+                final List<?> keywords = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, List.class);
+                keyword = (RobotKeywordDefinition) keywords.get(keywords.size() - 1);
+            }
             selectionLayerAccessor.selectElementInFirstCellAfterOperation(keyword, tableInputIsReplaced());
         }
     }
@@ -434,9 +439,9 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                 selectionLayerAccessor.selectElementInFirstCellAfterOperation(keywordCall, tableInputIsReplaced());
             } else {
                 sortModel.clear();
-                @SuppressWarnings("unchecked")
-                final List<RobotKeywordCall> calls = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, List.class);
-                selectionLayerAccessor.selectElementInFirstCellAfterOperation(calls.get(calls.size() - 1), tableInputIsReplaced());
+                final List<?> calls = Events.get(event, RobotModelEvents.ADDITIONAL_DATA, List.class);
+                final RobotKeywordCall lastCall = (RobotKeywordCall) calls.get(calls.size() - 1);
+                selectionLayerAccessor.selectElementInFirstCellAfterOperation(lastCall, tableInputIsReplaced());
             }
         }
     }
