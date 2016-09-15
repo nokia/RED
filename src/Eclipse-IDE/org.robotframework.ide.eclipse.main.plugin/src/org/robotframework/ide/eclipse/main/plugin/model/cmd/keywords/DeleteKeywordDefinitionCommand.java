@@ -21,7 +21,7 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
 
     private final List<RobotKeywordDefinition> definitionsToDelete;
     
-    private List<Integer> deletedDefinitionsIndexes = newArrayList();
+    private final List<Integer> deletedDefinitionsIndexes = newArrayList();
 
     public DeleteKeywordDefinitionCommand(final List<RobotKeywordDefinition> definitionsToDelete) {
         this.definitionsToDelete = definitionsToDelete;
@@ -41,7 +41,7 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
         
         removeModelElements(keywordsSection);
 
-        eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, keywordsSection);
+        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, keywordsSection);
     }
 
     private void removeModelElements(final RobotSuiteFileSection keywordsSection) {
