@@ -58,8 +58,12 @@ public class PositionCoordinateTransfer extends RedTransfer<PositionCoordinateSe
         private final int rowPosition;
 
         public PositionCoordinateSerializer(final PositionCoordinate positionCoordinate) {
-            this.columnPosition = positionCoordinate.columnPosition;
-            this.rowPosition = positionCoordinate.rowPosition;
+            this(positionCoordinate.columnPosition, positionCoordinate.rowPosition);
+        }
+
+        public PositionCoordinateSerializer(final int columnPosition, final int rowPosition) {
+            this.columnPosition = columnPosition;
+            this.rowPosition = rowPosition;
         }
 
         public int getColumnPosition() {
@@ -84,6 +88,12 @@ public class PositionCoordinateTransfer extends RedTransfer<PositionCoordinateSe
         @Override
         public int hashCode() {
             return Objects.hash(rowPosition, columnPosition);
+        }
+
+        @Override
+        public String toString() {
+            // debugging or junit reports purposes only
+            return "[" + columnPosition + ", " + rowPosition + "]";
         }
     }
 }
