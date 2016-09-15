@@ -15,7 +15,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.IRobotCodeHoldingElement
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteKeywordCallCommand extends EditorCommand {
@@ -40,7 +39,6 @@ public class DeleteKeywordCallCommand extends EditorCommand {
         if (callsToDelete.isEmpty()) {
             return;
         }
-        deletedCallsIndexes.clear();
         for (final RobotKeywordCall call : callsToDelete) {
             deletedCallsIndexes.add(call.getIndex());
         }
@@ -59,8 +57,8 @@ public class DeleteKeywordCallCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCompoundCommand(new CompoundEditorCommand(this, setupUndoCommandsForDeletedCalls()));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(setupUndoCommandsForDeletedCalls());
     }
 
     private List<EditorCommand> setupUndoCommandsForDeletedCalls() {

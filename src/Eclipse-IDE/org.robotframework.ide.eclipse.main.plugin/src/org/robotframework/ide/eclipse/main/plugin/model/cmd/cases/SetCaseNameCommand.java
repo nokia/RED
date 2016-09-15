@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -36,7 +38,7 @@ public class SetCaseNameCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new SetCaseNameCommand(testCase, previousName));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new SetCaseNameCommand(testCase, previousName));
     }
 }

@@ -22,6 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class CreateFreshSectionCommandTest {
 
@@ -52,7 +53,9 @@ public class CreateFreshSectionCommandTest {
         assertThat(model.getChildren()).hasSize(1);
         assertThat(model.getChildren().get(0)).isSameAs(currentSection);
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(model.getChildren()).hasSize(1);
         assertThat(model.getChildren().get(0)).isSameAs(currentSection);
@@ -76,7 +79,9 @@ public class CreateFreshSectionCommandTest {
         assertThat(model.getLinkedElement().getVariableTable().isPresent()).isTrue();
         assertThat(model.getLinkedElement().getVariableTable().getParent()).isSameAs(model.getLinkedElement());
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(model.getChildren()).isEmpty();
         assertThat(model.getLinkedElement().getVariableTable().isPresent()).isFalse();
@@ -102,7 +107,9 @@ public class CreateFreshSectionCommandTest {
         assertThat(model.getLinkedElement().getSettingTable().isPresent()).isTrue();
         assertThat(model.getLinkedElement().getSettingTable().getParent()).isSameAs(model.getLinkedElement());
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(model.getChildren()).isEmpty();
         assertThat(model.getLinkedElement().getSettingTable().isPresent()).isFalse();
@@ -128,7 +135,9 @@ public class CreateFreshSectionCommandTest {
         assertThat(model.getLinkedElement().getKeywordTable().isPresent()).isTrue();
         assertThat(model.getLinkedElement().getKeywordTable().getParent()).isSameAs(model.getLinkedElement());
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(model.getChildren()).isEmpty();
         assertThat(model.getLinkedElement().getKeywordTable().isPresent()).isFalse();
@@ -154,7 +163,9 @@ public class CreateFreshSectionCommandTest {
         assertThat(model.getLinkedElement().getTestCaseTable().isPresent()).isTrue();
         assertThat(model.getLinkedElement().getTestCaseTable().getParent()).isSameAs(model.getLinkedElement());
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(model.getChildren()).isEmpty();
         assertThat(model.getLinkedElement().getTestCaseTable().isPresent()).isFalse();

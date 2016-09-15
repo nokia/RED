@@ -14,7 +14,6 @@ import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteKeywordDefinitionCommand extends EditorCommand {
@@ -32,6 +31,7 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
         if (definitionsToDelete.isEmpty()) {
             return;
         }
+        deletedDefinitionsIndexes.clear();
         for (final RobotKeywordDefinition def : definitionsToDelete) {
             deletedDefinitionsIndexes.add(def.getIndex());
         }
@@ -55,16 +55,18 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCompoundCommand(new CompoundEditorCommand(this, setupUndoCommandsForDeletedDefinitions()));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(setupUndoCommandsForDeletedDefinitions());
     }
 
     private List<EditorCommand> setupUndoCommandsForDeletedDefinitions() {
         final List<EditorCommand> commands = newArrayList();
-        for (int i = 0; i < definitionsToDelete.size(); i++) {
-            final RobotKeywordDefinition def = definitionsToDelete.get(i);
-            commands.add(new InsertKeywordDefinitionsCommand(def.getParent(), deletedDefinitionsIndexes.get(i),
-                    new RobotKeywordDefinition[] { def }));
+        if (definitionsToDelete.size() == deletedDefinitionsIndexes.size()) {
+            for (int i = 0; i < definitionsToDelete.size(); i++) {
+                final RobotKeywordDefinition def = definitionsToDelete.get(i);
+                commands.add(new InsertKeywordDefinitionsCommand(def.getParent(), deletedDefinitionsIndexes.get(i),
+                        new RobotKeywordDefinition[] { def }));
+            }
         }
         return commands;
     }

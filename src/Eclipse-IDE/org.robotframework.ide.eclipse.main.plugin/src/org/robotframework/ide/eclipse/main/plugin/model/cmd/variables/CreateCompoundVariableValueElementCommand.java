@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.List;
+
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
@@ -75,13 +77,13 @@ public class CreateCompoundVariableValueElementCommand extends EditorCommand {
     }
     
     @Override
-    public EditorCommand getUndoCommand() {
+    public List<EditorCommand> getUndoCommands() {
         EditorCommand command = null;
         if (variable.getType() == VariableType.DICTIONARY) {
             command = new RemoveDictVariableValueElementsCommand(variable, newArrayList(newKeyValuePair));
         } else {
             command = new RemoveListVariableValueElementsCommand(variable, newArrayList(newToken));
         }
-        return newUndoCommand(command);
+        return newUndoCommands(command);
     }
 }

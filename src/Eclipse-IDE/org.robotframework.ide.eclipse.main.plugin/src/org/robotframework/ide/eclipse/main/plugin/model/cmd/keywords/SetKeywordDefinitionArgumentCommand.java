@@ -15,7 +15,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand2;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.services.event.RedEventBroker;
 
@@ -55,7 +54,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             command.setEventBroker(eventBroker);
             command.execute();
 
-            undoCommands.add(command.getUndoCommand());
+            undoCommands.addAll(command.getUndoCommands());
 
         } else if (setting == null) {
             // there is no setting, but we have arguments to set
@@ -63,7 +62,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             command.setEventBroker(eventBroker);
             command.execute();
 
-            undoCommands.add(command.getUndoCommand());
+            undoCommands.addAll(command.getUndoCommands());
 
         } else if (!newArguments.equals(setting.getArguments())) {
             // there is a setting and we have arguments which are different than current
@@ -71,7 +70,7 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
             command.setEventBroker(eventBroker);
             command.execute();
 
-            undoCommands.add(command.getUndoCommand());
+            undoCommands.addAll(command.getUndoCommands());
         }
     }
 
@@ -85,8 +84,8 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return new CompoundEditorCommand(this, undoCommands);
+    public List<EditorCommand> getUndoCommands() {
+        return undoCommands;
     }
     
     private static class CreateArgumentSettingCommand extends EditorCommand {
@@ -113,8 +112,8 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         }
 
         @Override
-        public EditorCommand getUndoCommand() {
-            return newUndoCommand(new DeleteArgumentSettingCommand(setting));
+        public List<EditorCommand> getUndoCommands() {
+            return newUndoCommands(new DeleteArgumentSettingCommand(setting));
         }
     }
 
@@ -145,8 +144,8 @@ public class SetKeywordDefinitionArgumentCommand extends EditorCommand {
         }
 
         @Override
-        public EditorCommand getUndoCommand() {
-            return newUndoCommand(new CreateArgumentSettingCommand(keyword, oldArguments));
+        public List<EditorCommand> getUndoCommands() {
+            return newUndoCommands(new CreateArgumentSettingCommand(keyword, oldArguments));
         }
     }
 }

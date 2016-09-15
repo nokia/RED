@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import java.util.List;
+
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -38,7 +40,7 @@ public class MoveKeywordCallUpCommand extends EditorCommand {
     }
 
     @Override
-    public EditorCommand getUndoCommand() {
-        return newUndoCommand(new MoveKeywordCallDownCommand(keywordCall));
+    public List<EditorCommand> getUndoCommands() {
+        return newUndoCommands(new MoveKeywordCallDownCommand(keywordCall));
     }
 }

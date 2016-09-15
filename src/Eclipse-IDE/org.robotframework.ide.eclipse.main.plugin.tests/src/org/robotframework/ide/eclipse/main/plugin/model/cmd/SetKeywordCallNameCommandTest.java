@@ -33,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableMap;
@@ -91,7 +92,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
         
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
         
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call", "arg1", "arg2", "arg3", "# comment");
@@ -127,7 +130,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
         
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
         
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call", "arg1", "arg2", "arg3", "# comment");
@@ -162,7 +167,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
         
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
         
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call_to_setting", "[setup]", "arg1", "arg2",
@@ -202,7 +209,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("tags", "tag1", "tag2", "tag3", "# comment");
@@ -242,7 +251,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.ARGUMENTS, executablesHolder.getClass()));
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("tags", "tag1", "tag2", "tag3", "# comment");
@@ -282,7 +293,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call", "arg1", "arg2", "arg3", "# comment");
@@ -318,7 +331,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.SETUP, executablesHolder.getClass()));
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("call_to_setting", "[setup]", "arg1", "arg2",
@@ -361,7 +376,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("tags", "tag1", "tag2", "tag3",
@@ -404,7 +421,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.SETUP, executablesHolder.getClass()));
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("tags", "[setup]", "tag1", "tag2", "# comment");
@@ -446,7 +465,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         final RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
         assertThat(constructRow(callAfterUndo)).containsExactly("tags", "[tags]", "tag1", "tag2", "# comment");
@@ -486,7 +507,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(actionNames(executablesHolder)).containsExactly("tags", "teardown", "unknown", "call1", "call2",
                 "call3");
@@ -534,7 +557,9 @@ public class SetKeywordCallNameCommandTest {
         assertThat(callAfterNameChange.getLinkedElement().getModelType())
                 .isEqualTo(modelTypes.get(CommonModelTypes.SETUP, executablesHolder.getClass()));
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(actionNames(executablesHolder)).containsExactly("tags", "teardown", "unknown", "call1", "call2",
                 "call3");
