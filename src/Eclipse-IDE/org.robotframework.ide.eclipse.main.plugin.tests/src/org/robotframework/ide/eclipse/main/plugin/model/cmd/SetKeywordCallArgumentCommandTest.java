@@ -33,11 +33,11 @@ public class SetKeywordCallArgumentCommandTest {
 
         verifyArguments(call, 2, 0, "2");
 
-        EditorCommand undoCommand = command.getUndoCommands().get(0);
+        EditorCommand undoCommand = command.getUndoCommand();
         undoCommand.execute();
         verifyArguments(call, 3, 0, "1");
 
-        EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+        EditorCommand redoCommand = undoCommand.getUndoCommand();
         redoCommand.execute();
         verifyArguments(call, 2, 0, "2");
 
@@ -54,11 +54,11 @@ public class SetKeywordCallArgumentCommandTest {
 
         verifyArguments(call, 3, 0, "");
 
-        EditorCommand undoCommand = command.getUndoCommands().get(0);
+        EditorCommand undoCommand = command.getUndoCommand();
         undoCommand.execute();
         verifyArguments(call, 3, 0, "keyword");
 
-        EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+        EditorCommand redoCommand = undoCommand.getUndoCommand();
         redoCommand.execute();
         verifyArguments(call, 3, 0, "\\");
 
@@ -75,11 +75,11 @@ public class SetKeywordCallArgumentCommandTest {
 
         verifyArguments(call, 2, 1, "2");
 
-        EditorCommand undoCommand = command.getUndoCommands().get(0);
+        EditorCommand undoCommand = command.getUndoCommand();
         undoCommand.execute();
         verifyArguments(call, 3, 1, "1");
 
-        EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+        EditorCommand redoCommand = undoCommand.getUndoCommand();
         redoCommand.execute();
         verifyArguments(call, 2, 1, "2");
 
@@ -96,11 +96,11 @@ public class SetKeywordCallArgumentCommandTest {
 
         verifyArguments(call, 2, 0, "T2");
 
-        EditorCommand undoCommand = command.getUndoCommands().get(0);
+        EditorCommand undoCommand = command.getUndoCommand();
         undoCommand.execute();
         verifyArguments(call, 3, 0, "T1");
 
-        EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+        EditorCommand redoCommand = undoCommand.getUndoCommand();
         redoCommand.execute();
         verifyArguments(call, 2, 0, "T2");
 
@@ -121,29 +121,29 @@ public class SetKeywordCallArgumentCommandTest {
         
         assertTrue(call.getArguments().isEmpty());
         
-        EditorCommand undoCommand1 = command3.getUndoCommands().get(0);
+        EditorCommand undoCommand1 = command3.getUndoCommand();
         undoCommand1.execute();
         verifyArguments(call, 1, 0, "3");
         
-        EditorCommand undoCommand2 = command2.getUndoCommands().get(0);
+        EditorCommand undoCommand2 = command2.getUndoCommand();
         undoCommand2.execute();
         verifyArguments(call, 2, 0, "2");
         
-        EditorCommand undoCommand3 = command1.getUndoCommands().get(0);
+        EditorCommand undoCommand3 = command1.getUndoCommand();
         undoCommand3.execute();
         verifyArguments(call, 3, 0, "1");
         verifyArguments(call, 3, 1, "2");
         verifyArguments(call, 3, 2, "3");
         
-        EditorCommand redoCommand1 = undoCommand3.getUndoCommands().get(0);
+        EditorCommand redoCommand1 = undoCommand3.getUndoCommand();
         redoCommand1.execute();
         verifyArguments(call, 2, 0, "2");
         
-        EditorCommand redoCommand2 = undoCommand2.getUndoCommands().get(0);
+        EditorCommand redoCommand2 = undoCommand2.getUndoCommand();
         redoCommand2.execute();
         verifyArguments(call, 1, 0, "3");
         
-        EditorCommand redoCommand3 = undoCommand1.getUndoCommands().get(0);
+        EditorCommand redoCommand3 = undoCommand1.getUndoCommand();
         redoCommand3.execute();
         assertTrue(call.getArguments().isEmpty());
     }

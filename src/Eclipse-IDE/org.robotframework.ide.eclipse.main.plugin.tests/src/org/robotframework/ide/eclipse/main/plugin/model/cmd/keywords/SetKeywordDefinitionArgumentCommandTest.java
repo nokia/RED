@@ -35,11 +35,11 @@ public class SetKeywordDefinitionArgumentCommandTest {
 
         verifyArguments(def, 2, 0, "2");
 
-        final EditorCommand undoCommand = command.getUndoCommands().get(0);
+        final EditorCommand undoCommand = command.getUndoCommand();
         undoCommand.execute();
         verifyArguments(def, 3, 0, "1");
 
-        final EditorCommand redoCommand = undoCommand.getUndoCommands().get(0);
+        final EditorCommand redoCommand = undoCommand.getUndoCommand();
         redoCommand.execute();
         verifyArguments(def, 2, 0, "2");
 
