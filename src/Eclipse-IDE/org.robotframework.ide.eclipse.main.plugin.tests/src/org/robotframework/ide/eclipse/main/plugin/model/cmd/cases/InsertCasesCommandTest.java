@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCaseConditions;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 import com.google.common.collect.ImmutableMap;
 
@@ -37,7 +38,9 @@ public class InsertCasesCommandTest {
         command.execute();
         assertThat(section.getChildren().size()).isEqualTo(3);
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
         assertThat(section.getChildren().size()).isEqualTo(3);
 
         verifyZeroInteractions(eventBroker);
@@ -62,7 +65,9 @@ public class InsertCasesCommandTest {
         assertCase(section.getChildren().get(3), "inserted case 1");
         assertCase(section.getChildren().get(4), "inserted case 2");
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(section.getChildren().size()).isEqualTo(3);
 
@@ -96,7 +101,9 @@ public class InsertCasesCommandTest {
         assertCase(section.getChildren().get(3), "case 2");
         assertCase(section.getChildren().get(4), "case 3");
 
-        command.getUndoCommand().execute();
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
 
         assertThat(section.getChildren().size()).isEqualTo(3);
 
