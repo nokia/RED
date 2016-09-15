@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.util.List;
 
@@ -35,6 +36,13 @@ public class SetKeywordCallCommentCommandTest {
     }
 
     @Test
+    public void nothingChangesWhenTryingToSetSameCommentForSettingsElements() {
+        for (final RobotKeywordCall generalSetting : createSettingsKeywordCalls()) {
+            changeToSameAndVerify(generalSetting);
+        }
+    }
+
+    @Test
     public void commentsAreProperlyRemovedForSettingsElements() {
         for (final RobotKeywordCall generalSetting : createSettingsKeywordCalls()) {
             changeAndVerify(generalSetting, null, "");
@@ -45,6 +53,13 @@ public class SetKeywordCallCommentCommandTest {
     public void commentsAreProperlyUpdatedForTestCaseElements() {
         for (final RobotKeywordCall caseExecutable : createTestCaseKeywordCalls()) {
             changeAndVerify(caseExecutable, "new comment", "#new comment");
+        }
+    }
+
+    @Test
+    public void nothingChangesWhenTryingToSetSameCommentForTestCaseElements() {
+        for (final RobotKeywordCall caseExecutable : createTestCaseKeywordCalls()) {
+            changeToSameAndVerify(caseExecutable);
         }
     }
 
@@ -63,6 +78,13 @@ public class SetKeywordCallCommentCommandTest {
     }
 
     @Test
+    public void nothingChangesWhenTryingToSetSameCommentForKeywordsElements() {
+        for (final RobotKeywordCall keywordExecutable : createUserKeywordKeywordCalls()) {
+            changeToSameAndVerify(keywordExecutable);
+        }
+    }
+
+    @Test
     public void commentsAreProperlyRemovedForKeywordElements() {
         for (final RobotKeywordCall keywordExecutable : createUserKeywordKeywordCalls()) {
             changeAndVerify(keywordExecutable, null, "");
@@ -71,7 +93,7 @@ public class SetKeywordCallCommentCommandTest {
 
     private void changeAndVerify(final RobotKeywordCall keywordExecutable, final String newComment,
             final String expected) {
-        final Object oldComment = keywordExecutable.getComment();
+        final String oldComment = keywordExecutable.getComment();
 
         final IEventBroker eventBroker = mock(IEventBroker.class);
         final SetKeywordCallCommentCommand command = ContextInjector.prepareContext()
@@ -89,6 +111,25 @@ public class SetKeywordCallCommentCommandTest {
 
         verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_COMMENT_CHANGE, keywordExecutable);
         verifyNoMoreInteractions(eventBroker);
+    }
+
+    private static void changeToSameAndVerify(final RobotKeywordCall keywordExecutable) {
+        final String oldComment = keywordExecutable.getComment();
+
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+        final SetKeywordCallCommentCommand command = ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetKeywordCallCommentCommand(keywordExecutable, oldComment));
+        command.execute();
+
+        assertThat(keywordExecutable.getComment()).isEqualTo(oldComment);
+
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(keywordExecutable.getComment()).isEqualTo(oldComment);
+
+        verifyZeroInteractions(eventBroker);
     }
 
     private static List<RobotKeywordCall> createSettingsKeywordCalls() {
