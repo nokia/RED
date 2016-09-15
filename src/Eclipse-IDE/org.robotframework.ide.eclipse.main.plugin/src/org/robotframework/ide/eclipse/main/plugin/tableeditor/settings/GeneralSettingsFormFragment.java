@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.inject.Inject;
@@ -184,6 +185,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private GeneralSettingsDataProvider dataProvider;
 
+    private Semaphore docSemaphore = new Semaphore(1, true);
+
     private ISortModel sortModel;
 
     private RowSelectionProvider<Entry<String, RobotElement>> selectionProvider;
@@ -268,14 +271,13 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
                 @Override
                 public void modifyText(final ModifyEvent e) {
-                    isDocumentationModified.set(true);
                     if (!hasFocusOnDocumentation.get() || (hasFocusOnDocumentation.get()
                             && (documentation.getText().equals(getDocumentation(getSection(), true))
                                     || documentation.getText().equals(getDocumentation(getSection(), false))))) {
                         return;
                     }
+                    isDocumentationModified.set(true);
                     setDirty();
-
                     if (documentationChangeJob != null && documentationChangeJob.getState() == Job.SLEEPING) {
                         documentationChangeJob.cancel();
                     }
@@ -466,22 +468,30 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                final String newDocumentation = docu.replaceAll("\t", "\\\\t");
-                final RobotSettingsSection settingsSection = getSection();
-                if (settingsSection == null) {
-                    return Status.OK_STATUS;
+                try {
+                    docSemaphore.acquire();
+                    final String newDocumentation = docu.replaceAll("\t", "\\\\t");
+                    final RobotSettingsSection settingsSection = getSection();
+                    if (settingsSection == null) {
+                        return Status.OK_STATUS;
+                    }
+
+                    final RobotSetting docSetting = settingsSection.getSetting("Documentation");
+
+                    if (docSetting == null && !newDocumentation.isEmpty()) {
+                        commandsStack.execute(new CreateFreshSettingCommand(settingsSection, "Documentation",
+                                newArrayList(newDocumentation)));
+                    } else if (docSetting != null && newDocumentation.isEmpty()) {
+                        commandsStack.execute(new DeleteSettingCommand(newArrayList(docSetting)));
+                    } else if (docSetting != null) {
+                        commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
+                    }
+                } catch (InterruptedException e) {
+                    RedPlugin.logError("Error during change job perform", e);
+                } finally {
+                    docSemaphore.release();
                 }
 
-                final RobotSetting docSetting = settingsSection.getSetting("Documentation");
-
-                if (docSetting == null && !newDocumentation.isEmpty()) {
-                    commandsStack.execute(new CreateFreshSettingCommand(settingsSection, "Documentation",
-                            newArrayList(newDocumentation)));
-                } else if (docSetting != null && newDocumentation.isEmpty()) {
-                    commandsStack.execute(new DeleteSettingCommand(newArrayList(docSetting)));
-                } else if (docSetting != null) {
-                    commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
-                }
                 return Status.OK_STATUS;
             }
         };
@@ -751,7 +761,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         // to wait for it to
         // end in order to proceed with saving
         try {
-            if (isDocumentationModified.get()) {
+            if (isDocumentationModified.get() || (!documentation.getText().equals(getDocumentation(getSection(), true))
+                    && !documentation.getText().equals(getDocumentation(getSection(), false)))) {
                 if (documentationChangeJob != null) {
                     documentationChangeJob.cancel();
                 }

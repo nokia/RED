@@ -129,7 +129,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
                 tableIndex = getImportSettings().indexOf(currentElement);
             }
         }
-        
+
         final AModelElement<?> newModelElement = settingTableModelUpdater.create(getLinkedElement(), tableIndex, name,
                 comment, args);
         final RobotSetting setting = newSetting(name, newModelElement);
@@ -137,7 +137,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex <= elements.size()) {
             elements.add(allSettingsElementsIndex, setting);
         }
-        
+
         return setting;
     }
 
@@ -199,7 +199,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         }));
     }
 
-    public RobotSetting getSetting(final String name) {
+    public synchronized RobotSetting getSetting(final String name) {
         for (final RobotKeywordCall setting : getChildren()) {
             if (name.equals(setting.getName())) {
                 return (RobotSetting) setting;

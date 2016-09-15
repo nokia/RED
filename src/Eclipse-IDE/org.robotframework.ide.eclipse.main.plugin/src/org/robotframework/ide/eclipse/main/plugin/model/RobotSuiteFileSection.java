@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -29,7 +30,8 @@ public abstract class RobotSuiteFileSection implements RobotFileInternalElement 
 
     private final RobotElement parent;
 
-    protected final List<RobotFileInternalElement> elements = new ArrayList<>();
+    protected final List<RobotFileInternalElement> elements = Collections
+            .synchronizedList(new ArrayList<RobotFileInternalElement>());
 
     private final ARobotSectionTable sectionTable;
 
