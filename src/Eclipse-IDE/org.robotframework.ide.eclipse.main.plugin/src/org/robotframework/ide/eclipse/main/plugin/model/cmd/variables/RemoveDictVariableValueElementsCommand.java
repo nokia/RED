@@ -15,6 +15,7 @@ import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 
@@ -56,8 +57,8 @@ public class RemoveDictVariableValueElementsCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(setupUndoCommandsForRemovedElements());
+    public EditorCommand getUndoCommand() {
+        return newUndoCompoundCommand(new CompoundEditorCommand(this, setupUndoCommandsForRemovedElements()));
     }
 
     private List<EditorCommand> setupUndoCommandsForRemovedElements() {

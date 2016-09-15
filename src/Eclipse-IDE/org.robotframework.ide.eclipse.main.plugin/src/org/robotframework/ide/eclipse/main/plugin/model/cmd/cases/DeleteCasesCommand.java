@@ -13,6 +13,7 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.CompoundEditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteCasesCommand extends EditorCommand {
@@ -46,18 +47,16 @@ public class DeleteCasesCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(setupUndoCommandsForDeletedCases());
+    public EditorCommand getUndoCommand() {
+        return newUndoCompoundCommand(new CompoundEditorCommand(this, setupUndoCommandsForDeletedCases()));
     }
 
     private List<EditorCommand> setupUndoCommandsForDeletedCases() {
         final List<EditorCommand> commands = newArrayList();
-        if (casesToDelete.size() == deletedCasesIndexes.size()) {
-            for (int i = 0; i < casesToDelete.size(); i++) {
-                final RobotCase robotCase = casesToDelete.get(i);
-                commands.add(new InsertCasesCommand(robotCase.getParent(), deletedCasesIndexes.get(i),
-                        new RobotCase[] { robotCase }));
-            }
+        for (int i = 0; i < casesToDelete.size(); i++) {
+            final RobotCase robotCase = casesToDelete.get(i);
+            commands.add(new InsertCasesCommand(robotCase.getParent(), deletedCasesIndexes.get(i),
+                    new RobotCase[] { robotCase }));
         }
         return commands;
     }

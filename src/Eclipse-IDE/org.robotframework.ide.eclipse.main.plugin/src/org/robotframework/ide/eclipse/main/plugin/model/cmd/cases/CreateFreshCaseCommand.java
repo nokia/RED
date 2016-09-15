@@ -7,8 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.List;
-
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -49,7 +47,7 @@ public class CreateFreshCaseCommand extends EditorCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new DeleteCasesCommand(newArrayList(newTestCase)));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new DeleteCasesCommand(newArrayList(newTestCase)));
     }
 }

@@ -68,7 +68,7 @@ public class SetDictVariableValueElementCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetDictVariableValueElementCommand(variable, oldElement, previousValue));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new SetDictVariableValueElementCommand(variable, oldElement, previousValue));
     }
 }

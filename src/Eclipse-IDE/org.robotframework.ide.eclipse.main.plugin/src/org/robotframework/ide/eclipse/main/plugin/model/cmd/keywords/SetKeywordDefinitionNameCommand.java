@@ -5,8 +5,6 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.keywords;
 
-import java.util.List;
-
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -37,7 +35,7 @@ public class SetKeywordDefinitionNameCommand extends EditorCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetKeywordDefinitionNameCommand(definition, previousName));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new SetKeywordDefinitionNameCommand(definition, previousName));
     }
 }

@@ -38,8 +38,8 @@ public class SetSettingArgumentCommand extends SetKeywordCallArgumentCommand {
     }
 
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetSettingArgumentCommand(keywordCall, index, previousValue,
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new SetSettingArgumentCommand(keywordCall, index, previousValue,
                 isFirstArgAndShouldAlwaysReplaceValue() ? true : shouldReplaceValue));
     }
 

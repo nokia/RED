@@ -197,7 +197,7 @@ public class SetVariableNameCommand extends EditorCommand {
     }
     
     @Override
-    public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new SetVariableNameCommand(variable, previousName));
+    public EditorCommand getUndoCommand() {
+        return newUndoCommand(new SetVariableNameCommand(variable, previousName));
     }
 }
