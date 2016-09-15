@@ -12,11 +12,13 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveCaseDownCommand extends EditorCommand {
 
     private final RobotCase testCase;
+    private boolean wasMoved = true;
 
     public MoveCaseDownCommand(final RobotCase testCase) {
         this.testCase = testCase;
@@ -28,6 +30,7 @@ public class MoveCaseDownCommand extends EditorCommand {
         final int size = section.getChildren().size();
         final int index = section.getChildren().indexOf(testCase);
         if (index == size - 1) {
+            wasMoved = false;
             return;
         }
         Collections.swap(section.getChildren(), index, index + 1);
@@ -40,6 +43,6 @@ public class MoveCaseDownCommand extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new MoveCaseUpCommand(testCase));
+        return newUndoCommands(wasMoved ? new MoveCaseUpCommand(testCase) : new EmptyCommand());
     }
 }
