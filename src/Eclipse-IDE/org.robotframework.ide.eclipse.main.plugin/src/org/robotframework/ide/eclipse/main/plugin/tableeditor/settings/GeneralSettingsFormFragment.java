@@ -185,7 +185,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
     private GeneralSettingsDataProvider dataProvider;
 
-    private Semaphore docSemaphore = new Semaphore(1, true);
+    private final Semaphore docSemaphore = new Semaphore(1, true);
 
     private ISortModel sortModel;
 
@@ -486,7 +486,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     } else if (docSetting != null) {
                         commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
                     }
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     RedPlugin.logError("Error during change job perform", e);
                 } finally {
                     docSemaphore.release();
@@ -556,7 +556,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         sortModel = columnHeaderSortingLayer.getSortModel();
         selectionProvider = new RowSelectionProvider<>(bodySelectionLayer, dataProvider, false);
-        selectionLayerAccessor = new SelectionLayerAccessor(bodySelectionLayer, selectionProvider);
+        selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
 
         // tooltips support
         new GeneralSettingsTableContentTooltip(table.get(), markersContainer, dataProvider);

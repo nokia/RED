@@ -23,6 +23,7 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.robotframework.red.swt.SwtThread;
@@ -37,11 +38,16 @@ import com.google.common.primitives.Ints;
  */
 public class SelectionLayerAccessor {
 
+    private final IRowDataProvider<? extends Object> dataProvider;
+
     private final SelectionLayer selectionLayer;
 
     private final ISelectionProvider selectionProvider;
 
-    public SelectionLayerAccessor(final SelectionLayer selectionLayer, final ISelectionProvider selectionProvider) {
+    public SelectionLayerAccessor(final IRowDataProvider<? extends Object> dataProvider,
+            final SelectionLayer selectionLayer,
+            final ISelectionProvider selectionProvider) {
+        this.dataProvider = dataProvider;
         this.selectionLayer = selectionLayer;
         this.selectionProvider = selectionProvider;
     }
@@ -61,6 +67,10 @@ public class SelectionLayerAccessor {
 
     public void clear() {
         selectionLayer.clear();
+    }
+
+    public Object getElementSelectedAt(final int row) {
+        return selectionLayer.isRowPositionSelected(row) ? dataProvider.getRowObject(row) : null;
     }
 
     public boolean onlyFullRowsAreSelected() {
