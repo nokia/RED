@@ -19,6 +19,8 @@ public interface ISettingTableElementOperation {
     boolean isApplicable(final ModelType elementType);
 
     AModelElement<?> create(final SettingTable settingsTable, final int tableIndex, final List<String> args, final String comment);
+    
+    void insert(final SettingTable settingsTable, int index, AModelElement<?> modelElement);
 
     void update(final AModelElement<?> modelElement, final int index, final String value);
 
