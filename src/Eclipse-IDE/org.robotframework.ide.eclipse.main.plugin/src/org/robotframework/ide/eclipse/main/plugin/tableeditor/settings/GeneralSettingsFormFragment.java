@@ -102,7 +102,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteSettingCommand;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetDocumentationCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.FilterSwitchRequest;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollector;
@@ -117,6 +117,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.RedoHandler.E4RedoHandler;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.UndoHandler.E4UndoHandler;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.graphics.ColorsManager;
@@ -294,11 +296,19 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 if (e.stateMask == SWT.CTRL) {
                     final int C_KEY = 0x3;
                     final int X_KEY = 0x18;
+                    final int Z_KEY = 0x1A;
+                    final int Y_KEY = 0x19;
 
                     if (e.character == C_KEY) {
                         documentation.copy();
                     } else if (e.character == X_KEY) {
                         documentation.cut();
+                    } else if (e.character == Z_KEY) {
+                        new E4UndoHandler().undo(commandsStack);
+                        updateDocumentationWithPositionPresave(getDocumentation(getSection(), hasEditDocRepresentation.get()));
+                    } else if (e.character == Y_KEY) {
+                        new E4RedoHandler().redo(commandsStack);
+                        updateDocumentationWithPositionPresave(getDocumentation(getSection(), hasEditDocRepresentation.get()));
                     }
                 } else if (e.stateMask == SWT.NONE && e.character == SWT.TAB) {
                     updateDocumentationWithPositionPresave(documentation.getText().replaceAll("\\t", "\\\\t"));
@@ -480,7 +490,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     } else if (docSetting != null && newDocumentation.isEmpty()) {
                         commandsStack.execute(new DeleteSettingCommand(newArrayList(docSetting)));
                     } else if (docSetting != null) {
-                        commandsStack.execute(new SetSettingArgumentCommand(docSetting, 0, newDocumentation));
+                        commandsStack.execute(new SetDocumentationCommand(docSetting, newDocumentation));
                     }
                 } catch (final InterruptedException e) {
                     RedPlugin.logError("Error during change job perform", e);
