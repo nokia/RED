@@ -9,7 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.TextStyle;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
@@ -26,7 +28,7 @@ public class KeywordProposalsLabelProviderTest {
     public void normalKeywordImageIsReturnedForLibraryKeyword() {
         final KeywordProposalsLabelProvider labelProvider = new KeywordProposalsLabelProvider();
         final Image image = labelProvider
-                .getImage(new KeywordContentProposal(createProposalToWrap(KeywordType.LIBRARY)));
+                .getImage(new KeywordContentProposal(createProposalToWrap(KeywordType.LIBRARY), ""));
 
         assertThat(image).isSameAs(ImagesManager.getImage(RedImages.getKeywordImage()));
     }
@@ -35,7 +37,7 @@ public class KeywordProposalsLabelProviderTest {
     public void userKeywordImageIsReturnedForUserDefinedKeyword() {
         final KeywordProposalsLabelProvider labelProvider = new KeywordProposalsLabelProvider();
         final Image image = labelProvider
-                .getImage(new KeywordContentProposal(createProposalToWrap(KeywordType.USER_DEFINED)));
+                .getImage(new KeywordContentProposal(createProposalToWrap(KeywordType.USER_DEFINED), ""));
 
         assertThat(image).isSameAs(ImagesManager.getImage(RedImages.getUserKeywordImage()));
     }
@@ -44,7 +46,7 @@ public class KeywordProposalsLabelProviderTest {
     public void labelIsTheNameDecoratedWithDecoration() {
         final KeywordProposalsLabelProvider labelProvider = new KeywordProposalsLabelProvider();
         final String label = labelProvider
-                .getText(new KeywordContentProposal(createProposalToWrap(KeywordType.USER_DEFINED)));
+                .getText(new KeywordContentProposal(createProposalToWrap(KeywordType.USER_DEFINED), ""));
         assertThat(label).isEqualTo("&name decoration");
     }
 
@@ -52,7 +54,7 @@ public class KeywordProposalsLabelProviderTest {
     public void styledLabelIsTheNameDecoratedWithDecoration_usingEclipseDecorationStyler() {
         final KeywordProposalsLabelProvider labelProvider = new KeywordProposalsLabelProvider();
         final StyledString label = labelProvider
-                .getStyledText(new KeywordContentProposal(createProposalToWrap(KeywordType.USER_DEFINED)));
+                .getStyledText(new KeywordContentProposal(createProposalToWrap(KeywordType.USER_DEFINED), ""));
 
         assertThat(label.getString()).isEqualTo("&name decoration");
         assertThat(label.getStyleRanges()).hasSize(1);
@@ -60,6 +62,29 @@ public class KeywordProposalsLabelProviderTest {
                 .isEqualTo(RedTheme.getEclipseDecorationColor().getRGB());
         assertThat(label.getStyleRanges()[0].start).isEqualTo(5);
         assertThat(label.getStyleRanges()[0].length).isEqualTo(11);
+    }
+
+    @Test
+    public void styledLabelHasMatchingPrefixDecoratedWithBackground() {
+        final KeywordProposalsLabelProvider labelProvider = new KeywordProposalsLabelProvider();
+        final StyledString label = labelProvider
+                .getStyledText(new KeywordContentProposal(createProposalToWrap(KeywordType.USER_DEFINED), "$NAM"));
+
+        final TextStyle expectedStyle = new TextStyle();
+        Stylers.Common.MARKED_PREFIX_STYLER.applyStyles(expectedStyle);
+
+        assertThat(label.getString()).isEqualTo("&name decoration");
+        assertThat(label.getStyleRanges()).hasSize(2);
+        assertThat(label.getStyleRanges()[0].background.getRGB()).isEqualTo(expectedStyle.background.getRGB());
+        assertThat(label.getStyleRanges()[0].foreground.getRGB()).isEqualTo(expectedStyle.foreground.getRGB());
+        assertThat(label.getStyleRanges()[0].borderColor.getRGB()).isEqualTo(expectedStyle.borderColor.getRGB());
+        assertThat(label.getStyleRanges()[0].borderStyle).isEqualTo(expectedStyle.borderStyle);
+        assertThat(label.getStyleRanges()[0].start).isEqualTo(0);
+        assertThat(label.getStyleRanges()[0].length).isEqualTo(4);
+        assertThat(label.getStyleRanges()[1].foreground.getRGB())
+                .isEqualTo(RedTheme.getEclipseDecorationColor().getRGB());
+        assertThat(label.getStyleRanges()[1].start).isEqualTo(5);
+        assertThat(label.getStyleRanges()[1].length).isEqualTo(11);
     }
 
     private RedKeywordProposal createProposalToWrap(final KeywordType kwType) {
