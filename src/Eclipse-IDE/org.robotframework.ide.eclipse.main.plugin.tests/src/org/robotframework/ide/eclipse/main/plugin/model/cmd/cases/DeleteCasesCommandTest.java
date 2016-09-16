@@ -7,7 +7,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.childrens;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.children;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.name;
 
 import java.util.List;
@@ -61,10 +61,10 @@ public class DeleteCasesCommandTest {
         assertThat(section.getChildren()).hasSize(2);
         assertThat(section.getChildren().get(0)).has(RobotCaseConditions.properlySetParent())
                 .has(name("case 1"))
-                .has(childrens());
+                .has(children());
         assertThat(section.getChildren().get(1)).has(RobotCaseConditions.properlySetParent())
                 .has(name("case 3"))
-                .has(childrens());
+                .has(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
@@ -73,7 +73,7 @@ public class DeleteCasesCommandTest {
         assertThat(section.getChildren()).hasSize(3);
         assertThat(section.getChildren().get(1)).has(RobotCaseConditions.properlySetParent())
                 .has(name("case 2"))
-                .has(childrens());
+                .has(children());
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
         verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED),
@@ -96,7 +96,7 @@ public class DeleteCasesCommandTest {
         assertThat(section.getChildren()).hasSize(1);
         assertThat(section.getChildren().get(0)).has(RobotCaseConditions.properlySetParent())
                 .has(name("case 2"))
-                .has(childrens());
+                .has(children());
 
         for (final EditorCommand undo : command.getUndoCommands()) {
             undo.execute();
@@ -105,13 +105,13 @@ public class DeleteCasesCommandTest {
         assertThat(section.getChildren()).hasSize(3);
         assertThat(section.getChildren().get(0)).has(RobotCaseConditions.properlySetParent())
                 .has(name("case 1"))
-                .has(childrens());
+                .has(children());
         assertThat(section.getChildren().get(1)).has(RobotCaseConditions.properlySetParent())
                 .has(name("case 2"))
-                .has(childrens());
+                .has(children());
         assertThat(section.getChildren().get(2)).has(RobotCaseConditions.properlySetParent())
                 .has(name("case 3"))
-                .has(childrens());
+                .has(children());
 
         verify(eventBroker).send(RobotModelEvents.ROBOT_CASE_REMOVED, section);
         verify(eventBroker).send(eq(RobotModelEvents.ROBOT_CASE_ADDED), eq(ImmutableMap
