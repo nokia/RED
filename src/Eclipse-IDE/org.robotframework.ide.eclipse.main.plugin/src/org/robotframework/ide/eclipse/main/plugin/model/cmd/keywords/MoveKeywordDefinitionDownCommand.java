@@ -41,7 +41,7 @@ public class MoveKeywordDefinitionDownCommand extends EditorCommand {
             ((KeywordTable)linkedElement).moveDownKeyword(keywordDef.getLinkedElement());
         }
 
-        eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_MOVED, section);
+        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_MOVED, section);
     }
 
     @Override
