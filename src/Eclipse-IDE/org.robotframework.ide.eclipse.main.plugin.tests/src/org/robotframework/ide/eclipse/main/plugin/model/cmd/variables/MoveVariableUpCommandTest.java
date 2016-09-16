@@ -5,21 +5,23 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.variables;
 
+import static com.google.common.collect.Iterables.transform;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.toNames;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.table.VariableTable;
-import org.robotframework.ide.eclipse.main.plugin.mockeclipse.ContextInjector;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.MoveVariableUpCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveVariableUpCommandTest {
 
@@ -30,20 +32,18 @@ public class MoveVariableUpCommandTest {
         final RobotVariablesSection varSection = createVariables();
         final RobotVariable variableToMove = varSection.getChildren().get(0);
 
-        ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new MoveVariableUpCommand(variableToMove))
-                .execute();
+        final MoveVariableUpCommand command = new MoveVariableUpCommand(variableToMove);
+        command.setEventBroker(eventBroker);
 
-        assertThat(varSection.getChildren()).hasSize(5);
-        assertThat(varSection.getChildren().indexOf(variableToMove)).isEqualTo(0);
+        command.execute();
+        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "list",
+                "dict", "invalid}");
 
-        final VariableTable varTable = varSection.getLinkedElement();
-        assertThat(varTable.getVariables().get(0).getName()).isEqualTo("scalar");
-        assertThat(varTable.getVariables().get(1).getName()).isEqualTo("scalar_as_list");
-        assertThat(varTable.getVariables().get(2).getName()).isEqualTo("list");
-        assertThat(varTable.getVariables().get(3).getName()).isEqualTo("dict");
-        assertThat(varTable.getVariables().get(4).getName()).isEqualTo("invalid}");
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "list",
+                "dict", "invalid}");
 
         verifyZeroInteractions(eventBroker);
     }
@@ -55,22 +55,21 @@ public class MoveVariableUpCommandTest {
         final RobotVariablesSection varSection = createVariables();
         final RobotVariable variableToMove = varSection.getChildren().get(varSection.getChildren().size() - 1);
 
-        ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new MoveVariableUpCommand(variableToMove))
-                .execute();
+        final MoveVariableUpCommand command = new MoveVariableUpCommand(variableToMove);
+        command.setEventBroker(eventBroker);
 
-        assertThat(varSection.getChildren()).hasSize(5);
-        assertThat(varSection.getChildren().indexOf(variableToMove)).isEqualTo(3);
+        command.execute();
+        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "list",
+                "invalid}", "dict");
 
-        final VariableTable varTable = varSection.getLinkedElement();
-        assertThat(varTable.getVariables().get(0).getName()).isEqualTo("scalar");
-        assertThat(varTable.getVariables().get(1).getName()).isEqualTo("scalar_as_list");
-        assertThat(varTable.getVariables().get(2).getName()).isEqualTo("list");
-        assertThat(varTable.getVariables().get(3).getName()).isEqualTo("invalid}");
-        assertThat(varTable.getVariables().get(4).getName()).isEqualTo("dict");
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "list",
+                "dict", "invalid}");
 
-        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_MOVED, varSection);
+        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_VARIABLE_MOVED, varSection);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     @Test
@@ -80,22 +79,21 @@ public class MoveVariableUpCommandTest {
         final RobotVariablesSection varSection = createVariables();
         final RobotVariable variableToMove = varSection.getChildren().get(2);
 
-        ContextInjector.prepareContext()
-                .inWhich(eventBroker)
-                .isInjectedInto(new MoveVariableUpCommand(variableToMove))
-                .execute();
+        final MoveVariableUpCommand command = new MoveVariableUpCommand(variableToMove);
+        command.setEventBroker(eventBroker);
 
-        assertThat(varSection.getChildren()).hasSize(5);
-        assertThat(varSection.getChildren().indexOf(variableToMove)).isEqualTo(1);
+        command.execute();
+        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "list", "scalar_as_list",
+                "dict", "invalid}");
 
-        final VariableTable varTable = varSection.getLinkedElement();
-        assertThat(varTable.getVariables().get(0).getName()).isEqualTo("scalar");
-        assertThat(varTable.getVariables().get(1).getName()).isEqualTo("list");
-        assertThat(varTable.getVariables().get(2).getName()).isEqualTo("scalar_as_list");
-        assertThat(varTable.getVariables().get(3).getName()).isEqualTo("dict");
-        assertThat(varTable.getVariables().get(4).getName()).isEqualTo("invalid}");
+        for (final EditorCommand undo : command.getUndoCommands()) {
+            undo.execute();
+        }
+        assertThat(transform(varSection.getChildren(), toNames())).containsExactly("scalar", "scalar_as_list", "list",
+                "dict", "invalid}");
 
-        verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_MOVED, varSection);
+        verify(eventBroker, times(2)).send(RobotModelEvents.ROBOT_VARIABLE_MOVED, varSection);
+        verifyNoMoreInteractions(eventBroker);
     }
 
     private static RobotVariablesSection createVariables() {
