@@ -20,7 +20,7 @@ public class KeywordContentProposalTest {
 
     @Test
     public void checkPropertiesExposedByContentProposalBean() {
-        final KeywordContentProposal proposal = new KeywordContentProposal(createProposalToWrap());
+        final KeywordContentProposal proposal = new KeywordContentProposal(createProposalToWrap(), "&na");
         
         assertThat(proposal.getContent()).isEqualTo("&name");
         assertThat(proposal.getCursorPosition()).isEqualTo(5);
@@ -28,7 +28,7 @@ public class KeywordContentProposalTest {
         assertThat(proposal.getImage()).isEqualTo(RedImages.getKeywordImage());
         assertThat(proposal.getLabelDecoration()).isEqualTo("decoration");
         assertThat(proposal.hasDescription()).isTrue();
-        assertThat(proposal.getMatchingPrefix()).isEmpty();
+        assertThat(proposal.getMatchingPrefix()).isEqualTo("&na");
         final String description = proposal.getDescription();
 
         assertThat(description).contains("&amp;name", "&lt;source&gt;", "arg&lt;&gt;");
