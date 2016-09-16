@@ -305,6 +305,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                     + RobotCasesSection.SECTION_NAME.replaceAll(" ", "_");
             eventBroker.send(topic, new FilterSwitchRequest(RobotCasesSection.SECTION_NAME.replaceAll(" ", "_"), ""));
         }
+        CellEditorCloser.closeForcibly(table);
         selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
         setFocus();
     }

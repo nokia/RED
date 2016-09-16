@@ -312,6 +312,7 @@ public class MetadataSettingsFormFragment implements ISectionFormFragment, ISett
                     + RobotSettingsSection.SECTION_NAME;
             eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
         }
+        CellEditorCloser.closeForcibly(table);
         selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
         setFocus();
     }
