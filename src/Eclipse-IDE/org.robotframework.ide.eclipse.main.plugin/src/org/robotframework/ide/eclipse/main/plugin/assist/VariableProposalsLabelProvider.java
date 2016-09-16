@@ -26,12 +26,8 @@ class VariableProposalsLabelProvider extends RedCommonLabelProvider {
     @Override
     public StyledString getStyledText(final Object element) {
         final VariableContentProposal proposal = (VariableContentProposal) element;
-        if (!proposal.getMatchingPrefix().isEmpty()) {
-            final StyledString label = new StyledString(proposal.getMatchingPrefix(),
-                    Stylers.Common.MARKED_PREFIX_STYLER);
-            label.append(proposal.getLabel().substring(proposal.getMatchingPrefix().length()));
-            return label;
-        }
-        return new StyledString(proposal.getLabel());
+        final StyledString label = new StyledString(proposal.getLabel());
+        label.setStyle(0, proposal.getMatchingPrefix().length(), Stylers.Common.MARKED_PREFIX_STYLER);
+        return label;
     }
 }
