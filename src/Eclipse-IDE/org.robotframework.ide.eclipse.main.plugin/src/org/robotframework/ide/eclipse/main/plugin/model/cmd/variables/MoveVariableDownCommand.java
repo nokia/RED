@@ -12,11 +12,13 @@ import org.rf.ide.core.testdata.model.table.VariableTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveVariableDownCommand extends EditorCommand {
 
     private final RobotVariable variable;
+    private boolean wasMoved = true;
 
     public MoveVariableDownCommand(final RobotVariable variable) {
         this.variable = variable;
@@ -29,6 +31,7 @@ public class MoveVariableDownCommand extends EditorCommand {
 
         final List<RobotVariable> children = variablesSection.getChildren();
         if (index == children.size() - 1) {
+            wasMoved = false;
             return;
         }
         Collections.swap(children, index, index + 1);
@@ -41,6 +44,6 @@ public class MoveVariableDownCommand extends EditorCommand {
     
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new MoveVariableUpCommand(variable));
+        return newUndoCommands(wasMoved ? new MoveVariableUpCommand(variable) : new EmptyCommand());
     }
 }
