@@ -13,7 +13,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.childrens;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.children;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.name;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -161,7 +161,7 @@ public class InsertKeywordDefinitionsCommandTest {
     private static void assertKeyword(final RobotKeywordDefinition keyword, final String expectedName) {
         assertThat(keyword).has(RobotKeywordDefinitionConditions.properlySetParent())
                 .has(name(expectedName))
-                .has(childrens());
+                .has(children());
     }
 
     private static RobotKeywordsSection createKeywordsSection() {
