@@ -39,8 +39,7 @@ public class CreateFreshKeywordDefinitionCommand extends EditorCommand {
         newKeywordDefinition = keywordsSection.createKeywordDefinition(index, name);
 
         RedEventBroker.using(eventBroker)
-                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA)
-                .to(newKeywordDefinition)
+                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newKeywordDefinition)
                 .send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_ADDED, keywordsSection);
     }
 
