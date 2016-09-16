@@ -2,6 +2,7 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.Iterables.all;
+import static org.assertj.core.api.Assertions.not;
 
 import java.util.List;
 
@@ -68,7 +69,7 @@ public class ModelConditions {
         };
     }
 
-    public static Condition<RobotElement> childrens() {
+    public static Condition<RobotElement> children() {
         return new Condition<RobotElement>("non empty children list") {
 
             @Override
@@ -76,5 +77,10 @@ public class ModelConditions {
                 return !element.getChildren().isEmpty();
             }
         };
+    }
+
+    public static Condition<RobotElement> noChildren() {
+        return not(children());
+
     }
 }
