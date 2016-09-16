@@ -310,6 +310,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                     + RobotSettingsSection.SECTION_NAME;
             eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
         }
+        CellEditorCloser.closeForcibly(table);
         selectionProvider.setSelection(new StructuredSelection(new Object[] { setting }));
         setFocus();
     }

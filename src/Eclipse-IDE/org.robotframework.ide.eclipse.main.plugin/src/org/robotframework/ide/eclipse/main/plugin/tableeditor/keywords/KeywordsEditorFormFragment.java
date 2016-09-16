@@ -307,6 +307,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                     + RobotKeywordsSection.SECTION_NAME;
             eventBroker.send(topic, new FilterSwitchRequest(RobotKeywordsSection.SECTION_NAME, ""));
         }
+        CellEditorCloser.closeForcibly(table);
         selectionProvider.setSelection(new StructuredSelection(new Object[] { element }));
         setFocus();
     }

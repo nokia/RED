@@ -644,6 +644,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                         + RobotSettingsSection.SECTION_NAME;
                 eventBroker.send(topic, new FilterSwitchRequest(RobotSettingsSection.SECTION_NAME, ""));
             }
+            CellEditorCloser.closeForcibly(table.get());
             selectionProvider.setSelection(new StructuredSelection(new Object[] { entry }));
             setFocus();
         }
