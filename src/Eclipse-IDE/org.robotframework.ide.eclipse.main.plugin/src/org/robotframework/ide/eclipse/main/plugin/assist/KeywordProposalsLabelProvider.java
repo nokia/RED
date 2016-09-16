@@ -28,6 +28,7 @@ class KeywordProposalsLabelProvider extends RedCommonLabelProvider {
         final KeywordContentProposal proposal = (KeywordContentProposal) element;
         final StyledString label = new StyledString(proposal.getLabel());
         label.append(" " + proposal.getLabelDecoration(), Stylers.Common.ECLIPSE_DECORATION_STYLER);
+        label.setStyle(0, proposal.getMatchingPrefix().length(), Stylers.Common.MARKED_PREFIX_STYLER);
         return label;
     }
 }
