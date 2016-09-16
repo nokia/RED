@@ -7,6 +7,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -25,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFileSection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 @RunWith(Theories.class)
 public class DeleteKeywordCallCommandTest {
@@ -143,6 +145,77 @@ public class DeleteKeywordCallCommandTest {
 
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder1);
         verify(eventBroker, times(1)).send(RobotModelEvents.ROBOT_KEYWORD_CALL_REMOVED, codeHolder2);
+    }
+    
+    @Theory
+    public void rowsAreProperlyRemovedAndReturnedToPreviousState_whenRemovingFromDifferentCases(
+            final RobotSuiteFileSection section) {
+        final RobotCodeHoldingElement<?> codeHolder1 = (RobotCodeHoldingElement<?>) section.getChildren().get(0);
+        final RobotCodeHoldingElement<?> codeHolder2 = (RobotCodeHoldingElement<?>) section.getChildren().get(1);
+
+        final List<RobotKeywordCall> callsToRemove = newArrayList(codeHolder1.getChildren().get(1),
+                codeHolder1.getChildren().get(3), codeHolder2.getChildren().get(0), codeHolder2.getChildren().get(2));
+
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+        final DeleteKeywordCallCommand command = ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new DeleteKeywordCallCommand(callsToRemove));
+        command.execute();
+
+        assertThat(codeHolder1.getChildren().size()).isEqualTo(3);
+        assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
+        assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Teardown");
+        assertThat(codeHolder1.getChildren().get(2).getName()).isEqualTo("Log");
+        assertThat(codeHolder2.getChildren().size()).isEqualTo(2);
+        assertThat(codeHolder2.getChildren().get(0).getName()).isEqualTo("Timeout");
+        assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Log");
+
+        List<EditorCommand> undoCommands = command.getUndoCommands();
+        for (EditorCommand undoCommand : undoCommands) {
+            undoCommand.execute();
+        }
+
+        assertThat(codeHolder1.getChildren().size()).isEqualTo(5);
+        assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
+        assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Tags");
+        assertThat(codeHolder1.getChildren().get(2).getName()).isEqualTo("Teardown");
+        assertThat(codeHolder1.getChildren().get(3).getName()).isEqualTo("Log");
+        assertThat(codeHolder2.getChildren().size()).isEqualTo(4);
+        assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Timeout");
+        assertThat(codeHolder2.getChildren().get(3).getName()).isEqualTo("Log");
+
+        List<EditorCommand> redoCommands = new ArrayList<>();
+        for (EditorCommand undoCommand : undoCommands) {
+            redoCommands.addAll(0, undoCommand.getUndoCommands());
+        }
+        for (EditorCommand redoCommand : redoCommands) {
+            redoCommand.execute();
+        }
+
+        assertThat(codeHolder1.getChildren().size()).isEqualTo(3);
+        assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
+        assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Teardown");
+        assertThat(codeHolder1.getChildren().get(2).getName()).isEqualTo("Log");
+        assertThat(codeHolder2.getChildren().size()).isEqualTo(2);
+        assertThat(codeHolder2.getChildren().get(0).getName()).isEqualTo("Timeout");
+        assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Log");
+        
+        undoCommands = new ArrayList<>();
+        for (EditorCommand redoCommand : redoCommands) {
+            undoCommands.addAll(0, redoCommand.getUndoCommands());
+        }
+        for (EditorCommand undoCommand : undoCommands) {
+            undoCommand.execute();
+        }
+        
+        assertThat(codeHolder1.getChildren().size()).isEqualTo(5);
+        assertThat(codeHolder1.getChildren().get(0).getName()).isEqualTo("Documentation");
+        assertThat(codeHolder1.getChildren().get(1).getName()).isEqualTo("Tags");
+        assertThat(codeHolder1.getChildren().get(2).getName()).isEqualTo("Teardown");
+        assertThat(codeHolder1.getChildren().get(3).getName()).isEqualTo("Log");
+        assertThat(codeHolder2.getChildren().size()).isEqualTo(4);
+        assertThat(codeHolder2.getChildren().get(1).getName()).isEqualTo("Timeout");
+        assertThat(codeHolder2.getChildren().get(3).getName()).isEqualTo("Log");
     }
 
     private static RobotSuiteFile createModel() {
