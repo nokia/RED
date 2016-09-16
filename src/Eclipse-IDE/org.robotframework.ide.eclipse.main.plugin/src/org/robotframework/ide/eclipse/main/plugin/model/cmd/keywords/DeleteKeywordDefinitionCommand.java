@@ -18,40 +18,33 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class DeleteKeywordDefinitionCommand extends EditorCommand {
 
-    private final List<RobotKeywordDefinition> definitionsToDelete;
+    private final List<RobotKeywordDefinition> keywordsToDelete;
     
-    private final List<Integer> deletedDefinitionsIndexes = newArrayList();
+    private final List<Integer> deletedKeywordsIndexes = newArrayList();
 
-    public DeleteKeywordDefinitionCommand(final List<RobotKeywordDefinition> definitionsToDelete) {
-        this.definitionsToDelete = definitionsToDelete;
+    public DeleteKeywordDefinitionCommand(final List<RobotKeywordDefinition> keywordsToDelete) {
+        this.keywordsToDelete = keywordsToDelete;
     }
 
     @Override
     public void execute() throws CommandExecutionException {
-        if (definitionsToDelete.isEmpty()) {
+        if (keywordsToDelete.isEmpty()) {
             return;
         }
-        deletedDefinitionsIndexes.clear();
-        for (final RobotKeywordDefinition def : definitionsToDelete) {
-            deletedDefinitionsIndexes.add(def.getIndex());
+        deletedKeywordsIndexes.clear();
+        for (final RobotKeywordDefinition def : keywordsToDelete) {
+            deletedKeywordsIndexes.add(def.getIndex());
         }
        
-        final RobotSuiteFileSection keywordsSection = definitionsToDelete.get(0).getParent();
-        keywordsSection.getChildren().removeAll(definitionsToDelete);
+        final RobotSuiteFileSection keywordsSection = keywordsToDelete.get(0).getParent();
+        keywordsSection.getChildren().removeAll(keywordsToDelete);
         
-        removeModelElements(keywordsSection);
+        final KeywordTable keywordsTable = (KeywordTable) keywordsSection.getLinkedElement();
+        for (final RobotKeywordDefinition keywordToDelete : keywordsToDelete) {
+            keywordsTable.removeKeyword(keywordToDelete.getLinkedElement());
+        }
 
         eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_REMOVED, keywordsSection);
-    }
-
-    private void removeModelElements(final RobotSuiteFileSection keywordsSection) {
-        final ARobotSectionTable table = keywordsSection.getLinkedElement();
-        if(table != null && table instanceof KeywordTable) {
-            final KeywordTable keywordsTable = (KeywordTable) table;
-            for (final RobotKeywordDefinition robotKeywordDefinition : definitionsToDelete) {
-                keywordsTable.removeKeyword(robotKeywordDefinition.getLinkedElement());
-            }
-        }
     }
 
     @Override
@@ -61,10 +54,10 @@ public class DeleteKeywordDefinitionCommand extends EditorCommand {
 
     private List<EditorCommand> setupUndoCommandsForDeletedDefinitions() {
         final List<EditorCommand> commands = newArrayList();
-        if (definitionsToDelete.size() == deletedDefinitionsIndexes.size()) {
-            for (int i = 0; i < definitionsToDelete.size(); i++) {
-                final RobotKeywordDefinition def = definitionsToDelete.get(i);
-                commands.add(new InsertKeywordDefinitionsCommand(def.getParent(), deletedDefinitionsIndexes.get(i),
+        if (keywordsToDelete.size() == deletedKeywordsIndexes.size()) {
+            for (int i = 0; i < keywordsToDelete.size(); i++) {
+                final RobotKeywordDefinition def = keywordsToDelete.get(i);
+                commands.add(new InsertKeywordDefinitionsCommand(def.getParent(), deletedKeywordsIndexes.get(i),
                         new RobotKeywordDefinition[] { def }));
             }
         }
