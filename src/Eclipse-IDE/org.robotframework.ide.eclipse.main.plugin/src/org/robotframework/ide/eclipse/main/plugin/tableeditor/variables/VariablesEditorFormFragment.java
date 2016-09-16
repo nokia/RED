@@ -260,6 +260,7 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
                     + RobotVariablesSection.SECTION_NAME;
             eventBroker.send(topic, new FilterSwitchRequest(RobotVariablesSection.SECTION_NAME, ""));
         }
+        CellEditorCloser.closeForcibly(table);
         selectionProvider.setSelection(new StructuredSelection(new Object[] { robotVariable }));
     }
 
