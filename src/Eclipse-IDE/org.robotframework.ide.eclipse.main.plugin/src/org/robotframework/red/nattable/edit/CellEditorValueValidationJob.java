@@ -14,7 +14,6 @@ import org.robotframework.red.nattable.edit.CellEditorValueValidator.CellEditorV
 
 /**
  * @author Michal Anglart
- *
  */
 class CellEditorValueValidationJob<V> extends Job {
 
