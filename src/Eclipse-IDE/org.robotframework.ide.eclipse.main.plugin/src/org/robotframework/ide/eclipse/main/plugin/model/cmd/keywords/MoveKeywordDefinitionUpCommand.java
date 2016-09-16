@@ -40,7 +40,7 @@ public class MoveKeywordDefinitionUpCommand extends EditorCommand {
             ((KeywordTable)linkedElement).moveUpKeyword(keywordDef.getLinkedElement());
         }
 
-        eventBroker.post(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_MOVED, section);
+        eventBroker.send(RobotModelEvents.ROBOT_KEYWORD_DEFINITION_MOVED, section);
     }
 
     @Override
