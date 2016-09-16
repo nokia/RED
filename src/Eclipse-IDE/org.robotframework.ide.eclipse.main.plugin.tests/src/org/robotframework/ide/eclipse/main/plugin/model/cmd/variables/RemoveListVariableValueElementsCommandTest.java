@@ -10,6 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.RemoveListVariableValueElementsCommand;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand.CommandExecutionException;
 
 public class RemoveListVariableValueElementsCommandTest {
@@ -117,6 +119,49 @@ public class RemoveListVariableValueElementsCommandTest {
 
         assertThat(variable.getValue()).isEqualTo("[1]");
         verify(eventBroker).send(RobotModelEvents.ROBOT_VARIABLE_VALUE_CHANGE, variable);
+    }
+    
+    @Test
+    public void elementIsRemovedFromListAndReturnsToPreviousState() {
+        final RobotVariable variable = createVariables().get(2);
+
+        final Collection<RobotToken> elementsToRemove = newArrayList(
+                ((ListVariable) variable.getLinkedElement()).getItems().subList(0, 2));
+
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+        final RemoveListVariableValueElementsCommand command = ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new RemoveListVariableValueElementsCommand(variable, elementsToRemove));
+        command.execute();
+
+        assertThat(variable.getValue()).isEqualTo("[3]");
+
+        List<EditorCommand> undoCommands = command.getUndoCommands();
+        for (EditorCommand undoCommand : undoCommands) {
+            undoCommand.execute();
+        }
+        
+        assertThat(variable.getValue()).isEqualTo("[1, 2, 3]");
+        
+        final List<EditorCommand> redoCommands = new ArrayList<>();
+        for (EditorCommand undoCommand : undoCommands) {
+            redoCommands.addAll(0, undoCommand.getUndoCommands());
+        }
+        for (EditorCommand redoCommand : redoCommands) {
+            redoCommand.execute();
+        }
+        
+        assertThat(variable.getValue()).isEqualTo("[3]");
+        
+        undoCommands = new ArrayList<>();
+        for (EditorCommand redoCommand : redoCommands) {
+            undoCommands.addAll(0, redoCommand.getUndoCommands());
+        }
+        for (EditorCommand undoCommand : undoCommands) {
+            undoCommand.execute();
+        }
+        
+        assertThat(variable.getValue()).isEqualTo("[1, 2, 3]");
     }
 
     private static List<RobotVariable> createVariables() {

@@ -14,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -577,6 +578,69 @@ public class SetKeywordCallNameCommandTest {
                         RobotModelEvents.ADDITIONAL_DATA, callAfterUndo)));
 
         verifyNoMoreInteractions(eventBroker);
+    }
+    
+    @Theory
+    public void callChangesNameProperlyToSettingAndThenReturnsToPreviousState(
+            final RobotCodeHoldingElement<?> executablesHolder) {
+        // only perform this test for keyword/case without special purpose
+        assumeTrue(!executablesHolder.getName().contains("_"));
+
+        final IEventBroker eventBroker = mock(IEventBroker.class);
+
+        final int callIndex = 1;
+        final int callIndexAfterCommand = 1;
+
+        final RobotKeywordCall call = executablesHolder.getChildren().get(callIndex);
+        assertThat(call.getName()).isEqualTo("call_to_setting");
+
+        final SetKeywordCallNameCommand command = ContextInjector.prepareContext()
+                .inWhich(eventBroker)
+                .isInjectedInto(new SetKeywordCallNameCommand(call, "[Tags]"));
+        command.execute();
+        
+        final RobotKeywordCall callAfterNameChange = executablesHolder.getChildren().get(callIndexAfterCommand);
+        assertThat(constructRow(callAfterNameChange)).containsExactly("Tags", "[setup]", "arg1", "arg2", "# comment");
+        assertThat(callAfterNameChange.getLinkedElement().getModelType())
+                .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
+        
+        List<EditorCommand> undoCommands = command.getUndoCommands();
+        for (EditorCommand undoCommand : undoCommands) {
+            undoCommand.execute();
+        }
+        
+        RobotKeywordCall callAfterUndo = executablesHolder.getChildren().get(callIndex);
+        assertThat(constructRow(callAfterUndo)).containsExactly("call_to_setting", "[setup]", "arg1", "arg2",
+                "# comment");
+        assertThat(callAfterUndo.getLinkedElement().getModelType())
+                .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
+
+        List<EditorCommand> redoCommands = new ArrayList<>();
+        for (EditorCommand undoCommand : undoCommands) {
+            redoCommands.addAll(0, undoCommand.getUndoCommands());
+        }
+        for (EditorCommand redoCommand : redoCommands) {
+            redoCommand.execute();
+        }
+        
+        final RobotKeywordCall callAfterRedo = executablesHolder.getChildren().get(callIndexAfterCommand);
+        assertThat(constructRow(callAfterRedo)).containsExactly("Tags", "[setup]", "arg1", "arg2", "# comment");
+        assertThat(callAfterRedo.getLinkedElement().getModelType())
+                .isEqualTo(modelTypes.get(CommonModelTypes.TAGS, executablesHolder.getClass()));
+        
+        undoCommands = new ArrayList<>();
+        for (EditorCommand redoCommand : redoCommands) {
+            undoCommands.addAll(0, redoCommand.getUndoCommands());
+        }
+        for (EditorCommand undoCommand : undoCommands) {
+            undoCommand.execute();
+        }
+        
+        callAfterUndo = executablesHolder.getChildren().get(callIndex);
+        assertThat(constructRow(callAfterUndo)).containsExactly("call_to_setting", "[setup]", "arg1", "arg2",
+                "# comment");
+        assertThat(callAfterUndo.getLinkedElement().getModelType())
+                .isEqualTo(modelTypes.get(CommonModelTypes.EXECUTABLE_ROW, executablesHolder.getClass()));
     }
 
     private List<String> actionNames(final RobotCodeHoldingElement<?> executablesHolder) {
