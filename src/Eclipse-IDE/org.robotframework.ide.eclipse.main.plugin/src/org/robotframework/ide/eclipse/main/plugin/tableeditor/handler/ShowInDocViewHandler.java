@@ -19,6 +19,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.documentation.DocumentationViewPartListener;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
@@ -123,7 +124,7 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                                     page.showView(DocumentationView.ID);
                                     page.activate(page.getActiveEditor()); // activate current RobotFormEditor to reset DocViewPartListener instance, partActivated method will be invoked 
                                 } catch (final PartInitException e) {
-                                    e.printStackTrace();
+                                    RedPlugin.logError("Unable to show Documentation View.", e);
                                 }
                             }
                         }
