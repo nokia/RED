@@ -44,51 +44,7 @@ public class CellEditorValueValidationJobScheduler<V> {
             validationJob.cancel();
         }
         validationJob = new CellEditorValueValidationJob<>(validator, value);
-        validationJob.addJobChangeListener(new JobChangeAdapter() {
-
-            @Override
-            public void done(final IJobChangeEvent event) {
-                if (event.getJob().getResult() == null) {
-                    return;
-                }
-                isClosingLocked = (Boolean) event.getJob()
-                        .getProperty(CellEditorValueValidationJob.getLockPropertyName());
-                final String errorMsg = (String) event.getJob()
-                        .getProperty(CellEditorValueValidationJob.getErrorMessagePropertyName());
-
-                SwtThread.syncExec(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        if (decoration != null) {
-                            decoration.hide();
-                            decoration.dispose();
-                        }
-                    }
-                });
-                decoration = SwtThread.syncEval(new Evaluation<ControlDecoration>() {
-
-                    @Override
-                    public ControlDecoration runCalculation() {
-                        if (control == null || control.isDisposed()) {
-                            return null;
-                        }
-                        if (errorMsg == null) {
-                            control.setForeground(control.getParent().getForeground());
-                            return null;
-                        }
-                        control.setForeground(ColorsManager.getColor(255, 0, 0));
-                        final ControlDecoration dec = new ControlDecoration(control, SWT.LEFT | SWT.TOP);
-                        dec.setDescriptionText(errorMsg);
-                        dec.setImage(FieldDecorationRegistry.getDefault()
-                                .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
-                                .getImage());
-                        return dec;
-                    }
-                });
-
-            }
-        });
+        validationJob.addJobChangeListener(new CellEditorValueValidationListener<>(control));
         validationJob.schedule(300);
     }
 
@@ -125,5 +81,65 @@ public class CellEditorValueValidationJobScheduler<V> {
     @VisibleForTesting
     public CellEditorValueValidator<V> getValidator() {
         return this.validator;
+    }
+
+    @VisibleForTesting
+    class CellEditorValueValidationListener<P> extends JobChangeAdapter {
+
+        private final Control control;
+
+        public CellEditorValueValidationListener(final Control control) {
+            this.control = control;
+        }
+
+        @Override
+        public void done(final IJobChangeEvent event) {
+            if (event.getJob().getResult() == null) {
+                return;
+            }
+            Object prop = event.getJob().getProperty(CellEditorValueValidationJob.getLockPropertyName());
+            if (prop instanceof Boolean) {
+                isClosingLocked = (Boolean) prop;
+            }
+            final String errorMsg = (String) event.getJob()
+                    .getProperty(CellEditorValueValidationJob.getErrorMessagePropertyName());
+
+            SwtThread.syncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    if (decoration != null) {
+                        decoration.hide();
+                        decoration.dispose();
+                    }
+                }
+            });
+            decoration = SwtThread.syncEval(new Evaluation<ControlDecoration>() {
+
+                @Override
+                public ControlDecoration runCalculation() {
+                    if (control == null || control.isDisposed()) {
+                        return null;
+                    }
+                    if (errorMsg == null) {
+                        control.setForeground(control.getParent().getForeground());
+                        return null;
+                    }
+                    control.setForeground(ColorsManager.getColor(255, 0, 0));
+                    final ControlDecoration dec = new ControlDecoration(control, SWT.LEFT | SWT.TOP);
+                    dec.setDescriptionText(errorMsg);
+                    dec.setImage(FieldDecorationRegistry.getDefault()
+                            .getFieldDecoration(FieldDecorationRegistry.DEC_ERROR)
+                            .getImage());
+                    return dec;
+                }
+            });
+
+        }
+    }
+
+    @VisibleForTesting
+    ControlDecoration getDecoration() {
+        return this.decoration;
     }
 }
