@@ -60,7 +60,7 @@ public class VariableProposalsLabelProviderTest {
     public void styledLabelHasPrefixHighlighted_whenThereIsAMatchingPrefix() {
         final VariableProposalsLabelProvider labelProvider = new VariableProposalsLabelProvider();
         final StyledString label = labelProvider
-                .getStyledText(new VariableContentProposal(createProposalToWrap(VariableType.SCALAR), "${n"));
+                .getStyledText(new VariableContentProposal(createProposalToWrap(VariableType.SCALAR), "${N"));
 
         final TextStyle expectedStyle = new TextStyle();
         Stylers.Common.MARKED_PREFIX_STYLER.applyStyles(expectedStyle);
