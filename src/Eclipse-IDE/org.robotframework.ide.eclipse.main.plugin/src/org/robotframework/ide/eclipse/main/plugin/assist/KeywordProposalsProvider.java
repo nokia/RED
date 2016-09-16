@@ -30,7 +30,7 @@ class KeywordProposalsProvider implements IContentProposalProvider {
 
         final List<KeywordContentProposal> proposals = newArrayList();
         for (final RedKeywordProposal proposedKeyword : keywordsEntities) {
-            proposals.add(new KeywordContentProposal(proposedKeyword));
+            proposals.add(new KeywordContentProposal(proposedKeyword, prefix));
         }
         return proposals.toArray(new IContentProposal[0]);
     }
