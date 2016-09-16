@@ -13,11 +13,13 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
 public class MoveKeywordDefinitionDownCommand extends EditorCommand {
 
     private final RobotKeywordDefinition keywordDef;
+    private boolean wasMoved = true;
 
     public MoveKeywordDefinitionDownCommand(final RobotKeywordDefinition keywordDef) {
         this.keywordDef = keywordDef;
@@ -29,6 +31,7 @@ public class MoveKeywordDefinitionDownCommand extends EditorCommand {
         final int size = section.getChildren().size();
         final int index = section.getChildren().indexOf(keywordDef);
         if (index == size - 1) {
+            wasMoved = false;
             return;
         }
         Collections.swap(section.getChildren(), index, index + 1);
@@ -43,6 +46,6 @@ public class MoveKeywordDefinitionDownCommand extends EditorCommand {
 
     @Override
     public List<EditorCommand> getUndoCommands() {
-        return newUndoCommands(new MoveKeywordDefinitionUpCommand(keywordDef));
+        return newUndoCommands(wasMoved ? new MoveKeywordDefinitionUpCommand(keywordDef) : new EmptyCommand());
     }
 }
