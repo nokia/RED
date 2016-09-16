@@ -15,9 +15,11 @@ import com.google.common.xml.XmlEscapers;
 class KeywordContentProposal implements IRedContentProposal {
 
     private final RedKeywordProposal wrappedProposal;
+    private final String matchingPrefix;
 
-    KeywordContentProposal(final RedKeywordProposal proposedKeyword) {
+    KeywordContentProposal(final RedKeywordProposal proposedKeyword, final String matchingPrefix) {
         this.wrappedProposal = proposedKeyword;
+        this.matchingPrefix = matchingPrefix;
     }
 
     @Override
@@ -74,6 +76,6 @@ class KeywordContentProposal implements IRedContentProposal {
 
     @Override
     public String getMatchingPrefix() {
-        return "";
+        return matchingPrefix;
     }
 }
