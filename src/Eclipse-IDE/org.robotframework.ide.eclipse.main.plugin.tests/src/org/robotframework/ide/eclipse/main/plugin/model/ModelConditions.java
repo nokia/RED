@@ -79,6 +79,16 @@ public class ModelConditions {
         };
     }
 
+    public static Condition<RobotElement> children(final int expectedChildren) {
+        return new Condition<RobotElement>("exectly " + expectedChildren + " children") {
+
+            @Override
+            public boolean matches(final RobotElement element) {
+                return element.getChildren().size() == expectedChildren;
+            }
+        };
+    }
+
     public static Condition<RobotElement> noChildren() {
         return not(children());
 
