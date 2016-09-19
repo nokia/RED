@@ -38,10 +38,10 @@ class CellEditorValueValidationJob<V> extends Job {
     @Override
     protected IStatus run(final IProgressMonitor monitor) {
         try {
+            setProperty(getLockPropertyName(), Boolean.TRUE);
             validator.validate(valueToValidate);
             setProperty(getLockPropertyName(), Boolean.FALSE);
         } catch (final CellEditorValueValidationException e) {
-            setProperty(getLockPropertyName(), Boolean.TRUE);
             setProperty(getErrorMessagePropertyName(), e.getMessage());
         }
         return Status.OK_STATUS;
