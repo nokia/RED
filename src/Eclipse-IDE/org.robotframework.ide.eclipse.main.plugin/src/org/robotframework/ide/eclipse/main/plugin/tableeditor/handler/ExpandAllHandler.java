@@ -27,8 +27,15 @@ public class ExpandAllHandler extends DIParameterizedHandler<E4ExpandAllHandler>
         @Execute
         public void expandAll(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final Optional<TreeLayerAccessor> treeLayerAccessor = editor.getTreeLayerAccessor();
+
             if (treeLayerAccessor.isPresent()) {
-                treeLayerAccessor.get().expandAll();
+                editor.getSelectionLayerAccessor().preserveElementSelectionWhen(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        treeLayerAccessor.get().expandAll();
+                    }
+                });
             }
         }
     }
