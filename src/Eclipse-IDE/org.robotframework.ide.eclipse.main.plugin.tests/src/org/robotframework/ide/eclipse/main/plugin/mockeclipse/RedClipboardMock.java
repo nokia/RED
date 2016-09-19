@@ -134,4 +134,14 @@ public class RedClipboardMock extends RedClipboard {
         }
         return this;
     }
+
+    @Override
+    public void clear() {
+        text = null;
+        cases = null;
+        keywordDefinitions = null;
+        calls = null;
+        variables = null;
+        positions = null;
+    }
 }
