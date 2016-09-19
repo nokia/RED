@@ -9,6 +9,7 @@ import javax.inject.Named;
 
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.ui.ISources;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.CollapseAllHandler.E4CollapseAllHandler;
@@ -27,8 +28,16 @@ public class CollapseAllHandler extends DIParameterizedHandler<E4CollapseAllHand
         @Execute
         public void collapseAll(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final Optional<TreeLayerAccessor> treeLayerAccessor = editor.getTreeLayerAccessor();
+
             if (treeLayerAccessor.isPresent()) {
-                treeLayerAccessor.get().collapseAll();
+                editor.getSelectionLayerAccessor().preserveElementsParentSelectionWhen(RobotCodeHoldingElement.class,
+                        new Runnable() {
+
+                            @Override
+                            public void run() {
+                                treeLayerAccessor.get().collapseAll();
+                            }
+                        });
             }
         }
     }
