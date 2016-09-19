@@ -10,6 +10,7 @@ import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 import static com.google.common.collect.Sets.newHashSet;
+import static com.google.common.collect.Sets.newIdentityHashSet;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,12 +22,15 @@ import java.util.Set;
 
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.red.swt.SwtThread;
+import org.robotframework.red.viewers.Selections;
 
 import com.google.common.base.Function;
 import com.google.common.base.Functions;
@@ -141,9 +145,26 @@ public class SelectionLayerAccessor {
     }
 
     public void preserveElementSelectionWhen(final Runnable operation) {
+        preserveElementsSelection(operation, selectionProvider.getSelection());
+    }
+
+    public void preserveElementsParentSelectionWhen(final Class<? extends RobotElement> parentClass,
+            final Runnable operation) {
         final ISelection oldSelection = selectionProvider.getSelection();
+
+        final List<Object> elements = Selections.getElements((IStructuredSelection) oldSelection, Object.class);
+        final Set<Object> toSelect = newIdentityHashSet();
+        for (final Object element : elements) {
+            toSelect.add(getAncestorOfClass(parentClass, element));
+        }
+        final StructuredSelection selection = new StructuredSelection(newArrayList(filter(toSelect, notNull())));
+
+        preserveElementsSelection(operation, selection);
+    }
+
+    private void preserveElementsSelection(final Runnable operation, final ISelection selectionToRestore) {
         operation.run();
-        selectionProvider.setSelection(oldSelection);
+        selectionProvider.setSelection(selectionToRestore);
 
         final PositionCoordinate[] positions = selectionLayer.getSelectedCellPositions();
         SwtThread.asyncExec(new Runnable() {
@@ -153,6 +174,17 @@ public class SelectionLayerAccessor {
                 reestablishSelection(selectionLayer, positions, Functions.<PositionCoordinate> identity());
             }
         });
+    }
+
+    private Object getAncestorOfClass(final Class<? extends RobotElement> parentClass, final Object element) {
+        if (element instanceof RobotElement && parentClass.isAssignableFrom(element.getClass())) {
+            return element;
+        } else if (element instanceof RobotElement) {
+            return getAncestorOfClass(parentClass, ((RobotElement) element).getParent());
+        } else if (element instanceof AddingToken) {
+            return getAncestorOfClass(parentClass, ((AddingToken) element).getParent());
+        }
+        return null;
     }
 
     public void selectElementInFirstCellAfterOperation(final Object elementToSelect, final Runnable operation) {
