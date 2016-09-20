@@ -5,8 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.io.ObjectStreamException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -16,13 +21,6 @@ import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpd
 import org.rf.ide.core.testdata.model.presenter.update.TestCaseTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseSetup;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTags;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTemplate;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
-import org.rf.ide.core.testdata.model.table.testcases.TestCaseUnknownSettings;
-import org.rf.ide.core.testdata.model.table.testcases.TestDocumentation;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 
@@ -53,32 +51,43 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
 
     public void link() {
         final TestCase testCase = getLinkedElement();
+
+        final List<PrioriterizedCaseSettings> settings = newArrayList(EnumSet.allOf(PrioriterizedCaseSettings.class));
+        Collections.sort(settings);
+
         // settings
-        for (final TestDocumentation documentation : testCase.getDocumentation()) {
-            getChildren().add(new RobotDefinitionSetting(this, documentation));
+        for (final PrioriterizedCaseSettings setting : settings) {
+            for (final AModelElement<TestCase> element : setting.getModelElements(testCase)) {
+                getChildren().add(new RobotDefinitionSetting(this, element));
+            }
         }
-        for (final TestCaseTags tags : testCase.getTags()) {
-            getChildren().add(new RobotDefinitionSetting(this, tags));
-        }
-        for (final TestCaseSetup setup : testCase.getSetups()) {
-            getChildren().add(new RobotDefinitionSetting(this, setup));
-        }
-        for (final TestCaseTeardown teardown : testCase.getTeardowns()) {
-            getChildren().add(new RobotDefinitionSetting(this, teardown));
-        }
-        for (final TestCaseTemplate template : testCase.getTemplates()) {
-            getChildren().add(new RobotDefinitionSetting(this, template));
-        }
-        for (final TestCaseTimeout timeout : testCase.getTimeouts()) {
-            getChildren().add(new RobotDefinitionSetting(this, timeout));
-        }
-        for (final TestCaseUnknownSettings unknown : testCase.getUnknownSettings()) {
-            getChildren().add(new RobotDefinitionSetting(this, unknown));
-        }
+
         // executables
         for (final RobotExecutableRow<TestCase> execRow : testCase.getTestExecutionRows()) {
             getChildren().add(new RobotKeywordCall(this, execRow));
         }
+    }
+
+    @Override
+    public void fixChildrenOrder() {
+        Collections.sort(getChildren(), new Comparator<RobotKeywordCall>() {
+
+            @Override
+            public int compare(final RobotKeywordCall call1, final RobotKeywordCall call2) {
+                if (call1 instanceof RobotDefinitionSetting && call2 instanceof RobotDefinitionSetting) {
+                    final ModelType modelType1 = call1.getLinkedElement().getModelType();
+                    final ModelType modelType2 = call2.getLinkedElement().getModelType();
+                    return PrioriterizedCaseSettings.from(modelType1).compareTo(PrioriterizedCaseSettings.from(modelType2));
+                } else if (call1 instanceof RobotDefinitionSetting && !(call2 instanceof RobotDefinitionSetting)) {
+                    return -1;
+                } else if (!(call1 instanceof RobotDefinitionSetting) && call2 instanceof RobotDefinitionSetting) {
+                    return 1;
+                } else {
+                    // sort is stable so we don't care about those cases
+                    return 0;
+                }
+            }
+        });
     }
 
     @Override
@@ -135,5 +144,43 @@ public class RobotCase extends RobotCodeHoldingElement<TestCase> {
     public String toString() {
         // for debugging purposes only
         return getName();
+    }
+
+    static enum PrioriterizedCaseSettings {
+        // the order is defined by enums definitions order (see Enum.compareTo() method javadoc)
+        DOCUMENTATION,
+        TAGS,
+        SETUP,
+        TEARDOWN,
+        TEMPLATE,
+        TIMEOUT,
+        UNKNOWN;
+
+        public List<? extends AModelElement<TestCase>> getModelElements(final TestCase testCase) {
+            switch (this) {
+                case DOCUMENTATION: return testCase.getDocumentation();
+                case TAGS: return testCase.getTags();
+                case SETUP: return testCase.getSetups();
+                case TEARDOWN: return testCase.getTeardowns();
+                case TEMPLATE: return testCase.getTemplates();
+                case TIMEOUT: return testCase.getTimeouts();
+                case UNKNOWN: return testCase.getUnknownSettings();
+                default: return new ArrayList<>();
+            }
+        }
+
+        public static PrioriterizedCaseSettings from(final ModelType modelType) {
+            switch (modelType) {
+                case TEST_CASE_DOCUMENTATION: return DOCUMENTATION;
+                case TEST_CASE_TAGS: return TAGS;
+                case TEST_CASE_SETUP: return SETUP;
+                case TEST_CASE_TEARDOWN: return TEARDOWN;
+                case TEST_CASE_TEMPLATE: return TEMPLATE;
+                case TEST_CASE_TIMEOUT: return TIMEOUT;
+                case TEST_CASE_SETTING_UNKNOWN: return UNKNOWN;
+                default:
+                    throw new IllegalArgumentException("No setting defined for " + modelType.name());
+            }
+        }
     }
 }

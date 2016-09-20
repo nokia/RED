@@ -36,9 +36,6 @@ public class InsertKeywordCallsCommand extends EditorCommand {
 
     @Override
     public void execute() throws CommandExecutionException {
-        // FIXME : we currently keep all settings before executable rows, so this condition
-        // should be also fulfilled after command is executed
-
         final RobotCodeHoldingElement<?> parentElement = (RobotCodeHoldingElement<?>) parent;
         int shift = 0;
         for (final RobotKeywordCall call : callsToInsert) {
@@ -46,11 +43,13 @@ public class InsertKeywordCallsCommand extends EditorCommand {
             shift++;
         }
 
+        parentElement.fixChildrenOrder();
+
         RedEventBroker.using(eventBroker)
             .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(callsToInsert)
             .send(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED, parent);
     }
-    
+
     @Override
     public List<EditorCommand> getUndoCommands() {
         return newUndoCommands(new DeleteKeywordCallCommand(callsToInsert));
