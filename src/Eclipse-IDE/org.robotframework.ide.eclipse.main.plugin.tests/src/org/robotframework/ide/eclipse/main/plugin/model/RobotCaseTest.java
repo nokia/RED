@@ -1,16 +1,32 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.filePositions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.noFilePositions;
 import static org.robotframework.ide.eclipse.main.plugin.model.ModelConditions.nullParent;
 
+import java.util.EnumSet;
 import java.util.List;
 
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCase.PrioriterizedCaseSettings;
 
 public class RobotCaseTest {
+
+    @Test
+    public void settingsOrderTest() {
+        // the order of enum's fields is important, so we want to quickly see
+        // that this change may harm GUI tests etc.
+        final List<PrioriterizedCaseSettings> caseSettings = newArrayList(
+                EnumSet.allOf(PrioriterizedCaseSettings.class));
+
+        assertThat(caseSettings).containsExactly(PrioriterizedCaseSettings.DOCUMENTATION,
+                PrioriterizedCaseSettings.TAGS, PrioriterizedCaseSettings.SETUP, PrioriterizedCaseSettings.TEARDOWN,
+                PrioriterizedCaseSettings.TEMPLATE, PrioriterizedCaseSettings.TIMEOUT,
+                PrioriterizedCaseSettings.UNKNOWN);
+    }
 
     @Test
     public void copyBySerializationTest() {
