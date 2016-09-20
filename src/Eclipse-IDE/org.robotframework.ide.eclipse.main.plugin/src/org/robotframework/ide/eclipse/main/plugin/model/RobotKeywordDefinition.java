@@ -8,7 +8,10 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.ObjectStreamException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -23,11 +26,6 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.MappingResult
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordDocumentation;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordReturn;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTags;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
-import org.rf.ide.core.testdata.model.table.keywords.KeywordUnknownSettings;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -64,33 +62,44 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
 
     public void link() {
         final UserKeyword keyword = getLinkedElement();
+
+        final List<PrioriterizedKeywordsSettings> settings = newArrayList(EnumSet.allOf(PrioriterizedKeywordsSettings.class));
+        Collections.sort(settings);
+
         // settings
-        for (final KeywordArguments argument : keyword.getArguments()) {
-            getChildren().add(new RobotDefinitionSetting(this, argument));
-        }
-        for (final KeywordDocumentation documentation : keyword.getDocumentation()) {
-            getChildren().add(new RobotDefinitionSetting(this, documentation));
-        }
-        for (final KeywordTags tags : keyword.getTags()) {
-            getChildren().add(new RobotDefinitionSetting(this, tags));
-        }
-        for (final KeywordTimeout timeout : keyword.getTimeouts()) {
-            getChildren().add(new RobotDefinitionSetting(this, timeout));
-        }
-        for (final KeywordTeardown teardown : keyword.getTeardowns()) {
-            getChildren().add(new RobotDefinitionSetting(this, teardown));
-        }
-        for (final KeywordReturn returnSetting : keyword.getReturns()) {
-            getChildren().add(new RobotDefinitionSetting(this, returnSetting));
-        }
-        for (final KeywordUnknownSettings unknownSettings : keyword.getUnknownSettings()) {
-            getChildren().add(new RobotDefinitionSetting(this, unknownSettings));
+        for (final PrioriterizedKeywordsSettings setting : settings) {
+            for (final AModelElement<UserKeyword> element : setting.getModelElements(keyword)) {
+                getChildren().add(new RobotDefinitionSetting(this, element));
+            }
         }
         
         // body
         for (final RobotExecutableRow<UserKeyword> execRow : keyword.getKeywordExecutionRows()) {
             getChildren().add(new RobotKeywordCall(this, execRow));
         }
+    }
+
+    @Override
+    public void fixChildrenOrder() {
+        Collections.sort(getChildren(), new Comparator<RobotKeywordCall>() {
+
+            @Override
+            public int compare(final RobotKeywordCall call1, final RobotKeywordCall call2) {
+                if (call1 instanceof RobotDefinitionSetting && call2 instanceof RobotDefinitionSetting) {
+                    final ModelType modelType1 = call1.getLinkedElement().getModelType();
+                    final ModelType modelType2 = call2.getLinkedElement().getModelType();
+                    return PrioriterizedKeywordsSettings.from(modelType1)
+                            .compareTo(PrioriterizedKeywordsSettings.from(modelType2));
+                } else if (call1 instanceof RobotDefinitionSetting && !(call2 instanceof RobotDefinitionSetting)) {
+                    return -1;
+                } else if (!(call1 instanceof RobotDefinitionSetting) && call2 instanceof RobotDefinitionSetting) {
+                    return 1;
+                } else {
+                    // sort is stable so we don't care about those cases
+                    return 0;
+                }
+            }
+        });
     }
 
     @Override
@@ -217,5 +226,43 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     public String toString() {
         // for debugging purposes only
         return getName();
+    }
+
+    static enum PrioriterizedKeywordsSettings {
+        // the order is defined by enums definitions order (see Enum.compareTo() method javadoc)
+        ARGUMENTS,
+        DOCUMENTATION,
+        TAGS,
+        TIMEOUT,
+        TEARDOWN,
+        RETURN,
+        UNKNOWN;
+
+        public List<? extends AModelElement<UserKeyword>> getModelElements(final UserKeyword keyword) {
+            switch (this) {
+                case ARGUMENTS: return keyword.getArguments();
+                case DOCUMENTATION: return keyword.getDocumentation();
+                case TAGS: return keyword.getTags();
+                case TIMEOUT: return keyword.getTimeouts();
+                case TEARDOWN: return keyword.getTeardowns();
+                case RETURN: return keyword.getReturns();
+                case UNKNOWN: return keyword.getUnknownSettings();
+                default: return new ArrayList<>();
+            }
+        }
+
+        public static PrioriterizedKeywordsSettings from(final ModelType modelType) {
+            switch (modelType) {
+                case USER_KEYWORD_ARGUMENTS: return ARGUMENTS;
+                case USER_KEYWORD_DOCUMENTATION: return DOCUMENTATION;
+                case USER_KEYWORD_TAGS: return TAGS;
+                case USER_KEYWORD_TIMEOUT: return TIMEOUT;
+                case USER_KEYWORD_TEARDOWN: return TEARDOWN;
+                case USER_KEYWORD_RETURN: return RETURN;
+                case USER_KEYWORD_SETTING_UNKNOWN: return UNKNOWN;
+                default:
+                    throw new IllegalArgumentException("No setting defined for " + modelType.name());
+            }
+        }
     }
 }
