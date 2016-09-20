@@ -13,6 +13,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.CreateFreshKeywordCallCommand;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
@@ -36,7 +37,7 @@ public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLine
             final Optional<RobotElement> selectedElement = Selections.getOptionalFirstElement(selection,
                     RobotElement.class);
 
-            EditorCommand newLineCommand = null;
+            EditorCommand newLineCommand = new EmptyCommand();
 
             RobotCodeHoldingElement<?> codeHoldingElement = null;
             int index = -1;
@@ -58,9 +59,7 @@ public class InsertNewLineHandler extends DIParameterizedHandler<E4InsertNewLine
                 }
             }
 
-            if (newLineCommand != null) {
-                stack.execute(newLineCommand);
-            }
+            stack.execute(newLineCommand);
         }
     }
 }
