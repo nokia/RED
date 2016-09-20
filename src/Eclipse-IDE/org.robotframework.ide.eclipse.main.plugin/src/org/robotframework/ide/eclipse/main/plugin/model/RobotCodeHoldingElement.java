@@ -90,6 +90,8 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         getModelUpdater().remove(getLinkedElement(), child.getLinkedElement());
     }
 
+    public abstract void fixChildrenOrder();
+
     public abstract void moveChildDown(final RobotKeywordCall keywordCall);
 
     public abstract void moveChildUp(final RobotKeywordCall keywordCall);
