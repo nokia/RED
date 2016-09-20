@@ -5,12 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 
+import static com.google.common.collect.Iterables.transform;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.robotframework.ide.eclipse.main.plugin.model.ModelFunctions.toNames;
 import static org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCallConditions.properlySetParent;
 
 import java.util.Arrays;
@@ -117,6 +119,40 @@ public class InsertKeywordCallsCommandTest {
     }
 
     @Test
+    public void testCaseSettingIsInsertedAndMovedToProperPosition_whenInsertingIntoTestCaseBody() {
+        final RobotCase testCase = createTestCaseWithSettingsForInsertions();
+        final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createTestCaseUnknownSetting("setting") };
+
+        final InsertKeywordCallsCommand command = new InsertKeywordCallsCommand(testCase, 4, callsToInsert);
+        command.setEventBroker(eventBroker);
+        command.execute();
+
+        assertThat(transform(testCase.getChildren(), toNames())).containsExactly("tags", "setup", "teardown", "setting",
+                "call1", "call2", "call3");
+
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
+                        Arrays.asList(callsToInsert))));
+    }
+
+    @Test
+    public void testCaseExecutableRowIsInsertedAndMovedToProperPosition_whenInsertingIntoTestCaseSettings() {
+        final RobotCase testCase = createTestCaseWithSettingsForInsertions();
+        final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createTestCaseExecutableRow("action") };
+
+        final InsertKeywordCallsCommand command = new InsertKeywordCallsCommand(testCase, 1, callsToInsert);
+        command.setEventBroker(eventBroker);
+        command.execute();
+
+        assertThat(transform(testCase.getChildren(), toNames())).containsExactly("tags", "setup", "teardown", "action",
+                "call1", "call2", "call3");
+
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, testCase, RobotModelEvents.ADDITIONAL_DATA,
+                        Arrays.asList(callsToInsert))));
+    }
+
+    @Test
     public void keywordExecutableRowIsProperlyInsertedIntoTestCase() {
         final RobotCase testCase = createTestCaseForInsertions();
         final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createKeywordExecutableRow("call") };
@@ -191,6 +227,40 @@ public class InsertKeywordCallsCommandTest {
         assertThat(keyword.getChildren().get(1).getArguments()).containsExactly("arg1", "arg2");
         assertThat(keyword.getChildren().get(1).getComment()).isEqualTo("#comment");
         assertThat(keyword.getChildren().get(1)).has(properlySetParent());
+
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
+                        Arrays.asList(callsToInsert))));
+    }
+
+    @Test
+    public void keywordSettingIsInsertedAndMovedToProperPosition_whenInsertingIntoTestCaseBody() {
+        final RobotKeywordDefinition keyword = createKeywordWithSettingsForInsertions();
+        final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createKeywordUnknownSetting("setting") };
+
+        final InsertKeywordCallsCommand command = new InsertKeywordCallsCommand(keyword, 4, callsToInsert);
+        command.setEventBroker(eventBroker);
+        command.execute();
+
+        assertThat(transform(keyword.getChildren(), toNames())).containsExactly("arguments", "tags", "return",
+                "setting", "call1", "call2", "call3");
+
+        verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
+                eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
+                        Arrays.asList(callsToInsert))));
+    }
+
+    @Test
+    public void keywordExecutableRowIsInsertedAndMovedToProperPosition_whenInsertingIntoTestCaseSettings() {
+        final RobotKeywordDefinition keyword = createKeywordWithSettingsForInsertions();
+        final RobotKeywordCall[] callsToInsert = new RobotKeywordCall[] { createKeywordExecutableRow("action") };
+
+        final InsertKeywordCallsCommand command = new InsertKeywordCallsCommand(keyword, 1, callsToInsert);
+        command.setEventBroker(eventBroker);
+        command.execute();
+
+        assertThat(transform(keyword.getChildren(), toNames())).containsExactly("arguments", "tags", "return", "action",
+                "call1", "call2", "call3");
 
         verify(eventBroker, times(1)).send(eq(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED),
                 eq(ImmutableMap.<String, Object> of(IEventBroker.DATA, keyword, RobotModelEvents.ADDITIONAL_DATA,
@@ -372,8 +442,6 @@ public class InsertKeywordCallsCommandTest {
                         newArrayList(setting))));
     }
 
-    // TODO : write tests here
-
     @Test
     public void keywordTagsSettingIsProperlyInsertedIntoTestCase() {
         keywordSettingIsProperlyInsertedIntoTestCase(createKeywordTagsSetting(), ModelType.TEST_CASE_TAGS, "Tags",
@@ -532,11 +600,37 @@ public class InsertKeywordCallsCommandTest {
         return model.findSection(RobotCasesSection.class).get().getChildren().get(0);
     }
 
+    private static RobotCase createTestCaseWithSettingsForInsertions() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("case")
+                .appendLine("  [tags]  t1  t2")
+                .appendLine("  [setup]  kw")
+                .appendLine("  [teardown]  kw")
+                .appendLine("  call1  1")
+                .appendLine("  call2  2")
+                .appendLine("  call3  3")
+                .build();
+        return model.findSection(RobotCasesSection.class).get().getChildren().get(0);
+    }
+
     private static RobotKeywordDefinition createKeywordForInsertions() {
         final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("kw")
                 .appendLine("  call1  1")
                 .appendLine("  call2  2")
+                .build();
+        return model.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
+    }
+
+    private static RobotKeywordDefinition createKeywordWithSettingsForInsertions() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("kw")
+                .appendLine("  [arguments]  kw")
+                .appendLine("  [tags]  t1  t2")
+                .appendLine("  [return]  x")
+                .appendLine("  call1  1")
+                .appendLine("  call2  2")
+                .appendLine("  call3  3")
                 .build();
         return model.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
     }
