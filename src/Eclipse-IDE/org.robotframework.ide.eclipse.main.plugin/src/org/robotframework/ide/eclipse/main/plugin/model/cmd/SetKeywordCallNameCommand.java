@@ -14,7 +14,6 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
@@ -107,7 +106,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         final RobotCodeHoldingElement<?> parent = (RobotCodeHoldingElement<?>) keywordCall.getParent();
 
         final int index = keywordCall.getIndex();
-        final int lastSettingIndex = calculateIndexOfLastSetting(parent);
+        final int lastSettingIndex = parent.indexOfLastSetting();
 
         final MoveKeywordCall moveCommand = new MoveKeywordCall(parent, index, lastSettingIndex + 1);
         moveCommand.execute();
@@ -127,7 +126,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         final RobotDefinitionSetting setting = (RobotDefinitionSetting) keywordCall;
 
         final int index = setting.getIndex();
-        final int lastSettingIndex = calculateIndexOfLastSetting(parent);
+        final int lastSettingIndex = parent.indexOfLastSetting();
         
         final MoveKeywordCall moveCommand = new MoveKeywordCall(parent, index, lastSettingIndex);
         moveCommand.execute();
@@ -140,15 +139,6 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         executedCommands.add(moveCommand);
 
         return parent.getChildren().get(lastSettingIndex);
-    }
-
-    private static int calculateIndexOfLastSetting(final RobotElement parent) {
-        for (int i = parent.getChildren().size() - 1; i >= 0; i--) {
-            if (parent.getChildren().get(i) instanceof RobotDefinitionSetting) {
-                return i;
-            }
-        }
-        return -1;
     }
 
     private void removeFirstArgument(final RobotKeywordCall actualCall) {
