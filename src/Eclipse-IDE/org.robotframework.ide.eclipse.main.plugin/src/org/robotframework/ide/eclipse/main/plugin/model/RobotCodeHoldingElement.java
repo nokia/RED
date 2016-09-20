@@ -5,6 +5,7 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model;
 
+import static com.google.common.base.Predicates.instanceOf;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -23,6 +24,7 @@ import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Iterables;
 
 public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         implements IRobotCodeHoldingElement, Serializable {
@@ -95,6 +97,15 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
     protected abstract ModelType getExecutableRowModelType();
 
     public abstract RobotTokenType getSettingDeclarationTokenTypeFor(final String name);
+
+    public int indexOfLastSetting() {
+        for (int i = calls.size() - 1; i >= 0; i--) {
+            if (calls.get(i) instanceof RobotDefinitionSetting) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     @Override
     public String getName() {
@@ -175,7 +186,7 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
     protected int countRowsOfTypeUpTo(final ModelType type, final int toIndex) {
         int index = 0;
         int count = 0;
-        for (final RobotKeywordCall call : getChildren()) {
+        for (final RobotKeywordCall call : calls) {
             if (index >= toIndex) {
                 break;
             }
@@ -185,6 +196,10 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
             index++;
         }
         return count;
+    }
+
+    public boolean hasSettings() {
+        return Iterables.any(calls, instanceOf(RobotDefinitionSetting.class));
     }
     
     public RobotDefinitionSetting findSetting(final ModelType... modelTypes) {
