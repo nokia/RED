@@ -108,7 +108,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_DOCUMENTATION);
 
         final KeywordDocumentation keyDoc = new KeywordDocumentation(dec);
-        addDocumentation(keyDoc);
+        addDocumentation(0, keyDoc);
 
         return keyDoc;
     }
@@ -136,7 +136,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_TAGS);
 
         final KeywordTags keyTags = new KeywordTags(dec);
-        addTag(keyTags);
+        addTag(0, keyTags);
 
         return keyTags;
     }
@@ -163,7 +163,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_ARGUMENTS);
 
         final KeywordArguments keyArgs = new KeywordArguments(dec);
-        addArguments(keyArgs);
+        addArguments(0, keyArgs);
 
         return keyArgs;
     }
@@ -190,7 +190,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_RETURN);
 
         final KeywordReturn keyReturn = new KeywordReturn(dec);
-        addReturn(keyReturn);
+        addReturn(0, keyReturn);
 
         return keyReturn;
     }
@@ -217,7 +217,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_TEARDOWN);
 
         final KeywordTeardown keyTeardown = new KeywordTeardown(dec);
-        addTeardown(keyTeardown);
+        addTeardown(0, keyTeardown);
 
         return keyTeardown;
     }
@@ -244,7 +244,7 @@ public class UserKeyword extends AModelElement<KeywordTable>
         fixForTheType(dec, RobotTokenType.KEYWORD_SETTING_TIMEOUT);
 
         final KeywordTimeout keyTimeout = new KeywordTimeout(dec);
-        addTimeout(keyTimeout);
+        addTimeout(0, keyTimeout);
 
         return keyTimeout;
     }

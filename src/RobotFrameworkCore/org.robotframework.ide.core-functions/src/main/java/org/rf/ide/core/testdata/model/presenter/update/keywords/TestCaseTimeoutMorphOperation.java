@@ -27,8 +27,9 @@ public class TestCaseTimeoutMorphOperation extends ExecutablesStepsHolderMorphOp
         final TestCaseTimeout caseTimeout = (TestCaseTimeout) modelElement;
 
         final KeywordTimeout kwTimeout = keyword.newTimeout();
-        kwTimeout.setTimeout(caseTimeout.getTimeout().getText());
+        kwTimeout.getDeclaration().setText(caseTimeout.getDeclaration().getText());
 
+        kwTimeout.setTimeout(caseTimeout.getTimeout().getText());
         for (final RobotToken msg : caseTimeout.getMessage()) {
             kwTimeout.addMessagePart(msg);
         }

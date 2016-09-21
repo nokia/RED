@@ -138,7 +138,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_DOCUMENTATION);
 
         final TestDocumentation testDoc = new TestDocumentation(dec);
-        addDocumentation(testDoc);
+        addDocumentation(0, testDoc);
 
         return testDoc;
     }
@@ -166,7 +166,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TAGS_DECLARATION);
 
         final TestCaseTags testTags = new TestCaseTags(dec);
-        addTag(testTags);
+        addTag(0, testTags);
 
         return testTags;
     }
@@ -193,7 +193,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_SETUP);
 
         final TestCaseSetup testSetup = new TestCaseSetup(dec);
-        addSetup(testSetup);
+        addSetup(0, testSetup);
 
         return testSetup;
     }
@@ -220,7 +220,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TEARDOWN);
 
         final TestCaseTeardown testTeardown = new TestCaseTeardown(dec);
-        addTeardown(testTeardown);
+        addTeardown(0, testTeardown);
 
         return testTeardown;
     }
@@ -247,7 +247,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TEMPLATE);
 
         final TestCaseTemplate testTemplate = new TestCaseTemplate(dec);
-        addTemplate(testTemplate);
+        addTemplate(0, testTemplate);
 
         return testTemplate;
     }
@@ -274,7 +274,7 @@ public class TestCase extends AModelElement<TestCaseTable> implements IExecutabl
         fixForTheType(dec, RobotTokenType.TEST_CASE_SETTING_TIMEOUT);
 
         final TestCaseTimeout testTimeout = new TestCaseTimeout(dec);
-        addTimeout(testTimeout);
+        addTimeout(0, testTimeout);
 
         return testTimeout;
     }
