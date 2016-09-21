@@ -21,8 +21,9 @@ public class UserKeywordTeardownMorphOperation extends ExecutablesStepsHolderMor
         final KeywordTeardown kwTeardown = (KeywordTeardown) modelElement;
         
         final TestCaseTeardown caseTeardown = testCase.newTeardown();
-        caseTeardown.setKeywordName(kwTeardown.getKeywordName());
+        caseTeardown.getDeclaration().setText(kwTeardown.getDeclaration().getText());
 
+        caseTeardown.setKeywordName(kwTeardown.getKeywordName());
         for (final RobotToken arg : kwTeardown.getArguments()) {
             caseTeardown.addArgument(arg);
         }

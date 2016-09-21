@@ -21,8 +21,9 @@ public class UserKeywordTimeoutMorphOperation extends ExecutablesStepsHolderMorp
         final KeywordTimeout kwTimeout = (KeywordTimeout) modelElement;
         
         final TestCaseTimeout caseTimeout = testCase.newTimeout();
-        caseTimeout.setTimeout(kwTimeout.getTimeout().getText());
+        caseTimeout.getDeclaration().setText(kwTimeout.getDeclaration().getText());
 
+        caseTimeout.setTimeout(kwTimeout.getTimeout().getText());
         for (final RobotToken msg : kwTimeout.getMessage()) {
             caseTimeout.addMessagePart(msg);
         }
