@@ -27,8 +27,9 @@ public class TestCaseTeardownMorphOperation extends ExecutablesStepsHolderMorphO
         final TestCaseTeardown caseTeardown = (TestCaseTeardown) modelElement;
 
         final KeywordTeardown kwTeardown = keyword.newTeardown();
-        kwTeardown.setKeywordName(caseTeardown.getKeywordName());
+        kwTeardown.getDeclaration().setText(caseTeardown.getDeclaration().getText());
 
+        kwTeardown.setKeywordName(caseTeardown.getKeywordName());
         for (final RobotToken arg : caseTeardown.getArguments()) {
             kwTeardown.addArgument(arg);
         }

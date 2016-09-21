@@ -21,6 +21,8 @@ public class UserKeywordTagsMorphOperation extends ExecutablesStepsHolderMorphOp
         final KeywordTags kwTags = (KeywordTags) modelElement;
         
         final TestCaseTags caseTags = testCase.newTags();
+        caseTags.getDeclaration().setText(kwTags.getDeclaration().getText());
+
         for (final RobotToken tag : kwTags.getTags()) {
             caseTags.addTag(tag.getText());
         }
