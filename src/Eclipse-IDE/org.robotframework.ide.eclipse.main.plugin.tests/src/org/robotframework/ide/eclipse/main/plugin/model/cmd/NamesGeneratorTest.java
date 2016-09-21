@@ -46,6 +46,16 @@ public class NamesGeneratorTest {
     }
 
     @Test
+    public void generatedNameHaveConsecutiveNumber_whenThereAreAlreadyNumberedChildren_andPrefixContainsNumber() {
+        final ParentElement parent = new ParentElement(
+                new NamedElement("name"),
+                new NamedElement("name 1"),
+                new NamedElement("name 2"));
+
+        assertThat(NamesGenerator.generateUniqueName(parent, "name 2")).isEqualTo("name 3");
+    }
+
+    @Test
     public void generatedNameHaveConsecutiveNumber_whenThereAreAlreadyNumberedChildrenRegardlessCase() {
         final ParentElement parent = new ParentElement(
                 new NamedElement("name"),
