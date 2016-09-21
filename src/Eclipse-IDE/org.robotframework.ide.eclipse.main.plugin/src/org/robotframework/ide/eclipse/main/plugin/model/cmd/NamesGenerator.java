@@ -19,20 +19,33 @@ import com.google.common.primitives.Ints;
 
 public class NamesGenerator {
 
+    public static String generateUniqueName(final RobotElement parent, final String prefix) {
+        return generateUniqueName(parent, prefix, true);
+    }
+
     public static String generateUniqueName(final RobotElement parent, final String prefix,
             final boolean includeSpace) {
-        final int maxNumber = getCurrentMaxNumber(parent, prefix);
+        final String prefixWithoutNumber = removeNumberSuffix(prefix);
+        final int maxNumber = getCurrentMaxNumber(parent, prefixWithoutNumber);
         if (maxNumber < 0) {
             return prefix;
         } else if (includeSpace) {
-            return prefix + " " + (maxNumber + 1);
+            return prefixWithoutNumber + " " + (maxNumber + 1);
         } else {
-            return prefix + (maxNumber + 1);
+            return prefixWithoutNumber + (maxNumber + 1);
         }
     }
 
-    public static String generateUniqueName(final RobotElement parent, final String prefix) {
-        return generateUniqueName(parent, prefix, true);
+    private static String removeNumberSuffix(final String name) {
+        final StringBuilder number = new StringBuilder();
+        for (int i = name.length() - 1; i >= 0; i--) {
+            if (Character.isDigit(name.charAt(i))) {
+                number.append(name.charAt(i));
+            } else {
+                break;
+            }
+        }
+        return name.substring(0, name.length() - number.length()).trim();
     }
 
     private static int getCurrentMaxNumber(final RobotElement parent, final String prefix) {
