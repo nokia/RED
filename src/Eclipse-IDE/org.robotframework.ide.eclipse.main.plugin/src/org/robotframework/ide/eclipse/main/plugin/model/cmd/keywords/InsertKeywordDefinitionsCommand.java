@@ -48,7 +48,7 @@ public class InsertKeywordDefinitionsCommand extends EditorCommand {
             keyword.getLinkedElement().setParent(keywordTable);
 
             if (nameChangeIsRequired(keyword)) {
-                final String newName = NamesGenerator.generateUniqueName(keywordsSection, keyword.getName(), true);
+                final String newName = NamesGenerator.generateUniqueName(keywordsSection, keyword.getName());
                 keyword.getLinkedElement().getKeywordName().setText(newName);
             }
 

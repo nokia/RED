@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.cmd.cases;
 
+import static com.google.common.collect.Iterables.any;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -12,8 +14,11 @@ import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.NamesGenerator;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.services.event.RedEventBroker;
+
+import com.google.common.base.Predicate;
 
 public class InsertCasesCommand extends EditorCommand {
 
@@ -39,6 +44,12 @@ public class InsertCasesCommand extends EditorCommand {
         for (final RobotCase testCase : casesToInsert) {
             testCase.setParent(casesSection);
             testCase.getLinkedElement().setParent(testCaseTable);
+
+            if (nameChangeIsRequired(testCase)) {
+                final String newName = NamesGenerator.generateUniqueName(casesSection, testCase.getName());
+                testCase.getLinkedElement().getTestName().setText(newName);
+            }
+
             if (counter == -1) {
                 casesSection.getChildren().add(testCase);
                 testCaseTable.addTest(testCase.getLinkedElement());
@@ -54,6 +65,15 @@ public class InsertCasesCommand extends EditorCommand {
                     .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(casesToInsert)
                     .send(RobotModelEvents.ROBOT_CASE_ADDED, casesSection);
         }
+    }
+
+    private boolean nameChangeIsRequired(final RobotCase testCase) {
+        return any(casesSection.getChildren(), new Predicate<RobotCase>() {
+            @Override
+            public boolean apply(final RobotCase theCase) {
+                return theCase.getName().equalsIgnoreCase(testCase.getName());
+            }
+        });
     }
 
     @Override
