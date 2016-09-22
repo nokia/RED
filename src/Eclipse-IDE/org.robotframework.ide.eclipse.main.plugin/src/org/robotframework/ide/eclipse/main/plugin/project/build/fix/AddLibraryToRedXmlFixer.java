@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
@@ -29,6 +30,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
@@ -115,7 +117,17 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                         return true;
                     }
                 } else {
-                    return importLibraryByPath(config, modulePath.get().getAbsolutePath());
+                    final File moduleFile = modulePath.get();
+                    if (moduleFile.isDirectory()
+                            && new File(moduleFile.getPath() + File.separator + "__init__.py").exists()) {
+                        final ReferencedLibrary newLibrary = ReferencedLibrary.create(LibraryType.PYTHON, pathOrName,
+                                new Path(moduleFile.getPath()).toPortableString());
+                        addedLibraries.add(newLibrary);
+                        config.addReferencedLibrary(newLibrary);
+                        return true;
+                    } else {
+                        return importLibraryByPath(config, moduleFile.getAbsolutePath());
+                    }
                 }
             } catch (final RobotEnvironmentException e) {
                 StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
