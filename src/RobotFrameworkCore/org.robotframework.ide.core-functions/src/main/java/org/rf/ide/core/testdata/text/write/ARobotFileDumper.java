@@ -170,10 +170,28 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     private List<AModelElement<ARobotSectionTable>> copyVariables(final List<AModelElement<VariableTable>> elems) {
         final List<AModelElement<ARobotSectionTable>> copied = new ArrayList<>();
         for (final AModelElement<?> stE : elems) {
+            fixVariableDeclarationToName((AVariable) stE);
             copied.add(((AModelElement<ARobotSectionTable>) stE));
         }
 
         return copied;
+    }
+
+    private void fixVariableDeclarationToName(final AVariable var) {
+        final String varName = var.getName();
+        if (varName != null && !varName.isEmpty()) {
+            String varDeclaration = varName;
+            final String correctBeginOfVariable = var.getType().getIdentificator() + "{";
+            if (!varName.startsWith(correctBeginOfVariable)) {
+                varDeclaration = correctBeginOfVariable + varName;
+            }
+
+            if (!varDeclaration.endsWith("}")) {
+                varDeclaration += "}";
+            }
+
+            var.getDeclaration().setText(varDeclaration);
+        }
     }
 
     @SuppressWarnings("unchecked")
