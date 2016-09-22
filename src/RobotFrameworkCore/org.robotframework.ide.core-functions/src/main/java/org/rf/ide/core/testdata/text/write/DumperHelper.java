@@ -180,7 +180,8 @@ public class DumperHelper {
             for (int elemIndex = 0; elemIndex < size; elemIndex++) {
                 final AModelElement<ARobotSectionTable> e = sortedElements.get(elemIndex);
                 FilePosition pos = e.getBeginPosition();
-                if (pos.isNotSet()) {
+
+                if (pos.isNotSet() || pos.getOffset() == FilePosition.NOT_SET) {
                     if (size == index || elemIndex - 1 == index) {
                         index = elemIndex;
                         nextFound = 0;

@@ -138,7 +138,8 @@ public abstract class ANotExecutableTableElementDumper implements ISectionElemen
 
         Collections.sort(tokens, sorter);
         // dump as it is
-        if (!lastToken.getFilePosition().isNotSet()
+        if (!lastToken.isDirty() && (lastToken.getRaw().equals(lastToken.getText()))
+                && !lastToken.getFilePosition().isNotSet()
                 && !getElementDumperHelper().getFirstBrokenChainPosition(tokens, true).isPresent() && !tokens.isEmpty()
                 && !getElementDumperHelper().isDirtyAnyDirtyInside(tokens)) {
             boolean wasDumped = getElementDumperHelper().dumpAsItIs(getDumperHelper(), model, lastToken, tokens, lines);
