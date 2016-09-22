@@ -69,7 +69,7 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
             final RobotProject robotProject = RedPlugin.getModelManager().createProject(externalFile.getProject());
             RobotProjectConfig config = robotProject.getOpenedProjectConfig();
 
-            final boolean isEditorOpeneEditor = config != null;
+            final boolean isEditorOpened = config != null;
             if (config == null) {
                 config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
             }
@@ -77,7 +77,7 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
             if (apply(externalFile, config)) {
                 marker.delete();
 
-                if (!isEditorOpeneEditor) {
+                if (!isEditorOpened) {
                     new RobotProjectConfigWriter().writeConfiguration(config, externalFile.getProject());
                 }
 
