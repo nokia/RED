@@ -290,7 +290,7 @@ public class LibrariesAutoDiscoverer {
             pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(dryRunLibraryImport.getSourcePath(),
                     Optional.of(dryRunLibraryImport.getName()));
         } catch (final RobotEnvironmentException e) {
-            if (!isPythonLibraryRecognizedByName(config, dryRunLibraryImport, addedLibs)) {
+            if (!isPythonLibraryRecognizedAndAddedByName(config, dryRunLibraryImport, addedLibs)) {
                 dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
             }
             return;
@@ -316,7 +316,7 @@ public class LibrariesAutoDiscoverer {
         addReferencedLibrariesToProjectConfiguration(config, dryRunLibraryImport, addedLibs, librariesToAdd);
     }
 
-    private boolean isPythonLibraryRecognizedByName(final RobotProjectConfig config,
+    private boolean isPythonLibraryRecognizedAndAddedByName(final RobotProjectConfig config,
             final RobotDryRunLibraryImport dryRunLibraryImport, final List<ReferencedLibrary> addedLibs) {
         Optional<File> modulePath = Optional.absent();
         try {
