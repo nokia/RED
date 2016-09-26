@@ -40,4 +40,14 @@ public class TsvRobotFileDumper extends ARobotFileDumper {
 
         return sep;
     }
+
+    @Override
+    protected boolean isAcceptableForDefault(final Separator separator) {
+        return separator.getTypes().contains(SeparatorType.TABULATOR_OR_DOUBLE_SPACE);
+    }
+
+    @Override
+    protected boolean canBeSeparatorAddBeforeExecutableUnitName(final Separator separator) {
+        return false;
+    }
 }

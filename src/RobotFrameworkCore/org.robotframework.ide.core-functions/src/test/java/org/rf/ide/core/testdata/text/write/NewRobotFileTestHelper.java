@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.nio.file.Path;
 
+import org.rf.ide.core.testdata.DumpContext;
 import org.rf.ide.core.testdata.RobotFileDumper;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -21,14 +22,15 @@ public class NewRobotFileTestHelper {
         return new RobotFileOutput(RobotVersion.from("2.9")).getFileModel();
     }
 
-    public static void assertNewModelTheSameAsInFile(final String fileName, final RobotFile modelFile)
-            throws Exception {
+    public static void assertNewModelTheSameAsInFile(final String fileName, final RobotFile modelFile,
+            final DumpContext ctx) throws Exception {
         // prepare
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(fileName);
         final String fileContent = DumperTestHelper.getINSTANCE()
                 .readWithLineSeparatorPresave(inputFile)
                 .replaceAll("(\r)?\n", System.lineSeparator());
         final RobotFileDumper dumper = new RobotFileDumper();
+        dumper.setContext(ctx);
 
         // execute
         final String dumpResult = dumper.dump(modelFile.getParent()).replaceAll("(\r)?\n", System.lineSeparator());
@@ -38,5 +40,10 @@ public class NewRobotFileTestHelper {
 
         assertThat(cmpResult.report()).isNull();
 
+    }
+
+    public static void assertNewModelTheSameAsInFile(final String fileName, final RobotFile modelFile)
+            throws Exception {
+        assertNewModelTheSameAsInFile(fileName, modelFile, new DumpContext());
     }
 }
