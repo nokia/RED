@@ -113,6 +113,10 @@ public class DumperHelper {
         return currentDumper.getSeparator(model, lines, lastToken, currentToken);
     }
 
+    public boolean isSeparatorForExecutableUnitName(final Separator separator) {
+        return currentDumper.canBeSeparatorAddBeforeExecutableUnitName(separator);
+    }
+
     public boolean isEndOfLine(final IRobotLineElement elem) {
         boolean result = false;
         for (final IRobotTokenType t : elem.getTypes()) {
@@ -287,5 +291,28 @@ public class DumperHelper {
 
     public String getEmpty() {
         return EMPTY;
+    }
+
+    public boolean wasSeparatorBefore(final List<RobotLine> lines) {
+        return countSeparatorsBefore(lines) > 0;
+    }
+
+    public int countSeparatorsBefore(final List<RobotLine> lines) {
+        int separators = 0;
+        final int size = lines.size();
+        if (size > 0) {
+            final RobotLine line = lines.get(size - 1);
+            final List<IRobotLineElement> lineElements = line.getLineElements();
+            final int elemsInLine = lineElements.size();
+            for (int elem = elemsInLine - 1; elem >= 0; elem--) {
+                if (lineElements.get(elem) instanceof Separator) {
+                    ++separators;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        return separators;
     }
 }
