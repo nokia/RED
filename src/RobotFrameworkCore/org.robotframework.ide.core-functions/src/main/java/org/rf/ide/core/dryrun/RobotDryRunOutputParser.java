@@ -50,7 +50,11 @@ public class RobotDryRunOutputParser implements ILineHandler {
         if (parsedLine.containsKey(LIBRARY_IMPORT_EVENT_NAME)) {
             final List<Object> libraryImportList = (List<Object>) parsedLine.get(LIBRARY_IMPORT_EVENT_NAME);
             final Map<String, Object> details = (Map<String, Object>) libraryImportList.get(1);
-            final String libraryName = (String) libraryImportList.get(0);
+            String libraryName = (String) libraryImportList.get(0);
+            final String originalName = (String) details.get("originalname");
+            if(originalName != null && !originalName.isEmpty() && !originalName.equals(libraryName)) {
+                libraryName = originalName;
+            }
             final String importer = (String) details.get("importer");
             final String source = (String) details.get("source");
             final List<String> args = (List<String>) details.get("args");
@@ -87,6 +91,10 @@ public class RobotDryRunOutputParser implements ILineHandler {
     public List<RobotDryRunLibraryImport> getImportedLibraries() {
         return dryRunLibraryImportCollector != null ? dryRunLibraryImportCollector.getImportedLibraries()
                 : new ArrayList<RobotDryRunLibraryImport>();
+    }
+    
+    public void filterImportedLibrariesByName(final String libraryName) {
+        dryRunLibraryImportCollector.filterImportedLibrariesByName(libraryName);
     }
 
     public void setStartSuiteHandler(final IDryRunStartSuiteHandler startSuiteHandler) {

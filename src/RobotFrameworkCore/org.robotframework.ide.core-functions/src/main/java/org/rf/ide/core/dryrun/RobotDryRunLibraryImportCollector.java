@@ -144,4 +144,17 @@ public class RobotDryRunLibraryImportCollector {
         return importedLibraries;
     }
 
+    public void filterImportedLibrariesByName(final String libraryName) {
+        RobotDryRunLibraryImport filteredLibraryImport = null;
+        for (final RobotDryRunLibraryImport robotDryRunLibraryImport : importedLibraries) {
+            if (robotDryRunLibraryImport.getName().equalsIgnoreCase(libraryName)) {
+                filteredLibraryImport = robotDryRunLibraryImport;
+                break;
+            }
+        }
+        importedLibraries.clear();
+        if (filteredLibraryImport != null) {
+            importedLibraries.add(filteredLibraryImport);
+        }
+    }
 }

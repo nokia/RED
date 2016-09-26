@@ -74,13 +74,22 @@ public class LibrariesAutoDiscoverer {
     private final RobotDryRunHandler dryRunHandler;
 
     private boolean isSummaryWindowEnabled;
+    
+    private Optional<String> libraryNameToDiscover = Optional.absent();
 
     private static AtomicBoolean isWorkspaceJobRunning = new AtomicBoolean(false);
 
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
             final IEventBroker eventBroker) {
+        this(robotProject, suiteFiles, eventBroker, null);
+    }
+
+    public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
+            final IEventBroker eventBroker, final String libraryNameToDiscover) {
         this(robotProject, suiteFiles, true);
         this.eventBroker = eventBroker;
+        this.libraryNameToDiscover = libraryNameToDiscover != null && !libraryNameToDiscover.isEmpty()
+                ? Optional.of(libraryNameToDiscover) : Optional.<String> absent();
     }
 
     public LibrariesAutoDiscoverer(final RobotProject robotProject, final Collection<IResource> suiteFiles,
@@ -204,15 +213,18 @@ public class LibrariesAutoDiscoverer {
     }
 
     private void startAddingLibrariesToProjectConfiguration(final IProgressMonitor monitor) {
-        final List<RobotDryRunLibraryImport> dryRunLibraryImports = filterUnknownDryRunLibraryImports();
-        if (!dryRunLibraryImports.isEmpty()) {
+        if(libraryNameToDiscover.isPresent()) {
+            dryRunOutputParser.filterImportedLibrariesByName(libraryNameToDiscover.get()); // after this filtering, RobotDryRunOutputParser will return only one imported library or nothing
+        }
+        final List<RobotDryRunLibraryImport> dryRunLibrariesImports = filterUnknownDryRunLibraryImports(dryRunOutputParser.getImportedLibraries());
+        if (!dryRunLibrariesImports.isEmpty()) {
             RobotProjectConfig config = robotProject.getOpenedProjectConfig();
             final boolean inEditor = config != null;
             if (config == null) {
                 config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
             }
             final List<RobotDryRunLibraryImport> dryRunLibrariesToAdd = filterExistingReferencedLibraries(
-                    dryRunLibraryImports, config);
+                    dryRunLibrariesImports, config);
 
             final SubMonitor subMonitor = SubMonitor.convert(monitor);
             subMonitor.setWorkRemaining(dryRunLibrariesToAdd.size() + 1);
@@ -250,27 +262,27 @@ public class LibrariesAutoDiscoverer {
         }
     }
 
-    private List<RobotDryRunLibraryImport> filterUnknownDryRunLibraryImports() {
-        final List<RobotDryRunLibraryImport> importedLibraries = newArrayList();
-        for (final RobotDryRunLibraryImport dryRunLibraryImport : dryRunOutputParser.getImportedLibraries()) {
+    private List<RobotDryRunLibraryImport> filterUnknownDryRunLibraryImports(final List<RobotDryRunLibraryImport> importedLibraries) {
+        final List<RobotDryRunLibraryImport> filteredLibrariesImports = newArrayList();
+        for (final RobotDryRunLibraryImport dryRunLibraryImport : importedLibraries) {
             if (dryRunLibraryImport.getType() != DryRunLibraryType.UNKNOWN) {
-                importedLibraries.add(dryRunLibraryImport);
+                filteredLibrariesImports.add(dryRunLibraryImport);
             }
         }
-        return importedLibraries;
+        return filteredLibrariesImports;
     }
 
     private List<RobotDryRunLibraryImport> filterExistingReferencedLibraries(
-            final List<RobotDryRunLibraryImport> dryRunLibraryImports, final RobotProjectConfig config) {
-        final List<RobotDryRunLibraryImport> dryRunLibrariesToAdd = newArrayList();
+            final List<RobotDryRunLibraryImport> importedLibraries, final RobotProjectConfig config) {
+        final List<RobotDryRunLibraryImport> filteredLibrariesImports = newArrayList();
         if (config != null) {
             final List<String> currentLibrariesNames = newArrayList();
             for (final ReferencedLibrary referencedLibrary : config.getLibraries()) {
                 currentLibrariesNames.add(referencedLibrary.getName());
             }
-            for (final RobotDryRunLibraryImport dryRunLibraryImport : dryRunLibraryImports) {
+            for (final RobotDryRunLibraryImport dryRunLibraryImport : importedLibraries) {
                 if (!currentLibrariesNames.contains(dryRunLibraryImport.getName())) {
-                    dryRunLibrariesToAdd.add(dryRunLibraryImport);
+                    filteredLibrariesImports.add(dryRunLibraryImport);
                 } else {
                     dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.ALREADY_EXISTING,
                             "Library '" + dryRunLibraryImport.getName()
@@ -278,7 +290,7 @@ public class LibrariesAutoDiscoverer {
                 }
             }
         }
-        return dryRunLibrariesToAdd;
+        return filteredLibrariesImports;
     }
 
     private void addPythonLibraryToProjectConfiguration(final RobotProjectConfig config,
