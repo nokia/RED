@@ -354,5 +354,17 @@ public class RepositionElementsBaseOnListMethodTest {
                 final AModelElement<SettingTable> m, int currentIndex) {
             return super.isNextTheSameAsCurrent(src, m, currentIndex);
         }
+
+        @Override
+        protected boolean isAcceptableForDefault(Separator separator) {
+            // irrelevant
+            return false;
+        }
+
+        @Override
+        protected boolean canBeSeparatorAddBeforeExecutableUnitName(final Separator separator) {
+            // irrelevant
+            return false;
+        }
     }
 }
