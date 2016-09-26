@@ -517,7 +517,7 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
             sep = Separator.matchSeparator(dumpContext.getPreferedSeparator());
         }
 
-        if (sep == null) {
+        if (sep == null || !isAcceptableForDefault(sep)) {
             sep = getSeparatorDefault();
         }
 
@@ -553,4 +553,8 @@ public abstract class ARobotFileDumper implements IRobotFileDumper {
     }
 
     protected abstract Separator getSeparatorDefault();
+
+    protected abstract boolean isAcceptableForDefault(final Separator separator);
+
+    protected abstract boolean canBeSeparatorAddBeforeExecutableUnitName(final Separator currentSeparator);
 }

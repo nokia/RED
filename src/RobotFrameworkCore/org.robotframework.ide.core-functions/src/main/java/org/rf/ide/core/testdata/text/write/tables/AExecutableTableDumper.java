@@ -21,6 +21,7 @@ import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
+import org.rf.ide.core.testdata.text.read.separators.Separator;
 import org.rf.ide.core.testdata.text.write.DumpLineUpdater;
 import org.rf.ide.core.testdata.text.write.DumperHelper;
 import org.rf.ide.core.testdata.text.write.EmptyLineDumper;
@@ -112,6 +113,16 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                 if (currentLine != null) {
                     getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine,
                             elemDeclaration, lines);
+                } else if (getDumperHelper().isSeparatorForExecutableUnitName(
+                        getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration))) {
+                    if (!getDumperHelper().wasSeparatorBefore(lines)) {
+                        Separator sep = getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration);
+                        if (sep.getText().equals(" | ")) {
+                            sep.setText("| ");
+                            sep.setRaw("| ");
+                        }
+                        getDumperHelper().getDumpLineUpdater().updateLine(model, lines, sep);
+                    }
                 }
 
                 if (!elemDeclaration.isDirty() && currentLine != null) {
