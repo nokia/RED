@@ -152,9 +152,10 @@ class MyIMPORTER(object):
                             result = _BaseTestLibrary(libcode=None, name=argser[0], args=argser[1], source=None,
                                                       variables=argser[2])
                         except:
-                            result = _BaseTestLibrary(libcode=None, name=argser[0], args=[], source=None,
-                                                      variables=argser[2])
-                            errors.append(sys.exc_info())
+                            try:
+                                result = _BaseTestLibrary(libcode=None, name=argser[0], args=[], source=None, variables=argser[3])
+                            except:
+                                errors.append(sys.exc_info())
 
                 if lib_cached is None:
                     lib = LibItem(argser[0], argser[1])
