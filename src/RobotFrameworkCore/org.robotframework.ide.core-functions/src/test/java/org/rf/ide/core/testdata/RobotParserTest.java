@@ -20,6 +20,11 @@ import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable;
+import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
+import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
+import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 
@@ -213,5 +218,65 @@ public class RobotParserTest {
         order.verify(projectHolder, times(1)).shouldBeLoaded(theFirst);
         order.verify(projectHolder, times(1)).findFileByName(theFirst);
 
+    }
+
+    @Test
+    public void testGivenFileTSV_withVariableTable_withOneWrongVariable_andOneCorrect_thenCheckRawAndTextParameter()
+            throws Exception {
+        assertOneCorrectAndOneWrongVariable_ifAllWasReadAndWillBePresented(
+                "parser/bugs/CorrectAndIncorrectNameVariable_inVariableTable.tsv");
+    }
+
+    @Test
+    public void testGivenFileRobot_withVariableTable_withOneWrongVariable_andOneCorrect_thenCheckRawAndTextParameter()
+            throws Exception {
+        assertOneCorrectAndOneWrongVariable_ifAllWasReadAndWillBePresented(
+                "parser/bugs/CorrectAndIncorrectNameVariable_inVariableTable.robot");
+    }
+
+    private void assertOneCorrectAndOneWrongVariable_ifAllWasReadAndWillBePresented(final String filename)
+            throws Exception {
+        // prepare
+        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        when(runtime.getVersion()).thenReturn("2.9");
+        RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
+        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+
+        RobotParser parser = spy(RobotParser.createEager(projectHolder));
+
+        //// prepare paths
+        final File startFile = new File(this.getClass().getResource(filename).toURI());
+
+        // execute
+        List<RobotFileOutput> output = parser.parse(startFile);
+
+        // verify
+        assertThat(output).hasSize(1);
+        final RobotFileOutput file = output.get(0);
+        final RobotFile robotModel = file.getFileModel();
+        assertThatVariableTableIsIncluded(robotModel);
+        final VariableTable variableTable = robotModel.getVariableTable();
+        List<AVariable> variables = variableTable.getVariables();
+        assertThat(variables).hasSize(2);
+        AVariable varCorrect = variables.get(0);
+        assertThat(varCorrect).isInstanceOf(ScalarVariable.class);
+        assertThat(varCorrect.getDeclaration().getText()).isEqualTo("${var_ok}");
+        assertThat(varCorrect.getDeclaration().getRaw()).isEqualTo("${var_ok}");
+        assertThat(varCorrect.getType()).isEqualTo(VariableType.SCALAR);
+        assertThat(varCorrect.getName()).isEqualTo("var_ok");
+
+        AVariable varIncorrect = variables.get(1);
+        assertThat(varIncorrect).isInstanceOf(UnknownVariable.class);
+        assertThat(varIncorrect.getDeclaration().getText()).isEqualTo("${var} data");
+        assertThat(varIncorrect.getDeclaration().getRaw()).isEqualTo("${var} data");
+        assertThat(varIncorrect.getType()).isEqualTo(VariableType.INVALID);
+        assertThat(varIncorrect.getName()).isEqualTo("${var} data");
+    }
+
+    private void assertThatVariableTableIsIncluded(final RobotFile fileModel) {
+        assertThat(fileModel.getSettingTable().isPresent()).isFalse();
+        assertThat(fileModel.getVariableTable().isPresent()).isTrue();
+        assertThat(fileModel.getTestCaseTable().isPresent()).isFalse();
+        assertThat(fileModel.getKeywordTable().isPresent()).isFalse();
     }
 }
