@@ -63,17 +63,7 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
                     new ArrayList<AModelElement<ARobotSectionTable>>(sorted));
 
             for (int settingIndex = 0; settingIndex <= lastIndexToDump; settingIndex++) {
-                if (!lines.isEmpty()) {
-                    RobotLine lastLine = lines.get(lines.size() - 1);
-                    IRobotLineElement endOfLine = lastLine.getEndOfLine();
-                    if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
-                            || endOfLine.getTypes().contains(EndOfLineTypes.NON)
-                            || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
-                            && !lastLine.getLineElements().isEmpty()) {
-                        final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                        getDumperHelper().getDumpLineUpdater().updateLine(model, lines, lineSeparator);
-                    }
-                }
+                addLineSeparatorIfIsRequired(model, lines);
 
                 final AModelElement<ARobotSectionTable> setting = sorted.get(settingIndex);
 
@@ -103,6 +93,20 @@ public abstract class ANotExecutableTableDumper implements ISectionTableDumper {
                 for (int elemIndex = 0; elemIndex <= lastIndexToDump; elemIndex++) {
                     sorted.remove(0);
                 }
+            }
+        }
+    }
+
+    private void addLineSeparatorIfIsRequired(final RobotFile model, final List<RobotLine> lines) {
+        if (!lines.isEmpty()) {
+            RobotLine lastLine = lines.get(lines.size() - 1);
+            IRobotLineElement endOfLine = lastLine.getEndOfLine();
+            if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
+                    || endOfLine.getTypes().contains(EndOfLineTypes.NON)
+                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
+                    && !lastLine.getLineElements().isEmpty()) {
+                final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
+                getDumperHelper().getDumpLineUpdater().updateLine(model, lines, lineSeparator);
             }
         }
     }

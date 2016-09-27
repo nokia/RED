@@ -74,17 +74,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
 
             AModelElement<?> last = null;
             for (int execUnitIndex = 0; execUnitIndex <= lastIndexToDump; execUnitIndex++) {
-                if (!lines.isEmpty()) {
-                    RobotLine lastLine = lines.get(lines.size() - 1);
-                    IRobotLineElement endOfLine = lastLine.getEndOfLine();
-                    if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
-                            || endOfLine.getTypes().contains(EndOfLineTypes.NON)
-                            || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
-                            && !lastLine.getLineElements().isEmpty()) {
-                        final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                        getLineDumperHelper().updateLine(model, lines, lineSeparator);
-                    }
-                }
+                addLineSeperatorIfIsRequired(model, lines);
 
                 final AModelElement<ARobotSectionTable> execUnit = sorted.get(execUnitIndex);
                 if (execUnitIndex > 0) {
@@ -102,45 +92,13 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                     fileOffset = filePosition.getOffset();
                 }
 
-                RobotLine currentLine = null;
-                if (fileOffset >= 0) {
-                    Optional<Integer> lineIndex = model.getRobotLineIndexBy(fileOffset);
-                    if (lineIndex.isPresent()) {
-                        currentLine = model.getFileContent().get(lineIndex.get());
-                    }
-                }
+                RobotLine currentLine = getLineForToken(model, fileOffset);
 
-                if (currentLine != null) {
-                    getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine,
-                            elemDeclaration, lines);
-                } else if (getDumperHelper().isSeparatorForExecutableUnitName(
-                        getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration))) {
-                    if (!getDumperHelper().wasSeparatorBefore(lines)) {
-                        Separator sep = getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration);
-                        if (sep.getText().equals(" | ")) {
-                            sep.setText("| ");
-                            sep.setRaw("| ");
-                        }
-                        getDumperHelper().getDumpLineUpdater().updateLine(model, lines, sep);
-                    }
-                }
+                addSeparatorInTheBeginning(model, lines, elemDeclaration, currentLine);
 
                 if (!elemDeclaration.isDirty() && currentLine != null) {
                     getLineDumperHelper().updateLine(model, lines, elemDeclaration);
-                    final List<IRobotLineElement> lineElements = currentLine.getLineElements();
-                    final int tokenPosIndex = lineElements.indexOf(elemDeclaration);
-                    if (lineElements.size() - 1 > tokenPosIndex + 1) {
-                        for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
-                            final IRobotLineElement nextElem = lineElements.get(index);
-                            final List<IRobotTokenType> types = nextElem.getTypes();
-                            if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
-                                    || types.contains(RobotTokenType.ASSIGNMENT)) {
-                                getLineDumperHelper().updateLine(model, lines, nextElem);
-                            } else {
-                                break;
-                            }
-                        }
-                    }
+                    addSuffixAfterTokenDeclaration(model, lines, elemDeclaration, currentLine);
                 } else {
                     getLineDumperHelper().updateLine(model, lines, elemDeclaration);
                 }
@@ -151,21 +109,7 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                     final AModelElement<? extends IExecutableStepsHolder<?>> execElement = sortedUnits
                             .get(sortedUnitId);
 
-                    if (!lines.isEmpty()) {
-                        RobotLine lastLine = lines.get(lines.size() - 1);
-                        IRobotLineElement endOfLine = lastLine.getEndOfLine();
-                        if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
-                                || endOfLine.getTypes().contains(EndOfLineTypes.NON)
-                                || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
-                                && !lastLine.getLineElements().isEmpty()) {
-                            boolean shouldSeparateLine = shouldSeparateLine(execHolder, execElement);
-
-                            if (shouldSeparateLine) {
-                                final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
-                                getLineDumperHelper().updateLine(model, lines, lineSeparator);
-                            }
-                        }
-                    }
+                    addLineSeparatorIfIsRequiredAfterExecElement(model, lines, execHolder, execElement);
 
                     IExecutableSectionElementDumper elemDumper = null;
                     for (final IExecutableSectionElementDumper dumper : dumpers) {
@@ -197,6 +141,87 @@ public abstract class AExecutableTableDumper implements ISectionTableDumper {
                 for (int elemIndex = 0; elemIndex <= lastIndexToDump; elemIndex++) {
                     sorted.remove(0);
                 }
+            }
+        }
+    }
+
+    private void addLineSeparatorIfIsRequiredAfterExecElement(final RobotFile model, final List<RobotLine> lines,
+            final IExecutableStepsHolder execHolder,
+            final AModelElement<? extends IExecutableStepsHolder<?>> execElement) {
+        if (!lines.isEmpty()) {
+            RobotLine lastLine = lines.get(lines.size() - 1);
+            IRobotLineElement endOfLine = lastLine.getEndOfLine();
+            if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
+                    || endOfLine.getTypes().contains(EndOfLineTypes.NON)
+                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
+                    && !lastLine.getLineElements().isEmpty()) {
+                boolean shouldSeparateLine = shouldSeparateLine(execHolder, execElement);
+
+                if (shouldSeparateLine) {
+                    final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
+                    getLineDumperHelper().updateLine(model, lines, lineSeparator);
+                }
+            }
+        }
+    }
+
+    private void addSuffixAfterTokenDeclaration(final RobotFile model, final List<RobotLine> lines,
+            final RobotToken elemDeclaration, RobotLine currentLine) {
+        final List<IRobotLineElement> lineElements = currentLine.getLineElements();
+        final int tokenPosIndex = lineElements.indexOf(elemDeclaration);
+        if (lineElements.size() - 1 > tokenPosIndex + 1) {
+            for (int index = tokenPosIndex + 1; index < lineElements.size(); index++) {
+                final IRobotLineElement nextElem = lineElements.get(index);
+                final List<IRobotTokenType> types = nextElem.getTypes();
+                if (types.contains(RobotTokenType.PRETTY_ALIGN_SPACE)
+                        || types.contains(RobotTokenType.ASSIGNMENT)) {
+                    getLineDumperHelper().updateLine(model, lines, nextElem);
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
+    private void addSeparatorInTheBeginning(final RobotFile model, final List<RobotLine> lines,
+            final RobotToken elemDeclaration, RobotLine currentLine) {
+        if (currentLine != null) {
+            getDumperHelper().getSeparatorDumpHelper().dumpSeparatorsBeforeToken(model, currentLine,
+                    elemDeclaration, lines);
+        } else if (getDumperHelper().isSeparatorForExecutableUnitName(
+                getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration))) {
+            if (!getDumperHelper().wasSeparatorBefore(lines)) {
+                Separator sep = getDumperHelper().getSeparator(model, lines, elemDeclaration, elemDeclaration);
+                if (sep.getText().equals(" | ")) {
+                    sep.setText("| ");
+                    sep.setRaw("| ");
+                }
+                getDumperHelper().getDumpLineUpdater().updateLine(model, lines, sep);
+            }
+        }
+    }
+
+    private RobotLine getLineForToken(final RobotFile model, int fileOffset) {
+        RobotLine currentLine = null;
+        if (fileOffset >= 0) {
+            Optional<Integer> lineIndex = model.getRobotLineIndexBy(fileOffset);
+            if (lineIndex.isPresent()) {
+                currentLine = model.getFileContent().get(lineIndex.get());
+            }
+        }
+        return currentLine;
+    }
+
+    private void addLineSeperatorIfIsRequired(final RobotFile model, final List<RobotLine> lines) {
+        if (!lines.isEmpty()) {
+            RobotLine lastLine = lines.get(lines.size() - 1);
+            IRobotLineElement endOfLine = lastLine.getEndOfLine();
+            if ((endOfLine == null || endOfLine.getFilePosition().isNotSet()
+                    || endOfLine.getTypes().contains(EndOfLineTypes.NON)
+                    || endOfLine.getTypes().contains(EndOfLineTypes.EOF))
+                    && !lastLine.getLineElements().isEmpty()) {
+                final IRobotLineElement lineSeparator = getDumperHelper().getLineSeparator(model);
+                getLineDumperHelper().updateLine(model, lines, lineSeparator);
             }
         }
     }
