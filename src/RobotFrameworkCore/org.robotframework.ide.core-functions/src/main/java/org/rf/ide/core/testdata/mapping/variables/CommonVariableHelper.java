@@ -159,7 +159,14 @@ public class CommonVariableHelper {
     }
 
     public boolean isCorrectVariable(final String text) {
-        return (countNumberOfChars(text, '{') == 1 && countNumberOfChars(text, '}') == 1);
+        if (countNumberOfChars(text, '{') == 1 && countNumberOfChars(text, '}') == 1) {
+            final String trimmed = text.trim().replaceAll("[}]\\s*[=]+", "}");
+            if (trimmed.endsWith("}")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @VisibleForTesting
