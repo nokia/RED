@@ -20,6 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPrefere
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Iterables;
@@ -28,10 +29,14 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        final IEclipsePreferences preferences = DefaultScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID);
+        initializeDefaultPreferences(DefaultScope.INSTANCE.getNode(RedPlugin.PLUGIN_ID));
+    }
 
+    @VisibleForTesting
+    void initializeDefaultPreferences(final IEclipsePreferences preferences) {
         initializeFrameworkPreferences(preferences);
         initializeEditorPreferences(preferences);
+        initializeSourceFoldingPreferences(preferences);
         initializeSourceEditorAssistantPreferences(preferences);
         initializeSyntaxColoringPreferences(preferences);
     }
@@ -58,6 +63,14 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         preferences.put(RedPreferences.SEPARATOR_TO_USE, "ssss");
         preferences.putInt(RedPreferences.MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS, 5);
         preferences.put(RedPreferences.BEHAVIOR_ON_CELL_COMMIT, CellCommitBehavior.MOVE_TO_ADJACENT_CELL.name());
+    }
+
+    private void initializeSourceFoldingPreferences(final IEclipsePreferences preferences) {
+        preferences.putInt(RedPreferences.FOLDING_LINE_LIMIT, 2);
+        preferences.putBoolean(RedPreferences.FOLDABLE_SECTIONS, true);
+        preferences.putBoolean(RedPreferences.FOLDABLE_CASES, true);
+        preferences.putBoolean(RedPreferences.FOLDABLE_KEYWORDS, true);
+        preferences.putBoolean(RedPreferences.FOLDABLE_DOCUMENTATION, true);
     }
 
     private void initializeSourceEditorAssistantPreferences(final IEclipsePreferences preferences) {
