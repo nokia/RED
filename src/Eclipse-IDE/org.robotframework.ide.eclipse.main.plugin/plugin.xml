@@ -1476,6 +1476,20 @@
     <handler
           class="org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.ShowInDocViewHandler"
           commandId="org.robotframework.ide.eclipse.showInDocView">
+       <enabledWhen>
+           <with
+                 variable="selection">
+              <iterate
+                    ifEmpty="false"
+                    operator="and">
+                 <not>
+                    <instanceof
+                          value="org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken">
+                    </instanceof>
+                 </not>
+              </iterate>
+           </with>
+       </enabledWhen>
        <activeWhen>
           <reference
                 definitionId="org.robotframework.editorContextIsActive">
