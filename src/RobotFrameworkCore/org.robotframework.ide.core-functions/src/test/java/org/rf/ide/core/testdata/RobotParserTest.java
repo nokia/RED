@@ -16,17 +16,24 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
+import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.RobotVersion;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.VariableTable;
+import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
+import org.rf.ide.core.testdata.model.table.exec.descs.RobotAction;
+import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 import org.rf.ide.core.testdata.model.table.variables.AVariable;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.rf.ide.core.testdata.model.table.variables.ScalarVariable;
 import org.rf.ide.core.testdata.model.table.variables.UnknownVariable;
 import org.rf.ide.core.testdata.text.read.EndOfLineBuilder.EndOfLineTypes;
 import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 @SuppressWarnings("PMD.MethodNamingConventions")
 public class RobotParserTest {
@@ -278,5 +285,67 @@ public class RobotParserTest {
         assertThat(fileModel.getVariableTable().isPresent()).isTrue();
         assertThat(fileModel.getTestCaseTable().isPresent()).isFalse();
         assertThat(fileModel.getKeywordTable().isPresent()).isFalse();
+    }
+
+    private void assertThatTestCaseTableIsIncluded(final RobotFile fileModel) {
+        assertThat(fileModel.getSettingTable().isPresent()).isFalse();
+        assertThat(fileModel.getVariableTable().isPresent()).isFalse();
+        assertThat(fileModel.getTestCaseTable().isPresent()).isTrue();
+        assertThat(fileModel.getKeywordTable().isPresent()).isFalse();
+    }
+
+    @Test
+    public void test_givenTwoTestCasesInTsvFile_oneIsEmpty_andSecondIsJustVariableName_withEmptyExecute()
+            throws Exception {
+        // prepare
+        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        when(runtime.getVersion()).thenReturn("2.9");
+        RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
+        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+
+        RobotParser parser = spy(RobotParser.createEager(projectHolder));
+
+        //// prepare paths
+        final File startFile = new File(this.getClass().getResource("parser/bugs/tsv_positionCheck.tsv").toURI());
+
+        // execute
+        List<RobotFileOutput> output = parser.parse(startFile);
+
+        // verify
+        assertThat(output).hasSize(1);
+        final RobotFileOutput file = output.get(0);
+        final RobotFile robotModel = file.getFileModel();
+        assertThatTestCaseTableIsIncluded(robotModel);
+        TestCaseTable testCaseTable = robotModel.getTestCaseTable();
+        List<TestCase> testCases = testCaseTable.getTestCases();
+        assertThat(testCases).hasSize(2);
+        final TestCase testCaseT3 = testCases.get(0);
+
+        //// verify test case T3
+        final RobotToken testCaseT3Name = testCaseT3.getName();
+        assertThat(testCaseT3Name.getText()).isEqualTo("T3");
+        assertThat(testCaseT3Name.getRaw()).isEqualTo("T3");
+        final FilePosition tcT3Pos = testCaseT3Name.getFilePosition();
+        assertThat(tcT3Pos.isSamePlace(new FilePosition(2, 0, 20))).as("got %s", tcT3Pos).isTrue();
+        assertThat(testCaseT3.getExecutionContext()).isEmpty();
+
+        //// verify test case ${x}
+        final TestCase testCaseSpacesX = testCases.get(1);
+        assertThat(testCaseSpacesX.getName().getText()).isEqualTo("${x}");
+        assertThat(testCaseSpacesX.getName().getRaw()).isEqualTo("${x}");
+        final FilePosition tcXPos = testCaseSpacesX.getName().getFilePosition();
+        assertThat(tcXPos.isSamePlace(new FilePosition(3, 4, 28))).as("got %s", tcXPos).isTrue();
+        final List<RobotExecutableRow<TestCase>> xTestExecutionList = testCaseSpacesX.getExecutionContext();
+        assertThat(xTestExecutionList).hasSize(1);
+        final IExecutableRowDescriptor<TestCase> xTestFirstLineDescription = xTestExecutionList.get(0)
+                .buildLineDescription();
+
+        RobotAction action = xTestFirstLineDescription.getAction();
+        RobotToken emptyAction = action.getToken();
+        assertThat(emptyAction.getText()).isEmpty();
+        assertThat(emptyAction.getRaw()).isEmpty();
+        final FilePosition emptyActionPosition = emptyAction.getFilePosition();
+        assertThat(emptyActionPosition.isSamePlace(new FilePosition(4, 5, 43))).as("got %s", emptyActionPosition)
+                .isTrue();
     }
 }
