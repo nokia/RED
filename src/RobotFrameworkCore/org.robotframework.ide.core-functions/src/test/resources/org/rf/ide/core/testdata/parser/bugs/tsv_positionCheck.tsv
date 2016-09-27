@@ -1,0 +1,6 @@
+*** Test Cases ***
+T3
+    ${x}    
+	...		Set Variable
+	\	...	2
+	

@@ -77,44 +77,46 @@ public class PrettyAlignSpaceUtility {
 
     public void extractPrettyAlignWhitespaces(final RobotLine line, final RobotToken rt, final String rawText) {
         final boolean isNotPrettyAlign = !rt.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE);
-        String correctedString = rawText;
-        if (rawText.startsWith(" ") && isNotPrettyAlign) {
-            final RobotToken prettyLeftAlign = new RobotToken();
-            prettyLeftAlign.setStartOffset(rt.getStartOffset());
-            prettyLeftAlign.setLineNumber(rt.getLineNumber());
-            prettyLeftAlign.setStartColumn(rt.getStartColumn());
+        if (isNotPrettyAlign) {
+            String correctedString = rawText;
+            if (rawText.startsWith(" ")) {
+                final RobotToken prettyLeftAlign = new RobotToken();
+                prettyLeftAlign.setStartOffset(rt.getStartOffset());
+                prettyLeftAlign.setLineNumber(rt.getLineNumber());
+                prettyLeftAlign.setStartColumn(rt.getStartColumn());
 
-            int lastBeginSpaceIndex = lastSpaceIndexLeft(correctedString);
-            int numberOfSpacesLeft = lastBeginSpaceIndex + 1;
-            prettyLeftAlign.setRaw(String.format("%" + numberOfSpacesLeft + "s", " "));
-            prettyLeftAlign.setText(String.format("%" + numberOfSpacesLeft + "s", " "));
-            prettyLeftAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
-            line.addLineElementAt(line.getLineElements().size() - 1, prettyLeftAlign);
+                int lastBeginSpaceIndex = lastSpaceIndexLeft(correctedString);
+                int numberOfSpacesLeft = lastBeginSpaceIndex + 1;
+                prettyLeftAlign.setRaw(String.format("%" + numberOfSpacesLeft + "s", " "));
+                prettyLeftAlign.setText(String.format("%" + numberOfSpacesLeft + "s", " "));
+                prettyLeftAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
+                line.addLineElementAt(line.getLineElements().size() - 1, prettyLeftAlign);
 
-            rt.setStartColumn(rt.getStartColumn() + numberOfSpacesLeft);
-            rt.setStartOffset(rt.getStartOffset() + numberOfSpacesLeft);
-            correctedString = rawText.substring(numberOfSpacesLeft);
-            rt.setText(correctedString);
-            rt.setRaw(correctedString);
-        }
+                rt.setStartColumn(rt.getStartColumn() + numberOfSpacesLeft);
+                rt.setStartOffset(rt.getStartOffset() + numberOfSpacesLeft);
+                correctedString = rawText.substring(numberOfSpacesLeft);
+                rt.setText(correctedString);
+                rt.setRaw(correctedString);
+            }
 
-        if (correctedString.endsWith(" ") && isNotPrettyAlign) {
-            final int theLongestTextLength = correctedString.length();
+            if (correctedString.endsWith(" ")) {
+                final int theLongestTextLength = correctedString.length();
 
-            int lastEndSpaceIndex = lastSpaceIndexRight(correctedString);
-            int numberOfSpacesRight = theLongestTextLength - lastEndSpaceIndex;
-            final RobotToken prettyRightAlign = new RobotToken();
-            prettyRightAlign.setStartOffset(rt.getStartOffset() + rawText.length() - numberOfSpacesRight);
-            prettyRightAlign.setLineNumber(rt.getLineNumber());
-            prettyRightAlign.setStartColumn(theLongestTextLength - numberOfSpacesRight);
-            prettyRightAlign.setRaw(String.format("%" + numberOfSpacesRight + "s", " "));
-            prettyRightAlign.setText(String.format("%" + numberOfSpacesRight + "s", " "));
-            prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
-            line.addLineElement(prettyRightAlign);
+                int lastEndSpaceIndex = lastSpaceIndexRight(correctedString);
+                int numberOfSpacesRight = theLongestTextLength - lastEndSpaceIndex;
+                final RobotToken prettyRightAlign = new RobotToken();
+                prettyRightAlign.setStartOffset(rt.getStartOffset() + correctedString.length() - numberOfSpacesRight);
+                prettyRightAlign.setLineNumber(rt.getLineNumber());
+                prettyRightAlign.setStartColumn(rt.getStartColumn() + theLongestTextLength - numberOfSpacesRight);
+                prettyRightAlign.setRaw(String.format("%" + numberOfSpacesRight + "s", " "));
+                prettyRightAlign.setText(String.format("%" + numberOfSpacesRight + "s", " "));
+                prettyRightAlign.setType(RobotTokenType.PRETTY_ALIGN_SPACE);
+                line.addLineElement(prettyRightAlign);
 
-            correctedString = correctedString.substring(0, correctedString.length() - numberOfSpacesRight);
-            rt.setText(correctedString);
-            rt.setRaw(correctedString);
+                correctedString = correctedString.substring(0, correctedString.length() - numberOfSpacesRight);
+                rt.setText(correctedString);
+                rt.setRaw(correctedString);
+            }
         }
     }
 
