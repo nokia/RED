@@ -19,6 +19,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
@@ -194,7 +195,13 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
     @Override
     public Position getPosition() {
-        return new Position(0);
+        final FilePosition begin = linkedElement.getBeginPosition();
+        final FilePosition end = linkedElement.getEndPosition();
+
+        if (begin.isNotSet() || end.isNotSet()) {
+            return new Position(0, 0);
+        }
+        return new Position(begin.getOffset(), end.getOffset() - begin.getOffset());
     }
 
     @Override

@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin;
 
+import java.util.EnumSet;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -27,6 +29,12 @@ public class RedPreferences {
     public static final String SEPARATOR_TO_USE = "separatorToUse";
     public static final String MINIMAL_NUMBER_OF_ARGUMENT_COLUMNS = "minimalArgsColumns";
     public static final String BEHAVIOR_ON_CELL_COMMIT = "cellCommitBehavior";
+    
+    public static final String FOLDABLE_SECTIONS = "foldableSections";
+    public static final String FOLDABLE_CASES = "foldableCases";
+    public static final String FOLDABLE_KEYWORDS = "foldableKeywords";
+    public static final String FOLDABLE_DOCUMENTATION = "foldableDocumentation";
+    public static final String FOLDING_LINE_LIMIT = "foldingLineLimit";
 
     public static final String ASSISTANT_COMPLETION_MODE = "assistantCompletionMode";
     public static final String ASSISTANT_AUTO_ACTIVATION_ENABLED = "assistantAutoActivationEnabled";
@@ -94,6 +102,27 @@ public class RedPreferences {
         return store.getBoolean(ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED);
     }
 
+    public EnumSet<FoldableElements> getFoldableElements() {
+        final EnumSet<FoldableElements> elements = EnumSet.noneOf(FoldableElements.class);
+        if(store.getBoolean(FOLDABLE_SECTIONS)) {
+            elements.add(FoldableElements.SECTIONS);
+        }
+        if (store.getBoolean(FOLDABLE_CASES)) {
+            elements.add(FoldableElements.CASES);
+        }
+        if (store.getBoolean(FOLDABLE_KEYWORDS)) {
+            elements.add(FoldableElements.KEYWORDS);
+        }
+        if (store.getBoolean(FOLDABLE_DOCUMENTATION)) {
+            elements.add(FoldableElements.DOCUMENTATION);
+        }
+        return elements;
+    }
+
+    public int getFoldingLineLimit() {
+        return store.getInt(FOLDING_LINE_LIMIT);
+    }
+
     public ColoringPreference getSyntaxColoring(final SyntaxHighlightingCategory category) {
         final int fontStyle = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".fontStyle");
         final int red = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.r");
@@ -135,5 +164,12 @@ public class RedPreferences {
     public enum CellCommitBehavior {
         STAY_IN_SAME_CELL,
         MOVE_TO_ADJACENT_CELL
+    }
+
+    public enum FoldableElements {
+        SECTIONS,
+        KEYWORDS,
+        CASES,
+        DOCUMENTATION
     }
 }
