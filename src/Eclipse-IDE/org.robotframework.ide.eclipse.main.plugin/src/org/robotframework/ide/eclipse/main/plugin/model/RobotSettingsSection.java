@@ -124,6 +124,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         settingTableModelUpdater.insert(getLinkedElement(), tableIndex, setting.getLinkedElement());
 
         if (allSettingsElementsIndex >= 0 && allSettingsElementsIndex <= elements.size()) {
+            call.setParent(this);
             elements.add(allSettingsElementsIndex, setting);
         }
 
