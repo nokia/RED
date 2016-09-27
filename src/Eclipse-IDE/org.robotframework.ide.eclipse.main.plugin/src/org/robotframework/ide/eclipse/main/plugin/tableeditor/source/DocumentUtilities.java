@@ -306,7 +306,7 @@ public class DocumentUtilities {
         try {
             return document.getLineOfOffset(offset);
         } catch (final BadLocationException e) {
-            return 0;
+            return -1;
         }
     }
 

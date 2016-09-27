@@ -3837,6 +3837,69 @@
             </visibleWhen>
          </command>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:#TextRulerContext?before=settings">
+         <menu
+               label="Folding">
+            <command
+                  commandId="org.eclipse.ui.edit.text.folding.expand_all"
+                  id="Expand all"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <with
+                        variable="activeEditor">
+                     <instanceof
+                           value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                     </instanceof>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.eclipse.ui.edit.text.folding.collapse_all"
+                  label="Collapse all"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <with
+                        variable="activeEditor">
+                     <instanceof
+                           value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                     </instanceof>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.eclipse.ui.edit.text.folding.expand"
+                  label="Expand"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <with
+                        variable="activeEditor">
+                     <instanceof
+                           value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                     </instanceof>
+                  </with>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="org.eclipse.ui.edit.text.folding.collapse"
+                  label="Collapse"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="true">
+                  <with
+                        variable="activeEditor">
+                     <instanceof
+                           value="org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor">
+                     </instanceof>
+                  </with>
+               </visibleWhen>
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -3952,6 +4015,42 @@
       <handler
             class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ToggleBreakpointHandler"
             commandId="org.eclipse.debug.ui.commands.ToggleBreakpoint">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ExpandAllHandler"
+            commandId="org.eclipse.ui.edit.text.folding.expand_all">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.CollapseAllHandler"
+            commandId="org.eclipse.ui.edit.text.folding.collapse_all">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.ExpandHandler"
+            commandId="org.eclipse.ui.edit.text.folding.expand">
+         <activeWhen>
+            <reference
+                  definitionId="org.robotframework.sourcePartIsActive">
+            </reference>
+         </activeWhen>
+      </handler>
+      <handler
+            class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.CollapseHandler"
+            commandId="org.eclipse.ui.edit.text.folding.collapse">
          <activeWhen>
             <reference
                   definitionId="org.robotframework.sourcePartIsActive">
@@ -4935,6 +5034,12 @@
             class="org.robotframework.ide.eclipse.main.plugin.preferences.ContentAssistPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist"
             name="Content Assist">
+      </page>
+      <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.FoldingPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.folding"
+            name="Folding">
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
