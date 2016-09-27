@@ -64,7 +64,7 @@ abstract class VariableMappingsDetailsEditingSupport extends ElementsAddingEditi
     protected abstract void setMappingValue(VariableMapping mapping, String value);
 
     private IEventBroker getEventBroker() {
-        return PlatformUI.getWorkbench().getService(IEventBroker.class);
+        return (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
     }
 
     static class VariableMappingNameEditingSupport extends VariableMappingsDetailsEditingSupport {
