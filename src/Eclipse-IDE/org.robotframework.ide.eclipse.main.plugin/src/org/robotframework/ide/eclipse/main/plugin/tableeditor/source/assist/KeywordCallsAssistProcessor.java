@@ -23,6 +23,7 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
@@ -70,7 +71,8 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
             if (shouldShowProposal) {
                 final boolean isTsv = assist.isTsvFile();
                 final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
-                final String prefix = DocumentUtilities.getPrefix(document, region, offset);
+                final String prefix = GherkinStyleSupport
+                        .getTextAfterGherkinPrefixIfExists(DocumentUtilities.getPrefix(document, region, offset));
                 final String content = region.isPresent()
                         ? document.get(region.get().getOffset(), region.get().getLength()) : "";
                 final String separator = getSeparatorToFollow();
