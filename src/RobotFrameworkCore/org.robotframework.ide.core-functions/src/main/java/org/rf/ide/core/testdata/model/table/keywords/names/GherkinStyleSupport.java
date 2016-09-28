@@ -46,6 +46,20 @@ public class GherkinStyleSupport {
             operation.perform(current);
         }
     }
+    
+    public static String getTextAfterGherkinPrefixIfExists(final String text) {
+        for (final String prefix : PREFIXES) {
+            if (text.toLowerCase().startsWith(prefix)) {
+                final String textAfterPrefix = text.substring(prefix.length());
+                if (!textAfterPrefix.isEmpty()) { 
+                    return textAfterPrefix.trim();
+                } else {
+                    return text; // if no any text after gherkin prefix, return gherkin prefix
+                }
+            }
+        }
+        return text; 
+    }
 
     private static String removeGherkinPrefix(final String name) {
         for (final String prefix : PREFIXES) {
