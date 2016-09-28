@@ -76,6 +76,27 @@
                 </repository>
             </repositories>
         </profile>
+        <profile>
+            <id>oxygen-profile</id>
+            <activation>
+                <property>
+                    <name>eclipse.version</name>
+                    <value>oxygen</value>
+                </property>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>eclipse-oxygen</id>
+                    <url>http://download.eclipse.org/releases/oxygen/</url>
+                    <layout>p2</layout>
+                </repository>
+                <repository>
+                    <id>nattable</id>
+                    <url>http://download.eclipse.org/nattable/releases/1.4.0/repository/</url>
+                    <layout>p2</layout>
+                </repository>
+            </repositories>
+        </profile>
     </profiles>
 
     <properties>
