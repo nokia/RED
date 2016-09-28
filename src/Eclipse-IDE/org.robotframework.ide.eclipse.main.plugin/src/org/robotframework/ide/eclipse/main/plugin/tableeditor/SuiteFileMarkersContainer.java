@@ -9,7 +9,7 @@ import com.google.common.base.Optional;
 
 public interface SuiteFileMarkersContainer {
 
-    Optional<Severity> getHighestSeverityMarkerFor(Optional<RobotFileInternalElement> element);
+    Optional<Severity> getHighestSeverityMarkerFor(Optional<? extends RobotFileInternalElement> element);
 
-    List<String> getMarkersMessagesFor(Optional<RobotFileInternalElement> element);
+    List<String> getMarkersMessagesFor(Optional<? extends RobotFileInternalElement> element);
 }
