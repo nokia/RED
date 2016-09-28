@@ -10,12 +10,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemC
 import com.google.common.base.Optional;
 
 
-public class SuiteFileMarkersContainerMock implements SuiteFileMarkersContainer {
+class SuiteFileMarkersContainerMock implements SuiteFileMarkersContainer {
 
     private final Map<RobotFileInternalElement, Severity> markers = new HashMap<>();
 
     @Override
-    public Optional<Severity> getHighestSeverityMarkerFor(final Optional<RobotFileInternalElement> element) {
+    public Optional<Severity> getHighestSeverityMarkerFor(final Optional<? extends RobotFileInternalElement> element) {
         if (element.isPresent() && markers.containsKey(element.get())) {
             return Optional.of(markers.get(element.get()));
         }
@@ -23,8 +23,7 @@ public class SuiteFileMarkersContainerMock implements SuiteFileMarkersContainer 
     }
 
     @Override
-    public List<String> getMarkersMessagesFor(final Optional<RobotFileInternalElement> element) {
-        // TODO Auto-generated method stub
+    public List<String> getMarkersMessagesFor(final Optional<? extends RobotFileInternalElement> element) {
         return null;
     }
 
