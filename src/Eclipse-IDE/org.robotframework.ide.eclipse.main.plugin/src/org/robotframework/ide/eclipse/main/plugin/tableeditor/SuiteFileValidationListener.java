@@ -1,5 +1,7 @@
 package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +23,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.table.keywords.KeywordArguments;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
@@ -29,6 +34,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause.Severity;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
@@ -42,6 +48,11 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
     private IEventBroker eventBroker;
 
     private final Map<Long, IMarker> markers = new HashMap<>();
+
+    @VisibleForTesting
+    Map<Long, IMarker> getMarkers() {
+        return markers;
+    }
 
     public void init() {
         if (suiteModel.getFile() == null) {
@@ -93,19 +104,12 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
         }
     }
 
-    private Range<Integer> getMarkerRange(final IMarker marker) {
-        final int start = marker.getAttribute(IMarker.CHAR_START, -1);
-        final int end = marker.getAttribute(IMarker.CHAR_END, -1);
-        return start != -1 && end != -1 ? Range.closed(start, end) : null;
-    }
-
     @Override
-    public List<String> getMarkersMessagesFor(final Optional<RobotFileInternalElement> modelElement) {
-        if (!modelElement.isPresent()) {
+    public List<String> getMarkersMessagesFor(final Optional<? extends RobotFileInternalElement> element) {
+        if (!element.isPresent()) {
             return new ArrayList<>();
         }
-        final AModelElement<?> element = (AModelElement<?>) modelElement.get().getLinkedElement();
-        final List<RobotToken> allTokens = element.getElementTokens();
+        final List<RobotToken> allTokens = getTokensFor(element.get());
 
         final List<String> markerDescriptions = new ArrayList<>();
         browseMatchingMarkers(new MarkerVisitor() {
@@ -122,12 +126,11 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
     }
 
     @Override
-    public Optional<Severity> getHighestSeverityMarkerFor(final Optional<RobotFileInternalElement> modelElement) {
-        if (!modelElement.isPresent()) {
+    public Optional<Severity> getHighestSeverityMarkerFor(final Optional<? extends RobotFileInternalElement> element) {
+        if (!element.isPresent()) {
             return Optional.absent();
         }
-        final AModelElement<?> element = (AModelElement<?>) modelElement.get().getLinkedElement();
-        final List<RobotToken> allTokens = element.getElementTokens();
+        final List<RobotToken> allTokens = getTokensFor(element.get());
 
         final AtomicBoolean hasError = new AtomicBoolean(false);
         final AtomicBoolean hasWarning = new AtomicBoolean(false);
@@ -157,6 +160,25 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
         return Optional.absent();
     }
 
+    private List<RobotToken> getTokensFor(final RobotFileInternalElement element) {
+        final AModelElement<?> modelElement = (AModelElement<?>) element.getLinkedElement();
+
+        if (modelElement.getModelType() == ModelType.TEST_CASE) {
+            return newArrayList(modelElement.getDeclaration());
+        } else if (modelElement.getModelType() == ModelType.USER_KEYWORD) {
+            final UserKeyword keyword = (UserKeyword) modelElement;
+
+            final List<RobotToken> tokens = new ArrayList<>();
+            tokens.add(modelElement.getDeclaration());
+            for (final KeywordArguments arguments : keyword.getArguments()) {
+                tokens.addAll(arguments.getElementTokens());
+            }
+            return tokens;
+        } else {
+            return modelElement.getElementTokens();
+        }
+    }
+
     private void browseMatchingMarkers(final MarkerVisitor visitor, final List<RobotToken> tokens) {
         // TODO : consider using e.g. segment tree for searching using segments (ranges), when
         // performance becomes the issue
@@ -179,6 +201,12 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
                 }
             }
         }
+    }
+
+    private Range<Integer> getMarkerRange(final IMarker marker) {
+        final int start = marker.getAttribute(IMarker.CHAR_START, -1);
+        final int end = marker.getAttribute(IMarker.CHAR_END, -1);
+        return start != -1 && end != -1 ? Range.closed(start, end) : null;
     }
 
     private static interface MarkerVisitor {

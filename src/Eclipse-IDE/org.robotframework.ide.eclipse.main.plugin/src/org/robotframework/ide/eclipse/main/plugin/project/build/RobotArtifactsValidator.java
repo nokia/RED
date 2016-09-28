@@ -57,15 +57,15 @@ public class RobotArtifactsValidator {
         this.logger = logger;
     }
 
-    public static void revalidate(final RobotSuiteFile suiteModel) {
+    public static Job revalidate(final RobotSuiteFile suiteModel) {
         final IFile file = suiteModel.getFile();
         if (file == null || !file.exists() || file.getProject() == null || !file.getProject().exists()
                 || !RobotProjectNature.hasRobotNature(file.getProject())) {
-            return;
+            return null;
         }
         final RobotRuntimeEnvironment runtimeEnvironment = suiteModel.getProject().getRuntimeEnvironment();
         if (runtimeEnvironment == null || runtimeEnvironment.getVersion() == null) {
-            return;
+            return null;
         }
 
         final ValidationContext context = new ValidationContext(file.getProject(), new BuildLogger());
@@ -86,10 +86,12 @@ public class RobotArtifactsValidator {
                 };
                 wsJob.setSystem(true);
                 wsJob.schedule();
+                return wsJob;
             }
         } catch (final CoreException e) {
             // so we won't revalidate
         }
+        return null;
     }
     
     public Job createValidationJob(final Job dependentJob, final IResourceDelta delta, final int kind,
