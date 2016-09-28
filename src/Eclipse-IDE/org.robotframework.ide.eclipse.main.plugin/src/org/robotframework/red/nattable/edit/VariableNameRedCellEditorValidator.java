@@ -38,7 +38,7 @@ public class VariableNameRedCellEditorValidator extends DefaultRedCellEditorValu
                     || value.startsWith(VariableType.LIST.getIdentificator() + "{")
                     || value.startsWith(VariableType.DICTIONARY.getIdentificator() + "{")) {
                 if (value.endsWith("}")) {
-                    if (!commonVarHelper.isCorrectVariable(value)) {
+                    if (!commonVarHelper.matchesBracketsConditionsForCorrectVariable(value)) {
                         error = Optional.of("Name should match with [$@&]{name}");
                     }
                 } else {
