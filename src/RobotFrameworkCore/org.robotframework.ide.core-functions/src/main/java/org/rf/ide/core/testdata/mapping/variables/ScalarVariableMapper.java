@@ -59,7 +59,7 @@ public class ScalarVariableMapper implements IParsingMapper {
             if (positionResolver.isCorrectPosition(PositionExpected.VARIABLE_DECLARATION_IN_VARIABLE_TABLE,
                     robotFileOutput.getFileModel(), currentLine, rt)) {
                 if (varHelper.isIncludedInVariableTable(currentLine, processingState)) {
-                    if (varHelper.isCorrectVariable(text)) {
+                    if (varHelper.matchesBracketsConditionsForCorrectVariable(text)) {
                         result = true;
                     } else {
                         // FIXME: error here or in validation

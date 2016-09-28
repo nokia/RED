@@ -158,7 +158,7 @@ public class CommonVariableHelper {
         return replaced.toString();
     }
 
-    public boolean isCorrectVariable(final String text) {
+    public boolean matchesBracketsConditionsForCorrectVariable(final String text) {
         if (countNumberOfChars(text, '{') == 1 && countNumberOfChars(text, '}') == 1) {
             final String trimmed = text.trim().replaceAll("[}]\\s*[=]+", "}");
             if (trimmed.endsWith("}")) {
