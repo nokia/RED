@@ -6,7 +6,6 @@
 package org.robotframework.ide.eclipse.main.plugin.mockeclipse;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,9 +39,7 @@ public class ContextInjector {
         try {
             while (clazz != Object.class) {
                 for (final Field field : clazz.getDeclaredFields()) {
-                    if (field.getAnnotation(Inject.class) != null
-                            && ((field.getModifiers() & Modifier.PUBLIC) != 0)
-                            || ((field.getModifiers() & Modifier.PROTECTED) != 0)) {
+                    if (field.getAnnotation(Inject.class) != null) {
 
                         field.setAccessible(true);
                         for (final Entry<Class<?>, Object> binding : objectsToInject.entrySet()) {
