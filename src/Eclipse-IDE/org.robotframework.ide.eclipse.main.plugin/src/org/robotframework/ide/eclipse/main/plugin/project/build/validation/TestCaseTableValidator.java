@@ -85,11 +85,12 @@ class TestCaseTableValidator implements ModelUnitValidator {
             return;
         }
         final RobotCasesSection robotCasesSection = testCaseSection.get();
-        final TestCaseTable casesTable = (TestCaseTable) robotCasesSection.getLinkedElement();
+        final TestCaseTable casesTable = robotCasesSection.getLinkedElement();
         final List<TestCase> cases = casesTable.getTestCases();
 
         validateByExternal(robotCasesSection, monitor);
 
+        reportEmptyNamesOfCases(cases);
         reportEmptyCases(cases);
         reportDuplicatedCases(cases);
         reportSettingsProblems(cases);
@@ -104,6 +105,21 @@ class TestCaseTableValidator implements ModelUnitValidator {
         new PreconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section).validate(monitor);
         new PostconditionDeclarationExistanceValidator(validationContext.getFile(), reporter, section)
                 .validate(monitor);
+    }
+
+    private void reportEmptyNamesOfCases(final List<TestCase> cases) {
+        for (final TestCase testCase : cases) {
+            final RobotToken caseName = testCase.getName();
+            if (caseName.getText().trim().isEmpty()) {
+                final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.EMPTY_CASE_NAME);
+                final int startOffset = caseName.getStartOffset();
+                final int endOffset = testCase.getEndPosition().getOffset();
+
+                final ProblemPosition problemPosition = new ProblemPosition(caseName.getFilePosition().getLine(),
+                        Range.closed(startOffset, endOffset));
+                reporter.handleProblem(problem, validationContext.getFile(), problemPosition);
+            }
+        }
     }
 
     private void reportEmptyCases(final List<TestCase> cases) {
