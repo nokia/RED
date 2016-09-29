@@ -37,17 +37,25 @@ public class RobotSuiteFileCreator {
     }
 
     public RobotSuiteFile build() {
-        final String content = getContent();
-        final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
-        final RobotSuiteStreamFile model = new RobotSuiteStreamFile("file.robot", stream, false);
-        model.reparseEverything(content);
-        return model;
+        return buildModel("file.robot", false);
+    }
+
+    public RobotSuiteFile buildTsv() {
+        return buildModel("file.tsv", false);
     }
 
     public RobotSuiteFile buildReadOnly() {
+        return buildModel("file.robot", true);
+    }
+
+    public RobotSuiteFile buildReadOnlyTsv() {
+        return buildModel("file.tsv", true);
+    }
+
+    private RobotSuiteFile buildModel(final String filename, final boolean readOnly) {
         final String content = getContent();
         final ByteArrayInputStream stream = new ByteArrayInputStream(content.getBytes());
-        final RobotSuiteStreamFile model = new RobotSuiteStreamFile("file.robot", stream, true);
+        final RobotSuiteStreamFile model = new RobotSuiteStreamFile(filename, stream, readOnly);
         model.reparseEverything(content);
         return model;
     }
