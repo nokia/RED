@@ -185,14 +185,14 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
         final Set<IMarker> alreadyVisitedMarkers = new HashSet<>();
         for (final RobotToken token : tokens) {
             for (final IMarker marker : markers.values()) {
-                final FilePosition tokenPosition = token.getFilePosition();
-
-                final Range<Integer> tokenRange = Range.closed(tokenPosition.getOffset(),
-                        tokenPosition.getOffset() + token.getRaw().length());
+                if (alreadyVisitedMarkers.contains(marker)) {
+                    continue;
+                }
+                final Range<Integer> tokenRange = getTokenRange(token);
                 final Range<Integer> markerRange = getMarkerRange(marker);
+                
+                if ((markerRange != null && tokenRange.isConnected(markerRange))) {
 
-                if (markerRange != null && tokenRange.isConnected(markerRange)
-                        && !alreadyVisitedMarkers.contains(marker)) {
                     alreadyVisitedMarkers.add(marker);
                     final boolean shallContinue = visitor.visit(marker);
                     if (!shallContinue) {
@@ -201,6 +201,11 @@ public class SuiteFileValidationListener implements IResourceChangeListener, Sui
                 }
             }
         }
+    }
+
+    private Range<Integer> getTokenRange(final RobotToken token) {
+        final FilePosition tokenPosition = token.getFilePosition();
+        return Range.closed(tokenPosition.getOffset(), tokenPosition.getOffset() + token.getRaw().length());
     }
 
     private Range<Integer> getMarkerRange(final IMarker marker) {

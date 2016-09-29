@@ -31,7 +31,15 @@ public enum TestCasesProblem implements IProblemCause {
             return "Duplicated test case definition '%s'";
         }
     },
+    EMPTY_CASE_NAME {
+
+        @Override
+        public String getProblemDescription() {
+            return "Test case name cannot be empty";
+        }
+    },
     EMPTY_CASE {
+
         @Override
         public String getProblemDescription() {
             return "Test case '%s' contains no keywords to execute";
