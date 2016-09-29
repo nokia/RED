@@ -55,6 +55,72 @@ public class TestCaseTableValidatorTest {
 		reporter = new MockReporter();
 	}
 
+    @Test
+    public void emptyNameIsReported_1() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator()
+                .appendLine("*** Test Cases ***")
+                .appendLine("")
+                .appendLine("  kw")
+                .build();
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(TestCasesProblem.EMPTY_CASE_NAME, new ProblemPosition(2, Range.closed(19, 24))));
+    }
+
+    @Test
+    public void emptyNameIsReported_2() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("  kw")
+                .build();
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(TestCasesProblem.EMPTY_CASE_NAME, new ProblemPosition(2, Range.closed(19, 23))));
+    }
+
+    @Test
+    public void emptyNameIsReported_inTsvFile() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("    ")
+                .appendLine("\tkw")
+                .buildTsv();
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(TestCasesProblem.EMPTY_CASE_NAME, new ProblemPosition(2, Range.closed(19, 27))));
+    }
+
 	@Test
 	public void emptyTestCaseIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator()
