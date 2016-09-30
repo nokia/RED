@@ -1,0 +1,113 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _zKaAYG-LEeas5uogJbgGYA
+Element-Name: DocumentationViewInSource
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _cKvDgIbgEeaPRdjThepTww
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/30/16 11:49 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+
+
+proc "wait-for-view" [val text ""]{
+	try -times 8 -delay 500 -command{
+		get-view "Documentation View" | get-editbox | get-property text | equals $text | verify-true
+	}
+}
+// ================================ check Show in Doc view ======================================
+
+// check test1 libdoc Show in Doc while Doc window is closed
+get-view "Project Explorer" | get-tree | select "RobotProject/checking_doc.robot" | double-click
+with [get-editor "checking_doc.robot" | get-text-viewer] {
+    set-caret-pos 5 3
+    get-menu "Show in Doc View" | click
+}
+get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
+    + "checking_doc.robot\n\n"
+    + "Doc for TC: test 1" | verify-true
+with [get-editor "checking_doc.robot" | get-text-viewer] {
+    set-caret-pos 7 12
+    hover-text 7 15
+}
+get-view "Documentation View" | click
+get-view "Message Log" | click
+get-editor "checking_doc.robot" | click
+get-view "Documentation View" | close
+get-view "Message Log" | click
+
+// check kw with empty doc 
+get-editor "checking_doc.robot" | get-text-viewer | get-menu "Show in Doc View" | click
+get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw1_with_imported_kw\n"
+    + "Source: User Defined (/RobotProject/checking_doc.robot)\n"
+    + "Arguments: []\n\n"
+    + "<not documented>" | verify-true
+with [get-editor "checking_doc.robot" | get-text-viewer] {
+    set-caret-pos 16 6
+    hover-text 16 6
+}
+get-view "Documentation View" | click
+get-view "Message Log" | click
+get-editor "checking_doc.robot" | click
+get-view "Documentation View" | close
+get-view "Message Log" | click
+
+// check Show in Doc for bultin kw
+
+get-editor "checking_doc.robot" | get-text-viewer | get-menu "Show in Doc View" | click
+get-view "Documentation View" | get-editbox | get-property text | equals "Name: Log\n"
+    + "Source: BuiltIn\n"
+    + "Arguments: [message, level=INFO, html=False, console=False, repr=False]\n\n"
+    + "Logs the given message with the given level.\n\n"
+    + "Valid levels are TRACE, DEBUG, INFO (default), HTML, WARN, and ERROR.\n"
+    + "Messages below the current active log level are ignored. See\n"
+    + "`Set Log Level` keyword and ``--loglevel`` command line option\n"
+    + "for more details about setting the level.\n\n"
+    + "Messages logged with the WARN or ERROR levels will be automatically\n"
+    + "visible also in the console and in the Test Execution Errors section\n"
+    + "in the log file.\n\n"
+    + "Logging can be configured using optional ``html``, ``console`` and\n"
+    + "``repr`` arguments. They are off by default, but can be enabled\n"
+    + "by giving them a true value. See `Boolean arguments` section for more\n"
+    + "information about true and false values.\n\n"
+    + "If the ``html`` argument is given a true value, the message will be\n"
+    + "considered HTML and special characters such as ``<`` in it are not\n"
+    + "escaped. For example, logging ``<img src=\"image.png\">`` creates an\n"
+    + "image when ``html`` is true, but otherwise the message is that exact\n"
+    + "string. An alternative to using the ``html`` argument is using the HTML\n"
+    + "pseudo log level. It logs the message as HTML using the INFO level.\n\n"
+    + "If the ``console`` argument is true, the message will be written to\n"
+    + "the console where test execution was started from in addition to\n"
+    + "the log file. This keyword always uses the standard output stream\n"
+    + "and adds a newline after the written message. Use `Log To Console`\n"
+    + "instead if either of these is undesirable,\n\n"
+    + "If the ``repr`` argument is true, the given item will be passed through\n"
+    + "a custom version of Python's ``pprint.pformat()`` function before\n"
+    + "logging it. This is useful, for example, when working with strings or\n"
+    + "bytes containing invisible characters, or when working with nested data\n"
+    + "structures. The custom version differs from the standard one so that it\n"
+    + "omits the ``u`` prefix from Unicode strings and adds ``b`` prefix to\n"
+    + "byte strings.\n\n"
+    + "Examples:\n"
+    + "| Log | Hello, world!        |          |   | # Normal INFO message.   |\n"
+    + "| Log | Warning, world!      | WARN     |   | # Warning.               |\n"
+    + "| Log | <b>Hello</b>, world! | html=yes |   | # INFO message as HTML.  |\n"
+    + "| Log | <b>Hello</b>, world! | HTML     |   | # Same as above.         |\n"
+    + "| Log | <b>Hello</b>, world! | DEBUG    | html=true | # DEBUG as HTML. |\n"
+    + "| Log | Hello, console!   | console=yes | | # Log also to the console. |\n"
+    + "| Log | Hyvä \\x00     | repr=yes    | | # Log ``'Hyv\\xe4 \\x00'``. |\n\n"
+    + "See `Log Many` if you want to log multiple messages in one go, and\n"
+    + "`Log To Console` if you only want to write to the console.\n\n"
+    + "Arguments ``html``, ``console``, and ``repr`` are new in Robot Framework\n"
+    + "2.8.2.\n\n"
+    + "Pprint support when ``repr`` is used is new in Robot Framework 2.8.6,\n"
+    + "and it was changed to drop the ``u`` prefix and add the ``b`` prefix\n"
+    + "in Robot Framework 2.9." | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
