@@ -117,8 +117,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.RedoHandler.E4RedoHandler;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.UndoHandler.E4UndoHandler;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.graphics.ColorsManager;
@@ -304,10 +302,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                     } else if (e.character == X_KEY) {
                         documentation.cut();
                     } else if (e.character == Z_KEY) {
-                        new E4UndoHandler().undo(commandsStack);
                         updateDocumentationWithPositionPresave(getDocumentation(getSection(), hasEditDocRepresentation.get()));
                     } else if (e.character == Y_KEY) {
-                        new E4RedoHandler().redo(commandsStack);
                         updateDocumentationWithPositionPresave(getDocumentation(getSection(), hasEditDocRepresentation.get()));
                     }
                 } else if (e.stateMask == SWT.NONE && e.character == SWT.TAB) {
