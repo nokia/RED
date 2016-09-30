@@ -8,6 +8,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -34,7 +35,9 @@ public class PasteInCasesTableHandler extends DIParameterizedHandler<E4PasteInCa
             final List<EditorCommand> pasteCommands = new PasteCasesCellsCommandsCollector()
                     .collectPasteCommands(editor.getSelectionLayerAccessor(), selectedElements, clipboard);
 
+            final EditorCommand parentCommand = new EmptyCommand(); 
             for (final EditorCommand command : pasteCommands) {
+                command.setParent(parentCommand);
                 commandsStack.execute(command);
             }
         }

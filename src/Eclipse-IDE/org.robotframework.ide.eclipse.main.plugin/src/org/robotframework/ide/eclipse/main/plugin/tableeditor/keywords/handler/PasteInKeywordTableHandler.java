@@ -13,6 +13,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -39,7 +40,9 @@ public class PasteInKeywordTableHandler extends DIParameterizedHandler<E4PasteIn
             final List<EditorCommand> pasteCommands = new PasteKeywordsCellsCommandsCollector()
                     .collectPasteCommands(editor.getSelectionLayerAccessor(), selectedKeywords, clipboard);
 
+            final EditorCommand parentCommand = new EmptyCommand(); 
             for (final EditorCommand command : pasteCommands) {
+                command.setParent(parentCommand);
                 commandsStack.execute(command);
             }
         }

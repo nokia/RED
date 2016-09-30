@@ -17,6 +17,7 @@ import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.CleanVariableValueCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.variables.SetVariableNameCommand;
@@ -46,7 +47,9 @@ public class DeleteInVariableTableHandler extends DIParameterizedHandler<E4Delet
             final Collection<EditorCommand> detailsDeletingCommands = createCommandsForDetailsRemoval(section,
                     selectionLayerAccessor.getSelectedPositions());
 
+            final EditorCommand parentCommand = new EmptyCommand(); 
             for (final EditorCommand command : detailsDeletingCommands) {
+                command.setParent(parentCommand);
                 commandsStack.execute(command);
             }
         }
