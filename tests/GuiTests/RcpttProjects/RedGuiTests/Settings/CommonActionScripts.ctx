@@ -5,8 +5,8 @@ Element-Name: CommonActionScripts
 Element-Type: context
 Element-Version: 2.0
 Id: _Qh0yIA9TEeWFTuCZGHkLuQ
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 6/27/16 3:49 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/30/16 12:15 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -52,7 +52,7 @@ proc "os-specific" [val windowsValue] [val linuxValue]
 
 
 //get python path: "C:\Pyhon27"
-global [val python_exe_path [run-process-and-trim  "python" "-c"  "import sys,os.path; print os.path.dirname(sys.executable)" ]]
+global [val python_exe_path [run-process-and-trim  "python" "-c"  "import sys,os.path; print(os.path.dirname(sys.executable))" ]]
 
 
 //get jython path: "d:\jyton\jython2.7.0\bin\"
