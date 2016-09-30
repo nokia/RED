@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.ui.ISources;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
@@ -36,7 +37,9 @@ public abstract class E4DeleteInTableHandler {
             Collections.reverse(detailsDeletingCommands); // deleting must be started from the
                                                           // biggest column index
 
+            final EditorCommand parentCommand = new EmptyCommand(); 
             for (final EditorCommand command : detailsDeletingCommands) {
+                command.setParent(parentCommand);
                 commandsStack.execute(command);
             }
         }

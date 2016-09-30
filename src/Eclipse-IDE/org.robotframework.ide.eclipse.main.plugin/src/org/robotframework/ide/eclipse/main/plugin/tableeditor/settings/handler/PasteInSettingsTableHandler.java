@@ -15,6 +15,7 @@ import org.eclipse.ui.ISources;
 import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.model.cmd.EmptyCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorSources;
@@ -53,7 +54,9 @@ public class PasteInSettingsTableHandler extends DIParameterizedHandler<E4PasteI
             final List<EditorCommand> pasteCommands = new PasteSettingsCellsCommandsCollector()
                     .collectPasteCommands(selectionLayerAccessor, selectedSettings, clipboard);
 
+            final EditorCommand parentCommand = new EmptyCommand(); 
             for (final EditorCommand command : pasteCommands) {
+                command.setParent(parentCommand);
                 commandsStack.execute(command);
             }
         }
