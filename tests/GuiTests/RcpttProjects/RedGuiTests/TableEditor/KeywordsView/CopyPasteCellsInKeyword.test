@@ -1,0 +1,92 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _kJ0i8BXWEeW05sQKg0mypw
+Element-Name: CopyPasteCellsInKeyword
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _r4_OYHjlEeakktY5L2hCSg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 9/14/16 10:24 AM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+// test: copy one cell to the same body of KW
+
+// open suite and change to KW table
+get-view "Project Explorer" | get-tree | select "MediumRobotTest/Script.robot" | double-click
+with [get-editor "Script.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 30 8
+    }
+    get-tab-folder | get-tab-item Keywords | click
+}
+//set focus on item to copy from KW from Outline
+get-view Outline | get-tree | select "Script.robot/Keywords/REVERSE MY LIST/Create List"
+with [get-editor "Script.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+	// use RMB menu to copy element
+    get-menu Copy | click
+    // go 2 rows down
+    key-type Down -times 2
+    // paste item
+    get-menu Paste | click
+    key-type "M1+s"
+}
+// move cursor one row down on ..., add new line by Enter, bast the same cell by ctrl+v
+get-eclipse-window | key-type "TRAVERSE_ARROW_NEXT"
+get-eclipse-window | key-type Down
+with [get-editor "Script.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type "M1+v"
+    }
+
+}
+
+
+
+// move one down to ... create new line by Enter, ADD ROW by ctrl+shift+v RMB menu
+with [get-editor "Script.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type "M1+M2+v"
+        key-type Down
+        get-menu "Row/Paste row" | click
+    }
+//valiate Source
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "Script.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Library  String\n"
+    + "Library  Collections\n"
+    + "*** Variables ***\n"
+    + "${x}    5\n"
+    + "${long_name_global_value}    I have a space and \\t single tab\n"
+    + "*** Test Cases ***\n"
+    + "CAPITAL LETTER\n"
+    + "\tSet Global Variable  ${global_made_by_test}  made by test\n"
+    + "\tShould Be Equal  ${global_made_by_test}  made by test\n"
+    + "\tREVERSE MY LIST\n"
+    + "test1\n"
+    + "\t@{list1}=  Create List  1  2  8  4  1 33\n"
+    + "\t@{list2}=  Create List   55  66  77\n"
+    + "\tInsert Into List \t${list1} \t3  \t${list2}\n"
+    + "\t#${new}  comment\n"
+    + "\t${a}=    Set Variable    ${SPACE}\n"
+    + "\tSort List  ${list1}\n"
+    + "\tLog   ${long_name_global_value} \n"
+    + "*** Keywords ***\n"
+    + "REVERSE MY LIST\n"
+    + "\t@{list_to_revert}=  Create List  1  2\n"
+    + "\tReverse List  ${list_to_revert}\n"
+    + "\t@{list_to_revert}=  ${list_to_revert}\n"
+    + "    @{list_to_revert}=\n"
+    + "    @{list_to_revert}=    Create List    1    2\n"
+    + "    @{list_to_revert}=    Create List    1    2\n"
+    + "    \\" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
