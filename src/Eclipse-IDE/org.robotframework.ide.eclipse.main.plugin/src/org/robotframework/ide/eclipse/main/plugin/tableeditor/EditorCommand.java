@@ -37,6 +37,10 @@ public abstract class EditorCommand {
         return parent;
     }
 
+    public void setParent(final EditorCommand parent) {
+        this.parent = parent;
+    }
+
     protected List<EditorCommand> newUndoCommands(final EditorCommand newUndoCommand) {
         return newUndoCommands(newArrayList(newUndoCommand));
     }
