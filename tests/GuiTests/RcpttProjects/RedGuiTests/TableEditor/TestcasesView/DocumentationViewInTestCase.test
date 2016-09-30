@@ -7,12 +7,14 @@ Element-Version: 3.0
 External-Reference: 
 Id: _72sQgG-KEeas5uogJbgGYA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/8/16 3:05 PM
+Save-Time: 9/30/16 11:42 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
+
+
 
 proc "wait-for-view" [val text ""]{
 	try -times 8 -delay 500 -command{
@@ -195,5 +197,74 @@ get-view "Documentation View" | get-editbox | get-property text | equals "kw_wit
 get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type Down -times 3
 get-view "Documentation View" | get-editbox | get-property text | equals "" | verify-true  
 
-   
+//==================================== Show in Doc View ==========================================================================
+// Show in Doc - KW
+get-view "Documentation View" | click
+get-view "Message Log" | click
+get-editor "checking_doc.robot" | click
+get-view "Documentation View" | close
+get-view "Message Log" | click
+    
+
+// check Show in Doc for KW doc
+get-view Outline | get-tree | select "checking_doc.robot/Keywords/kw_with_doc_and_arg"
+get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Show in Doc View" 
+    | click
+get-view "Documentation View" | get-editbox | get-property text | equals "kw_with_doc_and_arg\n"
+    + "checking_doc.robot\n\n"
+    + "Second main kw" | verify-true
+get-view "Documentation View" | click
+get-view "Message Log" | click
+get-editor "checking_doc.robot" | click
+get-view "Documentation View" | close
+get-view "Message Log" | click
+// check Show in Doc for built in doc
+get-view Outline | get-tree | select "checking_doc.robot/Keywords/kw_with_doc_and_arg/Catenate" | double-click
+get-editor "checking_doc.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Show in Doc View" 
+    | click
+get-view "Documentation View" | get-editbox | get-property text | equals "Name: Catenate\n"
+    + "Source: BuiltIn\n"
+    + "Arguments: [*items]\n\n"
+    + "Catenates the given items together and returns the resulted string.\n\n"
+    + "By default, items are catenated with spaces, but if the first item\n"
+    + "contains the string ``SEPARATOR=<sep>``, the separator ``<sep>`` is\n"
+    + "used instead. Items are converted into strings when necessary.\n\n"
+    + "Examples:\n"
+    + "| ${str1} = | Catenate | Hello         | world |       |\n"
+    + "| ${str2} = | Catenate | SEPARATOR=--- | Hello | world |\n"
+    + "| ${str3} = | Catenate | SEPARATOR=    | Hello | world |\n"
+    + "=>\n"
+    + "| ${str1} = 'Hello world'\n"
+    + "| ${str2} = 'Hello---world'\n"
+    + "| ${str3} = 'Helloworld'" | verify-true
+
+
+// Show in Doc View in TestCases
+
+get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test1"
+get-view "Documentation View" | click
+get-view "Message Log" | click
+get-editor "checking_doc.robot" | click
+get-view "Documentation View" | close
+get-view "Message Log" | click
+
+// check Show in Doc for TC libdoc
+get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-menu "Show in Doc View" 
+    | click
+get-view "Documentation View" | get-editbox | get-property text | equals "test1\n"
+    + "checking_doc.robot\n\n"
+    + "Doc for TC: test 1" | verify-true
+get-view "Documentation View" | click
+get-view "Message Log" | click
+get-view Outline | click
+get-view "Documentation View" | close
+get-view "Message Log" | click
+// check Show in Doc for child kw in TC
+get-view Outline | get-tree | select "checking_doc.robot/Test Cases/test1/kw1_with_imported_kw"
+get-editor "checking_doc.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-menu "Show in Doc View" 
+    | click
+get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw1_with_imported_kw\n"
+    + "Source: User Defined (/RobotProject/checking_doc.robot)\n"
+    + "Arguments: []\n\n"
+    + "<not documented>" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
