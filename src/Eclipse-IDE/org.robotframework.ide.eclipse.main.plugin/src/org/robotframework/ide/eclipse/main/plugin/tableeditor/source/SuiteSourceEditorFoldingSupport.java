@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.source.Annotation;
@@ -90,9 +91,7 @@ class SuiteSourceEditorFoldingSupport {
         final Iterable<Position> positionsSpanningOverLimit = filter(positions,
                 onlyPositionsSpanning(document, preferences.getFoldingLineLimit()));
 
-        final int additionalLength = DocumentUtilities.getDelimiter(document).length();
-        return newHashSet(transform(positionsSpanningOverLimit,
-                delimiterShiftedPosition(additionalLength, document.getLength())));
+        return newHashSet(transform(positionsSpanningOverLimit, nextLineShiftedPosition(document)));
     }
 
     private Collection<Position> calculateSectionsFoldingPositions(final RobotSuiteFile model) {
@@ -251,17 +250,23 @@ class SuiteSourceEditorFoldingSupport {
         };
     }
 
-    private static Function<Position, Position> delimiterShiftedPosition(final int additionalLength,
-            final int documentLength) {
+    private static Function<Position, Position> nextLineShiftedPosition(final IDocument document) {
         return new Function<Position, Position>() {
 
             @Override
             public Position apply(final Position position) {
-                final int length = position.getLength() + additionalLength;
-                if (position.getOffset() + length > documentLength) {
-                    return new Position(position.getOffset(), Math.max(0, documentLength - position.getOffset()));
-                } else {
-                    return new Position(position.getOffset(), length);
+                try {
+                    final int line = document.getLineOfOffset(position.getOffset() + position.getLength());
+                    final int nextLine = line + 1;
+                    if (nextLine >= document.getNumberOfLines()) {
+                        return new Position(position.getOffset(),
+                                Math.max(0, document.getLength() - position.getOffset()));
+                    } else {
+                        final int nextLineOffset = document.getLineInformation(nextLine).getOffset();
+                        return new Position(position.getOffset(), nextLineOffset - position.getOffset());
+                    }
+                } catch (final BadLocationException e) {
+                    return position;
                 }
             }
         };
