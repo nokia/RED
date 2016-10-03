@@ -164,7 +164,9 @@ public class RobotVariable implements RobotFileInternalElement, Serializable {
                 end = maxStart + token.getText().length();
             }
         }
-        return new Position(begin, end - begin);
+        // it may happen that begin == -1 when there is no declaration (only comment in variable table)
+        final int beginToUse = begin == -1 ? maxStart : begin;
+        return new Position(beginToUse, end - beginToUse);
     }
 
     @Override
