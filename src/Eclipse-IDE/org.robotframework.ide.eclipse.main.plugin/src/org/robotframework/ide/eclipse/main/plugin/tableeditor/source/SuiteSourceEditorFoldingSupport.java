@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,6 +70,19 @@ class SuiteSourceEditorFoldingSupport {
         this.textControl = textControl;
         this.annotationsModel = annotationsModel;
         this.oldFoldingAnnotations = new HashMap<>();
+    }
+
+    public void reset() {
+        if (annotationsModel != null) {
+            final Iterator<Annotation> annotationIterator = annotationsModel.getAnnotationIterator();
+            while (annotationIterator.hasNext()) {
+                final Annotation next = annotationIterator.next();
+                if (next instanceof ProjectionAnnotation) {
+                    annotationsModel.removeAnnotation(next);
+                }
+            }
+        }
+        oldFoldingAnnotations.clear();
     }
 
     Collection<Position> calculateFoldingPositions(final RobotSuiteFile model, final IDocument document) {
