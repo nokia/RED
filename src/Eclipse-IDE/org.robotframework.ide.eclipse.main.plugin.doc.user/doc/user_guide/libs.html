@@ -36,10 +36,10 @@ Double click on Discover option, RED will search either PythonPath or library fi
 <br>
 All changes are stored in red.xml, if you need to modify them, open red.xml using Eclipse Default Editor.
 
-<h3>Using libspec file when external library is not present locally</h3>
+<h3>Using libdoc file when external library is not present locally</h3>
 
 In some scenarios, testware edit happens on different host than test runtime thus it is undesirable/unnecessary to install/import all libraries as on remote host. RobotFramework provides possibility to generate an xml file with list of keywords, this also provides agile test development where libraries are developed in parallel to test cases.<br>
-Libspec file can be included instead of link to external library by using red.xml editor.<br><br>
+Libdoc file can be included instead of link to external library by using red.xml editor.<br><br>
 For more information about LibDoc please refer to <a href="http://robot-framework.readthedocs.io/en/latest/_modules/robot/libdoc.html?highlight=libdoc">http://robot-framework.readthedocs.io/en/latest/_modules/robot/libdoc.html?highlight=libdoc</a> <br>
 <h3>Errors while importing Referenced Libraries </h3>
 During library import, RED is generating LibDoc from given python file using local python interpreter. 
@@ -49,6 +49,12 @@ Whenever RED encounters problem, it will be shown as popup window from Python ex
 <br><br><img src="libs/libs_8.png"> <br><br>
 This indicates that some of the dependencies are missing on your local machine which may affect testcase execution.    
 To verify you can try to execute libdoc in console:<br>
-<i>python -m robot.libdoc &ltPATH_TO_LIBNAME&gt list
+<i>python -m robot.libdoc &ltPATH_TO_LIBNAME&gt list </i>
+
+<h3>Reloading libraries after change</h3>
+
+Whenever external library is changed (for instance new keyword is added), libdoc needs to be regenerated to provide changes on content assist and validation in RED.</br>
+This can be done by right click on project name and selecting <i>Robot Framework -&gt Reset Robot Enviroment</i>. <br>
+For reloading selected libdoc, right click on library from Project Explorer and use <i>Reload action</i>. 
 </body>
 </html>
