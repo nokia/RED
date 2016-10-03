@@ -52,6 +52,7 @@ public class SuiteSourceReconcilingStrategy implements IReconcilingStrategy, IRe
 
     @Override
     public void initialReconcile() {
+        getFoldingSupport().reset();
         updateFoldingStructure();
     }
 
