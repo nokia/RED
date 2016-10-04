@@ -51,7 +51,8 @@
     </topic>
 	<topic href="doc/user_guide/python_red_debug.html" label="Debug Robot and Python scripts">
     </topic>
-	
+	<topic href="doc/user_guide/maven.html" label="Integrate RED with Robotframework Maven Plugin">
+    </topic>
 
  </topic> 
 </toc>
