@@ -23,5 +23,10 @@ If you need to change it, this can be done by: <b>Window -> Preference -> Robot 
 Type of new variable in Variable Editor can be controlled by small green arrow next to "...add new xxx":
 <br><br><img src="table_general/add_new_var.png"> <br><br>
 Scalar type is displayed as default on add action element. Other types are: list and dictionary.<br>
+
+<h3>Undo - CTRL+Z actions in Table Editors</h3>
+Each table editor stores theirs list of performed actions which can be reverted by CTRL+Z. <br>
+Those table actions groups are independent from each other which means that CTRL+Z reverts only in active table editor even when there were other actions performed in another table editor in between.<br>
+Note that due to table to source synchronisation, revertible actions are discarted when switching to Source editor. </br>
 </body>
 </html>
