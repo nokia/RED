@@ -7,8 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _zcIlcFPzEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/17/16 10:11 AM
-Tags: Bugs
+Save-Time: 10/4/16 12:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -138,7 +137,7 @@ compare-row-with-list -file "warnings.robot" -col_amount 7 -row "4" -ref_table [
 compare-row-with-list -file "warnings.robot" -col_amount 7 -row "5" -ref_table [list  ""  ""  ""  ""  ""  ""  "#comment in line with kw" ]
 compare-row-with-list -file "warnings.robot" -col_amount 7 -row "6" -ref_table [list  "2 keyword"  ""  ""  ""  ""  ""  "" ]
 compare-row-with-list -file "warnings.robot" -col_amount 7 -row "7" -ref_table [list "${EMPTY}"  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "8" -ref_table [list "${new param}"  "Convert To Number"  "56"  ""  ""  ""  "#converting" ]
+compare-row-with-list -file "warnings.robot" -col_amount 7 -row "8" -ref_table [list "${new param}="  "Convert To Number"  "56"  ""  ""  ""  "#converting" ]
 compare-row-with-list -file "warnings.robot" -col_amount 7 -row "9" -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
 
 compare-row-with-list -file "warnings.robot" -col_amount 7 -row "10" -ref_table [list "Empty lines"  ""  ""  ""  ""  ""  "" ]
