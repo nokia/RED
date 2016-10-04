@@ -10,9 +10,9 @@
 <li>Download from <a href="https://sourceforge.net/projects/launch4j/files/launch4j-3/3.8/">launch4j</a> applicable for your OS package - we will use launch4j-3.8-win32.zip (it is standalone version, which requires only unzip)</li>
 <li>Run <i>launch4j.exe</i> GUI application</li>
 <li>In Basic tab set <i>Output file:</i> to be jython.exe application, the location and select <i>Dont't wrap the jar, launch only</i>. <br><br><img src="maven/3-basic.png"> <br><br></li>
-<li>In Classpath tab switch on <i>Custom classpath </i> and set <i>Main class:</i> to org.python.util.jython. In <i>Edit item</i>: put robotframework*.jar and press Accept button. Repeat this to add %RF_JAR% variable.<br><br><img src="maven/4-classpath.jpg"> <br><br> <br><br><img src="maven/4-classpath1.jpg"> <br><br></li>
+<li>In Classpath tab switch on <i>Custom classpath </i> and set <i>Main class:</i> to org.python.util.jython. <br>In <i>Edit item</i>: put robotframework*.jar and press Accept button. <br>Repeat this to add %RF_JAR% variable.<br><br><img src="maven/4-classpath.jpg"> <br><br> <br><br><img src="maven/4-classpath1.jpg"> <br><br></li>
 <li>In Header tab just switch <i>Header type</i> from GUI to Console.<br><br><img src="maven/5-header.png"> <br><br> </li>
-<li>In JRE tab please put in Min JRE version value 1.7.0. <br><br><img src="maven/6-jre.jpg"> <br><br></li>
+<li>In JRE tab put in Min JRE version value 1.7.0. <br><br><img src="maven/6-jre.jpg"> <br><br></li>
 <li>In main menu press <i>Build wrapper</i> (gear icon) . The application will ask you for save configuration, it is required - the name of configuration and place where it will be located is optional.</li>
 <li>If everything was done ok you will be able to see in Log text area information about Successfully created file. <br><br><img src="maven/8-jre.png"> <br><br></li>
 </ul>
