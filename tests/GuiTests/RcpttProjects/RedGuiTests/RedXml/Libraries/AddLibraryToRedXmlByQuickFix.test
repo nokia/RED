@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 5/24/16 5:40 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/4/16 11:43 AM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -209,7 +209,7 @@ with [get-view "Project Explorer" | get-tree] {
         | verify-true
 }
 
-//add here_is_class.Dog
+//add here_is_class.DOG
 get-tab-folder -index 1 | get-tab-item "Script.robot" | click
 with [get-editor "Script.robot" | get-text-viewer] {
     set-caret-pos 6 28
@@ -218,42 +218,23 @@ with [get-editor "Script.robot" | get-text-viewer] {
     key-type "M1+SPACE"
     key-type Enter
     type-text "here_is_class."
-    type-text D
-    type-text o
-    type-text g
+    type-text Dog
     key-type "M1+s"
     set-caret-pos 7 19
     get-menu "Quick Fix" | click
     wait 300
 }
-//check error
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Discover 'here_is_class.Dog' and add to configuration"
-exec-with-options {
-    get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | click -default
-    get-window "Problem Occurred" | get-label "Unable to import here_is_class.Dog library" | get-property caption 
-        | equals "Unable to import here_is_class.Dog library" | verify-true
-    get-window "Problem Occurred" | get-button OK | click
-} -allowStatusDialog    
 
-//add python extension
-with [get-editor "Script.robot" | get-text-viewer] {
-    set-caret-pos 7 29
-    key-type BackSpace -times 3
-    type-text py
-    key-type "M1+s"
-    wait 1000
-    set-caret-pos 7 21
-    get-menu "Quick Fix" | click
-    wait 300
-}
-//add DOg
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
-    | select "Discover 'here_is_class.py' and add to configuration" | click -default
-with [get-window "Select library class"] {
-    get-table | select "here_is_class.Dog"
-    get-button OK | click
-}
+    | select "Discover 'here_is_class.Dog' and add to configuration" | click -default
+wait 1000    
+get-window "Discovering libraries summary" | get-tree 
+    | get-item "here_is_class.Dog/Status: Added to project configuration" | get-property caption 
+    | equals "Status: Added to project configuration" | verify-true
+    
+    
+get-window "Discovering libraries summary" | get-button OK | click
+get-editor "RobotProject/red.xml" | click
 //check red.xml
 try -times 8 -delay 1000 -command{
 	with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries" | get-table] {
@@ -266,17 +247,6 @@ try -times 8 -delay 1000 -command{
 
 }
 
-//add Dog
 get-button "Save \((Ctrl|M1)\+S\)" | click
-get-tab-folder -index 1 | get-tab-item "Script.robot" | click
-with [get-editor "Script.robot" | get-text-viewer] {
-    set-caret-pos 7 28
-    key-type BackSpace -times 2
-    type-text Dog
-    key-type Up
-    key-type BackSpace -times 2
-    type-text Cat
-    key-type "M1+s"
-}
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
