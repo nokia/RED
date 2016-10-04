@@ -1,0 +1,38 @@
+<html>
+<head>
+<link
+	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+	rel="stylesheet" type="text/css" />
+</head>
+<body>
+<h2>How to integrate RED with Robotframework Maven Plugin</h2>
+<ul>
+<li>Download from <a href="https://sourceforge.net/projects/launch4j/files/launch4j-3/3.8/">launch4j</a> applicable for your OS package - we will use launch4j-3.8-win32.zip (it is standalone version, which requires only unzip)</li>
+<li>Run <i>launch4j.exe</i> GUI application</li>
+<li>In Basic tab set <i>Output file:</i> to be jython.exe application, the location and select <i>Dont't wrap the jar, launch only</i>. <br><br><img src="maven/3-basic.png"> <br><br></li>
+<li>In Classpath tab switch on <i>Custom classpath </i> and set <i>Main class:</i> to org.python.util.jython. In <i>Edit item</i>: put robotframework*.jar and press Accept button. Repeat this to add %RF_JAR% variable.<br><br><img src="maven/4-classpath.jpg"> <br><br> <br><br><img src="maven/4-classpath1.jpg"> <br><br></li>
+<li>In Header tab just switch <i>Header type</i> from GUI to Console.<br><br><img src="maven/5-header.png"> <br><br> </li>
+<li>In JRE tab please put in Min JRE version value 1.7.0. <br><br><img src="maven/6-jre.jpg"> <br><br></li>
+<li>In main menu press <i>Build wrapper</i> (gear icon) . The application will ask you for save configuration, it is required - the name of configuration and place where it will be located is optional.</li>
+<li>If everything was done ok you will be able to see in Log text area information about Successfully created file. <br><br><img src="maven/8-jre.png"> <br><br></li>
+</ul>
+<br>
+The created <i>jython.exe</i> file has to two possibilities to set <i>robotframework*.jar</i> location:<br>
+1) via already set variable %RF_JAR% you can set it in <i>System Variables</i><br>
+2) using jar located in the same directory where jython.exe file is present<br>
+<br>
+The last test before integration with RED - is to test if executable file was compiled ok and will work.<br>
+Execute in command line <i>set RF_JAR=D:\userdata\RED\Desktop></i><br> <i>set RF_JAR=C:\Users\RED\.m2\repository\org\robotframework\robotframework\3.0\robotframework-3.0.jar</i> <br>
+and <i>jython.exe -m robot.run --version</i><br>
+If output looks like: Robot Framework 3.0 (Jython 2.7.0 on java1.*) it means that you can integrate jython.exe with RED.<br>
+<br>
+To integrate jython.exe with RED:<br>
+1) put <i>jython.exe</i> file to bin directory. It can be anywhere, but parent folder must be named as bin - i.e. <i>C:\bin\ </i> <br>
+2) It is easier to copy robotframework*.jar to this bin directory instead of set RF_JAR environment variable <br>
+3) run <i>eclipse.exe</i> or <i>RED.exe</i> depends on which RED version you are using<br>
+4) go to <i>Window -&gt Preferences -&gt Robot Framework -&gt Installed frameworks </i>preference<br>
+5) click <i>Add...</i> button and select bin directory from 1.<br>
+6) if everything is ok, information about Robot Framework version should be visible<br>
+7) when you will create RED project or execute Clean\Build, you should see in Robot Standard libraries standard libraries like i.e. BultIn with information about keywords, which they contains.<br>
+</body>
+</html>
