@@ -35,13 +35,13 @@ public class TokenSeparatorBuilderForTxtFormatTest {
     }
 
     @Test
-    public void test_isPipeSeparated_with_SPACE_Pipe_SPACE_shouldReturn_True() {
-        assertThat(builder.isPipeSeparated(" | ")).isTrue();
+    public void test_isPipeSeparated_with_SPACE_Pipe_SPACE_shouldReturn_False() {
+        assertThat(builder.isPipeSeparated(" | ")).isFalse();
     }
 
     @Test
-    public void test_isPipeSeparated_with_SPACE_Pipe_TAB_shouldReturn_True() {
-        assertThat(builder.isPipeSeparated(" |\t")).isTrue();
+    public void test_isPipeSeparated_with_SPACE_Pipe_TAB_shouldReturn_False() {
+        assertThat(builder.isPipeSeparated(" |\t")).isFalse();
     }
 
     @Test
