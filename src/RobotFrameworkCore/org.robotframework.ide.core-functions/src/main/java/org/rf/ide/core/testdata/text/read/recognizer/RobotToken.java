@@ -80,6 +80,10 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return endColumn;
     }
 
+    public int getEndOffset() {
+        return getStartOffset() + getEndColumn() - getStartColumn();
+    }
+
     public void setStartOffset(final int startOffset) {
         fp = new FilePosition(fp.getLine(), fp.getColumn(), startOffset);
     }
@@ -179,16 +183,18 @@ public class RobotToken implements IRobotLineElement, Serializable {
         return vai;
     }
 
+    @Override
     public RobotToken copyWithoutPosition() {
         return copy(false);
     }
 
+    @Override
     public RobotToken copy() {
         return copy(true);
     }
 
     private RobotToken copy(final boolean posInclude) {
-        RobotToken t = new RobotToken();
+        final RobotToken t = new RobotToken();
         t.setText(getText());
         t.setRaw(getRaw());
         t.types.clear();
