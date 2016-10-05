@@ -1,0 +1,128 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fC6f0Il4EeaMF54F4EAT1Q
+Element-Name: FoldingAfterChangesInTables
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _di6ocIpDEea71boqaFnZ5w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/4/16 5:12 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file
+get-view "Project Explorer" | get-tree | select "FoldingProject/all_sections.robot" | double-click
+
+//add new kw 
+get-editor "all_sections.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+wait 500
+get-view Outline | get-tree | select "all_sections.robot/Test Cases/test1/log" | click
+wait 300
+
+//add new kw
+with [get-editor "all_sections.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down -times 2
+        key-type Enter
+        type-text n
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "new line"
+        key-type Enter
+    }
+    //go to Source
+    get-tab-folder | get-tab-item Source | click
+    //collapse all section
+    with [get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+        click-ruler -line 1
+        click-ruler -line 6
+        click-ruler -line 11
+        hover-ruler -line 11
+        click-ruler -line 14
+    }
+}
+
+//check text
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "*** Settings ***\n"
+    + "*** Variables ***\n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+    
+//expand all    
+with [get-editor "all_sections.robot" | get-left-ruler] {
+    get-ruler-column AnnotationColumn | click-ruler -line 11 -button Right
+    get-menu "Folding/Expand All" | click
+    
+    //collapse kw nad tc
+    with [get-ruler-column ProjectionRulerColumn] {
+        click-ruler -line 2
+        hover-ruler -line 2
+        click-ruler -line 7
+        click-ruler -line 20
+    }
+}
+
+//check text
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test1\n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "*** Settings ***\n"
+    + "Library    Collections\n"
+    + "Metadata    new\n"
+    + "*** Variables ***\n"
+    + "${a}    1\n"
+    + "&{newDict}    key=value\n"
+    + "@{newList}    item    \n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment" | verify-true
+    
+//make chages in Variable table
+get-editor "all_sections.robot" | get-tab-folder | get-tab-item Variables | click
+wait 500
+get-view Outline | get-tree | select "all_sections.robot/Variables/newList" | click
+wait 300
+
+//add new 2 variables
+with [get-editor "all_sections.robot"] {
+    with [get-canvas -after [get-label Variables] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type Down
+        key-type Enter
+    }
+    
+    //go to source and revert changes
+    get-tab-folder | get-tab-item Source | click
+    with [get-text-viewer] {
+        key-type "M1+z"
+        set-caret-pos 21 18
+    }
+    //collapse main sections
+    with [get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+        click-ruler -line 1
+        click-ruler -line 6
+        click-ruler -line 11
+        click-ruler -line 14
+    }
+}   
+//check if all sections were collpased
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "*** Settings ***\n"
+    + "*** Variables ***\n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
