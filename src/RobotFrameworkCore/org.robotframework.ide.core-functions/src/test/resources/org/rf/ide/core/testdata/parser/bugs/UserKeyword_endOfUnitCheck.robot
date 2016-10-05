@@ -19,11 +19,11 @@ Empty
   Log  ok 	 
 
 | One_ExecRowOnly_WithSpacesAndSpaceAsLastAndTab_Pipe |
- |  | Log | ok |	 
+|  | Log | ok |	 
 
 | Three_ExecsRowOnly_WithSpacesAndSpaceAsLastAndTab_Pipe |
- |  | Log | ok |	 
- | ... | data | 
+|  | Log | ok |	 
+|  | ... | data | 
   ...  not
   Log  ok2
   Log  ok3

@@ -194,8 +194,8 @@ public class UserKeywordPositionCountTest {
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
         assertThat(endPosition.getLine()).isEqualTo(22);
-        assertThat(endPosition.getColumn()).isEqualTo(18);
-        assertThat(endPosition.getOffset()).isEqualTo(456);
+        assertThat(endPosition.getColumn()).isEqualTo(17);
+        assertThat(endPosition.getOffset()).isEqualTo(455);
     }
 
     @Test
