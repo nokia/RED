@@ -1,3 +1,49 @@
+RED 0.7.1 - 2016/10/04
+** Feature
+    * [RED-357] - [table] Ctr+z in Documentation works slow or does not allow to reenter anything 
+    * [RED-368] - [table] ctrl+z in tables
+    * [RED-497] - github #37 - add info about lib reloading and reset robot env
+
+** Enhancement
+    * [RED-92]  - double click on item on Outline focus this item in respective editor
+    * [RED-261] - Validation for duplicated settings in Keyword and Test Case tables - compatibility with RF 2.9 - 3.0
+    * [RED-364] - [table] var tsv - nothing displayed when invalid vars are entered in source ${var}<space>text<tab>text2
+    * [RED-391] - product - set default preferences in product
+    * [RED-510] - Add actions to switch off editor linking and expand tree inside outline view
+    * [RED-518] - [github #41] investigate possibility to run tests in user-defined order
+
+** Bug
+    * [RED-278] - Incorrect colors of text in editor for scripts with pipes
+    * [RED-341] - Include pythonpath and classpath from red.xml in Quick Fix
+    * [RED-395] - Errors in regression from dumping to source
+    * [RED-414] - Not aggregating errors in table view markers
+    * [RED-460] - In KW/TC table preference with s|s as separator is not take into account
+    * [RED-462] - [table] table issues to polish
+    * [RED-468] - [Test problem] Wrong amount of errors
+    * [RED-473] - Content assistant does not show keywords when one of BDD prefixes is used
+    * [RED-475] - Empty test case names are not reported
+    * [RED-494] - Adding possibility to collaps entire sections in Source
+    * [RED-503] - Different behviour of row operation in TC/KW table
+    * [RED-507] - Table Variable - new line with comment in source and editing empty list name
+    * [RED-514] - IllegalArgumentException when user click on Setting Documentation after editor open
+    * [RED-523] - Libraries Autodiscovering does not work with library alias
+    * [RED-526] - [table] Settings => Ctrl+z in Doc field and Settings undo by groups
+
+** Sub-task
+    * [RED-410] - EditingDocumentation - exception while entering text
+    * [RED-411] - many errors
+    * [RED-422] - Coping button "..." in KW cause error
+    * [RED-426] - Sorting KW with the same name
+    * [RED-451] - Adding menu in KW and Source tab to open Documentation view
+    * [RED-458] - Wrong place after pasting cut row
+    * [RED-459] - No active row menu on new added line
+    * [RED-488] - Content Assist should be the same as in Source for writing variable
+    * [RED-490] - Disabling editing cell when content assit is on after setting focus by outline
+    * [RED-500] - Setting focus after collapsing/expanding items in table
+    * [RED-516] - [KW] kw is pasted at the end of whole table when pasting it on element inside other keyword
+    * [RED-517] - 'Settings first' order should be preserved inside keywords or test cases
+
+
 RED 0.7.0 - 2016/07/14
 
 ** Feature
@@ -50,4 +96,21 @@ RED 0.7.0 - 2016/07/14
     Removing all empty lines after editing table
     Disabling cells next to test case name
     Removig second duplicated setting line
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
