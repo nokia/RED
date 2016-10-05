@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableScope;
 import org.rf.ide.core.testdata.model.table.variables.IVariableHolder;
 import org.rf.ide.core.testdata.model.table.variables.ListVariable;
 import org.rf.ide.core.testdata.text.read.ParsingState;
+import org.rf.ide.core.testdata.text.read.ParsingState.TableType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -49,7 +50,7 @@ public class VariablesDeclarationCommentMapper implements IHashCommentMapper {
             final List<AVariable> variables = variableTable.getVariables();
             final IVariableHolder var = variables.get(variables.size() - 1);
             if (isInTheSameLine(rt, var) || resolver.buildPositionDescription(fileModel, currentLine, rt)
-                    .isContinuePreviousLineTheFirstToken()) {
+                    .isContinuePreviousLineTheFirstToken(TableType.VARIABLES)) {
                 var.addCommentPart(rt);
             } else {
                 final ListVariable newVar = new ListVariable(null, createArtifactalListVariable(rt),
