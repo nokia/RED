@@ -6,16 +6,93 @@ Element-Version: 3.0
 External-Reference: 
 Id: _OPRvEF18EeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/30/16 1:23 PM
+Save-Time: 10/5/16 5:12 PM
 Tags: Bugs
 Testcase-Type: ecl
 
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+newst bug: RED-536 
+corrected bugs:
+RED-458
+RED-459
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
 get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
 
+// check Copy Past rows of KW parent - RED-458
+
+// set default source 
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "kw1\n"
+    + "    log  1\n"
+    + "    [return]  9\n"
+    + "   \n"
+    + "kw-2\n"
+    + "    Should Be Empty    item       \n"
+    + "   \n"
+    + "kw3\n"
+    + "    [Documentation]    doc\n"
+    + "    a1\n"
+    + "    a2\n"
+    + "    a3\n"
+    + "       \n"
+    + "kw4\n"
+    + "    Set Log Level    5\n"
+    + "    Catenate    a  3\n"
+    + "    \n"
+    + "kw5\n"
+    + "    \\" 
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+
+// select parent KW-2 and copy row (copy whole parent)
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw-2" | click
+wait 300
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Row/Copy row" | click
+
+// select kw4 (parent) past double KW-2, both should be pasted above current
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        get-menu "Row/Paste row" | click
+        get-menu "Row/Paste row" | click
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+// verify
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "kw1\n"
+    + "    log  1\n"
+    + "    [return]  9\n"
+    + "kw-2\n"
+    + "    Should Be Empty    item       \n"
+    + "kw3\n"
+    + "    [Documentation]    doc\n"
+    + "    a1\n"
+    + "    a2\n"
+    + "    a3\n"
+    + "kw- 4\n"
+    + "    Should Be Empty    item\n"
+    + "kw- 3\n"
+    + "    Should Be Empty    item\n"
+    + "kw4\n"
+    + "    Set Log Level    5\n"
+    + "    Catenate    a  3\n"
+    + "kw5\n"
+    + "    \\" | verify-true
+    
+//------------------------------------------------------------------------------------
+//bug RED-536 
 get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
     + "*** Keywords ***\n"
     + "kw1\n"
@@ -66,15 +143,13 @@ with [get-editor "TestFile.robot"] {
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         key-type Down -times 2
         key-type Enter
-        //remove this after bug RED-459
-        key-type Right
     }
     with [get-canvas -after [get-label "User Keywords"] -index 1] {
         get-menu "Row/Cut row" | click
 	}
 }
 
-//
+//go to "..." and paste empty line
 get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4" | click
 wait 500
 with [get-editor "TestFile.robot"] {
@@ -111,7 +186,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 
 
-//bug created here
+//bug created here: RED-536 
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
     + "*** Keywords ***\n"
     + "kw1\n"
@@ -130,69 +205,6 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "kw5\n"
     + "    \\" | verify-true
     
-//wklejanie 2x tego samego, wklejanie [set] do isniejacej i innego kw
-
-
-// check Copy Past rows of KW parent - RED-458
-
-// set default source 
-get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
-    + "*** Keywords ***\n"
-    + "kw1\n"
-    + "    log  1\n"
-    + "    [return]  9\n"
-    + "   \n"
-    + "kw-2\n"
-    + "    Should Be Empty    item       \n"
-    + "   \n"
-    + "kw3\n"
-    + "    [Documentation]    doc\n"
-    + "    a1\n"
-    + "    a2\n"
-    + "    a3\n"
-    + "       \n"
-    + "kw4\n"
-    + "    Set Log Level    5\n"
-    + "    Catenate    a  3\n"
-    + "    \n"
-    + "kw5\n"
-    + "    \\" 
+//to-do wklejanie 2x tego samego, wklejanie [set] do isniejacej i innego kw
     
-get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"    
-get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
-// select parent KW-2 and copy row (copy whole parent)
-get-view Outline | get-tree | select "TestFile.robot/Keywords/kw-2"
-get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu "Row/Copy row" | click
-// select kw4 (parent) past double KW-2, both should be pasted above current
-get-view Outline | get-tree | select "TestFile.robot/Keywords/kw4"
-with [get-editor "TestFile.robot"] {
-    with [get-canvas -after [get-label "User Keywords"] -index 1] {
-        get-menu "Row/Paste row" | click
-        get-menu "Row/Paste row" | click
-    }
-    get-tab-folder | get-tab-item Source | click
-}
-
-// verify
-get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
-    + "*** Keywords ***\n"
-    + "kw1\n"
-    + "    log  1\n"
-    + "    [return]  9\n"
-    + "kw-2\n"
-    + "    Should Be Empty    item       \n"
-    + "kw3\n"
-    + "    [Documentation]    doc\n"
-    + "    a1\n"
-    + "    a2\n"
-    + "    a3\n"
-    + "kw- 4\n"
-    + "    Should Be Empty    item\n"
-    + "kw- 3\n"
-    + "    Should Be Empty    item\n"
-    + "kw4\n"
-    + "    Set Log Level    5\n"
-    + "    Catenate    a  3\n"
-    + "kw5\n"
-    + "    \\" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
