@@ -5,6 +5,8 @@
  */
 package org.rf.ide.core.testdata.model;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
@@ -37,7 +39,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
 
     public abstract RobotToken getDeclaration();
 
-    public void setParent(T parent) {
+    public void setParent(final T parent) {
         this.parent = parent;
     }
 
@@ -49,19 +51,15 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
     public FilePosition getEndPosition() {
         FilePosition pos = FilePosition.createNotSet();
         if (isPresent()) {
-            List<RobotToken> elementTokens = getElementTokens();
+            final List<RobotToken> elementTokens = getElementTokens();
 
-            int size = elementTokens.size();
-            for (int i = size - 1; i >= 0; i--) {
-                RobotToken robotToken = elementTokens.get(i);
-                if (robotToken.getStartOffset() >= 0) {
-                    int endColumn = robotToken.getEndColumn();
-                    int length = endColumn - robotToken.getStartColumn();
-                    FilePosition fp = robotToken.getFilePosition();
-                    pos = new FilePosition(fp.getLine(), robotToken.getEndColumn(), fp.getOffset() + length);
-                    break;
+            final RobotToken lastToken = Collections.max(elementTokens, new Comparator<RobotToken>() {
+                @Override
+                public int compare(final RobotToken o1, final RobotToken o2) {
+                    return Integer.compare(o1.getEndOffset(), o2.getEndOffset());
                 }
-            }
+            });
+            pos = new FilePosition(lastToken.getLineNumber(), lastToken.getEndColumn(), lastToken.getEndOffset());
         }
 
         return pos;
@@ -80,7 +78,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
             }
 
             if (pos.getOffset() >= 0) {
-                Optional<Integer> line = fileModel.getRobotLineIndexBy(pos.getOffset());
+                final Optional<Integer> line = fileModel.getRobotLineIndexBy(pos.getOffset());
                 if (line.isPresent()) {
                     pos = fileModel.getFileContent().get(line.get()).getEndOfLine().getFilePosition().copy();
                 }
@@ -111,7 +109,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
 
     protected void updateOrCreateTokenInside(final List<RobotToken> toModify, final int index, final String value,
             final IRobotTokenType expectedType) {
-        RobotToken token = new RobotToken();
+        final RobotToken token = new RobotToken();
         if (expectedType != null) {
             fixForTheType(token, expectedType);
         }
@@ -128,14 +126,14 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         if (expectedType != null) {
             fixForTheType(token, expectedType);
         }
-        int size = toModify.size();
+        final int size = toModify.size();
         if (size > index) {
             toModify.get(index).setText(token.getText());
         } else if (size == index) {
             toModify.add(token);
         } else {
             for (int i = size; i < index + 1; i++) {
-                RobotToken tempToken = new RobotToken();
+                final RobotToken tempToken = new RobotToken();
                 tempToken.getTypes().clear();
                 if (expectedType == null) {
                     tempToken.getTypes().addAll(token.getTypes());
@@ -191,7 +189,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
     }
 
     protected void fixForTheType(final RobotToken token, final IRobotTokenType expectedMainType,
-            boolean shouldNullCheck) {
+            final boolean shouldNullCheck) {
         if (shouldNullCheck && token == null) {
             return;
         }
@@ -205,7 +203,7 @@ public abstract class AModelElement<T> implements IOptional, IChildElement<T> {
         }
 
         int orderTokIndex = 0;
-        int size = listOfTokens.size();
+        final int size = listOfTokens.size();
         for (int i = 0; i < size; i++) {
             if (order.contains(listOfTokens.get(i))) {
                 listOfTokens.set(i, order.get(orderTokIndex));
