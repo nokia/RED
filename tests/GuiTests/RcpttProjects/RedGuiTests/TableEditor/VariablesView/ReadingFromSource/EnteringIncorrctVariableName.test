@@ -7,13 +7,15 @@ Element-Version: 3.0
 External-Reference: 
 Id: _ddTAYEH8EeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/3/16 12:06 PM
+Save-Time: 10/5/16 2:30 PM
+Tags: Bugs
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
 Content-Type: text/plain
 Entry-Name: .description
 
+Bug RED-531
 Temporary adding method is used.
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -213,6 +215,22 @@ check-variable-row -file "TestFile.robot" -row "5" -var "&dict" -value "[]"
 check-variable-row -file "TestFile.robot" -row "6" -var "\"nothing\"" -value "[5]"
 check-variable-row -file "TestFile.robot" -row "7" -var "!abc" -value "[]"
 check-variable-row -file "TestFile.robot" -row "8" -var "${" -value "[space}, 99]"
-check-variable-row -file "TestFile.robot" -row "9" -var "${scala}" -value "56"
-    
+check-variable-row -file "TestFile.robot" -row "9" -var "${scala}r" -value "[56]"
+check-variable-row -file "TestFile.robot" -row "10" -var "{$scalar}" -value "[21]"
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals  "*** Variables ***\n"
+    + "&{newDict}   slownik = 1=value1  2=value2  key1=    =4\n"
+    + "${}\n"
+    + "scalar \n"
+    + "@tab \n"
+    + "&dict\n"
+    + "\"nothing\"  5\n"
+    + "!abc\n"
+    + "${   space}   99\n"
+    + "${scala}r  56\n"
+    + "{$scalar}  21\n\n\n"
+    + "*** Test Cases ***\n"
+    + "test\n"
+    + "    log many  &{newDict}" | verify-true
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
