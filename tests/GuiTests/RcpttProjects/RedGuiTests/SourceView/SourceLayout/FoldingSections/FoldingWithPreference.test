@@ -1,0 +1,569 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fC6f0Il4EeaMF54F4EAT1Q
+Element-Name: FoldingWithPreference
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _p1t0sIlwEeaMF54F4EAT1Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/5/16 1:49 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Folding"
+}
+
+//check layout
+with [get-window Preferences | get-control Any -after [get-label Folding] -index 9] {
+    get-property "getChildren().Control[0].getText()" 
+        | equals "Configure which elements are foldable in Red Source Editor" | verify-true
+    get-property "getChildren().Control[1].getChildren().length" | equals 3 | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().length" | equals 4 | verify-true
+    
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getText()" 
+        | equals "Sections (tables)" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[0].getSelection()" 
+        | equals true | verify-true
+        
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].getText()" 
+        | equals "Test cases" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[1].getSelection()" 
+        | equals true | verify-true
+        
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getText()" 
+        | equals Keywords | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[2].getSelection()" 
+        | equals true | verify-true
+        
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getText()" 
+        | equals "Documentations settings (of suites, keywords, cases)" | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[0].getChildren().Control[3].getSelection()" 
+        | equals true | verify-true
+        
+    get-property "getChildren().Control[1].getChildren().Control[1].getText()" 
+        | equals "Minimum number of lines element must span" | verify-true
+        
+    get-property "getChildren().Control[1].getChildren().Control[2].getTextLimit()" | equals 10 | verify-true
+    get-property "getChildren().Control[1].getChildren().Control[2].getText()" | equals 2 | verify-true
+    
+    
+    get-property "getChildren().Control[2].getChildren().Control[0].getText()" | equals "Restore &Defaults" 
+        | verify-true
+        
+    get-property "getChildren().Control[2].getChildren().Control[1].getText()" | equals "&Apply" | verify-true
+}
+
+//set line numbers
+
+proc "check-incorrect-value" [val value]{
+	get-window Preferences | get-editbox -after [get-label "Minimum number of lines element must span"] | set-text $value
+	get-window Preferences | get-editbox -index 1 | get-property text | equals "Value must be an Integer between 1 and 500" 
+	    | verify-true
+}
+
+proc "check-correct-value"[val value]{
+	get-window Preferences | get-editbox -after [get-label "Minimum number of lines element must span"] | set-text $value
+	get-window Preferences | get-label Folding | get-property caption | equals Folding | verify-true
+}
+//set -1
+check-incorrect-value -value "-1"
+check-correct-value -value 5
+    
+check-incorrect-value -value "0"
+check-correct-value -value 100
+
+check-incorrect-value -value "501"
+check-correct-value -value 100
+
+check-incorrect-value -value "text"
+check-correct-value -value 10
+
+check-incorrect-value -value ""
+
+//unselect all and press Restore to default
+with [get-window Preferences] {
+    get-button "Sections (tables)" | uncheck
+    get-button "Test cases" | uncheck
+    get-button Keywords | uncheck
+    get-button "Documentations settings (of suites, keywords, cases)" | uncheck
+    get-button "Restore Defaults" | click
+}
+
+//check if all wa resored
+with [get-window Preferences] {
+    get-button "Sections (tables)" | get-property selected | equals true | verify-true
+    get-button "Test cases" | get-property selected | equals true | verify-true
+    get-button Keywords | get-property selected | equals true | verify-true
+    get-button "Documentations settings (of suites, keywords, cases)" | get-property selected | equals true 
+        | verify-true
+    get-editbox -after [get-label "Minimum number of lines element must span"] | get-property text | equals 2 
+        | verify-true
+}
+//save
+get-window Preferences | get-button OK | click
+
+//open file
+get-view "Project Explorer" | get-tree | select "FoldingProject/all_sections.robot" | double-click
+
+//close all sections
+with [get-editor "all_sections.robot"] {
+    get-text-viewer | hover-text 8 10
+    with [get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+        click-ruler -line 1
+        click-ruler -line 5
+        click-ruler -line 10
+        click-ruler -line 13
+    }
+}
+
+//check if all was collapsed
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "*** Settings ***\n"
+    + "*** Variables ***\n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+    
+//expand all    
+with [get-editor "all_sections.robot" | get-left-ruler] {
+    get-ruler-column AnnotationColumn | click-ruler -line 5 -button Right
+    get-menu "Folding/Expand All" | click
+}
+
+//unselect folding Sections
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button "Sections (tables)" | uncheck
+    get-button OK | click
+}
+
+//make nay changes to make file dirty and save - folding will be changed
+with [get-editor "all_sections.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 20 18
+        type-text " "
+        key-type "M1+s"
+    }
+    //select all sections
+    with [get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+        click-ruler -line 1
+        click-ruler -line 5
+        click-ruler -line 10
+        click-ruler -line 13
+    }
+}
+//check if file is the same
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test1\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    ddd    1    3\n"
+    + "    Call Method    object    method_name    \n"
+    + "    Comment\n"
+    + "*** Settings ***\n"
+    + "Library    Collections\n"
+    + "Metadata    new\n"
+    + "*** Variables ***\n"
+    + "${a}    1\n"
+    + "&{newDict}    key=value\n"
+    + "@{newList}    item    \n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+
+//---------------------------------------------------------------------------
+//select Sections again
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button "Sections (tables)" | check
+    get-button OK | click
+}
+//make changes to restore folding
+with [get-editor "all_sections.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 20 19
+        type-text " "
+        key-type "M1+s"
+    }
+    //collapse KW
+    get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 6
+    get-text-viewer | set-caret-pos 16 13
+}
+//check if was collapsed
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test1\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "*** Settings ***\n"
+    + "Library    Collections\n"
+    + "Metadata    new\n"
+    + "*** Variables ***\n"
+    + "${a}    1\n"
+    + "&{newDict}    key=value\n"
+    + "@{newList}    item    \n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+    
+get-editor "all_sections.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn | hover-ruler -line 6
+
+//set to not collapse KW
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button Keywords | uncheck
+    get-button OK | click
+}
+//make changes
+with [get-editor "all_sections.robot" | get-text-viewer] {
+    set-caret-pos 20 20
+    type-text " "
+    key-type "M1+s"
+}
+//check if was expand now after making changes
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test1\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    ddd    1    3\n"
+    + "    Call Method    object    method_name    \n"
+    + "    Comment\n"
+    + "*** Settings ***\n"
+    + "Library    Collections\n"
+    + "Metadata    new\n"
+    + "*** Variables ***\n"
+    + "${a}    1\n"
+    + "&{newDict}    key=value\n"
+    + "@{newList}    item    \n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+    
+//collpse KW    
+get-editor "all_sections.robot" | get-left-ruler | get-ruler-column LineNumberColumn | click-ruler -line 6
+
+//check if was not collpased
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test1\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    ddd    1    3\n"
+    + "    Call Method    object    method_name    \n"
+    + "    Comment\n"
+    + "*** Settings ***\n"
+    + "Library    Collections\n"
+    + "Metadata    new\n"
+    + "*** Variables ***\n"
+    + "${a}    1\n"
+    + "&{newDict}    key=value\n"
+    + "@{newList}    item    \n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+
+
+//------------------------------------------------------------------------------------------------    
+//select KW again    
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button Keywords | check
+    get-button OK | click
+}
+
+//make changes
+with [get-editor "all_sections.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 20 21
+        type-text " "
+        key-type "M1+s"
+    }
+    
+    //collapse TC
+    get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 2
+    get-text-viewer | set-caret-pos 19 7
+}
+
+//check if was collapsed
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test1\n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    ddd    1    3\n"
+    + "    Call Method    object    method_name    \n"
+    + "    Comment\n"
+    + "*** Settings ***\n"
+    + "Library    Collections\n"
+    + "Metadata    new\n"
+    + "*** Variables ***\n"
+    + "${a}    1\n"
+    + "&{newDict}    key=value\n"
+    + "@{newList}    item    \n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+    
+//expand    
+with [get-editor "all_sections.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+    hover-ruler -line 2
+    click-ruler -line 2
+}
+
+//uncheck TC
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button "Test cases" | uncheck
+    get-button OK | click
+}
+
+//make changes
+with [get-editor "all_sections.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 20 22
+        type-text " "
+        key-type "M1+s"
+    }
+    //try to collpase
+    get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 2
+}
+
+//check if Tc was not collapsed
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test1\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    ddd    1    3\n"
+    + "    Call Method    object    method_name    \n"
+    + "    Comment\n"
+    + "*** Settings ***\n"
+    + "Library    Collections\n"
+    + "Metadata    new\n"
+    + "*** Variables ***\n"
+    + "${a}    1\n"
+    + "&{newDict}    key=value\n"
+    + "@{newList}    item    \n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+
+//-----------------------------------------------------------------------------------------------    
+get-view "Project Explorer" | get-tree | select "FoldingProject/TestFile.robot" | double-click
+
+//collapse doc
+with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+    click-ruler -line 29
+    hover-ruler -line 29
+}
+
+//check if was collapsed
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${newScalar}        ${sss}\n"
+    + "${9}    9    \n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  12\n"
+    + " one spce before\n"
+    + "     Should Be Empty    item\n"
+    + "    Log Many    second line\n"
+    + "    \n"
+    + "    \n\n"
+    + "dots at the end\n"
+    + "\tlog\t5\n"
+    + "\t${d}=\tSet Variable    8\n"
+    + "\t...\n\n"
+    + "many line\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "    log  3\n"
+    + "    log  4\n"
+    + "    log  5\n"
+    + "    log  6\n"
+    + "    log  7\t\n"
+    + "    \n"
+    + "doc is here\n"
+    + "    [Documentation]    line 1\n"
+    + "    Catenate    a    4\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "last" | verify-true
+    
+//expand    
+get-editor "TestFile.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 29
+
+//uncheck in Preference
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button "Test cases" | check
+    get-button "Documentations settings (of suites, keywords, cases)" | uncheck
+    get-button OK | click
+}
+
+//make changes
+with [get-editor "TestFile.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 36 7
+        type-text " "
+        key-type "M1+s"
+    }
+    //try to collapse
+    get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 29
+}
+
+//check that was not collpased
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${newScalar}        ${sss}\n"
+    + "${9}    9    \n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  12\n"
+    + " one spce before\n"
+    + "     Should Be Empty    item\n"
+    + "    Log Many    second line\n"
+    + "    \n"
+    + "    \n\n"
+    + "dots at the end\n"
+    + "\tlog\t5\n"
+    + "\t${d}=\tSet Variable    8\n"
+    + "\t...\n\n"
+    + "many line\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "    log  3\n"
+    + "    log  4\n"
+    + "    log  5\n"
+    + "    log  6\n"
+    + "    log  7\t\n"
+    + "    \n"
+    + "doc is here\n"
+    + "    [Documentation]    line 1\n"
+    + "    ...  line 2\n"
+    + "    ...  line 3    #commnet in line 3\n"
+    + "    ...  line 4\n"
+    + "    Catenate    a    4\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "last" | verify-true    
+    
+//---------------------------------------------------------------------------------------------------    
+//set 5 lines
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-editbox -after [get-label "Minimum number of lines element must span"] | set-text 5
+    get-button OK | click
+}
+//make changes
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 36 9
+    type-text " "
+    key-type "M1+s"
+}
+
+//collapse all TC
+with [get-editor "TestFile.robot"] {
+    with [get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+        click-ruler -line 8
+        click-ruler -line 14
+        click-ruler -line 19
+    }
+    get-text-viewer | set-caret-pos 31 34
+    get-left-ruler | get-ruler-column ProjectionRulerColumn | click-ruler -line 28
+    get-text-viewer | set-caret-pos 30 5
+}
+
+//check if only 2 last was collpased
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${newScalar}        ${sss}\n"
+    + "${9}    9    \n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  12\n"
+    + " one spce before\n"
+    + "     Should Be Empty    item\n"
+    + "    Log Many    second line\n"
+    + "    \n"
+    + "    \n\n"
+    + "dots at the end\n"
+    + "\tlog\t5\n"
+    + "\t${d}=\tSet Variable    8\n"
+    + "\t...\n\n"
+    + "many line\n"
+    + "    \n"
+    + "doc is here\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "last" | verify-true
+    
+//-------------------------------------------------------
+//set to 100 -  no TC willbe collapsed
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-editbox -after [get-label "Minimum number of lines element must span"] | set-text 100
+    get-button OK | click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 36 8
+    type-text " "
+    key-type "M1+s"
+}
+with [get-editor "TestFile.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+    click-ruler -line 6
+    click-ruler -line 14
+    click-ruler -line 19
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${newScalar}        ${sss}\n"
+    + "${9}    9    \n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  12\n"
+    + " one spce before\n"
+    + "     Should Be Empty    item\n"
+    + "    Log Many    second line\n"
+    + "    \n"
+    + "    \n\n"
+    + "dots at the end\n"
+    + "\tlog\t5\n"
+    + "\t${d}=\tSet Variable    8\n"
+    + "\t...\n\n"
+    + "many line\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "    log  3\n"
+    + "    log  4\n"
+    + "    log  5\n"
+    + "    log  6\n"
+    + "    log  7\t\n"
+    + "    \n"
+    + "doc is here\n"
+    + "    [Documentation]    line 1\n"
+    + "    ...  line 2\n"
+    + "    ...  line 3    #commnet in line 3\n"
+    + "    ...  line 4\n"
+    + "    Catenate    a    4\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "last" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

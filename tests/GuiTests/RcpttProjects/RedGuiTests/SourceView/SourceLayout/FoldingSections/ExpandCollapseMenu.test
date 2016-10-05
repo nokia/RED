@@ -1,0 +1,481 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _fC6f0Il4EeaMF54F4EAT1Q
+Element-Name: ExpandCollapseMenu
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _V3RHMIpKEea71boqaFnZ5w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/5/16 1:46 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "FoldingProject/empty_lines.robot" 
+    | select "FoldingProject/empty_lines.robot" | double-click
+    
+wait 500    
+//collaspe 3 items
+with [get-editor "empty_lines.robot" | get-left-ruler | get-ruler-column ProjectionRulerColumn] {
+    click-ruler -line 2
+    click-ruler -line 24
+    click-ruler -line 40
+}
+
+get-editor "empty_lines.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Documentation    line 11\n"
+    + "Suite Teardown    Catenate    1    2\n\n"
+    + "*** Keywords ***\n"
+    + "CheckThroughputRobot\n"
+    + "\tImport Library    name\n"
+    + "\tShould Start With    str1    str2        \n"
+    + "    log  \"log    \\t= CHECK THROUGHPUT\"    #last kw\n"
+    + "    \n"
+    + "slashes in KW\n"
+    + "    Catenate    7\n"
+    + "    \\     Should Be Equal As Strings  ds    \\    \\    fsf\n"
+    + "    \\\n"
+    + "    #kw nr 2\n"
+    + "kw with doc\n"
+    + "    [Documentation]    \n"
+    + "    ...    \n"
+    + "    Convert To String    item\n"
+    + "    \n"
+    + "Keyword\n"
+    + "Keyword 1\n"
+    + "    CheckThroughputRobot    \n"
+    + "    [Return]    d    \n"
+    + "Keyword 2\n"
+    + "    Convert To Bytes    44    \n"
+    + "    \n"
+    + "    \n"
+    + "    \n"
+    + "    \n"
+    + "Keyword 3\n"
+    + "    Get Time    \n\n"
+    + "#here more kw: \n"
+    + "*** Test cases ***\n"
+    + "many line" | verify-true
+    
+//set caret on collapsed section (Keyword)    
+with [get-editor "empty_lines.robot"] {
+    with [get-text-viewer] {
+        hover-text 24 4
+        set-caret-pos 24 4
+    }
+    //click ruler below kw and use Expand
+    with [get-left-ruler] {
+        get-ruler-column AnnotationColumn | click-ruler -line 28 -button Right
+        get-menu "Folding/Expand" | click
+    }
+    //set caret on doc
+    with [get-text-viewer] {
+        hover-text 2 8
+        set-caret-pos 2 8
+    }
+    //expand on the same line
+    with [get-left-ruler] {
+        get-ruler-column AnnotationColumn | click-ruler -line 2 -button Right
+        get-menu "Folding/Expand" | click
+    }
+    //set on TC: many lines and use shortcut
+    with [get-text-viewer] {
+        set-caret-pos 40 7
+        key-type "M1+NUMPAD_ADD" "+"
+    }
+}
+get-editor "empty_lines.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Documentation    line 11\n"
+    + "    ...    line 12\n"
+    + "    ...    line 13     \n"
+    + "    ...  #comment   \n"
+    + "Suite Teardown    Catenate    1    2\n\n"
+    + "*** Keywords ***\n"
+    + "CheckThroughputRobot\n"
+    + "\tImport Library    name\n"
+    + "\tShould Start With    str1    str2        \n"
+    + "    log  \"log    \\t= CHECK THROUGHPUT\"    #last kw\n"
+    + "    \n"
+    + "slashes in KW\n"
+    + "    Catenate    7\n"
+    + "    \\     Should Be Equal As Strings  ds    \\    \\    fsf\n"
+    + "    \\\n"
+    + "    #kw nr 2\n"
+    + "kw with doc\n"
+    + "    [Documentation]    \n"
+    + "    ...    \n"
+    + "    Convert To String    item\n"
+    + "    \n"
+    + "Keyword\n"
+    + "    [Arguments]    33\n"
+    + "Keyword 1\n"
+    + "    CheckThroughputRobot    \n"
+    + "    [Return]    d    \n"
+    + "Keyword 2\n"
+    + "    Convert To Bytes    44    \n"
+    + "    \n"
+    + "    \n"
+    + "    \n"
+    + "    \n"
+    + "Keyword 3\n"
+    + "    Get Time    \n\n"
+    + "#here more kw: \n"
+    + "*** Test cases ***\n"
+    + "many line\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "    log  3\n"
+    + "    log  4\n"
+    + "    log  5\n"
+    + "    log  6\n"
+    + "    log  7" | verify-true
+    
+    
+// --------------------------------------collapse ------------------------------------------------
+//set caret on doc and collapse from menu
+with [get-editor "empty_lines.robot"] {
+    get-text-viewer | set-caret-pos 5 6
+    with [get-left-ruler] {
+        get-ruler-column AnnotationColumn | click-ruler -line 3 -button Right
+        get-menu "Folding/Collapse" | click
+    }
+    //check cartet in CheckThroughputRobot KW and use shortcut
+    with [get-text-viewer] {
+        set-caret-pos 11 18
+        hover-text 11 13
+        key-type "M1+NUMPAD_SUBTRACT" "-"
+    }
+}
+
+//open new file
+get-view "Project Explorer" | get-tree | select "FoldingProject/TestFile.robot" | double-click
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	//set caret on last variable and collapse
+    set-caret-pos 3 11
+    key-type "M1+NUMPAD_SUBTRACT" "-"
+    
+    //set caret in doc in TC nad collapse
+    set-caret-pos 31 13
+    key-type "M1+NUMPAD_SUBTRACT" "-"
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  12\n"
+    + " one spce before\n"
+    + "     Should Be Empty    item\n"
+    + "    Log Many    second line\n"
+    + "    \n"
+    + "    \n\n"
+    + "dots at the end\n"
+    + "\tlog\t5\n"
+    + "\t${d}=\tSet Variable    8\n"
+    + "\t...\n\n"
+    + "many line\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "    log  3\n"
+    + "    log  4\n"
+    + "    log  5\n"
+    + "    log  6\n"
+    + "    log  7\t\n"
+    + "    \n"
+    + "doc is here\n"
+    + "    [Documentation]    line 1\n"
+    + "    Catenate    a    4\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "last" | verify-true
+    
+//set caret on empty line at the end of section    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 34 1
+    key-type "M1+NUMPAD_SUBTRACT" "-"
+}
+
+//entire TC section is collpased
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n\n"
+    + "*** Test Cases ***\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "last" | verify-true
+    
+//check second file    
+get-editor "empty_lines.robot" | click
+get-editor "empty_lines.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Documentation    line 11\n"
+    + "Suite Teardown    Catenate    1    2\n\n"
+    + "*** Keywords ***\n"
+    + "CheckThroughputRobot\n"
+    + "    \n"
+    + "slashes in KW\n"
+    + "    Catenate    7\n"
+    + "    \\     Should Be Equal As Strings  ds    \\    \\    fsf\n"
+    + "    \\\n"
+    + "    #kw nr 2\n"
+    + "kw with doc\n"
+    + "    [Documentation]    \n"
+    + "    ...    \n"
+    + "    Convert To String    item\n"
+    + "    \n"
+    + "Keyword\n"
+    + "    [Arguments]    33\n"
+    + "Keyword 1\n"
+    + "    CheckThroughputRobot    \n"
+    + "    [Return]    d    \n"
+    + "Keyword 2\n"
+    + "    Convert To Bytes    44    \n"
+    + "    \n"
+    + "    \n"
+    + "    \n"
+    + "    \n"
+    + "Keyword 3\n"
+    + "    Get Time    \n\n"
+    + "#here more kw: \n"
+    + "*** Test cases ***\n"
+    + "many line\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "    log  3\n"
+    + "    log  4\n"
+    + "    log  5\n"
+    + "    log  6\n"
+    + "    log  7" | verify-true
+
+
+
+//------------------------------------------------  collapse/expande all   --------------------------------
+
+proc "check-collapsed-text"{
+	get-editor "empty_lines.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n\n"
+	    + "*** Keywords ***\n\n"
+	    + "#here more kw: \n"
+	    + "*** Test cases ***" | verify-true
+		
+}
+
+proc "check-expanded-text"{
+	get-editor "empty_lines.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+	    + "Documentation    line 11\n"
+	    + "    ...    line 12\n"
+	    + "    ...    line 13     \n"
+	    + "    ...  #comment   \n"
+	    + "Suite Teardown    Catenate    1    2\n\n"
+	    + "*** Keywords ***\n"
+	    + "CheckThroughputRobot\n"
+	    + "\tImport Library    name\n"
+	    + "\tShould Start With    str1    str2        \n"
+	    + "    log  \"log    \\t= CHECK THROUGHPUT\"    #last kw\n"
+	    + "    \n"
+	    + "slashes in KW\n"
+	    + "    Catenate    7\n"
+	    + "    \\     Should Be Equal As Strings  ds    \\    \\    fsf\n"
+	    + "    \\\n"
+	    + "    #kw nr 2\n"
+	    + "kw with doc\n"
+	    + "    [Documentation]    \n"
+	    + "    ...    \n"
+	    + "    Convert To String    item\n"
+	    + "    \n"
+	    + "Keyword\n"
+	    + "    [Arguments]    33\n"
+	    + "Keyword 1\n"
+	    + "    CheckThroughputRobot    \n"
+	    + "    [Return]    d    \n"
+	    + "Keyword 2\n"
+	    + "    Convert To Bytes    44    \n"
+	    + "    \n"
+	    + "    \n"
+	    + "    \n"
+	    + "    \n"
+	    + "Keyword 3\n"
+	    + "    Get Time    \n\n"
+	    + "#here more kw: \n"
+	    + "*** Test cases ***\n"
+	    + "many line\n"
+	    + "    log  1\n"
+	    + "    log  2\n"
+	    + "    log  3\n"
+	    + "    log  4\n"
+	    + "    log  5\n"
+	    + "    log  6\n"
+	    + "    log  7" | verify-true
+
+}
+
+//set caret in other place then used menu
+with [get-editor "empty_lines.robot"] {
+    with [get-text-viewer] {
+        hover-text 36 9
+        set-caret-pos 36 11
+    }
+    with [get-left-ruler] {
+        with [get-ruler-column AnnotationColumn] {
+            click-ruler -line 18 -button Right
+        }
+        get-menu "Folding/Collapse all" | click
+    }
+}
+
+//check that all was collapsed
+check-collapsed-text
+    
+//expand all    
+with [get-editor "empty_lines.robot" | get-left-ruler] {
+    get-ruler-column AnnotationColumn | click-ruler -line 38 -button Right
+    get-menu "Folding/Expand All" | click
+}
+check-expanded-text
+
+//set caret on empty line    
+with [get-editor "empty_lines.robot" | get-text-viewer] {
+    set-caret-pos 33 3
+    key-type "M1+M2+NUMPAD_DIVIDE" "/"
+}
+check-collapsed-text
+
+//set carte at the end of line
+with [get-editor "empty_lines.robot" | get-text-viewer] {
+    set-caret-pos 39 19
+    key-type "M1+NUMPAD_MULTIPLY" "*"
+}
+check-expanded-text
+
+//set caret on 1,1 position
+with [get-editor "empty_lines.robot" | get-text-viewer] {
+    set-caret-pos 1 1
+    key-type "M1+M2+NUMPAD_DIVIDE" "/"
+}    
+
+check-collapsed-text
+
+//expand twice
+with [get-editor "empty_lines.robot" | get-text-viewer] {
+    key-type "M1+NUMPAD_MULTIPLY" "*" -times 2
+}    
+
+check-expanded-text
+
+
+//------------------------------------- edkited file collpase/expand----------------------------------
+
+//go to second file and expand using menu
+with [get-editor "TestFile.robot"] {
+    click
+    with [get-left-ruler] {
+        get-ruler-column AnnotationColumn | click-ruler -line 5 -button Right
+        get-menu "Folding/Expand All" | click
+    }
+}
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n"
+    + "${newScalar}        ${sss}\n"
+    + "${9}    9    \n\n"
+    + "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    log  12\n"
+    + " one spce before\n"
+    + "     Should Be Empty    item\n"
+    + "    Log Many    second line\n"
+    + "    \n"
+    + "    \n\n"
+    + "dots at the end\n"
+    + "\tlog\t5\n"
+    + "\t${d}=\tSet Variable    8\n"
+    + "\t...\n\n"
+    + "many line\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "    log  3\n"
+    + "    log  4\n"
+    + "    log  5\n"
+    + "    log  6\n"
+    + "    log  7\t\n"
+    + "    \n"
+    + "doc is here\n"
+    + "    [Documentation]    line 1\n"
+    + "    ...  line 2\n"
+    + "    ...  line 3    #commnet in line 3\n"
+    + "    ...  line 4\n"
+    + "    Catenate    a    4\n"
+    + "    \n"
+    + "*** Test Cases ***\n"
+    + "last" | verify-true
+    
+//add new line and don't save    
+with [get-editor "TestFile.robot" | get-text-viewer] {
+    set-caret-pos 24 11
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "log  5a"
+    key-type "M1+M2+NUMPAD_DIVIDE" "/"
+}
+
+//check if was collapsed
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Variables ***\n\n"
+    + "*** Test Cases ***\n"
+    + "    \n"
+    + "*** Test Cases ***" | verify-true
+   
+    
+//-----------------------------------------------changes in file -------------------------------------------------------
+
+get-view "Project Explorer" | get-tree | select "FoldingProject/all_sections.robot" | double-click
+with [get-editor "all_sections.robot"] {
+    with [get-text-viewer] {
+        //add new line in the middle and collapse
+        set-caret-pos 15 24
+        key-type Enter
+        key-type "M1+NUMPAD_SUBTRACT" "-"
+        
+        //add new test
+        set-caret-pos 4 11
+        key-type "NUMPAD_ENTER" "\\u000D"
+        key-type Left -times 4
+        type-text "new test"
+        key-type Enter
+        type-text "catenate  1  2"
+    }
+    //collapse in the same line
+    with [get-left-ruler] {
+        get-ruler-column ProjectionRulerColumn | click-ruler -line 6 -button Right
+        get-menu "Folding/Collapse" | click
+    }
+}
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test1\n"
+    + "    log  1\n"
+    + "    log  2\n"
+    + "new test\n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    ddd    1    3\n"
+    + "    Call Method    object    method_name    \n"
+    + "    Comment\n"
+    + "*** Settings ***\n"
+    + "Library    Collections\n"
+    + "Metadata    new\n"
+    + "*** Variables ***\n"
+    + "${a}    1\n"
+    + "&{newDict}    key=value\n\n"
+    + "@{newList}    item    \n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***\n"
+    + "comment\n"
+    + "    #comment here" | verify-true
+    
+//collapse all    
+with [get-editor "all_sections.robot" | get-text-viewer] {
+    set-caret-pos 18 1
+    key-type "M1+M2+NUMPAD_DIVIDE" "/"
+}
+get-editor "all_sections.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "*** Keywords ***\n"
+    + "*** Settings ***\n"
+    + "*** Variables ***\n"
+    + "*** Keywords ***\n"
+    + "*** Test Cases ***" | verify-true
+    
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
