@@ -13,13 +13,11 @@ import org.rf.ide.core.test.helpers.ClassFieldCleaner;
 import org.rf.ide.core.test.helpers.ClassFieldCleaner.ForClean;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
-
 @SuppressWarnings("PMD.MethodNamingConventions")
 public class PipeSeparatorTest {
 
     @ForClean
     private PipeSeparator separator;
-
 
     @Test
     public void testCaseLine_withMultipleSpaceInFirstColumn() {
@@ -27,8 +25,7 @@ public class PipeSeparatorTest {
         String theSecondSeparator = "    | ";
         String action = "${dict} =";
         String lastSeparator = "  |   ";
-        String text = theFirstSeparator + theSecondSeparator + action
-                + lastSeparator;
+        String text = theFirstSeparator + theSecondSeparator + action + lastSeparator;
         separator = new PipeSeparator(0, text);
 
         assertThat(separator.hasNextSeparator()).isTrue();
@@ -46,8 +43,7 @@ public class PipeSeparatorTest {
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
         assertThat(sep.getStartColumn()).isEqualTo(theFirstSeparator.length());
-        assertThat(sep.getEndColumn()).isEqualTo(
-                theFirstSeparator.length() + theSecondSeparator.length());
+        assertThat(sep.getEndColumn()).isEqualTo(theFirstSeparator.length() + theSecondSeparator.length());
         assertThat(sep.getText().toString()).isEqualTo(theSecondSeparator);
         assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
 
@@ -56,15 +52,13 @@ public class PipeSeparatorTest {
         sep = separator.nextSeparator();
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
-        assertThat(sep.getStartColumn()).isEqualTo(
-                theFirstSeparator.length() + theSecondSeparator.length()
-                        + action.length());
+        assertThat(sep.getStartColumn())
+                .isEqualTo(theFirstSeparator.length() + theSecondSeparator.length() + action.length());
         assertThat(sep.getEndColumn()).isEqualTo(text.length());
         assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
 
         assertThat(separator.hasNextSeparator()).isFalse();
     }
-
 
     @Test
     public void twoSeparatorsAt_theBegin() {
@@ -88,13 +82,11 @@ public class PipeSeparatorTest {
         assertThat(sep).isNotNull();
         assertThat(sep.getLineNumber()).isEqualTo(0);
         assertThat(sep.getStartColumn()).isEqualTo(theFirstSeparator.length());
-        assertThat(sep.getEndColumn()).isEqualTo(
-                theFirstSeparator.length() + theSecondSeparator.length());
+        assertThat(sep.getEndColumn()).isEqualTo(theFirstSeparator.length() + theSecondSeparator.length());
         assertThat(sep.getText().toString()).isEqualTo(theSecondSeparator);
         assertThat(sep.getTypes()).containsExactly(SeparatorType.PIPE);
         assertThat(separator.hasNextSeparator()).isFalse();
     }
-
 
     @Test
     public void singleSeparatorAt_theBegin() {
@@ -113,14 +105,12 @@ public class PipeSeparatorTest {
         assertThat(separator.hasNextSeparator()).isFalse();
     }
 
-
     @Test
     public void no_separator() {
         separator = new PipeSeparator(0, "  test");
 
         assertThat(separator.hasNextSeparator()).isFalse();
     }
-
 
     @After
     public void tearDown() throws Exception {
