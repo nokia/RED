@@ -174,7 +174,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
 
             @Override
             public boolean apply(final RobotKeywordCall element) {
-                return SettingsGroup.getImportsGroupsSet().contains((((RobotSetting) element).getGroup()));
+                return ((RobotSetting) element).isImportSetting();
             }
         }));
     }

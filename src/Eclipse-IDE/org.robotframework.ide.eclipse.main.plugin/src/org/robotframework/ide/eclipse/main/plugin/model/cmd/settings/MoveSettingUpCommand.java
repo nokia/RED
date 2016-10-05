@@ -38,7 +38,7 @@ public class MoveSettingUpCommand extends EditorCommand {
         }
         Collections.swap(section.getChildren(), currentIndex, upIndex);
         
-        ARobotSectionTable linkedElement = section.getLinkedElement();
+        final ARobotSectionTable linkedElement = section.getLinkedElement();
         if (linkedElement != null && linkedElement instanceof SettingTable) {
             if (setting.getGroup() == SettingsGroup.METADATA) {
                 ((SettingTable) linkedElement).moveUpMetadata((Metadata) setting.getLinkedElement());
@@ -62,8 +62,7 @@ public class MoveSettingUpCommand extends EditorCommand {
     }
 
     private EnumSet<SettingsGroup> getSettingsGroupSet(final SettingsGroup group) {
-        final EnumSet<SettingsGroup> imports = EnumSet.of(SettingsGroup.LIBRARIES, SettingsGroup.RESOURCES,
-                SettingsGroup.VARIABLES);
+        final EnumSet<SettingsGroup> imports = SettingsGroup.getImportsGroupsSet();
         if (imports.contains(group)) {
             return imports;
         }
