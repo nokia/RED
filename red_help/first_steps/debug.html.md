@@ -1,7 +1,7 @@
 ## Debug
 
 Debug functionality is unique way of checking what is happening during
-TestCase and TestSuite execution.It works similiary as debug functionality in
+TestCase and TestSuite execution. It works similar as debug functionality in
 most of programming languages - it allows track execution of program for
 checking unwanted behaviour either on TestCase side or in tested software. It
 is important to note that Debug functionality works only with text editor
@@ -20,7 +20,7 @@ follows: ![](debug/debug_2.png) First thing with working with Debug is to
 place at least one breakpoint. This allows RED to pause Debug execution and
 activate Stepping options.  
 To place breakpoint in Source view click on line in script and under right
-click menu choose Add breakpoint. You can also add breakpoint directly by
+click menu choose _Add breakpoint_. You can also add breakpoint directly by
 clicking on line number in Source editor view.  
 When successful, blue ball icon will appear next to it, new breakpoint entry
 will be visible in Breakpoint lists.  
@@ -40,10 +40,10 @@ Configurations... _from Debug button: ![](debug/debug_4.png)
 
 #### Breakpoints and execution stepping
 
-Breakpoints are essential item, each pause execution and allows to initiate
+Breakpoints are essential items, each pauses execution and allows to initiate
 Debug actions.  
 When breakpoint line is activated during execution, following icons are
-active: ![](debug/debug_5.png) moving from left to right:
+active: ![](debug/debug_5.png) Moving from left to right:
 
   * Blue circle - Skip All Breakpoints - allow to continue testcase execution onwards without stopping on defined breakpoints
   * Green Play - Resume - resumes test execution
@@ -55,7 +55,7 @@ active: ![](debug/debug_5.png) moving from left to right:
   * Step Return - F7 key - allows to return to main TestCase execution from embedded TestCase or Keyword if Step Into was used before
 
 List of breakpoints can be seen in upper right side of the Debug perspective.
-![](debug/break_1.png)
+![](debug/break_1.png) Breakpoints actions:
 
   * each breakpoint can be enabled/disabled
   * each breakpoint can be removed

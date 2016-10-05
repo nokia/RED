@@ -57,14 +57,14 @@ red.xml
 All changes are stored in red.xml, if you need to modify them, open red.xml
 using Eclipse Default Editor.
 
-### Using libspec file when external library is not present locally
+### Using libdoc file when external library is not present locally
 
 In some scenarios, testware edit happens on different host than test runtime
 thus it is undesirable/unnecessary to install/import all libraries as on
 remote host. RobotFramework provides possibility to generate an xml file with
 list of keywords, this also provides agile test development where libraries
 are developed in parallel to test cases.  
-Libspec file can be included instead of link to external library by using
+Libdoc file can be included instead of link to external library by using
 red.xml editor.  
   
 For more information about LibDoc please refer to <http://robot-
@@ -84,5 +84,14 @@ execution:
 This indicates that some of the dependencies are missing on your local machine
 which may affect testcase execution. To verify you can try to execute libdoc
 in console:  
-_python -m robot.libdoc &amp;ltPATH;_TO_LIBNAME&gt; list
+_python -m robot.libdoc &amp;ltPATH;_TO_LIBNAME&gt; list _
+
+### Reloading libraries after change
+
+Whenever external library is changed (for instance new keyword is added),
+libdoc needs to be regenerated to provide changes on content assist and
+validation in RED. This can be done by right click on project name and
+selecting _Robot Framework -&gt; Reset Robot Enviroment_.  
+For reloading selected libdoc, right click on library from Project Explorer
+and use _Reload action_.
 

@@ -18,3 +18,4 @@
 *    [Debug Robot](red_help/user_guide/debug.html.md) 
 *    [Remote debug] (red_help/user_guide/remote.html.md)    
 *    [Debug Robot&amp;Python scripts](red_help/user_guide/python_red_debug.html.md) 
+*    [How to integrate RED with Robotframework Maven Plugin](red_help/user_guide/maven.html.md) 
