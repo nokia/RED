@@ -2,15 +2,15 @@
 
 This page is intended to help users in following cases:  
 
-  * set custom Python & Robot instance in multiple Python environment for workspace or project wide usage
-  * include external resource files to be seen in content assistance and validation
+  * set custom Python & Robot instance in multiple Python environment for workspace or project wide usage;
+  * include external resource files to be seen in content assistance and validation.
 
 ###  Preferences
 
 Editor preferences are stored together with other Eclipse settings, all of
 them are shared across **active workspace**.  
 Preferences can be found in toolbar menu _Window -> Preferences -> Robot
-Framework _  
+Framework_.  
 One of the most important item in multiple python environment is setting
 active Python and RobotFramework instances to be used for running and
 debugging.  
@@ -34,7 +34,7 @@ RED
   
 ![](preferences_misc/project_external_libs.png)  
   
-**In current releases there is no transparent and discovery mechanism of including variables and libraries files automaticly** to red.xml file so user action is required any time when new external library and variable file is included in settings of testcase file.   
+**In current releases there is no transparent and discovery mechanism of including variables and libraries files automaticly** to red.xml file. For now user action is required any time when new external library and variable file is included in settings of testcase file.   
   
 Red.xml file opened with RED Project Editor should look like follows:  
   
