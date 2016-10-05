@@ -194,12 +194,12 @@ public class TestCasePositionCountTest {
         // verify
         assertThat(endPosition.isNotSet()).isFalse();
         assertThat(endPosition.getLine()).isEqualTo(22);
-        assertThat(endPosition.getColumn()).isEqualTo(18);
-        assertThat(endPosition.getOffset()).isEqualTo(458);
+        assertThat(endPosition.getColumn()).isEqualTo(17);
+        assertThat(endPosition.getOffset()).isEqualTo(457);
     }
 
     @Test
-    public void given_Three_ExecsRowOnly_WithSpacesAndSpaceAsLastAndTab_PipeTestCase_when_shouldReturnEndOf_29thLine() {
+    public void given_One_ExecsRowOnly_WithSpacesAndSpaceAsLastAndTab_PipeTestCase_when_shouldReturnEndOf_29thLine() {
         // prepare
         IExecutableStepsHolder<? extends AModelElement<? extends ARobotSectionTable>> exec = CACHED_UNITS
                 .get("Three_ExecsRowOnly_WithSpacesAndSpaceAsLastAndTab_Pipe");

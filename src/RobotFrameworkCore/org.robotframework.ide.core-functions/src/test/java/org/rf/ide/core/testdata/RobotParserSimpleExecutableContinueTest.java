@@ -33,6 +33,37 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 public class RobotParserSimpleExecutableContinueTest {
 
     @Test
+    public void givenTwoKeywords_oneWithNormalName_andSecondWithTripleDotsName_shouldReturnTwoKeywords()
+            throws Exception {
+        // prepare
+        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        when(runtime.getVersion()).thenReturn("2.9");
+        RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
+        when(projectHolder.getRobotRuntime()).thenReturn(runtime);
+        final String mainPath = "parser/bugs/";
+        final File file = new File(this.getClass().getResource(mainPath + "KeywordNameAsTripleDots.robot").toURI());
+        when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
+
+        // execute
+        final RobotParser parser = RobotParser.create(projectHolder);
+        final List<RobotFileOutput> parsed = parser.parse(file);
+
+        // verify
+        assertThat(parsed).hasSize(1);
+        final RobotFileOutput robotFileOutput = parsed.get(0);
+        assertThat(robotFileOutput.getStatus()).isEqualTo(Status.PASSED);
+        assertThat(robotFileOutput.getType()).isEqualTo(RobotFileType.RESOURCE);
+        final RobotFile fileModel = robotFileOutput.getFileModel();
+
+        assertThatOnlyKeywordTableIsIncluded(fileModel);
+        final KeywordTable keywordTable = fileModel.getKeywordTable();
+        final List<UserKeyword> keywords = keywordTable.getKeywords();
+        assertThat(keywords).hasSize(2);
+        assertThat(keywords.get(0).getName().getText()).isEqualTo("Key1");
+        assertThat(keywords.get(1).getName().getText()).isEqualTo("...");
+    }
+
+    @Test
     public void test_givenMultipleRobotExecutableLines_withCommentsJoinedByPreviouseLineContinue_shouldGives_4RobotExecutableLines()
             throws Exception {
         // prepare

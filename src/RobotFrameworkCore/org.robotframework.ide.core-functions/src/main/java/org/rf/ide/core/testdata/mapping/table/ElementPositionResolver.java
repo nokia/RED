@@ -11,6 +11,7 @@ import java.util.List;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.exec.descs.ForDescriptorInfo;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.ParsingState.TableType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -110,7 +111,7 @@ public class ElementPositionResolver {
             return previousLineContinuePosIndexes;
         }
 
-        public boolean isContinuePreviousLineTheFirstToken() {
+        public boolean isContinuePreviousLineTheFirstToken(final TableType type) {
             boolean result = false;
             if (!previousLineContinuePosIndexes.isEmpty()) {
                 final int theFirstContinue = previousLineContinuePosIndexes.get(0);
@@ -121,6 +122,17 @@ public class ElementPositionResolver {
                     result = true;
                 }
             }
+
+            if (result) {
+                if (type == TableType.KEYWORD || type == TableType.TEST_CASE) {
+                    if (getLineSeparator() == SeparatorType.TABULATOR_OR_DOUBLE_SPACE) {
+                        result = getSeparatorsPosIndexes().size() == 1;
+                    } else {
+                        result = getSeparatorsPosIndexes().size() >= 2;
+                    }
+                }
+            }
+
             return result;
         }
 
@@ -225,7 +237,7 @@ public class ElementPositionResolver {
             @Override
             public boolean isExpectedPosition(final PositionInformation posInfo, final RobotFile model,
                     final RobotLine currentLine, final RobotToken currentToken) {
-                return posInfo.isContinuePreviousLineTheFirstToken();
+                return posInfo.isContinuePreviousLineTheFirstToken(TableType.SETTINGS);
             }
         },
         LINE_CONTINUE_NEWLINE_FOR_VARIABLE_TABLE {
@@ -233,7 +245,7 @@ public class ElementPositionResolver {
             @Override
             public boolean isExpectedPosition(final PositionInformation posInfo, final RobotFile model,
                     final RobotLine currentLine, final RobotToken currentToken) {
-                return posInfo.isContinuePreviousLineTheFirstToken();
+                return posInfo.isContinuePreviousLineTheFirstToken(TableType.VARIABLES);
             }
         },
         LINE_CONTINUE_NEWLINE_FOR_TESTCASE_TABLE {
@@ -241,7 +253,7 @@ public class ElementPositionResolver {
             @Override
             public boolean isExpectedPosition(final PositionInformation posInfo, final RobotFile model,
                     final RobotLine currentLine, final RobotToken currentToken) {
-                return posInfo.isContinuePreviousLineTheFirstToken();
+                return posInfo.isContinuePreviousLineTheFirstToken(TableType.TEST_CASE);
             }
         },
         LINE_CONTINUE_NEWLINE_FOR_KEYWORD_TABLE {
@@ -249,7 +261,7 @@ public class ElementPositionResolver {
             @Override
             public boolean isExpectedPosition(final PositionInformation posInfo, final RobotFile model,
                     final RobotLine currentLine, final RobotToken currentToken) {
-                return posInfo.isContinuePreviousLineTheFirstToken();
+                return posInfo.isContinuePreviousLineTheFirstToken(TableType.KEYWORD);
             }
         },
         LINE_CONTINUE_INLINED_FOR_TESTCASE_TABLE {
