@@ -86,6 +86,10 @@ public class RobotSetting extends RobotKeywordCall {
         return arguments;
     }
 
+    public boolean isImportSetting() {
+        return SettingsGroup.getImportsGroupsSet().contains(getGroup());
+    }
+
     @Override
     public ImageDescriptor getImage() {
         return RedImages.getRobotSettingImage();

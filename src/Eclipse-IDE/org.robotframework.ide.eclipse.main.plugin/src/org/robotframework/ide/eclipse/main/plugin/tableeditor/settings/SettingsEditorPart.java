@@ -91,7 +91,7 @@ public class SettingsEditorPart extends DISectionEditorPart<SettingsEditor> {
                         metadataFragment.get().revealSetting(setting);
                     }
                     importFragment.clearSettingsSelection();
-                } else if (SettingsGroup.getImportsGroupsSet().contains(setting.getGroup())) {
+                } else if (setting.isImportSetting()) {
                     generalFragment.clearSettingsSelection();
                     if (metadataFragment.isPresent()) {
                         metadataFragment.get().clearSettingsSelection();
