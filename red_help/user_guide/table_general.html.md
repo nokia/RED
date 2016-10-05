@@ -35,3 +35,13 @@ next to "...add new xxx":
 Scalar type is displayed as default on add action element. Other types are:
 list and dictionary.  
 
+### Undo - CTRL+Z actions in Table Editors
+
+Each table editor stores theirs list of performed actions which can be
+reverted by CTRL+Z.  
+Those table actions groups are independent from each other which means that
+CTRL+Z reverts only in active table editor even when there were other actions
+performed in another table editor in between.  
+Note that due to table to source synchronisation, revertible actions are
+discarted when switching to Source editor.
+
