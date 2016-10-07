@@ -1,0 +1,114 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _AXAyAF_dEeaRBaqqj0N1Gg
+Element-Name: CollapseAllTestCasesInTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _bG_rgIynEea71boqaFnZ5w
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/7/16 6:22 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | select "RobotProject/TestFile.robot" 
+    | double-click
+    
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "case\n"
+    + "    Should Be True    1\n"
+    + "test 1\n"
+    + "    Log    2\n"
+    + "    Convert To Boolean    4\n"
+    + "last test\n"
+    + "    Convert To Number    7    #text" 
+
+//set focus on Log in second TC
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+wait 500
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1/Log" | click
+wait 300
+
+
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    get-menu "Table/Collapse All" | click
+}
+
+is-row-fully-selected -row 1
+
+check-test_case-row -file "TestFile.robot" -row 1 -tc "case"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "test 1"
+check-test_case-row -file "TestFile.robot" -row 3 -tc "last test"
+
+//go down when tc are collapsed
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Down
+    get-menu "Table/Expand All" | click
+}
+ 
+check-test_case-row -file "TestFile.robot" -row 1 -tc "case"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "Should Be True" -c1 "1"
+check-test_case-row -file "TestFile.robot" -row 3 -tc "..."
+
+check-test_case-row -file "TestFile.robot" -row 4 -tc "test 1"
+check-test_case-row -file "TestFile.robot" -row 5 -tc "Log" -c1 2
+check-test_case-row -file "TestFile.robot" -row 6 -tc "Convert To Boolean" -c1 4
+check-test_case-row -file "TestFile.robot" -row 7 -tc "..."
+
+check-test_case-row -file "TestFile.robot" -row 8 -tc "last test"
+check-test_case-row -file "TestFile.robot" -row 9 -tc "Convert To Number" -c1 7 -comment "#text"
+
+is-row-fully-selected -row 7
+
+
+//set focus on button "..."
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    key-type Down -times 2
+    get-menu "Table/Collapse All" | click
+}
+
+is-row-fully-selected -row 2
+
+check-test_case-row -file "TestFile.robot" -row 1 -tc "case"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "test 1"
+check-test_case-row -file "TestFile.robot" -row 3 -tc "last test"
+
+//add new TC with one child
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type Down
+        key-type Enter -times 2
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "new line"
+        key-type Enter
+    }
+     get-editbox -after [get-label "Test Cases"] -index 1 | key-type Esc
+}
+
+
+
+check-test_case-row -file "TestFile.robot" -row 1 -tc "case"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "test 1"
+check-test_case-row -file "TestFile.robot" -row 3 -tc "last test"
+check-test_case-row -file "TestFile.robot" -row 4 -tc "case 1"
+check-test_case-row -file "TestFile.robot" -row 5 -tc "new line"
+check-test_case-row -file "TestFile.robot" -row 6 -tc "..."
+
+//collpase  table with new TC
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-menu "Table/Collapse All" 
+    | click
+    
+check-test_case-row -file "TestFile.robot" -row 1 -tc "case"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "test 1"
+check-test_case-row -file "TestFile.robot" -row 3 -tc "last test"
+check-test_case-row -file "TestFile.robot" -row 4 -tc "case 1"
+
+is-row-fully-selected -row 3
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
