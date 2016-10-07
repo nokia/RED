@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _46WUAFTXEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/4/16 11:50 AM
+Save-Time: 10/7/16 4:52 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -173,7 +173,7 @@ proc "check-submenu-for-kw" [val row_enabled true] [val is_move_enabled true] [v
 	}
 }
 
-proc "check-menu-for-kw" [val is_child_kw_row false]{
+proc "check-menu-for-kw"{
 	get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | get-menu Paste 
 	
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -212,26 +212,13 @@ proc "check-menu-for-kw" [val is_child_kw_row false]{
 	    get-property "getMenu().getItems().MenuItem[12].getText()" | equals "Row" | verify-true
 	    
 	    get-property "getMenu().getItems().MenuItem[13].getStyle()" | equals "[SEPARATOR]"  | verify-true
-	}    
-	if [$is_child_kw_row | eq true]{
-		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-	    	get-property "getMenu().getItemCount()" | equals 16 | verify-true
-	    }
-	    
-	    //additional menu Open declaration
-	    with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-		    get-property "getMenu().getItems().MenuItem[14].isEnabled()" | equals true | verify-true
-		    get-property "getMenu().getItems().MenuItem[14].getText()" | equals "Open Declaration" | verify-true
-		    
-		    get-property "getMenu().getItems().MenuItem[15].getText()" | equals "References" | verify-true
-		}
-	    
-	}-else{
-		with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
-	    	get-property "getMenu().getItemCount()" | equals 15 | verify-true	
-		    get-property "getMenu().getItems().MenuItem[14].getText()" | equals "References" | verify-true
-		}
+	}   
+
+	with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
+    	get-property "getMenu().getItemCount()" | equals 15 | verify-true	
+	    get-property "getMenu().getItems().MenuItem[14].getText()" | equals "References" | verify-true
 	}
+	
 	if [$is_product | eq true]{
 		check-tooltip
 	}		
@@ -320,7 +307,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"
     key-type Down
 }
 
-check-menu-for-kw -is_child_kw_row true
+check-menu-for-kw
 check-submenu-for-kw -is_move_enabled false
 
 //set focus on keyword "log"
@@ -328,7 +315,7 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"
     key-type Down
 }
 
-check-menu-for-kw -is_child_kw_row true
+check-menu-for-kw
 check-submenu-for-kw
 
 //set focus on "..."
