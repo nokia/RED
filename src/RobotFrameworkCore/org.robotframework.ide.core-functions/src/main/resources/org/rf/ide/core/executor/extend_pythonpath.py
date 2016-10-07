@@ -29,7 +29,7 @@ def find_module_path(start_path):
         if os.path.isfile(current_path):
             current_path = os.path.dirname(current_path)
         elif os.path.isdir(current_path):
-            if os.path.exists(current_path + os.sep + '__init__.py'):
+            if os.path.exists(current_path + os.sep + '__init__.py') or _is_already_included_in_builtinsModules_by_pthFiles(current_path):
                 current_path = parent(current_path)
             else:
                 path = current_path
@@ -40,6 +40,9 @@ def find_module_path(start_path):
             break
 
     return path
+
+def _is_already_included_in_builtinsModules_by_pthFiles(current_path):
+    return os.path.basename(current_path) in sys.modules
 
 def get_module_name_by_path(start_path):
     module_name = start_path
