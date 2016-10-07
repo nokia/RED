@@ -1560,29 +1560,6 @@
     </handler>
  </extension>
  <extension
-       name="Code commons handlers"
-       point="org.eclipse.ui.handlers">
-    <handler
-          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.code.handler.OpenDeclarationHandler"
-          commandId="org.robotframework.ide.eclipse.openDeclaration">
-       <activeWhen>
-          <or>
-             <reference
-                   definitionId="org.robotframework.keywordsPartIsActive">
-             </reference>
-             <reference
-                   definitionId="org.robotframework.casesPartIsActive">
-             </reference>
-          </or>
-       </activeWhen>
-       <enabledWhen>
-          <reference
-                definitionId="org.robotframework.exactlyOneElementIsSelected">
-          </reference>
-       </enabledWhen>
-    </handler>
- </extension>
- <extension
        name="Test Cases part handlers"
        point="org.eclipse.ui.handlers">
     <handler
@@ -3127,24 +3104,6 @@
              name="actions"
              visible="true">
        </separator>
-       <command
-             commandId="org.robotframework.ide.eclipse.openDeclaration"
-             label="Open Declaration"
-             style="push">
-          <visibleWhen
-                checkEnabled="false">
-             <with
-                   variable="selection">
-                <iterate
-                      ifEmpty="false"
-                      operator="and">
-                   <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall">
-                   </instanceof>
-                </iterate>
-             </with>
-          </visibleWhen>
-       </command>
        <menu
              label="References">
           <command
@@ -3337,24 +3296,6 @@
              name="actions"
              visible="true">
        </separator>
-       <command
-             commandId="org.robotframework.ide.eclipse.openDeclaration"
-             label="Open Declaration"
-             style="push">
-          <visibleWhen
-                checkEnabled="false">
-             <with
-                   variable="selection">
-                <iterate
-                      ifEmpty="false"
-                      operator="and">
-                   <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall">
-                   </instanceof>
-                </iterate>
-             </with>
-          </visibleWhen>
-       </command>
        <menu
              label="References">
           <command
