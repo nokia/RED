@@ -75,7 +75,7 @@ public class TestCaseTableValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(TestCasesProblem.EMPTY_CASE_NAME, new ProblemPosition(2, Range.closed(19, 24))));
+                new Problem(TestCasesProblem.EMPTY_CASE_NAME, new ProblemPosition(2, Range.closed(19, 19))));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class TestCaseTableValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(TestCasesProblem.EMPTY_CASE_NAME, new ProblemPosition(2, Range.closed(19, 23))));
+                new Problem(TestCasesProblem.EMPTY_CASE_NAME, new ProblemPosition(2, Range.closed(19, 19))));
     }
 
     @Test
@@ -118,7 +118,7 @@ public class TestCaseTableValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(TestCasesProblem.EMPTY_CASE_NAME, new ProblemPosition(2, Range.closed(19, 27))));
+                new Problem(TestCasesProblem.EMPTY_CASE_NAME, new ProblemPosition(2, Range.closed(19, 19))));
     }
 
 	@Test
