@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _7xd9UMD2EeWqU8ILayOzQw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/5/16 5:26 PM
+Save-Time: 10/7/16 1:21 PM
 Testcase-Type: ecl
 Verifications: _SjOlgIr4Eea71boqaFnZ5w
 
@@ -22,6 +22,12 @@ get-view Problems | get-label "13 errors, 0 warnings, 0 others" | get-property c
 
 //select all problems
 
+//sort by Location
+if [or [get-view Problems | get-tree| get-property "getSortColumn().getText()" -raw| not-eq Location]
+        [get-view Problems | get-tree| get-property "getSortDirection()" -raw | not-eq 128]]{
+        
+	get-view Problems | get-tree | get-column-header Location | click
+}
 
 //error like it was in good order 
 get-view Problems | get-tree | select "Errors (13 items)/There is no keyword to execute specified" 
@@ -111,4 +117,6 @@ with [get-editor "tsv_check.tsv" | get-text-viewer] {
     get-property "caretPosition.column" | equals 13 | verify-true
     get-property "getSelectionText()" | equals "...  #ok" | verify-true
 }    
+//reset to sort by Description
+get-view Problems | get-tree | get-column-header Description | click
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
