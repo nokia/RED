@@ -113,7 +113,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
             if (caseName.getText().trim().isEmpty()) {
                 final RobotProblem problem = RobotProblem.causedBy(TestCasesProblem.EMPTY_CASE_NAME);
                 final int startOffset = caseName.getStartOffset();
-                final int endOffset = testCase.getEndPosition().getOffset();
+                final int endOffset = caseName.getEndOffset();
 
                 final ProblemPosition problemPosition = new ProblemPosition(caseName.getFilePosition().getLine(),
                         Range.closed(startOffset, endOffset));
