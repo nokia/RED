@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _aovVQG3GEeaFMpJxhF5ZTQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/4/16 11:23 AM
+Save-Time: 10/7/16 4:45 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -175,7 +175,7 @@ proc "check-submenus" [val row_enabled true] [val is_move_enabled true] [val sta
 	}
 }
 
-proc "check-menu-for-tc" [val is_child_kw_row false] [val is_move_enabled true]{
+proc "check-menu-for-tc" [val is_move_enabled true]{
 	get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-menu Paste 
 	
 	with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
@@ -219,27 +219,6 @@ proc "check-menu-for-tc" [val is_child_kw_row false] [val is_move_enabled true]{
 	    
 	}	   
 	    
-	    if [$is_child_kw_row | eq true]{
-			with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
-		    	get-property "getMenu().getItemCount()" | equals 19 | verify-true
-	    	}
-		    with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
-			    //additional menu Open declaration
-			    get-property "getMenu().getItems().MenuItem[14].getText()" | equals "Open Declaration" | verify-true
-			    
-			    get-property "getMenu().getItems().MenuItem[15].getText()" | equals References | verify-true
-			    get-property "getMenu().getItems().MenuItem[15].getStyle()" | equals "[CASCADE]" | verify-true
-			    
-			    get-property "getMenu().getItems().MenuItem[16].getStyle()" | equals "[SEPARATOR]" | verify-true
-			    
-			    get-property "getMenu().getItems().MenuItem[17].isEnabled()" | equals true | verify-true
-			    get-property "getMenu().getItems().MenuItem[17].getText()" | equals "Run test: 'test1'\\9M3+R" | verify-true
-			    
-			    get-property "getMenu().getItems().MenuItem[18].isEnabled()" | equals true | verify-true
-			    get-property "getMenu().getItems().MenuItem[18].getText()" | equals "Debug test: 'test1'\\9M1+M3+R" | verify-true
-			}
-	    
-	}-else{
 		with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
 	    	get-property "getMenu().getItemCount()" | equals  18 | verify-true
 		    
@@ -253,8 +232,8 @@ proc "check-menu-for-tc" [val is_child_kw_row false] [val is_move_enabled true]{
 		    
 		    get-property "getMenu().getItems().MenuItem[17].isEnabled()" | equals true | verify-true
 		    get-property "getMenu().getItems().MenuItem[17].getText()" | equals "Debug test: 'test1'\\9M1+M3+R" | verify-true	    	
-	   }
-	}
+	   
+		}
 	if [$is_product | eq true]{
 		check-tooltip 
 	}	
@@ -330,22 +309,22 @@ check-submenus
 
 //set focus on [teardown]
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
-check-menu-for-tc -is_child_kw_row true
+check-menu-for-tc 
 check-submenus -is_move_enabled false
 
 //set on arg of teardown
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Right
-check-menu-for-tc -is_child_kw_row true
+check-menu-for-tc 
 check-submenus  -is_move_enabled false
 
 //set on arg of Log
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Down
-check-menu-for-tc -is_child_kw_row true
+check-menu-for-tc 
 check-submenus  
 
 //set on Log
 get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type Left
-check-menu-for-tc -is_child_kw_row true
+check-menu-for-tc
 check-submenus 
 
 //chec menu on "..."
