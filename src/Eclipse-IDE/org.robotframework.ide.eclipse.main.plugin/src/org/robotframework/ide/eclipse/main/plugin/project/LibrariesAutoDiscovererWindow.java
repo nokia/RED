@@ -10,6 +10,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -26,6 +30,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -34,16 +44,28 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorRegistry;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.TreeContentProvider;
 
+import com.google.common.base.Optional;
+
 /**
  * @author mmarzec
+ * @author bembenek
  */
 public class LibrariesAutoDiscovererWindow extends Dialog {
 
@@ -126,6 +148,10 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
         discoveredLibrariesViewer
                 .setInput(importedLibraries.toArray(new RobotDryRunLibraryImport[importedLibraries.size()]));
 
+        registerLibrariesViewerListeners();
+    }
+
+    private void registerLibrariesViewerListeners() {
         discoveredLibrariesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 
             @Override
@@ -143,6 +169,86 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             }
 
         });
+
+        discoveredLibrariesViewer.getTree().addKeyListener(new KeyAdapter() {
+
+            @Override
+            public void keyReleased(final KeyEvent e) {
+                if (e.keyCode == SWT.F3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1)
+                    handleFileOpeningEvent();
+            }
+        });
+
+        final Menu menu = createContextMenu();
+        discoveredLibrariesViewer.getTree().addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseDown(final MouseEvent e) {
+                if (e.button == 3 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1
+                        && getOpenableFilePath().isPresent())
+                    menu.setVisible(true);
+            }
+
+            @Override
+            public void mouseDoubleClick(final MouseEvent e) {
+                if (e.button == 1 && discoveredLibrariesViewer.getTree().getSelectionCount() == 1)
+                    handleFileOpeningEvent();
+            }
+        });
+    }
+
+    private Menu createContextMenu() {
+        final Menu menu = new Menu(discoveredLibrariesViewer.getTree());
+        final MenuItem gotoItem = new MenuItem(menu, SWT.PUSH);
+        gotoItem.setText("Go to File");
+        gotoItem.setImage(ImagesManager.getImage(RedImages.getGoToImage()));
+        gotoItem.addSelectionListener(new SelectionAdapter() {
+
+            @Override
+            public void widgetSelected(final SelectionEvent event) {
+                handleFileOpeningEvent();
+            }
+        });
+        return menu;
+    }
+
+    private void handleFileOpeningEvent() {
+        Optional<String> filePath = getOpenableFilePath();
+        if (filePath.isPresent()) {
+            Optional<IFile> openableFile = getOpenableFile(filePath.get());
+            if (openableFile.isPresent())
+                openFileInEditor(openableFile.get());
+        }
+    }
+
+    private Optional<String> getOpenableFilePath() {
+        final TreeSelection selection = (TreeSelection) discoveredLibrariesViewer.getSelection();
+        if (selection != null && selection.getFirstElement() instanceof DryRunLibraryImportChildElement) {
+            DryRunLibraryImportChildElement childElement = (DryRunLibraryImportChildElement) selection
+                    .getFirstElement();
+            if (childElement.isOpenableFilePath())
+                return Optional.of(childElement.getValue());
+        }
+        return Optional.absent();
+    }
+
+    private static Optional<IFile> getOpenableFile(String filePath) {
+        final IPath path = new Path(filePath);
+        final IFile file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(path);
+        if (file != null && file.exists())
+            return Optional.of(file);
+        return Optional.absent();
+    }
+
+    private void openFileInEditor(IFile file) {
+        final IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
+        final IEditorDescriptor descriptor = registry.findEditor(RobotFormEditor.ID);
+        try {
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(file),
+                    descriptor.getId());
+        } catch (PartInitException e) {
+            throw new RobotEditorOpeningException("Unable to open editor for file: " + file.getName(), e);
+        }
     }
 
     private void createDetailsComposite(final Composite mainComposite) {
@@ -181,13 +287,13 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                     new DryRunLibraryImportChildElement(STATUS_ELEMENT_NAME, libraryImport.getStatus().getMessage()));
         }
         if (libraryImport.getSourcePath() != null && !libraryImport.getSourcePath().isEmpty()) {
-            children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, libraryImport.getSourcePath()));
+            children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, libraryImport.getSourcePath(), true));
         } else {
             children.add(new DryRunLibraryImportChildElement(SOURCE_ELEMENT_NAME, "Unknown"));
         }
         final List<String> importersPaths = libraryImport.getImportersPaths();
         if (importersPaths.size() == 1) {
-            children.add(new DryRunLibraryImportChildElement(IMPORTERS_ELEMENT_NAME, importersPaths.get(0)));
+            children.add(new DryRunLibraryImportChildElement(IMPORTERS_ELEMENT_NAME, importersPaths.get(0), true));
         } else {
             children.add(new DryRunLibraryImportListChildElement(IMPORTERS_ELEMENT_NAME, importersPaths));
         }
@@ -268,7 +374,17 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
                 }
                 final String childElementValue = libraryImportChildElement.getValue();
                 if (childElementValue != null && !childElementValue.isEmpty()) {
-                    label.append(childElementValue);
+                    if (libraryImportChildElement.isOpenableFilePath())
+                        label.append(new StyledString(childElementValue, new Styler() {
+
+                            @Override
+                            public void applyStyles(final TextStyle textStyle) {
+                                textStyle.underline = true;
+                                textStyle.foreground = Display.getCurrent().getSystemColor(SWT.COLOR_BLUE);
+                            }
+                        }));
+                    else
+                        label.append(childElementValue);
                 }
             } else if (element instanceof DryRunLibraryImportListChildElement) {
                 label = new StyledString(((DryRunLibraryImportListChildElement) element).getName(), new Styler() {
@@ -340,11 +456,18 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         private String value;
 
+        private boolean isOpenableFilePath;
+
         public DryRunLibraryImportChildElement(final String name, final String value) {
+            this(name, value, false);
+        }
+
+        public DryRunLibraryImportChildElement(final String name, final String value, final boolean isFilePath) {
             if (name != null) {
                 this.name = name + ELEMENT_SEPARATOR;
             }
             this.value = value;
+            this.isOpenableFilePath = isFilePath && getOpenableFile(value).isPresent();
         }
 
         public String getName() {
@@ -353,6 +476,10 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
 
         public String getValue() {
             return value;
+        }
+
+        public boolean isOpenableFilePath() {
+            return isOpenableFilePath;
         }
 
         @Override
@@ -383,7 +510,7 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
             }
             if (list != null) {
                 for (final String listElement : list) {
-                    this.list.add(new DryRunLibraryImportChildElement(null, listElement));
+                    this.list.add(new DryRunLibraryImportChildElement(null, listElement, true));
                 }
             }
         }
