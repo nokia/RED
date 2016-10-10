@@ -1,0 +1,93 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _eXb6MPp7EeW7_PzjO98BIw
+Element-Name: AutoDiscoveryHyperlinks
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _Ys0LEIyGEeaNFdJIt_L-Rg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/10/16 1:59 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+
+get-view "Project Explorer" | get-tree | select RobotProject 
+    | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
+    
+    
+//open links with double click
+with [get-window "Discovering libraries summary" | get-tree] {
+    select [format "add/Source: %s%sRobotProject%slibs%sadd.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+        | double-click
+}
+
+with [get-window "Discovering libraries summary" | get-tree] {
+    select [format "divide/Importers: %s%sRobotProject%stests%slib_with_EXECDIR.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+        | double-click
+}
+
+
+//open links with F3
+with [get-window "Discovering libraries summary" | get-tree] {
+    select [format "multiply/Importers:/%s%sRobotProject%slib_with_variable.robot" $RED_workspace_path $sys_sep $sys_sep] 
+        | key-type F3
+}
+
+with [get-window "Discovering libraries summary" | get-tree] {
+    select [format "multiply/Importers:/%s%sRobotProject%stests%stsv_with_relative_paths.tsv" $RED_workspace_path $sys_sep $sys_sep $sys_sep] 
+        | key-type F3
+}
+
+
+//select nodes without links
+with [get-window "Discovering libraries summary" | get-tree] {
+    get-item error | click
+    select error | double-click
+    get-item "error/Status: Not added to project configuration" | click
+    select "error/Status: Not added to project configuration" | double-click
+    get-item "error/Source: Unknown" | click
+    select "error/Source: Unknown" | double-click
+}
+
+
+//check opened files
+with [get-tab-folder -index 1] {
+    get-property "pages[0]" | equals "add.py" | verify-true
+    get-property "pages[1]" | equals "lib_with_EXECDIR.robot" | verify-true
+    get-property "pages[2]" | equals "lib_with_variable.robot" | verify-true
+    get-property "pages[3]" | equals "tsv_with_relative_paths.tsv" | verify-true
+    get-property activePage | equals "tsv_with_relative_paths.tsv" | verify-true
+    get-property tabCount | equals 4 | verify-true
+}
+
+
+//check hyperlinks formatting
+proc "check-hyperlink-style"  [val item] [val styleIndex] [val startIndex] {
+    get-item $item | get-property [format "styles[%s].start" $styleIndex] | equals $startIndex | verify-true
+    get-item $item | get-property [format "styles[%s].underline" $styleIndex] | equals single | verify-true
+    get-item $item | get-property [format "styles[%s].foregroundColor" $styleIndex] | equals "#0000FF" | verify-true
+}
+
+with [get-window "Discovering libraries summary" | get-tree] {
+    check-hyperlink-style [format "add/Source: %s%sRobotProject%slibs%sadd.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep] 1 8
+    check-hyperlink-style [format "divide/Importers: %s%sRobotProject%stests%slib_with_EXECDIR.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep] 1 11
+    check-hyperlink-style [format "multiply/Importers:/%s%sRobotProject%slib_with_variable.robot" $RED_workspace_path $sys_sep $sys_sep] 0 0
+    check-hyperlink-style [format "multiply/Importers:/%s%sRobotProject%stests%stsv_with_relative_paths.tsv" $RED_workspace_path $sys_sep $sys_sep $sys_sep] 0 0
+}
+
+
+//check not hyperlinks formatting
+proc "check-not-hyperlink-style"  [val item] {
+    get-item $item | verify-error {get-property "styles[1].underline" | equals single | verify-true}
+    get-item $item | verify-error {get-property "styles[1].foregroundColor" | equals "#0000FF" | verify-true}
+}
+
+with [get-window "Discovering libraries summary" | get-tree] {
+    check-not-hyperlink-style "error/Status: Not added to project configuration"
+    check-not-hyperlink-style "error/Source: Unknown"
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
