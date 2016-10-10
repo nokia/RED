@@ -30,11 +30,11 @@ import com.google.common.base.Optional;
 /**
  * @author Michal Anglart
  */
-public class HyperlinkToFilesDetector implements IHyperlinkDetector {
+public class SourceHyperlinksToFilesDetector implements IHyperlinkDetector {
 
     private final RobotSuiteFile suiteFile;
 
-    public HyperlinkToFilesDetector(final RobotSuiteFile suiteFile) {
+    public SourceHyperlinksToFilesDetector(final RobotSuiteFile suiteFile) {
         this.suiteFile = suiteFile;
     }
 

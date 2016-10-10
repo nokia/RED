@@ -57,11 +57,11 @@ import com.google.common.io.Files;
 /**
  * @author mmarzec
  */
-public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
+public class SourceHyperlinksToKeywordsDetector implements IHyperlinkDetector {
 
     private final RobotSuiteFile suiteFile;
 
-    public HyperlinkToKeywordsDetector(final RobotSuiteFile suiteFile) {
+    public SourceHyperlinksToKeywordsDetector(final RobotSuiteFile suiteFile) {
         this.suiteFile = suiteFile;
     }
 
