@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
+package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.BadLocationException;
@@ -15,7 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 /**
  * @author mmarzec
  */
-public class RegionsHyperlink implements RedHyperlink {
+public class SuiteFileSourceRegionHyperlink implements RedHyperlink {
 
     private final ITextViewer viewer;
 
@@ -27,11 +27,11 @@ public class RegionsHyperlink implements RedHyperlink {
 
     private final String additionalLabelDecoration;
 
-    public RegionsHyperlink(final ITextViewer viewer, final IRegion from, final IRegion to) {
+    public SuiteFileSourceRegionHyperlink(final ITextViewer viewer, final IRegion from, final IRegion to) {
         this(viewer, null, from, to, "");
     }
 
-    public RegionsHyperlink(final ITextViewer viewer, final RobotSuiteFile fromAndToFile, final IRegion from,
+    public SuiteFileSourceRegionHyperlink(final ITextViewer viewer, final RobotSuiteFile fromAndToFile, final IRegion from,
             final IRegion to, final String additionalLabelDecoration) {
         this.sourceAndDestinationFile = fromAndToFile;
         this.source = from;

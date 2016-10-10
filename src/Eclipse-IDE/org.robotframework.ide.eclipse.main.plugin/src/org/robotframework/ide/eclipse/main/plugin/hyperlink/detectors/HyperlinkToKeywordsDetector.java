@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
+package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
@@ -29,6 +29,13 @@ import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.CompoundHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordDocumentationHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordInLibrarySourceHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.RedHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileSourceRegionHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.UserKeywordDocumentationHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -107,7 +114,7 @@ public class HyperlinkToKeywordsDetector implements IHyperlinkDetector {
                                     + keywordPosition.getLine() + "] ["
                                     + keywordEntity.exposingResource.getFile().getFullPath() + "]";
 
-                            definitionHyperlinks.add(new RegionsHyperlink(textViewer, keywordEntity.exposingResource,
+                            definitionHyperlinks.add(new SuiteFileSourceRegionHyperlink(textViewer, keywordEntity.exposingResource,
                                     adjustedFromRegion, keywordPosition.toRegion(), lbl));
                             documentationHyperlinks.add(new UserKeywordDocumentationHyperlink(adjustedFromRegion,
                                     keywordEntity.exposingResource, keywordEntity.userKeyword, lbl));
