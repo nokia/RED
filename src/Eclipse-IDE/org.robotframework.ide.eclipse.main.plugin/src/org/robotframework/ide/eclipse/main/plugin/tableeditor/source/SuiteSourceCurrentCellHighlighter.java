@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.source.SourceViewer;
 import org.eclipse.swt.custom.CaretEvent;
 import org.eclipse.swt.custom.CaretListener;
@@ -29,14 +30,13 @@ import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
- *
  */
 class SuiteSourceCurrentCellHighlighter {
 
     private static final String MARKER_ID = "org.robotframework.red.cellHighlighting";
 
     private final SuiteSourceEditor editor;
-    
+
     private final IFile file;
 
     private final IDocument document;
@@ -81,8 +81,9 @@ class SuiteSourceCurrentCellHighlighter {
                 removeCellHighlighting();
                 highlightCell(newRegion.get());
                 currentCell = newRegion.get();
-                editor.notifyDocSelectionChangedListener(currentCell, false);
             }
+
+            editor.notifyDocSelectionChangedListener(new Region(offset, 1), false);
         } catch (final BadLocationException | InterruptedException e) {
             RedPlugin.logError("Unable to create cell highlight markers", e);
         }

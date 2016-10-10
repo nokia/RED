@@ -5,12 +5,14 @@
  */
 package org.rf.ide.core.testdata.model;
 
+import java.util.List;
+
 /**
  * @author wypych
  */
 public interface IRegionCacheable<T> {
 
-    public FileRegion getRegion();
+    public List<FileRegion> getContinuousRegions();
 
     public T getCached();
 }

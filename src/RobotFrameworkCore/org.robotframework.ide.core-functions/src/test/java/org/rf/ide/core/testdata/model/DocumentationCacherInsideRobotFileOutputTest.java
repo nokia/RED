@@ -350,7 +350,10 @@ public class DocumentationCacherInsideRobotFileOutputTest {
 
     private int middleOffset(final IDocumentationHolder holder) {
         int startOffset = holder.getBeginPosition().getOffset();
-        int endOffset = holder.getRegion().getEnd().getOffset();
+        int endOffset = holder.getContinuousRegions()
+                .get(holder.getContinuousRegions().size() - 1)
+                .getEnd()
+                .getOffset();
 
         return startOffset + ((endOffset - startOffset) % 2);
     }

@@ -39,7 +39,7 @@ public class FileRegionCacher<T> {
 
         if (lineNumber > FilePosition.NOT_SET) {
             for (final IRegionCacheable<T> cacheElement : cache) {
-                if (cacheElement.getRegion().containsLine(lineNumber)) {
+                if (isRegionContainsLine(cacheElement, lineNumber)) {
                     inPosition.add(cacheElement);
                 }
             }
@@ -53,7 +53,7 @@ public class FileRegionCacher<T> {
 
         if (offset > FilePosition.NOT_SET) {
             for (final IRegionCacheable<T> cacheElement : cache) {
-                if (cacheElement.getRegion().isInside(offset)) {
+                if (isRegionContainsOffset(cacheElement, offset)) {
                     inPosition.add(cacheElement);
                 }
             }
@@ -65,5 +65,25 @@ public class FileRegionCacher<T> {
     @VisibleForTesting
     public Set<IRegionCacheable<T>> getUnmodificableCacheContent() {
         return Collections.unmodifiableSet(cache);
+    }
+
+    private boolean isRegionContainsLine(final IRegionCacheable<T> region, final int line) {
+        for (final FileRegion continuesRegion : region.getContinuousRegions()) {
+            if (continuesRegion.containsLine(line)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isRegionContainsOffset(final IRegionCacheable<T> region, final int offset) {
+        for (final FileRegion continuesRegion : region.getContinuousRegions()) {
+            if (continuesRegion.isInside(offset)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

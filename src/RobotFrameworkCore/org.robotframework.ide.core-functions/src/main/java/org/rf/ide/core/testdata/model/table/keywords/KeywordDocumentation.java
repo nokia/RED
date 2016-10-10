@@ -171,8 +171,8 @@ public class KeywordDocumentation extends AModelElement<UserKeyword>
     }
 
     @Override
-    public FileRegion getRegion() {
-        return new FileRegion(getBeginPosition(), getEndPosition());
+    public List<FileRegion> getContinuousRegions() {
+        return new FileRegion.FileRegionSplitter().splitContinouesRegions(getElementTokens());
     }
 
     @Override

@@ -5,6 +5,13 @@
  */
 package org.rf.ide.core.testdata.model;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.rf.ide.core.testdata.model.table.RobotTokenPositionComparator;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+
 import com.google.common.collect.Range;
 
 public class FileRegion {
@@ -51,4 +58,45 @@ public class FileRegion {
         return String.format("FileRegion [start=%s, end=%s]", start, end);
     }
 
+    public static class FileRegionSplitter {
+
+        public List<FileRegion> splitContinouesRegions(final List<RobotToken> tokens) {
+            Collections.sort(tokens, new RobotTokenPositionComparator());
+            List<FileRegion> regions = new ArrayList<>(0);
+
+            RobotToken lastTokenWithPosition = null;
+            int lastLine = -1;
+            for (final RobotToken token : tokens) {
+                if (token.getFilePosition().getOffset() == FilePosition.NOT_SET) {
+                    break;
+                } else {
+                    if (lastLine == -1) {
+                        regions.add(new FileRegion(token.getFilePosition(), null));
+                    } else if (lastLine == token.getLineNumber() || lastLine + 1 == token.getLineNumber()) {
+                        regions.get(regions.size() - 1).setEnd(
+                                new FilePosition(token.getLineNumber(), token.getEndColumn(), token.getEndOffset()));
+                    } else {
+                        regions.get(regions.size() - 1).setEnd(new FilePosition(lastTokenWithPosition.getLineNumber(),
+                                lastTokenWithPosition.getEndColumn(), lastTokenWithPosition.getEndOffset()));
+                        regions.add(new FileRegion(token.getFilePosition(), null));
+                    }
+
+                    lastTokenWithPosition = token;
+                    lastLine = token.getLineNumber();
+                }
+            }
+
+            if (regions.isEmpty()) {
+                regions.add(new FileRegion(FilePosition.createNotSet(), FilePosition.createNotSet()));
+            } else {
+                FileRegion lastRegion = regions.get(regions.size() - 1);
+                if (lastRegion.getEnd() == null) {
+                    lastRegion.setEnd(new FilePosition(lastTokenWithPosition.getLineNumber(),
+                            lastTokenWithPosition.getEndColumn(), lastTokenWithPosition.getEndOffset()));
+                }
+            }
+
+            return regions;
+        }
+    }
 }
