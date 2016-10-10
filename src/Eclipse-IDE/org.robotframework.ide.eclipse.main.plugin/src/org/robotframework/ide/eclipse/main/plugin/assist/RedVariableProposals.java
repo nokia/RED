@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
@@ -54,15 +55,16 @@ public class RedVariableProposals {
     private VariableDetector createDetector(final Set<RedVariableProposal> proposals) {
         return new VariableDetector() {
             @Override
-            public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
+            public ContinueDecision variableDetected(final RobotVariable variable) {
                 proposals.add(RedVariableProposal.create(variable));
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
-            public ContinueDecision localVariableDetected(final RobotSuiteFile file, final RobotToken variable) {
+            public ContinueDecision localVariableDetected(final RobotFileInternalElement element,
+                    final RobotToken variable) {
                 final String varName = variable.getText().trim();
-                proposals.add(RedVariableProposal.createLocal(varName, file.getName()));
+                proposals.add(RedVariableProposal.createLocal(varName, element.getSuiteFile().getName()));
                 return ContinueDecision.CONTINUE;
             }
 
