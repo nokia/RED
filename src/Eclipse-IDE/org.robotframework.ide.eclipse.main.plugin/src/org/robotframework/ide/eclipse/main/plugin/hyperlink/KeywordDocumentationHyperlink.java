@@ -70,7 +70,11 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     @Override
     public void open() {
+        open(kwSpec);
+    }
+
+    protected final void open(final KeywordSpecification keywordSpecification) {
         final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        new KeywordDocumentationPopup(shell, kwSpec).open();
+        new KeywordDocumentationPopup(shell, keywordSpecification).open();
     }
 }

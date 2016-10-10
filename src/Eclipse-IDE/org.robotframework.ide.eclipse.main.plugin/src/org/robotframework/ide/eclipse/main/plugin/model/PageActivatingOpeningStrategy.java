@@ -41,18 +41,23 @@ class PageActivatingOpeningStrategy extends OpenStrategy {
     }
 
     @Override
-    public void run() {
+    public void run(final String labelWhichShouldBeInSelectedCell) {
         final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
         final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
         try {
             final IEditorPart ed = page.openEditor(new FileEditorInput(file), desc.getId());
-            if (ed instanceof RobotFormEditor) { // it can be ErrorEditorPart if something went wrong
+            if (ed instanceof RobotFormEditor) { // it can be ErrorEditorPart if something went
+                                                 // wrong
                 final RobotFormEditor editor = (RobotFormEditor) ed;
                 final ISectionEditorPart activatedPage = editor.activatePage(section);
                 activatedPage.setFocus();
 
                 if (elementToReveal.isPresent()) {
                     activatedPage.revealElement(elementToReveal.get());
+                }
+
+                if (labelWhichShouldBeInSelectedCell != null) {
+                    editor.getSelectionLayerAccessor().selectCellContaining(labelWhichShouldBeInSelectedCell);
                 }
             }
         } catch (final PartInitException e) {
