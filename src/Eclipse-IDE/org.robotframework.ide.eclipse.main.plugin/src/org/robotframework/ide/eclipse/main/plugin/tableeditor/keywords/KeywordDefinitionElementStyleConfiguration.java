@@ -23,15 +23,12 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.InactiveCellPainter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
-
-import com.google.common.base.Supplier;
+import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
 public class KeywordDefinitionElementStyleConfiguration extends AbstractRegistryConfiguration {
 
@@ -39,11 +36,7 @@ public class KeywordDefinitionElementStyleConfiguration extends AbstractRegistry
 
     private final boolean isEditable;
 
-    private final Supplier<HeaderFilterMatchesCollection> matchesSupplier;
-
-    public KeywordDefinitionElementStyleConfiguration(final TableTheme theme, final boolean isEditable,
-            final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
-        this.matchesSupplier = matchesSupplier;
+    public KeywordDefinitionElementStyleConfiguration(final TableTheme theme, final boolean isEditable) {
         this.font = theme.getFont();
         this.isEditable = isEditable;
     }
@@ -85,8 +78,8 @@ public class KeywordDefinitionElementStyleConfiguration extends AbstractRegistry
                 DisplayMode.NORMAL,
                 KeywordElementsInTreeLabelAccumulator.KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
 
-        final ICellPainter cellPainter = new CellPainterDecorator(new SearchMatchesTextPainter(matchesSupplier, 2),
-                CellEdgeEnum.LEFT, new ImagePainter(imageToUse));
+        final ICellPainter cellPainter = new CellPainterDecorator(new RedTableTextPainter(2), CellEdgeEnum.LEFT,
+                new ImagePainter(imageToUse));
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, cellPainter, DisplayMode.NORMAL,
                 KeywordElementsInTreeLabelAccumulator.KEYWORD_DEFINITION_CONFIG_LABEL);
     };

@@ -24,28 +24,21 @@ import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.InactiveCellPainter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
-import com.google.common.base.Supplier;
-
-public class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
+class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
 
     private final Font font;
 
     private final boolean isEditable;
 
-    private final Supplier<HeaderFilterMatchesCollection> matchesSupplier;
-
-    public CasesElementsStyleConfiguration(final TableTheme theme, final boolean isEditable,
-            final Supplier<HeaderFilterMatchesCollection> matchesSupplier) {
+    CasesElementsStyleConfiguration(final TableTheme theme, final boolean isEditable) {
         this.font = theme.getFont();
         this.isEditable = isEditable;
-        this.matchesSupplier = matchesSupplier;
     }
 
     @Override
@@ -81,11 +74,10 @@ public class CasesElementsStyleConfiguration extends AbstractRegistryConfigurati
                 : RedImages.getGreyedImage(RedImages.getTestCaseImage());
         final ImageDescriptor templatedCaseImage = isEditable ? RedImages.getTemplatedTestCaseImage()
                 : RedImages.getGreyedImage(RedImages.getTemplatedTestCaseImage());
-        final ICellPainter caseCellPainter = new CellPainterDecorator(new SearchMatchesTextPainter(matchesSupplier, 2),
+        final ICellPainter caseCellPainter = new CellPainterDecorator(new RedTableTextPainter(2),
                 CellEdgeEnum.LEFT, new ImagePainter(ImagesManager.getImage(caseImage)));
-        final ICellPainter templatedCaseCellPainter = new CellPainterDecorator(
-                new SearchMatchesTextPainter(matchesSupplier, 2), CellEdgeEnum.LEFT,
-                new ImagePainter(ImagesManager.getImage(templatedCaseImage)));
+        final ICellPainter templatedCaseCellPainter = new CellPainterDecorator(new RedTableTextPainter(2),
+                CellEdgeEnum.LEFT, new ImagePainter(ImagesManager.getImage(templatedCaseImage)));
         
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, caseCellPainter, DisplayMode.NORMAL,
                 CasesElementsLabelAccumulator.CASE_CONFIG_LABEL);
