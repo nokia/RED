@@ -14,9 +14,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -102,22 +104,54 @@ public class ProjectProvider implements TestRule {
         };
     }
 
+    public IFolder createDir(final String dirPath) throws CoreException {
+        return createDir(Path.fromPortableString(dirPath));
+    }
+
     public IFolder createDir(final IPath dirPath) throws CoreException {
         final IFolder directory = project.getFolder(dirPath);
         directory.create(true, true, null);
         return directory;
     }
 
+    public IFile createFile(final String filePath, final String... lines) throws IOException, CoreException {
+        return createFile(Path.fromPortableString(filePath), lines);
+    }
+
     public IFile createFile(final IPath filePath, final String... lines) throws IOException, CoreException {
-        final IFile file = project.getFile(filePath);
-        try (InputStream source = new ByteArrayInputStream(Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
-            if (file.exists()) {
-                file.setContents(source, true, false, null);
-            } else {
-                file.create(source, true, null);
+        project.getWorkspace().run(new IWorkspaceRunnable() {
+
+            @Override
+            public void run(final IProgressMonitor monitor) throws CoreException {
+                // TODO Auto-generated method stub
+                final IFile file = project.getFile(filePath);
+                try (InputStream source = new ByteArrayInputStream(
+                        Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
+                    if (file.exists()) {
+                        file.setContents(source, true, false, null);
+                    } else {
+                        file.create(source, true, null);
+                    }
+                    project.refreshLocal(IResource.DEPTH_INFINITE, null);
+                } catch (final IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
-        }
-        return file;
+        }, null);
+        //
+        // final IFile file = project.getFile(filePath);
+        // try (InputStream source = new
+        // ByteArrayInputStream(Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
+        // if (file.exists()) {
+        // file.setContents(source, true, false, null);
+        // } else {
+        // file.create(source, true, null);
+        // }
+        // project.refreshLocal(IResource.DEPTH_INFINITE, null);
+        // }
+        // return file;
+        return project.getFile(filePath);
     }
 
     public IFile getFile(final IPath filePath) {
