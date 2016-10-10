@@ -380,7 +380,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
      */
     @Override
     public Optional<? extends RobotElement> findElement(final int offset) {
-        for (final RobotSuiteFileSection section : getChildren()) {
+        for (final RobotSuiteFileSection section : getSections()) {
             final Optional<? extends RobotElement> candidate = section.findElement(offset);
             if (candidate.isPresent()) {
                 return candidate;
