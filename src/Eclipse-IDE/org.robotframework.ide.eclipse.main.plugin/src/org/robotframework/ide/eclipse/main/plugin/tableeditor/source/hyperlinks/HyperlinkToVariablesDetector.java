@@ -17,6 +17,7 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
@@ -74,8 +75,10 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
         return new VariableDetector() {
 
             @Override
-            public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
+            public ContinueDecision variableDetected(final RobotVariable variable) {
                 if (VariableNamesSupport.extractUnifiedVariableName(variable.getName()).equals(hoveredVariableName)) {
+                    final RobotSuiteFile file = variable.getSuiteFile();
+
                     final DefinitionPosition position = variable.getDefinitionPosition();
                     final IRegion destination = new Region(position.getOffset(), position.getLength());
 
@@ -90,7 +93,7 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
             }
 
             @Override
-            public ContinueDecision localVariableDetected(final RobotSuiteFile file,
+            public ContinueDecision localVariableDetected(final RobotFileInternalElement element,
                     final RobotToken variableToken) {
                 if (VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(variableToken.getText().toString())
                         .equals(hoveredVariableName)) {

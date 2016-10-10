@@ -53,6 +53,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.swt.SwtThread.Evaluation;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicates;
@@ -423,6 +424,11 @@ public class RobotProject extends RobotContainer {
         return newArrayList();
     }
     
+    @VisibleForTesting
+    public void setReferencedVariablesFiles(final List<ReferencedVariableFile> varFiles) {
+        this.referencedVariableFiles = varFiles;
+    }
+
     public synchronized List<ReferencedVariableFile> getVariablesFromReferencedFiles() {
         if(referencedVariableFiles != null) {
             return referencedVariableFiles;
