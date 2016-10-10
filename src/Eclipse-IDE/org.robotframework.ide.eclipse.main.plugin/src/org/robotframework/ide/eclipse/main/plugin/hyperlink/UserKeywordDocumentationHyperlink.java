@@ -7,21 +7,16 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.KeywordDocumentationPopup;
 
 
 /**
  * @author Michal Anglart
  *
  */
-public class UserKeywordDocumentationHyperlink implements RedHyperlink {
-
-    private final IRegion sourceRegion;
+public class UserKeywordDocumentationHyperlink extends KeywordDocumentationHyperlink {
 
     private final RobotKeywordDefinition userKeyword;
 
@@ -29,27 +24,12 @@ public class UserKeywordDocumentationHyperlink implements RedHyperlink {
 
     private final String additionalLabelDecoration;
 
-    public UserKeywordDocumentationHyperlink(final IRegion sourceRegion, final RobotSuiteFile exposingResource,
+    public UserKeywordDocumentationHyperlink(final IRegion from, final RobotSuiteFile exposingResource,
             final RobotKeywordDefinition userKeyword, final String additionalLabelDecoration) {
-        this.sourceRegion = sourceRegion;
+        super(from, null, null, null);
         this.exposingResource = exposingResource;
         this.userKeyword = userKeyword;
         this.additionalLabelDecoration = additionalLabelDecoration;
-    }
-
-    @Override
-    public IRegion getHyperlinkRegion() {
-        return sourceRegion;
-    }
-
-    @Override
-    public String getTypeLabel() {
-        return null;
-    }
-
-    @Override
-    public String getHyperlinkText() {
-        return "Open Documentation";
     }
 
     @Override
@@ -69,8 +49,6 @@ public class UserKeywordDocumentationHyperlink implements RedHyperlink {
 
     @Override
     public void open() {
-        final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        new KeywordDocumentationPopup(shell, userKeyword.createSpecification()).open();
+        open(userKeyword.createSpecification());
     }
-
 }
