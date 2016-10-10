@@ -36,11 +36,11 @@ import com.google.common.base.Optional;
  * @author Michal Anglart
  *
  */
-public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
+public class SourceHyperlinksToVariablesDetector implements IHyperlinkDetector {
 
     private final RobotSuiteFile suiteFile;
 
-    public HyperlinkToVariablesDetector(final RobotSuiteFile suiteFile) {
+    public SourceHyperlinksToVariablesDetector(final RobotSuiteFile suiteFile) {
         this.suiteFile = suiteFile;
     }
 
