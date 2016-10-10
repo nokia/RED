@@ -63,10 +63,22 @@ public interface RobotElement {
     OpenStrategy getOpenRobotEditorStrategy(IWorkbenchPage page);
 
     /**
-     * The strategy for opening given this element in editor.
+     * The strategy for opening this element in editor.
      */
     public class OpenStrategy {
         public void run() {
+            run(null);
+        }
+
+        /**
+         * Opens proper editor page for given element and then selects the cell which contains given
+         * string.
+         * 
+         * @param labelWhichShouldBeInSelectedCell
+         *            After opening the cell containing this string
+         *            should be selected
+         */
+        public void run(final String labelWhichShouldBeInSelectedCell) {
 
         }
     }
