@@ -21,6 +21,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
@@ -48,26 +49,34 @@ public class DocumentUtilities {
 
             final int projectedOffset = offset - cellRegion.get().getOffset();
 
-            final Stack<Integer> positions = new Stack<>();
+            return findVariable(cellContent, projectedOffset).transform(new Function<IRegion, IRegion>() {
+                @Override
+                public IRegion apply(final IRegion reg) {
+                    return new Region(reg.getOffset() + cellRegion.get().getOffset(), reg.getLength());
+                }
+            });
+        }
+        return Optional.absent();
+    }
 
-            int stackLevel = -1;
-            int lastIndex = 0;
-            for (int i = 0; i < cellContent.length(); i++) {
-                if (varStartDetected(cellContent, i)) {
-                    positions.push(i);
-                }
-                if (i == projectedOffset) {
-                    stackLevel = positions.size() - 1;
-                }
-                if (varEndDetected(cellContent, i) && !positions.isEmpty()) {
-                    lastIndex = positions.pop();
-                    if (stackLevel == positions.size() && i >= projectedOffset) {
-                        return Optional
-                                .<IRegion> of(new Region(lastIndex + cellRegion.get().getOffset(), i - lastIndex + 1));
-                    }
+    public static Optional<IRegion> findVariable(final String cellContent, final int offset) {
+        final Stack<Integer> positions = new Stack<>();
+
+        int stackLevel = -1;
+        int lastIndex = 0;
+        for (int i = 0; i < cellContent.length(); i++) {
+            if (varStartDetected(cellContent, i)) {
+                positions.push(i);
+            }
+            if (i == offset) {
+                stackLevel = positions.size() - 1;
+            }
+            if (varEndDetected(cellContent, i) && !positions.isEmpty()) {
+                lastIndex = positions.pop();
+                if (stackLevel == positions.size() && i >= offset) {
+                    return Optional.<IRegion> of(new Region(lastIndex, i - lastIndex + 1));
                 }
             }
-            return Optional.absent();
         }
         return Optional.absent();
     }
