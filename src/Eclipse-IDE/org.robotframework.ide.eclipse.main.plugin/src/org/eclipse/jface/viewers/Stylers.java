@@ -94,6 +94,16 @@ public class Stylers {
                 textStyle.borderStyle = SWT.BORDER_DOT;
             }
         };
+
+        public static final Styler HYPERLINK_STYLER = new Styler() {
+
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.foreground = ColorsManager.getColor(SWT.COLOR_LINK_FOREGROUND);
+                textStyle.underline = true;
+                textStyle.underlineColor = ColorsManager.getColor(SWT.COLOR_LINK_FOREGROUND);
+            }
+        };
     }
 
     public static Styler mixingStyler(final Styler... stylers) {
@@ -130,6 +140,15 @@ public class Stylers {
             @Override
             public void applyStyles(final TextStyle textStyle) {
                 textStyle.foreground = color;
+            }
+        };
+    }
+
+    public static Styler withFont(final Font font) {
+        return new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.font = font;
             }
         };
     }
