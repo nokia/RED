@@ -3,39 +3,44 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
+package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.navigator.actions.KeywordDocumentationPopup;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowLibrarySourceAction;
+import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
-
 
 /**
  * @author Michal Anglart
  *
  */
-public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
+public class KeywordDocumentationHyperlink implements RedHyperlink {
 
-    private final IRegion source;
+    private final IRegion from;
 
     private final IProject project;
 
     private final LibrarySpecification libSpec;
 
-    public KeywordInLibrarySourceHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec) {
-        this.source = from;
+    private final KeywordSpecification kwSpec;
+
+    public KeywordDocumentationHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec,
+            final KeywordSpecification kwSpec) {
+        this.from = from;
         this.project = project;
         this.libSpec = libSpec;
+        this.kwSpec = kwSpec;
     }
 
     @Override
     public IRegion getHyperlinkRegion() {
-        return source;
+        return from;
     }
 
     @Override
@@ -45,7 +50,7 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
 
     @Override
     public String getHyperlinkText() {
-        return "Open Definition";
+        return "Open Documentation";
     }
 
     @Override
@@ -65,7 +70,7 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
 
     @Override
     public void open() {
-        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        ShowLibrarySourceAction.openLibrarySource(page, project, libSpec);
+        final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+        new KeywordDocumentationPopup(shell, kwSpec).open();
     }
 }

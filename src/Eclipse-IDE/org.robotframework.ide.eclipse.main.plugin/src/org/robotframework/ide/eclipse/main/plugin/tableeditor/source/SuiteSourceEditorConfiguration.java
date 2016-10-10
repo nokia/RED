@@ -48,6 +48,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinkToFilesDetector;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinkToKeywordsDetector;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinkToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
@@ -83,9 +86,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.TestCaseSettingsRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToFilesDetector;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToKeywordsDetector;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks.HyperlinkToVariablesDetector;
 import org.robotframework.red.graphics.ColorsManager;
 
 class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
