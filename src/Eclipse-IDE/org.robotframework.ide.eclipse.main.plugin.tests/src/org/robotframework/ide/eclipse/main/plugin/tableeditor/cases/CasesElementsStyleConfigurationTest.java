@@ -14,11 +14,8 @@ import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.eclipse.nebula.widgets.nattable.style.IStyle;
 import org.eclipse.swt.widgets.Display;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.InactiveCellPainter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
-
-import com.google.common.base.Supplier;
 
 public class CasesElementsStyleConfigurationTest {
 
@@ -30,13 +27,7 @@ public class CasesElementsStyleConfigurationTest {
 
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
-        final CasesElementsStyleConfiguration configuration = new CasesElementsStyleConfiguration(theme, true,
-                new Supplier<HeaderFilterMatchesCollection>() {
-                    @Override
-                    public HeaderFilterMatchesCollection get() {
-                        return null;
-                    }
-                });
+        final CasesElementsStyleConfiguration configuration = new CasesElementsStyleConfiguration(theme, true);
         configuration.configureRegistry(configRegistry);
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class), isA(IStyle.class),
