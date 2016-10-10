@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.eclipse.nebula.widgets.nattable.layer.cell.ILayerCell;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer;
 import org.eclipse.nebula.widgets.nattable.selection.command.SelectCellCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -122,6 +123,21 @@ public class SelectionLayerAccessor {
             }
         }
         return columnsIndexes;
+    }
+
+    public void selectCellContaining(final String label) {
+        final PositionCoordinate[] positions = getSelectedPositions();
+
+        for (final PositionCoordinate coord : positions) {
+            final ILayerCell cell = selectionLayer.getCellByPosition(coord.getColumnPosition(), coord.getRowPosition());
+            if (cell.getDataValue() instanceof String
+                    && ((String) cell.getDataValue()).toLowerCase().contains(label.toLowerCase())) {
+                selectionLayer.clear();
+                selectionLayer.doCommand(new SelectCellCommand(selectionLayer, coord.getColumnPosition(),
+                        coord.getRowPosition(), false, false));
+                return;
+            }
+        }
     }
 
     public void preserveSelectionWhen(final Runnable operation) {

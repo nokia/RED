@@ -6,37 +6,44 @@
 package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.TextSelection;
+import org.eclipse.ui.IEditorDescriptor;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorRegistry;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.FileEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 
 /**
- * @author mmarzec
+ * @author Michal Anglart
+ *
  */
 public class SuiteFileSourceRegionHyperlink implements RedHyperlink {
-
-    private final ITextViewer viewer;
 
     private final IRegion source;
 
     private final IRegion destination;
 
-    private final RobotSuiteFile sourceAndDestinationFile;
+    private final RobotSuiteFile destinationFile;
 
     private final String additionalLabelDecoration;
 
-    public SuiteFileSourceRegionHyperlink(final ITextViewer viewer, final IRegion from, final IRegion to) {
-        this(viewer, null, from, to, "");
+    public SuiteFileSourceRegionHyperlink(final IRegion from, final RobotSuiteFile toFile, final IRegion to) {
+        this(from, toFile, to, "");
     }
 
-    public SuiteFileSourceRegionHyperlink(final ITextViewer viewer, final RobotSuiteFile fromAndToFile, final IRegion from,
-            final IRegion to, final String additionalLabelDecoration) {
-        this.sourceAndDestinationFile = fromAndToFile;
+    public SuiteFileSourceRegionHyperlink(final IRegion from, final RobotSuiteFile toFile, final IRegion to,
+            final String additionalLabelDecoration) {
         this.source = from;
+        this.destinationFile = toFile;
         this.destination = to;
-        this.viewer = viewer;
         this.additionalLabelDecoration = additionalLabelDecoration;
     }
 
@@ -57,8 +64,7 @@ public class SuiteFileSourceRegionHyperlink implements RedHyperlink {
 
     @Override
     public String getLabelForCompoundHyperlinksDialog() {
-        return sourceAndDestinationFile == null ? "[local definition in current file]"
-                : sourceAndDestinationFile.getName();
+        return destinationFile.getName();
     }
 
     @Override
@@ -68,18 +74,27 @@ public class SuiteFileSourceRegionHyperlink implements RedHyperlink {
 
     @Override
     public ImageDescriptor getImage() {
-        return RedImages.getImageForFileWithExtension(sourceAndDestinationFile.getFileExtension());
+        return RedImages.getImageForFileWithExtension(destinationFile.getFileExtension());
     }
 
     @Override
     public void open() {
+        final IEditorRegistry editorRegistry = PlatformUI.getWorkbench().getEditorRegistry();
+        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        final IEditorDescriptor desc = editorRegistry.findEditor(RobotFormEditor.ID);
         try {
-            final int topIndexPosition = viewer.getDocument().getLineOfOffset(destination.getOffset());
-            viewer.getTextWidget().setTopIndex(topIndexPosition);
-            viewer.getTextWidget().setSelection(destination.getOffset(), destination.getOffset() + destination.getLength());
+            final IEditorPart ed = page.openEditor(new FileEditorInput(destinationFile.getFile()), desc.getId());
+            if (ed instanceof RobotFormEditor) { // it can be ErrorEditorPart if something went wrong
+                final RobotFormEditor editor = (RobotFormEditor) ed;
+                final SuiteSourceEditor sourcePage = editor.activateSourcePage();
 
-        } catch (final BadLocationException e) {
-            throw new IllegalArgumentException("Cannot open hyperlink", e);
+                if (destination != null) {
+                    sourcePage.getSelectionProvider()
+                            .setSelection(new TextSelection(destination.getOffset(), destination.getLength()));
+                }
+            }
+        } catch (final PartInitException e) {
+            throw new RobotEditorOpeningException("Unable to open editor for file: " + destinationFile.getName(), e);
         }
     }
 }

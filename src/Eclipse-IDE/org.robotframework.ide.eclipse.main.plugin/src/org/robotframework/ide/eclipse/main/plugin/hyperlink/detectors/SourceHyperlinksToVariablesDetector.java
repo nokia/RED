@@ -5,28 +5,20 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
-import static com.google.common.collect.Lists.newArrayList;
-
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
-import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.RegionsHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileSourceRegionHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
 import com.google.common.base.Optional;
@@ -36,9 +28,11 @@ import com.google.common.base.Optional;
  * @author Michal Anglart
  *
  */
-public class SourceHyperlinksToVariablesDetector implements IHyperlinkDetector {
+public class SourceHyperlinksToVariablesDetector extends HyperlinksToVariablesDetector implements IHyperlinkDetector {
 
     private final RobotSuiteFile suiteFile;
+
+    private ITextViewer textViewer;
 
     public SourceHyperlinksToVariablesDetector(final RobotSuiteFile suiteFile) {
         this.suiteFile = suiteFile;
@@ -47,6 +41,7 @@ public class SourceHyperlinksToVariablesDetector implements IHyperlinkDetector {
     @Override
     public IHyperlink[] detectHyperlinks(final ITextViewer textViewer, final IRegion region,
             final boolean canShowMultipleHyperlinks) {
+        this.textViewer = textViewer;
         try {
             final Optional<IRegion> variableRegion = DocumentUtilities.findVariable(textViewer.getDocument(),
                     suiteFile.isTsvFile(), region.getOffset());
@@ -57,70 +52,26 @@ public class SourceHyperlinksToVariablesDetector implements IHyperlinkDetector {
             final String fullVariableName = textViewer.getDocument().get(fromRegion.getOffset(),
                     fromRegion.getLength());
 
-            final List<IHyperlink> hyperlinks = newArrayList();
-            new VariableDefinitionLocator(suiteFile.getFile()).locateVariableDefinitionWithLocalScope(
-                    createDetector(textViewer, fromRegion, fullVariableName, hyperlinks),
-                    region.getOffset());
-            if (!canShowMultipleHyperlinks && hyperlinks.size() > 1) {
-                throw new IllegalStateException(
-                        "Cannot provide more than one hyperlink, but there were " + hyperlinks.size() + " found");
-            }
+            final List<IHyperlink> hyperlinks = new ArrayList<>();
+            final VariableDetector varDetector = createDetector(suiteFile, fromRegion, fullVariableName, hyperlinks);
+            new VariableDefinitionLocator(suiteFile.getFile()).locateVariableDefinitionWithLocalScope(varDetector,
+                    fromRegion.getOffset());
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
         } catch (final BadLocationException e) {
             return null;
         }
     }
 
-    private VariableDetector createDetector(final ITextViewer textViewer, final IRegion fromRegion,
-            final String fullVariableName, final List<IHyperlink> hyperlinks) {
-        final String hoveredVariableName = VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(fullVariableName);
-        return new VariableDetector() {
+    @Override
+    protected IHyperlink createLocalVariableHyperlink(final RobotFileInternalElement element, final String varName,
+            final IRegion fromRegion, final RobotSuiteFile suiteFile, final IRegion destination) {
+        return new RegionsHyperlink(textViewer, fromRegion, destination);
+    }
 
-            @Override
-            public ContinueDecision variableDetected(final RobotVariable variable) {
-                if (VariableNamesSupport.extractUnifiedVariableName(variable.getName()).equals(hoveredVariableName)) {
-                    final RobotSuiteFile file = variable.getSuiteFile();
-
-                    final DefinitionPosition position = variable.getDefinitionPosition();
-                    final IRegion destination = new Region(position.getOffset(), position.getLength());
-
-                    final IHyperlink definitionHyperlink = file == suiteFile
-                            ? new SuiteFileSourceRegionHyperlink(textViewer, fromRegion, destination)
-                            : new SuiteFileHyperlink(fromRegion, file, destination);
-                    hyperlinks.add(definitionHyperlink);
-                    return ContinueDecision.STOP;
-                } else {
-                    return ContinueDecision.CONTINUE;
-                }
-            }
-
-            @Override
-            public ContinueDecision localVariableDetected(final RobotFileInternalElement element,
-                    final RobotToken variableToken) {
-                if (VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(variableToken.getText().toString())
-                        .equals(hoveredVariableName)) {
-                    final IRegion destination = new Region(variableToken.getStartOffset(), variableToken.getRaw()
-                            .length());
-                    hyperlinks.add(new SuiteFileSourceRegionHyperlink(textViewer, fromRegion, destination));
-                    return ContinueDecision.STOP;
-                } else {
-                    return ContinueDecision.CONTINUE;
-                }
-            }
-
-            @Override
-            public ContinueDecision globalVariableDetected(final String name, final Object value) {
-                // we don't want to do anything if variable is global
-                return ContinueDecision.CONTINUE;
-            }
-
-            @Override
-            public ContinueDecision varFileVariableDetected(final ReferencedVariableFile file,
-                    final String variableName, final Object value) {
-                // we don't want to do anything if variable is defined in Variable file
-                return ContinueDecision.CONTINUE;
-            }
-        };
+    @Override
+    protected IHyperlink createResourceVariableHyperlink(final RobotFileInternalElement element, final String varName,
+            final IRegion fromRegion, final RobotSuiteFile suiteFile, final IRegion destination) {
+        return new SuiteFileSourceRegionHyperlink(fromRegion, suiteFile, destination);
     }
 
 }
