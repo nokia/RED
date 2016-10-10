@@ -49,13 +49,15 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorDescriptor;
 import org.eclipse.ui.IEditorRegistry;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.editors.text.EditorsUI;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -241,11 +243,14 @@ public class LibrariesAutoDiscovererWindow extends Dialog {
     }
 
     private void openFileInEditor(IFile file) {
-        final IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
-        final IEditorDescriptor descriptor = registry.findEditor(RobotFormEditor.ID);
         try {
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(new FileEditorInput(file),
-                    descriptor.getId());
+            final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            IEditorDescriptor descriptor = IDE.getEditorDescriptor(file);
+            if (!descriptor.isInternal()) {
+                final IEditorRegistry registry = PlatformUI.getWorkbench().getEditorRegistry();
+                descriptor = registry.findEditor(EditorsUI.DEFAULT_TEXT_EDITOR_ID);
+            }
+            page.openEditor(new FileEditorInput(file), descriptor.getId());
         } catch (PartInitException e) {
             throw new RobotEditorOpeningException("Unable to open editor for file: " + file.getName(), e);
         }
