@@ -76,6 +76,7 @@ import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
+import org.robotframework.red.nattable.TableCellsStrings;
 import org.robotframework.red.nattable.configs.AddingElementStyleConfiguration;
 import org.robotframework.red.nattable.configs.AlternatingRowsStyleConfiguration;
 import org.robotframework.red.nattable.configs.ColumnHeaderStyleConfiguration;
@@ -85,10 +86,12 @@ import org.robotframework.red.nattable.configs.HoveredCellStyleConfiguration;
 import org.robotframework.red.nattable.configs.RedTableEditConfiguration;
 import org.robotframework.red.nattable.configs.RowHeaderStyleConfiguration;
 import org.robotframework.red.nattable.configs.SelectionStyleConfiguration;
+import org.robotframework.red.nattable.configs.TableMatchesSupplierRegistryConfiguration;
 import org.robotframework.red.nattable.configs.TableMenuConfiguration;
+import org.robotframework.red.nattable.configs.TableStringsPositionsRegistryConfiguration;
 import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
-import org.robotframework.red.nattable.painter.SearchMatchesTextPainter;
+import org.robotframework.red.nattable.painter.RedTableTextPainter;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Function;
@@ -242,6 +245,20 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
 
         addCustomStyling(table, theme);
 
+        // matches support
+        final Supplier<HeaderFilterMatchesCollection> matchesSupplier = new Supplier<HeaderFilterMatchesCollection>() {
+
+            @Override
+            public HeaderFilterMatchesCollection get() {
+                return matches;
+            }
+        };
+        table.addConfiguration(new TableMatchesSupplierRegistryConfiguration(matchesSupplier));
+
+        // hyperlinks support
+        final TableCellsStrings tableStrings = new TableCellsStrings();
+        table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
+
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
         table.addConfiguration(new SettingsDynamicTableSortingConfiguration());
@@ -258,16 +275,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
     }
 
     private void addCustomStyling(final NatTable table, final TableTheme theme) {
-        final GeneralTableStyleConfiguration tableStyle = new GeneralTableStyleConfiguration(theme,
-                new SearchMatchesTextPainter(new Supplier<HeaderFilterMatchesCollection>() {
-
-                    @Override
-                    public HeaderFilterMatchesCollection get() {
-                        return matches;
-                    }
-                }));
-
-        table.addConfiguration(tableStyle);
+        table.addConfiguration(new GeneralTableStyleConfiguration(theme, new RedTableTextPainter()));
         table.addConfiguration(new HoveredCellStyleConfiguration(theme));
         table.addConfiguration(new ColumnHeaderStyleConfiguration(theme));
         table.addConfiguration(new RowHeaderStyleConfiguration(theme));
