@@ -48,9 +48,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinkToFilesDetector;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinkToKeywordsDetector;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.HyperlinkToVariablesDetector;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToFilesDetector;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToKeywordsDetector;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
@@ -116,8 +116,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     @Override
     public IHyperlinkDetector[] getHyperlinkDetectors(final ISourceViewer sourceViewer) {
         final RobotSuiteFile model = editor.getFileModel();
-        return new IHyperlinkDetector[] { new HyperlinkToVariablesDetector(model),
-                new HyperlinkToKeywordsDetector(model), new HyperlinkToFilesDetector(model) };
+        return new IHyperlinkDetector[] { new SourceHyperlinksToVariablesDetector(model),
+                new SourceHyperlinksToKeywordsDetector(model), new SourceHyperlinksToFilesDetector(model) };
     }
 
     @Override
