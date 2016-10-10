@@ -28,6 +28,7 @@ import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
@@ -175,14 +176,16 @@ public class ValidationContext {
         new VariableDefinitionLocator(file, model).locateVariableDefinition(new VariableDetector() {
 
             @Override
-            public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
-                variables.add((variable.getPrefix()
-                        + VariableNamesSupport.extractUnifiedVariableName(variable.getName()) + variable.getSuffix()).toLowerCase());
+            public ContinueDecision variableDetected(final RobotVariable variable) {
+                final String name = variable.getPrefix()
+                        + VariableNamesSupport.extractUnifiedVariableName(variable.getName()) + variable.getSuffix();
+                variables.add(name.toLowerCase());
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
-            public ContinueDecision localVariableDetected(final RobotSuiteFile file, final RobotToken variable) {
+            public ContinueDecision localVariableDetected(final RobotFileInternalElement element,
+                    final RobotToken variable) {
                 // local variables will be added to context during validation
                 return ContinueDecision.CONTINUE;
             }

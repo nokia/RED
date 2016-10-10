@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -88,7 +89,7 @@ class SimilaritiesAnalyst {
         new VariableDefinitionLocator(suiteFile).locateVariableDefinitionWithLocalScope(new VariableDetector() {
 
             @Override
-            public ContinueDecision variableDetected(final RobotSuiteFile file, final RobotVariable variable) {
+            public ContinueDecision variableDetected(final RobotVariable variable) {
                 names.add(variable.getName());
                 return ContinueDecision.CONTINUE;
             }
@@ -101,7 +102,8 @@ class SimilaritiesAnalyst {
             }
 
             @Override
-            public ContinueDecision localVariableDetected(final RobotSuiteFile file, final RobotToken variable) {
+            public ContinueDecision localVariableDetected(final RobotFileInternalElement element,
+                    final RobotToken variable) {
                 names.add(variable.getText());
                 return ContinueDecision.CONTINUE;
             }
