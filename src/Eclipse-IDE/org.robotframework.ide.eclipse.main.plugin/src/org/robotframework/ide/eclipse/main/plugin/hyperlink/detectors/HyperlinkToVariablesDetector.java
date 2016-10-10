@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
+package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
 import static com.google.common.collect.Lists.newArrayList;
 
@@ -17,6 +17,8 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileSourceRegionHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -83,7 +85,7 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
                     final IRegion destination = new Region(position.getOffset(), position.getLength());
 
                     final IHyperlink definitionHyperlink = file == suiteFile
-                            ? new RegionsHyperlink(textViewer, fromRegion, destination)
+                            ? new SuiteFileSourceRegionHyperlink(textViewer, fromRegion, destination)
                             : new SuiteFileHyperlink(fromRegion, file, destination);
                     hyperlinks.add(definitionHyperlink);
                     return ContinueDecision.STOP;
@@ -99,7 +101,7 @@ public class HyperlinkToVariablesDetector implements IHyperlinkDetector {
                         .equals(hoveredVariableName)) {
                     final IRegion destination = new Region(variableToken.getStartOffset(), variableToken.getRaw()
                             .length());
-                    hyperlinks.add(new RegionsHyperlink(textViewer, fromRegion, destination));
+                    hyperlinks.add(new SuiteFileSourceRegionHyperlink(textViewer, fromRegion, destination));
                     return ContinueDecision.STOP;
                 } else {
                     return ContinueDecision.CONTINUE;
