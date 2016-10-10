@@ -3,44 +3,39 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.hyperlinks;
+package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.navigator.actions.KeywordDocumentationPopup;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowLibrarySourceAction;
-import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+
 
 /**
  * @author Michal Anglart
  *
  */
-public class KeywordDocumentationHyperlink implements RedHyperlink {
+public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
 
-    private final IRegion from;
+    private final IRegion source;
 
     private final IProject project;
 
     private final LibrarySpecification libSpec;
 
-    private final KeywordSpecification kwSpec;
-
-    public KeywordDocumentationHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec,
-            final KeywordSpecification kwSpec) {
-        this.from = from;
+    public KeywordInLibrarySourceHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec) {
+        this.source = from;
         this.project = project;
         this.libSpec = libSpec;
-        this.kwSpec = kwSpec;
     }
 
     @Override
     public IRegion getHyperlinkRegion() {
-        return from;
+        return source;
     }
 
     @Override
@@ -50,7 +45,7 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     @Override
     public String getHyperlinkText() {
-        return "Open Documentation";
+        return "Open Definition";
     }
 
     @Override
@@ -70,7 +65,7 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     @Override
     public void open() {
-        final Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-        new KeywordDocumentationPopup(shell, kwSpec).open();
+        final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+        ShowLibrarySourceAction.openLibrarySource(page, project, libSpec);
     }
 }
