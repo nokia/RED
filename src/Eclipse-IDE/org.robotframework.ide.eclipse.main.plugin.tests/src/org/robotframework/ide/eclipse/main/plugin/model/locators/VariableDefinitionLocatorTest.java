@@ -13,10 +13,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.junit.Before;
-import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
@@ -44,14 +42,9 @@ import com.google.common.collect.ObjectArrays;
 
 public class VariableDefinitionLocatorTest {
 
-    @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(
+    @Rule
+    public ProjectProvider projectProvider = new ProjectProvider(
             VariableDefinitionLocatorTest.class.getSimpleName());
-
-    @Before
-    public void beforeTest() throws CoreException {
-        projectProvider.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
-    }
 
     @Test
     public void variablesDefinedInPreviousCallsAreLocatedByOffset_1() throws Exception {
