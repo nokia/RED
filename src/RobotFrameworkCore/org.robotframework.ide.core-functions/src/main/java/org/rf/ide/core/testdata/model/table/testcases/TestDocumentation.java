@@ -143,8 +143,8 @@ public class TestDocumentation extends AModelElement<TestCase>
     }
 
     @Override
-    public FileRegion getRegion() {
-        return new FileRegion(getBeginPosition(), getEndPosition());
+    public List<FileRegion> getContinuousRegions() {
+        return new FileRegion.FileRegionSplitter().splitContinouesRegions(getElementTokens());
     }
 
     @Override

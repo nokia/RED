@@ -76,8 +76,17 @@ public class SourceDocumentationSelectionChangedListener {
             }
 
             if (linkedFile != null) {
+                final int lineSelected;
+                try {
+                    lineSelected = (document.getLineOfOffset(currentRegion.getOffset()) + 1);
+                } catch (BadLocationException e1) {
+                    // shouldn't happen
+                    e1.printStackTrace();
+                    return Status.OK_STATUS;
+                }
+
                 final Optional<IDocumentationHolder> docSettingToShow = linkedFile.getParent()
-                        .findDocumentationForOffset(currentRegion.getOffset());
+                        .findDocumentationForLine(lineSelected);
 
                 if (docSettingToShow.isPresent()) {
                     if (isEditing.get()) {
