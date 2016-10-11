@@ -7,13 +7,26 @@ Element-Version: 3.0
 External-Reference: 
 Id: _Ys0LEIyGEeaNFdJIt_L-Rg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/10/16 1:59 PM
+Save-Time: 10/11/16 10:29 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
+//system specific absolute path formatting
+
+proc "format-absolute-path"  [val workspaceRelativeWindowsPath] {
+	let [val workspaceRelativePath [replace -input $workspaceRelativeWindowsPath -old "\\" -new $sys_sep]] {
+		echo [concat $RED_workspace_path $sys_sep $workspaceRelativePath]
+	}
+}
+
+proc "format-absolute-node-path"  [val workspaceRelativeWindowsPath] {
+	let [val absolutePath [format-absolute-path $workspaceRelativeWindowsPath]] {
+		echo [get-by-os -win $absolutePath -linux [replace -input $absolutePath -old "/" -new "\\/"]]
+	}
+}
 
 get-view "Project Explorer" | get-tree | select RobotProject 
     | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
@@ -21,24 +34,24 @@ get-view "Project Explorer" | get-tree | select RobotProject
     
 //open links with double click
 with [get-window "Discovering libraries summary" | get-tree] {
-    select [format "add/Source: %s%sRobotProject%slibs%sadd.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+    select [concat "add/Source: " [format-absolute-node-path "RobotProject\\libs\\add.py"]]
         | double-click
 }
 
 with [get-window "Discovering libraries summary" | get-tree] {
-    select [format "divide/Importers: %s%sRobotProject%stests%slib_with_EXECDIR.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep]
+    select [concat "divide/Importers: " [format-absolute-node-path "RobotProject\\tests\\lib_with_EXECDIR.robot"]]
         | double-click
 }
 
 
 //open links with F3
 with [get-window "Discovering libraries summary" | get-tree] {
-    select [format "multiply/Importers:/%s%sRobotProject%slib_with_variable.robot" $RED_workspace_path $sys_sep $sys_sep] 
+    select [concat "multiply/Importers:/" [format-absolute-node-path "RobotProject\\lib_with_variable.robot"]] 
         | key-type F3
 }
 
 with [get-window "Discovering libraries summary" | get-tree] {
-    select [format "multiply/Importers:/%s%sRobotProject%stests%stsv_with_relative_paths.tsv" $RED_workspace_path $sys_sep $sys_sep $sys_sep] 
+    select [concat "multiply/Importers:/" [format-absolute-node-path "RobotProject\\tests\\tsv_with_relative_paths.tsv"]] 
         | key-type F3
 }
 
@@ -73,10 +86,10 @@ proc "check-hyperlink-style"  [val item] [val styleIndex] [val startIndex] {
 }
 
 with [get-window "Discovering libraries summary" | get-tree] {
-    check-hyperlink-style [format "add/Source: %s%sRobotProject%slibs%sadd.py" $RED_workspace_path $sys_sep $sys_sep $sys_sep] 1 8
-    check-hyperlink-style [format "divide/Importers: %s%sRobotProject%stests%slib_with_EXECDIR.robot" $RED_workspace_path $sys_sep $sys_sep $sys_sep] 1 11
-    check-hyperlink-style [format "multiply/Importers:/%s%sRobotProject%slib_with_variable.robot" $RED_workspace_path $sys_sep $sys_sep] 0 0
-    check-hyperlink-style [format "multiply/Importers:/%s%sRobotProject%stests%stsv_with_relative_paths.tsv" $RED_workspace_path $sys_sep $sys_sep $sys_sep] 0 0
+    check-hyperlink-style [concat "add/Source: " [format-absolute-node-path "RobotProject\\libs\\add.py"]] 1 8
+    check-hyperlink-style [concat "divide/Importers: " [format-absolute-node-path "RobotProject\\tests\\lib_with_EXECDIR.robot"]] 1 11
+    check-hyperlink-style [concat "multiply/Importers:/" [format-absolute-node-path "RobotProject\\lib_with_variable.robot"]] 0 0
+    check-hyperlink-style [concat "multiply/Importers:/" [format-absolute-node-path "RobotProject\\tests\\tsv_with_relative_paths.tsv"]] 0 0
 }
 
 
