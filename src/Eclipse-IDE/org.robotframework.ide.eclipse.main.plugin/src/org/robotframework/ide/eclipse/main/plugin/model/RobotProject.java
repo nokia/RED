@@ -137,6 +137,11 @@ public class RobotProject extends RobotContainer {
         return stdLibsSpecs;
     }
 
+    @VisibleForTesting
+    public void setStandardLibraries(final Map<String, LibrarySpecification> libs) {
+        stdLibsSpecs = libs;
+    }
+
     public synchronized boolean hasReferencedLibraries() {
         readProjectConfigurationIfNeeded();
         if (refLibsSpecs != null && !refLibsSpecs.isEmpty()) {
@@ -166,6 +171,11 @@ public class RobotProject extends RobotContainer {
         removeUnusedLibspecFiles(refLibsSpecs);
 
         return refLibsSpecs;
+    }
+
+    @VisibleForTesting
+    public void setReferencedLibraries(final Map<ReferencedLibrary, LibrarySpecification> libs) {
+        refLibsSpecs = libs;
     }
 
     public synchronized void unregisterWatchingOnReferencedLibraries(final List<ReferencedLibrary> libraries) {
