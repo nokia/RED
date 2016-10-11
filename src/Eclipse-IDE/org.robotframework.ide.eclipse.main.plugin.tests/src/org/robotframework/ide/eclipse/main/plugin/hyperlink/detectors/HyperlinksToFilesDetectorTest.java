@@ -93,7 +93,7 @@ public class HyperlinksToFilesDetectorTest {
     }
 
 
-    static Condition<IHyperlink> objectsOfClass(final Class<FileHyperlink> clazz) {
+    static Condition<IHyperlink> objectsOfClass(final Class<? extends IHyperlink> clazz) {
         return new Condition<IHyperlink>() {
 
             @Override

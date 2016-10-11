@@ -14,11 +14,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
@@ -119,39 +117,16 @@ public class ProjectProvider implements TestRule {
     }
 
     public IFile createFile(final IPath filePath, final String... lines) throws IOException, CoreException {
-        project.getWorkspace().run(new IWorkspaceRunnable() {
-
-            @Override
-            public void run(final IProgressMonitor monitor) throws CoreException {
-                // TODO Auto-generated method stub
-                final IFile file = project.getFile(filePath);
-                try (InputStream source = new ByteArrayInputStream(
-                        Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
-                    if (file.exists()) {
-                        file.setContents(source, true, false, null);
-                    } else {
-                        file.create(source, true, null);
-                    }
-                    project.refreshLocal(IResource.DEPTH_INFINITE, null);
-                } catch (final IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+        final IFile file = project.getFile(filePath);
+        try (InputStream source = new ByteArrayInputStream(Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
+            if (file.exists()) {
+                file.setContents(source, true, false, null);
+            } else {
+                file.create(source, true, null);
             }
-        }, null);
-        //
-        // final IFile file = project.getFile(filePath);
-        // try (InputStream source = new
-        // ByteArrayInputStream(Joiner.on('\n').join(lines).getBytes(Charsets.UTF_8))) {
-        // if (file.exists()) {
-        // file.setContents(source, true, false, null);
-        // } else {
-        // file.create(source, true, null);
-        // }
-        // project.refreshLocal(IResource.DEPTH_INFINITE, null);
-        // }
-        // return file;
-        return project.getFile(filePath);
+            project.refreshLocal(IResource.DEPTH_INFINITE, null);
+        }
+        return file;
     }
 
     public IFile getFile(final IPath filePath) {
@@ -162,15 +137,20 @@ public class ProjectProvider implements TestRule {
         return getFile(new Path(filePath));
     }
 
+    public String getFileContent(final String filePath) throws IOException, CoreException {
+        return getFileContent(new Path(filePath));
+    }
+
     public String getFileContent(final IPath filePath) throws IOException, CoreException {
-        try (final InputStream stream = getFile(filePath).getContents()) {
+        return getFileContent(getFile(filePath));
+    }
+
+    public String getFileContent(final IFile file) throws IOException, CoreException {
+        try (final InputStream stream = file.getContents()) {
             return CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8));
         }
     }
 
-    public String getFileContent(final String filePath) throws IOException, CoreException {
-        return getFileContent(new Path(filePath));
-    }
 
     public IFolder getDir(final IPath dirPath) {
         return project.getFolder(dirPath);
