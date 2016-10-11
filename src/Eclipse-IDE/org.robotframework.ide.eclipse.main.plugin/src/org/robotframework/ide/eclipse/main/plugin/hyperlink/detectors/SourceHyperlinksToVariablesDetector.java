@@ -13,14 +13,17 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.RegionsHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileSourceRegionHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 
@@ -30,11 +33,19 @@ import com.google.common.base.Optional;
  */
 public class SourceHyperlinksToVariablesDetector extends HyperlinksToVariablesDetector implements IHyperlinkDetector {
 
+    private final RobotModel model;
+
     private final RobotSuiteFile suiteFile;
 
     private ITextViewer textViewer;
 
     public SourceHyperlinksToVariablesDetector(final RobotSuiteFile suiteFile) {
+        this(RedPlugin.getModelManager().getModel(), suiteFile);
+    }
+
+    @VisibleForTesting
+    SourceHyperlinksToVariablesDetector(final RobotModel model, final RobotSuiteFile suiteFile) {
+        this.model = model;
         this.suiteFile = suiteFile;
     }
 
@@ -53,9 +64,9 @@ public class SourceHyperlinksToVariablesDetector extends HyperlinksToVariablesDe
                     fromRegion.getLength());
 
             final List<IHyperlink> hyperlinks = new ArrayList<>();
+            final VariableDefinitionLocator locator = new VariableDefinitionLocator(suiteFile.getFile(), model);
             final VariableDetector varDetector = createDetector(suiteFile, fromRegion, fullVariableName, hyperlinks);
-            new VariableDefinitionLocator(suiteFile.getFile()).locateVariableDefinitionWithLocalScope(varDetector,
-                    fromRegion.getOffset());
+            locator.locateVariableDefinitionWithLocalScope(varDetector, fromRegion.getOffset());
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
         } catch (final BadLocationException e) {
             return null;

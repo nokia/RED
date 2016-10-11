@@ -15,6 +15,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 
+import com.google.common.annotations.VisibleForTesting;
 
 public class SuiteFileTableElementHyperlink extends RedClipboard implements RedHyperlink {
 
@@ -37,6 +38,16 @@ public class SuiteFileTableElementHyperlink extends RedClipboard implements RedH
     @Override
     public IRegion getHyperlinkRegion() {
         return from;
+    }
+
+    @VisibleForTesting
+    public RobotSuiteFile getDestinationFile() {
+        return destinationFile;
+    }
+
+    @VisibleForTesting
+    public RobotFileInternalElement getDestinationElement() {
+        return targetElement;
     }
 
     @Override
