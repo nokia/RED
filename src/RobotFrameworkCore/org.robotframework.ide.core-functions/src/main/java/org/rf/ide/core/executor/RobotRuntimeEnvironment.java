@@ -466,6 +466,18 @@ public class RobotRuntimeEnvironment {
         }
         return new LinkedHashMap<String, Object>();
     }
+    
+    public boolean isVirtualenv() {
+        if (hasRobotInstalled()) {
+            final RobotCommandExecutor executor = PythonInterpretersCommandExecutors.getInstance()
+                    .getRobotCommandExecutor((PythonInstallationDirectory) location);
+            final Boolean result = executor.isVirtualenv();
+            if (result != null) {
+                return result;
+            }
+        }
+        return false;
+    }
 
     public void startTestRunnerAgentHandler(final int port, final ILineHandler lineHandler,
             final IExecutionHandler executionHandler) {

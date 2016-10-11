@@ -150,6 +150,14 @@ def get_run_module_path():
 @logresult
 @encode_result_or_exception
 @logargs
+def is_virtualenv():
+    import red_virtualenv_check
+    return red_virtualenv_check.is_virtualenv()
+
+
+@logresult
+@encode_result_or_exception
+@logargs
 def create_libdoc(result_filepath, libname, python_paths, class_paths):
     import robot
     from robot import pythonpathsetter
@@ -206,6 +214,7 @@ if __name__ == '__main__':
     server.register_function(get_standard_library_path, 'getStandardLibraryPath')
     server.register_function(get_robot_version, 'getRobotVersion')
     server.register_function(get_run_module_path, 'getRunModulePath')
+    server.register_function(is_virtualenv, 'isVirtualenv')
     server.register_function(create_libdoc, 'createLibdoc')
     server.register_function(check_server_availability, 'checkServerAvailability')
 

@@ -41,6 +41,8 @@ public class RedPreferences {
     public static final String ASSISTANT_AUTO_ACTIVATION_DELAY = "assistantAutoActivationDelay";
     public static final String ASSISTANT_AUTO_ACTIVATION_CHARS = "assistantAutoActivationChars";
     public static final String ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED = "assistantKeywordPrefixAutoAdditionEnabled";
+    
+    public static final String PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED = "projectModulesRecursiveAdditionOnVirtualenvEnabled";
 
     public static final String SYNTAX_COLORING_PREFIX = "syntaxColoring.";
 
@@ -100,6 +102,10 @@ public class RedPreferences {
     
     public boolean isAssistantKeywordPrefixAutoAdditionEnabled() {
         return store.getBoolean(ASSISTANT_KEYWORD_PREFIX_AUTO_ADDITION_ENABLED);
+    }
+    
+    public boolean isProjectModulesRecursiveAdditionOnVirtualenvEnabled() {
+        return store.getBoolean(PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED);
     }
 
     public EnumSet<FoldableElements> getFoldableElements() {

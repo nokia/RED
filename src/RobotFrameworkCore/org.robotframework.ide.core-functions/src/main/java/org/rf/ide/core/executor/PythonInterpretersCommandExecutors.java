@@ -42,6 +42,7 @@ class PythonInterpretersCommandExecutors {
             RobotRuntimeEnvironment.copyResourceFile("red_libraries.py");
             RobotRuntimeEnvironment.copyResourceFile("red_variables.py");
             RobotRuntimeEnvironment.copyResourceFile("red_modules.py");
+            RobotRuntimeEnvironment.copyResourceFile("red_virtualenv_check.py");
         } catch (final IOException e) {
             xmlRpcServerScriptFile = null;
         }

@@ -4971,6 +4971,12 @@
             name="Editor">
       </page>
       <page
+            category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
+            class="org.robotframework.ide.eclipse.main.plugin.preferences.AutoDiscoveringPreferencePage"
+            id="org.robotframework.ide.eclipse.main.plugin.preferences.autodiscovering"
+            name="Autodiscovering">
+      </page>
+      <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.editor"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.ContentAssistPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.editor.assist"
