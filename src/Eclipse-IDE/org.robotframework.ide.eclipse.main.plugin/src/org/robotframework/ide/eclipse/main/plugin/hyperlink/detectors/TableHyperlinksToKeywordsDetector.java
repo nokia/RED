@@ -21,8 +21,6 @@ public class TableHyperlinksToKeywordsDetector extends HyperlinksToKeywordsDetec
 
     private final IRowDataProvider<? extends Object> dataProvider;
 
-    private RobotFileInternalElement element;
-
     public TableHyperlinksToKeywordsDetector(final IRowDataProvider<? extends Object> dataProvider) {
         this.dataProvider = dataProvider;
     }
@@ -31,7 +29,7 @@ public class TableHyperlinksToKeywordsDetector extends HyperlinksToKeywordsDetec
     public List<IHyperlink> detectHyperlinks(final int row, final int column, final String label, final int indexInLabel) {
         final Object rowObject = dataProvider.getRowObject(row);
         if (rowObject instanceof RobotFileInternalElement) {
-            element = (RobotFileInternalElement) rowObject;
+            final RobotFileInternalElement element = (RobotFileInternalElement) rowObject;
             final RobotSuiteFile suiteFile = element.getSuiteFile();
 
             return detectHyperlinks(suiteFile, new Region(0, label.length()), label);

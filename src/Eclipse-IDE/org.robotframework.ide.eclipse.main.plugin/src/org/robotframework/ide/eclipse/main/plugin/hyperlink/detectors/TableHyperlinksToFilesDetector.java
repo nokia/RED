@@ -19,7 +19,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 public class TableHyperlinksToFilesDetector extends HyperlinksToFilesDetector implements ITableHyperlinksDetector {
 
     private final IRowDataProvider<? extends Object> dataProvider;
-    private RobotSetting setting;
 
     public TableHyperlinksToFilesDetector(final IRowDataProvider<? extends Object> dataProvider) {
         this.dataProvider = dataProvider;
@@ -29,16 +28,12 @@ public class TableHyperlinksToFilesDetector extends HyperlinksToFilesDetector im
     public List<IHyperlink> detectHyperlinks(final int row, final int column, final String label, final int indexInLabel) {
         final Object rowObject = dataProvider.getRowObject(row);
         if (column == 1 && rowObject instanceof RobotSetting && ((RobotSetting) rowObject).isImportSetting()) {
-            setting = (RobotSetting) rowObject;
+            final RobotSetting setting = (RobotSetting) rowObject;
             final RobotSuiteFile suiteFile = setting.getSuiteFile();
 
-            return detectHyperlinks(suiteFile, new Region(0, label.length()), label);
+            final boolean isLibraryImport = setting.getGroup() == SettingsGroup.LIBRARIES;
+            return detectHyperlinks(suiteFile, new Region(0, label.length()), label, isLibraryImport);
         }
         return new ArrayList<>();
-    }
-
-    @Override
-    protected boolean isLibraryImport() {
-        return setting.getGroup() == SettingsGroup.LIBRARIES;
     }
 }
