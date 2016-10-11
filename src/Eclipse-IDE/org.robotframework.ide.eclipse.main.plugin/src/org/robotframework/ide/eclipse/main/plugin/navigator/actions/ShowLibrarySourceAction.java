@@ -29,6 +29,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.viewers.Selections;
@@ -57,20 +58,20 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
                 selection, LibrarySpecification.class);
         final IProject project = (IProject) selection.getPaths()[0].getFirstSegment();
 
-        openLibrarySource(page, project, spec);
+        openLibrarySource(page, RedPlugin.getModelManager().getModel(), project, spec);
     }
 
-    public static void openLibrarySource(final IWorkbenchPage page, final IProject project,
+    public static void openLibrarySource(final IWorkbenchPage page, final RobotModel model, final IProject project,
             final LibrarySpecification spec) {
         try {
             final String libName = spec.getName() + ".py";
             
-            final IPath location = extractLibraryLocation(project, spec);
+            final IPath location = extractLibraryLocation(model, project, spec);
             if(location == null) {
                 throw new CoreException(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, "Empty location path!"));
             }
             
-            final IFile file = LibspecsFolder.get(project).getFile(libName);
+            final IFile file = LibspecsFolder.createIfNeeded(project).getFile(libName);
             file.createLink(location, IResource.REPLACE | IResource.HIDDEN, null);
 
             IEditorDescriptor desc = IDE.getEditorDescriptor(file);
@@ -91,8 +92,9 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         }
     }
     
-    public static IPath extractLibraryLocation(final IProject project, final LibrarySpecification spec) {
-        final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
+    public static IPath extractLibraryLocation(final RobotModel model, final IProject project,
+            final LibrarySpecification spec) {
+        final RobotProject robotProject = model.createRobotProject(project);
         if (robotProject.isStandardLibrary(spec)) {
             final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
             final File standardLibraryPath = runtimeEnvironment.getStandardLibraryPath(spec.getName());

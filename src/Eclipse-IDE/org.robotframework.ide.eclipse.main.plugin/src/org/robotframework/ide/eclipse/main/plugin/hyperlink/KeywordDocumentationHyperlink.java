@@ -11,16 +11,22 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.KeywordDocumentationPopup;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowLibrarySourceAction;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
  *
  */
 public class KeywordDocumentationHyperlink implements RedHyperlink {
+
+    private final RobotModel model;
 
     private final IRegion from;
 
@@ -30,8 +36,16 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     private final KeywordSpecification kwSpec;
 
+
     public KeywordDocumentationHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec,
             final KeywordSpecification kwSpec) {
+        this(RedPlugin.getModelManager().getModel(), from, project, libSpec, kwSpec);
+    }
+
+    @VisibleForTesting
+    KeywordDocumentationHyperlink(final RobotModel model, final IRegion from, final IProject project,
+            final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
+        this.model = model;
         this.from = from;
         this.project = project;
         this.libSpec = libSpec;
@@ -60,7 +74,7 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
 
     @Override
     public String additionalLabelDecoration() {
-        return "[" + ShowLibrarySourceAction.extractLibraryLocation(project, libSpec) + "]";
+        return "[" + ShowLibrarySourceAction.extractLibraryLocation(model, project, libSpec) + "]";
     }
 
     @Override

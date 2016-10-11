@@ -119,6 +119,10 @@ class KeywordDocumentationComposite extends InputLoadingFormComposite {
     protected void fillControl(final Object jobResult) {
         final Documentation kwSpec = (Documentation) jobResult;
 
+        if (getControl() == null || getControl().isDisposed()) {
+            return;
+        }
+
         if (kwSpec.isHtml) {
             documentationText.setText(kwSpec.text, true, true);
         } else {
