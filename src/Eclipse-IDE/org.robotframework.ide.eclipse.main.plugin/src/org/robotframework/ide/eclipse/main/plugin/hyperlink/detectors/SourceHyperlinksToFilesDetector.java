@@ -24,7 +24,6 @@ import com.google.common.base.Optional;
 public class SourceHyperlinksToFilesDetector extends HyperlinksToFilesDetector implements IHyperlinkDetector {
 
     private final RobotSuiteFile suiteFile;
-    private String lineContent;
 
     public SourceHyperlinksToFilesDetector(final RobotSuiteFile suiteFile) {
         this.suiteFile = suiteFile;
@@ -40,15 +39,16 @@ public class SourceHyperlinksToFilesDetector extends HyperlinksToFilesDetector i
             if (!hyperlinkRegion.isPresent()) {
                 return null;
             }
-            lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document,
+            final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document,
                     hyperlinkRegion.get().getOffset());
             if (!isApplicable(lineContent)) {
                 return null;
             }
             final IRegion fromRegion = hyperlinkRegion.get();
             final String pathAsString = document.get(fromRegion.getOffset(), fromRegion.getLength());
+            final boolean isLibraryImprort = lineContent.trim().toLowerCase().startsWith("library");
 
-            final List<IHyperlink> hyperlinks = detectHyperlinks(suiteFile, fromRegion, pathAsString);
+            final List<IHyperlink> hyperlinks = detectHyperlinks(suiteFile, fromRegion, pathAsString, isLibraryImprort);
             return hyperlinks.isEmpty() ? null : hyperlinks.toArray(new IHyperlink[0]);
         } catch (final BadLocationException e) {
             return null;
@@ -59,10 +59,5 @@ public class SourceHyperlinksToFilesDetector extends HyperlinksToFilesDetector i
         return lineContent.trim().toLowerCase().startsWith("resource")
                 || lineContent.trim().toLowerCase().startsWith("variables")
                 || lineContent.trim().toLowerCase().startsWith("library");
-    }
-
-    @Override
-    protected boolean isLibraryImport() {
-        return lineContent.trim().toLowerCase().startsWith("library");
     }
 }
