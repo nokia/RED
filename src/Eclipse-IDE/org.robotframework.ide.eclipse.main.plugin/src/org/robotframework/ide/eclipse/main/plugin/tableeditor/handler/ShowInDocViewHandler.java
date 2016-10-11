@@ -18,6 +18,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.model.AModelElement;
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.documentation.DocumentationViewPartListener;
@@ -89,6 +90,9 @@ public class ShowInDocViewHandler extends DIParameterizedHandler<E4ShowInDocView
                         || modelType == ModelType.TEST_CASE_EXECUTABLE_ROW) {
                     view.setShowLibdocEnabled();
                     view.showLibdoc(robotFileInternalElement);
+                } else if (modelType == ModelType.SUITE_DOCUMENTATION) {
+                    view.showDocumentation((IDocumentationHolder) linkedElement,
+                            robotFileInternalElement.getSuiteFile());
                 } else {
                     RobotCodeHoldingElement<?> parent = null;
                     if (modelType == ModelType.USER_KEYWORD || modelType == ModelType.TEST_CASE) {
