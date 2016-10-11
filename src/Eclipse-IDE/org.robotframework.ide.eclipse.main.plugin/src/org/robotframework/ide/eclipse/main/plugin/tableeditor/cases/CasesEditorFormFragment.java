@@ -49,6 +49,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -246,19 +249,22 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
         addCustomStyling(table, theme);
 
-        // matches support
         final Supplier<HeaderFilterMatchesCollection> matchesSupplier = new Supplier<HeaderFilterMatchesCollection>() {
-
             @Override
             public HeaderFilterMatchesCollection get() {
                 return matches;
             }
         };
+
+        // find matches configuration
         table.addConfiguration(new TableMatchesSupplierRegistryConfiguration(matchesSupplier));
 
-        // hyperlinks support
+        // hyperlinks configuration
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
+        final TableHyperlinksSupport detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+        detector.addDetectors(new TableHyperlinksToKeywordsDetector(dataProvider),
+                new TableHyperlinksToVariablesDetector(dataProvider));
 
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
