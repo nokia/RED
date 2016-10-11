@@ -1,0 +1,95 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _AXAyAF_dEeaRBaqqj0N1Gg
+Element-Name: CopyPasteRowInTestCaseTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _fQ-mYHRCEeaTdNH0nRm1gg
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/11/16 3:14 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot"    | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Case ***\n"
+    + "test 1\n"
+    + "    log    1    2    3    #log command\n"
+    + "    Call Method    my_method    2\n"
+    + "    Convert To Bytes    8    #cov to bytes\n"
+    + "test 22\n"
+    + "    [Setup]    Catenate    1    5\n"
+    + "    Convert To Hex    33    44\n"
+    + "last test\n"
+    + "    None Shall Pass    who\n"
+    + "    \\"
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 22" | click
+wait 200
+
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+	//copy test 22
+    get-menu "Row/Copy row" | click
+    
+    //go down to kw "\" and paste
+    key-type Down -times 6
+    get-menu "Row/Paste row" | click
+    
+    //focus is set on new test 23
+    
+    //go down to "last test" and copy using shortcut
+    key-type Down -times 4
+    key-type "M1+M2+c"
+    
+    key-type Up -times 8
+    //set focus on "test 22" and paste twice - two new tc will be paste down
+    key-type "M1+M2+v"
+    get-menu "Row/Paste row" | click
+}
+
+get-editor "TestFile.robot" | maximize
+check-test_case-row -file "TestFile.robot"  -row 1 -tc "test 1"
+check-test_case-row -file "TestFile.robot"  -row 2 -tc "log" -c1 1 -c2 2 -c3 3  -comment"#log command"
+check-test_case-row -file "TestFile.robot"  -row 3 -tc "Call Method" -c1 "my_method" -c2 2
+check-test_case-row -file "TestFile.robot"  -row 4 -tc "Convert To Bytes" -c1 8 -comment "#cov to bytes"
+check-test_case-row -file "TestFile.robot"  -row 5 -tc "..."
+
+
+check-test_case-row -file "TestFile.robot"  -row 6 -tc "last test 2"
+check-test_case-row -file "TestFile.robot"  -row 7 -tc "None Shall Pass" -c1 "who"
+check-test_case-row -file "TestFile.robot"  -row 8 -tc "\\"
+check-test_case-row -file "TestFile.robot"  -row 9 -tc "..."
+
+check-test_case-row -file "TestFile.robot"  -row 10 -tc "last test 1"
+check-test_case-row -file "TestFile.robot"  -row 11 -tc "None Shall Pass" -c1 "who"
+check-test_case-row -file "TestFile.robot"  -row 12 -tc "\\"
+check-test_case-row -file "TestFile.robot"  -row 13 -tc "..."
+
+check-test_case-row -file "TestFile.robot"  -row 14 -tc "test 22"
+check-test_case-row -file "TestFile.robot"  -row 15 -tc "[Setup]" -c1 "Catenate" -c2 1 -c3 5
+check-test_case-row -file "TestFile.robot"  -row 16 -tc "Convert To Hex" -c1 33 -c2 44
+check-test_case-row -file "TestFile.robot"  -row 17 -tc "..."
+
+check-test_case-row -file "TestFile.robot"  -row 18 -tc "test 23"
+check-test_case-row -file "TestFile.robot"  -row 19 -tc "[Setup]" -c1 "Catenate" -c2 1 -c3 5
+check-test_case-row -file "TestFile.robot"  -row 20 -tc "Convert To Hex" -c1 33 -c2 44
+check-test_case-row -file "TestFile.robot"  -row 21 -tc "..."
+
+check-test_case-row -file "TestFile.robot"  -row 22 -tc "last test"
+check-test_case-row -file "TestFile.robot"  -row 23 -tc "None Shall Pass" -c1 "who"
+check-test_case-row -file "TestFile.robot"  -row 24 -tc "\\"
+check-test_case-row -file "TestFile.robot"  -row 25 -tc "..."
+
+get-editor "TestFile.robot" | restore
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
