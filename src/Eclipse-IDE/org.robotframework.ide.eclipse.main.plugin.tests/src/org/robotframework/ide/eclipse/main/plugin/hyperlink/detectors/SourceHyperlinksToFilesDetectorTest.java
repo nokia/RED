@@ -12,7 +12,6 @@ import static org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.Hyp
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +29,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Splitter;
-import com.google.common.io.CharStreams;
 
 public class SourceHyperlinksToFilesDetectorTest {
 
@@ -172,7 +169,7 @@ public class SourceHyperlinksToFilesDetectorTest {
 
     private static List<String> getContent(final IFile file) {
         try (InputStream stream = file.getContents()) {
-            return Splitter.on('\n').splitToList(CharStreams.toString(new InputStreamReader(stream, Charsets.UTF_8)));
+            return Splitter.on('\n').splitToList(projectProvider.getFileContent(file));
         } catch (IOException | CoreException e) {
             return new ArrayList<>();
         }
