@@ -21,6 +21,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor.RobotEditorOpeningException;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourceEditor;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author Michal Anglart
  *
@@ -50,6 +52,16 @@ public class SuiteFileSourceRegionHyperlink implements RedHyperlink {
     @Override
     public IRegion getHyperlinkRegion() {
         return source;
+    }
+
+    @VisibleForTesting
+    public IRegion getDestinationRegion() {
+        return destination;
+    }
+
+    @VisibleForTesting
+    public RobotSuiteFile getDestinationFile() {
+        return destinationFile;
     }
 
     @Override

@@ -12,6 +12,8 @@ import org.eclipse.jface.text.ITextViewer;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author mmarzec
  */
@@ -43,6 +45,11 @@ public class RegionsHyperlink implements RedHyperlink {
     @Override
     public IRegion getHyperlinkRegion() {
         return source;
+    }
+
+    @VisibleForTesting
+    public IRegion getDestinationRegion() {
+        return destination;
     }
 
     @Override
