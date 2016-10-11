@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
 Contexts: _fC6f0Il4EeaMF54F4EAT1Q
-Element-Name: ExpandCollapseMenu
+Element-Name: ExpandCollapseMenuFromRuler
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _V3RHMIpKEea71boqaFnZ5w
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/11/16 1:36 PM
+Save-Time: 10/11/16 1:39 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
