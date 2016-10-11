@@ -39,6 +39,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeSourceFoldingPreferences(preferences);
         initializeSourceEditorAssistantPreferences(preferences);
         initializeSyntaxColoringPreferences(preferences);
+        initializeAutodiscoveringPreferences(preferences);
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
@@ -90,6 +91,10 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
             preferences.putInt(getGreenFactorIdentifierFor(category), defaultPref.getRgb().green);
             preferences.putInt(getBlueFactorIdentifierFor(category), defaultPref.getRgb().blue);
         }
+    }
+    
+    private void initializeAutodiscoveringPreferences(final IEclipsePreferences preferences) {
+        preferences.putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
     }
 
     static String getFontStyleIdentifierFor(final SyntaxHighlightingCategory category) {

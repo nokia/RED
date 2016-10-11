@@ -163,9 +163,14 @@ public class LibrariesAutoDiscoverer {
     }
 
     private LibrariesSourcesCollector collectPythonpathAndClasspathLocations() throws InvocationTargetException {
+        boolean shouldCollectRecursively = true;
+        if (!RedPlugin.getDefault().getPreferences().isProjectModulesRecursiveAdditionOnVirtualenvEnabled()
+                && robotProject.getRuntimeEnvironment().isVirtualenv()) {
+            shouldCollectRecursively = false;
+        }
         final LibrariesSourcesCollector librariesSourcesCollector = new LibrariesSourcesCollector(robotProject);
         try {
-            librariesSourcesCollector.collectPythonAndJavaLibrariesSources();
+            librariesSourcesCollector.collectPythonAndJavaLibrariesSources(shouldCollectRecursively);
         } catch (final CoreException e) {
             throw new InvocationTargetException(e);
         }
