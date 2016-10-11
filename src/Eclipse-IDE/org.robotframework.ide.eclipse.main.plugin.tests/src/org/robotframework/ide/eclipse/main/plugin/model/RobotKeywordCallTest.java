@@ -42,9 +42,33 @@ public class RobotKeywordCallTest {
         assertArguments(createCallsFromKeywordForTest());
     }
 
+    @Test
+    public void testArgumentsForKeywordCallFollowedByCommentedSection() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
+                .appendLine("t1")
+                .appendLine("  Log  t")
+                .appendLine("  ")
+                .appendLine("  ")
+                .appendLine("# *** Settings ***")
+                .appendLine("# Documentation    set3  set4")
+                .build();
+        final List<RobotKeywordCall> calls = model.findSection(RobotCasesSection.class)
+                .get()
+                .getChildren()
+                .get(0)
+                .getChildren();
+        assertThat(calls).hasSize(2);
+        assertThat(calls.get(0).getName()).isEqualTo("Log");
+        assertThat(calls.get(0).getArguments()).containsExactly("t");
+        assertThat(calls.get(0).getComment()).isEmpty();
+        assertThat(calls.get(1).getName()).isEmpty();
+        assertThat(calls.get(1).getArguments()).isEmpty();
+        assertThat(calls.get(1).getComment()).isEqualTo("# *** Settings ***");
+    }
+
     private static void assertArguments(final List<RobotKeywordCall> calls) {
         assertThat(calls.get(0).getArguments()).isEmpty();
-        assertThat(calls.get(1).getArguments()).isEmpty();
+        assertThat(calls.get(0).getArguments()).isEmpty();
         assertThat(calls.get(2).getArguments()).containsExactly("1");
         assertThat(calls.get(3).getArguments()).containsExactly("1");
         assertThat(calls.get(4).getArguments()).containsExactly("1", "2");
