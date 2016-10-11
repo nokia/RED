@@ -86,7 +86,7 @@ public class SourceDocumentationSelectionChangedListener {
                 }
 
                 final Optional<IDocumentationHolder> docSettingToShow = linkedFile.getParent()
-                        .findDocumentationForLine(lineSelected);
+                        .findDocumentation(currentRegion.getOffset(), lineSelected);
 
                 if (docSettingToShow.isPresent()) {
                     if (isEditing.get()) {

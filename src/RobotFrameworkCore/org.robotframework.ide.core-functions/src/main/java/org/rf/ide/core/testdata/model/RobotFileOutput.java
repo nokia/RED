@@ -71,6 +71,19 @@ public class RobotFileOutput {
         return result;
     }
 
+    public Optional<IDocumentationHolder> findDocumentation(final int offset, final int line) {
+        final List<IRegionCacheable<IDocumentationHolder>> docInOffset = docCacher.findByOffset(offset);
+        final List<IRegionCacheable<IDocumentationHolder>> docInLine = docCacher.findByLineNumber(line);
+
+        if (!docInLine.isEmpty()) {
+            if (docInOffset.size() < docInLine.size() || docInOffset.size() == docInLine.size()) {
+                return Optional.fromNullable(docInLine.get(0).getCached());
+            }
+        }
+
+        return Optional.absent();
+    }
+
     public Optional<IDocumentationHolder> findDocumentationForOffset(final int offset) {
         final List<IRegionCacheable<IDocumentationHolder>> found = docCacher.findByOffset(offset);
         if (found.size() >= 1) {

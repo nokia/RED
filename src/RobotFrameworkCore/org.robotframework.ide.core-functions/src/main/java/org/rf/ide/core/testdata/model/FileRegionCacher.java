@@ -7,7 +7,7 @@ package org.rf.ide.core.testdata.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +23,7 @@ import com.google.common.annotations.VisibleForTesting;
 @Beta
 public class FileRegionCacher<T> {
 
-    private final Set<IRegionCacheable<T>> cache = new HashSet<IRegionCacheable<T>>(0);
+    private final Set<IRegionCacheable<T>> cache = new LinkedHashSet<IRegionCacheable<T>>(0);
 
     public void register(final IRegionCacheable<T> newCacheable) {
         unregister(newCacheable);
