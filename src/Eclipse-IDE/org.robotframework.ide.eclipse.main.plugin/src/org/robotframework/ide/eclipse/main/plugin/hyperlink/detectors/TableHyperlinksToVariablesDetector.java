@@ -11,23 +11,35 @@ import java.util.List;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileTableElementHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 
 public class TableHyperlinksToVariablesDetector extends HyperlinksToVariablesDetector
         implements ITableHyperlinksDetector {
 
+    private final RobotModel model;
+
     private final IRowDataProvider<? extends Object> dataProvider;
 
     public TableHyperlinksToVariablesDetector(final IRowDataProvider<? extends Object> dataProvider) {
+        this(RedPlugin.getModelManager().getModel(), dataProvider);
+    }
+
+    @VisibleForTesting
+    public TableHyperlinksToVariablesDetector(final RobotModel model,
+            final IRowDataProvider<? extends Object> dataProvider) {
+        this.model = model;
         this.dataProvider = dataProvider;
     }
 
@@ -42,10 +54,11 @@ public class TableHyperlinksToVariablesDetector extends HyperlinksToVariablesDet
             if (fromRegion.isPresent()) {
                 final String realName = label.substring(fromRegion.get().getOffset(),
                         fromRegion.get().getOffset() + fromRegion.get().getLength());
+
                 final List<IHyperlink> hyperlinks = new ArrayList<>();
                 final VariableDetector varDetector = createDetector(suiteFile, fromRegion.get(), realName, hyperlinks);
-                new VariableDefinitionLocator(suiteFile.getFile()).locateVariableDefinitionWithLocalScope(varDetector,
-                        element);
+                final VariableDefinitionLocator locator = new VariableDefinitionLocator(suiteFile.getFile(), model);
+                locator.locateVariableDefinitionWithLocalScope(varDetector, element);
                 return hyperlinks;
             }
         }
