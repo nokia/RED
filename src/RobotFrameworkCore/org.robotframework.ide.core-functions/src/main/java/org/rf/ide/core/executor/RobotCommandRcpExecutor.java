@@ -358,6 +358,15 @@ class RobotCommandRcpExecutor implements RobotCommandExecutor {
             throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
         }
     }
+    
+    @Override
+    public Boolean isVirtualenv() {
+        try {
+            return (Boolean) callRpcFunction("isVirtualenv");
+        } catch (final XmlRpcException e) {
+            throw new RobotEnvironmentException("Unable to check if is virtualenv.", e);
+        }
+    }
 
     private Object callRpcFunction(final String functionName, final Object... arguments) throws XmlRpcException {
         final Object rpcResult = client.execute(functionName, arguments);
