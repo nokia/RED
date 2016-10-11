@@ -22,11 +22,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 abstract class HyperlinksToFilesDetector {
 
     protected final List<IHyperlink> detectHyperlinks(final RobotSuiteFile suiteFile, final IRegion fromRegion,
-            final String pathAsString) {
+            final String pathAsString, final boolean isLibraryImport) {
         final List<IHyperlink> hyperlinks = new ArrayList<>();
 
         final String normalizedPath = pathAsString.replaceAll(" [\\\\] ", " ");
-        if (isLibraryImport() && !isPath(normalizedPath)) {
+        if (isLibraryImport && !isPath(normalizedPath)) {
             return hyperlinks;
         }
 
@@ -48,8 +48,6 @@ abstract class HyperlinksToFilesDetector {
         }
         return hyperlinks;
     }
-
-    protected abstract boolean isLibraryImport();
 
     private boolean isPath(final String pathAsString) {
         return pathAsString.endsWith("/") || pathAsString.endsWith(".py") || pathAsString.endsWith(".class")

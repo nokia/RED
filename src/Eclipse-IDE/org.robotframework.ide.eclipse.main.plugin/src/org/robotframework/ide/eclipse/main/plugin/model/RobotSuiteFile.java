@@ -38,7 +38,6 @@ import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
@@ -360,7 +359,11 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public RobotProject getProject() {
-        return RedPlugin.getModelManager().getModel().createRobotProject(file.getProject());
+        RobotElement current = parent;
+        while (!(current instanceof RobotProject)) {
+            current = current.getParent();
+        }
+        return (RobotProject) current;
     }
 
     public <T extends RobotElement> Optional<T> findSection(final Class<T> sectionClass) {
