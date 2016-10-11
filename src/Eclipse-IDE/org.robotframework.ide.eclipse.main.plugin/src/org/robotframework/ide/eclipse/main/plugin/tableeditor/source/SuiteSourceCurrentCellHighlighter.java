@@ -77,13 +77,13 @@ class SuiteSourceCurrentCellHighlighter {
             if (!newRegion.isPresent()) {
                 removeCellHighlighting();
                 currentCell = null;
+                editor.notifyDocSelectionChangedListener(new Region(offset, 1), false);
             } else if (!Objects.equals(currentCell, newRegion.get())) {
                 removeCellHighlighting();
                 highlightCell(newRegion.get());
                 currentCell = newRegion.get();
+                editor.notifyDocSelectionChangedListener(currentCell, false);
             }
-
-            editor.notifyDocSelectionChangedListener(new Region(offset, 1), false);
         } catch (final BadLocationException | InterruptedException e) {
             RedPlugin.logError("Unable to create cell highlight markers", e);
         }
