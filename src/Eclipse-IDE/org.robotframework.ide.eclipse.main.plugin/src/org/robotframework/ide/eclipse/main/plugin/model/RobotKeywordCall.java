@@ -135,7 +135,8 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
                 public boolean apply(final RobotToken token) {
                     final List<IRobotTokenType> types = token.getTypes();
                     final IRobotTokenType type = types.isEmpty() ? null : types.get(0);
-                    return type != RobotTokenType.START_HASH_COMMENT && type != RobotTokenType.COMMENT_CONTINUE
+                    return !types.contains(RobotTokenType.START_HASH_COMMENT)
+                            && !types.contains(RobotTokenType.COMMENT_CONTINUE)
                             && type != RobotTokenType.KEYWORD_ACTION_NAME
                             && type != RobotTokenType.TEST_CASE_ACTION_NAME;
                 }
