@@ -14,6 +14,8 @@ import org.robotframework.red.jface.dialogs.RobotPopupDialog;
 
 public class KeywordDocumentationPopup extends RobotPopupDialog {
 
+    public static final String POPUP_TEXT = "Keyword Documentation";
+
     private InputLoadingFormComposite composite;
     private final KeywordSpecification specification;
 
@@ -24,6 +26,7 @@ public class KeywordDocumentationPopup extends RobotPopupDialog {
 
     @Override
     protected Control createDialogControls(final Composite parent) {
+        parent.getShell().setText(POPUP_TEXT);
         composite = new KeywordDocumentationComposite(parent, specification);
         return composite;
     }

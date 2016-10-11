@@ -11,15 +11,20 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.navigator.actions.ShowLibrarySourceAction;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
  *
  */
 public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
+
+    private final RobotModel model;
 
     private final IRegion source;
 
@@ -28,6 +33,13 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
     private final LibrarySpecification libSpec;
 
     public KeywordInLibrarySourceHyperlink(final IRegion from, final IProject project, final LibrarySpecification libSpec) {
+        this(RedPlugin.getModelManager().getModel(), from, project, libSpec);
+    }
+
+    @VisibleForTesting
+    KeywordInLibrarySourceHyperlink(final RobotModel model, final IRegion from, final IProject project,
+            final LibrarySpecification libSpec) {
+        this.model = model;
         this.source = from;
         this.project = project;
         this.libSpec = libSpec;
@@ -55,7 +67,7 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
 
     @Override
     public String additionalLabelDecoration() {
-        return "[" + ShowLibrarySourceAction.extractLibraryLocation(project, libSpec) + "]";
+        return "[" + ShowLibrarySourceAction.extractLibraryLocation(model, project, libSpec) + "]";
     }
 
     @Override
@@ -66,6 +78,6 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
     @Override
     public void open() {
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-        ShowLibrarySourceAction.openLibrarySource(page, project, libSpec);
+        ShowLibrarySourceAction.openLibrarySource(page, model, project, libSpec);
     }
 }
