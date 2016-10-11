@@ -27,8 +27,6 @@ public class TableHyperlinksToVariablesDetector extends HyperlinksToVariablesDet
 
     private final IRowDataProvider<? extends Object> dataProvider;
 
-    private RobotFileInternalElement element;
-
     public TableHyperlinksToVariablesDetector(final IRowDataProvider<? extends Object> dataProvider) {
         this.dataProvider = dataProvider;
     }
@@ -37,7 +35,7 @@ public class TableHyperlinksToVariablesDetector extends HyperlinksToVariablesDet
     public List<IHyperlink> detectHyperlinks(final int row, final int column, final String label, final int indexInLabel) {
         final Object rowObject = dataProvider.getRowObject(row);
         if (rowObject instanceof RobotFileInternalElement) {
-            element = (RobotFileInternalElement) rowObject;
+            final RobotFileInternalElement element = (RobotFileInternalElement) rowObject;
             final RobotSuiteFile suiteFile = element.getSuiteFile();
 
             final Optional<IRegion> fromRegion = DocumentUtilities.findVariable(label, indexInLabel);
