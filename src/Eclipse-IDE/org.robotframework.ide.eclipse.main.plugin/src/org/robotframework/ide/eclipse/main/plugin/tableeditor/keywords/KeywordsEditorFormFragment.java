@@ -49,6 +49,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
@@ -260,6 +263,9 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
         // hyperlinks support
         final TableCellsStrings tableStrings = new TableCellsStrings();
         table.addConfiguration(new TableStringsPositionsRegistryConfiguration(tableStrings));
+        final TableHyperlinksSupport detector = TableHyperlinksSupport.enableHyperlinksInTable(table, tableStrings);
+        detector.addDetectors(new TableHyperlinksToKeywordsDetector(dataProvider),
+                new TableHyperlinksToVariablesDetector(dataProvider));
 
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
