@@ -279,4 +279,24 @@ class RobotCommandDirectExecutor implements RobotCommandExecutor {
             throw new RobotEnvironmentException("Unable to find path of '" + moduleName + "' module", e);
         }
     }
+    
+    @Override
+    public Boolean isVirtualenv() {
+        try {
+            final File scriptFile = RobotRuntimeEnvironment.copyResourceFile("red_virtualenv_check.py");
+            final List<String> cmdLine = newArrayList(interpreterPath, scriptFile.getAbsolutePath());
+            final StringBuilder result = new StringBuilder();
+            final ILineHandler linesHandler = new ILineHandler() {
+
+                @Override
+                public void processLine(final String line) {
+                    result.append(line);
+                }
+            };
+            RobotRuntimeEnvironment.runExternalProcess(cmdLine, linesHandler);
+            return Boolean.parseBoolean(result.toString().toLowerCase().trim());
+        } catch (final IOException e) {
+            return false;
+        }
+    }
 }

@@ -29,9 +29,13 @@ public class LibrariesSourcesCollector {
         this.robotProject = robotProject;
     }
 
-    public void collectPythonAndJavaLibrariesSources() throws CoreException {
+    public void collectPythonAndJavaLibrariesSources(final boolean shouldCollectRecursively) throws CoreException {
 
-        collectLocationsWithPythonAndJavaMembers(robotProject.getProject().members());
+        if (shouldCollectRecursively) {
+            collectLocationsWithPythonAndJavaMembersRecursively(robotProject.getProject().members());
+        } else {
+            collectOnlyParentLocationsWithPythonAndJavaMembers(robotProject.getProject().members());
+        }
 
         final IPath projectLocation = robotProject.getProject().getLocation();
         if(projectLocation != null) {
@@ -42,22 +46,43 @@ public class LibrariesSourcesCollector {
         classpathLocations.addAll(robotProject.getClasspath());
     }
 
-    private void collectLocationsWithPythonAndJavaMembers(final IResource[] members) throws CoreException {
+    private void collectLocationsWithPythonAndJavaMembersRecursively(final IResource[] members) throws CoreException {
         if (members != null) {
             for (int i = 0; i < members.length; i++) {
                 final IResource resource = members[i];
                 if (resource.getType() == IResource.FILE) {
-                    final String fileExtension = resource.getFileExtension();
-                    if (fileExtension != null) {
-                        if (isPythonMember(fileExtension)) {
-                            addPythonPathLocation(resource);
-                        } else if (isJavaMember(fileExtension)) {
-                            addClassPathLocation(resource);
+                    checkFileExtensionAndAddToProperLocations(resource);
+                } else if (resource.getType() == IResource.FOLDER) {
+                    collectLocationsWithPythonAndJavaMembersRecursively(((IFolder) resource).members());
+                }
+            }
+        }
+    }
+
+    private void collectOnlyParentLocationsWithPythonAndJavaMembers(final IResource[] members) throws CoreException {
+        if (members != null) {
+            for (int i = 0; i < members.length; i++) {
+                final IResource resource = members[i];
+                if (resource.getType() == IResource.FOLDER) {
+                    final IResource[] folderMembers = ((IFolder) resource).members();
+                    for (int j = 0; j < folderMembers.length; j++) {
+                        final IResource folderMember = folderMembers[j];
+                        if (folderMember.getType() == IResource.FILE) {
+                            checkFileExtensionAndAddToProperLocations(folderMember);
                         }
                     }
-                } else if (resource.getType() == IResource.FOLDER) {
-                    collectLocationsWithPythonAndJavaMembers(((IFolder) resource).members());
                 }
+            }
+        }
+    }
+    
+    public void checkFileExtensionAndAddToProperLocations(final IResource resource) {
+        final String fileExtension = resource.getFileExtension();
+        if (fileExtension != null) {
+            if (isPythonMember(fileExtension)) {
+                addPythonPathLocation(resource);
+            } else if (isJavaMember(fileExtension)) {
+                addClassPathLocation(resource);
             }
         }
     }

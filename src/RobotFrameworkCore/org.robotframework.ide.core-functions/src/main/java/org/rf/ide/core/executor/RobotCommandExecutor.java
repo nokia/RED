@@ -30,6 +30,8 @@ interface RobotCommandExecutor {
     String getStandardLibraryPath(final String libName);
 
     String getRobotVersion();
+    
+    Boolean isVirtualenv();
 
     void createLibdocForStdLibrary(final String resultFilePath, final String libName, final String libPath);
 
