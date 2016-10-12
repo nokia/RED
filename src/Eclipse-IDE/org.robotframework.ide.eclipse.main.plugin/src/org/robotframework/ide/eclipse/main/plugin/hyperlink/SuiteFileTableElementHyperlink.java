@@ -27,8 +27,8 @@ public class SuiteFileTableElementHyperlink extends RedClipboard implements RedH
 
     private final String labelPart;
 
-    public SuiteFileTableElementHyperlink(final String labelPart, final IRegion from, final RobotSuiteFile toFile,
-            final RobotFileInternalElement targetElement) {
+    public SuiteFileTableElementHyperlink(final IRegion from, final RobotSuiteFile toFile,
+            final RobotFileInternalElement targetElement, final String labelPart) {
         this.labelPart = labelPart;
         this.from = from;
         this.destinationFile = toFile;
