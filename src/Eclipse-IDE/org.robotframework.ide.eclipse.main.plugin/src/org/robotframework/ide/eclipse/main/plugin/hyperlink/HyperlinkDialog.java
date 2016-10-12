@@ -38,10 +38,10 @@ import org.robotframework.red.viewers.StructuredContentProvider;
  * @author Michal Anglart
  *
  */
-public class HyperlinkDialog extends PopupDialog {
+class HyperlinkDialog extends PopupDialog {
 
+    static final String POPUP_TEXT = "Hyperlink dialog";
     private static final String TITLE = "Imported Resources and Libraries defining keywords which matches '%s'";
-
     private static final String TIP = " (double click to open)";
 
     private final String name;
@@ -49,7 +49,7 @@ public class HyperlinkDialog extends PopupDialog {
     private Control focusControl;
 
 
-    public HyperlinkDialog(final Shell parent, final String name, final List<RedHyperlink> hyperlinks) {
+    HyperlinkDialog(final Shell parent, final String name, final List<RedHyperlink> hyperlinks) {
         super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE | SWT.ON_TOP, true, true, true, false, false, null, null);
         this.name = name;
         this.hyperlinks = hyperlinks;
@@ -57,6 +57,7 @@ public class HyperlinkDialog extends PopupDialog {
 
     @Override
     protected Control createContents(final Composite parent) {
+        parent.getShell().setText(POPUP_TEXT);
         parent.setLayout(new FillLayout(SWT.VERTICAL));
         return createDialogArea(parent);
     }
