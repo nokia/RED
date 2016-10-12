@@ -72,12 +72,12 @@ public class TableHyperlinksToVariablesDetector extends HyperlinksToVariablesDet
         final RobotFileInternalElement realElement = element instanceof RobotDefinitionSetting
                 && ((RobotDefinitionSetting) element).isArguments() ? (RobotFileInternalElement) element.getParent()
                         : element;
-        return new SuiteFileTableElementHyperlink(varName, fromRegion, suiteFile, realElement);
+        return new SuiteFileTableElementHyperlink(fromRegion, suiteFile, realElement, varName);
     }
 
     @Override
     protected IHyperlink createResourceVariableHyperlink(final RobotFileInternalElement element, final String varName,
             final IRegion fromRegion, final RobotSuiteFile suiteFile, final IRegion destination) {
-        return new SuiteFileTableElementHyperlink(varName, fromRegion, suiteFile, element);
+        return new SuiteFileTableElementHyperlink(fromRegion, suiteFile, element, varName);
     }
 }
