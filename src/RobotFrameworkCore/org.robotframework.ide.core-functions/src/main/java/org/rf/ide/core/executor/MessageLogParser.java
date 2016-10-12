@@ -17,11 +17,11 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 class MessageLogParser implements ILineHandler {
 
-    private static final String LOG_MESSAGE_NAME = "log_message";
+    private static final String LOG_MESSAGE_EVENT_NAME = "log_message";
 
-    private static final String START_TEST_NAME = "start_test";
+    private static final String START_TEST_EVENT_NAME = "start_test";
 
-    private static final String END_TEST_NAME = "end_test";
+    private static final String END_TEST_EVENT_NAME = "end_test";
 
     private final ObjectMapper mapper;
 
@@ -43,17 +43,15 @@ class MessageLogParser implements ILineHandler {
         } catch (final IOException e) {
             e.printStackTrace();
         }
-        if (parsedLine.containsKey(LOG_MESSAGE_NAME)) {
-            final Map<String, String> elements = extractElementsFromLine(parsedLine, LOG_MESSAGE_NAME, 0);
-            lineHandler.processLine(elements.get("timestamp") + " : " + elements.get("level") + " : "
-                    + elements.get("message") + '\n');
-        }
-        if (parsedLine.containsKey(START_TEST_NAME)) {
-            final Map<String, String> elements = extractElementsFromLine(parsedLine, START_TEST_NAME, 1);
+        if (parsedLine.containsKey(LOG_MESSAGE_EVENT_NAME)) {
+            final Map<String, String> elements = extractElementsFromLine(parsedLine, LOG_MESSAGE_EVENT_NAME, 0);
+            lineHandler.processLine(
+                    elements.get("timestamp") + " : " + elements.get("level") + " : " + elements.get("message") + '\n');
+        } else if (parsedLine.containsKey(START_TEST_EVENT_NAME)) {
+            final Map<String, String> elements = extractElementsFromLine(parsedLine, START_TEST_EVENT_NAME, 1);
             lineHandler.processLine("Starting test: " + elements.get("longname") + '\n');
-        }
-        if (parsedLine.containsKey(END_TEST_NAME)) {
-            final Map<String, String> elements = extractElementsFromLine(parsedLine, END_TEST_NAME, 1);
+        } else if (parsedLine.containsKey(END_TEST_EVENT_NAME)) {
+            final Map<String, String> elements = extractElementsFromLine(parsedLine, END_TEST_EVENT_NAME, 1);
             lineHandler.processLine("Ending test: " + elements.get("longname") + '\n');
             lineHandler.processLine("\n");
         }
