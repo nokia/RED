@@ -6,11 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.robotframework.ide.eclipse.main.plugin.hyperlink.Conditions.shellWithText;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.assertj.core.api.Condition;
 import org.eclipse.jface.text.Region;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -86,7 +86,6 @@ public class KeywordDocumentationHyperlinkTest {
     @Test
     public void testIfPopupOpensCorrectly() {
         final Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
-
         assertThat(display.getShells()).doesNotHave(shellWithText(KeywordDocumentationPopup.POPUP_TEXT));
 
         final KeywordDocumentationHyperlink link = new KeywordDocumentationHyperlink(model, new Region(20, 50),
@@ -99,19 +98,5 @@ public class KeywordDocumentationHyperlinkTest {
                 shell.close();
             }
         }
-    }
-
-    private static Condition<? super Shell[]> shellWithText(final String text) {
-        return new Condition<Shell[]>() {
-            @Override
-            public boolean matches(final Shell[] shells) {
-                for (final Shell shell : shells) {
-                    if (shell.getText().equals(text)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };
     }
 }
