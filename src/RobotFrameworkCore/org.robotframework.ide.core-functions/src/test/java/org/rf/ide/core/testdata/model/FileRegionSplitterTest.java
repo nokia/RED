@@ -25,7 +25,7 @@ public class FileRegionSplitterTest {
         List<RobotToken> tokens = new ArrayList<>(0);
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinouesRegions(tokens);
+        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
 
         // then
         assertThat(splitContinouesRegions).hasSize(1);
@@ -40,7 +40,7 @@ public class FileRegionSplitterTest {
         List<RobotToken> tokens = Arrays.asList(RobotToken.create(""));
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinouesRegions(tokens);
+        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
 
         // then
         assertThat(splitContinouesRegions).hasSize(1);
@@ -59,7 +59,7 @@ public class FileRegionSplitterTest {
         List<RobotToken> tokens = Arrays.asList(token);
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinouesRegions(tokens);
+        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
 
         // then
         assertThat(splitContinouesRegions).hasSize(1);
@@ -91,7 +91,7 @@ public class FileRegionSplitterTest {
         List<RobotToken> tokens = Arrays.asList(tokenThree, tokenTwo, tokenOne);
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinouesRegions(tokens);
+        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
 
         // then
         assertThat(splitContinouesRegions).hasSize(1);
@@ -123,7 +123,7 @@ public class FileRegionSplitterTest {
         List<RobotToken> tokens = Arrays.asList(tokenThree, tokenTwo, tokenOne);
 
         // when
-        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinouesRegions(tokens);
+        List<FileRegion> splitContinouesRegions = new FileRegion.FileRegionSplitter().splitContinuousRegions(tokens);
 
         // then
         assertThat(splitContinouesRegions).hasSize(2);
