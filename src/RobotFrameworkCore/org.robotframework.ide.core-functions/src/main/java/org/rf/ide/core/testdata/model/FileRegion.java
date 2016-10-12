@@ -60,7 +60,7 @@ public class FileRegion {
 
     public static class FileRegionSplitter {
 
-        public List<FileRegion> splitContinouesRegions(final List<RobotToken> tokens) {
+        public List<FileRegion> splitContinuousRegions(final List<RobotToken> tokens) {
             Collections.sort(tokens, new RobotTokenPositionComparator());
             List<FileRegion> regions = new ArrayList<>(0);
 
