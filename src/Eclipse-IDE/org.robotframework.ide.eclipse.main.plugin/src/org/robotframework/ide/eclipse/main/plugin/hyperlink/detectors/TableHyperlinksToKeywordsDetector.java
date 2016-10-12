@@ -40,14 +40,14 @@ public class TableHyperlinksToKeywordsDetector extends HyperlinksToKeywordsDetec
     @Override
     protected IHyperlink createLocalKeywordHyperlink(final KeywordHyperlinkEntity keywordEntity, final IRegion from,
             final String additionalInfo) {
-        return new SuiteFileTableElementHyperlink(null, from, keywordEntity.exposingResource,
-                keywordEntity.userKeyword);
+        return new SuiteFileTableElementHyperlink(from, keywordEntity.exposingResource, keywordEntity.userKeyword,
+                null);
     }
 
     @Override
     protected IHyperlink createResourceKeywordHyperlink(final KeywordHyperlinkEntity keywordEntity, final IRegion from,
             final String additionalInfo) {
-        return new SuiteFileTableElementHyperlink(null, from, keywordEntity.exposingResource,
-                keywordEntity.userKeyword);
+        return new SuiteFileTableElementHyperlink(from, keywordEntity.exposingResource, keywordEntity.userKeyword,
+                null);
     }
 }

@@ -35,10 +35,10 @@ public class RegionsHyperlink implements RedHyperlink {
 
     public RegionsHyperlink(final ITextViewer viewer, final RobotSuiteFile fromAndToFile, final IRegion from,
             final IRegion to, final String additionalLabelDecoration) {
+        this.viewer = viewer;
         this.sourceAndDestinationFile = fromAndToFile;
         this.source = from;
         this.destination = to;
-        this.viewer = viewer;
         this.additionalLabelDecoration = additionalLabelDecoration;
     }
 
@@ -75,7 +75,8 @@ public class RegionsHyperlink implements RedHyperlink {
 
     @Override
     public ImageDescriptor getImage() {
-        return RedImages.getImageForFileWithExtension(sourceAndDestinationFile.getFileExtension());
+        return RedImages.getImageForFileWithExtension(
+                sourceAndDestinationFile == null ? "" : sourceAndDestinationFile.getFileExtension());
     }
 
     @Override
