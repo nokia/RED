@@ -144,7 +144,7 @@ public class SuiteDocumentation extends AModelElement<SettingTable> implements I
 
     @Override
     public List<FileRegion> getContinuousRegions() {
-        return new FileRegion.FileRegionSplitter().splitContinouesRegions(getElementTokens());
+        return new FileRegion.FileRegionSplitter().splitContinuousRegions(getElementTokens());
     }
 
     @Override

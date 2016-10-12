@@ -172,7 +172,7 @@ public class KeywordDocumentation extends AModelElement<UserKeyword>
 
     @Override
     public List<FileRegion> getContinuousRegions() {
-        return new FileRegion.FileRegionSplitter().splitContinouesRegions(getElementTokens());
+        return new FileRegion.FileRegionSplitter().splitContinuousRegions(getElementTokens());
     }
 
     @Override
