@@ -158,6 +158,7 @@ public class DocumentationView {
             clearView();
             return;
         }
+        resetCurrentlyDisplayedElement();
         showLibdocText(elementName, suiteFile);
     }
 
