@@ -312,7 +312,7 @@ public class TableHyperlinksSupport {
             viewer.getTable().pack();
 
             infoShell.pack();
-            infoShell.open();
+            infoShell.setVisible(true);
         }
 
         private void changeCursor() {
