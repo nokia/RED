@@ -12,11 +12,14 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.jface.text.hyperlink.IHyperlinkDetector;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.RegionsHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileSourceRegionHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 /**
@@ -29,6 +32,12 @@ public class SourceHyperlinksToKeywordsDetector extends HyperlinksToKeywordsDete
     private ITextViewer textViewer;
 
     public SourceHyperlinksToKeywordsDetector(final RobotSuiteFile suiteFile) {
+        this(RedPlugin.getModelManager().getModel(), suiteFile);
+    }
+
+    @VisibleForTesting
+    SourceHyperlinksToKeywordsDetector(final RobotModel model, final RobotSuiteFile suiteFile) {
+        super(model);
         this.suiteFile = suiteFile;
     }
 

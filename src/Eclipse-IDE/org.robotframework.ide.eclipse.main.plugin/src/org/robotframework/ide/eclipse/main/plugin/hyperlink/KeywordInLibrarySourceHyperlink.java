@@ -45,6 +45,11 @@ public class KeywordInLibrarySourceHyperlink implements RedHyperlink {
         this.libSpec = libSpec;
     }
 
+    @VisibleForTesting
+    public LibrarySpecification getDestinationSpecification() {
+        return libSpec;
+    }
+
     @Override
     public IRegion getHyperlinkRegion() {
         return source;
