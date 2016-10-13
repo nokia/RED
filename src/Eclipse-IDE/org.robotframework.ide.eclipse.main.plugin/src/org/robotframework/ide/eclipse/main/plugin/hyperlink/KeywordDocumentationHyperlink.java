@@ -52,6 +52,16 @@ public class KeywordDocumentationHyperlink implements RedHyperlink {
         this.kwSpec = kwSpec;
     }
 
+    @VisibleForTesting
+    public LibrarySpecification getDestinationLibrarySpecification() {
+        return libSpec;
+    }
+
+    @VisibleForTesting
+    public KeywordSpecification getDestinationKeywordSpecification() {
+        return kwSpec;
+    }
+
     @Override
     public IRegion getHyperlinkRegion() {
         return from;

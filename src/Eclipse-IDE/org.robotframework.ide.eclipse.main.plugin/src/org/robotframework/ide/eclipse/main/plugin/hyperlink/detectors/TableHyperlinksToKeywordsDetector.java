@@ -12,16 +12,25 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.SuiteFileTableElementHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.annotations.VisibleForTesting;
 
 public class TableHyperlinksToKeywordsDetector extends HyperlinksToKeywordsDetector implements ITableHyperlinksDetector {
 
     private final IRowDataProvider<? extends Object> dataProvider;
 
     public TableHyperlinksToKeywordsDetector(final IRowDataProvider<? extends Object> dataProvider) {
+        this(RedPlugin.getModelManager().getModel(), dataProvider);
+    }
+
+    @VisibleForTesting
+    TableHyperlinksToKeywordsDetector(final RobotModel model, final IRowDataProvider<? extends Object> dataProvider) {
+        super(model);
         this.dataProvider = dataProvider;
     }
 

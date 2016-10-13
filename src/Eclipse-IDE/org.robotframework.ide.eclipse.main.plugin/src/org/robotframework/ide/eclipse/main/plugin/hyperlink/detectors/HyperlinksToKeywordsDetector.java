@@ -25,7 +25,6 @@ import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.CompoundHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordDocumentationHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordInLibrarySourceHyperlink;
@@ -34,6 +33,7 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.UserKeywordDocumenta
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities.AccessibleKeywordsCollector;
@@ -49,6 +49,12 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 
 abstract class HyperlinksToKeywordsDetector {
+
+    private final RobotModel model;
+
+    public HyperlinksToKeywordsDetector(final RobotModel model) {
+        this.model = model;
+    }
 
     protected final List<IHyperlink> detectHyperlinks(final RobotSuiteFile suiteFile, final IRegion fromRegion,
             final String keywordName) {
@@ -113,13 +119,17 @@ abstract class HyperlinksToKeywordsDetector {
             }
         }
 
-        if (definitionHyperlinks.size() > 0 && documentationHyperlinks.size() > 0) {
+        if (definitionHyperlinks.size() > 0) {
             hyperlinks.add(definitionHyperlinks.get(0));
+        }
+        if (documentationHyperlinks.size() > 0) {
             hyperlinks.add(documentationHyperlinks.get(0));
         }
-        if (definitionHyperlinks.size() > 1 && documentationHyperlinks.size() > 0) {
+        if (definitionHyperlinks.size() > 1) {
             hyperlinks.add(new CompoundHyperlink(name, adjustedFromRegion,
                     newArrayList(filter(definitionHyperlinks, RedHyperlink.class)), "Show All Definitions"));
+        }
+        if (documentationHyperlinks.size() > 1) {
             hyperlinks.add(new CompoundHyperlink(name, adjustedFromRegion,
                     newArrayList(filter(documentationHyperlinks, RedHyperlink.class)), "Show All Documentations"));
         }
@@ -133,15 +143,17 @@ abstract class HyperlinksToKeywordsDetector {
             IRegion from, final String additionalInfo);
 
     private AccessibleKeywordsEntities createEntities(final RobotSuiteFile suiteFile) {
-        final AccessibleKeywordsCollector collector = new HyperlinksKeywordCollector(suiteFile.getFile());
+        final AccessibleKeywordsCollector collector = new HyperlinksKeywordCollector(model, suiteFile.getFile());
         return new AccessibleKeywordsEntities(suiteFile.getFile().getFullPath(), collector);
     }
 
     private static final class HyperlinksKeywordCollector implements AccessibleKeywordsCollector {
 
+        private final RobotModel model;
         private final IFile file;
 
-        public HyperlinksKeywordCollector(final IFile file) {
+        public HyperlinksKeywordCollector(final RobotModel model, final IFile file) {
+            this.model = model;
             this.file = file;
         }
 
@@ -152,7 +164,7 @@ abstract class HyperlinksToKeywordsDetector {
 
         private Map<String, Collection<KeywordEntity>> collectAccessibleKeywordNames(final IFile file) {
             final Map<String, Collection<KeywordEntity>> accessibleKeywords = newHashMap();
-            new KeywordDefinitionLocator(file, RedPlugin.getModelManager().getModel())
+            new KeywordDefinitionLocator(file, model)
                     .locateKeywordDefinition(new KeywordDetector() {
 
                         @Override

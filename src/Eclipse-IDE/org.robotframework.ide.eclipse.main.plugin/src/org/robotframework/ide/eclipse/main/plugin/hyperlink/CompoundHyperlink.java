@@ -13,6 +13,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
+import com.google.common.annotations.VisibleForTesting;
+
 /**
  * @author Michal Anglart
  *
@@ -33,6 +35,11 @@ public class CompoundHyperlink implements IHyperlink {
         this.source = sourceRegion;
         this.hyperlinks = hyperlinks;
         this.label = label;
+    }
+
+    @VisibleForTesting
+    public List<RedHyperlink> getHyperlinks() {
+        return hyperlinks;
     }
 
     @Override
