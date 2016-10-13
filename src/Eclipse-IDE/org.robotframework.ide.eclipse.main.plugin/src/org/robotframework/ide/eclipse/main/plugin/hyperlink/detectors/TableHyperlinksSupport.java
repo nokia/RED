@@ -115,6 +115,7 @@ public class TableHyperlinksSupport {
                 final int column = table.getColumnPositionByX(e.x);
                 final int row = table.getRowPositionByY(e.y);
 
+                final String actualLabel = (String) table.getCellByPosition(column, row).getDataValue();
                 final TableCellStringData textData = tableStrings.get(column, row);
                 if (textData == null) {
                     removeHyperlink();
@@ -135,7 +136,7 @@ public class TableHyperlinksSupport {
                 hyperlinks.clear();
                 for (final ITableHyperlinksDetector detector : detectors) {
                     // 1 is substracted due to column/row headers
-                    hyperlinks.addAll(detector.detectHyperlinks(row - 1, column - 1, textData.getString(), index));
+                    hyperlinks.addAll(detector.detectHyperlinks(row - 1, column - 1, actualLabel, index));
                 }
                 if (hyperlinks.isEmpty()) {
                     removeHyperlink();
