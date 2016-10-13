@@ -72,8 +72,7 @@ public class HyperlinksToFilesDetectorTest {
         final String absPath = projectProvider.getProject().getLocation().append(relPath).toString();
 
         final HyperlinksToFilesDetector detector = createDetector();
-        assertThat(detector.detectHyperlinks(robotFile, new Region(50, 10), relPath, true))
-                .isEmpty();
+        assertThat(detector.detectHyperlinks(robotFile, new Region(50, 10), relPath, true)).isEmpty();
         assertThat(detector.detectHyperlinks(robotFile, new Region(50, 10), absPath, true)).isEmpty();
     }
 
