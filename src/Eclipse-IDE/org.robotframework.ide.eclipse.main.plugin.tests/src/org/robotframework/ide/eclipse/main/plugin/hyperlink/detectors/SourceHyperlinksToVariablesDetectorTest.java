@@ -217,7 +217,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
 
     // TODO : subject of change? maybe we want to open variable files?
     @Test
-    public void noHyperlinksAreProbided_whenVariableIsDefinedInProjectVarFiles() throws Exception {
+    public void noHyperlinksAreProvided_whenVariableIsDefinedInProjectVarFiles() throws Exception {
         final IFile file = projectProvider.createFile("f7.robot",
                 "*** Test Cases ***",
                 "tc",
@@ -241,7 +241,7 @@ public class SourceHyperlinksToVariablesDetectorTest {
     }
 
     @Test
-    public void noHyperlinkIsProvided_whenVariableIsGlobal() throws Exception {
+    public void noHyperlinkAreProvided_whenVariableIsGlobal() throws Exception {
         final IFile file = projectProvider.createFile("f8.robot",
                 "*** Test Cases ***",
                 "tc",
