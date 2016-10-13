@@ -90,7 +90,7 @@ import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;

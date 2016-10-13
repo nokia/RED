@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToFilesDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
