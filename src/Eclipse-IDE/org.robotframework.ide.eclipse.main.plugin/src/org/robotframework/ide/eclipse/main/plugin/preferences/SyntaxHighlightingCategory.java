@@ -21,7 +21,8 @@ public enum SyntaxHighlightingCategory {
     SETTING("setting", new ColoringPreference(new RGB(149, 0, 85), SWT.NORMAL), "Settings"),
     DEFINITION("definition", new ColoringPreference(new RGB(0, 0, 0), SWT.BOLD), "Keyword/Test Cases definition headers"),
     KEYWORD_CALL("call", new ColoringPreference(new RGB(0, 128, 192), SWT.BOLD), "Keyword calls"),
-    VARIABLE("var", new ColoringPreference(new RGB(0, 128, 0), SWT.NORMAL), "Variables");
+    VARIABLE("var", new ColoringPreference(new RGB(0, 128, 0), SWT.NORMAL), "Variables"),
+    GHERKIN("gherkin", new ColoringPreference(new RGB(128, 128, 64), SWT.NORMAL), "Given/When/And/Then");
 
     private String id;
 

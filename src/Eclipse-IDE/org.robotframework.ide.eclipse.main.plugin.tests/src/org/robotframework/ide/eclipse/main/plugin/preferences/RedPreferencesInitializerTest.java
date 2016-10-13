@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 
 public class RedPreferencesInitializerTest {
 
@@ -25,6 +26,22 @@ public class RedPreferencesInitializerTest {
         verify(preferences).putBoolean(RedPreferences.FOLDABLE_CASES, true);
         verify(preferences).putBoolean(RedPreferences.FOLDABLE_KEYWORDS, true);
         verify(preferences).putBoolean(RedPreferences.FOLDABLE_DOCUMENTATION, true);
+    }
+
+    @Test
+    public void byDefaultAllSyntaxHighlightingCategoryPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        for (SyntaxHighlightingCategory category : SyntaxHighlightingCategory.values()) {
+            final String prefix = RedPreferences.SYNTAX_COLORING_PREFIX + category.getId();
+            final ColoringPreference preference = category.getDefault();
+            verify(preferences).putInt(prefix + ".fontStyle", preference.getFontStyle());
+            verify(preferences).putInt(prefix + ".color.r", preference.getRgb().red);
+            verify(preferences).putInt(prefix + ".color.g", preference.getRgb().green);
+            verify(preferences).putInt(prefix + ".color.b", preference.getRgb().blue);
+        }
     }
 
 }
