@@ -210,6 +210,10 @@ public class TableHyperlinksSupport {
                     && index <= currentHyperlinkRegion.upperEndpoint()) {
                 // no need to remove hyperlinks, we're moving inside place which already has link
                 return;
+            } else if (currentHyperlinkRegion != null && isPopupOpen()) {
+                // we're over the label, outside the generated link, but the popup is open, so we
+                // don't want to recalculate hyperlinks
+                return;
             }
 
             hyperlinks = collectHyperlinks(column, row, actualLabel, index);
@@ -234,6 +238,10 @@ public class TableHyperlinksSupport {
             }
             changeCursor();
             table.redraw();
+        }
+
+        private boolean isPopupOpen() {
+            return infoShell != null && !infoShell.isDisposed() && infoShell.isVisible();
         }
 
         private List<IHyperlink> collectHyperlinks(final int column, final int row, final String actualLabel,
