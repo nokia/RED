@@ -131,7 +131,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
     private void refreshPreview() {
         @SuppressWarnings("unchecked")
         final List<StyleRange> ranges = newArrayList(Iterables.concat(getSectionHeaderRanges(), getCommentsRanges(),
-                getSettingRanges(), getDefinitionRanges(), getKeywordCallRanges(), getVariableRanges()));
+                getSettingRanges(), getDefinitionRanges(), getKeywordCallRanges(), getVariableRanges(), getGherkinRanges()));
         Collections.sort(ranges, new Comparator<StyleRange>() {
 
             @Override
@@ -175,7 +175,9 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
         final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.DEFINITION);
 
         return newArrayList(new StyleRange(258, 9, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(634, 11, preference.getColor(), null, preference.getFontStyle()));
+                new StyleRange(634, 11, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(807, 13, preference.getColor(), null, preference.getFontStyle())
+        );
     }
 
     private List<StyleRange> getKeywordCallRanges() {
@@ -190,7 +192,11 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
                 new StyleRange(556, 8, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(730, 9, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(747, 15, preference.getColor(), null, preference.getFontStyle()),
-                new StyleRange(783, 3, preference.getColor(), null, preference.getFontStyle())
+                new StyleRange(783, 3, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(828, 19, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(854, 19, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(879, 25, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(911, 17, preference.getColor(), null, preference.getFontStyle())
         );
     }
 
@@ -219,6 +225,16 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
                 new StyleRange(766, 5, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(775, 6, preference.getColor(), null, preference.getFontStyle()),
                 new StyleRange(790, 15, preference.getColor(), null, preference.getFontStyle())
+        );
+    }
+
+    private List<StyleRange> getGherkinRanges() {
+        final ColoringPreference preference = currentPreferences.get(SyntaxHighlightingCategory.GHERKIN);
+
+        return newArrayList(new StyleRange(822, 5, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(849, 4, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(875, 3, preference.getColor(), null, preference.getFontStyle()),
+                new StyleRange(906, 4, preference.getColor(), null, preference.getFontStyle())
         );
     }
 
