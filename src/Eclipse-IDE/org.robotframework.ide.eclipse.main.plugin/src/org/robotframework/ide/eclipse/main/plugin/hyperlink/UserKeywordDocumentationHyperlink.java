@@ -11,6 +11,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * @author Michal Anglart
@@ -30,6 +31,11 @@ public class UserKeywordDocumentationHyperlink extends KeywordDocumentationHyper
         this.exposingResource = exposingResource;
         this.userKeyword = userKeyword;
         this.additionalLabelDecoration = additionalLabelDecoration;
+    }
+
+    @VisibleForTesting
+    public RobotKeywordDefinition getDestinationKeyword() {
+        return userKeyword;
     }
 
     @Override
