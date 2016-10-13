@@ -49,7 +49,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
-import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksSupport;
+import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
