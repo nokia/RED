@@ -74,7 +74,7 @@ public class LibrariesAutoDiscoverer {
     private final RobotDryRunHandler dryRunHandler;
 
     private boolean isSummaryWindowEnabled;
-    
+
     private Optional<String> libraryNameToDiscover = Optional.absent();
 
     private static AtomicBoolean isWorkspaceJobRunning = new AtomicBoolean(false);
@@ -218,10 +218,13 @@ public class LibrariesAutoDiscoverer {
     }
 
     private void startAddingLibrariesToProjectConfiguration(final IProgressMonitor monitor) {
-        if(libraryNameToDiscover.isPresent()) {
-            dryRunOutputParser.filterImportedLibrariesByName(libraryNameToDiscover.get()); // after this filtering, RobotDryRunOutputParser will return only one imported library or nothing
+        if (libraryNameToDiscover.isPresent()) {
+            dryRunOutputParser.filterImportedLibrariesByName(libraryNameToDiscover.get());
+            // after this filtering RobotDryRunOutputParser will return only one imported library or
+            // nothing
         }
-        final List<RobotDryRunLibraryImport> dryRunLibrariesImports = filterUnknownDryRunLibraryImports(dryRunOutputParser.getImportedLibraries());
+        final List<RobotDryRunLibraryImport> dryRunLibrariesImports = filterUnknownDryRunLibraryImports(
+                dryRunOutputParser.getImportedLibraries());
         if (!dryRunLibrariesImports.isEmpty()) {
             RobotProjectConfig config = robotProject.getOpenedProjectConfig();
             final boolean inEditor = config != null;
@@ -267,7 +270,8 @@ public class LibrariesAutoDiscoverer {
         }
     }
 
-    private List<RobotDryRunLibraryImport> filterUnknownDryRunLibraryImports(final List<RobotDryRunLibraryImport> importedLibraries) {
+    private List<RobotDryRunLibraryImport> filterUnknownDryRunLibraryImports(
+            final List<RobotDryRunLibraryImport> importedLibraries) {
         final List<RobotDryRunLibraryImport> filteredLibrariesImports = newArrayList();
         for (final RobotDryRunLibraryImport dryRunLibraryImport : importedLibraries) {
             if (dryRunLibraryImport.getType() != DryRunLibraryType.UNKNOWN) {
@@ -305,7 +309,7 @@ public class LibrariesAutoDiscoverer {
         Collection<PythonClass> pythonClasses = newArrayList();
         try {
             pythonClasses = pythonLibStructureBuilder.provideEntriesFromFile(dryRunLibraryImport.getSourcePath(),
-                    Optional.of(dryRunLibraryImport.getName()));
+                    Optional.of(dryRunLibraryImport.getName()), true);
         } catch (final RobotEnvironmentException e) {
             if (!isPythonLibraryRecognizedAndAddedByName(config, dryRunLibraryImport, addedLibs)) {
                 dryRunLibraryImport.setStatusAndAdditionalInfo(DryRunLibraryImportStatus.NOT_ADDED, e.getMessage());
