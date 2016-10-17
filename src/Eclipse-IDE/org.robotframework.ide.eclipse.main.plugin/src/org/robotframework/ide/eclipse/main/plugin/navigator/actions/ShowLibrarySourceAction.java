@@ -56,7 +56,7 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
         final ITreeSelection selection = (ITreeSelection) selectionProvider.getSelection();
         final LibrarySpecification spec = Selections.getSingleElement(
                 selection, LibrarySpecification.class);
-        final IProject project = (IProject) selection.getPaths()[0].getFirstSegment();
+        final IProject project = RedPlugin.getAdapter(selection.getPaths()[0].getFirstSegment(), IProject.class);
 
         openLibrarySource(page, RedPlugin.getModelManager().getModel(), project, spec);
     }
@@ -130,6 +130,8 @@ public class ShowLibrarySourceAction extends Action implements IEnablementUpdati
     }
 
     private static class SourceOpeningException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
 
         public SourceOpeningException(final String message) {
             super(message);

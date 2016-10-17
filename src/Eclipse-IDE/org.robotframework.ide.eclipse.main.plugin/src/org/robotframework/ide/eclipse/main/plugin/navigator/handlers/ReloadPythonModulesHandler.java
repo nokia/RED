@@ -40,7 +40,7 @@ public class ReloadPythonModulesHandler extends DIParameterizedHandler<E4ReloadP
 
         @Execute
         public Object reloadProject(final @Named(Selections.SELECTION) IStructuredSelection selection) {
-            final List<IProject> projects = Selections.getElements(selection, IProject.class);
+            final List<IProject> projects = Selections.getAdaptableElements(selection, IProject.class);
 
             final Set<RobotRuntimeEnvironment> envsToReset = new HashSet<>();
             for (final IProject project : projects) {
@@ -63,7 +63,7 @@ public class ReloadPythonModulesHandler extends DIParameterizedHandler<E4ReloadP
         private void reparseModelsInOpenedEditors() {
             // this ensures that models which are currently opened are reparsed in order to
             // recreate removed cached data
-            final List<IEditorReference> editors = new ArrayList<IEditorReference>();
+            final List<IEditorReference> editors = new ArrayList<>();
             for (final IWorkbenchWindow window : PlatformUI.getWorkbench().getWorkbenchWindows()) {
                 for (final IWorkbenchPage page : window.getPages()) {
                     for (final IEditorReference editor : page.getEditorReferences()) {
