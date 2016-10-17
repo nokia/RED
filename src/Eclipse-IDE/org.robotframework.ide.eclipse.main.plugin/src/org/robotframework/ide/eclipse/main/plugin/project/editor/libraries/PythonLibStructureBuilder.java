@@ -31,7 +31,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 
 public class PythonLibStructureBuilder {
-    
+
     private final RobotRuntimeEnvironment environment;
 
     private final EnvironmentSearchPaths additionalSearchPaths;
@@ -42,27 +42,29 @@ public class PythonLibStructureBuilder {
         this.additionalSearchPaths = config.createEnvironmentSearchPaths(project);
     }
 
-    public Collection<PythonClass> provideEntriesFromFile(final String path, final Optional<String> moduleName)
-            throws RobotEnvironmentException {
-    
+    public Collection<PythonClass> provideEntriesFromFile(final String path, final Optional<String> moduleName,
+            final boolean allowDuplicationOfFileAndClassName) throws RobotEnvironmentException {
+
         final List<String> classes = environment.getClassesDefinedInModule(new File(path), moduleName,
                 additionalSearchPaths);
         return newLinkedHashSet(transform(classes, new Function<String, PythonClass>() {
+
             @Override
             public PythonClass apply(final String name) {
-                return PythonClass.create(name);
+                return PythonClass.create(name, allowDuplicationOfFileAndClassName);
             }
         }));
     }
 
     public static final class PythonClass {
+
         private final String qualifiedName;
 
         private PythonClass(final String qualifiedName) {
             this.qualifiedName = qualifiedName;
         }
 
-        static PythonClass create(final String name) {
+        static PythonClass create(final String name, boolean allowDuplicationOfFileAndClassName) {
             final List<String> splitted = newArrayList(Splitter.on('.').splitToList(name));
             if (splitted.size() > 1) {
                 final String last = splitted.get(splitted.size() - 1);
@@ -71,7 +73,8 @@ public class PythonLibStructureBuilder {
                 // ROBOT requires whole qualified name of class if it is defined with different name
                 // than module
                 // containing it in module
-                if (last.equals(beforeLast)) {
+                // FIXME check the comment above if its still apply
+                if (last.equals(beforeLast) && !allowDuplicationOfFileAndClassName) {
                     splitted.remove(splitted.size() - 1);
                 }
                 return new PythonClass(Joiner.on('.').join(splitted));
