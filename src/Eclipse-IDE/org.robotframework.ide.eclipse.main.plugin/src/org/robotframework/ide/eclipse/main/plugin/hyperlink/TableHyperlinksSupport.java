@@ -16,8 +16,6 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
@@ -29,6 +27,8 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseMoveListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -37,6 +37,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.TableItem;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.ITableHyperlinksDetector;
 import org.robotframework.red.nattable.TableCellStringData;
 import org.robotframework.red.nattable.TableCellsStrings;
@@ -282,9 +283,22 @@ public class TableHyperlinksSupport {
             viewer.getTable().setHeaderVisible(false);
             viewer.getTable().setLinesVisible(false);
             viewer.setContentProvider(new HyperlinksContentProvider());
-            viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+            viewer.getTable().addMouseMoveListener(new MouseMoveListener() {
+
                 @Override
-                public void selectionChanged(final SelectionChangedEvent event) {
+                public void mouseMove(final MouseEvent e) {
+                    if (viewer.getTable().equals(e.getSource())) {
+                        final Object item = viewer.getTable().getItem(new Point(e.x, e.y));
+                        if (item instanceof TableItem) {
+                            viewer.getTable().setSelection(new TableItem[] { (TableItem) item });
+                        }
+                    }
+                }
+            });
+            viewer.getTable().addSelectionListener(new SelectionAdapter() {
+
+                @Override
+                public void widgetSelected(final SelectionEvent e) {
                     final IHyperlink linkToOpen = Selections.getSingleElement(viewer.getStructuredSelection(),
                             IHyperlink.class);
                     removeHyperlink();
@@ -298,6 +312,7 @@ public class TableHyperlinksSupport {
                     });
                 }
             });
+
             ViewerColumnsFactory.newColumn("")
                     .labelsProvidedBy(new HyperlinksLabelProvider())
                     .shouldGrabAllTheSpaceLeft(true)
