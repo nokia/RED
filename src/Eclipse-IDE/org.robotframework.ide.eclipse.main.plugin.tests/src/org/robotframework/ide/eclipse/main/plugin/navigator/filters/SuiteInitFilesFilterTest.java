@@ -12,6 +12,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.mockeclipse.WrappedResource;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.ResourcesMocks;
 
 public class SuiteInitFilesFilterTest {
@@ -40,6 +41,13 @@ public class SuiteInitFilesFilterTest {
     public void whenSuiteInitFileIsGiven_itDoesNotPassThroughFilter() {
         final IFile file = ResourcesMocks.prepareSuiteInitMockFile();
         final boolean result = filter.select(null, null, file);
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void whenWrapepdSuiteInitFileIsGiven_itDoesNotPassThroughFilter() {
+        final IFile file = ResourcesMocks.prepareSuiteInitMockFile();
+        final boolean result = filter.select(null, null, new WrappedResource(file));
         assertThat(result).isFalse();
     }
 
