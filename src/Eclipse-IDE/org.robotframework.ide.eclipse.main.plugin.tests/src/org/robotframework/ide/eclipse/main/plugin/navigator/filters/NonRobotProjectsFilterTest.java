@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.mockeclipse.WrappedResource;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.ResourcesMocks;
 
 public class NonRobotProjectsFilterTest {
@@ -59,11 +60,29 @@ public class NonRobotProjectsFilterTest {
     }
 
     @Test
+    public void whenOpenWrappedProjectIsGiven_itDoesNotPassThroughFilter() {
+        final IProject project = mock(IProject.class);
+        when(project.isOpen()).thenReturn(true);
+
+        final boolean result = filter.select(null, null, new WrappedResource(project));
+        assertThat(result).isFalse();
+    }
+
+    @Test
     public void whenOpenRobotProjectIsGiven_itPassesThroughFilter() {
         final IProject project = ResourcesMocks.prepareRobotMockProject();
         when(project.isOpen()).thenReturn(true);
 
         final boolean result = filter.select(null, null, project);
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void whenOpenWrappedRobotProjectIsGiven_itPassesThroughFilter() {
+        final IProject project = ResourcesMocks.prepareRobotMockProject();
+        when(project.isOpen()).thenReturn(true);
+
+        final boolean result = filter.select(null, null, new WrappedResource(project));
         assertThat(result).isTrue();
     }
 

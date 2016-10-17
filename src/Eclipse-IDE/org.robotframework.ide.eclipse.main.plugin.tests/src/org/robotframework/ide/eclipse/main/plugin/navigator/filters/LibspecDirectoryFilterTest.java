@@ -13,6 +13,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.mockeclipse.WrappedResource;
 
 public class LibspecDirectoryFilterTest {
 
@@ -56,6 +57,16 @@ public class LibspecDirectoryFilterTest {
         when(mock.getParent()).thenReturn(mock(IProject.class));
 
         final boolean result = filter.select(null, null, mock);
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void whenWrappedAdaptableLibspecFolderOnTopLevelIsGiven_itDoesNotPassThroughFilter() {
+        final IFolder mock = mock(IFolder.class);
+        when(mock.getName()).thenReturn("libspecs");
+        when(mock.getParent()).thenReturn(mock(IProject.class));
+
+        final boolean result = filter.select(null, null, new WrappedResource(mock));
         assertThat(result).isFalse();
     }
 }
