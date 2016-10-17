@@ -59,13 +59,17 @@ public class GherkinPrefixRuleTest {
     public void gherkinPrefixIsNotRecognized_whenPositionIsInsideToken() {
         final List<IRobotLineElement> previousTokens = new ArrayList<>();
 
+        boolean thereWasName = false;
         for (final RobotToken token : TokensSource.createTokens()) {
-            final int positionInsideToken = new Random().nextInt(token.getText().length());
+            final int positionInsideToken = new Random().nextInt(token.getText().length()) + 1;
             final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, positionInsideToken,
                     previousTokens);
+            
+            thereWasName = true;
 
             assertThat(evaluatedToken).is(absent());
             previousTokens.add(token);
         }
+        assertThat(thereWasName).isTrue();
     }
 }
