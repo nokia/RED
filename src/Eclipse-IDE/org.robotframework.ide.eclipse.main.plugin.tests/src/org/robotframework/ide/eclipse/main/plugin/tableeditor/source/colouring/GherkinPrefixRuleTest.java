@@ -19,9 +19,9 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.I
 
 import com.google.common.base.Optional;
 
-public class ExecutableRowCallRuleTest {
+public class GherkinPrefixRuleTest {
 
-    private final ExecutableRowCallRule testedRule = new ExecutableRowCallRule(new Token("token"));
+    private final GherkinPrefixRule testedRule = new GherkinPrefixRule(new Token("token"));
 
     @Test
     public void ruleIsApplicableOnlyForRobotTokens() {
@@ -31,7 +31,7 @@ public class ExecutableRowCallRuleTest {
     }
 
     @Test
-    public void executableCallIsRecognized() {
+    public void gherkinprefixIsRecognized() {
         final List<IRobotLineElement> previousTokens = new ArrayList<>();
 
         boolean thereWasName = false;
@@ -39,13 +39,12 @@ public class ExecutableRowCallRuleTest {
             final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, 0,
                     previousTokens);
 
-            if (token.getText().equals("call") || token.getText().equals(":FOR") || token.getText().equals("\\")
-                    || token.getText().equals("given call") || token.getText().equals("when then call")) {
+            if (token.getText().equals("given call") || token.getText().equals("when then call")) {
                 thereWasName = true;
 
                 assertThat(evaluatedToken).is(present());
                 assertThat(evaluatedToken.get().getPosition())
-                        .isEqualTo(new Position(token.getStartOffset(), token.getText().length()));
+                        .isEqualTo(new Position(token.getStartOffset(), token.getText().length() - "call".length()));
                 assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
 
             } else {
@@ -57,29 +56,16 @@ public class ExecutableRowCallRuleTest {
     }
 
     @Test
-    public void executableCallIsRecognized_evenWhenPositionIsInsideToken() {
+    public void gherkinPrefixIsNotRecognized_whenPositionIsInsideToken() {
         final List<IRobotLineElement> previousTokens = new ArrayList<>();
 
-        boolean thereWasName = false;
         for (final RobotToken token : TokensSource.createTokens()) {
             final int positionInsideToken = new Random().nextInt(token.getText().length());
             final Optional<PositionedTextToken> evaluatedToken = testedRule.evaluate(token, positionInsideToken,
                     previousTokens);
 
-            if (token.getText().equals("call") || token.getText().equals(":FOR") || token.getText().equals("\\")
-                    || token.getText().equals("given call") || token.getText().equals("when then call")) {
-                thereWasName = true;
-
-                assertThat(evaluatedToken).is(present());
-                assertThat(evaluatedToken.get().getPosition()).isEqualTo(new Position(
-                        token.getStartOffset() + positionInsideToken, token.getText().length() - positionInsideToken));
-                assertThat(evaluatedToken.get().getToken().getData()).isEqualTo("token");
-
-            } else {
-                assertThat(evaluatedToken).is(absent());
-            }
+            assertThat(evaluatedToken).is(absent());
             previousTokens.add(token);
         }
-        assertThat(thereWasName).isTrue();
     }
 }

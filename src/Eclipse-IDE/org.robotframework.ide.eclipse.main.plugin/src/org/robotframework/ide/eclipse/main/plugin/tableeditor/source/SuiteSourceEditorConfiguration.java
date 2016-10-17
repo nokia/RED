@@ -71,6 +71,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Vari
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CaseNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.CommentRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ExecutableRowCallRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.GherkinPrefixRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.ISyntaxColouringRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordNameRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.KeywordSettingsCallRule;
@@ -376,6 +377,9 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final ColoringPreference settingPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.SETTING);
         final IToken setting = new Token(createAttribute(settingPref));
 
+        final ColoringPreference gherkinPref = preferences.getSyntaxColoring(SyntaxHighlightingCategory.GHERKIN);
+        final IToken gherkin = new Token(createAttribute(gherkinPref));
+
         final ColoringPreference garbagePref = preferences
                 .getSyntaxColoring(SyntaxHighlightingCategory.DEFAULT_SECTION);
         final IToken defaultSection = new Token(createAttribute(garbagePref));
@@ -389,14 +393,14 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
         final ISyntaxColouringRule[] testCasesRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new CaseNameRule(definition), new TestCaseSettingsRule(setting), new TestCaseSettingsCallRule(call),
-                new ExecutableRowCallRule(call), new CommentRule(comment), new VariableUsageRule(variable) };
-        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, store,
-                testCasesRules);
+                new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call), new CommentRule(comment),
+                new VariableUsageRule(variable) };
+        createDamageRepairer(reconciler, SuiteSourcePartitionScanner.TEST_CASES_SECTION, store, testCasesRules);
 
         final ISyntaxColouringRule[] keywordsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),
                 new KeywordNameRule(definition, variable), new KeywordSettingsRule(setting),
-                new KeywordSettingsCallRule(call), new ExecutableRowCallRule(call), new CommentRule(comment),
-                new VariableUsageRule(variable) };
+                new KeywordSettingsCallRule(call), new GherkinPrefixRule(gherkin), new ExecutableRowCallRule(call),
+                new CommentRule(comment), new VariableUsageRule(variable) };
         createDamageRepairer(reconciler, SuiteSourcePartitionScanner.KEYWORDS_SECTION, store, keywordsRules);
 
         final ISyntaxColouringRule[] settingsRules = new ISyntaxColouringRule[] { new SectionHeaderRule(section),

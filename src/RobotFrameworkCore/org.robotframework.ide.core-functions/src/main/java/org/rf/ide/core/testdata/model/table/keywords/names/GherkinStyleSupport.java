@@ -46,19 +46,24 @@ public class GherkinStyleSupport {
             operation.perform(current);
         }
     }
-    
-    public static String getTextAfterGherkinPrefixIfExists(final String text) {
-        for (final String prefix : PREFIXES) {
-            if (text.toLowerCase().startsWith(prefix)) {
-                final String textAfterPrefix = text.substring(prefix.length());
-                if (!textAfterPrefix.isEmpty()) { 
-                    return textAfterPrefix.trim();
-                } else {
-                    return text; // if no any text after gherkin prefix, return gherkin prefix
-                }
-            }
+
+    public static String getTextAfterGherkinPrefixesIfExists(final String originalName) {
+        String current = originalName;
+        String gherkinFree = GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(originalName);
+        
+        while (!gherkinFree.equals(current)) {
+            current = gherkinFree;
+            gherkinFree = GherkinStyleSupport.getTextAfterGherkinPrefixIfExists(current);
         }
-        return text; 
+        return gherkinFree;
+    }
+    
+    public static String getTextAfterGherkinPrefixIfExists(final String originalName) {
+        final String textAfterPrefix = GherkinStyleSupport.removeGherkinPrefix(originalName);
+        if (textAfterPrefix.isEmpty()) {
+            return originalName; // if no any text after gherkin prefix, return gherkin prefix
+        }
+        return textAfterPrefix;
     }
 
     private static String removeGherkinPrefix(final String name) {
