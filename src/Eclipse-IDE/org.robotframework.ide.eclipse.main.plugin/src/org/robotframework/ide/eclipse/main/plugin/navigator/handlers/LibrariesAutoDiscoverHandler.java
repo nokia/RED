@@ -37,7 +37,7 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
 
         @Execute
         public Object addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
-            final List<IResource> selectedResources = Selections.getElements(selection, IResource.class);
+            final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
             final List<IResource> suitesList = new ArrayList<>();
             IProject suitesProject = null;

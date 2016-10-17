@@ -63,7 +63,7 @@ public class RedImages {
     }
 
     public static ImageDescriptor getRobotSuiteFolderDecoratorImage() {
-        return RedPlugin.getImageDescriptor("resources/decorator_suite_directory.png");
+        return RedPlugin.getImageDescriptor("resources/decorator_suite_folder.png");
     }
 
     public static ImageDescriptor getRobotResourceDecoratorImage() {

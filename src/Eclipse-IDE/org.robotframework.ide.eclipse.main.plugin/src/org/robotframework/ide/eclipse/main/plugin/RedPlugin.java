@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -104,5 +105,16 @@ public class RedPlugin extends AbstractUIPlugin {
 
     public static void logError(final String message, final Throwable cause) {
         getDefault().getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, cause));
+    }
+
+    public static <T> T getAdapter(final Object adaptee, final Class<? extends T> adapterClass) {
+        if (adapterClass.isInstance(adaptee)) {
+            return adapterClass.cast(adaptee);
+        } else if (adaptee instanceof IAdaptable) {
+            return ((IAdaptable) adaptee).getAdapter(adapterClass);
+        } else {
+            return null;
+        }
+
     }
 }

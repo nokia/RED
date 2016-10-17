@@ -97,7 +97,8 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     @Override
     public void launch(final ISelection selection, final String mode) {
         if (selection instanceof IStructuredSelection) {
-            final List<IResource> resources = Selections.getElements((IStructuredSelection) selection, IResource.class);
+            final List<IResource> resources = Selections.getAdaptableElements((IStructuredSelection) selection,
+                    IResource.class);
             if (!resources.isEmpty()) {
                 launch(resources, mode);
             }
@@ -207,7 +208,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         }
 
         DebugSocketManager socketManager = null;
-        boolean isDebugServerSocketListening = false; 
+        boolean isDebugServerSocketListening = false;
         if (!isDebugging) {
             runtimeEnvironment.startTestRunnerAgentHandler(cmdLine.getPort(), new ILineHandler() {
                 @Override
@@ -358,7 +359,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     private List<String> getSuitesToRun(final Collection<IResource> suites) {
-        final List<String> suiteNames = new ArrayList<String>();
+        final List<String> suiteNames = new ArrayList<>();
 
         for (final IResource suite : suites) {
             suiteNames.add(createSuiteName(suite));

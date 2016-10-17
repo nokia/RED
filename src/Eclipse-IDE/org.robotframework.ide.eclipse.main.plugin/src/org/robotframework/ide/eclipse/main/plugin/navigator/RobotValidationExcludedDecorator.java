@@ -40,8 +40,8 @@ public class RobotValidationExcludedDecorator implements ILightweightLabelDecora
 
     @Override
     public void decorate(final Object element, final IDecoration decoration) {
-        if (element instanceof IFolder) {
-            final IFolder folder = (IFolder) element;
+        final IFolder folder = RedPlugin.getAdapter(element, IFolder.class);
+        if (folder != null) {
             final RobotProject robotProject = RedPlugin.getModelManager()
                     .getModel()
                     .createRobotProject(folder.getProject());

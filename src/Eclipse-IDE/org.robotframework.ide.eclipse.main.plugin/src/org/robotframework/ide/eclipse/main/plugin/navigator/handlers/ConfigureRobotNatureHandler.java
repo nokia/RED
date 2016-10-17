@@ -29,16 +29,12 @@ public class ConfigureRobotNatureHandler extends DIParameterizedHandler<E4Config
                 @Named("org.robotframework.red.configureRobotNature.enablement") final String enablement)
                 throws CoreException {
 
-            final List<IProject> projects = Selections.getElements(selection, IProject.class);
+            final List<IProject> projects = Selections.getAdaptableElements(selection, IProject.class);
 
-            if ("enable".equalsIgnoreCase(enablement)) {
-
-                for (final IProject project : projects) {
+            for (final IProject project : projects) {
+                if ("enable".equalsIgnoreCase(enablement)) {
                     RobotProjectNature.addRobotNature(project, new NullProgressMonitor());
-                }
-            } else if ("disable".equalsIgnoreCase(enablement)) {
-
-                for (final IProject project : projects) {
+                } else if ("disable".equalsIgnoreCase(enablement)) {
                     RobotProjectNature.removeRobotNature(project, new NullProgressMonitor(),
                             shouldRedXmlBeRemoved(project.getName()));
                 }
