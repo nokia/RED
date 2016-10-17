@@ -34,6 +34,8 @@ public class TokensSource {
                 .appendLine("  call  arg  ${x}  # comment   comment")
                 .appendLine("case 2")
                 .appendLine("  call  arg  ${x}  # comment   comment")
+                .appendLine("  given call  # comment")
+                .appendLine("  when then call  # comment")
                 .appendLine("*Keywords")
                 .appendLine("userkw 1")
                 .appendLine("  [arguments]  ${a}  # comment")

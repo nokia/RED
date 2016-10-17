@@ -11,10 +11,9 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 
 import com.google.common.base.Optional;
 
-
 public class ExecutableRowCallRule implements ISyntaxColouringRule {
 
-    private final IToken textToken;
+    protected final IToken textToken;
 
     public ExecutableRowCallRule(final IToken textToken) {
         this.textToken = textToken;
@@ -28,29 +27,31 @@ public class ExecutableRowCallRule implements ISyntaxColouringRule {
     @Override
     public Optional<PositionedTextToken> evaluate(final IRobotLineElement token, final int offsetInToken,
             final List<IRobotLineElement> analyzedTokens) {
-        final List<IRobotTokenType> types = token.getTypes();
-        final IRobotTokenType type = types.get(0);
 
-        if (isAction(type) || isActionArgument(type)) {
-            final List<RobotToken> tokensBeforeInLine = getTokensFromLine(analyzedTokens, token.getLineNumber());
+        if (shouldBeColored(token, analyzedTokens)) {
+            return Optional.of(new PositionedTextToken(textToken, token.getStartOffset() + offsetInToken,
+                    token.getText().length() - offsetInToken));
+        }
+        return Optional.absent();
+    }
 
-            for (int i = 0; i < tokensBeforeInLine.size(); i++) {
-                final RobotToken prevToken = tokensBeforeInLine.get(i);
+    protected boolean shouldBeColored(final IRobotLineElement token, final List<IRobotLineElement> analyzedTokens) {
+        final IRobotTokenType type = token.getTypes().get(0);
+
+        if ((isAction(type) || isActionArgument(type)) && !token.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
+            final List<RobotToken> tokensBeforeInLine = getTokensFromLine(analyzedTokens, token.getLineNumber());            
+            for (final RobotToken prevToken : tokensBeforeInLine) {
                 if (!prevToken.getTypes().contains(RobotTokenType.VARIABLE_USAGE)
-                        && !prevToken.getTypes().contains(RobotTokenType.ASSIGNMENT)
+                        && !prevToken.getTypes().contains(RobotTokenType.ASSIGNMENT) 
                         && !prevToken.getText().isEmpty()
                         && !prevToken.getTypes().contains(RobotTokenType.PRETTY_ALIGN_SPACE)
                         && !prevToken.getText().equals("\\")) {
-                    return Optional.absent();
+                    return false;
                 }
             }
-
-            if (!token.getTypes().contains(RobotTokenType.VARIABLE_USAGE)) {
-                return Optional
-                        .of(new PositionedTextToken(textToken, token.getStartOffset(), token.getText().length()));
-            }
+            return true;
         }
-        return Optional.absent();
+        return false;
     }
 
     private boolean isActionArgument(final IRobotTokenType type) {
