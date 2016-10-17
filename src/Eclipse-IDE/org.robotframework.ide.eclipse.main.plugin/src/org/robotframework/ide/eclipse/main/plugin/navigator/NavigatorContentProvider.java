@@ -67,8 +67,10 @@ public class NavigatorContentProvider extends TreeContentProvider {
 
 	@Override
     public Object[] getChildren(final Object parentElement) {
-        if (parentElement instanceof IFile) {
-            return RedPlugin.getModelManager().createSuiteFile((IFile) parentElement).getSections().toArray();
+        final IFile file = RedPlugin.getAdapter(parentElement, IFile.class);
+                
+        if (file != null) {
+            return RedPlugin.getModelManager().createSuiteFile(file).getSections().toArray();
         } else if (parentElement instanceof RobotSettingsSection) {
             final List<? extends RobotElement> children = ((RobotSettingsSection) parentElement).getChildren();
             return groupedChildren(children).toArray();
