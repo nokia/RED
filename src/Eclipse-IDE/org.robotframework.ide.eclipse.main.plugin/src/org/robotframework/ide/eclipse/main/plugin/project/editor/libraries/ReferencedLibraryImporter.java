@@ -59,17 +59,17 @@ public class ReferencedLibraryImporter {
                 public void run(final IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
                     monitor.beginTask("Reading classes/modules from module '" + fullLibraryPath + "'", 100);
                     try {
-                        pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath, Optional. <String>absent()));
+                        pythonClasses.addAll(pythonLibStructureBuilder.provideEntriesFromFile(fullLibraryPath,
+                                Optional.<String> absent(), false));
                     } catch (final RobotEnvironmentException e) {
                         throw new InvocationTargetException(e);
                     }
                 }
             });
         } catch (InvocationTargetException | InterruptedException e) {
-            StatusManager.getManager()
-                    .handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
-                            "RED was unable to find classes/modules inside '" + fullLibraryPath + "' module",
-                            e.getCause()), StatusManager.SHOW);
+            StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID,
+                    "RED was unable to find classes/modules inside '" + fullLibraryPath + "' module", e.getCause()),
+                    StatusManager.SHOW);
             return new ArrayList<>();
         }
 
@@ -147,12 +147,11 @@ public class ReferencedLibraryImporter {
 
     public ReferencedLibrary importLibFromSpecFile(final String fullLibraryPath) {
         final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath));
-        return ReferencedLibrary.create(LibraryType.VIRTUAL,
-                path.lastSegment(), path.toPortableString());
+        return ReferencedLibrary.create(LibraryType.VIRTUAL, path.lastSegment(), path.toPortableString());
     }
 
-    static ElementListSelectionDialog createSelectionDialog(final Shell shell, final String path,
-            final List<?> classes, final LabelProvider labelProvider) {
+    static ElementListSelectionDialog createSelectionDialog(final Shell shell, final String path, final List<?> classes,
+            final LabelProvider labelProvider) {
         final ElementListSelectionDialog classesDialog = new ElementListSelectionDialog(shell, labelProvider);
         classesDialog.setMultipleSelection(true);
         classesDialog.setTitle("Select library class");

@@ -27,13 +27,13 @@ import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.Pytho
 import com.google.common.base.Optional;
 
 public class JarStructureBuilder {
-    
+
     private final RobotRuntimeEnvironment environment;
 
     private final RobotProjectConfig config;
 
     private final IProject project;
-    
+
     public JarStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config,
             final IProject project) {
         this.environment = environment;
@@ -67,17 +67,17 @@ public class JarStructureBuilder {
         } catch (final IOException e) {
             // nothing to do
         }
-        
+
         jarClasses.addAll(providePythonEntriesFromJarFile(file));
-        
+
         return jarClasses;
     }
-    
+
     private List<JarClass> providePythonEntriesFromJarFile(final File file) {
         final PythonLibStructureBuilder pythonLibStructureBuilder = new PythonLibStructureBuilder(environment, config,
                 project);
-        final Collection<PythonClass> entriesFromFile = pythonLibStructureBuilder
-                .provideEntriesFromFile(file.getPath(), Optional. <String>absent());
+        final Collection<PythonClass> entriesFromFile = pythonLibStructureBuilder.provideEntriesFromFile(file.getPath(),
+                Optional.<String> absent(), false);
 
         final List<JarClass> jarClasses = newArrayList();
         for (final PythonClass pythonClass : entriesFromFile) {
@@ -92,6 +92,7 @@ public class JarStructureBuilder {
     }
 
     public static class JarClass {
+
         private final String qualifiedName;
 
         private JarClass(final String qualifiedName) {
@@ -103,7 +104,7 @@ public class JarStructureBuilder {
             final String qualifiedName = nameWithoutExtension.replaceAll("/", ".");
             return new JarClass(qualifiedName);
         }
-        
+
         private static JarClass createFromZipPythonEntry(final String name) {
             return new JarClass(name);
         }
