@@ -121,8 +121,9 @@ public class NavigatorLibrariesContentProvider extends TreeContentProvider {
 
     @Override
     public Object[] getChildren(final Object parentElement) {
-        if (parentElement instanceof IProject) {
-            final IProject project = (IProject) parentElement;
+        final IProject project = RedPlugin.getAdapter(parentElement, IProject.class);
+
+        if (project != null) {
             final RobotProject robotProject = RedPlugin.getModelManager().getModel().createRobotProject(project);
             final List<RobotProjectDependencies> dependencies = newArrayList(
                     new RobotProjectDependencies(robotProject));

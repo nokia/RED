@@ -38,7 +38,7 @@ import com.google.common.collect.Multimap;
 abstract class ChangeExclusionHandler {
 
     public Object changeExclusion(final IEventBroker eventBroker, final IStructuredSelection selection) {
-        final List<IFolder> foldersToChange = Selections.getElements(selection, IFolder.class);
+        final List<IFolder> foldersToChange = Selections.getAdaptableElements(selection, IFolder.class);
         final Multimap<IProject, IPath> groupedPaths = groupByProject(foldersToChange);
 
         for (final IProject groupingProject : groupedPaths.keySet()) {

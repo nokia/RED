@@ -45,7 +45,7 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
 
         @Execute
         public Object addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
-            final List<IFile> selectedFiles = Selections.getElements(selection, IFile.class);
+            final List<IFile> selectedFiles = Selections.getAdaptableElements(selection, IFile.class);
 
             final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
 
