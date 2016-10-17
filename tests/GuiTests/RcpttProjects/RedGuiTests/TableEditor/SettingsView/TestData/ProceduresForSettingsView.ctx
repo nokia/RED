@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _2rVvIENaEeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/28/16 11:07 AM
+Save-Time: 10/17/16 11:41 AM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -93,4 +93,23 @@ proc "is-row-fully-selected" [val row] [val table]{
 	}
 } 
 
+
+proc "check-metadata-layer-size"{
+	with [get-editor "TestFile.robot" | get-section Metadata | get-canvas] {
+		  //const width of window
+	    get-property "getLayer().getPreferredWidth()" -raw |  let [val preferredWidth -input]{
+	        	$preferredWidth  | gt 873
+	    	    | assert-true -message [format "Resolution of screen must be greater than 1600x900. Metadata width is: %s but should be bigger that 874" $preferredWidth] 
+	    }
+	
+	    //width is changing when size of red window is changed - checking in case if window size is changed
+	    get-property "getLayer().getBodyLayer().getWidth()" -raw | let [val width -input]{
+	    	$width  | gt 858
+	    	    | assert-true -message [format "Resolution of screen must be greater than 1600x900. Metadata width is: %s but should be bigger that 858" $width] 
+	    }
+	  
+	    //height depands on amount of items in table
+	    //get-property "getLayer().getBodyLayer().getHeight()" -raw | equals 220 | verify-true
+	}
+}
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998--
