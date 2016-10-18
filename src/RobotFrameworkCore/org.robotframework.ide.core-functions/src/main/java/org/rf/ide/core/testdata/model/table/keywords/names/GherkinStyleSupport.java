@@ -69,7 +69,11 @@ public class GherkinStyleSupport {
     private static String removeGherkinPrefix(final String name) {
         for (final String prefix : PREFIXES) {
             if (name.toLowerCase().startsWith(prefix)) {
-                return name.substring(prefix.length()).trim();
+                final String suffix = name.substring(prefix.length());
+                final String trimmedsuffix = suffix.trim();
+                if (suffix.equals(trimmedsuffix))
+                    continue;
+                return trimmedsuffix;
             }
         }
         return name;
