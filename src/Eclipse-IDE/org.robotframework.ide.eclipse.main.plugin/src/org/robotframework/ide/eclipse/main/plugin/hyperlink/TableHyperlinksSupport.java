@@ -114,6 +114,18 @@ public class TableHyperlinksSupport {
         hyperlinks.clear();
     }
 
+    private void openHyperlink(final IHyperlink linkToOpen) {
+        removeHyperlink();
+
+        SwtThread.asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                linkToOpen.open();
+            }
+        });
+    }
+
     @VisibleForTesting
     static Optional<IRegion> getMergedHyperlinkRegion(final Collection<IHyperlink> hyperlinks) {
         if (hyperlinks.isEmpty()) {
@@ -147,14 +159,9 @@ public class TableHyperlinksSupport {
 
         @Override
         public void mouseUp(final MouseEvent e) {
-            if (hyperlinks.isEmpty()) {
-                return;
+            if (!hyperlinks.isEmpty()) {
+                openHyperlink(hyperlinks.get(0));
             }
-            if (infoShell != null && !infoShell.isDisposed()) {
-                infoShell.close();
-                infoShell.dispose();
-            }
-            hyperlinks.get(0).open();
         }
     }
 
@@ -288,9 +295,26 @@ public class TableHyperlinksSupport {
                 @Override
                 public void mouseMove(final MouseEvent e) {
                     if (viewer.getTable().equals(e.getSource())) {
-                        final Object item = viewer.getTable().getItem(new Point(e.x, e.y));
-                        if (item instanceof TableItem) {
-                            viewer.getTable().setSelection(new TableItem[] { (TableItem) item });
+                        final TableItem item = viewer.getTable().getItem(new Point(e.x, e.y));
+                        if (item != null) {
+                            viewer.getTable().setSelection(new TableItem[] { item });
+                        }
+                    }
+                }
+            });
+            viewer.getTable().addMouseListener(new MouseAdapter() {
+
+                @Override
+                public void mouseUp(final MouseEvent e) {
+                    if (viewer.getTable().getSelectionCount() < 1 || e.button != 1) {
+                        return;
+                    }
+
+                    if (viewer.getTable().equals(e.getSource())) {
+                        final TableItem item = viewer.getTable().getItem(new Point(e.x, e.y));
+                        final TableItem selection = viewer.getTable().getSelection()[0];
+                        if (selection.equals(item)) {
+                            openHyperlink((IHyperlink) item.getData());
                         }
                     }
                 }
@@ -298,18 +322,8 @@ public class TableHyperlinksSupport {
             viewer.getTable().addSelectionListener(new SelectionAdapter() {
 
                 @Override
-                public void widgetSelected(final SelectionEvent e) {
-                    final IHyperlink linkToOpen = Selections.getSingleElement(viewer.getStructuredSelection(),
-                            IHyperlink.class);
-                    removeHyperlink();
-
-                    SwtThread.asyncExec(new Runnable() {
-
-                        @Override
-                        public void run() {
-                            linkToOpen.open();
-                        }
-                    });
+                public void widgetDefaultSelected(final SelectionEvent e) {
+                    openHyperlink(Selections.getSingleElement(viewer.getStructuredSelection(), IHyperlink.class));
                 }
             });
 
