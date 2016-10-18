@@ -6,10 +6,10 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _kmM50CsHEeW667Afdo4DcA
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 4/15/16 4:29 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/18/16 2:00 PM
 Testcase-Type: ecl
-Verifications: _ase_IGBvEeW-9bGOK0urnw
+Verifications: _Xbz7EJUqEeaXOtocAkFx_w
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
@@ -575,4 +575,5 @@ with [get-tab-folder -index 1] {
 
 get-view "Project Explorer" | get-tree | select New | key-type F5
 wait 1000
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
