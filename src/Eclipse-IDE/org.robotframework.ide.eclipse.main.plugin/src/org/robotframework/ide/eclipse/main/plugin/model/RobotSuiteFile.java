@@ -177,6 +177,11 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public void dispose() {
+        if (fileOutput != null) {
+            // this is required because we want to reparse file output when user did some changes
+            // to the model, but those changes were discarded (editor wasn't saved)
+            fileOutput.setLastModificationEpochTime(System.currentTimeMillis());
+        }
         contentTypeId = null;
         sections = null;
         fileOutput = null;
