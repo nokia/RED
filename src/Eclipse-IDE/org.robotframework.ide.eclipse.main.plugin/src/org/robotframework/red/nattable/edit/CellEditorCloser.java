@@ -19,7 +19,9 @@ public class CellEditorCloser {
 
             @Override
             public void run() {
-                table.setFocus();
+                if (table != null && !table.isDisposed()) {
+                    table.setFocus();
+                }
             }
         });
     }
