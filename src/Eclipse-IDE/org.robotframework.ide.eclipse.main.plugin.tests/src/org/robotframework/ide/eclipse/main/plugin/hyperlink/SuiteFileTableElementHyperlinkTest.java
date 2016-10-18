@@ -16,14 +16,14 @@ import org.eclipse.ui.PlatformUI;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotContainer;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotFormEditor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesEditorPart;
@@ -66,14 +66,16 @@ public class SuiteFileTableElementHyperlinkTest {
         assertThat(link.getImage()).isEqualTo(RedImages.getImageForFileWithExtension("robot"));
     }
 
-    @Ignore("investigating wrongly injected objects")
     @Test
     public void testIfTestCaseProperlyOpensInEditor() {
         final IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
         assertThat(page.getEditorReferences()).isEmpty();
 
-        final RobotSuiteFile sourceModel = new RobotModel().createSuiteFile(projectProvider.getFile("f.robot"));
+        // FIXME : this shouldn't use global model; there should be a way to inject own model
+        final RobotSuiteFile sourceModel = RedPlugin.getModelManager()
+                .getModel()
+                .createSuiteFile(projectProvider.getFile("f.robot"));
         final RobotCase testCase = sourceModel.findSection(RobotCasesSection.class).get().getChildren().get(1);
 
         final SuiteFileTableElementHyperlink link = new SuiteFileTableElementHyperlink(new Region(20, 10), sourceModel,
@@ -95,5 +97,8 @@ public class SuiteFileTableElementHyperlinkTest {
                 .getSelectionProvider()
                 .getSelection();
         assertThat(selection.size()).isEqualTo(1);
+
+        // TODO : this is not required when local model i used instead of global
+        ((RobotContainer) sourceModel.getParent()).getChildren().remove(sourceModel);
     }
 }
