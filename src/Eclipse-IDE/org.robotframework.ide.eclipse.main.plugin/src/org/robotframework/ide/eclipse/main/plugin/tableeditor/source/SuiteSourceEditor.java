@@ -10,6 +10,7 @@ import javax.inject.Named;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.e4.core.services.events.IEventBroker;
@@ -38,7 +39,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IStorageEditorInput;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.editors.text.TextEditor;
@@ -98,7 +98,7 @@ public class SuiteSourceEditor extends TextEditor {
     @Override
     protected void doSetInput(final IEditorInput input) throws CoreException {
         super.doSetInput(input);
-        if (input instanceof IStorageEditorInput) {
+        if (input.getAdapter(IStorage.class) != null) {
             fileModel.reparseEverything(getDocument().get());
             final IEventBroker eventBroker = (IEventBroker) PlatformUI.getWorkbench().getService(IEventBroker.class);
             eventBroker.post(RobotModelEvents.REPARSING_DONE, fileModel);
