@@ -172,24 +172,6 @@
        point="org.eclipse.ui.decorators">
     <decorator
           adaptable="true"
-          class="org.robotframework.ide.eclipse.main.plugin.navigator.RobotSuitesDecorator"
-          icon="resources/decorator_suite_folder.png"
-          id="org.robotframework.ide.eclipse.main.plugin.robotSuiteDecorator"
-          label="Robot Test Suites"
-          lightweight="true"
-          location="TOP_RIGHT"
-          state="true">
-       <description>
-          This decorator adds icon to Robot test suites folders
-       </description>
-       <enablement>
-          <objectClass
-                name="org.eclipse.core.resources.IFolder">
-          </objectClass>
-       </enablement>
-    </decorator>
-    <decorator
-          adaptable="true"
           class="org.robotframework.ide.eclipse.main.plugin.navigator.RobotFilesDecorator"
           id="org.robotframework.red.decorator.resource"
           label="Robot Files"
@@ -603,14 +585,6 @@
              id="org.robotframework.keyword.actions.provider">
        </actionProvider>
     </navigatorContent>
-    <commonFilter
-          activeByDefault="false"
-          class="org.robotframework.ide.eclipse.main.plugin.navigator.filters.SuiteInitFilesFilter"
-          description="Hides all Robot Suite initialization files (__init__.robot)"
-          id="org.robotframework.filters.initFilesFilter"
-          name="Robot Suite initialization files"
-          visibleInUI="true">
-    </commonFilter>
     <commonFilter
           activeByDefault="false"
           class="org.robotframework.ide.eclipse.main.plugin.navigator.filters.NonRobotProjectsFilter"
