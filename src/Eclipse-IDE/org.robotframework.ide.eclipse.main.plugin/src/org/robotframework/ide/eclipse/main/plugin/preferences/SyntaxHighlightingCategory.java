@@ -15,14 +15,14 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPrefere
  *
  */
 public enum SyntaxHighlightingCategory {
-    DEFAULT_SECTION("default", new ColoringPreference(new RGB(255, 200, 100), SWT.ITALIC), "Undefined tables"),
-    SECTION_HEADER("section", new ColoringPreference(new RGB(255, 0, 0), SWT.NORMAL), "Section headers"),
     COMMENT("comment", new ColoringPreference(new RGB(192, 192, 192), SWT.NORMAL), "Comments"),
-    SETTING("setting", new ColoringPreference(new RGB(149, 0, 85), SWT.NORMAL), "Settings"),
-    DEFINITION("definition", new ColoringPreference(new RGB(0, 0, 0), SWT.BOLD), "Keyword/Test Cases definition headers"),
+    GHERKIN("gherkin", new ColoringPreference(new RGB(128, 128, 64), SWT.BOLD), "Given/When/And/Then"),
     KEYWORD_CALL("call", new ColoringPreference(new RGB(0, 128, 192), SWT.BOLD), "Keyword calls"),
-    VARIABLE("var", new ColoringPreference(new RGB(0, 128, 0), SWT.NORMAL), "Variables"),
-    GHERKIN("gherkin", new ColoringPreference(new RGB(128, 128, 64), SWT.BOLD), "Given/When/And/Then");
+    DEFINITION("definition", new ColoringPreference(new RGB(0, 0, 0), SWT.BOLD), "Keyword/Test Cases definition headers"),
+    SECTION_HEADER("section", new ColoringPreference(new RGB(255, 0, 0), SWT.NORMAL), "Section headers"),
+    SETTING("setting", new ColoringPreference(new RGB(149, 0, 85), SWT.NORMAL), "Settings"),
+    DEFAULT_SECTION("default", new ColoringPreference(new RGB(255, 200, 100), SWT.ITALIC), "Undefined tables"),
+    VARIABLE("var", new ColoringPreference(new RGB(0, 128, 0), SWT.NORMAL), "Variables");
 
     private String id;
 
