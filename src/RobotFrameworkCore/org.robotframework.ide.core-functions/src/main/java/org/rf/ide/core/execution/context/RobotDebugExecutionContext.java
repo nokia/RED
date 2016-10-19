@@ -34,7 +34,7 @@ public class RobotDebugExecutionContext {
 
     private RobotParser robotParser;
 
-    private ResourceImporter resourceImporter;
+    private final ResourceImporter resourceImporter;
 
     private final List<String> resourceImportPaths;
 
@@ -158,7 +158,7 @@ public class RobotDebugExecutionContext {
         }
         int line = -1;
         if (executableRow != null) {
-            IExecutableRowDescriptor<?> buildLineDescription = executableRow.buildLineDescription();
+            final IExecutableRowDescriptor<?> buildLineDescription = executableRow.buildLineDescription();
             if (buildLineDescription.getRowType() == ERowType.FOR_CONTINUE) {
                 line = ((ForLoopContinueRowDescriptor<?>) buildLineDescription).getKeywordAction()
                         .getToken()
@@ -196,8 +196,7 @@ public class RobotDebugExecutionContext {
                 isForLoopStarted = false;
                 executableRowFindersManager.clearForLoopState();
             }
-        }
-        if (!isMainKeyword(keywordType) && !isForLoopItemKeyword(keywordType)) {
+        } else if (!isMainKeyword(keywordType) && !isForLoopItemKeyword(keywordType)) {
             isSetupTeardownKeywordStarted = false;
         }
     }
