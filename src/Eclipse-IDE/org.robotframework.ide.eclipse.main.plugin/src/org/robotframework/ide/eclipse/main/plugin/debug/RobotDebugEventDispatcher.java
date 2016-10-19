@@ -424,7 +424,8 @@ public class RobotDebugEventDispatcher extends Job {
         final IContainer suiteContainer = ResourcesPlugin.getWorkspace()
                 .getRoot()
                 .getContainerForLocation(keywordExecutionManager.getCurrentSuiteLocation());
-        if (suiteContainer != null && suiteContainer.getType() == IResource.FOLDER) {
+        if (suiteContainer != null
+                && (suiteContainer.getType() == IResource.FOLDER || suiteContainer.getType() == IResource.PROJECT)) {
             final IResource initFile = findInitFile(suiteContainer);
             if (initFile != null && initFile.getType() == IResource.FILE) {
                 final IFile currentSuiteFile = (IFile) initFile;
