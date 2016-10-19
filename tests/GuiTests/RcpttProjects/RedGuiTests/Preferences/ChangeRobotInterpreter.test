@@ -1,0 +1,91 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ChangeRobotInterpreter
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _PXQzQOxcEeWqTNBmS5Gi4w
+Runtime-Version: 2.0.2.201511100828
+Save-Time: 4/21/16 3:05 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Installed frameworks"
+}
+if [get-window Preferences | get-table | get-property itemCount | equals 0 ]{
+	with [get-window Preferences] {
+	    get-button Discover | click
+	    get-table | get-item "Robot Framework 3.0 \\(Python 2.7.8 on win32\\)" | check
+	    get-button OK | click
+	    get-window "Rebuild required" | get-button OK | click
+	}
+}
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Installed frameworks"
+    get-button Cancel | click
+}
+wait 2000
+get-preferences-menu | click
+wait 3000
+with [get-window Preferences] {
+    get-table | get-item "Robot Framework 3.0 \\(Jython 2.7.0 on java1.8.0_25\\)" | check
+    get-button OK | click
+    get-window "Rebuild required" | get-button OK | click
+}
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Standard libraries \\[Robot Framework 3.0 \\(Jython 2.7.0 on java1.8.0_25\\)\\]" 
+    | get-property caption | equals "Robot Standard libraries [Robot Framework 3.0 (Jython 2.7.0 on java1.8.0_25)]" 
+    | verify-true
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-table | get-item "Robot Framework 3.0 \\(Python 2.7.8 on win32\\)" | check
+    get-button OK | click
+    get-window "Rebuild required" | get-button OK | click
+}
+get-view "Project Explorer" | get-tree 
+    | select "RobotProject/Robot Standard libraries [Robot Framework 3.0 (Jython 2.7.0 on java1.8.0_25)]"
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Standard libraries \\[Robot Framework 3.0 \\(Python 2.7.8 on win32\\)\\]" 
+    | get-property caption | equals "Robot Standard libraries [Robot Framework 3.0 (Python 2.7.8 on win32)]" 
+    | verify-true
+get-preferences-menu | click
+set-dialog-result Folder "C:\\Program Files"
+with [get-window Preferences] {
+    get-button "Add..." | click
+    get-table | get-item "<unknown>" | check
+    get-button OK | click
+    get-window "Rebuild required" | get-button OK | click
+}
+get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Standard libraries \\[???\\]" 
+    | get-property caption | equals "Robot Standard libraries [???]" | verify-true
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-table | select "<unknown>"
+    get-button Remove | click
+    get-table | select "Robot Framework 3.0 \\(Jython 2.7.0 on java1.8.0_25\\)"
+    get-button Remove | click
+}
+with [get-window Preferences | get-table] {
+    get-item "Robot Framework 3.0 \\(Python 2.7.8 on win32\\)" | get-property "values['Name']" 
+        | equals "Robot Framework 3.0 (Python 2.7.8 on win32)" | verify-true
+    get-item "Robot Framework 3.0 \\(Python 2.7.8 on win32\\)" | get-property "values['Path']" | equals "c:\\Python27" 
+        | verify-true
+    get-property itemCount | equals 1 | verify-true
+}
+with [get-window Preferences] {
+    get-table | get-item "Robot Framework 3.0 \\(Python 2.7.8 on win32\\)" | check
+    get-button OK | click
+    get-window "Rebuild required" | get-button OK | click
+}
+get-view "Project Explorer" | get-tree 
+    | get-item "RobotProject/Robot Standard libraries \\[Robot Framework 3.0 \\(Python 2.7.8 on win32\\)\\]" 
+    | get-property caption | equals "Robot Standard libraries [Robot Framework 3.0 (Python 2.7.8 on win32)]" 
+    | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
