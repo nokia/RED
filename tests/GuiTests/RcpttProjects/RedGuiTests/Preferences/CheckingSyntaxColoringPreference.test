@@ -1,0 +1,93 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: CheckingSyntaxColoringPreference
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _rIRz0JRoEeaAWer3wBFETA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/19/16 3:58 PM
+Testcase-Type: ecl
+Verifications: _yvhKoJRrEeaAWer3wBFETA
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-bold-and-italic-preference" [val bold false] [val italic false]{
+	with [get-window Preferences] {
+	    get-button Bold | get-property selected | equals $bold | verify-true
+	    get-button Italic | get-property selected | equals $italic | verify-true
+	}
+
+}
+
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Editor/Syntax Coloring"
+
+////check if all items for coloring exists
+with [get-window Preferences] {
+    get-label "Syntax Coloring" | get-property caption | equals "Syntax Coloring" | verify-true
+    with [get-list] {
+        get-property "getItems().String[0]" | equals Comments | verify-true
+        get-property "getItems().String[1]" | equals "Given/When/And/Then"| verify-true
+        get-property "getItems().String[2]" | equals "Keyword calls" | verify-true
+        get-property "getItems().String[3]" | equals "Keyword/Test Cases definition headers" | verify-true
+        get-property "getItems().String[4]" | equals "Section headers"| verify-true
+        get-property "getItems().String[5]" | equals Settings | verify-true
+        get-property "getItems().String[6]" | equals "Undefined tables"| verify-true
+        get-property "getItems().String[7]" | equals Variables | verify-true
+    }
+}
+
+//preview label
+with [get-window Preferences] {
+    get-label "Preview:" | get-property caption | equals "Preview:" | verify-true
+}
+//check how many items are next to section
+
+with [get-window Preferences | get-control Any -after [get-label "Syntax Coloring"] -index 13] {
+    get-property "getChildren().length" | equals 3 | verify-true
+    get-property "getChildren().Control[0].getClassName()" | equals "org.eclipse.swt.widgets.Button" | verify-true
+    get-property "getChildren().Control[0].getText()" | equals "" | verify-true
+    
+    get-property "getChildren().Control[1].getSelection()" | equals false | verify-true
+    get-property "getChildren().Control[1].getText()" | equals Bold | verify-true
+    get-property "getChildren().Control[1].isEnabled()" | equals false | verify-true
+    
+    get-property "getChildren().Control[2].getSelection()" | equals false | verify-true
+    get-property "getChildren().Control[2].getText()" | equals Italic | verify-true
+    get-property "getChildren().Control[2].isEnabled()" | equals false | verify-true
+}
+
+//click on Section headres
+get-window Preferences | get-list | select "Section headers"
+set-dialog-result Color
+get-window Preferences | get-button -after [get-label "Syntax Coloring"] -index 3 | click
+
+//check bold and italic
+check-bold-and-italic-preference
+
+//select Settings
+get-window Preferences | get-list | select Settings
+check-bold-and-italic-preference
+
+get-window Preferences | get-list | select "Keyword\\/Test Cases definition headers"
+check-bold-and-italic-preference -bold true -italic false
+
+get-window Preferences | get-list | select "Given\\/When\\/And\\/Then"
+check-bold-and-italic-preference -bold true
+
+get-window Preferences | get-list | select Comments
+check-bold-and-italic-preference
+
+get-window Preferences | get-list | select "Undefined tables"
+check-bold-and-italic-preference -bold false -italic true
+
+get-window Preferences | get-list | select "Keyword calls"
+check-bold-and-italic-preference -bold true -italic false
+
+get-window Preferences | get-list | select Variables
+check-bold-and-italic-preference
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

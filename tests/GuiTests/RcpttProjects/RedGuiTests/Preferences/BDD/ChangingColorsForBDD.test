@@ -1,0 +1,109 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _8TRAgJRlEeaAWer3wBFETA
+Element-Name: ChangingColorsForBDD
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _3_q8AJRzEeaAWer3wBFETA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/19/16 4:10 PM
+Testcase-Type: ecl
+Verifications: _brhw8JRzEeaAWer3wBFETA
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "BDDProject/tsv_file.tsv" | select "BDDProject/tsv_file.tsv" 
+    | double-click
+    
+//open prefernece and change to italic pink    
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Syntax Coloring"
+    get-list | select "Given\\/When\\/And\\/Then"
+}
+set-dialog-result Color "255,128,255"
+with [get-window Preferences] {
+    get-button -after [get-label "Syntax Coloring"] -index 3 | click
+    get-button Italic | check
+    get-button OK | click
+}
+
+//close and open editor
+get-view "Project Explorer" | click
+get-editor "tsv_file.tsv" | close
+with [get-view "Project Explorer" | get-tree] {
+    select "BDDProject/tsv_file.tsv" | double-click
+}
+
+//check if words color was changed
+with [get-editor "tsv_file.tsv" | get-text-viewer] {
+    get-property "styles[10].text" | equals given | verify-true
+    get-property "styles[10].fontStyle" | equals "bold-italic" | verify-true
+    get-property "styles[10].foregroundColor" | equals "#FF80FF" | verify-true
+    
+    get-property "styles[11].text" | equals "kw 1" | verify-true
+    get-property "styles[11].fontStyle" | equals bold | verify-true
+    get-property "styles[11].foregroundColor" | equals "#0080C0" | verify-true
+    
+    get-property "styles[13].text" | equals then | verify-true
+    get-property "styles[13].fontStyle" | equals "bold-italic" | verify-true
+    get-property "styles[13].foregroundColor" | equals "#FF80FF" | verify-true
+    
+    get-property "styles[14].text" | equals log | verify-true
+    get-property "styles[14].fontStyle" | equals bold | verify-true
+    get-property "styles[14].foregroundColor" | equals "#0080C0" | verify-true
+    
+    get-property "styles[15].text" | equals 44 | verify-true
+    get-property "styles[15].fontStyle" | equals normal | verify-true
+    
+    get-property "styles[16].text" | equals AND | verify-true
+    get-property "styles[16].fontStyle" | equals "bold-italic" | verify-true
+    get-property "styles[16].foregroundColor" | equals "#FF80FF" | verify-true
+    
+    get-property "styles[17].text" | equals "kw with arg" | verify-true
+    get-property "styles[17].fontStyle" | equals bold | verify-true
+    get-property "styles[17].foregroundColor" | equals "#0080C0" | verify-true
+    
+    get-property "styles[19].text" | equals "${and}" | verify-true
+    get-property "styles[19].fontStyle" | equals normal | verify-true
+    
+    get-property "styles[23].text" | equals "${when" | verify-true
+    get-property "styles[23].fontStyle" | equals bold | verify-true
+    get-property "styles[23].foregroundColor" | equals "#0080C0" | verify-true
+    
+    get-property "styles[25].text" | equals AndThanGoBack | verify-true
+    get-property "styles[25].fontStyle" | equals bold | verify-true
+    get-property "styles[25].foregroundColor" | equals "#0080C0" | verify-true
+        
+    get-property "styles[27].text" | equals "${when}" | verify-true
+    get-property "styles[27].fontStyle" | equals normal | verify-true
+    
+    get-property "styles[31].text" | equals GivenNotExists | verify-true
+    get-property "styles[31].fontStyle" | equals bold | verify-true
+    get-property "styles[31].underline" | equals error | verify-true
+    get-property "styles[31].foregroundColor" | equals "#0080C0" | verify-true
+    get-property "styles[31].underlineColor" | equals "#FF0080" | verify-true
+    
+    get-property "styles[33].fontStyle" | equals bold | verify-true
+    get-property "styles[33].underline" | equals error | verify-true
+    get-property "styles[33].foregroundColor" | equals "#0080C0" | verify-true
+    get-property "styles[33].underlineColor" | equals "#FF0080" | verify-true
+}
+//restore to default
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-list | select "Keyword\\/Test Cases definition headers"
+    get-button "Restore Defaults" | click
+    get-button OK | click
+}
+
+//restart view
+get-editor "tsv_file.tsv" | click
+get-view "Project Explorer" | click
+get-editor "tsv_file.tsv" | close
+get-view "Project Explorer" | get-tree | select "BDDProject/tsv_file.tsv" | double-click
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
