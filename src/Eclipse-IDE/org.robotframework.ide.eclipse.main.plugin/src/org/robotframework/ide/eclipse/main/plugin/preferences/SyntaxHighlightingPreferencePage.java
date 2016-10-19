@@ -6,10 +6,10 @@
 package org.robotframework.ide.eclipse.main.plugin.preferences;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +70,7 @@ public class SyntaxHighlightingPreferencePage extends PreferencePage implements 
     public SyntaxHighlightingPreferencePage() {
         setPreferenceStore(new ScopedPreferenceStore(InstanceScope.INSTANCE, RedPlugin.PLUGIN_ID));
 
-        this.currentPreferences = newHashMap();
+        this.currentPreferences = new EnumMap<>(SyntaxHighlightingCategory.class);
         for (final SyntaxHighlightingCategory category : EnumSet.allOf(SyntaxHighlightingCategory.class)) {
             currentPreferences.put(category, category.getPreference());
         }
