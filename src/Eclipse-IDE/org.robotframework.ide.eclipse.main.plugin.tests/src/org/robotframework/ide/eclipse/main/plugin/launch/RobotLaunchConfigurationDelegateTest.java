@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -143,5 +144,24 @@ public class RobotLaunchConfigurationDelegateTest {
         final String projectAbsPath = projectProvider.getProject().getLocation().toOSString();
         assertThat(commandLine.getCommandLine()).containsSubsequence("-P",
                 projectAbsPath + File.separator + "folder1:" + projectAbsPath + File.separator + "folder2");
+    }
+    
+    @Test
+    public void commandLineContainsActualProjectName() throws Exception {
+        final RobotRuntimeEnvironment environment = RuntimeEnvironmentsMocks.createValidRobotEnvironment("RF 3");
+        final RobotProject robotProject = spy(new RobotModel().createRobotProject(projectProvider.getProject()));
+        when(robotProject.getRuntimeEnvironment()).thenReturn(environment);
+
+        final Collection<IResource> suiteResources = Lists
+                .<IResource> newArrayList(projectProvider.getDir(Path.fromPortableString("001__suites_a")));
+        final RobotLaunchConfigurationMock launchConfig = new RobotLaunchConfigurationMock("DifferentProjectName");
+        launchConfig.addSuite("001__suites_a", newArrayList("001__case1"));
+
+        final RobotLaunchConfigurationDelegate delegate = new RobotLaunchConfigurationDelegate();
+        final RunCommandLine commandLine = delegate.createStandardModeCmd(launchConfig, robotProject, suiteResources,
+                false);
+
+        assertThat(commandLine.getCommandLine()).containsSubsequence("-s", PROJECT_NAME + ".Suites_a");
+        assertThat(commandLine.getCommandLine()).containsSubsequence("-t", PROJECT_NAME + ".Suites_a.001__case1");
     }
 }

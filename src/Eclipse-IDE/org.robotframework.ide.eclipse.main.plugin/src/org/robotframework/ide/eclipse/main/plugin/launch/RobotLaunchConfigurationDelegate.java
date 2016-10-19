@@ -300,7 +300,7 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
         builder.addVariableFiles(robotProject.getVariableFilePaths());
 
         builder.suitesToRun(getSuitesToRun(suiteResources));
-        builder.testsToRun(getTestsToRun(robotConfig));
+        builder.testsToRun(getTestsToRun(robotProject.getProject(), robotConfig));
 
         if (robotConfig.isIncludeTagsEnabled()) {
             builder.includeTags(robotConfig.getIncludedTags());
@@ -368,23 +368,22 @@ public class RobotLaunchConfigurationDelegate extends LaunchConfigurationDelegat
     }
 
     public static String createSuiteName(final IResource suite) {
-        final String actualProjectName = suite.getProject().getLocation().lastSegment();
-        return createSuiteName(actualProjectName, suite.getProjectRelativePath());
+        return createSuiteName(suite.getProject(), suite.getProjectRelativePath());
     }
 
-    public static String createSuiteName(final String projectName, final IPath path) {
-        final List<String> upperCased = newArrayList(toRobotFrameworkName(projectName));
+    public static String createSuiteName(final IProject project, final IPath path) {
+        final String actualProjectName = project.getLocation().lastSegment();
+        final List<String> upperCased = newArrayList(toRobotFrameworkName(actualProjectName));
         upperCased.addAll(
                 Lists.transform(Arrays.asList(path.removeFileExtension().segments()), toRobotFrameworkName()));
         return Joiner.on('.').join(upperCased);
     }
 
-    private Collection<String> getTestsToRun(final RobotLaunchConfiguration robotConfig) throws CoreException {
-        final String projectName = robotConfig.getProjectName();
+    private Collection<String> getTestsToRun(final IProject project, final RobotLaunchConfiguration robotConfig) throws CoreException {
         final List<String> tests = new ArrayList<>();
         for (final Entry<String, List<String>> entries : robotConfig.getSuitePaths().entrySet()) {
             for (final String testName : entries.getValue()) {
-                tests.add(createSuiteName(projectName, Path.fromPortableString(entries.getKey())) + "." + testName);
+                tests.add(createSuiteName(project, Path.fromPortableString(entries.getKey())) + "." + testName);
             }
         }
         return tests;
