@@ -68,7 +68,7 @@ class KeywordTableValidator implements ModelUnitValidator {
         }
 
         final RobotKeywordsSection robotKeywordsSection = keywordSection.get();
-        final KeywordTable keywordTable = (KeywordTable) robotKeywordsSection.getLinkedElement();
+        final KeywordTable keywordTable = robotKeywordsSection.getLinkedElement();
         final List<UserKeyword> keywords = keywordTable.getKeywords();
 
         validateByExternal(robotKeywordsSection, monitor);

@@ -35,11 +35,11 @@ public class DeprecatedKeywordHeaderAlias implements ModelUnitValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        KeywordTable keywords = (KeywordTable) section.getLinkedElement();
+        final KeywordTable keywords = section.getLinkedElement();
         if (keywords.isPresent()) {
             for (final TableHeader<? extends ARobotSectionTable> th : keywords.getHeaders()) {
-                RobotToken declaration = th.getDeclaration();
-                String raw = declaration.getRaw();
+                final RobotToken declaration = th.getDeclaration();
+                final String raw = declaration.getRaw();
                 final String rawWihtoutWithspaces = raw.toLowerCase().replaceAll("\\s", "");
                 if (rawWihtoutWithspaces.toLowerCase().contains("userkeyword")) {
                     reporter.handleProblem(RobotProblem.causedBy(KeywordsProblem.USER_KEYWORD_TABLE_HEADER_SYNONIM)
