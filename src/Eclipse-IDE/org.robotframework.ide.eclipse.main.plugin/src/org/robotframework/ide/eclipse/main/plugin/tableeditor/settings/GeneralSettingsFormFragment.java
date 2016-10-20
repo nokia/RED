@@ -231,8 +231,8 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
         createDocumentationControl(panel);
         if (!fileModel.isResourceFile()) {
             setupNatTable(panel);
-            setInput();
         }
+        setInput();
     }
 
     private Composite createPanel(final Section section) {
