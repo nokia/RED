@@ -36,8 +36,8 @@ public class DocumentationUserKeywordDeclarationSettingValidator extends ADocume
 
     @Override
     public List<RobotToken> getDocumentationDeclaration() {
-        List<RobotToken> documentationDec = new ArrayList<>(0);
-        KeywordTable keywordTable = (KeywordTable) section.getLinkedElement();
+        final List<RobotToken> documentationDec = new ArrayList<>(0);
+        final KeywordTable keywordTable = section.getLinkedElement();
         if (keywordTable.isPresent()) {
             final List<UserKeyword> keywords = keywordTable.getKeywords();
             for (final UserKeyword keyword : keywords) {
