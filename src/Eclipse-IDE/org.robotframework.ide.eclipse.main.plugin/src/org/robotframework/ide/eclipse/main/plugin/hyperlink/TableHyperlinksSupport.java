@@ -197,13 +197,17 @@ public class TableHyperlinksSupport {
             if (index < 0) {
                 // mouse position is outside of drawn label
 
-                if (infoShell != null && !infoShell.isDisposed() && infoShell.isVisible()) {
+                if (isPopupOpen()) {
                     final Point popupLocation = infoShell.getLocation();
                     final Point popupSize = infoShell.getSize();
-                    final Rectangle rectangle = new Rectangle(popupLocation.x, popupLocation.y - popupYShift() - 2,
-                            popupSize.x, popupSize.y + popupYShift() + 2);
+                    final Rectangle popupRectangle = new Rectangle(popupLocation.x, popupLocation.y, popupSize.x,
+                            popupSize.y);
 
-                    if (!rectangle.contains(table.toDisplay(e.x, e.y))) {
+                    final Point labelLocation = table.toDisplay(textData.getCoordinate());
+                    final Rectangle labelRectangle = new Rectangle(labelLocation.x, labelLocation.y,
+                            textData.getExtent().x, textData.getExtent().y);
+
+                    if (!popupRectangle.union(labelRectangle).contains(table.toDisplay(e.x, e.y))) {
                         // mouse is moving outside of popup, so we need to close and remove
                         removeHyperlink();
                     }
@@ -242,7 +246,7 @@ public class TableHyperlinksSupport {
 
 
             if (hyperlinks.size() > 1) {
-                openChoicePopup(calculatePopupLocation(textData));
+                openChoicePopup(calculatePopupLocation(cell, textData));
             }
             changeCursor();
             table.redraw();
@@ -262,14 +266,10 @@ public class TableHyperlinksSupport {
             return hyperlinks;
         }
 
-        private Point calculatePopupLocation(final TableCellStringData textData) {
+        private Point calculatePopupLocation(final ILayerCell cell, final TableCellStringData textData) {
             final int x = textData.getCoordinate().x;
-            final int y = textData.getCoordinate().y + textData.getExtent().y + popupYShift();
+            final int y = cell.getBounds().y + cell.getBounds().height;
             return table.toDisplay(x, y);
-        }
-
-        private int popupYShift() {
-            return 5;
         }
 
         private void openChoicePopup(final Point location) {
