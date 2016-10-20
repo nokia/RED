@@ -42,7 +42,7 @@ public class RobotInitFileValidator extends RobotFileValidator {
         if (!settingsSection.isPresent()) {
             return;
         }
-        final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
+        final SettingTable settingsTable = settingsSection.get().getLinkedElement();
         for (final TestTemplate template : settingsTable.getTestTemplates()) {
             reportProblem(template.getDeclaration().getText(), template);
         }
