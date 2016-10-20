@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.debug.core.DebugPlugin;
+import org.eclipse.debug.core.IBreakpointManager;
 import org.eclipse.debug.core.model.IBreakpoint;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugElement;
 import org.robotframework.ide.eclipse.main.plugin.debug.model.RobotDebugTarget;
@@ -69,7 +70,7 @@ public class KeywordExecutionManager {
         return currentResourceFile;
     }
 
-    public String extractExecutedFileNameWithParentFolderInfo(String executedSuiteName) {
+    public String extractExecutedFileNameWithParentFolderInfo(final String executedSuiteName) {
         String fileName = executedSuiteName;
         if (currentResourceFile != null && currentResourceParent != null && currentResourceParent instanceof IFolder) {
             fileName = currentResourceParent.getName() + File.separator + fileName;
@@ -84,12 +85,14 @@ public class KeywordExecutionManager {
         if(keywordLineNumber < 0) {
             return false;
         }
+        final IBreakpointManager breakpointManager = DebugPlugin.getDefault().getBreakpointManager();
+        if (!breakpointManager.isEnabled()) {
+            return false;
+        }
+
         boolean hasBreakpoint = false;
-        final IBreakpoint[] currentBreakpoints = DebugPlugin.getDefault()
-                .getBreakpointManager()
-                .getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
-        for (int i = 0; i < currentBreakpoints.length; i++) {
-            final IBreakpoint currentBreakpoint = currentBreakpoints[i];
+        final IBreakpoint[] currentBreakpoints = breakpointManager.getBreakpoints(RobotDebugElement.DEBUG_MODEL_ID);
+        for (final IBreakpoint currentBreakpoint : currentBreakpoints) {
             try {
                 if (currentBreakpoint.isEnabled()
                         && isBreakpointSourceFileInCurrentExecutionContext(currentBreakpoint.getMarker().getResource(),
@@ -97,7 +100,7 @@ public class KeywordExecutionManager {
                     final int breakpointLineNum = (Integer) currentBreakpoint.getMarker().getAttribute(
                             IMarker.LINE_NUMBER);
                     if (keywordLineNumber == breakpointLineNum) {
-                        boolean hasHitCountConditionFullfilled = checkHitCountCondition(currentBreakpoint);
+                        final boolean hasHitCountConditionFullfilled = checkHitCountCondition(currentBreakpoint);
                         if (hasHitCountConditionFullfilled) {
                             breakpointCondition = currentBreakpoint.getMarker().getAttribute(
                                     RobotLineBreakpoint.CONDITIONAL_ATTRIBUTE, "");
