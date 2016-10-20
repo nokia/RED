@@ -50,7 +50,7 @@ public class RobotSuiteFileValidator extends RobotFileValidator {
         if (!section.isPresent()) {
             return new ProblemPosition(1);
         }
-        final TestCaseTable table = (TestCaseTable) section.get().getLinkedElement();
+        final TestCaseTable table = section.get().getLinkedElement();
         final List<TableHeader<? extends ARobotSectionTable>> headers = table.getHeaders();
         if (!headers.isEmpty()) {
             final TableHeader<? extends ARobotSectionTable> header = headers.get(0);

@@ -24,7 +24,7 @@ public class DocumentationTestCaseDeclarationSettingValidator extends ADocumentD
     private final RobotCasesSection section;
 
     public DocumentationTestCaseDeclarationSettingValidator(final IFile file, final RobotCasesSection section,
-            ProblemsReportingStrategy reporter) {
+            final ProblemsReportingStrategy reporter) {
         super(file, reporter);
         this.section = section;
     }
@@ -36,8 +36,8 @@ public class DocumentationTestCaseDeclarationSettingValidator extends ADocumentD
 
     @Override
     public List<RobotToken> getDocumentationDeclaration() {
-        List<RobotToken> documentationDec = new ArrayList<>(0);
-        TestCaseTable testCaseTable = (TestCaseTable) section.getLinkedElement();
+        final List<RobotToken> documentationDec = new ArrayList<>(0);
+        final TestCaseTable testCaseTable = section.getLinkedElement();
         if (testCaseTable.isPresent()) {
             final List<TestCase> testCases = testCaseTable.getTestCases();
             for (final TestCase testCase : testCases) {
