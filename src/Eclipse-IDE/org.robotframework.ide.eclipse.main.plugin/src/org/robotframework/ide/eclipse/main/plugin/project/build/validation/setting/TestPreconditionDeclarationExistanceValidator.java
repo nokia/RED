@@ -35,8 +35,8 @@ public class TestPreconditionDeclarationExistanceValidator extends ADeprecatedSe
 
     @Override
     public List<RobotToken> getDeclaration() {
-        List<RobotToken> declarations = new ArrayList<>(0);
-        SettingTable settingTable = (SettingTable) section.getLinkedElement();
+        final List<RobotToken> declarations = new ArrayList<>(0);
+        final SettingTable settingTable = section.getLinkedElement();
         if (settingTable.isPresent()) {
             for (final TestSetup setup : settingTable.getTestSetups()) {
                 declarations.add(setup.getDeclaration());

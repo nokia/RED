@@ -37,9 +37,9 @@ public class LibraryAliasesDeclarationUpperCaseValidator implements ModelUnitVal
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        final SettingTable settingTable = (SettingTable) section.getLinkedElement();
+        final SettingTable settingTable = section.getLinkedElement();
         if (settingTable.isPresent()) {
-            for (AImported imported : settingTable.getImports()) {
+            for (final AImported imported : settingTable.getImports()) {
                 if (imported.getType() == Type.LIBRARY) {
                     final LibraryImport libImport = (LibraryImport) imported;
                     final LibraryAlias alias = libImport.getAlias();
@@ -60,7 +60,7 @@ public class LibraryAliasesDeclarationUpperCaseValidator implements ModelUnitVal
     private final boolean isUpperCaseAliasesWITH_NAME(final String aliasesText) {
         boolean result = true;
         final char[] aliasTextCA = aliasesText.toCharArray();
-        for (char c : aliasTextCA) {
+        for (final char c : aliasTextCA) {
             if (Character.isLetter(c)) {
                 if (Character.isLowerCase(c)) {
                     result = false;

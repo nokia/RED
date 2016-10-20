@@ -35,11 +35,11 @@ public class DocumentationDeclarationSettingValidator extends ADocumentDepracate
 
     @Override
     public List<RobotToken> getDocumentationDeclaration() {
-        List<RobotToken> documentationDec = new ArrayList<>(0);
-        SettingTable settingTable = (SettingTable) section.getLinkedElement();
+        final List<RobotToken> documentationDec = new ArrayList<>(0);
+        final SettingTable settingTable = section.getLinkedElement();
         if (settingTable.isPresent()) {
-            List<SuiteDocumentation> documentation = settingTable.getDocumentation();
-            for (SuiteDocumentation sd : documentation) {
+            final List<SuiteDocumentation> documentation = settingTable.getDocumentation();
+            for (final SuiteDocumentation sd : documentation) {
                 documentationDec.add(sd.getDeclaration());
             }
         }
