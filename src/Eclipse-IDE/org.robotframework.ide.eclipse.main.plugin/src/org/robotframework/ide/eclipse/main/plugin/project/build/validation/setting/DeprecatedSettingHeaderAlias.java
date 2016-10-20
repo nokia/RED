@@ -35,11 +35,11 @@ public class DeprecatedSettingHeaderAlias implements ModelUnitValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        SettingTable settings = (SettingTable) section.getLinkedElement();
+        final SettingTable settings = section.getLinkedElement();
         if (settings.isPresent()) {
             for (final TableHeader<? extends ARobotSectionTable> th : settings.getHeaders()) {
-                RobotToken declaration = th.getDeclaration();
-                String raw = declaration.getRaw();
+                final RobotToken declaration = th.getDeclaration();
+                final String raw = declaration.getRaw();
                 final String rawWihtoutWithspaces = raw.toLowerCase().replaceAll("\\s", "");
                 if (rawWihtoutWithspaces.toLowerCase().contains("metadata")) {
                     reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.METADATA_TABLE_HEADER_SYNONIM)
