@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
