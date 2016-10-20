@@ -40,7 +40,7 @@ public abstract class AMetadataKeyInColumnOfSettingValidator extends VersionDepe
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        final SettingTable table = (SettingTable) section.getLinkedElement();
+        final SettingTable table = section.getLinkedElement();
 
         final List<Metadata> metadatas = table.getMetadatas();
         for (final Metadata metadata : metadatas) {
