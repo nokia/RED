@@ -75,7 +75,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
             return;
         }
         final RobotSuiteFile suiteFile = settingsSection.get().getSuiteFile();
-        final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
+        final SettingTable settingsTable = settingsSection.get().getLinkedElement();
 
         validateByExternal(settingsSection.get(), monitor);
 
@@ -319,7 +319,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private void validateVariablesInTagsSettings(final List<RobotToken> tags) {
         final Set<String> accessibleVariables = validationContext.getAccessibleVariables();
-        for (RobotToken tag : tags) {
+        for (final RobotToken tag : tags) {
             final List<VariableDeclaration> variablesDeclarationsInTag = new VariableExtractor()
                     .extract(tag, validationContext.getFile().getName()).getCorrectVariables();
             TestCaseTableValidator.reportUnknownVariablesInSettingWithoutExeRows(validationContext, reporter,
