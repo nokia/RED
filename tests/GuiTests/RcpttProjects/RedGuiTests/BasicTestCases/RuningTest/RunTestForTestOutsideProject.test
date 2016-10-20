@@ -1,0 +1,106 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _qgS94JbFEeaa4JtzzKMFzw,_Z-g4gJbDEeaa4JtzzKMFzw
+Element-Name: RunTestForTestOutsideProject
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _o5VugJbCEeaa4JtzzKMFzw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/20/16 4:41 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//create new project but unselect "Usedefault location" and add outside WS
+get-menu "File/New/Robot Project" | click
+with [get-window "New Robot project"] {
+    get-editbox -after [get-label "Project name:"] | set-text ProjectInside
+    get-button "Use default location" | uncheck
+}
+
+//set path to porject from user folder
+set-dialog-result Folder [concat $user_folder "/RunTestFormOtside/tests"] 
+with [get-window "New Robot project"] {
+    get-button "Browse..." | click
+    get-button Finish | click
+}
+get-view "Project Explorer" | get-tree | select "ProjectInside/simple_test.robot/Test Cases/test 1" | get-menu Run 
+    | click
+    
+try -times 4 -delay 1000 -command{      
+	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Tests.Simple Test.test 1\n"
+	    + ".* : INFO : 6\n"
+	    + "Ending test: Tests.Simple Test.test 1" | verify-true
+}    
+ //check console   
+get-view Console | get-text-viewer | get-property text 
+    | matches ".*\n"
+    + ".*\n"
+    + "==============================================================================\n"
+    + "Tests                                                                         \n"
+    + "==============================================================================\n"
+    + "Tests.Simple Test                                                             \n"
+    + "==============================================================================\n"
+    + "test 1                                                                \| PASS \|\n"
+    + "------------------------------------------------------------------------------\n"
+    + "Tests.Simple Test                                                     \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Tests                                                                 \| PASS \|\n"
+    + "1 critical test, 1 passed, 0 failed\n"
+    + "1 test total, 1 passed, 0 failed\n"
+    + "==============================================================================\n"
+    + "Output:  .*\n"
+    + "Log:     .*\n"
+    + "Report:  .*" | verify-true
+    
+//run test from folder    
+get-view "Project Explorer" | get-tree | select "ProjectInside/folder/second_test.robot/Test Cases/abc1" 
+    | get-menu Run | click
+    
+try -times 4 -delay 1000 -command{    
+	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Tests.Folder.Second Test.abc1\n"
+	    + ".* : INFO : here I am\n"
+	    + "Ending test: Tests.Folder.Second Test.abc1" | verify-true
+}	    
+
+//run entire test suite
+get-view "Project Explorer" | get-tree | select "ProjectInside/simple_test.robot" | get-menu "Run As/\\d+ Robot Test" 
+    | click
+    
+try -times 4 -delay 1000 -command{     
+	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Tests.Simple Test.test 1\n"
+	    + ".* : INFO : 6\n"
+	    + "Ending test: Tests.Simple Test.test 1\n\n"
+	    + "Starting test: Tests.Simple Test.test 3\n"
+	    + ".* : INFO : 8\n"
+	    + "Ending test: Tests.Simple Test.test 3" | verify-true
+}
+
+//run second test in folder	    
+get-view "Project Explorer" | get-tree | select "ProjectInside/folder/second_test.robot" 
+    | get-menu "Run As/1 Robot Test" | click
+    
+try -times 4 -delay 1000 -command{     
+	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: Tests.Folder.Second Test.abc1\n"
+	    + ".* : INFO : here I am\n"
+	    + "Ending test: Tests.Folder.Second Test.abc1\n\n"
+	    + "Starting test: Tests.Folder.Second Test.abc2\n"
+	    + ".* : INFO : 7\n"
+	    + "Ending test: Tests.Folder.Second Test.abc2" | verify-true
+}    
+    
+//remove project
+with [get-view "Project Explorer" | get-tree] {
+    select ProjectInside | key-type F5
+    select ProjectInside | get-menu Delete | click
+}
+with [get-window "Delete Resources"] {
+    get-button "Delete project contents on disk (cannot be undone)" | check
+    get-button OK | click
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
