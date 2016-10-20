@@ -9,7 +9,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.TestSetup;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
@@ -32,8 +31,7 @@ public class DuplicatedTestSetupInOlderValidator extends ADuplicatedInOldValidat
 
     @Override
     protected List<TestSetup> getElements() {
-        final SettingTable table = (SettingTable) section.getLinkedElement();
-        return table.getTestSetups();
+        return section.getLinkedElement().getTestSetups();
     }
 
     @Override
