@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
@@ -36,8 +35,7 @@ public class DuplicatedForceTagsInOlderValidator extends ADuplicatedInOldValidat
 
     @Override
     protected List<ForceTags> getElements() {
-        final SettingTable table = (SettingTable) section.getLinkedElement();
-        return table.getForceTags();
+        return section.getLinkedElement().getForceTags();
     }
 
     @Override
