@@ -148,35 +148,33 @@ public class RobotDebugExecutionContext {
     }
 
     private KeywordPosition createNewKeywordPosition(final RobotExecutableRow<?> executableRow) {
-        final KeywordPosition keywordPosition = new KeywordPosition();
-        final KeywordContext parentKeywordContext = getParentKeywordContext();
-        if (parentKeywordContext != null && parentKeywordContext.getResourceImportReference() != null) {
-            keywordPosition.setFilePath(parentKeywordContext.getResourceImportReference()
-                    .getReference()
-                    .getProcessedFile()
-                    .getAbsolutePath());
-        }
-        int line = -1;
-        if (executableRow != null) {
-            final IExecutableRowDescriptor<?> buildLineDescription = executableRow.buildLineDescription();
-            if (buildLineDescription.getRowType() == ERowType.FOR_CONTINUE) {
-                line = ((ForLoopContinueRowDescriptor<?>) buildLineDescription).getKeywordAction()
-                        .getToken()
-                        .getLineNumber();
-            } else {
-                line = executableRow.getAction().getLineNumber();
-            }
-        }
-        keywordPosition.setLineNumber(line);
-        return keywordPosition;
+        final String path = getFirstResourceImportPath();
+        final int line = getLine(executableRow);
+        return new KeywordPosition(path, line);
     }
 
-    private KeywordContext getParentKeywordContext() {
-        KeywordContext parentKeywordContext = null;
-        if ((currentKeywords.size() - 2) >= 0) {
-            parentKeywordContext = currentKeywords.get(currentKeywords.size() - 2);
+    private int getLine(final RobotExecutableRow<?> executableRow) {
+        if (executableRow == null) {
+            return -1;
         }
-        return parentKeywordContext;
+        final IExecutableRowDescriptor<?> buildLineDescription = executableRow.buildLineDescription();
+        if (buildLineDescription.getRowType() != ERowType.FOR_CONTINUE) {
+            return executableRow.getAction().getLineNumber();
+        } else {
+            return ((ForLoopContinueRowDescriptor<?>) buildLineDescription).getKeywordAction()
+                    .getToken()
+                    .getLineNumber();
+        }
+    }
+
+    private String getFirstResourceImportPath() {
+        for (int i = currentKeywords.size() - 1; i >= 0; i--) {
+            final ResourceImportReference resImport = currentKeywords.get(i).getResourceImportReference();
+            if (resImport != null) {
+                return resImport.getReference().getProcessedFile().getAbsolutePath();
+            }
+        }
+        return null;
     }
 
     private void checkStartKeywordType(final String type) {
@@ -289,26 +287,23 @@ public class RobotDebugExecutionContext {
 
     }
 
-    public class KeywordPosition {
+    public static class KeywordPosition {
 
-        private int lineNumber;
+        private final int lineNumber;
 
-        private String filePath;
+        private final String filePath;
+
+        KeywordPosition(final String filePath, final int lineNumber) {
+            this.filePath = filePath;
+            this.lineNumber = lineNumber;
+        }
 
         public int getLineNumber() {
             return lineNumber;
         }
 
-        public void setLineNumber(final int lineNumber) {
-            this.lineNumber = lineNumber;
-        }
-
         public String getFilePath() {
             return filePath;
-        }
-
-        public void setFilePath(final String filePath) {
-            this.filePath = filePath;
         }
     }
 
