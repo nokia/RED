@@ -48,7 +48,7 @@ public class RobotResourceFileValidator extends RobotFileValidator {
         if (!settingsSection.isPresent()) {
             return;
         }
-        final SettingTable settingsTable = (SettingTable) settingsSection.get().getLinkedElement();
+        final SettingTable settingsTable = settingsSection.get().getLinkedElement();
         for (final SuiteSetup setup : settingsTable.getSuiteSetups()) {
             reportProblem(setup.getDeclaration().getText(), setup);
         }
