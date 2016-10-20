@@ -35,8 +35,8 @@ public class TestPostconditionDeclarationExistanceValidator extends ADeprecatedS
 
     @Override
     public List<RobotToken> getDeclaration() {
-        List<RobotToken> declarations = new ArrayList<>(0);
-        SettingTable settingTable = (SettingTable) section.getLinkedElement();
+        final List<RobotToken> declarations = new ArrayList<>(0);
+        final SettingTable settingTable = section.getLinkedElement();
         if (settingTable.isPresent()) {
             for (final TestTeardown teardown : settingTable.getTestTeardowns()) {
                 declarations.add(teardown.getDeclaration());

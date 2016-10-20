@@ -37,11 +37,11 @@ public class MetaDeclarationSettingValidator implements ModelUnitValidator {
 
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
-        SettingTable settingTable = (SettingTable) section.getLinkedElement();
+        final SettingTable settingTable = section.getLinkedElement();
         for (final Metadata meta : settingTable.getMetadatas()) {
             if (!oldMetaSyntaxHelper.isOldSyntax(meta, settingTable)) {
-                RobotToken metaToken = meta.getDeclaration();
-                String raw = metaToken.getRaw();
+                final RobotToken metaToken = meta.getDeclaration();
+                final String raw = metaToken.getRaw();
                 final String settingPrepared = raw.replaceAll("\\s", "").toLowerCase();
                 if (settingPrepared.equals("meta") || settingPrepared.equals("meta:")) {
                     reporter.handleProblem(
