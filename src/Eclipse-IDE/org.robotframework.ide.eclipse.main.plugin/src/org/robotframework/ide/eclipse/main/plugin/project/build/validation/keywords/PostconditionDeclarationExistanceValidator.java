@@ -37,7 +37,7 @@ public class PostconditionDeclarationExistanceValidator extends ADeprecatedSetti
     @Override
     public List<RobotToken> getDeclaration() {
         final List<RobotToken> declarations = new ArrayList<>(0);
-        final KeywordTable keywordTable = (KeywordTable) section.getLinkedElement();
+        final KeywordTable keywordTable = section.getLinkedElement();
         if (keywordTable.isPresent()) {
             for (final UserKeyword keyword : keywordTable.getKeywords()) {
                 for (final KeywordTeardown teardown : keyword.getTeardowns()) {
