@@ -1,0 +1,99 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _OCxtEBRGEeWWV9IuysVI_A,_NvY3ABRGEeWWV9IuysVI_A
+Element-Name: SkipAllBreakpoints
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _OdaRMJbhEeaa4JtzzKMFzw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/21/16 1:29 PM
+Tags: Debug
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "wait-for-thread"{
+	wait 1000
+	try -times 5 -delay 1000 -command{
+		get-view Debug | get-tree | get-item "BigScript.robot \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" 
+		    | get-property childCount -raw | int| gt 0 | verify-true
+		}
+}
+
+//open Debug perspective and switch on skipping all BP
+get-button "Open Perspective" | click
+get-window "Open Perspective" | get-table | select Debug | double-click
+get-button "Skip All Breakpoints (M1+M3+B)"  | click
+get-button "Skip All Breakpoints (M1+M3+B)" | get-property selected | equals true | verify-true
+
+//go to test and add some BP
+get-button Robot | click
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | double-click
+wait 1000
+with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+    double-click-ruler 17
+    double-click-ruler 23
+    double-click-ruler 27
+    double-click-ruler 37
+    double-click-ruler 50
+    double-click-ruler 67
+    double-click-ruler 92
+}
+
+//run test
+get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
+    | click
+wait 3000    
+
+//check if test ended with no BP
+get-view Debug | get-tree 
+    | get-item "<terminated>BigScript.robot \\[Robot\\]/<terminated, exit value.*" 
+    | get-property caption | equals "<terminated, exit value: 1>.*" | verify-true
+    
+//turn off skipping        
+get-button "Skip All Breakpoints (M1+M3+B)" | click
+get-button "Skip All Breakpoints (M1+M3+B)" | get-property selected | equals false | verify-true
+
+//go to test and run it
+get-button Robot | click
+
+exec-with-options -disableJobWaiting -command {
+	get-view "Project Explorer" | get-tree | select "ScriptWithResource/BigScript.robot" | get-menu "Debug As/1 Robot Test" 
+    	| click
+	wait 5000
+	wait-for-thread
+	
+	//check if not test was stopped
+	check-debug-marker-on-ruler -line 17 -script_name "BigScript.robot"
+	get-button "Terminate (M1+F2)" | click
+
+}
+
+//remove all BP
+with [get-view Breakpoints] {
+    click
+    get-button "Remove All Breakpoints" | click
+}
+get-window "Remove All Breakpoints" | get-button Yes | click
+
+//add new 2 BP
+with [get-editor "BigScript.robot" | get-left-ruler | get-ruler-column AnnotationColumn] {
+    double-click-ruler 22
+    double-click-ruler 29
+}
+
+//now skipp all BP
+get-button "Skip All Breakpoints (M1+M3+B)" | click
+get-button "Skip All Breakpoints (M1+M3+B)" | get-property selected | equals true | verify-true
+
+get-button "Debug BigScript.robot" | click
+
+wait 3000
+//check if test ended with no BP
+get-view Debug | get-tree 
+    | get-item "<terminated>BigScript.robot \\[Robot\\]/<terminated, exit value.*" 
+    | get-property caption | equals "<terminated, exit value: 1>.*" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
