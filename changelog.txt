@@ -1,3 +1,22 @@
+RED 0.7.2 - 2016/10/21
+** Enhancement
+    * [RED-136] - Adding sorting ascending to resources in content assist
+    * [RED-302] - Autodiscovering - possibility to open available files from Importer and Source labels.
+    * [RED-448] - [table] Removing/implementing option in menu: Open Declaration
+    * [RED-527] - Change coloring of Given/When/And/Then
+    * [RED-547] - #52 GitHub issue: extend_pythonpath.py script doesn't support pth files directories to be modules
+    * [RED-548] - Libs Autodiscovering should not add all modules in project recursively when virtualenv is used
+
+** Bug
+    * [RED-438] - Triple dots as TC/KW name
+    * [RED-524] - Documentation view - no libdoc from TC and KW when Settings has Documentation entry
+    * [RED-532] - LineBegin_Space_PIPE_Space shouldn't be treat as start of PIPE separated value
+    * [RED-533] - LineContinue in Keywords and Test Cases should take in account if separator before exists
+    * [RED-555] - #48 GitHub issue: Debugger not working if :FOR in main suite __init__ file.
+    * [RED-556] - #49 Github issue: Running sinlge test not possible if eclipse project named different than main test directory.
+    * [RED-558] - PyDev & RED nature conflicts - unable to set RED nature when project is PyDev type
+
+
 RED 0.7.1 - 2016/10/04
 ** Feature
     * [RED-357] - [table] Ctr+z in Documentation works slow or does not allow to reenter anything 
