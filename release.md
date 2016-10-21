@@ -1,3 +1,44 @@
+# RED - Robot Editor v0.7.2
+## Introduction
+RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
+Release contains Eclipse feature of RED Robot Editor to be installed into Eclipse. 
+
+## Requirements 
+*  Oracle Java 1.7+, preferably 1.8+  https://www.java.com/
+*  RED feature only: Eclipse Neon (v 4.6),Eclipse Mars (v 4.5) or Luna (v 4.4), preferably IDE for Java Developers  https://www.eclipse.org/downloads/
+*  Python/Jython & RobotFramework installed
+
+## Installation
+[Installation instructions](https://github.com/nokia/RED/blob/master/installation.md)
+
+## Updates
+- #48 - fix for Debugger not working if :FOR in main suite __init__ file
+- #49 - fix for Running sinlge test not possible if eclipse project named different than main test directory.
+- extend_pythonpath.py script doesn't support pth files directories to be modules
+- fix for PyDev & RED nature conflicts - unable to set RED nature when project is PyDev type
+- possibility to go to Declaration from Table editors
+- fix for Documentation view - no libdoc from TC and KW when Settings has Documentation entry
+- Change coloring of Given/When/And/Then
+- Libs Autodiscovering should not add all modules in project recursively when virtualenv is used
+- Check **[changelog.txt](https://github.com/nokia/RED/blob/master/changelog.txt)** for details
+
+## What's in the package
+- Robot Perspective & Robot nature (Project,files and other file artefacts)
+- Text Source editor with syntax coloring, code assistance and real-time validation
+- Table editors synced with Source
+- Debug Perspective for test case debugging with breakpoints, stepping, variable watch
+- Remote debug
+- Support for dictionaries & lists
+- Eclipse help
+- File support: .robot, .txt, .tsv
+
+## Known issues
+- Under Ubuntu/Xubuntu it was discovered that NullPointerException is shown when opening file from Project Explorer and clicking on file structure instead of file name. As a workaround open file by clicking on filename. 
+- Cannot delete library by right click of mouse in red.xml under Ubuntu/Mint. Use Delete key as workaround
+- GTK3 seems to mess up with Eclipse under Linux. Force usage of GTK2 by executing command in terminal: export SWT_GTK3=0
+
+
+--------------------------------------------------------------------------------------------------------------------------
 # RED - Robot Editor v0.7.1
 ## Introduction
 RED Robot Editor is Eclipse based editor for RobotFramework test cases. 
