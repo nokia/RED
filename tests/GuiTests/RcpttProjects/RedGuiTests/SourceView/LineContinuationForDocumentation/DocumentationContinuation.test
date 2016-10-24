@@ -1,0 +1,315 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: DocumentationContinuation
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _hNVjgJngEeaF69zyQwob4Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/24/16 5:06 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open file .robot
+with [get-view "Project Explorer" | get-tree] {
+    select "RobotProject/TestFile.robot" | double-click
+}
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	//add test
+    set-caret-pos 1 19
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text test1
+    key-type Enter
+    
+    // add doc
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "line 1"
+    
+    //add next line
+    key-type Enter
+    type-text "line 2"
+    key-type Enter
+    
+    //remove ... and separator
+    key-type BackSpace -times 5
+    key-type Enter
+    
+    //add normal kw
+    type-text "log  12"
+    key-type Enter -times 2
+    key-type Left -times 4
+    
+    //add new test
+    type-text test2
+    key-type Enter
+    
+    //add doc
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "second doc"
+    
+    //add 4 lines
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type Enter -times 3
+    
+    //add text to last line
+    type-text "last line"
+    
+    //removed 4 spaces
+    key-type Del -times 4
+    
+    //add new line
+    key-type Enter
+}
+
+//check text
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test1\n"
+    + "    [Documentation]    line 1\n"
+    + "    ...    line 2\n"
+    + "    ..\n"
+    + "    log  12\n"
+    + "    \n"
+    + "test2\n"
+    + "    [Documentation]    second doc\n"
+    + "    ...    \n"
+    + "    ...    \n"
+    + "    ...    \n"
+    + "    ...    last line\n"
+    + "    ...    " | verify-true
+
+with [get-editor "TestFile.robot" | get-text-viewer] {
+	// add setting section
+    set-caret-pos 1 1
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type Up
+    
+    //add Doc
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    key-type "M1+SPACE"
+    type-text do
+    key-type Enter
+    //add text of doc
+    type-text "main doc"
+    key-type Enter
+    type-text abc
+    
+    //add 2 lines
+    key-type Enter -times 2
+}
+
+//check text
+get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Documentation    main doc\n"
+    + "...    abc\n"
+    + "...    \n"
+    + "...    \n"
+    + "*** Test Cases ***\n"
+    + "test1\n"
+    + "    [Documentation]    line 1\n"
+    + "    ...    line 2\n"
+    + "    ..\n"
+    + "    log  12\n"
+    + "    \n"
+    + "test2\n"
+    + "    [Documentation]    second doc\n"
+    + "    ...    \n"
+    + "    ...    \n"
+    + "    ...    \n"
+    + "    ...    last line\n"
+    + "    ..." | verify-true
+    
+    
+//--------------------------------------------------------- tsv file ----------------------------------------------------
+//creat tsv file    
+get-menu "File/New/Robot Test Suite" | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text "tsv_file"
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+
+
+with [get-editor "tsv_file.tsv" | get-text-viewer] {
+    set-caret-pos 1 19
+    key-type Enter
+    
+    //add test
+    type-text "test 3"
+    key-type Enter
+    
+    //add doc
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "tsv doc"
+    
+    //add new line
+    key-type Enter
+    type-text "new line"
+    key-type Enter -times 2
+    type-text "last line"
+    key-type Enter
+
+    //back to line above
+    key-type BackSpace -times 6
+    key-type Enter
+    key-type BackSpace -times 5
+    
+    //add test
+    type-text "test 4"
+    key-type Enter
+    
+    //add doc
+    key-type "M1+SPACE"
+    key-type Enter
+    type-text "here is second"
+    
+    //add normal kw
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type BackSpace -times 4
+    type-text "log	12"
+    
+    //set caret after [doc] and add new line
+    set-caret-pos 8 35
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "i add new line"
+    
+    //add Setting section
+    set-caret-pos 10 11
+    key-type "NUMPAD_ENTER" "\\u000D"
+    key-type BackSpace
+    key-type Enter
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+
+    //add doc
+    key-type "M1+SPACE"
+    type-text do
+    key-type Enter
+    type-text text
+    
+    //add 2 lines
+    key-type Enter -times 3
+    type-text "4line"
+    key-type Tab
+    key-type Enter
+}
+get-editor "tsv_file.tsv" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
+    + "test 3\n"
+    + "\t[Documentation]\ttsv doc\n"
+    + "\t...\tnew line\n"
+    + "\t...\t\n"
+    + "\t...\tlast line\n"
+    + "test 4\n"
+    + "\t[Documentation]\there is second\n"
+    + "\t...\ti add new line\n"
+    + "\tlog\t12\n\n"
+    + "*** Settings ***\n"
+    + "Documentation\ttext\n"
+    + "...\t\n"
+    + "...\t\n"
+    + "...\t4line\t\n"
+    + "..." | verify-true
+    
+    
+//---------------------------------------------- txt resource --------------------------------------------------------------
+
+//change preference - changed for 4 spaces to 2
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor"
+    get-group "General settings" | get-editbox 
+        -after [get-label "user defined separator (use '|', 's' for space or 't' for tab)"] | set-text ss
+    get-button Apply | click
+    get-button OK | click
+}
+
+//create new file
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Robot Resource file" | click
+with [get-window "New Robot Resource file"] {
+    get-editbox -after [get-label "File name:"] | set-text res
+    get-button "as .txt file" | click
+    get-button Finish | click
+}
+with [get-editor "res.txt" | get-text-viewer] {
+    //add Settings section
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+
+    //add doc
+    key-type "M1+SPACE"
+    type-text do
+    key-type Enter
+    type-text "res doc"
+
+    //add new lines
+    key-type Enter
+    type-text abc
+    key-type Enter
+    
+    //remove line
+    key-type BackSpace -times 6
+    
+    //add new line again
+    key-type Enter
+    type-text def
+    key-type Enter
+    
+    key-type Tab
+    key-type Left -times 4
+    key-type Enter
+    type-text ghi
+    key-type End
+    set-caret-pos 6 13
+    key-type Enter -times 2
+    key-type BackSpace -times 5
+    
+    //add kw section
+    key-type "M1+SPACE"
+    key-type Enter
+    
+    //add new kw
+    type-text "my kw"
+    key-type Enter
+    //add doc
+    key-type "M1+SPACE"
+    key-type Down
+    key-type Enter
+    type-text "kw doc"
+    
+    //add new line
+    key-type Enter
+    type-text "line nr 2"
+    
+    //add line in the middle of existing
+    key-type Enter
+    key-type BackSpace -times 7
+    set-caret-pos 10 26
+    key-type "NUMPAD_ENTER" "\\u000D"
+    type-text "line added in the midlle"
+    key-type Enter
+}    
+
+
+get-editor "res.txt" | get-text-viewer | get-property text | equals "*** Settings ***\n"
+    + "Documentation  res doc\n"
+    + "...  abc\n"
+    + "...  def\n"
+    + "...\n"
+    + "...  ghi    \n"
+    + "...  \n"
+    + "*** Keywords ***\n"
+    + "my kw\n"
+    + "  [Documentation]  kw doc\n"
+    + "  ...  line added in the midlle\n"
+    + "  ...  \n"
+    + "  ...  line nr 2" | verify-true
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
