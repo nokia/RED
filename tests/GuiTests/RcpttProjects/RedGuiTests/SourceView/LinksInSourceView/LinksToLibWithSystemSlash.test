@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _4p6MQKS3EeWCSZzk3osblg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/18/16 12:56 PM
+Save-Time: 10/21/16 1:36 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -60,5 +60,21 @@ try -times 5 -delay 1000 -command{
 	get-view Problems | get-tree | get-property itemCount | equals 0 | verify-true
 }
 
+//try to open link with variable
+with [get-editor "Script.robot"] {
+    with [get-text-viewer] {
+        set-caret-pos 4 26
+        open-declaration
+    }
+}
+with [get-editor "SumTwoDigits.py" | get-text-viewer] {
+    get-property text | equals "class SumTwoDigits(object):\n"
+        + "\t'''Class that sums two digits\n"
+        + "\t'''\n"
+        + "\tdef sum(self, a, b):\n"
+        + "\t\treturn int(a)+int(b)" | verify-true
+    get-property "caretPosition.line" | equals 1 | verify-true
+    get-property "caretPosition.column" | equals 1 | verify-true
+}
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
