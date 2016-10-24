@@ -126,15 +126,11 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final boolean isTsv = "tsv".equals(editor.fileModel.getFileExtension());
         final List<IAutoEditStrategy> strategies = newArrayList();
         strategies.add(new SuiteSourceIndentLineEditStrategy(isTsv));
+        strategies.add(new SuiteSourceInsertLineContinuationStrategy(isTsv));
         if (contentType.equals(SuiteSourcePartitionScanner.KEYWORDS_SECTION)
                 || contentType.equals(SuiteSourcePartitionScanner.TEST_CASES_SECTION)
                 || contentType.equals(IDocument.DEFAULT_CONTENT_TYPE)) {
             strategies.add(new SuiteSourceIndentLineAfterDefinitionStrategy(isTsv));
-        }
-        if (contentType.equals(SuiteSourcePartitionScanner.KEYWORDS_SECTION)
-                || contentType.equals(SuiteSourcePartitionScanner.TEST_CASES_SECTION)
-                || contentType.equals(SuiteSourcePartitionScanner.SETTINGS_SECTION)) {
-            strategies.add(new SuiteSourceInsertLineContinuationStrategy(isTsv));
         }
         return strategies.toArray(new IAutoEditStrategy[0]);
     }
