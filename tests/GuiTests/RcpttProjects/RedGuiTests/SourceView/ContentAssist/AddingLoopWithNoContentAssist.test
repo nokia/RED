@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3DFlELkTEeWzJthH3JoEWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/29/16 4:51 PM
+Save-Time: 10/24/16 2:24 PM
 Testcase-Type: ecl
 Verifications: _V3Dw8Lt3EeWNQsJ9kfZ-bA,_l1AbYLt3EeWNQsJ9kfZ-bA,_xVs3YLt3EeWNQsJ9kfZ-bA,_ufZ8gLtzEeW29Kbu_epUIA
 
@@ -28,12 +28,12 @@ with [get-editor "TestFile.robot"] {
         key-type Enter
         type-text ":For  ${x}  In range  10"
         key-type Enter
-        type-text "  Log  5"
+        type-text "Log  5"
         key-type Enter
-        key-type BackSpace
+        key-type BackSpace -times 5
         type-text ": FOR  ${y}  in range  1  5"
         key-type Enter
-        type-text "  LOG  ${y}"
+        type-text "LOG  ${y}"
         key-type "M1+s"
     }
 }
@@ -43,9 +43,9 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "test 1\n"
     + "    Log  12\n"
     + "    :For  ${x}  In range  10\n"
-    + "    \\  Log  5\n"
+    + "    \\    Log  5\n"
     + "    : FOR  ${y}  in range  1  5\n"
-    + "    \\  LOG  ${y}" | verify-true
+    + "    \\    LOG  ${y}" | verify-true
     
     
 //add tsv
@@ -62,9 +62,10 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     key-type Enter
     type-text "test 2"
     key-type Enter
+    
+    //first loop
     type-text ":for\t${z}\tIN\t 855"
     key-type Enter
-    key-type Tab
     type-text Sho
     key-type "M1+SPACE"
     wait 300
@@ -72,15 +73,17 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     wait 100
     type-text "${z}"
     key-type Enter -times 2
-    key-type BackSpace
+    key-type BackSpace -times 2
+
+    //second loop
     type-text ": fOR\t${i}\tIn Range\t700\t750"
     key-type Enter
-    key-type Tab
     type-text "Log"
     key-type Tab
     type-text 66
     key-type Enter
-    key-type BackSpace
+    
+    key-type BackSpace -times 2
     type-text SH
     key-type "M1+SPACE"
     wait 300
