@@ -13,8 +13,6 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.TextUtilities;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
-import com.google.common.base.Optional;
-
 class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
 
     private final boolean isTsvFile;
@@ -49,36 +47,12 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
             if (end > start) {
                 final String whitespacesFromPreviousLine = document.get(start, end - start);
                 buf.append(whitespacesFromPreviousLine);
-                final Optional<String> lineContinuationIndent = getLineContinuationIndent(document, command);
-                if (lineContinuationIndent.isPresent()) {
-                    buf.append(lineContinuationIndent.get());
-                }
             }
             command.text = buf.toString();
 
         } catch (final BadLocationException e) {
             // stop work
         }
-    }
-
-    private Optional<String> getLineContinuationIndent(final IDocument document, final DocumentCommand command) {
-        final String commandLineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, command.offset)
-                .trim()
-                .toLowerCase();
-        if (isForLoop(commandLineContent))
-            return Optional.of("\\");
-        if (isDocumentation(commandLineContent))
-            return Optional.of("...");
-        return Optional.absent();
-    }
-
-    private boolean isForLoop(final String commandLineContent) {
-        return commandLineContent.startsWith(":for") || commandLineContent.startsWith(": for")
-                || commandLineContent.startsWith("\\");
-    }
-
-    private boolean isDocumentation(final String commandLineContent) {
-        return commandLineContent.startsWith("[documentation]") || commandLineContent.startsWith("...");
     }
 
     private int findEndOfWhiteSpace(final IDocument document, final int start, final int end)
@@ -94,7 +68,7 @@ class SuiteSourceIndentLineEditStrategy implements IAutoEditStrategy {
         return end;
     }
 
-    protected String getSeparator() {
+    private String getSeparator() {
         return RedPlugin.getDefault().getPreferences().getSeparatorToUse(isTsvFile);
     }
 }
