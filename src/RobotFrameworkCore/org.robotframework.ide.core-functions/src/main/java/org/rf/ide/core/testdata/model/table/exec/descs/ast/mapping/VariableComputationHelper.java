@@ -35,7 +35,7 @@ public class VariableComputationHelper {
                     if (!ILLEGAL_BRACKET_SYNTAX.matcher(variableName).matches()) {
                         if (isNumberOperation(variableName)) {
                             if (isNumberComputation(variableName)) {
-                                return Optional.of(new TextPosition("" + 2, 0, 1));
+                                return Optional.of(new TextPosition("" + 3, 0, 1));
                             }
                         } else {
 
