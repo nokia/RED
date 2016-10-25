@@ -19,3 +19,6 @@ variable_check_is_less_eq,${value<=3},2,value,true
 variable_check_is_eq,${value==3},2,value,true
 only_computation_without_variable,${2-2},2,2,true
 variable_as_bracket,${(-2-3)},2,(,true
+variable_computation_with_spaces_check,${var + (2+2)},2,var,true
+variable_plus_text,${var + "msg"},2,var,true
+variable_times_2,${var * 2},2,var,true
