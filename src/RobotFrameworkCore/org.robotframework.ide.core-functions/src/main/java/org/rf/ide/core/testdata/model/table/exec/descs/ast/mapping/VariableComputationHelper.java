@@ -33,7 +33,7 @@ public class VariableComputationHelper {
             if (!variableName.isEmpty()) {
                 if (!variableName.startsWith("(") && !variableName.startsWith("\"") && !variableName.startsWith("[")) {
                     if (!ILLEGAL_BRACKET_SYNTAX.matcher(variableName).matches()) {
-                        if (isNumberOperation(variableName)) {
+                        if (startsFromNumber(variableName)) {
                             if (isNumberComputation(variableName)) {
                                 return Optional.of(new TextPosition("" + 3, 0, 1));
                             }
@@ -48,7 +48,7 @@ public class VariableComputationHelper {
         return text;
     }
 
-    private boolean isNumberOperation(final String variableName) {
+    private boolean startsFromNumber(final String variableName) {
         return variableName.matches("^[+|-]*[0-9]+");
     }
 

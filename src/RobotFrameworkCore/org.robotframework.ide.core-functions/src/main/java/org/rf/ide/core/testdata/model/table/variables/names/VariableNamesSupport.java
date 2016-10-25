@@ -27,7 +27,7 @@ public class VariableNamesSupport {
 
     private VariableNamesSupport() {
     }
-    
+
     public static List<String> extractUnifiedVariableNames(final List<VariableDeclaration> assignments) {
         final List<String> vars = newArrayList();
         for (final VariableDeclaration variableDeclaration : assignments) {
@@ -35,7 +35,7 @@ public class VariableNamesSupport {
         }
         return vars;
     }
-    
+
     public static Multimap<String, RobotToken> extractUnifiedVariables(final List<RobotToken> assignments,
             final VariableExtractor extractor, final String fileName) {
         final Multimap<String, RobotToken> vars = ArrayListMultimap.create();
@@ -52,7 +52,7 @@ public class VariableNamesSupport {
     public static String extractUnifiedVariableName(final String variable) {
         return variable != null ? variable.toLowerCase().replaceAll("_", "").replaceAll(" ", "") : "";
     }
-    
+
     public static String extractUnifiedVariableNameWithoutBrackets(final String variable) {
         String name = "";
         if (variable != null && variable.length() >= 3 && variable.contains("{") && variable.contains("}")) {
@@ -60,11 +60,12 @@ public class VariableNamesSupport {
         }
         return extractUnifiedVariableName(name);
     }
-    
+
     public static boolean hasEqualNames(final String firstVariable, final String secondVariable) {
-        return extractUnifiedVariableNameWithoutBrackets(firstVariable).equals(extractUnifiedVariableNameWithoutBrackets(secondVariable));
+        return extractUnifiedVariableNameWithoutBrackets(firstVariable)
+                .equals(extractUnifiedVariableNameWithoutBrackets(secondVariable));
     }
-    
+
     public static boolean isDefinedVariable(final VariableDeclaration variableDeclaration,
             final Set<String> definedVariablesWithUnifiedNames) {
         return isDefinedVariable(variableDeclaration.getVariableName().getText(),
@@ -82,15 +83,28 @@ public class VariableNamesSupport {
         }
         return false;
     }
-    
+
     public static boolean isDefinedVariableInsideComputation(final VariableDeclaration variableDeclaration,
             final Set<String> definedVariables) {
         final Optional<TextPosition> variableWithoutComputation = variableDeclaration.getTextWithoutComputation();
-        if (variableWithoutComputation.isPresent()
-                && isDefinedVariable(variableWithoutComputation.get().getText(),
-                        variableDeclaration.getTypeIdentificator().getText(), definedVariables)) {
+        if (variableWithoutComputation.isPresent() && (isNumber(variableWithoutComputation.get())
+                || isDefinedVariable(variableWithoutComputation.get().getText(),
+                        variableDeclaration.getTypeIdentificator().getText(), definedVariables))) {
             return true;
         }
+        return false;
+    }
+
+    private static boolean isNumber(final TextPosition pos) {
+        try {
+            final String text = pos.getText();
+            if (!text.isEmpty()) {
+                Double.parseDouble(text);
+                return true;
+            }
+        } catch (NumberFormatException nfe) {
+        }
+
         return false;
     }
 
