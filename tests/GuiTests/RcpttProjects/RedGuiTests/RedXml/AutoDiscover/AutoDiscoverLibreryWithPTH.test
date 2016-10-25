@@ -1,0 +1,111 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _PrViQJISEea_J4BglwdxcA
+Element-Name: AutoDiscoverLibreryWithPTH
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _KASD8JISEea_J4BglwdxcA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 10/25/16 1:24 PM
+Testcase-Type: ecl
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
+Content-Type: text/plain
+Entry-Name: .description
+
+You must install library from:
+RedGuiTests\RedXml\TestData\pip_package
+
+This library must be installed in site-packeges.
+
+This used library is modul  despite  python files are in second older (folder up has no __init__.py). But this is module because in site-packages is file: .pth (pthRedTest.api-0.0.1-py2.py3-none-any-nspkg.pth)
+
+folder1
+	|_folder2
+		|_   __init__.py
+    |__ (no init file)
+
+To add lib to site-packegas run commands:
+
+1. to install twine:
+pip install twine --proxy 10.144.1.10:8080
+
+2. Run setup (from folder pip_package)
+python setup.py bdist_wheel --universal
+
+3. Go to genearted .whl file and insatll
+cd dist
+pip install pthRedTest.api-0.0.1-py2.py3-none-any.whl --upgrade
+
+4. To uninstall
+pip uninstall pthRedTest.api
+
+
+
+------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa--
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//open Problems and check errors
+
+get-view Problems | click
+get-view Problems | get-tree | get-item "Errors .*" |expand
+
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(3 items\\)/Unknown 'pthRedTest.api.dump.Dump' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        | get-property caption 
+        | equals "Unknown 'pthRedTest.api.dump.Dump' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+    get-item "Errors \\(3 items\\)/Unknown 'pthRedTest.api.LogLib.LogLib' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" 
+        | get-property caption 
+        | equals "Unknown 'pthRedTest.api.LogLib.LogLib' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+    get-item "Errors \\(3 items\\)/Unknown keyword 'dump'" | get-property caption | equals "Unknown keyword 'dump'" 
+        | verify-true
+}
+//changed file to autodiscover
+get-view "Project Explorer" | get-tree | select "ImportFromSitePkg/test.robot" | double-click
+
+with [get-editor "test.robot" | get-text-viewer] {
+    set-caret-pos 9 14
+    type-text " "
+    key-type "M1+s"
+}
+
+//check if 2 paths were added to red.xml
+get-view "Project Explorer" | get-tree | select "ImportFromSitePkg/red.xml" | double-click
+
+get-editor "ImportFromSitePkg/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+with [get-editor "ImportFromSitePkg/red.xml" | get-section "Referenced libraries" | get-table] {
+    get-property itemCount | equals 2 | verify-true
+    get-property "getItems().TableItem[0].getText()" 
+        | equals [format "pthRedTest.api.LogLib.LogLib - %s/lib/site-packages/pthRedTest/api" [replace -input $python_exe_path -old "\\" -new "/"]] | verify-true
+    get-property "getItems().TableItem[1].getText()" 
+        | equals [format "pthRedTest.api.dump.Dump - %s/lib/site-packages/pthRedTest/api" [replace -input $python_exe_path -old "\\" -new "/"]] | verify-true
+}
+//click Clean to remove errors
+get-editor "test.robot" | click
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+wait 2000
+
+//check if only warnings about paths are shown
+get-view Problems | get-tree | get-item "Warnings .*" | expand
+with [get-view Problems | get-tree] {
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Warnings (2 items)" | verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" 
+        | equals [format "The path %s/lib/site-packages/pthRedTest/api is absolute. RED prefers using workspace-relative paths which makes your projects more portable"
+            [replace -input $python_exe_path -old "\\" -new "/"]] 
+        	| verify-true
+    get-property "getItems().TreeItem[0].getItems().TreeItem[1].getText()" 
+        | equals [format "The path %s/lib/site-packages/pthRedTest/api is absolute. RED prefers using workspace-relative paths which makes your projects more portable" 
+        	[replace -input $python_exe_path -old "\\" -new "/"]] 
+        	| verify-true
+}
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
