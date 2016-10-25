@@ -17,17 +17,22 @@ public class VariableComputationHelper {
 
     private final static String NUMBER_PATTERN_TXT = "([+]|[-])*\\d+([.]\\d+)?\\s*";
 
-    private final static String COUNT_OPERATIONS = "(\\s)*([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])(\\s)*";
+    private final static String COUNT_OPERATIONS = "([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])";
 
     private final static Pattern NUMBER_PATTERN = Pattern.compile(NUMBER_PATTERN_TXT);
 
     private final static Pattern COUNT_OPERATION_PATTERN = Pattern.compile(COUNT_OPERATIONS);
 
     private final static Pattern ILLEGAL_BRACKET_SYNTAX = Pattern
-            .compile("((?!" + COUNT_OPERATIONS + ").)+" + "\\s*(\\(|\\[)");
+            .compile("\\s*((?!" + COUNT_OPERATIONS + "| (\\[|\\()).)\\s*(\\[|\\()");
 
     private final static Pattern NUMBER_OPERATION = Pattern
             .compile("^" + NUMBER_PATTERN + "(" + COUNT_OPERATIONS + NUMBER_PATTERN + ")*");
+
+    private final static String QUOTA_TEXT = "[\"](([\\\\][\"])|((?![\"]).))*[\"]";
+
+    private final static Pattern TEXT_OPERATION = Pattern
+            .compile("^((\\s*(" + COUNT_OPERATIONS + ")+\\s*(" + NUMBER_PATTERN + "|" + QUOTA_TEXT + ")+\\s*)+)*");
 
     public Optional<TextPosition> extractVariableName(final VariableDeclaration variableDec) {
         Optional<TextPosition> text = Optional.absent();
@@ -46,8 +51,13 @@ public class VariableComputationHelper {
                             final String variable = getVariableName(variableName);
                             if (variable != null) {
                                 final int startIndex = textPositionVariableName.getFullText().indexOf(variable);
-                                return Optional.of(new TextPosition(textPositionVariableName.getFullText(), startIndex,
-                                        startIndex + variable.length() - 1));
+
+                                if (startIndex >= 0) {
+                                    if (isPropertTextOperation(variableName, variable)) {
+                                        return Optional.of(new TextPosition(textPositionVariableName.getFullText(),
+                                                startIndex, startIndex + variable.length() - 1));
+                                    }
+                                }
                             }
                         }
                     }
@@ -60,6 +70,20 @@ public class VariableComputationHelper {
         }
 
         return text;
+    }
+
+    private static boolean isPropertTextOperation(final String expression, final String variable) {
+        final String restOperationText = expression.substring(variable.length()).trim();
+        final String withoutBrackets = validateAndRemoveBrackets(restOperationText);
+        if (withoutBrackets != null) {
+            return TEXT_OPERATION.matcher(withoutBrackets).matches();
+        }
+
+        return false;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(TEXT_OPERATION.matcher("+ \"msg\" * 2").matches());
     }
 
     private String getVariableName(final String variableName) {
