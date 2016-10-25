@@ -15,11 +15,16 @@ import com.google.common.base.Optional;
 
 public class VariableComputationHelper {
 
-    private final static Pattern ILLEGAL_BRACKET_SYNTAX = Pattern.compile("(\\)|\\])\\s*(\\(|\\[)");
-
-    private final static String NUMBER_PATTERN = "([+]|[-])*[0-9][0-9]*\\s*";
+    private final static String NUMBER_PATTERN_TXT = "([+]|[-])*\\d+([.]\\d+)?\\s*";
 
     private final static String COUNT_OPERATIONS = "(\\s)*([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])(\\s)*";
+
+    private final static Pattern NUMBER_PATTERN = Pattern.compile(NUMBER_PATTERN_TXT);
+
+    private final static Pattern COUNT_OPERATION_PATTERN = Pattern.compile(COUNT_OPERATIONS);
+
+    private final static Pattern ILLEGAL_BRACKET_SYNTAX = Pattern
+            .compile("((?!" + COUNT_OPERATIONS + ").)+" + "\\s*(\\(|\\[)");
 
     private final static Pattern NUMBER_OPERATION = Pattern
             .compile("^" + NUMBER_PATTERN + "(" + COUNT_OPERATIONS + NUMBER_PATTERN + ")*");
@@ -28,19 +33,28 @@ public class VariableComputationHelper {
         Optional<TextPosition> text = Optional.absent();
 
         if (variableDec.getVariableType() == GeneralVariableType.COMPUTATION) {
-            final TextPosition textPostionVariableName = variableDec.getVariableName();
-            final String variableName = textPostionVariableName.getText().trim();
+            final TextPosition textPositionVariableName = variableDec.getVariableName();
+            final String variableName = textPositionVariableName.getText().trim();
             if (!variableName.isEmpty()) {
                 if (!variableName.startsWith("(") && !variableName.startsWith("\"") && !variableName.startsWith("[")) {
-                    if (!ILLEGAL_BRACKET_SYNTAX.matcher(variableName).matches()) {
+                    if (!ILLEGAL_BRACKET_SYNTAX.matcher(variableName).find()) {
                         if (startsFromNumber(variableName)) {
                             if (isNumberComputation(variableName)) {
                                 return Optional.of(new TextPosition("" + 3, 0, 1));
                             }
-                        } else {
-
+                        } else if (startsWithVariableName(variableName)) {
+                            final String variable = getVariableName(variableName);
+                            if (variable != null) {
+                                final int startIndex = textPositionVariableName.getFullText().indexOf(variable);
+                                return Optional.of(new TextPosition(textPositionVariableName.getFullText(), startIndex,
+                                        startIndex + variable.length() - 1));
+                            }
                         }
                     }
+                } else {
+                    final int startIndex = textPositionVariableName.getFullText().indexOf(variableName.charAt(0));
+                    return Optional
+                            .of(new TextPosition(textPositionVariableName.getFullText(), startIndex, startIndex));
                 }
             }
         }
@@ -48,12 +62,25 @@ public class VariableComputationHelper {
         return text;
     }
 
-    private boolean startsFromNumber(final String variableName) {
-        return variableName.matches("^[+|-]*[0-9]+");
+    private String getVariableName(final String variableName) {
+        String[] split = COUNT_OPERATION_PATTERN.split(variableName);
+        if (split.length >= 2) {
+            return split[0].trim();
+        }
+
+        return null;
     }
 
-    private boolean isNumberComputation(final String variableName) {
-        final String bracketRemoved = validateAndRemoveBrackets(variableName);
+    private boolean startsFromNumber(final String expression) {
+        return NUMBER_PATTERN.matcher(expression).matches();
+    }
+
+    private boolean startsWithVariableName(final String expression) {
+        return !startsFromNumber(expression);
+    }
+
+    private boolean isNumberComputation(final String expression) {
+        final String bracketRemoved = validateAndRemoveBrackets(expression);
         if (bracketRemoved != null) {
             return NUMBER_OPERATION.matcher(bracketRemoved).matches();
         }

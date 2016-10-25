@@ -16,7 +16,6 @@ import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -111,7 +110,6 @@ public class VariableComputationHelperExtractionParametrizedTest {
         this.shouldExtract = shouldExtract;
     }
 
-    @Ignore
     @Test
     public void test() {
         assertForText(text, variableNameStart, variableName, shouldExtract);
