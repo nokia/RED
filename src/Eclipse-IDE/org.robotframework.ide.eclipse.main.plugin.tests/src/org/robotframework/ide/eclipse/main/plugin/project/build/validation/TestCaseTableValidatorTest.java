@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.testdata.model.RobotVersion;
@@ -442,7 +441,6 @@ public class TestCaseTableValidatorTest {
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
     }
 
-    @Ignore
     @Test
     public void variableInComputationIsNotReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
