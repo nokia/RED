@@ -5,91 +5,98 @@
  */
 package org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Stack;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.testdata.model.table.exec.descs.TextPosition;
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.GeneralVariableType;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 
 public class VariableComputationHelper {
 
-    public final static Pattern COMPUTATION_OPERATION_PATTERN = Pattern
-            .compile("([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])+");
+    private final static Pattern ILLEGAL_BRACKET_SYNTAX = Pattern.compile("(\\)|\\])\\s*(\\(|\\[)");
 
-    public final static Pattern BRACKETS = Pattern.compile("(\\[|\\(|\\)|\\])+");
+    private final static String NUMBER_PATTERN = "([+]|[-])*[0-9][0-9]*\\s*";
+
+    private final static String COUNT_OPERATIONS = "(\\s)*([+]|[-]|[*]|[/]|[:]|[>]|[<]|[=]|[&]|[%]|\\^|\\!|[|])(\\s)*";
+
+    private final static Pattern NUMBER_OPERATION = Pattern
+            .compile("^" + NUMBER_PATTERN + "(" + COUNT_OPERATIONS + NUMBER_PATTERN + ")*");
 
     public Optional<TextPosition> extractVariableName(final VariableDeclaration variableDec) {
         Optional<TextPosition> text = Optional.absent();
 
         if (variableDec.getVariableType() == GeneralVariableType.COMPUTATION) {
-            TextPosition variableName = variableDec.getVariableName();
-            String c = variableName.getText();
+            final TextPosition textPostionVariableName = variableDec.getVariableName();
+            final String variableName = textPostionVariableName.getText().trim();
+            if (!variableName.isEmpty()) {
+                if (!variableName.startsWith("(") && !variableName.startsWith("\"") && !variableName.startsWith("[")) {
+                    if (!ILLEGAL_BRACKET_SYNTAX.matcher(variableName).matches()) {
+                        if (isNumberOperation(variableName)) {
+                            if (isNumberComputation(variableName)) {
+                                return Optional.of(new TextPosition("" + 2, 0, 1));
+                            }
+                        } else {
 
-            int lastReadCharacter = 0;
-            List<String> splitted = Arrays.asList(COMPUTATION_OPERATION_PATTERN.split(c));
-            for (String s : splitted) {
-                try {
-                    Double.parseDouble(s);
-                } catch (final NumberFormatException nfe) {
-                    if (lastReadCharacter > 0) {
-                        if (!isBracketDecorated(s)) {
-                            text = Optional.absent();
-                            break;
                         }
-                    } else {
-                        int firstNotWhiteSpace = getFirstNotWhitespaceCharacter(s, 0);
-                        int textLength = s.trim().length();
-                        text = Optional.of(new TextPosition(variableName.getFullText(),
-                                variableName.getStart() + firstNotWhiteSpace,
-                                variableName.getStart() + firstNotWhiteSpace + textLength - 1));
                     }
                 }
-
-                lastReadCharacter = lastReadCharacter + s.length();
             }
         }
 
         return text;
     }
 
-    @VisibleForTesting
-    protected int getFirstNotWhitespaceCharacter(final String text, int beginChar) {
-        int index = -1;
-        char[] chars = text.toCharArray();
-        for (int i = beginChar; i < chars.length; i++) {
-            char c = chars[i];
-            if (c != ' ' && c != '\t') {
-                index = i;
-                break;
-            }
-        }
-
-        return index;
+    private boolean isNumberOperation(final String variableName) {
+        return variableName.matches("^[+|-]*[0-9]+");
     }
 
-    @VisibleForTesting
-    protected boolean isBracketDecorated(final String s) {
-        List<String> bracket = Arrays.asList(BRACKETS.split(s));
-        boolean result = !bracket.isEmpty();
-        if (!result) {
-            result = BRACKETS.matcher(s).matches();
+    private boolean isNumberComputation(final String variableName) {
+        final String bracketRemoved = validateAndRemoveBrackets(variableName);
+        if (bracketRemoved != null) {
+            return NUMBER_OPERATION.matcher(bracketRemoved).matches();
         }
-        for (final String value : bracket) {
-            try {
-                String checkValue = value.trim();
-                if (!checkValue.isEmpty()) {
-                    Double.parseDouble(checkValue);
+
+        return false;
+    }
+
+    private static String validateAndRemoveBrackets(final String text) {
+        final char[] chars = text.toCharArray();
+        final Stack<Character> bracketStack = new Stack<Character>();
+        final StringBuilder removed = new StringBuilder();
+        for (char c : chars) {
+            if (c == '(') {
+                bracketStack.push(c);
+            } else if (c == ')') {
+                if (bracketStack.isEmpty()) {
+                    return null;
                 }
-            } catch (final NumberFormatException nfe) {
-                result = false;
-                break;
+
+                Character pop = bracketStack.pop();
+                if (pop != '(') {
+                    return null;
+                }
+            } else if (c == '[') {
+                bracketStack.push(c);
+            } else if (c == ']') {
+                if (bracketStack.isEmpty()) {
+                    return null;
+                }
+
+                Character pop = bracketStack.pop();
+                if (pop != '[') {
+                    return null;
+                }
+            } else {
+                removed.append(c);
             }
         }
 
-        return result;
+        if (bracketStack.isEmpty()) {
+            return removed.toString();
+        } else {
+            return null;
+        }
     }
 }
