@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _KASD8JISEea_J4BglwdxcA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/25/16 2:53 PM
+Save-Time: 10/25/16 4:24 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -76,6 +76,11 @@ with [get-editor "test.robot" | get-text-viewer] {
 
 //check if 2 paths were added to red.xml
 get-view "Project Explorer" | get-tree | select "ImportFromSitePkg/red.xml" | double-click
+
+try -times 10 -delay 1000 -command{
+	get-editor "ImportFromSitePkg/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
+    | verify-true
+} 
 
 get-editor "ImportFromSitePkg/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
 with [get-editor "ImportFromSitePkg/red.xml" | get-section "Referenced libraries" | get-table] {
