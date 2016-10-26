@@ -26,6 +26,7 @@ may be appropriate.
 This is modified for RED propose of PTH files test.
 
 pip install twine
+pip install wheel
 python setup.py bdist_wheel --universal
 
 installation:
