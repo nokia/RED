@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _evjW4J3DEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/13/16 11:31 AM
+Save-Time: 10/26/16 4:23 PM
 Testcase-Type: ecl
 Verifications: _JnOjMJ3MEeWVv_UItyy1RQ
 
@@ -221,9 +221,11 @@ with [get-editor "Script.robot" | get-text-viewer] {
     type-text "here_is_class."
     type-text Dog
     key-type "M1+s"
+    wait 500
     set-caret-pos 7 19
+    wait 100
     get-menu "Quick Fix" | click
-    wait 300
+    wait 500
 }
 
 get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
