@@ -111,7 +111,7 @@ setup(
     # need to place data files outside of your packages. See:
     # http://docs.python.org/3.4/distutils/setupscript.html#installing-additional-files # noqa
     # In this case, 'data_file' will be installed into '<sys.prefix>/my_data'
-    data_files=[('Lib' + os.sep + 'site-packages' + os.sep, ['pthRedTest.api-0.0.1-py2.py3-none-any-nspkg.pth'])],
+    data_files=[(os.sep, ['pthRedTest.api-0.0.1-py2.py3-none-any-nspkg.pth'])],
 
     # To provide executable scripts, use entry points in preference to the
     # "scripts" keyword. Entry points provide cross-platform support and allow
