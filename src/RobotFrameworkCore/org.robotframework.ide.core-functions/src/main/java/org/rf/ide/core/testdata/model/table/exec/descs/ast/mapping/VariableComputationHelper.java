@@ -82,10 +82,6 @@ public class VariableComputationHelper {
         return false;
     }
 
-    public static void main(String[] args) {
-        System.out.println(TEXT_OPERATION.matcher("+ \"msg\" * 2").matches());
-    }
-
     private String getVariableName(final String variableName) {
         String[] split = COUNT_OPERATION_PATTERN.split(variableName);
         if (split.length >= 2) {
