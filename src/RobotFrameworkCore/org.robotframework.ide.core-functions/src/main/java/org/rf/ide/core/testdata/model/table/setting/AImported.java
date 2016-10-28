@@ -44,7 +44,7 @@ public abstract class AImported extends AModelElement<SettingTable> implements I
 
     @Override
     public void setComment(final String comment) {
-        RobotToken token = new RobotToken();
+        final RobotToken token = new RobotToken();
         token.setText(comment);
 
         setComment(token);
@@ -63,7 +63,7 @@ public abstract class AImported extends AModelElement<SettingTable> implements I
     }
 
     @Override
-    public void removeCommentPart(int index) {
+    public void removeCommentPart(final int index) {
         this.comment.remove(index);
     }
 
@@ -88,6 +88,8 @@ public abstract class AImported extends AModelElement<SettingTable> implements I
     public void setPathOrName(final String pathOrName) {
         this.pathOrName = updateOrCreate(this.pathOrName, pathOrName, type.getPathOrFileNameType());
     }
+
+    public abstract List<RobotToken> getArguments();
 
     public static enum Type {
         LIBRARY {
