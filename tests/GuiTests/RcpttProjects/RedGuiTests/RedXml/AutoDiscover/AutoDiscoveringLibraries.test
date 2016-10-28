@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _l6X6QPy3EeW7_PzjO98BIw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 7/25/16 12:08 PM
+Save-Time: 10/28/16 2:40 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -354,7 +354,15 @@ get-window Clean | get-button OK | click
 with [get-editor "test_with_resource.robot" | get-text-viewer] {
     set-caret-pos 4 2
     key-type BackSpace
-    wait 1000
+}
+
+try -times 4 -delay 1 -command{
+	with [get-editor "test_with_resource.robot" | get-text-viewer] {
+	    get-property "styles[8].text" | equals "multiply.py" | verify-true
+	    get-property "styles[8].underlineColor" | equals "#FF0080" | verify-true
+	}
+}
+with [get-editor "test_with_resource.robot" | get-text-viewer] {
     key-type "M1+s"
 }
 
