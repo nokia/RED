@@ -34,17 +34,18 @@ public class LibraryImport extends AImported {
     }
 
     public LibraryAlias newAlias() {
-        RobotToken dec = new RobotToken();
+        final RobotToken dec = new RobotToken();
         dec.setText(RobotTokenType.SETTING_LIBRARY_ALIAS
                 .getTheMostCorrectOneRepresentation(getParent().getParent().getParent().getRobotVersion())
                 .getRepresentation());
 
-        LibraryAlias libAlias = new LibraryAlias(dec);
+        final LibraryAlias libAlias = new LibraryAlias(dec);
         setAlias(libAlias);
 
         return libAlias;
     }
 
+    @Override
     public List<RobotToken> getArguments() {
         return Collections.unmodifiableList(arguments);
     }
@@ -58,7 +59,7 @@ public class LibraryImport extends AImported {
     }
 
     public void addArgument(final String argument) {
-        RobotToken rt = new RobotToken();
+        final RobotToken rt = new RobotToken();
         rt.setText(argument);
 
         addArgument(rt);
@@ -96,9 +97,9 @@ public class LibraryImport extends AImported {
     }
 
     @Override
-    public boolean removeElementToken(int index) {
-        int withoutAlias = arguments.size();
-        int withAlias = withoutAlias + getAlias().getElementTokens().size();
+    public boolean removeElementToken(final int index) {
+        final int withoutAlias = arguments.size();
+        final int withAlias = withoutAlias + getAlias().getElementTokens().size();
 
         if (index >= 0) {
             if (index < withoutAlias) {

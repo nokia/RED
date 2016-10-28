@@ -22,6 +22,11 @@ public class ResourceImport extends AImported {
         super(Type.RESOURCE, resourceDeclaration);
     }
 
+    @Override
+    public List<RobotToken> getArguments() {
+        return Collections.unmodifiableList(new ArrayList<RobotToken>());
+    }
+
     public List<RobotToken> getUnexpectedTrashArguments() {
         return Collections.unmodifiableList(unexpectedTrashArguments);
     }
@@ -37,7 +42,7 @@ public class ResourceImport extends AImported {
     }
 
     public void addUnexpectedTrashArgument(final String trashArgument) {
-        RobotToken rt = new RobotToken();
+        final RobotToken rt = new RobotToken();
         rt.setText(trashArgument);
 
         addUnexpectedTrashArgument(rt);
@@ -69,7 +74,7 @@ public class ResourceImport extends AImported {
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(unexpectedTrashArguments, index);
     }
 }

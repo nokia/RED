@@ -22,6 +22,7 @@ public class VariablesImport extends AImported {
         super(Type.VARIABLES, variablesDeclaration);
     }
 
+    @Override
     public List<RobotToken> getArguments() {
         return Collections.unmodifiableList(arguments);
     }
@@ -35,7 +36,7 @@ public class VariablesImport extends AImported {
     }
 
     public void addArgument(final String argument) {
-        RobotToken rt = new RobotToken();
+        final RobotToken rt = new RobotToken();
         rt.setText(argument);
 
         addArgument(rt);
@@ -67,7 +68,7 @@ public class VariablesImport extends AImported {
     }
 
     @Override
-    public boolean removeElementToken(int index) {
+    public boolean removeElementToken(final int index) {
         return super.removeElementFromList(arguments, index);
     }
 }
