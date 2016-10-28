@@ -80,8 +80,11 @@ public class RobotProject extends RobotContainer {
     public synchronized RobotProjectHolder getRobotProjectHolder() {
         if (projectHolder == null) {
             projectHolder = new RobotProjectHolder(getRuntimeEnvironment());
+            return projectHolder;
         }
-        provideVariableMappingsForProjectHolder();
+        if (projectHolder.getVariableMappings().isEmpty()) {
+            projectHolder.setVariableMappings(extractVariableMappingsFromProjectConfiguration());
+        }
         return projectHolder;
     }
 
@@ -324,11 +327,14 @@ public class RobotProject extends RobotContainer {
         return getProject().getFile(filename);
     }
 
+    public void setModuleSearchPaths(final List<File> paths) {
+        this.modulesSearchPath = paths;
+    }
+
     public synchronized List<File> getModuleSearchPaths() {
-        if (modulesSearchPath != null) {
-            return modulesSearchPath;
+        if (modulesSearchPath == null) {
+            modulesSearchPath = getRuntimeEnvironment().getModuleSearchPaths();
         }
-        modulesSearchPath = getRuntimeEnvironment().getModuleSearchPaths();
         return modulesSearchPath;
     }
     
@@ -470,12 +476,6 @@ public class RobotProject extends RobotContainer {
     public String resolve(final String expression) {
         readProjectConfigurationIfNeeded();
         return RobotExpressions.resolve(extractVariableMappingsFromProjectConfiguration(), expression);
-    }
-    
-    private void provideVariableMappingsForProjectHolder() {
-        if (projectHolder != null && projectHolder.getVariableMappings().isEmpty()) {
-            projectHolder.setVariableMappings(extractVariableMappingsFromProjectConfiguration());
-        }
     }
 
     private synchronized Map<String, String> extractVariableMappingsFromProjectConfiguration() {

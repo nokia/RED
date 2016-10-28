@@ -84,11 +84,12 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Empty setting '%s'. Specify path of variable file to import";
         }
     },
-    PARAMETERIZED_IMPORT_PATH {
+    IMPORT_PATH_PARAMETERIZED {
 
         @Override
         public String getProblemDescription() {
-            return "The library name/path '%s' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution";
+            return "The import name/path '%s' is parameterized. Some of used parameters cannot be resolved."
+                    + " Use Variable mappings in red.xml for parameter resolution";
         }
 
         @Override
@@ -102,7 +103,14 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return DefineGlobalVariableInConfigFixer.createFixers(nameOrPath);
         }
     },
-    ABSOLUTE_IMPORT_PATH {
+    IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS {
+
+        @Override
+        public String getProblemDescription() {
+            return "Windows paths are not supported. Use global variable '${/}' or Linux-like '/' path separators.";
+        }
+    },
+    IMPORT_PATH_ABSOLUTE {
 
         @Override
         public Severity getSeverity() {
@@ -114,6 +122,18 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Path '%s' is absolute. It is preferred to use relative paths";
         }
     },
+    IMPORT_PATH_RELATIVE_VIA_MODULES_PATH {
+
+        @Override
+        public Severity getSeverity() {
+            return Severity.WARNING;
+        }
+
+        @Override
+        public String getProblemDescription() {
+            return "Path '%s' is relative to location from python Modules Search Path (sys.path). Points to '%s'";
+        }
+    },
     IMPORT_PATH_OUTSIDE_WORKSPACE {
 
         @Override
@@ -121,7 +141,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Path '%s' points to location outside your workspace";
         }
     },
-    UNKNOWN_LIBRARY {
+    NON_EXISTING_LIBRARY_IMPORT {
 
         @Override
         public String getProblemDescription() {
@@ -146,27 +166,6 @@ public enum GeneralSettingsProblem implements IProblemCause {
                         new SimilaritiesAnalyst().provideSimilarLibraries(suiteFile, nameOrPath)));
             }
             return fixers;
-        }
-    },
-    INVALID_LIBRARY_PATH {
-
-        @Override
-        public String getProblemDescription() {
-            return "Invalid library path: %s";
-        }
-    },
-    INVALID_WINDOWS_LIBRARY_PATH {
-
-        @Override
-        public String getProblemDescription() {
-            return "Windows paths are not supported. Use global variable '${/}' or Linux-like '/' path separators.";
-        }
-    },
-    SETTING_ARGUMENTS_NOT_APPLICABLE {
-
-        @Override
-        public String getProblemDescription() {
-            return "Setting '%s' is not applicable for arguments: %s. %s";
         }
     },
     NON_EXISTING_RESOURCE_IMPORT {
@@ -213,11 +212,11 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Resource import '%s' is invalid: file does not exist. Check file name and path.";
         }
     },
-    INVALID_VARIABLES_IMPORT {
+    SETTING_ARGUMENTS_NOT_APPLICABLE {
 
         @Override
         public String getProblemDescription() {
-            return "Variable import '%s' is invalid%s";
+            return "Setting '%s' is not applicable for arguments: %s. %s";
         }
     },
     DUPLICATED_TEMPLATE_28 {

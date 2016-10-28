@@ -15,9 +15,12 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
+import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths;
+import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths.MarkedPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+
+import com.google.common.base.Optional;
 
 abstract class HyperlinksToFilesDetector {
 
@@ -30,23 +33,54 @@ abstract class HyperlinksToFilesDetector {
             return hyperlinks;
         }
 
-        final Path path = new Path(suiteFile.getProject().resolve(pathAsString));
-        final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
-        IPath wsRelativePath = null;
-        if (path.isAbsolute()) {
-            wsRelativePath = path.makeRelativeTo(wsRoot.getLocation());
-            if (!wsRoot.getLocation().isPrefixOf(path)) {
-                return hyperlinks;
-            }
+        final IPath absolutePath = createAbsolutePath(suiteFile, pathAsString);
+        if (absolutePath == null) {
+            return hyperlinks;
         }
-        if (wsRelativePath == null) {
-            wsRelativePath = PathsConverter.fromResourceRelativeToWorkspaceRelative(suiteFile.getFile(), path);
-        }
-        final IResource resource = wsRoot.findMember(wsRelativePath);
-        if (resource != null && resource.exists() && resource.getType() == IResource.FILE) {
-            hyperlinks.add(new FileHyperlink(fromRegion, (IFile) resource, "Open File"));
+
+        final Optional<IHyperlink> hyperlink = createLink(suiteFile, fromRegion, absolutePath);
+        if (hyperlink.isPresent()) {
+            hyperlinks.add(hyperlink.get());
         }
         return hyperlinks;
+    }
+
+    private IPath createAbsolutePath(final RobotSuiteFile suiteFile, final String pathAsString) {
+        final String resolved = suiteFile.getProject().resolve(pathAsString);
+        final IPath path = new Path(resolved);
+        if (path.isAbsolute()) {
+            return path;
+        } else {
+            final ImportSearchPaths searchPaths = new ImportSearchPaths(suiteFile.getProject());
+            final Optional<MarkedPath> markedPath = searchPaths.getAbsolutePath(suiteFile, path);
+            return markedPath.isPresent() ? markedPath.get().getPath() : null;
+        }
+    }
+
+    private Optional<IHyperlink> createLink(final RobotSuiteFile suiteFile, final IRegion fromRegion,
+            final IPath absolutePath) {
+        final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
+        // FIXME : linked folders!
+        final IPath wsRelativePath = absolutePath.makeRelativeTo(wsRoot.getLocation());
+        if (wsRoot.getLocation().isPrefixOf(absolutePath)
+                || wsRoot.findFilesForLocationURI(absolutePath.toFile().toURI()).length > 0) {
+            // points into the workspace
+            IResource resource = wsRoot.findMember(wsRelativePath);
+            if (resource == null) {
+                resource = wsRoot.findFilesForLocationURI(absolutePath.toFile().toURI())[0];
+            }
+            if (resource != null) {
+                return createHyperlink(fromRegion, resource);
+            }
+        }
+        return Optional.absent();
+    }
+
+    private Optional<IHyperlink> createHyperlink(final IRegion fromRegion, final IResource destination) {
+        if (destination != null && destination.exists() && destination.getType() == IResource.FILE) {
+            return Optional.<IHyperlink> of(new FileHyperlink(fromRegion, (IFile) destination, "Open File"));
+        }
+        return Optional.absent();
     }
 
     private boolean isPath(final String pathAsString) {
