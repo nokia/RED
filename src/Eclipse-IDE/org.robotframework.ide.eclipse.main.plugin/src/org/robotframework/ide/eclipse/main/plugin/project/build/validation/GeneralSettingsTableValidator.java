@@ -150,7 +150,7 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private void validateLibraries(final RobotSuiteFile suiteFile, final List<LibraryImport> libraryImports,
             final IProgressMonitor monitor) throws CoreException {
-        new GeneralSettingsImportsValidator.LibraryImportValidator(validationContext, suiteFile, libraryImports,
+        new GeneralSettingsLibrariesImportValidator(validationContext, suiteFile, libraryImports,
                 reporter, getLibrariesAutoDiscoverer()).validate(monitor);
     }
 
@@ -163,13 +163,13 @@ class GeneralSettingsTableValidator implements ModelUnitValidator {
 
     private void validateVariables(final RobotSuiteFile suiteFile, final List<VariablesImport> variablesImports,
             final IProgressMonitor monitor) throws CoreException {
-        new GeneralSettingsImportsValidator.VariablesImportValidator(validationContext, suiteFile, variablesImports,
+        new GeneralSettingsVariablesImportValidator(validationContext, suiteFile, variablesImports,
                 reporter).validate(monitor);
     }
 
     private void validateResources(final RobotSuiteFile suiteFile, final List<ResourceImport> resourcesImports,
             final IProgressMonitor monitor) throws CoreException {
-        new GeneralSettingsImportsValidator.ResourcesImportValidator(validationContext, suiteFile, resourcesImports,
+        new GeneralSettingsResourcesImportValidator(validationContext, suiteFile, resourcesImports,
                 reporter).validate(monitor);
     }
 

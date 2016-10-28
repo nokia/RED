@@ -29,10 +29,12 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
+import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 
@@ -826,8 +828,16 @@ public class RobotProjectConfig {
             if (asPath.isAbsolute()) {
                 return asPath.toFile();
             }
-            return PathsResolver
+            final File wsAbsolute = PathsResolver
                     .resolveToAbsolutePath(getRelativityLocation(relativityPoint, containingProject), asPath).toFile();
+            final IPath wsRelative = PathsConverter
+                    .toWorkspaceRelativeIfPossible(new Path(wsAbsolute.getAbsolutePath()));
+            final IResource member = containingProject.getWorkspace().getRoot().findMember(wsRelative);
+            if (member == null) {
+                return wsAbsolute;
+            } else {
+                return member.getLocation().toFile();
+            }
         }
 
         private static IPath getRelativityLocation(final RelativityPoint relativityPoint,

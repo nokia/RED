@@ -10,16 +10,21 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths;
+import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths.MarkedPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
+import com.google.common.base.Optional;
 import com.google.common.escape.Escaper;
 
 /**
@@ -45,9 +50,28 @@ public class PathsResolver {
             final IPath resolvedPath = isParameterized(path) ? resolveParametrizedPath(project, path.toPortableString())
                     : path;
 
-            final IPath r = normalizePath(file, resolvedPath);
-            if (r != null) {
-                resultPaths.add(r);
+            if (isParameterized(resolvedPath)) {
+                // it should be all-resolved by now
+                continue;
+            }
+            
+            final IPath absolutePath;
+            if (resolvedPath.isAbsolute()) {
+                absolutePath = resolvedPath;
+            } else {
+                final Optional<MarkedPath> markedAbsolutePath = new ImportSearchPaths(file.getProject())
+                        .getAbsolutePath(file, resolvedPath);
+                absolutePath = markedAbsolutePath.isPresent() ? markedAbsolutePath.get().getPath() : null;
+            }
+
+            final IWorkspaceRoot workspaceRoot = file.getFile().getWorkspace().getRoot();
+            if (workspaceRoot.getLocation().isPrefixOf(absolutePath)) {
+                resultPaths.add(absolutePath.makeRelativeTo(workspaceRoot.getLocation()));
+            } else {
+                final IFile[] files = workspaceRoot.findFilesForLocationURI(absolutePath.toFile().toURI());
+                if (files.length > 0) {
+                    resultPaths.add(files[0].getFullPath());
+                }
             }
         }
         return resultPaths;
@@ -57,44 +81,25 @@ public class PathsResolver {
         return Path.fromPortableString(project.resolve(path).replaceAll("\\\\", "/"));
     }
 
-    private static IPath normalizePath(final RobotSuiteFile file, final IPath resolvedPath) {
-        if (isParameterized(resolvedPath)) {
-            return null;
-        }
-
-        final IWorkspaceRoot workspaceRoot = file.getFile().getWorkspace().getRoot();
-        if (resolvedPath.isAbsolute() && workspaceRoot.getLocation().isPrefixOf(resolvedPath)) {
-                return resolvedPath.makeRelativeTo(workspaceRoot.getLocation());
-        } else if (!resolvedPath.isAbsolute()) {
-            return PathsConverter.fromResourceRelativeToWorkspaceRelative(file.getFile(), resolvedPath);
-        }
-        // we don't handle the case when path is absolute, but outside of workspace. this could be
-        // done in special cases, but i think we don't want to do it
-        return null;
+    public static IPath resolveParametrizedPath(final RobotProject project, final IPath path) {
+        return resolveParametrizedPath(project, path.toPortableString());
     }
 
     /**
-     * Returns absolute path to place given in path argument which is used in given file. Exception is thrown when
-     * path is parameterized. If the path is relative then target location is searched first relative to given file
-     * and then relative to directories taken from project module search paths. All those searched paths will be 
-     * returned.
+     * Returns absolute paths obtained by resolving given locations against given relative path.
      * 
      * @param file
      * @param path
      * @return
      */
-    public static List<IPath> resolveToAbsolutePossiblePaths(final RobotSuiteFile file, final String path)
-            throws PathResolvingException {
-        return resolveToAbsolutePossiblePath(file, new Path(path));
-    }
 
-    private static List<IPath> resolveToAbsolutePossiblePath(final RobotSuiteFile file, final IPath path)
+    public static List<IPath> resolveToAbsolutePossiblePaths(final List<File> files, final IPath path)
             throws PathResolvingException {
-        final List<IPath> paths = newArrayList(resolveToAbsolutePath(file, path));
+        final List<IPath> paths = new ArrayList<>();
         final Escaper escaper = PathsConverter.getUriSpecialCharsEscaper();
-        for (final File f : file.getProject().getModuleSearchPaths()) {
+        for (final File f : files) {
             final String resolvedPath = f.toURI().resolve(escaper.escape(path.toString())).getPath();
-            if(resolvedPath != null) {
+            if (resolvedPath != null) {
                 paths.add(new Path(resolvedPath));
             }
         }
@@ -148,7 +153,7 @@ public class PathsResolver {
         }
     }
 
-    private static boolean isParameterized(final IPath path) {
+    public static boolean isParameterized(final IPath path) {
         return parametrizedPathPattern.matcher(path.toPortableString()).find();
     }
     
@@ -157,6 +162,8 @@ public class PathsResolver {
     }
 
     public static class PathResolvingException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
 
         public PathResolvingException(final String message) {
             super(message);
