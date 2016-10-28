@@ -63,6 +63,9 @@ public class PathsResolver {
                         .getAbsolutePath(file, resolvedPath);
                 absolutePath = markedAbsolutePath.isPresent() ? markedAbsolutePath.get().getPath() : null;
             }
+            if (absolutePath == null) {
+                return resultPaths;
+            }
 
             final IWorkspaceRoot workspaceRoot = file.getFile().getWorkspace().getRoot();
             if (workspaceRoot.getLocation().isPrefixOf(absolutePath)) {
