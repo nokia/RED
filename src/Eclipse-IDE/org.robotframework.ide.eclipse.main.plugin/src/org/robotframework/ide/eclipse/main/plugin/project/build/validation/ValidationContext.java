@@ -112,6 +112,20 @@ public class ValidationContext {
         this.referencedAccessibleLibraries = refLibs;
     }
 
+    private static Map<String, LibrarySpecification> collectLibraries(final RobotProject robotProject) {
+        final Map<String, LibrarySpecification> libs = newLinkedHashMap();
+        libs.putAll(robotProject.getStandardLibraries());
+        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : robotProject.getReferencedLibraries()
+                .entrySet()) {
+            if (entry.getKey().provideType() == LibraryType.VIRTUAL && entry.getValue() != null) {
+                libs.put(entry.getValue().getName(), entry.getValue());
+            } else {
+                libs.put(entry.getKey().getName(), entry.getValue());
+            }
+        }
+        return libs;
+    }
+
     BuildLogger getLogger() {
         return logger;
     }
@@ -155,20 +169,6 @@ public class ValidationContext {
 
     public FileValidationContext createUnitContext(final IFile file) {
         return new FileValidationContext(this, file);
-    }
-
-    private static Map<String, LibrarySpecification> collectLibraries(final RobotProject robotProject) {
-        final Map<String, LibrarySpecification> libs = newLinkedHashMap();
-        libs.putAll(robotProject.getStandardLibraries());
-        for (final Entry<ReferencedLibrary, LibrarySpecification> entry : robotProject.getReferencedLibraries()
-                .entrySet()) {
-            if (entry.getKey().provideType() == LibraryType.VIRTUAL && entry.getValue() != null) {
-                libs.put(entry.getValue().getName(), entry.getValue());
-            } else {
-                libs.put(entry.getKey().getName(), entry.getValue());
-            }
-        }
-        return libs;
     }
 
     public Set<String> collectAccessibleVariables(final IFile file) {

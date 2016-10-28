@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -26,6 +27,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -450,16 +452,24 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     private LibrarySpecification findSpecForPath(final String toImportPathOrName) {
-        List<IPath> possiblePathsToLib = null;
-        try {
-            possiblePathsToLib = PathsResolver.resolveToAbsolutePossiblePaths(this, toImportPathOrName);
-        } catch (final PathResolvingException e) {
-            possiblePathsToLib = PathsResolver.resolveToAbsolutePossiblePaths(this,
-                    PathsResolver.resolveParametrizedPath(getProject(), toImportPathOrName).toPortableString());
-        }
-        if (possiblePathsToLib == null || possiblePathsToLib.isEmpty()) {
+        final IPath path = new Path(toImportPathOrName);
+        final IPath resolvedPath = PathsResolver.isParameterized(path)
+                ? PathsResolver.resolveParametrizedPath(getProject(), path) : path;
+        if (PathsResolver.isParameterized(resolvedPath)) {
             return null;
         }
+        
+        final Collection<IPath> possiblePaths = new ArrayList<>();
+        if (resolvedPath.isAbsolute()) {
+            possiblePaths.add(resolvedPath);
+        } else {
+            final Collection<IPath> paths = new ImportSearchPaths(getProject()).getAbsolutePaths(this, resolvedPath);
+            possiblePaths.addAll(paths);
+        }
+        if (possiblePaths.isEmpty()) {
+            return null;
+        }
+
         for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibraries()
                 .entrySet()) {
             if (entry.getValue() == null) {
@@ -469,7 +479,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             final IPath libPath1 = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
             final IPath libPath2 = PathsConverter
                     .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
-            for (final IPath candidate : possiblePathsToLib) {
+            for (final IPath candidate : possiblePaths) {
                 if (candidate.equals(libPath1) || candidate.equals(libPath2)) {
                     return entry.getValue();
                 }
