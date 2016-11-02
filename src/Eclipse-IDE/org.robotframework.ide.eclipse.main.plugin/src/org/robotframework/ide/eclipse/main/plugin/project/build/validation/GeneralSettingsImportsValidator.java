@@ -142,7 +142,9 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         if (destinationIsInWorkspace(wsRoot, absoluteImportPath)) {
 
             final IResource resource = getResourceFor(wsRoot, absoluteImportPath);
-            if (resource == null || !resource.exists()) {
+            if (resource == null) {
+                reportNonExistingResource(path, pathToken, null);
+            } else if (!resource.exists()) {
                 reportNonExistingResource(path, pathToken, resource.getFullPath().toPortableString());
             } else {
                 validateResource(resource, path, pathToken, arguments);
