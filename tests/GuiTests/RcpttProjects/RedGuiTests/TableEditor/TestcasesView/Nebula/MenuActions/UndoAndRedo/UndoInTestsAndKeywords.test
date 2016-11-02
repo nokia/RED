@@ -1,0 +1,167 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _VzYJ0KEAEea9Cvae3yWo1A
+Element-Name: UndoInTestsAndKeywords
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _ccE6QJ0dEeaF69zyQwob4Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/2/16 2:49 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "case\n"
+    + "    Should Be True    1\n"
+    + "    [Documentation]    doc is here\n"
+    + "test 1\n"
+    + "    [Tags]    newTag1    nextTag    3Tag\n"
+    + "    Log    2\n"
+    + "    Convert To Boolean  8\n"
+    + "last test\n"
+    + "    Convert To Number   text\n"
+    + "    Catenate    1    2    3    4    5\n"
+    + "    \n"
+    + "*** Keywords ***\n"
+    + "kw 1\n"
+    + "    Convert To Number    text\n"
+    + "    : FOR    ${x}   IN RANGE    12\n"
+    + "    \\    log  12\n\n"
+    + "second kw\n"
+    + "    kw 1\n"
+    + "    [Return]    4"
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1" | click
+wait 200
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+    	//add doc section
+        key-type Down -times 2
+        get-menu "Add new line" | click
+        type-text "["
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "Documentation]"
+        key-type Enter
+    }
+    //add text for doc
+    get-editbox -after [get-label "Test Cases"] -index 1 | set-text "simple doc"
+
+	//go to kw table
+    get-tab-folder | get-tab-item Keywords | click
+}
+
+get-view Outline | get-tree | select "TestFile.robot/Keywords/second kw" | click
+wait 200
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+    	//add new kw
+        key-type Down -times 4
+        key-type Enter -times 2
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "new keyword"
+        key-type Enter
+    }
+    //add argument
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "${a}"
+        key-type Enter -times 2
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Left -times 2
+        key-type Enter
+        key-type "M2+l"
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text og
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text 67
+        key-type Enter
+    }
+    
+    //go to TC view
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+
+check-test_case-row -file "TestFile.robot" -row 5 -tc "test 1" 
+check-test_case-row -file "TestFile.robot" -row 6 -tc "[Tags]" -c1 "newTag1" -c2 "nextTag" -c3 "3Tag"
+check-test_case-row -file "TestFile.robot" -row 7 -tc "[Documentation]" -c1 "simple doc"
+check-test_case-row -file "TestFile.robot" -row 8 -tc "Log"  -c1 2
+check-test_case-row -file "TestFile.robot" -row 9 -tc "Convert To Boolean"  -c1 8
+check-test_case-row -file "TestFile.robot" -row 10 -tc "..."
+
+//undo doc argument
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
+check-test_case-row -file "TestFile.robot" -row 7 -tc "[Documentation]"
+
+//undo [doc]
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
+check-test_case-row -file "TestFile.robot" -row 7 -tc ""
+
+
+//check if KW was not changed
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+
+check-keyword-row -file "TestFile.robot"  -row 1 -kw "kw 1"
+check-keyword-row -file "TestFile.robot"  -row 2 -kw "Convert To Number" -c1 "text"
+check-keyword-row -file "TestFile.robot"  -row 3 -kw ": FOR" -c1 "${x}" -c2 "IN RANGE" -c3 12
+check-keyword-row -file "TestFile.robot"  -row 4 -kw "\\"  -c1 "log" -c2 12
+check-keyword-row -file "TestFile.robot"  -row 5 -kw "..."
+
+check-keyword-row -file "TestFile.robot"  -row 6 -kw "second kw"
+check-keyword-row -file "TestFile.robot"  -row 7 -kw "[Return]" -c1 4
+check-keyword-row -file "TestFile.robot"  -row 8 -kw "kw 1"
+check-keyword-row -file "TestFile.robot"  -row 9 -kw "..."
+
+check-keyword-row -file "TestFile.robot"  -row 10 -kw "new keyword" -c1 "${a}"
+check-keyword-row -file "TestFile.robot"  -row 11 -kw "Log" -c1 67
+check-keyword-row -file "TestFile.robot"  -row 12 -kw "..."
+
+//undo (value 67) in KW table
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+
+check-keyword-row -file "TestFile.robot"  -row 10 -kw "new keyword" -c1 "${a}"
+check-keyword-row -file "TestFile.robot"  -row 11 -kw "Log"
+check-keyword-row -file "TestFile.robot"  -row 12 -kw "..."
+
+
+//undo (Log) in KW table
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+
+check-keyword-row -file "TestFile.robot"  -row 10 -kw "new keyword" -c1 "${a}"
+check-keyword-row -file "TestFile.robot"  -row 11 -kw ""
+check-keyword-row -file "TestFile.robot"  -row 12 -kw "..."
+
+//undo adding new line
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+check-keyword-row -file "TestFile.robot"  -row 1 -kw "kw 1"
+check-keyword-row -file "TestFile.robot"  -row 2 -kw "Convert To Number" -c1 "text"
+check-keyword-row -file "TestFile.robot"  -row 3 -kw ": FOR" -c1 "${x}" -c2 "IN RANGE" -c3 12
+check-keyword-row -file "TestFile.robot"  -row 4 -kw "\\"  -c1 "log" -c2 12
+check-keyword-row -file "TestFile.robot"  -row 5 -kw "..."
+
+check-keyword-row -file "TestFile.robot"  -row 6 -kw "second kw"
+check-keyword-row -file "TestFile.robot"  -row 7 -kw "[Return]" -c1 4
+check-keyword-row -file "TestFile.robot"  -row 8 -kw "kw 1"
+check-keyword-row -file "TestFile.robot"  -row 9 -kw "..."
+
+check-keyword-row -file "TestFile.robot"  -row 10 -kw "new keyword" -c1 "${a}"
+check-keyword-row -file "TestFile.robot"  -row 11 -kw "..."
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
