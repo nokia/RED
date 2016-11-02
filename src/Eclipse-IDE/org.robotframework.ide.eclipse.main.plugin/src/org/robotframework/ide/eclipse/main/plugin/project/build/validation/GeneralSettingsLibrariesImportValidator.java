@@ -127,4 +127,13 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             }
         }
     }
+
+    @Override
+    protected void reportMissingImportPath(final String path, final RobotToken pathToken, final IPath importPath) {
+        // FIXME : remove this
+        super.reportMissingImportPath(path, pathToken, importPath);
+        if (librariesAutoDiscoverer.isPresent()) {
+            librariesAutoDiscoverer.get().addSuiteFileToDiscovering(suiteFile.getFile());
+        }
+    }
 }
