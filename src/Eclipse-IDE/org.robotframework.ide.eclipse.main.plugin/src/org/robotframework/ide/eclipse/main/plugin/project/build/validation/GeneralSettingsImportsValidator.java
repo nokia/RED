@@ -210,7 +210,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         return absoluteMarkedPath;
     }
 
-    private void reportMissingImportPath(final String path, final RobotToken pathToken, final IPath importPath) {
+    protected void reportMissingImportPath(final String path, final RobotToken pathToken, final IPath importPath) {
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH,
                 importPath.toPortableString());
         reporter.handleProblem(RobotProblem.causedBy(getCauseForNonExistingImport()).formatMessageWith(path),
