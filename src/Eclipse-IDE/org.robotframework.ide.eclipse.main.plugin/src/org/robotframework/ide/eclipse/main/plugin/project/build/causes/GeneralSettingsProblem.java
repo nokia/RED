@@ -156,14 +156,16 @@ public enum GeneralSettingsProblem implements IProblemCause {
         @Override
         public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
             final IFile suiteFile = (IFile) marker.getResource();
-            final String nameOrPath = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
-            final boolean isPath = marker.getAttribute(AdditionalMarkerAttributes.IS_PATH, false);
+            final String name = marker.getAttribute(AdditionalMarkerAttributes.NAME, null);
+            final String path = marker.getAttribute(AdditionalMarkerAttributes.PATH, null);
+            final boolean isPath = path != null;
+            final boolean isName = name != null;
 
             final List<IMarkerResolution> fixers = new ArrayList<>();
-            fixers.add(new AddLibraryToRedXmlFixer(nameOrPath, isPath));
-            if (!isPath) {
+            fixers.add(new AddLibraryToRedXmlFixer(isPath ? path : name, isPath));
+            if (isName) {
                 fixers.addAll(ChangeToFixer.createFixers(RobotProblem.getRegionOf(marker),
-                        new SimilaritiesAnalyst().provideSimilarLibraries(suiteFile, nameOrPath)));
+                        new SimilaritiesAnalyst().provideSimilarLibraries(suiteFile, name)));
             }
             return fixers;
         }
