@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.rf.ide.core.testdata.ValuesEscapes;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths;
 import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths.MarkedPath;
@@ -28,12 +29,12 @@ abstract class HyperlinksToFilesDetector {
             final String pathAsString, final boolean isLibraryImport) {
         final List<IHyperlink> hyperlinks = new ArrayList<>();
 
-        final String normalizedPath = pathAsString.replaceAll(" [\\\\] ", " ");
+        final String normalizedPath = ValuesEscapes.unescapeSpaces(pathAsString);
         if (isLibraryImport && !isPath(normalizedPath)) {
             return hyperlinks;
         }
 
-        final IPath absolutePath = createAbsolutePath(suiteFile, pathAsString);
+        final IPath absolutePath = createAbsolutePath(suiteFile, normalizedPath);
         if (absolutePath == null) {
             return hyperlinks;
         }

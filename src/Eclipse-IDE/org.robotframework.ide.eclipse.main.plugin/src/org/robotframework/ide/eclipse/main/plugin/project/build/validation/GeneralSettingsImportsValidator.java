@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.testdata.ValuesEscapes;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -72,7 +73,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         if (pathOrNameToken == null) {
             reportMissingImportArgument(imported.getDeclaration());
         } else {
-            final String pathOrName = pathOrNameToken.getText().replaceAll(" [\\\\] ", "  ");
+            final String pathOrName = ValuesEscapes.unescapeSpaces(pathOrNameToken.getText());
             if (RobotExpressions.isParameterized(pathOrName)) {
                 final String resolved = suiteFile.getProject().resolve(pathOrName);
                 if (RobotExpressions.isParameterized(resolved)) {
