@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -32,8 +33,12 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 public class ValidationPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     private static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.validation";
+    
+    private static final String PROBLEM_PREFERENCES = "problemPreferences";
 
     private final Map<ProblemCategory, Severity> currentPreferences;
+    
+    private IDialogSettings preferencesSettings;
 
     public ValidationPreferencePage() {
         super(FieldEditorPreferencePage.GRID);
@@ -43,6 +48,12 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
         for (final ProblemCategory category : EnumSet.allOf(ProblemCategory.class)) {
             currentPreferences.put(category, category.getSeverity());
         }
+
+        IDialogSettings dialogSettings = RedPlugin.getDefault().getDialogSettings();
+        preferencesSettings = dialogSettings.getSection(PROBLEM_PREFERENCES);
+        if (preferencesSettings == null) {
+            preferencesSettings = dialogSettings.addNewSection(PROBLEM_PREFERENCES);
+        } 
     }
 
     @Override
@@ -100,8 +111,10 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
             public void expansionStateChanged(ExpansionEvent e) {
                 parent.layout(true);
                 getControl().getShell().pack();
+                preferencesSettings.put(type.name(), (boolean) e.data);
             }
         });
+        section.setExpanded(preferencesSettings.getBoolean(type.name()));
         return section;
     }
 
