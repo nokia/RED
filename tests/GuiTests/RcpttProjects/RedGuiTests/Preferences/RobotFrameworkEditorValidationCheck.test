@@ -5,8 +5,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _srvewJQcEeWNpL9oeriwCw
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/26/15 10:06 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/3/16 1:36 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -15,13 +15,18 @@ Entry-Name: .content
 
 // simple check if Validation menu exists
 
-// open preferences
 get-preferences-menu | click
-get-window Preferences | get-tree | select "Robot Framework/Validation"
-// check if Validation is present in item tree and opened page has caption Validation
-with [get-window Preferences] {
-    get-tree | get-item "Robot Framework/Validation" | get-property caption | equals Validation | verify-true
-    get-label Validation | get-property caption | equals Validation | verify-true
+with [get-window Preferences | get-tree] {
+    get-item "Robot Framework" | get-property childCount | equals 4 | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[0].getText()" | equals Autodiscovering | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[1].getText()" | equals Editor | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[2].getText()" | equals "Errors/Warnings" 
+        | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[3].getText()" | equals "Installed frameworks" 
+        | verify-true
 }
-get-window Preferences | get-button OK | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Errors\\/Warnings"
+    get-button OK | click
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
