@@ -12,7 +12,5 @@ public class AdditionalMarkerAttributes {
 
     public static final String SOURCES = "sources";
 
-    public static final String IS_PATH = "isPath";
-
     public static final String PATH = "path";
 }
