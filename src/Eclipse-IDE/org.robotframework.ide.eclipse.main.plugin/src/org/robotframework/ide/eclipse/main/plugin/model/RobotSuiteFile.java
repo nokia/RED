@@ -36,11 +36,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
-import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
@@ -411,17 +408,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
         final Map<String, String> toImport = newHashMap();
         if (section.isPresent()) {
-            final List<RobotKeywordCall> importSettings = section.get().getImportSettings();
-            for (final RobotKeywordCall element : importSettings) {
-                final RobotSetting setting = (RobotSetting) element;
-                if (SettingsGroup.LIBRARIES == setting.getGroup()) {
-                    final String nameOrPath = setting.getArguments().isEmpty() ? null : setting.getArguments().get(0);
-                    if (nameOrPath != null) {
-                        final String alias = extractLibraryAlias(setting);
-                        toImport.put(nameOrPath, alias);
-                    }
-                }
-            }
+            toImport.putAll(section.get().getLibrariesPathsOrNamesWithAliases());
         }
 
         final Map<LibrarySpecification, String> imported = newHashMap();
@@ -444,11 +431,6 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             }
         }
         return imported;
-    }
-
-    private String extractLibraryAlias(final RobotSetting setting) {
-        final LibraryAlias libAlias = ((LibraryImport) setting.getLinkedElement()).getAlias();
-        return libAlias.isPresent() ? libAlias.getLibraryAlias().getText() : "";
     }
 
     private LibrarySpecification findSpecForPath(final String toImportPathOrName) {

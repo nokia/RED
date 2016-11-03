@@ -6,12 +6,15 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.testdata.ValuesEscapes;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
@@ -20,6 +23,7 @@ import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.DefaultTags;
 import org.rf.ide.core.testdata.model.table.setting.ForceTags;
+import org.rf.ide.core.testdata.model.table.setting.LibraryAlias;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.model.table.setting.Metadata;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
@@ -209,7 +213,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
             if (!args.isEmpty()) {
-                paths.add(new org.eclipse.core.runtime.Path(args.get(0)));
+                final String escapedPath = ValuesEscapes.unescapeSpaces(args.get(0));
+                paths.add(new org.eclipse.core.runtime.Path(escapedPath));
             }
         }
         return paths;
@@ -222,10 +227,30 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
             if (!args.isEmpty()) {
-                paths.add(new org.eclipse.core.runtime.Path(args.get(0)));
+                final String escapedPath = ValuesEscapes.unescapeSpaces(args.get(0));
+                paths.add(new org.eclipse.core.runtime.Path(escapedPath));
             }
         }
         return paths;
+    }
+
+    public Map<String, String> getLibrariesPathsOrNamesWithAliases() {
+        final List<RobotKeywordCall> libraries = getLibrariesSettings();
+        final Map<String, String> toImport = newHashMap();
+        for (final RobotKeywordCall element : libraries) {
+            final RobotSetting setting = (RobotSetting) element;
+            final List<String> args = setting.getArguments();
+            if (!args.isEmpty()) {
+                final String unescapedNameOrPath = ValuesEscapes.unescapeSpaces(args.get(0));
+                toImport.put(unescapedNameOrPath, extractLibraryAlias(setting));
+            }
+        }
+        return toImport;
+    }
+
+    private String extractLibraryAlias(final RobotSetting setting) {
+        final LibraryAlias libAlias = ((LibraryImport) setting.getLinkedElement()).getAlias();
+        return libAlias.isPresent() ? libAlias.getLibraryAlias().getText() : "";
     }
 
     private static List<? extends AKeywordBaseSetting<?>> getKeywordBasedSettings(final SettingTable settingTable) {
