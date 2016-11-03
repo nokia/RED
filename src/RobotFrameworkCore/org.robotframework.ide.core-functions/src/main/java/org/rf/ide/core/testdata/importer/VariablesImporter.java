@@ -12,10 +12,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.ValuesEscapes;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -108,22 +108,17 @@ public class VariablesImporter {
 
     @VisibleForTesting
     protected boolean isCorrectPath(final String path) {
-        boolean isCorrectPath = false;
         if (path != null && !path.trim().isEmpty()) {
-            String convertedPath = path.replaceAll(" [\\\\] ", "  ");
-            Matcher matcher = ILLEGAL_PATH_TEXT.matcher(convertedPath);
-            isCorrectPath = !matcher.find();
+            final String convertedPath = ValuesEscapes.unescapeSpaces(path);
+            return !ILLEGAL_PATH_TEXT.matcher(convertedPath).find();
         }
-
-        return isCorrectPath;
+        return false;
     }
 
     private String replaceRobotSpecificArguments(final String path, final Map<String, String> variableMappings) {
-        String resultPath = path;
-        if (RobotExpressions.isParameterized(path)) {
-            resultPath = RobotExpressions.resolve(variableMappings, path);
-        }
-        return resultPath.replaceAll(" [\\\\] ", "  ");
+        final String resultPath = RobotExpressions.isParameterized(path)
+                ? RobotExpressions.resolve(variableMappings, path) : path;
+        return ValuesEscapes.unescapeSpaces(resultPath);
     }
 
     private VariablesFileImportReference findInProjectVariablesImport(final RobotProjectHolder robotProject,
