@@ -1,0 +1,146 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _VzYJ0KEAEea9Cvae3yWo1A
+Element-Name: UndoBetweenFiles
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _JIEEEKEcEea9Cvae3yWo1A
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/3/16 2:11 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "case\n"
+    + "    Should Be True    1\n"
+    + "    [Documentation]    doc is here\n"
+    + "test 1\n"
+    + "    [Tags]    newTag1    nextTag    3Tag\n"
+    + "    [Timeout]    1.6 s\n"
+    + "    Set Test Documentation    this is doc" 
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+
+// add new tsv file
+get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Test Suite" 
+    | click
+with [get-window "New Robot Test Suite"] {
+    get-editbox -after [get-label "File name:"] | set-text "new_tsv"
+    get-button "as .tsv file" | click
+    get-button Finish | click
+}
+
+//add tc
+with [get-editor "new_tsv.tsv"] {
+    with [get-text-viewer] {
+        set-caret-pos 1 19
+        key-type "NUMPAD_ENTER" "\\u000D"
+        type-text "my test"
+        key-type "M1+s"
+        wait 1000
+    }
+    get-tab-folder | get-tab-item "Test Cases" | click
+}
+
+try -times 5 -delay 1000 -command{
+	get-view Outline | get-tree | select "new_tsv.tsv/Test Cases/my test" | click
+}
+wait 200
+
+//add Log kw do test case
+with [get-editor "new_tsv.tsv"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down
+        key-type Enter
+        type-text l
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text og
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text 78
+        key-type Enter
+    }
+}
+
+// go to Tc table and try to revert - no result (table was not changed yet)
+with [get-editor "TestFile.robot"] {
+    click
+    get-tab-folder | get-tab-item "Test Cases" | click
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
+}
+
+
+check-test_case-row -file "TestFile.robot" -row 1 -tc "case" 
+check-test_case-row -file "TestFile.robot" -row 2 -tc "[Documentation]" -c1 "doc is here"
+check-test_case-row -file "TestFile.robot" -row 3 -tc "Should Be True" -c1 1
+check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
+
+
+check-test_case-row -file "TestFile.robot" -row 5 -tc "test 1" 
+check-test_case-row -file "TestFile.robot" -row 6 -tc "[Tags]" -c1 "newTag1" -c2 "nextTag" -c3 "3Tag"
+check-test_case-row -file "TestFile.robot" -row 7 -tc "[Timeout]"  -c1 "1.6 s"
+check-test_case-row -file "TestFile.robot" -row 8 -tc "Set Test Documentation"  -c1 "this is doc"
+check-test_case-row -file "TestFile.robot" -row 9 -tc "..."
+
+
+// go to second file and revert changes - one line: log will be removed
+with [get-editor "new_tsv.tsv"] {
+    click
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z" -times 2
+}
+
+check-test_case-row -file "new_tsv.tsv" -row 1 -tc "my test" 
+check-test_case-row -file "new_tsv.tsv" -row 2 -tc ""
+check-test_case-row -file "new_tsv.tsv" -row 3 -tc "..."
+
+// go to first file and remove 2x mother TC
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1" | click
+wait 200
+with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1] {
+    get-menu "Row/Delete row" | click
+    get-menu "Row/Delete row" | click
+}
+
+// go to variables and try to revert
+with [get-editor "TestFile.robot"] {
+    get-tab-folder | get-tab-item Variables | click
+    get-canvas -after [get-link "Section is not yet defined, do you want to create it?"] | key-type "M1+z" -times 2
+}
+
+//check if in variables section was removed
+get-editor "TestFile.robot" | get-link "Section is not yet defined, do you want to create it?" | get-property caption 
+    | equals "Section is not yet defined, do you want to create it?" | verify-true
+    
+//revert changes in tsv file    
+with [get-editor "new_tsv.tsv"] {
+    click
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type "M1+z"
+    }
+}
+
+check-test_case-row -file "new_tsv.tsv" -row 1 -tc "my test" 
+check-test_case-row -file "new_tsv.tsv" -row 2 -tc "..."
+
+
+//undo removing TC with kw
+with [get-editor "TestFile.robot"] {
+    click
+    get-tab-folder | get-tab-item "Test Cases" | click
+    get-canvas -after [get-label "Test Cases"] -index 1 | key-type "M1+z"
+}
+
+check-test_case-row -file "TestFile.robot" -row 1 -tc "case" 
+check-test_case-row -file "TestFile.robot" -row 2 -tc "[Documentation]" -c1 "doc is here"
+check-test_case-row -file "TestFile.robot" -row 3 -tc "Should Be True" -c1 1
+check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
