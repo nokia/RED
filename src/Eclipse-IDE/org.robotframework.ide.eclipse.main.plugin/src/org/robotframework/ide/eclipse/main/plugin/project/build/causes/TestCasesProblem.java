@@ -22,8 +22,8 @@ public enum TestCasesProblem implements IProblemCause {
     DUPLICATED_CASE {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_TEST_CASE;
         }
 
         @Override
@@ -48,6 +48,11 @@ public enum TestCasesProblem implements IProblemCause {
     DOCUMENT_SYNONIM {
 
         @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
+        }
+
+        @Override
         public String getProblemDescription() {
             return "Test Case setting '%s' is deprecated from Robot Framework 3.0. Use Documentation syntax instead of current.";
         }
@@ -65,6 +70,11 @@ public enum TestCasesProblem implements IProblemCause {
     PRECONDITION_SYNONIM {
 
         @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
+        }
+
+        @Override
         public String getProblemDescription() {
             return "Setting '%s' is deprecated from Robot Framework 3.0. Use Setup syntax instead of current.";
         }
@@ -80,6 +90,11 @@ public enum TestCasesProblem implements IProblemCause {
         }
     },
     POSTCONDITION_SYNONIM {
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
+        }
 
         @Override
         public String getProblemDescription() {
@@ -106,8 +121,8 @@ public enum TestCasesProblem implements IProblemCause {
     EMPTY_CASE_SETTING {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.EMPTY_SETTINGS;
         }
 
         @Override
@@ -124,11 +139,6 @@ public enum TestCasesProblem implements IProblemCause {
     };
 
     @Override
-    public Severity getSeverity() {
-        return Severity.ERROR;
-    }
-
-    @Override
     public boolean hasResolution() {
         return false;
     }
@@ -140,7 +150,7 @@ public enum TestCasesProblem implements IProblemCause {
 
     @Override
     public ProblemCategory getProblemCategory() {
-        return null;
+        return ProblemCategory.RUNTIME_ERROR;
     }
 
     @Override

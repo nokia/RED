@@ -51,8 +51,8 @@ public enum ArgumentProblem implements IProblemCause {
     },
     DICT_ARGUMENT_SHOULD_PROVIDE_ARGS {
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.COLLECTION_ARGUMENT_SIZE;
         }
 
         @Override
@@ -62,8 +62,8 @@ public enum ArgumentProblem implements IProblemCause {
     },
     LIST_ARGUMENT_SHOULD_PROVIDE_ARGS {
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.COLLECTION_ARGUMENT_SIZE;
         }
 
         @Override
@@ -74,8 +74,8 @@ public enum ArgumentProblem implements IProblemCause {
     INVALID_TIME_FORMAT {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.TIME_FORMAT;
         }
 
         @Override
@@ -83,11 +83,6 @@ public enum ArgumentProblem implements IProblemCause {
             return "Invalid time format '%s'";
         }
     };
-
-    @Override
-    public Severity getSeverity() {
-        return Severity.ERROR;
-    }
 
     @Override
     public boolean hasResolution() {
@@ -101,7 +96,7 @@ public enum ArgumentProblem implements IProblemCause {
 
     @Override
     public ProblemCategory getProblemCategory() {
-        return null;
+        return ProblemCategory.RUNTIME_ERROR;
     }
 
     @Override

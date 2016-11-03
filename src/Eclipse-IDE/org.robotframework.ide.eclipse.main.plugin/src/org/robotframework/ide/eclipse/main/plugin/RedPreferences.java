@@ -11,6 +11,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.red.graphics.ColorsManager;
 
@@ -135,6 +137,10 @@ public class RedPreferences {
         final int green = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.g");
         final int blue = store.getInt(SYNTAX_COLORING_PREFIX + category.getId() + ".color.b");
         return new ColoringPreference(new RGB(red, green, blue), fontStyle);
+    }
+
+    public Severity getProblemCategorySeverity(ProblemCategory category) {
+        return Severity.valueOf(store.getString(category.getId()));
     }
 
     public static class ColoringPreference {

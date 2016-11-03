@@ -59,7 +59,7 @@ public class ReportWithCheckstyleFormat implements AutoCloseable {
             final IProblemCause cause = problem.getCause();
             writer.append(Strings.repeat(" ", 4) + "<error line=\"" + position.getLine() + "\" message=\""
                     + xmlAttrEscaper.escape(problem.getMessage()) + "\" severity=\""
-                    + cause.getSeverity().getName().toLowerCase() + "\""
+                    + cause.getProblemCategory().getSeverity().getName().toLowerCase() + "\""
                     + "/>\n");
         }
     }

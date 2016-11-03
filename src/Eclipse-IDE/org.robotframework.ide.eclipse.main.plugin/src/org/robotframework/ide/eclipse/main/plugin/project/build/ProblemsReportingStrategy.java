@@ -11,6 +11,7 @@ import java.util.Map;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.ui.PlatformUI;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 import com.google.common.collect.Range;
 
@@ -58,15 +59,24 @@ public class ProblemsReportingStrategy {
 
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
             final Map<String, Object> additionalAttributes) {
-        if (!PlatformUI.isWorkbenchRunning()) {
-            throw new IllegalStateException("This reporter should not be used in headless mode");
-        }
-        if (problem != null) {
-            problem.createMarker(file, filePosition, additionalAttributes);
+        checkMode();
+        if (problem != null && problem.getCause().getProblemCategory().getSeverity() != Severity.IGNORE) {
+            reportProblem(problem, file, filePosition, additionalAttributes);
         }
         if (shouldPanic) {
             throw new ReportingInterruptedException("Building and validation was interrupted by fatal problem");
         }
+    }
+
+    protected void checkMode() {
+        if (!PlatformUI.isWorkbenchRunning()) {
+            throw new IllegalStateException("This reporter should not be used in headless mode");
+        }
+    }
+
+    protected void reportProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
+            final Map<String, Object> additionalAttributes) {
+        problem.createMarker(file, filePosition, additionalAttributes);
     }
 
     public class ReportingInterruptedException extends RuntimeException {

@@ -3,7 +3,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import java.util.List;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause.Severity;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 import com.google.common.base.Optional;
 

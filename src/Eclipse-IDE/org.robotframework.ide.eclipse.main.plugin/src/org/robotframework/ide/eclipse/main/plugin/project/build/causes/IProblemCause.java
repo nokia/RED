@@ -11,8 +11,6 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
-import com.google.common.base.CaseFormat;
-
 /**
  * This interface should be used together with
  * {@link RobotProblem#causedBy(IProblemCause)} static method.
@@ -20,14 +18,6 @@ import com.google.common.base.CaseFormat;
  * @{author Michal Anglart
  */
 public interface IProblemCause {
-
-    /**
-     * Returns problem severity. This severity will be used when creating marker
-     * for problem.
-     * 
-     * @return Severity of problem. One of: Error, Warning, Info
-     */
-    Severity getSeverity();
 
     /**
      * Return information whether this particular problem have one or more
@@ -76,34 +66,4 @@ public interface IProblemCause {
      * @return Class name of enum implementing this interface.
      */
     String getEnumClassName();
-
-    public static enum Severity {
-        FATAL(IMarker.SEVERITY_ERROR),
-        ERROR(IMarker.SEVERITY_ERROR),
-        WARNING(IMarker.SEVERITY_WARNING),
-        INFO(IMarker.SEVERITY_INFO);
-
-        public static Severity fromMarkerSeverity(final int markerSeverity) {
-            switch (markerSeverity) {
-                case IMarker.SEVERITY_ERROR: return ERROR;
-                case IMarker.SEVERITY_WARNING: return WARNING;
-                case IMarker.SEVERITY_INFO: return INFO;
-                default: throw new IllegalStateException("Unrecognized marker severity: " + markerSeverity);
-            }
-        }
-
-        private final int severity;
-
-        private Severity(final int severity) {
-            this.severity = severity;
-        }
-
-        public int getLevel() {
-            return severity;
-        }
-
-        public String getName() {
-            return CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, name());
-        }
-    }
 }

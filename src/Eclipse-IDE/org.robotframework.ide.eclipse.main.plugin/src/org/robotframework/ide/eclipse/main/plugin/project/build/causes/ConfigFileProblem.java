@@ -23,8 +23,8 @@ public enum ConfigFileProblem implements IProblemCause {
     },
     ABSOLUTE_PATH {
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.ABSOLUTE_PATH;
         }
 
         @Override
@@ -76,8 +76,8 @@ public enum ConfigFileProblem implements IProblemCause {
     },
     MISSING_EXCLUDED_FOLDER {
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.MISSING_PATH;
         }
 
         @Override
@@ -125,8 +125,8 @@ public enum ConfigFileProblem implements IProblemCause {
     },
     USELESS_FOLDER_EXCLUSION {
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_PATH;
         }
 
         @Override
@@ -137,8 +137,8 @@ public enum ConfigFileProblem implements IProblemCause {
     MISSING_SEARCH_PATH {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.MISSING_PATH;
         }
 
         @Override
@@ -157,11 +157,6 @@ public enum ConfigFileProblem implements IProblemCause {
     public static final String LIBRARY_INDEX = "marker.libraryIndex";
 
     @Override
-    public Severity getSeverity() {
-        return Severity.ERROR;
-    }
-
-    @Override
     public boolean hasResolution() {
         return false;
     }
@@ -178,6 +173,6 @@ public enum ConfigFileProblem implements IProblemCause {
 
     @Override
     public ProblemCategory getProblemCategory() {
-        return null;
+        return ProblemCategory.RUNTIME_ERROR;
     }
 }

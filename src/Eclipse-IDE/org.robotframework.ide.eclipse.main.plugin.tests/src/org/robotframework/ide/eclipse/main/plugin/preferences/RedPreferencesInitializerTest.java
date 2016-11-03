@@ -12,6 +12,8 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 public class RedPreferencesInitializerTest {
 
@@ -41,6 +43,17 @@ public class RedPreferencesInitializerTest {
             verify(preferences).putInt(prefix + ".color.r", preference.getRgb().red);
             verify(preferences).putInt(prefix + ".color.g", preference.getRgb().green);
             verify(preferences).putInt(prefix + ".color.b", preference.getRgb().blue);
+        }
+    }
+
+    @Test
+    public void byDefaultAllProblemCategoryPreferencesAreInitialized() {
+        final IEclipsePreferences preferences = mock(IEclipsePreferences.class);
+
+        new RedPreferencesInitializer().initializeDefaultPreferences(preferences);
+
+        for (ProblemCategory category : ProblemCategory.values()) {
+            verify(preferences).put(category.getId(), category.getDefaultSeverity().name());
         }
     }
 

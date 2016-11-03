@@ -37,7 +37,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.PROJECT_CONFIGURATION_FILE_DOES_NOT_EXIST;
+            return ProblemCategory.PROJECT_CONFIGURATION_FILE;
         }
     },
     CONFIG_FILE_READING_PROBLEM {
@@ -48,7 +48,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.PROJECT_CONFIGURATION_FILE_READING_PROBLEM;
+            return ProblemCategory.PROJECT_CONFIGURATION_FILE;
         }
     },
     ENVIRONMENT_MISSING {
@@ -70,7 +70,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.CHOSEN_ENVIRONMENT_IS_NOT_A_PYTHON_INSTALLATION;
+            return ProblemCategory.MISSING_ROBOT_ENVIRONMENT;
         }
     },
     ENVIRONMENT_HAS_NO_ROBOT {
@@ -81,7 +81,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.CHOSEN_ENVIRONMENT_WITH_PYTHON_INSTALLATION_HAS_NO_ROBOT_INSTALLED;
+            return ProblemCategory.MISSING_ROBOT_ENVIRONMENT;
         }
     },
     LIBRARY_SPEC_CANNOT_BE_GENERATED {
@@ -92,7 +92,7 @@ public enum ProjectConfigurationProblem implements IProblemCause {
 
         @Override
         public ProblemCategory getProblemCategory() {
-            return ProblemCategory.LIBRARY_SPECIFICATION_FILE_CANNOT_BE_GENERATED;
+            return ProblemCategory.LIBRARY_SPECIFICATION_FILE;
         }
     };
 
@@ -104,11 +104,6 @@ public enum ProjectConfigurationProblem implements IProblemCause {
     @Override
     public List<? extends IMarkerResolution> createFixers(final IMarker marker) {
         return newArrayList();
-    }
-
-    @Override
-    public Severity getSeverity() {
-        return Severity.FATAL;
     }
 
     @Override
