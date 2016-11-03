@@ -11,7 +11,7 @@ import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreato
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause.Severity;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 @SuppressWarnings("unchecked")
 public class MarkersLabelAccumulatorTest {

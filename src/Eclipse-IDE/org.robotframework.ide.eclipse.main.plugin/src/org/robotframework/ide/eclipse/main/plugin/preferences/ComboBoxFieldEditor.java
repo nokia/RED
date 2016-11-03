@@ -12,7 +12,6 @@ import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -25,8 +24,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-
-import com.google.common.collect.Range;
 
 /**
  * Custom combo field editor capable of showing line between label and combo
@@ -138,16 +135,6 @@ public class ComboBoxFieldEditor extends FieldEditor {
 
     private void installLineLinkingCapability(final Composite parent, final Label label, final Combo comboBox) {
         final AtomicBoolean shouldShowLine = new AtomicBoolean(false);
-        parent.addMouseMoveListener(new MouseMoveListener() {
-            @Override
-            public void mouseMove(final MouseEvent e) {
-                final Display display = parent.getDisplay();
-                final Point pointInLabelCoordinates = display.map(parent, label, e.x, e.y);
-
-                shouldShowLine.set(Range.closed(0, label.getSize().y).contains(pointInLabelCoordinates.y));
-                parent.redraw();
-            }
-        });
         final MouseTrackAdapter controlsMouseListener = new MouseTrackAdapter() {
             @Override
             public void mouseEnter(final MouseEvent e) {

@@ -38,7 +38,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause.Severity;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Optional;

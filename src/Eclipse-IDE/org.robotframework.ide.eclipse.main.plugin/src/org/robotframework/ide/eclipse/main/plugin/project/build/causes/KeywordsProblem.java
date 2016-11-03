@@ -82,8 +82,8 @@ public enum KeywordsProblem implements IProblemCause {
     DEPRECATED_KEYWORD {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEPRECATED_API;
         }
 
         @Override
@@ -128,8 +128,8 @@ public enum KeywordsProblem implements IProblemCause {
     KEYWORD_FROM_NESTED_LIBRARY {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.KEYWORD_FROM_NESTED_LIBRARY;
         }
 
         @Override
@@ -187,8 +187,8 @@ public enum KeywordsProblem implements IProblemCause {
     KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION;
         }
 
         @Override
@@ -211,8 +211,8 @@ public enum KeywordsProblem implements IProblemCause {
     KEYWORD_NAME_WITH_DOTS {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.KEYWORD_NAME_WITH_DOTS;
         }
 
         @Override
@@ -222,8 +222,8 @@ public enum KeywordsProblem implements IProblemCause {
     },
     KEYWORD_MASKS_OTHER_KEYWORD {
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.MASKED_KEYWORD;
         }
 
         @Override
@@ -233,6 +233,11 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     DOCUMENT_SYNONIM {
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
+        }
+
         @Override
         public boolean hasResolution() {
             return true;
@@ -250,6 +255,11 @@ public enum KeywordsProblem implements IProblemCause {
     },
     POSTCONDITION_SYNONIM {
         @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
+        }
+
+        @Override
         public boolean hasResolution() {
             return true;
         }
@@ -265,6 +275,11 @@ public enum KeywordsProblem implements IProblemCause {
         }
     },
     USER_KEYWORD_TABLE_HEADER_SYNONIM {
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
+        }
+
         @Override
         public boolean hasResolution() {
             return true;
@@ -295,8 +310,8 @@ public enum KeywordsProblem implements IProblemCause {
     },
     EMPTY_KEYWORD_SETTING {
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.EMPTY_SETTINGS;
         }
 
         @Override
@@ -311,18 +326,13 @@ public enum KeywordsProblem implements IProblemCause {
     }
 
     @Override
-    public Severity getSeverity() {
-        return Severity.ERROR;
-    }
-
-    @Override
     public boolean hasResolution() {
         return false;
     }
 
     @Override
     public ProblemCategory getProblemCategory() {
-        return null;
+        return ProblemCategory.RUNTIME_ERROR;
     }
 
     @Override
