@@ -5209,4 +5209,51 @@
             searchResultClass="org.robotframework.ide.eclipse.main.plugin.search.SearchResult">
           </viewPage>
       </extension>
+      <extension
+            id="syntaxColoring"
+            point="org.eclipse.ui.preferenceTransfer">
+         <transfer
+               icon="/resources/robot.png"
+               id="org.robotframework.ide.eclipse.main.plugin.transfer1"
+               name="Robot Framework">
+            <mapping
+                  scope="instance">
+               <entry
+                     node="org.robotframework.ide.eclipse.main.plugin">
+                  <key
+                        match="prefix"
+                        name="red.problem.category">
+                  </key>
+                  <key
+                        match="prefix"
+                        name="syntaxColoring">
+                  </key>
+                  <key
+                        match="prefix"
+                        name="assistant">
+                  </key>
+                  <key
+                        match="prefix"
+                        name="fold">
+                  </key>
+                  <key
+                        match="prefix"
+                        name="separator">
+                  </key>
+                  <key
+                        name="minimalArgsColumns">
+                  </key>
+                  <key
+                        name="cellCommitBehavior">
+                  </key>
+                  <key
+                        name="projectModulesRecursiveAdditionOnVirtualenvEnabled">
+                  </key>
+               </entry>
+            </mapping>
+            <description>
+               Robot Framework preferences: Autodiscovering, Editor, Errors/Warnings
+            </description>
+         </transfer>
+      </extension>
 </plugin>
