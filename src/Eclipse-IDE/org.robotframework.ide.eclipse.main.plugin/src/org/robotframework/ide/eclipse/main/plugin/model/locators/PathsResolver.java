@@ -36,7 +36,7 @@ public class PathsResolver {
     private static final Pattern parametrizedPathPattern = Pattern.compile("[@$&%]\\{[^\\}]+\\}");
 
     private static final Pattern notEscapedWindowsPathSeparatorPattern = Pattern
-            .compile("^.*[^\\\\][\\\\]{1}[^\\\\].*$");
+            .compile("^.*[^\\\\][\\\\]{1}[^\\\\ ].*$");
 
     static List<IPath> getWorkspaceRelativeResourceFilesPaths(final RobotSuiteFile file) {
         return getWorkspaceRelativePaths(file.getResourcesPaths(), file);
@@ -161,7 +161,8 @@ public class PathsResolver {
     }
     
     public static boolean hasNotEscapedWindowsPathSeparator(final String path) {
-        return notEscapedWindowsPathSeparatorPattern.matcher(path).find(); // e.g. c:\lib.py
+        // e.g. c:\lib.py, but space escape is allowed e.g. c:/folder \ with2spaces/file.robot
+        return notEscapedWindowsPathSeparatorPattern.matcher(path).find();
     }
 
     public static class PathResolvingException extends RuntimeException {
