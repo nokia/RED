@@ -118,7 +118,7 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
             final RobotProblem problem = RobotProblem.causedBy(GeneralSettingsProblem.NON_EXISTING_LIBRARY_IMPORT)
                     .formatMessageWith(pathOrName);
             final Map<String, Object> additional = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
-                    pathOrName, AdditionalMarkerAttributes.IS_PATH, isPath);
+                    pathOrName);
             reporter.handleProblem(problem, validationContext.getFile(), pathOrNameToken, additional);
 
             // FIXME : what it does here?
