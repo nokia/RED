@@ -40,8 +40,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     EMPTY_SETTING {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.EMPTY_SETTINGS;
         }
 
         @Override
@@ -113,8 +113,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     IMPORT_PATH_ABSOLUTE {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.ABSOLUTE_PATH;
         }
 
         @Override
@@ -125,8 +125,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     IMPORT_PATH_RELATIVE_VIA_MODULES_PATH {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH;
         }
 
         @Override
@@ -196,8 +196,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     HTML_RESOURCE_IMPORT {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.HTML_FORMAT;
         }
 
         @Override
@@ -222,8 +222,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DUPLICATED_TEMPLATE_28 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
         }
 
         @Override
@@ -234,8 +234,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DUPLICATED_SUITE_SETUP_28 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
         }
 
         @Override
@@ -246,8 +246,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DUPLICATED_SUITE_TEARDOWN_28 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
         }
 
         @Override
@@ -258,8 +258,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DUPLICATED_TEST_SETUP_28 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
         }
 
         @Override
@@ -270,8 +270,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DUPLICATED_TEST_TEARDOWN_28 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
         }
 
         @Override
@@ -282,8 +282,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DUPLICATED_TEST_TIMEOUT_28 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
         }
 
         @Override
@@ -294,8 +294,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DUPLICATED_FORCE_TAGS_28 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
         }
 
         @Override
@@ -306,8 +306,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DUPLICATED_DEFAULT_TAGS_28 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
         }
 
         @Override
@@ -318,8 +318,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DUPLICATED_DOCUMENTATION_28 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_DEFINITION;
         }
 
         @Override
@@ -330,8 +330,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     METADATA_SETTING_JOINED_WITH_KEY_IN_COLUMN_29 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DEPRECATED_API;
         }
 
         @Override
@@ -352,8 +352,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     METADATA_SETTING_JOINED_WITH_KEY_IN_COLUMN_30 {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
         }
 
         @Override
@@ -374,8 +374,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     META_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
         }
 
         @Override
@@ -396,8 +396,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     DOCUMENT_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
         }
 
         @Override
@@ -418,8 +418,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     SUITE_PRECONDITION_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
         }
 
         @Override
@@ -441,8 +441,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     SUITE_POSTCONDITION_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
         }
 
         @Override
@@ -464,8 +464,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     TEST_PRECONDITION_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
         }
 
         @Override
@@ -487,8 +487,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     TEST_POSTCONDITION_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
         }
 
         @Override
@@ -510,8 +510,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     METADATA_TABLE_HEADER_SYNONIM {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
         }
 
         @Override
@@ -533,8 +533,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     LIBRARY_WITH_NAME_NOT_UPPER_CASE_COMBINATION {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.ERROR;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.REMOVED_API;
         }
 
         @Override
@@ -555,8 +555,8 @@ public enum GeneralSettingsProblem implements IProblemCause {
     VARIABLE_AS_KEYWORD_USAGE_IN_SETTING {
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.VARIABLE_AS_KEYWORD_USAGE;
         }
 
         @Override
@@ -564,11 +564,6 @@ public enum GeneralSettingsProblem implements IProblemCause {
             return "Variable '%s' is given as keyword name.";
         }
     };
-
-    @Override
-    public Severity getSeverity() {
-        return Severity.ERROR;
-    }
 
     @Override
     public boolean hasResolution() {
@@ -582,7 +577,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
     @Override
     public ProblemCategory getProblemCategory() {
-        return null;
+        return ProblemCategory.RUNTIME_ERROR;
     }
 
     @Override

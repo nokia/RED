@@ -18,6 +18,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.SeparatorsMode;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -40,6 +41,7 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
         initializeSourceEditorAssistantPreferences(preferences);
         initializeSyntaxColoringPreferences(preferences);
         initializeAutodiscoveringPreferences(preferences);
+        initializeProblemSeverityPreferences(preferences);
     }
 
     private void initializeFrameworkPreferences(final IEclipsePreferences preferences) {
@@ -95,6 +97,12 @@ public class RedPreferencesInitializer extends AbstractPreferenceInitializer {
     
     private void initializeAutodiscoveringPreferences(final IEclipsePreferences preferences) {
         preferences.putBoolean(RedPreferences.PROJECT_MODULES_RECURSIVE_ADDITION_ON_VIRTUALENV_ENABLED, false);
+    }
+
+    private void initializeProblemSeverityPreferences(IEclipsePreferences preferences) {
+        for (final ProblemCategory category : EnumSet.allOf(ProblemCategory.class)) {
+            preferences.put(category.getId(), category.getDefaultSeverity().name());
+        }
     }
 
     static String getFontStyleIdentifierFor(final SyntaxHighlightingCategory category) {

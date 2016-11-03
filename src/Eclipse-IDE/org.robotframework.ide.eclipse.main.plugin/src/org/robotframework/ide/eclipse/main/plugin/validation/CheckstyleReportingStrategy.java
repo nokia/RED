@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.ui.PlatformUI;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.validation.ProblemsReportingStrategyFactory.HeadlessValidationReportingStrategy;
@@ -43,14 +44,16 @@ public class CheckstyleReportingStrategy extends HeadlessValidationReportingStra
     }
 
     @Override
-    public synchronized void handleProblem(final RobotProblem problem, final IFile file,
-            final ProblemPosition filePosition, final Map<String, Object> additionalAttributes) {
+    protected void checkMode() {
+        // nothing to do
+    }
+
+    @Override
+    protected void reportProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
+            final Map<String, Object> additionalAttributes) {
         numberOfProblems++;
         if (reportFilepath != null) {
             problems.put(file.getLocation(), new RobotProblemWithPosition(problem, filePosition));
-        }
-        if (shouldPanic) {
-            throw new ReportingInterruptedException("Building and validation was interrupted by fatal problem");
         }
     }
 

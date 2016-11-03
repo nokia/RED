@@ -21,14 +21,15 @@ public enum SuiteFileProblem implements IProblemCause {
         }
     },
     UNRECOGNIZED_TABLE_HEADER {
-        @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
-        }
         
         @Override
         public String getProblemDescription() {
             return "Unrecognized table header: '%s'";
+        }
+
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.UNRECOGNIZED_HEADER;
         }
     },
     BUILD_ERROR_MESSAGE {
@@ -51,8 +52,8 @@ public enum SuiteFileProblem implements IProblemCause {
         }
         
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.PARSER_WARNING;
         }
 
         @Override
@@ -84,13 +85,8 @@ public enum SuiteFileProblem implements IProblemCause {
     }
 
     @Override
-    public Severity getSeverity() {
-        return Severity.ERROR;
-    }
-
-    @Override
     public ProblemCategory getProblemCategory() {
-        return null;
+        return ProblemCategory.RUNTIME_ERROR;
     }
 
     @Override

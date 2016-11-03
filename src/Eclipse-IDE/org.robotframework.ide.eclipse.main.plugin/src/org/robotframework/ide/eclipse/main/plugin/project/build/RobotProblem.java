@@ -59,7 +59,7 @@ public class RobotProblem {
         try {
             final IMarker marker = file.createMarker(TYPE_ID);
             marker.setAttribute(IMarker.MESSAGE, getMessage().intern());
-            marker.setAttribute(IMarker.SEVERITY, cause.getSeverity().getLevel());
+            marker.setAttribute(IMarker.SEVERITY, cause.getProblemCategory().getSeverity().getLevel());
             if (position.getLine() >= 0) {
                 marker.setAttribute(IMarker.LOCATION, ("line " + position.getLine()).intern());
                 marker.setAttribute(IMarker.LINE_NUMBER, position.getLine());

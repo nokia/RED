@@ -26,13 +26,13 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RemoveWhites
 public enum VariablesProblem implements IProblemCause {
     DUPLICATED_VARIABLE {
         @Override
-        public String getProblemDescription() {
-            return "Duplicated variable definition '%s'";
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.DUPLICATED_VARIABLE;
         }
 
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public String getProblemDescription() {
+            return "Duplicated variable definition '%s'";
         }
 
         @Override
@@ -80,14 +80,19 @@ public enum VariablesProblem implements IProblemCause {
     },    
     DICTIONARY_NOT_AVAILABLE {
         @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.UNSUPPORTED_API;
+        }
+
+        @Override
         public String getProblemDescription() {
             return "Invalid variable definition '%s'. Dictionary type is available since Robot Framework 2.9.x version";
         }
     },
     SCALAR_WITH_MULTIPLE_VALUES_2_7 {
         @Override
-        public Severity getSeverity() {
-            return Severity.WARNING;
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.INCORRECT_INITIALIZATION;
         }
 
         @Override
@@ -96,6 +101,11 @@ public enum VariablesProblem implements IProblemCause {
         }
     },
     SCALAR_WITH_MULTIPLE_VALUES_2_8_x {
+        @Override
+        public ProblemCategory getProblemCategory() {
+            return ProblemCategory.UNSUPPORTED_API;
+        }
+
         @Override
         public String getProblemDescription() {
             return "Invalid variable definition '%s'. Scalar variable cannot have multiple value in RobotFramework 2.8.x";
@@ -129,11 +139,6 @@ public enum VariablesProblem implements IProblemCause {
     };
 
     @Override
-    public Severity getSeverity() {
-        return Severity.ERROR;
-    }
-
-    @Override
     public boolean hasResolution() {
         return false;
     }
@@ -145,7 +150,7 @@ public enum VariablesProblem implements IProblemCause {
 
     @Override
     public ProblemCategory getProblemCategory() {
-        return null;
+        return ProblemCategory.RUNTIME_ERROR;
     }
 
     @Override

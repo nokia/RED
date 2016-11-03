@@ -4985,7 +4985,7 @@
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
             class="org.robotframework.ide.eclipse.main.plugin.preferences.ValidationPreferencePage"
             id="org.robotframework.ide.eclipse.main.plugin.preferences.validation"
-            name="Validation">
+            name="Errors/Warnings">
       </page>
       <page
             category="org.robotframework.ide.eclipse.main.plugin.preferences.main"
