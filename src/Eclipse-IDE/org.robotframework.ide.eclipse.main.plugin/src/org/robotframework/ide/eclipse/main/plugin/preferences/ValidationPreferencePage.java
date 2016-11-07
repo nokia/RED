@@ -18,12 +18,16 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
+import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory;
@@ -33,11 +37,11 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 public class ValidationPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     private static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.validation";
-    
+
     private static final String PROBLEM_PREFERENCES = "problemPreferences";
 
     private final Map<ProblemCategory, Severity> currentPreferences;
-    
+
     private IDialogSettings preferencesSettings;
 
     public ValidationPreferencePage() {
@@ -53,7 +57,7 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
         preferencesSettings = dialogSettings.getSection(PROBLEM_PREFERENCES);
         if (preferencesSettings == null) {
             preferencesSettings = dialogSettings.addNewSection(PROBLEM_PREFERENCES);
-        } 
+        }
     }
 
     @Override
@@ -63,11 +67,25 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
 
     @Override
     protected void createFieldEditors() {
-        final Composite parent = getFieldEditorParent();     
+        final Composite parent = getFieldEditorParent();
+        final ScrolledContent scrolled = new ScrolledContent(parent.getParent());
+        GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 300).applyTo(scrolled);
+        scrolled.addControlListener(new ControlAdapter() {
+
+            @Override
+            public void controlResized(ControlEvent e) {
+                scrolled.reflow(true);
+            }
+        });
+
+        Composite body = scrolled.getBody();
+        GridDataFactory.fillDefaults().grab(true, false).applyTo(body);
+        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(body);
+
         Map<ProblemCategoryType, Collection<ProblemCategory>> categories = ProblemCategory.getCategories();
         for (Entry<ProblemCategoryType, Collection<ProblemCategory>> categpryEntry : categories.entrySet()) {
             if (!categpryEntry.getValue().isEmpty()) {
-                createProblemCategorySection(parent, categpryEntry.getKey(), categpryEntry.getValue());
+                createProblemCategorySection(body, categpryEntry.getKey(), categpryEntry.getValue());
             }
         }
     }
@@ -86,9 +104,7 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
         final ExpandableComposite redExpandableComposite = createExpandableSection(parent, type);
         final Composite client = new Composite(redExpandableComposite, SWT.NONE);
         redExpandableComposite.setClient(client);
-        GridDataFactory.fillDefaults().grab(true, true).applyTo(client);
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(client);
-        
+
         for (final ProblemCategory category : categpries) {
             addField(new ComboBoxFieldEditor(category.getId(), category.getName(), category.getDescription(), 20,
                     entries(category), client));
@@ -100,22 +116,31 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
                 ExpandableComposite.TWISTIE | ExpandableComposite.EXPANDED);
         section.setText(type.getName());
         section.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-        GridDataFactory.fillDefaults()
-                .grab(true, false)
-                .span(3, SWT.DEFAULT)
-                .hint(900, SWT.DEFAULT)
-                .applyTo(section);
+        GridDataFactory.fillDefaults().grab(true, false).span(3, SWT.DEFAULT).hint(900, SWT.DEFAULT).applyTo(section);
         section.addExpansionListener(new ExpansionAdapter() {
 
             @Override
             public void expansionStateChanged(ExpansionEvent e) {
-                parent.layout(true);
-                getControl().getShell().pack();
                 preferencesSettings.put(type.name(), (boolean) e.data);
+                ScrolledContent scrolled = getParentScrolledComposite((ExpandableComposite) e.getSource());
+                if (scrolled != null) {
+                    scrolled.reflow(true);
+                }
             }
         });
         section.setExpanded(preferencesSettings.getBoolean(type.name()));
         return section;
+    }
+
+    private ScrolledContent getParentScrolledComposite(Control control) {
+        Control parent = control.getParent();
+        while (!(parent instanceof ScrolledContent) && parent != null) {
+            parent = parent.getParent();
+        }
+        if (parent instanceof ScrolledContent) {
+            return (ScrolledContent) parent;
+        }
+        return null;
     }
 
     private static String[][] entries(final ProblemCategory category) {
@@ -129,6 +154,29 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
 
     private static String[] entry(final Severity severity) {
         return new String[] { severity.getName(), severity.name() };
+    }
+
+    private class ScrolledContent extends SharedScrolledComposite {
+
+        public ScrolledContent(Composite parent) {
+            this(parent, SWT.H_SCROLL | SWT.V_SCROLL);
+        }
+
+        public ScrolledContent(Composite parent, int style) {
+            super(parent, style);
+
+            setExpandHorizontal(true);
+            setExpandVertical(true);
+
+            Composite body = new Composite(this, SWT.NONE);
+            body.setFont(parent.getFont());
+            setContent(body);
+        }
+
+        public Composite getBody() {
+            return (Composite) getContent();
+        }
+
     }
 
 }
