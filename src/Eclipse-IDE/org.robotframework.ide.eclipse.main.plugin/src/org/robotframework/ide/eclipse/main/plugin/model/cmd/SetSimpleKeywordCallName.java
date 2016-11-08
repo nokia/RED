@@ -21,8 +21,7 @@ class SetSimpleKeywordCallName extends EditorCommand {
 
     private final String newName;
 
-    public SetSimpleKeywordCallName(final IEventBroker eventBroker, final RobotKeywordCall call,
-            final String newName) {
+    public SetSimpleKeywordCallName(final IEventBroker eventBroker, final RobotKeywordCall call, final String newName) {
         this.eventBroker = eventBroker;
         this.call = call;
         this.newName = newName;

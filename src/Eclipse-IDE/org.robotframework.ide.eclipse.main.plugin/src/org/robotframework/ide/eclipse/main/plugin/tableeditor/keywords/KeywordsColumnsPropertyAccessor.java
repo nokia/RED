@@ -11,12 +11,14 @@ import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
 
 import com.google.common.collect.ImmutableBiMap;
 
@@ -43,20 +45,18 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
         if (rowObject instanceof RobotKeywordCall) {
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
             final ModelType modelType = keywordCall.getLinkedElement().getModelType();
-            if (columnIndex == 0) {
-                return modelType == ModelType.USER_KEYWORD_EXECUTABLE_ROW || modelType == ModelType.UNKNOWN
-                        ? keywordCall.getName() : "[" + keywordCall.getName() + "]";
-            } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                final List<String> arguments = keywordCall.getArguments();
-                if (modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
-                    if (columnIndex == 1) {
-                        return getDocumentationText(keywordCall);
-                    }
-                } else if (columnIndex - 1 < arguments.size()) {
-                    return arguments.get(columnIndex - 1);
+
+            if (columnIndex > 0 && modelType == ModelType.USER_KEYWORD_DOCUMENTATION) {
+                if (columnIndex == 1) {
+                    return getDocumentationText(keywordCall);
+                } else {
+                    return "";
                 }
-            } else if (columnIndex == (numberOfColumns - 1)) {
-                return keywordCall.getComment();
+            }
+
+            final List<RobotToken> execRowView = ExecutablesRowHolderCommentService.execRowView(keywordCall);
+            if (columnIndex < execRowView.size()) {
+                return execRowView.get(columnIndex).getText();
             }
         } else if (rowObject instanceof RobotKeywordDefinition) {
             final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;

@@ -18,7 +18,10 @@ import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.FilePosition;
+import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
+import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -49,8 +52,9 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
         final int modelIndex = countRowsOfTypeUpTo(getExecutableRowModelType(), index);
 
         final RobotExecutableRow<?> robotExecutableRow = (RobotExecutableRow<?>) getModelUpdater()
-                .createExecutableRow(getLinkedElement(), modelIndex, name, comment, args);
+                .createExecutableRow(getLinkedElement(), modelIndex, name, null, args);
 
+        CommentServiceHandler.update(robotExecutableRow, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE, comment);
         final RobotKeywordCall call = new RobotKeywordCall(this, robotExecutableRow);
         getChildren().add(index, call);
         return call;
@@ -58,9 +62,11 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
 
     public RobotDefinitionSetting createSetting(final int index, final String settingName, final List<String> args,
             final String comment) {
-        final AModelElement<?> newModelElement = getModelUpdater().createSetting(getLinkedElement(), settingName,
-                comment, args);
+        final AModelElement<?> newModelElement = getModelUpdater().createSetting(getLinkedElement(), settingName, null,
+                args);
 
+        CommentServiceHandler.update((ICommentHolder) newModelElement, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE,
+                comment);
         final RobotDefinitionSetting setting = new RobotDefinitionSetting(this, newModelElement);
         getChildren().add(index, setting);
 
@@ -184,7 +190,7 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
     public OpenStrategy getOpenRobotEditorStrategy(final IWorkbenchPage page) {
         return new PageActivatingOpeningStrategy(page, getSuiteFile().getFile(), getParent(), this);
     }
-    
+
     protected int countRowsOfTypeUpTo(final ModelType type, final int toIndex) {
         int index = 0;
         int count = 0;
@@ -203,7 +209,7 @@ public abstract class RobotCodeHoldingElement<T extends AModelElement<?>>
     public boolean hasSettings() {
         return Iterables.any(calls, instanceOf(RobotDefinitionSetting.class));
     }
-    
+
     public RobotDefinitionSetting findSetting(final ModelType... modelTypes) {
         final List<RobotDefinitionSetting> settings = findSettings(modelTypes);
         return settings.isEmpty() ? null : settings.get(0);
