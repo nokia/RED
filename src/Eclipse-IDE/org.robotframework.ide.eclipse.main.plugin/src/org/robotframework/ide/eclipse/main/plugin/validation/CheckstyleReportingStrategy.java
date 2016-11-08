@@ -58,7 +58,7 @@ public class CheckstyleReportingStrategy extends HeadlessValidationReportingStra
     }
 
     @Override
-    public void finishReporting() {
+    void finishReporting() {
         if (reportFilepath != null) {
             if (numberOfProblems != problems.size()) {
                 logger.logError("There is an invalid number of problems handled: " + numberOfProblems + " counted, but "

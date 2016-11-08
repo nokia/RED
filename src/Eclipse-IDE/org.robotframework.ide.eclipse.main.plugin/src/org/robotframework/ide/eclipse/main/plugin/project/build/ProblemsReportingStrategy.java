@@ -60,7 +60,7 @@ public class ProblemsReportingStrategy {
     public void handleProblem(final RobotProblem problem, final IFile file, final ProblemPosition filePosition,
             final Map<String, Object> additionalAttributes) {
         checkMode();
-        if (problem != null && problem.getCause().getProblemCategory().getSeverity() != Severity.IGNORE) {
+        if (problem != null && problem.getSeverity() != Severity.IGNORE) {
             reportProblem(problem, file, filePosition, additionalAttributes);
         }
         if (shouldPanic) {

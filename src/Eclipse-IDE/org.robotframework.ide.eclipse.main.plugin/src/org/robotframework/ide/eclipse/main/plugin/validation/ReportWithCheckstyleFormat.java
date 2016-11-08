@@ -15,7 +15,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IPath;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
-import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 import org.robotframework.ide.eclipse.main.plugin.validation.CheckstyleReportingStrategy.RobotProblemWithPosition;
 
 import com.google.common.base.Charsets;
@@ -56,10 +56,10 @@ public class ReportWithCheckstyleFormat implements AutoCloseable {
         for (final RobotProblemWithPosition problemEntry : problems) {
             final ProblemPosition position = problemEntry.getPosition();
             final RobotProblem problem = problemEntry.getProblem();
-            final IProblemCause cause = problem.getCause();
+            final Severity severity = problem.getSeverity();
             writer.append(Strings.repeat(" ", 4) + "<error line=\"" + position.getLine() + "\" message=\""
                     + xmlAttrEscaper.escape(problem.getMessage()) + "\" severity=\""
-                    + cause.getProblemCategory().getSeverity().getName().toLowerCase() + "\""
+                    + severity.getName().toLowerCase() + "\""
                     + "/>\n");
         }
     }

@@ -15,6 +15,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.IProblemCause;
+import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
 import com.google.common.annotations.VisibleForTesting;
 
@@ -59,7 +60,7 @@ public class RobotProblem {
         try {
             final IMarker marker = file.createMarker(TYPE_ID);
             marker.setAttribute(IMarker.MESSAGE, getMessage().intern());
-            marker.setAttribute(IMarker.SEVERITY, cause.getProblemCategory().getSeverity().getLevel());
+            marker.setAttribute(IMarker.SEVERITY, getSeverity().getLevel());
             if (position.getLine() >= 0) {
                 marker.setAttribute(IMarker.LOCATION, ("line " + position.getLine()).intern());
                 marker.setAttribute(IMarker.LINE_NUMBER, position.getLine());
@@ -88,5 +89,9 @@ public class RobotProblem {
 
     public String getMessage() {
         return String.format(cause.getProblemDescription(), objects == null ? new Object[0] : objects);
+    }
+
+    public Severity getSeverity() {
+        return cause.getProblemCategory().getSeverity();
     }
 }

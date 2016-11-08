@@ -78,7 +78,7 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
             }
         });
 
-        Map<ProblemCategoryType, Collection<ProblemCategory>> categories = ProblemCategory.getCategories();
+        Map<ProblemCategoryType, Collection<ProblemCategory>> categories = ProblemCategory.getAllCategories();
         for (Entry<ProblemCategoryType, Collection<ProblemCategory>> categpryEntry : categories.entrySet()) {
             if (!categpryEntry.getValue().isEmpty()) {
                 createProblemCategorySection(scrolled.getBody(), categpryEntry.getKey(), categpryEntry.getValue());
