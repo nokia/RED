@@ -1,0 +1,56 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: RobotPreferencesListAndAutoDiscover
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _srvewJQcEeWNpL9oeriwCw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/8/16 12:58 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework"
+
+get-window Preferences | get-tree | get-item "Robot Framework" | expand-all
+
+with [get-window Preferences | get-tree] {
+    get-item "Robot Framework" | get-property childCount | equals 4 | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[0].getText()" | equals Autodiscovering | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[1].getText()" | equals Editor | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[1].getItemCount()" | equals 3 | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" 
+        | equals "Content Assist" | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[1].getItems().TreeItem[1].getText()" 
+        | equals Folding | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[1].getItems().TreeItem[2].getText()" 
+        | equals "Syntax Coloring" | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[2].getText()" | equals "Errors/Warnings" 
+        | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[2].getItemCount()" | equals 0 | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[3].getText()" | equals "Installed frameworks" 
+        | verify-true
+    get-item "Robot Framework" | get-property "getItems().TreeItem[3].getItemCount()" | equals 0 | verify-true
+}
+get-window Preferences | get-tree | select "Robot Framework/Autodiscovering"
+with [get-window Preferences] {
+    with [get-control Any -after [get-label Autodiscovering] -index 10] {
+        get-property "getChildren().length" | equals 1 | verify-true
+        get-property "getChildren().Control[0].getText()" | equals "Libraries Autodiscovering" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[0].getClassName()" 
+            | equals "org.eclipse.swt.widgets.Button" | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[0].getText()" 
+            | equals "Add project modules recursively to PYTHONPATH/CLASSPATH during Autodiscovering on virtualenv" 
+            | verify-true
+        get-property "getChildren().Control[0].getChildren().Control[0].getSelection()" | equals false | verify-true
+    }
+    get-button "Restore Defaults" | get-property enablement | equals true | verify-true
+    get-button Apply | get-property enablement | equals true | verify-true
+}
+
+get-window Preferences | get-button Cancel | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
