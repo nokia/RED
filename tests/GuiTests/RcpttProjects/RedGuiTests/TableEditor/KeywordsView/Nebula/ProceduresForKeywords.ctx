@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _YI1vUFJyEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/12/16 5:34 PM
+Save-Time: 11/8/16 3:45 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -34,8 +34,6 @@ proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""
 	    | my-assert-true -expected $c4 -row $row -col 5     
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue 
 	    | my-assert-true -expected $c5 -row $row -col 6 
-	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
-	    | my-assert-true -expected $comment -row $row -col 7
 }
 
 //proc "check-markers-in-table"  [val file] [val type ERROR] [val lines]  {
