@@ -10,7 +10,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.base.Function;
 
-class TokenFunctions {
+public class TokenFunctions {
 
     static Function<DictionaryKeyValuePair, String> pairToString(final String connector) {
         return new Function<DictionaryKeyValuePair, String>() {
@@ -22,7 +22,7 @@ class TokenFunctions {
         };
     }
 
-    static Function<RobotToken, String> tokenToString() {
+    public static Function<RobotToken, String> tokenToString() {
         return new Function<RobotToken, String>() {
 
             @Override

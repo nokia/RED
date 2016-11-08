@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.cmd;
 import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
@@ -22,6 +23,13 @@ public class SetKeywordCallCommentCommand extends EditorCommand {
     private final String newComment;
 
     private String previousComment;
+
+    public SetKeywordCallCommentCommand(final IEventBroker eventBroker, final RobotKeywordCall keywordCall,
+            final String comment) {
+        this.eventBroker = eventBroker;
+        this.keywordCall = keywordCall;
+        this.newComment = comment;
+    }
 
     public SetKeywordCallCommentCommand(final RobotKeywordCall keywordCall, final String comment) {
         this.keywordCall = keywordCall;
