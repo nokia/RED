@@ -36,9 +36,15 @@ import org.eclipse.jface.text.source.ISourceViewer;
 import org.eclipse.jface.text.source.ISourceViewerExtension2;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.texteditor.MarkerAnnotation;
+import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
+import org.rf.ide.core.testdata.text.read.IRobotLineElement;
+import org.rf.ide.core.testdata.text.read.IRobotTokenType;
+import org.rf.ide.core.testdata.text.read.RobotLine;
+import org.rf.ide.core.testdata.text.read.RobotLine.PositionCheck;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposals;
@@ -102,18 +108,42 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                     }
                 }
 
-                final Optional<String> info = GherkinStyleSupport.firstNameTransformationResult(hoveredText,
-                        new NameTransformation<String>() {
-                            @Override
-                            public Optional<String> transform(final String gherkinNameVariant) {
-                                return Optional.fromNullable(getKeywordHoverInfo(gherkinNameVariant));
-                            }
-                        });
-                return info.orNull();
+                if (isKeyword(suiteFile, hoverRegion)) {
+                    final Optional<String> info = GherkinStyleSupport.firstNameTransformationResult(hoveredText,
+                            new NameTransformation<String>() {
+
+                                @Override
+                                public Optional<String> transform(final String gherkinNameVariant) {
+                                    return Optional.fromNullable(getKeywordHoverInfo(gherkinNameVariant));
+                                }
+                            });
+                    return info.orNull();
+                }
             }
         } catch (final BadLocationException | CoreException e) {
         }
         return null;
+    }
+
+    private boolean isKeyword(final RobotSuiteFile suiteFile, final IRegion hoverRegion) {
+        final RobotFile model = suiteFile.getLinkedElement();
+        final Optional<Integer> lineIndex = model.getRobotLineIndexBy(hoverRegion.getOffset());
+        if (lineIndex.isPresent()) {
+            final RobotLine robotLine = model.getFileContent().get(lineIndex.get());
+            final Optional<Integer> elementPositionInLine = robotLine.getElementPositionInLine(hoverRegion.getOffset(),
+                    PositionCheck.INSIDE);
+            if (elementPositionInLine.isPresent()) {
+                final IRobotLineElement hoveredElement = robotLine.getLineElements().get(elementPositionInLine.get());
+                final List<IRobotTokenType> hoveredElementTypes = hoveredElement.getTypes();
+                if (hoveredElementTypes.contains(RobotTokenType.KEYWORD_ACTION_NAME)
+                        || hoveredElementTypes.contains(RobotTokenType.KEYWORD_NAME)
+                        || hoveredElementTypes.contains(RobotTokenType.TEST_CASE_ACTION_NAME)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private String getErrorMsgs(final ITextViewer textViewer, final IRegion hoverRegion) throws CoreException {
@@ -166,7 +196,8 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                     if (robotStackFrame.getFileName().equals(suiteFile.getFile().getName())) {
                         for (final IVariable variable : robotStackFrame.getAllVariables()) {
                             if (VariableNamesSupport.hasEqualNames(variable.getName(), variableName)) {
-                                return "Current value:\n" + RobotDebugValueManager.extractValueDetail(variable.getValue());
+                                return "Current value:\n"
+                                        + RobotDebugValueManager.extractValueDetail(variable.getValue());
                             }
                         }
                     }
@@ -203,7 +234,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
         }
         return null;
     }
-    
+
     private IAnnotationModel getAnnotationModel(final ISourceViewer viewer) {
         if (viewer instanceof ISourceViewerExtension2) {
             final ISourceViewerExtension2 extension = (ISourceViewerExtension2) viewer;
@@ -215,6 +246,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
     @Override
     public IInformationControlCreator getHoverControlCreator() {
         return new IInformationControlCreator() {
+
             @Override
             public IInformationControl createInformationControl(final Shell parent) {
                 return new DefaultInformationControl(parent);

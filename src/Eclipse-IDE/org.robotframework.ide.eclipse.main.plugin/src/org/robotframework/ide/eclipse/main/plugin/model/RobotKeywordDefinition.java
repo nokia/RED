@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.rf.ide.core.testdata.model.presenter.update.KeywordTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
@@ -63,7 +64,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
     public void link() {
         final UserKeyword keyword = getLinkedElement();
 
-        final List<PrioriterizedKeywordsSettings> settings = newArrayList(EnumSet.allOf(PrioriterizedKeywordsSettings.class));
+        final List<PrioriterizedKeywordsSettings> settings = newArrayList(
+                EnumSet.allOf(PrioriterizedKeywordsSettings.class));
         Collections.sort(settings);
 
         // settings
@@ -72,7 +74,7 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
                 getChildren().add(new RobotDefinitionSetting(this, element));
             }
         }
-        
+
         // body
         for (final RobotExecutableRow<UserKeyword> execRow : keyword.getKeywordExecutionRows()) {
             getChildren().add(new RobotKeywordCall(this, execRow));
@@ -120,11 +122,8 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
         final RobotDefinitionSetting documentationSetting = findSetting(ModelType.USER_KEYWORD_DOCUMENTATION);
         if (documentationSetting != null) {
             final KeywordDocumentation documentation = (KeywordDocumentation) documentationSetting.getLinkedElement();
-            final StringBuilder docBuilder = new StringBuilder();
-            for (final RobotToken token : documentation.getDocumentationText()) {
-                docBuilder.append(token.getText().toString());
-            }
-            return docBuilder.toString();
+
+            return DocumentationServiceHandler.toShowConsolidated(documentation);
         }
         return "<not documented>";
     }
@@ -240,26 +239,41 @@ public class RobotKeywordDefinition extends RobotCodeHoldingElement<UserKeyword>
 
         public List<? extends AModelElement<UserKeyword>> getModelElements(final UserKeyword keyword) {
             switch (this) {
-                case ARGUMENTS: return keyword.getArguments();
-                case DOCUMENTATION: return keyword.getDocumentation();
-                case TAGS: return keyword.getTags();
-                case TIMEOUT: return keyword.getTimeouts();
-                case TEARDOWN: return keyword.getTeardowns();
-                case RETURN: return keyword.getReturns();
-                case UNKNOWN: return keyword.getUnknownSettings();
-                default: return new ArrayList<>();
+                case ARGUMENTS:
+                    return keyword.getArguments();
+                case DOCUMENTATION:
+                    return keyword.getDocumentation();
+                case TAGS:
+                    return keyword.getTags();
+                case TIMEOUT:
+                    return keyword.getTimeouts();
+                case TEARDOWN:
+                    return keyword.getTeardowns();
+                case RETURN:
+                    return keyword.getReturns();
+                case UNKNOWN:
+                    return keyword.getUnknownSettings();
+                default:
+                    return new ArrayList<>();
             }
         }
 
         public static PrioriterizedKeywordsSettings from(final ModelType modelType) {
             switch (modelType) {
-                case USER_KEYWORD_ARGUMENTS: return ARGUMENTS;
-                case USER_KEYWORD_DOCUMENTATION: return DOCUMENTATION;
-                case USER_KEYWORD_TAGS: return TAGS;
-                case USER_KEYWORD_TIMEOUT: return TIMEOUT;
-                case USER_KEYWORD_TEARDOWN: return TEARDOWN;
-                case USER_KEYWORD_RETURN: return RETURN;
-                case USER_KEYWORD_SETTING_UNKNOWN: return UNKNOWN;
+                case USER_KEYWORD_ARGUMENTS:
+                    return ARGUMENTS;
+                case USER_KEYWORD_DOCUMENTATION:
+                    return DOCUMENTATION;
+                case USER_KEYWORD_TAGS:
+                    return TAGS;
+                case USER_KEYWORD_TIMEOUT:
+                    return TIMEOUT;
+                case USER_KEYWORD_TEARDOWN:
+                    return TEARDOWN;
+                case USER_KEYWORD_RETURN:
+                    return RETURN;
+                case USER_KEYWORD_SETTING_UNKNOWN:
+                    return UNKNOWN;
                 default:
                     throw new IllegalArgumentException("No setting defined for " + modelType.name());
             }
