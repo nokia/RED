@@ -110,12 +110,4 @@ public enum ProjectConfigurationProblem implements IProblemCause {
     public String getEnumClassName() {
         return ProjectConfigurationProblem.class.getName();
     }
-
-    public static Collection<ProblemCategory> getCategories() {
-        final Set<ProblemCategory> categories = newLinkedHashSet();
-        for (final IProblemCause cause : EnumSet.allOf(ProjectConfigurationProblem.class)) {
-            categories.add(cause.getProblemCategory());
-        }
-        return categories;
-    }
 }

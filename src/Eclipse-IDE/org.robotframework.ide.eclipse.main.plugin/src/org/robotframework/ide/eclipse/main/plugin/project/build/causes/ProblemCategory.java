@@ -224,7 +224,7 @@ public enum ProblemCategory {
         return new Severity[] {Severity.ERROR, Severity.WARNING, Severity.INFO, Severity.IGNORE};
     }
 
-    public static Map<ProblemCategoryType, Collection<ProblemCategory>> getCategories() {
+    public static Map<ProblemCategoryType, Collection<ProblemCategory>> getAllCategories() {
         List<ProblemCategory> categories = Arrays.asList(ProblemCategory.values());
         Multimap<ProblemCategoryType, ProblemCategory> groupedCategories = Multimaps.index(categories,
                 new Function<ProblemCategory, ProblemCategoryType>() {
@@ -237,7 +237,7 @@ public enum ProblemCategory {
         return TreeMultimap.create(groupedCategories).asMap();
     }
     
-    public enum ProblemCategoryType {
+    public static enum ProblemCategoryType {
         CODE_STYLE, NAME_SHADOWING_AND_CONFLICTS, UNNECESSARY_CODE, IMPORT, ROBOT_VERSION, RUNTIME, PROJECT_CONFIGURATION;
 
         public String getName() {
