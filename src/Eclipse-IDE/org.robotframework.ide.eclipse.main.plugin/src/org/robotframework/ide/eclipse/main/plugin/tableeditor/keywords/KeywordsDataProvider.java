@@ -101,22 +101,17 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
     }
 
     private int countColumnsNumber() {
-        return 1 + calculateLongestArgumentsLength();
-    }
-
-    private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        // add 1 for name column
+        int max = 1 + RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
         if (keywords != null) {
             for (final Object element : keywords) {
                 if (element instanceof RobotKeywordDefinition) {
                     final RobotKeywordDefinition keyword = (RobotKeywordDefinition) element;
-                    if (keyword != null) {
-                        max = Math.max(max, keyword.getEmbeddedArguments().size());
-                    }
+                    max = Math.max(max, keyword.getEmbeddedArguments().size());
+
                 } else if (element instanceof RobotKeywordCall) {
                     final RobotKeywordCall keyword = (RobotKeywordCall) element;
-                    if (keyword != null
-                            && keyword.getLinkedElement().getModelType() != ModelType.USER_KEYWORD_DOCUMENTATION) {
+                    if (keyword.getLinkedElement().getModelType() != ModelType.USER_KEYWORD_DOCUMENTATION) {
                         max = Math.max(max, ExecutablesRowHolderCommentService.execRowView(keyword).size());
                     }
                 }

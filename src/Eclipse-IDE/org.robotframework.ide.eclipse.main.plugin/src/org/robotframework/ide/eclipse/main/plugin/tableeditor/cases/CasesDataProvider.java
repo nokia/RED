@@ -63,19 +63,14 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     }
 
     private int countColumnsNumber() {
-        return 1 + calculateLongestArgumentsLength();
-    }
-
-    private int calculateLongestArgumentsLength() {
-        int max = RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
+        // add 1 for name column
+        int max = 1 + RedPlugin.getDefault().getPreferences().getMimalNumberOfArgumentColumns();
         if (cases != null) {
             for (final Object element : cases) {
                 if (element instanceof RobotKeywordCall) {
                     final RobotKeywordCall keyword = (RobotKeywordCall) element;
-                    if (keyword != null
-                            && keyword.getLinkedElement().getModelType() != ModelType.TEST_CASE_DOCUMENTATION) {
-                        max = Math.max(max,
-                                ExecutablesRowHolderCommentService.execRowView((RobotKeywordCall) element).size());
+                    if (keyword.getLinkedElement().getModelType() != ModelType.TEST_CASE_DOCUMENTATION) {
+                        max = Math.max(max, ExecutablesRowHolderCommentService.execRowView(keyword).size());
                     }
                 }
             }
