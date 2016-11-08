@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _VzYJ0KEAEea9Cvae3yWo1A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/2/16 2:54 PM
+Save-Time: 11/8/16 3:25 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -20,7 +20,7 @@ proc "my-assert-true" [val result -input] [val expected] [val col] [val row] {
 //HINT: do not use hexstring in comments! As parameter in procedure they are converted to decimal value
 
 //rows starts from 1
-proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 "" ] [val c4 "" ] [val c5 "" ] [val comment "" ]
+proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 ""] [val c3 "" ] [val c4 "" ] [val c5 "" ]
 {
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 		| my-assert-true -expected $tc -row $row -col 1 
@@ -34,12 +34,10 @@ proc "check-test_case-row" [val file] [val row] [val tc ""] [val c1 ""] [val c2 
 	    | my-assert-true -expected $c4 -row $row -col 5     
 	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue 
 	    | my-assert-true -expected $c5 -row $row -col 6 
-	get-editor $file | get-canvas -after [get-label "Test Cases"] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
-	    | my-assert-true -expected $comment -row $row -col 7
 }
 
 //rows starts from 1
-proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""] [val c3 "" ] [val c4 "" ] [val c5 "" ] [val comment "" ]
+proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""] [val c3 "" ] [val c4 "" ] [val c5 "" ]
 {
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1 | get-object | invoke getCellByPosition 1 $row|  invoke getDataValue 
 		| my-assert-true -expected $kw -row $row -col 1 
@@ -53,8 +51,6 @@ proc "check-keyword-row" [val file] [val row] [val kw ""] [val c1 ""] [val c2 ""
 	    | my-assert-true -expected $c4 -row $row -col 5     
 	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 6 $row|  invoke getDataValue 
 	    | my-assert-true -expected $c5 -row $row -col 6 
-	get-editor $file | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getCellByPosition 7 $row|  invoke getDataValue 
-	    | my-assert-true -expected $comment -row $row -col 7
 }
 
 proc "compare-markers-list-with-ref" [val markers -input] [val ref_markers] [val type]{
