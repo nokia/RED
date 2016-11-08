@@ -64,7 +64,12 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
             } else {
                 configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
             }
+        } else if (columnPosition == (dataProvider.getColumnCount() - 1) && isDocumentation(rowObject)) {
+            configLabels.addLabel(KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
         }
     }
 
+    private boolean isDocumentation(final Object object) {
+        return object instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) object).isDocumentation();
+    }
 }

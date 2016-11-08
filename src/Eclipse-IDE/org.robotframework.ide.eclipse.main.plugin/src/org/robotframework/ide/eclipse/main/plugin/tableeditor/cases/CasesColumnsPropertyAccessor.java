@@ -11,11 +11,13 @@ import org.eclipse.nebula.widgets.nattable.data.IColumnPropertyAccessor;
 import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
 
 import com.google.common.collect.ImmutableBiMap;
 
@@ -38,20 +40,17 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
             final RobotKeywordCall keywordCall = (RobotKeywordCall) rowObject;
             final ModelType modelType = keywordCall.getLinkedElement().getModelType();
 
-            if (columnIndex == 0) {
-                return modelType == ModelType.TEST_CASE_EXECUTABLE_ROW ? keywordCall.getName()
-                        : "[" + keywordCall.getName() + "]";
-            } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
-                final List<String> arguments = keywordCall.getArguments();
-                if (modelType == ModelType.TEST_CASE_DOCUMENTATION) {
-                    if (columnIndex == 1) {
-                        return getDocumentationText(keywordCall);
-                    }
-                } else if (columnIndex - 1 < arguments.size()) {
-                    return arguments.get(columnIndex - 1);
+            if (columnIndex > 0 && modelType == ModelType.TEST_CASE_DOCUMENTATION) {
+                if (columnIndex == 1) {
+                    return getDocumentationText(keywordCall);
+                } else {
+                    return "";
                 }
-            } else if (columnIndex == (numberOfColumns - 1)) {
-                return keywordCall.getComment();
+            }
+
+            final List<RobotToken> execRowView = ExecutablesRowHolderCommentService.execRowView(keywordCall);
+            if (columnIndex < execRowView.size()) {
+                return execRowView.get(columnIndex).getText();
             }
         } else if (rowObject instanceof RobotCase) {
             final RobotCase robotCase = (RobotCase) rowObject;
@@ -92,7 +91,7 @@ public class CasesColumnsPropertyAccessor implements IColumnPropertyAccessor<Obj
     public int getColumnIndex(final String propertyName) {
         return properties.inverse().get(propertyName);
     }
-    
+
     private String getDocumentationText(final RobotKeywordCall keywordCall) {
         return DocumentationServiceHandler.toEditConsolidated((IDocumentationHolder) keywordCall.getLinkedElement());
     }

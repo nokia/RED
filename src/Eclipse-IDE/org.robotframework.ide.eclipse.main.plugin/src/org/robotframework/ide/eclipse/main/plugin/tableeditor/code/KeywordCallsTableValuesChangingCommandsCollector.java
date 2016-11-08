@@ -26,6 +26,10 @@ public class KeywordCallsTableValuesChangingCommandsCollector {
         if (element instanceof RobotKeywordCall) {
             final RobotKeywordCall call = (RobotKeywordCall) element;
 
+            if (ExecutablesRowHolderCommentService.wasHandledAsComment(commands, call, value, column, numberOfColumns)) {
+                return commands;
+            }
+
             if (column == 0) {
                 commands.add(new SetKeywordCallNameCommand(call, value));
             } else if (column > 0 && column < (numberOfColumns - 1) && isDocumentationSetting(call)) {

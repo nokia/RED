@@ -106,6 +106,7 @@ import org.robotframework.services.event.Events;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 
+@SuppressWarnings("restriction")
 public class CasesEditorFormFragment implements ISectionFormFragment {
 
     @Inject
@@ -242,7 +243,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
                         theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
-        
+
         // calculate columns width
         table.addListener(SWT.Paint,
                 factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer, 270, 200));
@@ -250,6 +251,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         addCustomStyling(table, theme);
 
         final Supplier<HeaderFilterMatchesCollection> matchesSupplier = new Supplier<HeaderFilterMatchesCollection>() {
+
             @Override
             public HeaderFilterMatchesCollection get() {
                 return matches;
@@ -383,7 +385,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
     @Optional
     private void whenCaseIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_CASE_ADDED) final Event event) {
         final RobotCasesSection section = Events.get(event, IEventBroker.DATA, RobotCasesSection.class);
-        
+
         if (section != null && section.getSuiteFile() == fileModel) {
             sortModel.clear();
 
@@ -502,14 +504,16 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
             public void run() {
                 final int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
                 final int rowCountBeforeChange = dataProvider.getSortedList().size();
-                final List<Integer> expandedRowIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
-                
+                final List<Integer> expandedRowIndexes = treeLayerAccessor
+                        .expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
+
                 dataProvider.setInput(getSection());
                 table.refresh();
                 setDirty();
-                
+
                 final int rowCountChange = dataProvider.getSortedList().size() - rowCountBeforeChange;
-                treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
+                treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition,
+                        rowCountChange);
             }
         };
     }
@@ -606,7 +610,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
         @Override
         public Object getDataValue(final int columnIndex, final int rowIndex) {
-            return isLastColumn(columnIndex) ? "Comment" : "";
+            return "";
         }
     }
 

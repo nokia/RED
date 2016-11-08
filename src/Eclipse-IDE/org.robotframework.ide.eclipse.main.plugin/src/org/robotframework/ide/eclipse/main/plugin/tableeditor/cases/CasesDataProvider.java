@@ -22,6 +22,7 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatchesCollection.CasesFilter;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTreeFormat;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
 import ca.odell.glazedlists.FilterList;
@@ -37,23 +38,24 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     private RobotCasesSection section;
 
     private SortedList<Object> casesSortedList;
+
     private FilterList<Object> filterList;
+
     private TreeList<Object> cases;
-    
+
     private final CasesColumnsPropertyAccessor propertyAccessor;
-    
+
     private final CodeElementsTreeFormat casesTreeFormat;
 
     private CasesFilter filter;
-    
-    CasesDataProvider(final RobotEditorCommandsStack commandsStack,
-            final RobotCasesSection section) {
+
+    CasesDataProvider(final RobotEditorCommandsStack commandsStack, final RobotCasesSection section) {
         this.section = section;
         this.casesTreeFormat = new CodeElementsTreeFormat();
         createLists(section);
         this.propertyAccessor = new CasesColumnsPropertyAccessor(commandsStack, countColumnsNumber());
     }
-    
+
     void setInput(final RobotCasesSection section) {
         this.section = section;
         createLists(section);
@@ -61,7 +63,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     }
 
     private int countColumnsNumber() {
-        return calculateLongestArgumentsLength() + 2; // case name + args + comment
+        return calculateLongestArgumentsLength();
     }
 
     private int calculateLongestArgumentsLength() {
@@ -72,7 +74,8 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
                     final RobotKeywordCall keyword = (RobotKeywordCall) element;
                     if (keyword != null
                             && keyword.getLinkedElement().getModelType() != ModelType.TEST_CASE_DOCUMENTATION) {
-                        max = Math.max(max, ((RobotKeywordCall) element).getArguments().size());
+                        max = Math.max(max,
+                                ExecutablesRowHolderCommentService.execRowView((RobotKeywordCall) element).size());
                     }
                 }
             }
@@ -88,7 +91,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         }
         if (section != null) {
             casesSortedList.clear();
-            
+
             for (final RobotCase robotCase : section.getChildren()) {
                 casesSortedList.add(robotCase);
                 casesSortedList.addAll(filteredCalls(robotCase));
@@ -116,11 +119,11 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         }
         return filteredCalls;
     }
-    
+
     SortedList<Object> getSortedList() {
         return casesSortedList;
     }
-    
+
     TreeList<Object> getTreeList() {
         return cases;
     }
@@ -136,7 +139,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     CasesColumnsPropertyAccessor getPropertyAccessor() {
         return propertyAccessor;
     }
-    
+
     @Override
     public int getColumnCount() {
         return propertyAccessor.getColumnCount();
@@ -163,7 +166,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
         }
         return "";
     }
-    
+
     @Override
     public void setDataValue(final int columnIndex, final int rowIndex, final Object newValue) {
         if (newValue instanceof RobotElement) {
@@ -207,6 +210,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
             filterList.setMatcher(null);
         } else {
             filterList.setMatcher(new Matcher<Object>() {
+
                 @Override
                 public boolean matches(final Object item) {
                     return filter.isMatching(item);

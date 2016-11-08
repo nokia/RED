@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.e4.core.services.events.IEventBroker;
 import org.rf.ide.core.testdata.model.presenter.update.IExecutablesTableModelUpdater;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCodeHoldingElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -21,10 +22,20 @@ import com.google.common.base.Optional;
 public class SetKeywordCallArgumentCommand2 extends EditorCommand {
 
     private final RobotKeywordCall keywordCall;
+
     private final int index;
+
     private final String value;
-    
+
     private final List<EditorCommand> undoOperations = new ArrayList<>();
+
+    public SetKeywordCallArgumentCommand2(final IEventBroker eventBroker, final RobotKeywordCall keywordCall,
+            final int index, final String value) {
+        this.eventBroker = eventBroker;
+        this.keywordCall = keywordCall;
+        this.index = index;
+        this.value = value;
+    }
 
     public SetKeywordCallArgumentCommand2(final RobotKeywordCall keywordCall, final int index, final String value) {
         this.keywordCall = keywordCall;
@@ -43,7 +54,8 @@ public class SetKeywordCallArgumentCommand2 extends EditorCommand {
         final List<String> arguments = prepareArgumentsList(keywordCall.getArguments(), index, value);
 
         if (newName.isPresent()) {
-            final SetSimpleKeywordCallName changeNameCommand = new SetSimpleKeywordCallName(eventBroker, keywordCall, newName.get());
+            final SetSimpleKeywordCallName changeNameCommand = new SetSimpleKeywordCallName(eventBroker, keywordCall,
+                    newName.get());
             changeNameCommand.execute();
 
             undoOperations.addAll(changeNameCommand.getUndoCommands());

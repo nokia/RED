@@ -21,6 +21,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.AddingToken;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeElementsTreeFormat;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.keywords.KeywordsMatchesCollection.KeywordsFilter;
 import org.robotframework.red.nattable.IFilteringDataProvider;
 
@@ -39,22 +40,22 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
     private SortedList<Object> keywordsSortedList;
 
     private FilterList<Object> filteredList;
+
     private TreeList<Object> keywords;
-    
+
     private final KeywordsColumnsPropertyAccessor propertyAccessor;
-    
+
     private final CodeElementsTreeFormat keywordsTreeFormat;
 
     private KeywordsFilter filter;
-    
-    public KeywordsDataProvider(final RobotEditorCommandsStack commandsStack,
-            final RobotKeywordsSection section) {
+
+    public KeywordsDataProvider(final RobotEditorCommandsStack commandsStack, final RobotKeywordsSection section) {
         this.section = section;
         this.keywordsTreeFormat = new CodeElementsTreeFormat();
         createLists(section);
         this.propertyAccessor = new KeywordsColumnsPropertyAccessor(commandsStack, countColumnsNumber());
     }
-    
+
     public void setInput(final RobotKeywordsSection section) {
         this.section = section;
         createLists(section);
@@ -69,7 +70,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
         }
         if (section != null) {
             keywordsSortedList.clear();
-            
+
             for (final RobotKeywordDefinition robotKeywordDefinition : section.getChildren()) {
                 keywordsSortedList.add(robotKeywordDefinition);
                 keywordsSortedList.addAll(filteredCalls(robotKeywordDefinition));
@@ -77,7 +78,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
             }
         }
     }
-    
+
     private List<RobotKeywordCall> filteredCalls(final RobotKeywordDefinition keywordDefinition) {
         final List<RobotKeywordCall> allCalls = keywordDefinition.getChildren();
         final List<RobotKeywordCall> filteredCalls = new ArrayList<>();
@@ -85,9 +86,11 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
             if (call instanceof RobotDefinitionSetting) {
                 final RobotDefinitionSetting setting = (RobotDefinitionSetting) call;
                 @SuppressWarnings("unchecked")
-                final AModelElement<UserKeyword> linkedSetting = (AModelElement<UserKeyword>) setting.getLinkedElement();
+                final AModelElement<UserKeyword> linkedSetting = (AModelElement<UserKeyword>) setting
+                        .getLinkedElement();
                 final UserKeyword userKeyword = keywordDefinition.getLinkedElement();
-                if (!userKeyword.isDuplicatedSetting(linkedSetting) && linkedSetting.getModelType() != ModelType.USER_KEYWORD_ARGUMENTS) {
+                if (!userKeyword.isDuplicatedSetting(linkedSetting)
+                        && linkedSetting.getModelType() != ModelType.USER_KEYWORD_ARGUMENTS) {
                     filteredCalls.add(call);
                 }
             } else {
@@ -98,7 +101,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
     }
 
     private int countColumnsNumber() {
-        return calculateLongestArgumentsLength() + 2; // keyword name + args + comment
+        return calculateLongestArgumentsLength();
     }
 
     private int calculateLongestArgumentsLength() {
@@ -112,19 +115,20 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
                     }
                 } else if (element instanceof RobotKeywordCall) {
                     final RobotKeywordCall keyword = (RobotKeywordCall) element;
-                    if (keyword != null && keyword.getLinkedElement().getModelType() != ModelType.USER_KEYWORD_DOCUMENTATION) {
-                        max = Math.max(max, keyword.getArguments().size());
+                    if (keyword != null
+                            && keyword.getLinkedElement().getModelType() != ModelType.USER_KEYWORD_DOCUMENTATION) {
+                        max = Math.max(max, ExecutablesRowHolderCommentService.execRowView(keyword).size());
                     }
                 }
             }
         }
         return max;
     }
-    
+
     SortedList<Object> getSortedList() {
         return keywordsSortedList;
     }
-    
+
     TreeList<Object> getTreeList() {
         return keywords;
     }
@@ -188,7 +192,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
         }
         return null;
     }
-    
+
     @Override
     public int indexOfRowObject(final Object rowObject) {
         if (section != null) {
@@ -211,6 +215,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
             filteredList.setMatcher(null);
         } else {
             filteredList.setMatcher(new Matcher<Object>() {
+
                 @Override
                 public boolean matches(final Object item) {
                     return filter.isMatching(item);

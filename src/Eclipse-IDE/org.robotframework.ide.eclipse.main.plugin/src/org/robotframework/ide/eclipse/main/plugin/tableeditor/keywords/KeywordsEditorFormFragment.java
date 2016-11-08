@@ -107,6 +107,7 @@ import org.robotframework.services.event.Events;
 import com.google.common.base.Function;
 import com.google.common.base.Supplier;
 
+@SuppressWarnings("restriction")
 public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
     @Inject
@@ -243,7 +244,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
                         theme.getHeadersUnderlineColor(), 2, RedNattableLayersFactory.ROW_HEIGHT));
         table.setBackground(theme.getBodyBackgroundOddRowBackground());
         table.setForeground(parent.getForeground());
-        
+
         // calculate columns width
         table.addListener(SWT.Paint,
                 factory.getColumnsWidthCalculatingPaintListener(table, dataProvider, dataLayer, 270, 200));
@@ -273,7 +274,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         // popup menus
         table.addConfiguration(new KeywordsTableMenuConfiguration(site, table, selectionProvider));
-        
+
         table.configure();
         GridDataFactory.fillDefaults().grab(true, true).applyTo(table);
 
@@ -435,8 +436,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
     @Inject
     @Optional
-    private void whenKeywordCallIsAdded(
-            @UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final Event event) {
+    private void whenKeywordCallIsAdded(@UIEventTopic(RobotModelEvents.ROBOT_KEYWORD_CALL_ADDED) final Event event) {
         final RobotKeywordDefinition def = Events.get(event, IEventBroker.DATA, RobotKeywordDefinition.class);
         final RobotKeywordCall keywordCall = Events.get(event, RobotModelEvents.ADDITIONAL_DATA,
                 RobotKeywordCall.class);
@@ -525,14 +525,16 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
             public void run() {
                 final int lastSelectedRowPosition = selectionLayerAccessor.getLastSelectedRowPosition();
                 final int rowCountBeforeChange = dataProvider.getSortedList().size();
-                final List<Integer> expandedRowIndexes = treeLayerAccessor.expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
-                
+                final List<Integer> expandedRowIndexes = treeLayerAccessor
+                        .expandCollapsedRowsBeforeRowCountChange(rowCountBeforeChange);
+
                 dataProvider.setInput(getSection());
                 table.refresh();
                 setDirty();
-                
+
                 final int rowCountChange = dataProvider.getSortedList().size() - rowCountBeforeChange;
-                treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition, rowCountChange);
+                treeLayerAccessor.collapseRowsAfterRowCountChange(expandedRowIndexes, lastSelectedRowPosition,
+                        rowCountChange);
             }
         };
     }
@@ -627,7 +629,7 @@ public class KeywordsEditorFormFragment implements ISectionFormFragment {
 
         @Override
         public Object getDataValue(final int columnIndex, final int rowIndex) {
-            return isLastColumn(columnIndex) ? "Comment" : "";
+            return "";
         }
     }
 

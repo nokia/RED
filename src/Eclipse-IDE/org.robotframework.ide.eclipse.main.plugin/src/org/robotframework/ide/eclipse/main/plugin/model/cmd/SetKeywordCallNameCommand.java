@@ -29,6 +29,14 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
     private List<EditorCommand> executedCommands;
 
+    public SetKeywordCallNameCommand(final IEventBroker eventBroker, final RobotKeywordCall keywordCall,
+            final String name) {
+        this.eventBroker = eventBroker;
+        this.keywordCall = keywordCall;
+        this.newName = name;
+        this.oldName = keywordCall.getName();
+    }
+
     public SetKeywordCallNameCommand(final RobotKeywordCall keywordCall, final String name) {
         this.keywordCall = keywordCall;
         this.newName = name;
@@ -67,7 +75,6 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             removeFirstArgument(actualCall);
         }
     }
-
 
     private RobotKeywordCall changeName(final String nameToSet) {
         final EditorCommand command = new SetSimpleKeywordCallName(eventBroker, keywordCall, nameToSet);
@@ -110,7 +117,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
         final MoveKeywordCall moveCommand = new MoveKeywordCall(parent, index, lastSettingIndex + 1);
         moveCommand.execute();
-        
+
         final ConvertCallToSetting convertCommand = new ConvertCallToSetting(eventBroker, keywordCall, settingName);
         convertCommand.execute();
 
@@ -127,13 +134,13 @@ public class SetKeywordCallNameCommand extends EditorCommand {
 
         final int index = setting.getIndex();
         final int lastSettingIndex = parent.indexOfLastSetting();
-        
+
         final MoveKeywordCall moveCommand = new MoveKeywordCall(parent, index, lastSettingIndex);
         moveCommand.execute();
-        
+
         final ConvertSettingToCall convertCommand = new ConvertSettingToCall(eventBroker, setting, name);
         convertCommand.execute();
-        
+
         // when doing undo we also want to firstly move and then convert
         executedCommands.add(convertCommand);
         executedCommands.add(moveCommand);
@@ -146,7 +153,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
         if (!newArguments.isEmpty()) {
             newArguments.remove(0);
         }
-        final SetSimpleKeywordCallArguments command = new SetSimpleKeywordCallArguments(eventBroker, actualCall, newArguments);
+        final SetSimpleKeywordCallArguments command = new SetSimpleKeywordCallArguments(eventBroker, actualCall,
+                newArguments);
         executedCommands.add(command);
         command.execute();
     }
@@ -185,9 +193,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             parent.removeChild(call);
             newSetting = parent.createSetting(index, settingName, call.getArguments(), call.getComment());
 
-            RedEventBroker.using(eventBroker)
-                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newSetting)
-                .send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
+            RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newSetting).send(
+                    RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
         }
 
         @Override
@@ -221,9 +228,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             parent.removeChild(call);
             newSetting = parent.createSetting(index, settingName, call.getArguments(), call.getComment());
 
-            RedEventBroker.using(eventBroker)
-                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newSetting)
-                .send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
+            RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newSetting).send(
+                    RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
         }
 
         @Override
@@ -231,7 +237,7 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             return newUndoCommands(new ConvertSettingToSetting(eventBroker, newSetting, "[" + call.getName() + "]"));
         }
     }
-    
+
     private static class ConvertSettingToCall extends EditorCommand {
 
         private final IEventBroker eventBroker;
@@ -257,9 +263,8 @@ public class SetKeywordCallNameCommand extends EditorCommand {
             parent.removeChild(setting);
             newCall = parent.createKeywordCall(index, name, setting.getArguments(), setting.getComment());
 
-            RedEventBroker.using(eventBroker)
-                .additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newCall)
-                .send(RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
+            RedEventBroker.using(eventBroker).additionallyBinding(RobotModelEvents.ADDITIONAL_DATA).to(newCall).send(
+                    RobotModelEvents.ROBOT_KEYWORD_CALL_CONVERTED, parent);
         }
 
         @Override
