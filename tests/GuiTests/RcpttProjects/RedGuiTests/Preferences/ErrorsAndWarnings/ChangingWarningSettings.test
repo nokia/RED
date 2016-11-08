@@ -1,0 +1,203 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _nbc-YKKuEeaYz7OEWkETwg
+Element-Name: ChangingWarningSettings
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _-UsioKUBEeazyPh6f3_hNQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/8/16 3:14 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-default-errors"{
+	//check errors
+	with [get-view Problems | get-tree] {
+	    get-item "Errors \\(7 items\\)" | get-property childCount | equals 7 | verify-true
+	    get-item "Errors \\(7 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "Duplicated keyword definition 'kw with the same name'" | verify-true
+	    get-item "Errors \\(7 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals "Duplicated keyword definition 'kw with the same name'" | verify-true
+	    get-item "Errors \\(7 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+	        | equals "Invalid variable definition '${wrong'. Unable to recognize variable type" | verify-true
+	    get-item "Errors \\(7 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+	        | equals "Path '/home/folder/res.robot' points to location outside your workspace" | verify-true
+	    get-item "Errors \\(7 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+	        | equals "Path 'D:/folder/file.py' points to location outside your workspace" | verify-true
+	    get-item "Errors \\(7 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+	        | equals "Resource import '/home/folder/res.robot' is invalid: file does not exist" | verify-true
+	    get-item "Errors \\(7 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+	        | equals "Unknown 'D:/folder/file.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+	        | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property childCount | equals 10 | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals "Duplicated test case definition 'test1'" | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals "Duplicated test case definition 'test1'" | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+	        | equals "Duplicated variable definition 'newList'" | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+	        | equals "Duplicated variable definition 'newList'" | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+	        | equals "Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
+	        | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+	        | equals "Invalid time format '1 dec'" | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+	        | equals "Path '/home/folder/res.robot' is absolute. It is preferred to use relative paths" | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[7].getText()" 
+	        | equals "Path 'D:/folder/file.py' is absolute. It is preferred to use relative paths" | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[8].getText()" 
+	        | equals "The [Teardown] test case setting is empty" | verify-true
+	    get-item "Warnings \\(10 items\\)" | get-property "getItems().TreeItem[9].getText()" 
+	        | equals "Variable 'var_as_kw_name' is given as keyword name." | verify-true
+	}
+}
+
+check-default-errors
+
+//change Warning to Error for Keywords with dots
+get-preferences-menu | click
+get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings"
+with [get-window Preferences] {
+    get-section "Code style" | get-combo -after [get-label "Keyword name with dots"] | select Error
+    get-button Apply | click
+    get-button OK | click
+}
+
+//clean to update
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+//check if one warning was moved to errors
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(8 items\\)/Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
+        | get-property caption 
+        | equals "Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
+        | verify-true
+    get-item "Warnings \\(9 items\\)" | get-property childCount | equals 9 | verify-true
+}
+
+// change on to Info one to Ignore
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-section "Name shadowing and conflicts" | get-combo -after [get-label "Duplicated test case name"] | select Info
+    get-section "Unnecessary code" | get-combo -after [get-label "Empty settings definition"] | select Ignore
+    get-button Apply | click
+    get-button OK | click
+}
+
+//clean to update
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+
+with [get-view Problems | get-tree] {
+    get-item "Errors \\(8 items\\)" | get-property childCount | equals 8 | verify-true
+    get-item "Errors \\(8 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Duplicated keyword definition 'kw with the same name'" | verify-true
+    get-item "Errors \\(8 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "Duplicated keyword definition 'kw with the same name'" | verify-true
+    get-item "Errors \\(8 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "Given keyword name 'kw with.dot' contains dots. Use underscores instead of dots in keywords names." 
+        | verify-true
+    get-item "Errors \\(8 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "Invalid variable definition '${wrong'. Unable to recognize variable type" | verify-true
+    get-item "Errors \\(8 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+        | equals "Path '/home/folder/res.robot' points to location outside your workspace" | verify-true
+    get-item "Errors \\(8 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+        | equals "Path 'D:/folder/file.py' points to location outside your workspace" | verify-true
+    get-item "Errors \\(8 items\\)" | get-property "getItems().TreeItem[6].getText()" 
+        | equals "Resource import '/home/folder/res.robot' is invalid: file does not exist" | verify-true
+    get-item "Errors \\(8 items\\)" | get-property "getItems().TreeItem[7].getText()" 
+        | equals "Unknown 'D:/folder/file.py' library. Try to use Quick Fix (Ctrl+1) or add library to red.xml for proper validation" 
+        | verify-true
+    get-item "Warnings \\(6 items\\)" | get-property childCount | equals 6 | verify-true
+    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Duplicated variable definition 'newList'" | verify-true
+    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "Duplicated variable definition 'newList'" | verify-true
+    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[2].getText()" 
+        | equals "Invalid time format '1 dec'" | verify-true
+    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[3].getText()" 
+        | equals "Path '/home/folder/res.robot' is absolute. It is preferred to use relative paths" | verify-true
+    get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[4].getText()" 
+        | equals "Path 'D:/folder/file.py' is absolute. It is preferred to use relative paths" | verify-true
+	get-item "Warnings \\(6 items\\)" | get-property "getItems().TreeItem[5].getText()" 
+        | equals "Variable 'var_as_kw_name' is given as keyword name." | verify-true
+}	
+
+with [get-view Problems | get-tree] {
+    get-item "Infos \\(2 items\\)" | get-property childCount | equals 2 | verify-true
+    get-item "Infos \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "Duplicated test case definition 'test1'" | verify-true
+    get-item "Infos \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "Duplicated test case definition 'test1'" | verify-true
+}
+//check if marekr are info
+get-view "Project Explorer" | get-tree | select "RobotProject/tsv_file.tsv" | double-click
+with [get-editor "tsv_file.tsv" | get-text-viewer] {
+    get-property "markers['9'][0].Type" | equals "org.eclipse.ui.workbench.texteditor.info" | verify-true
+    get-property "markers['9'][0].text" | equals "Duplicated test case definition 'test1'" | verify-true
+    get-property "markers['5'][0].Type" | equals "org.eclipse.ui.workbench.texteditor.info" | verify-true
+    get-property "markers['5'][0].text" | equals "Duplicated test case definition 'test1'" | verify-true
+}
+
+//restore to default
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-button "Restore Defaults" | click
+    get-button OK | click
+}
+
+//clean to update
+get-menu "Project/Clean..." | click
+get-window Clean | get-button OK | click
+
+
+check-default-errors
+
+//change to error and add new setting with var
+get-preferences-menu | click
+with [get-window Preferences] {
+    with [get-section "Code style"] {
+        click
+        get-combo -after [get-label "Variable given as keyword name"] | select Error
+    }
+    get-button Apply | click
+    get-button OK | click
+}
+with [get-editor "tsv_file.tsv" | get-text-viewer] {
+    set-caret-pos 12 1
+    type-text "test 3"
+    key-type Enter
+    key-type "M1+SPACE"
+    key-type Down -times 3
+    key-type Enter
+    type-text "${var_as_kw_name}"
+}
+wait 2000
+
+try{
+	with [get-editor "tsv_file.tsv" | get-text-viewer] {
+	    get-property "markers['13'][0].Type" | equals "org.eclipse.ui.workbench.texteditor.error" | verify-true
+	    get-property "markers['13'][0].text" | equals "Variable 'var_as_kw_name' is given as keyword name." | verify-true
+	}
+}-catch{
+	try {
+		with [get-editor "tsv_file.tsv" | get-text-viewer] {
+		    get-property "markers['13'][1].Type" | equals "org.eclipse.ui.workbench.texteditor.error" | verify-true
+		    get-property "markers['13'][1].text" | equals "Variable 'var_as_kw_name' is given as keyword name." | verify-true
+		}
+	}-catch{
+		with [get-editor "tsv_file.tsv" | get-text-viewer] {
+		    get-property "markers['13'][2].Type" | equals "org.eclipse.ui.workbench.texteditor.error" | verify-true
+		    get-property "markers['13'][2].text" | equals "Variable 'var_as_kw_name' is given as keyword name." | verify-true
+		}
+	}	
+}
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
