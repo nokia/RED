@@ -101,7 +101,7 @@ public class KeywordsDataProvider implements IFilteringDataProvider, IRowDataPro
     }
 
     private int countColumnsNumber() {
-        return calculateLongestArgumentsLength();
+        return 1 + calculateLongestArgumentsLength();
     }
 
     private int calculateLongestArgumentsLength() {

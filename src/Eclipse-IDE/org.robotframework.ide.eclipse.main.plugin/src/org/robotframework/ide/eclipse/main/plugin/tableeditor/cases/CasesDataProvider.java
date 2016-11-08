@@ -63,7 +63,7 @@ public class CasesDataProvider implements IFilteringDataProvider, IRowDataProvid
     }
 
     private int countColumnsNumber() {
-        return calculateLongestArgumentsLength();
+        return 1 + calculateLongestArgumentsLength();
     }
 
     private int calculateLongestArgumentsLength() {
