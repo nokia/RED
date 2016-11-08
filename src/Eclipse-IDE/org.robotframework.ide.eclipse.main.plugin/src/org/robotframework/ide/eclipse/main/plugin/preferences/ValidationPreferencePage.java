@@ -68,8 +68,8 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
     @Override
     protected void createFieldEditors() {
         final Composite parent = getFieldEditorParent();
-        final ScrolledContent scrolled = new ScrolledContent(parent.getParent());
-        GridDataFactory.fillDefaults().grab(true, false).hint(SWT.DEFAULT, 300).applyTo(scrolled);
+        final ScrolledContent scrolled = new ScrolledContent(parent);
+        GridDataFactory.fillDefaults().grab(true, true).hint(SWT.DEFAULT, 200).applyTo(scrolled);
         scrolled.addControlListener(new ControlAdapter() {
 
             @Override
@@ -78,14 +78,10 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
             }
         });
 
-        Composite body = scrolled.getBody();
-        GridDataFactory.fillDefaults().grab(true, false).applyTo(body);
-        GridLayoutFactory.fillDefaults().numColumns(2).applyTo(body);
-
         Map<ProblemCategoryType, Collection<ProblemCategory>> categories = ProblemCategory.getCategories();
         for (Entry<ProblemCategoryType, Collection<ProblemCategory>> categpryEntry : categories.entrySet()) {
             if (!categpryEntry.getValue().isEmpty()) {
-                createProblemCategorySection(body, categpryEntry.getKey(), categpryEntry.getValue());
+                createProblemCategorySection(scrolled.getBody(), categpryEntry.getKey(), categpryEntry.getValue());
             }
         }
     }
@@ -171,6 +167,7 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
             Composite body = new Composite(this, SWT.NONE);
             body.setFont(parent.getFont());
             setContent(body);
+            GridLayoutFactory.fillDefaults().applyTo(body);
         }
 
         public Composite getBody() {
