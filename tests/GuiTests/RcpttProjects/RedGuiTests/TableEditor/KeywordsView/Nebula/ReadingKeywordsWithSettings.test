@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _zcIlcFPzEea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/4/16 12:18 PM
+Save-Time: 11/9/16 3:44 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -61,37 +61,37 @@ with [get-editor "TestFile.robot"] {
 
 get-editor "TestFile.robot" | maximize
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "1" -ref_table [list "All settings"  "5.a"  ""  ""  ""  ""  "" ] 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "2" -ref_table [list "[Documentation]"  "4.a"  ""  ""  ""  ""  "" ] 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "3" -ref_table [list "[Tags]"  "1.a"  ""  ""  ""  ""  "" ] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "1" -ref_table [list "All settings"  "5.a"  ""  ""  ""  ""] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "2" -ref_table [list "[Documentation]"  "4.a"  ""  ""  ""  ""] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "3" -ref_table [list "[Tags]"  "1.a"  ""  ""  ""  ""] 
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "4" -ref_table [list "[Timeout]"  "2.a"  ""  ""  ""  ""  ""  ] 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "5" -ref_table [list "[Teardown]"  "6.a"  ""  ""  ""  ""  ""  ] 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "6" -ref_table [list "[Return]"  "3.a"  ""  ""  ""  ""  "" ] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "4" -ref_table [list "[Timeout]"  "2.a"  ""  ""  ""  ""] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "5" -ref_table [list "[Teardown]"  "6.a"  ""  ""  ""  ""] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "6" -ref_table [list "[Return]"  "3.a"  ""  ""  ""  ""] 
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "7" -ref_table [list  "Convert To Binary"  "444"  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "8" -ref_table [list  "..."  ""  ""  ""  ""  ""  "" ] 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "9" -ref_table [list "Keyword"  "${a}"  "${b}"  "${c}"  ""  ""  "" ] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "7" -ref_table [list  "Convert To Binary"  "444"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "8" -ref_table [list  "..."  ""  ""  ""  ""  ""] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "9" -ref_table [list "Keyword"  "${a}"  "${b}"  "${c}"  ""  ""] 
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "10" -ref_table [list "[Documentation]"  "Simple doc"  ""  ""  ""  ""  "" ] 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "11" -ref_table [list  "[Tags]"  "tag1"  "tag2"  ""  ""  ""  "" ] 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "12" -ref_table [list  "[Return]"  "6"  ""  ""  ""  ""  "" ] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "10" -ref_table [list "[Documentation]"  "Simple doc"  ""  ""  ""  ""] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "11" -ref_table [list  "[Tags]"  "tag1"  "tag2"  ""  ""  ""] 
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "12" -ref_table [list  "[Return]"  "6"  ""  ""  ""  ""] 
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "13" -ref_table [list "Should Be Equal As Integers"  "34"  "d4242"  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "14" -ref_table [list  "..."  ""  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "15" -ref_table [list "2 keyword"  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "13" -ref_table [list "Should Be Equal As Integers"  "34"  "d4242"  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "14" -ref_table [list  "..."  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "15" -ref_table [list "2 keyword"  ""  ""  ""  ""  ""]
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "16" -ref_table [list "[Teardown]"  "log"  "67"  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "17" -ref_table [list  "[Return]"  "${param}"  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "18" -ref_table [list "Should Contain"  "I like pancake"  "ike"  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "16" -ref_table [list "[Teardown]"  "log"  "67"  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "17" -ref_table [list  "[Return]"  "${param}"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "18" -ref_table [list "Should Contain"  "I like pancake"  "ike"  ""  ""  ""]
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "19" -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "20" -ref_table [list "Wrong_argumnets"  "wrong arg"  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "21" -ref_table [list "log"  "8"  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "19" -ref_table [list "..."  ""  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "20" -ref_table [list "Wrong_argumnets"  "wrong arg"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "21" -ref_table [list "log"  "8"  ""  ""  ""  ""]
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "22" -ref_table [list  "\\"  ""  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "23" -ref_table [list "Set Tags"  "abba"  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row "24" -ref_table [list "Set Tags"  "bbaa"  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "22" -ref_table [list  "\\"  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "23" -ref_table [list "Set Tags"  "abba"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row "24" -ref_table [list "Set Tags"  "bbaa"  ""  ""  ""  ""]
 
 
 //set-list-with-markers-and-comapare -file "TestFile.robot" -ref_list [list  5 15 17] -type "ERROR"
@@ -129,22 +129,22 @@ get-editor "warnings.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
 get-editor "warnings.robot" |  get-tab-folder | get-tab-item Keywords | click
 
 
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "1" -ref_table [list "Warnig is here"  ""  ""  ""  ""  ""  "" ] 
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "2" -ref_table [list "[Documentation]"  ""  ""  ""  ""  ""  "" ] 
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "3" -ref_table [list  "..."  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "1" -ref_table [list "Warnig is here"  ""  ""  ""  ""  ""] 
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "2" -ref_table [list "[Documentation]"  ""  ""  ""  ""  ""] 
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "3" -ref_table [list  "..."  ""  ""  ""  ""  ""]
 
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "4" -ref_table [list "Kw with comments"  ""  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "5" -ref_table [list  ""  ""  ""  ""  ""  ""  "#comment in line with kw" ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "6" -ref_table [list  "2 keyword"  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "7" -ref_table [list "${EMPTY}"  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "8" -ref_table [list "${new param}="  "Convert To Number"  "56"  ""  ""  ""  "#converting" ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "9" -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "4" -ref_table [list "Kw with comments"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "5" -ref_table [list  "#comment in line with kw" ""  ""  ""  ""  ""]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "6" -ref_table [list  "2 keyword"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "7" -ref_table [list "${EMPTY}"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "8" -ref_table [list "${new param}="  "Convert To Number"  "56" "#converting" "" ""]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "9" -ref_table [list "..."  ""  ""  ""  ""  ""]
 
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "10" -ref_table [list "Empty lines"  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "11" -ref_table [list "\\"  "\\"  "\\"  "2 args"  ""  ""  "" ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "12" -ref_table [list "\\\\escepe"  ""  ""  ""  ""  ""  "##double com | second val" ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "13" -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "warnings.robot" -col_amount 7 -row "14" -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "10" -ref_table [list "Empty lines"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "11" -ref_table [list "\\"  "\\"  "\\"  "2 args"  ""  ""]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "12" -ref_table [list "\\\\escepe"  "##double com" "second val" ""  ""  ""  ""]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "13" -ref_table [list "..."  ""  ""  ""  ""  ""]
+compare-row-with-list -file "warnings.robot" -col_amount 6 -row "14" -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""]
 
 
 set-list-with-markers-and-comapare -file  "warnings.robot"  -ref_list [list 1 6 7 11 12] -type "ERROR"
