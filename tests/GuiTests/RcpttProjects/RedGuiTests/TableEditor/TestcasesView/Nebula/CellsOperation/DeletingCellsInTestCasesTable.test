@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _CEmxMGhtEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/2/16 2:51 PM
+Save-Time: 11/9/16 3:18 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -69,7 +69,7 @@ with [get-editor "suite.tsv" | get-canvas -after [get-label "Test Cases"] -index
     
     //remove comment
     key-type Down
-    key-type Right -times 8
+    key-type Right -times 3
     key-type Del
 }
 
@@ -81,7 +81,7 @@ check-test_case-row -file "suite.tsv" -row 3 -tc "..."
 check-test_case-row -file "suite.tsv" -row 4 -tc "test_2"
 check-test_case-row -file "suite.tsv" -row 5 -tc "second test"
 check-test_case-row -file "suite.tsv" -row 6 -tc "12"
-check-test_case-row -file "suite.tsv" -row 7 -tc "Should Be Empty" -c1 "item" -c2 "item2" -comment "#comment fo kw"
+check-test_case-row -file "suite.tsv" -row 7 -tc "Should Be Empty" -c1 "item" -c2 "item2"
 check-test_case-row -file "suite.tsv" -row 8 -tc "..."
 
 
@@ -94,7 +94,7 @@ get-editor "suite.tsv" | get-text-viewer | get-property text | equals "*Settings
     + "test_2\n"
     + "\tsecond test\n"
     + "\t12\n"
-    + "\tShould Be Empty\titem\titem2\t#comment fo kw" | verify-true
+    + "\tShould Be Empty\titem\titem2" | verify-true
     
 
 
