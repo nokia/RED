@@ -13,7 +13,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetDocumentationSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallArgumentCommand2;
-import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallCommentCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.SetKeywordCallNameCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 
@@ -32,12 +31,10 @@ public class KeywordCallsTableValuesChangingCommandsCollector {
 
             if (column == 0) {
                 commands.add(new SetKeywordCallNameCommand(call, value));
-            } else if (column > 0 && column < (numberOfColumns - 1) && isDocumentationSetting(call)) {
+            } else if (isDocumentationSetting(call)) {
                 commands.add(new SetDocumentationSettingCommand((RobotDefinitionSetting) call, value));
-            } else if (column > 0 && column < (numberOfColumns - 1)) {
-                commands.add(new SetKeywordCallArgumentCommand2(call, column - 1, value));
             } else {
-                commands.add(new SetKeywordCallCommentCommand(call, value));
+                commands.add(new SetKeywordCallArgumentCommand2(call, column - 1, value));
             }
         }
         return commands;
