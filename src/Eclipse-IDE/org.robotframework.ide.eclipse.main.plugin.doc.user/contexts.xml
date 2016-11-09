@@ -1,0 +1,6 @@
+<contexts>
+	<context id="validation_preferences_page_context">
+		<description>This page allows you to configure problem severities detected by RED.</description>
+		<topic href="doc/user_guide/validation_preferences.html" label="Validation - severity levels" ></topic>
+	</context>
+</contexts> 

@@ -24,6 +24,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
@@ -37,6 +38,8 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCa
 public class ValidationPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
     private static final String ID = "org.robotframework.ide.eclipse.main.plugin.preferences.validation";
+
+    private static final String HELP_CONTEXT_ID = RedPlugin.PLUGIN_ID + ".validation_preferences_page_context";
 
     private static final String PROBLEM_PREFERENCES = "problemPreferences";
 
@@ -58,6 +61,12 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
         if (preferencesSettings == null) {
             preferencesSettings = dialogSettings.addNewSection(PROBLEM_PREFERENCES);
         }
+    }
+
+    @Override
+    public void createControl(Composite parent) {
+        super.createControl(parent);
+        PlatformUI.getWorkbench().getHelpSystem().setHelp(getControl(), HELP_CONTEXT_ID);
     }
 
     @Override

@@ -23,4 +23,11 @@
             content="intro/red_webresources.xml">
       </configExtension>
    </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="contexts.xml"
+            plugin="org.robotframework.ide.eclipse.main.plugin">
+      </contexts>
+org.robotframework.ide.eclipse.main.plugin   </extension>
 </plugin>
