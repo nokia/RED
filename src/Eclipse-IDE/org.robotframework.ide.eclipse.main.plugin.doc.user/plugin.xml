@@ -29,5 +29,5 @@
             file="contexts.xml"
             plugin="org.robotframework.ide.eclipse.main.plugin">
       </contexts>
-org.robotframework.ide.eclipse.main.plugin   </extension>
+   </extension>
 </plugin>
