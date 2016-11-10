@@ -1,0 +1,190 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ExportImportREDPreference
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _x2ENoKdEEeazyPh6f3_hNQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/10/16 3:11 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//select prefernce from all sections
+get-preferences-menu | click
+with [get-window Preferences] {
+	//autodiscover
+    get-tree | select "Robot Framework/Autodiscovering"
+    get-group "Libraries Autodiscovering" 
+        | get-button "Add project modules recursively to PYTHONPATH/CLASSPATH during Autodiscovering on virtualenv" 
+        | check
+    //content assist    
+    get-tree | select "Robot Framework/Editor/Content Assist"
+    get-group "Auto activation" | get-editbox -after [get-label "Auto activation delay (ms)"] | set-text 300
+    get-group Proposals | get-button "Completion overrides" | click
+    get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" | check
+    
+    //folding
+    get-tree | select "Robot Framework/Editor/Folding"
+    get-button "Sections (tables)" | uncheck
+    get-button "Test cases" | uncheck
+    get-button Keywords | uncheck
+    get-button "Documentations settings (of suites, keywords, cases)" | uncheck
+    get-editbox -after [get-label "Minimum number of lines element must span"] | set-text 3
+    
+    //syntax coloring
+    get-tree | select "Robot Framework/Editor/Syntax Coloring"
+    get-list | select Comments
+    get-button Bold | check
+    get-button Italic | check
+    
+    //warnings
+    get-tree | select "Robot Framework/Errors\\/Warnings"
+    with [get-section "Code style"] {
+        mouse-press 11 7 button1
+        click
+        get-combo -after [get-label "Keyword from nested library"] | select Info
+        get-combo -after [get-label "Keyword occurence not consistent with definition"] | select Ignore
+    }
+    with [get-section "Name shadowing and conflicts"] {
+        click
+        get-combo -after [get-label "Duplicated variable name"] | select Error
+    }
+    
+    //frameworks
+    get-tree | select "Robot Framework/Installed frameworks"
+    get-table | get-item  "Robot Framework .*\(Jython .*\)" | check
+    get-button OK | click
+    get-window "Rebuild required" | get-button OK | click
+}
+
+//check export window
+get-menu "File/Export..." | click
+get-window Export | get-tree | select "General/Preferences" | double-click
+with [get-window "Export Preferences" | get-group "" | get-tree] {
+    get-property multiSelection | equals false | verify-true
+    get-property itemCount | equals 1 | verify-true
+    get-property "getItems().TreeItem[0].getText()" | equals "Robot Framework" | verify-true
+    get-property "getItems().TreeItem[0].getItems().length" | equals 0 | verify-true
+    get-item "Robot Framework" | get-property selected | equals false | verify-true
+}
+with [get-window "Export Preferences" | get-group "" | get-tree] {
+    select "Robot Framework"
+    get-item "Robot Framework" | check
+}
+
+//select path to export
+set-dialog-result File
+with [get-window "Export Preferences"] {
+    get-button "Browse..." | click
+    get-combo -after [get-label "To preference file:"] | set-text [concat $RED_workspace_path "/exported_pref"]
+    get-button Finish | click
+}
+
+//restore all settings to default
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Autodiscovering"
+    get-button "Restore Defaults" | click
+    get-tree | select "Robot Framework/Editor"
+    get-button "Restore Defaults" | click
+    get-tree | select "Robot Framework/Errors\\/Warnings"
+    get-button "Restore Defaults" | click
+    get-tree | select "Robot Framework/Installed frameworks"
+}
+//rebuild after changing to python
+with [get-window Preferences] {
+    get-table | get-item  "Robot Framework .*\(Python .*\)" | check
+    get-button OK | click
+    get-window "Rebuild required" | get-button OK | click
+}
+
+//import preference from file
+get-menu "File/Import..." | click
+with [get-window Import | get-tree] {
+    select General | double-click
+    select "General/Preferences" | double-click
+}
+//get-window "Import Preferences" | get-combo -after [get-label "From preference file:"] | set-text "D:\\abc\\jjj"
+set-dialog-result File [concat $RED_workspace_path "/exported_pref"]
+with [get-window "Import Preferences"] {
+    get-button "Browse..." | click
+    with [get-group "" | get-tree] {
+        select "Robot Framework"
+        get-item "Robot Framework" | check
+    }
+    get-button Finish | click
+}
+
+//check if preferences were imported
+get-preferences-menu | click
+
+//Autodiscovering
+get-window Preferences | get-tree | select "Robot Framework/Autodiscovering"
+get-window Preferences | get-group "Libraries Autodiscovering" 
+    | get-button "Add project modules recursively to PYTHONPATH/CLASSPATH during Autodiscovering on virtualenv" 
+    | get-property selected | equals true | verify-true
+    
+//Content Assist    
+get-window Preferences | get-tree | select "Robot Framework/Editor/Content Assist"
+with [get-window Preferences] {
+    get-group "Auto activation" | get-editbox -after [get-label "Auto activation delay (ms)"] | get-property text 
+        | equals 300 | verify-true
+    get-group Proposals | get-button "Completion overrides" | get-property selected | equals true | verify-true
+    get-group Keywords | get-button "Automatically add library or resource name to keyword proposal insertion" 
+        | get-property selected | equals true | verify-true
+}
+
+//folding
+get-window Preferences | get-tree | select "Robot Framework/Editor/Folding"
+with [get-window Preferences] {
+    get-button "Sections (tables)" | get-property selected | equals false | verify-true
+    get-button "Test cases" | get-property selected | equals false | verify-true
+    get-button Keywords | get-property selected | equals false | verify-true
+    get-button "Documentations settings (of suites, keywords, cases)" | get-property selected | equals false 
+        | verify-true
+    get-editbox -after [get-label "Minimum number of lines element must span"] | get-property text | equals 3 
+        | verify-true
+}
+
+//Syntax Coloring
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Syntax Coloring"
+    get-list | select Comments
+}
+with [get-window Preferences] {
+    get-button Bold | get-property selected | equals true | verify-true
+    get-button Italic | get-property selected | equals true | verify-true
+}
+
+//errors/warnings
+get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings"
+with [get-window Preferences] {
+    with [get-section "Code style"] {
+        get-combo -after [get-label "Keyword from nested library"] | get-property selection | equals Info | verify-true
+        get-combo -after [get-label "Keyword occurence not consistent with definition"] | get-property selection 
+            | equals Ignore | verify-true
+        get-combo -after [get-label "Keyword name with dots"] | get-property selection | equals Warning | verify-true
+        with [get-combo -after [get-label "Collection size should be equal to keyword arguments number"]] {
+            get-property selection | equals Warning | verify-true
+            get-property selection | equals Warning | verify-true
+        }
+        get-combo -after [get-label "Invalid time format"] | get-property selection | equals Warning | verify-true
+    }
+    with [get-section "Name shadowing and conflicts"] {
+        get-combo -after [get-label "Duplicated variable name"] | get-property selection | equals Error | verify-true
+        get-combo -after [get-label "Duplicated test case name"] | get-property selection | equals Warning | verify-true
+        get-combo -after [get-label "Masked keyword name"] | get-property selection | equals Warning | verify-true
+    }
+}
+
+//installed framework
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+get-window Preferences | get-table | get-item "Robot Framework .*\(Python .*\)" | get-property checked 
+    | equals true | verify-true
+
+get-window Preferences | get-button OK | click
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
