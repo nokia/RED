@@ -88,9 +88,9 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
         });
 
         Map<ProblemCategoryType, Collection<ProblemCategory>> categories = ProblemCategory.getAllCategories();
-        for (Entry<ProblemCategoryType, Collection<ProblemCategory>> categpryEntry : categories.entrySet()) {
-            if (!categpryEntry.getValue().isEmpty()) {
-                createProblemCategorySection(scrolled.getBody(), categpryEntry.getKey(), categpryEntry.getValue());
+        for (Entry<ProblemCategoryType, Collection<ProblemCategory>> categoryEntry : categories.entrySet()) {
+            if (!categoryEntry.getValue().isEmpty()) {
+                createProblemCategorySection(scrolled.getBody(), categoryEntry.getKey(), categoryEntry.getValue());
             }
         }
     }
@@ -105,12 +105,12 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
     }
 
     private void createProblemCategorySection(final Composite parent, final ProblemCategoryType type,
-            Collection<ProblemCategory> categpries) {
+            Collection<ProblemCategory> categories) {
         final ExpandableComposite redExpandableComposite = createExpandableSection(parent, type);
         final Composite client = new Composite(redExpandableComposite, SWT.NONE);
         redExpandableComposite.setClient(client);
 
-        for (final ProblemCategory category : categpries) {
+        for (final ProblemCategory category : categories) {
             addField(new ComboBoxFieldEditor(category.getId(), category.getName(), category.getDescription(), 20,
                     entries(category), client));
         }
@@ -142,10 +142,7 @@ public class ValidationPreferencePage extends FieldEditorPreferencePage implemen
         while (!(parent instanceof ScrolledContent) && parent != null) {
             parent = parent.getParent();
         }
-        if (parent instanceof ScrolledContent) {
-            return (ScrolledContent) parent;
-        }
-        return null;
+        return (ScrolledContent) parent;
     }
 
     private static String[][] entries(final ProblemCategory category) {
