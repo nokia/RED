@@ -1,0 +1,110 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ImportConflictedPreferences
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _gccY8KdQEeazyPh6f3_hNQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/10/16 5:07 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+with [get-window Preferences] {
+	//folding
+    get-tree | select "Robot Framework/Editor/Folding"
+    get-button "Test cases" | uncheck
+    get-button "Keywords" | uncheck
+    
+    //warnings
+    get-tree | select "Robot Framework/Errors\\/Warnings"
+    with [get-section "Code style"] {
+        click
+        get-combo -after [get-label "Keyword from nested library"] | select Info
+    }
+    with [get-section "Name shadowing and conflicts"] {
+        click
+        get-combo -after [get-label "Duplicated variable name"] | select Info
+    }
+    with [get-section "Unnecessary code"] {
+        click
+        get-combo -after [get-label "Empty settings definition"] | select Info
+        get-combo -after [get-label "Unrecognized header type"] | select Ignore
+    }
+    get-button OK | click
+}
+
+//export to file only RED prefernce
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Export..." | click
+with [get-window Export | get-tree] {
+    select General | double-click
+    select "General/Preferences" | double-click
+}
+with [get-window "Export Preferences"] {
+    with [get-group "" | get-tree] {
+        select "Robot Framework"
+        get-item "Robot Framework" | check
+    }
+    get-combo -after [get-label "To preference file:"] | set-text [concat $RED_workspace_path "/exported_pref"]
+    get-button Finish | click
+}
+
+//change to other values warnings
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-section "Code style" | get-combo -after [get-label "Keyword from nested library"] | select Error
+    get-section "Name shadowing and conflicts" | get-combo -after [get-label "Duplicated variable name"] | select Error
+    with [get-section "Unnecessary code"] {
+        get-combo -after [get-label "Empty settings definition"] | select Ignore
+        get-combo -after [get-label "Unrecognized header type"] | select Error
+    }
+    get-button Apply | click
+    get-button OK | click
+}
+
+//import
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "Import..." | click
+with [get-window Import | get-tree] {
+    select General | double-click
+    select "General/Preferences" | double-click
+}
+set-dialog-result File [concat $RED_workspace_path "/exported_pref"]
+with [get-window "Import Preferences"] {
+    get-button "Browse..." | click
+    with [get-group "" | get-tree] {
+        select "Robot Framework"
+        get-item "Robot Framework" | check
+    }
+    get-button Finish | click
+}
+
+//check if prefernce were overwritten for the same items
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-section "Code style" | get-combo -after [get-label "Keyword from nested library"] | get-property selection 
+        | equals Info | verify-true
+    get-section "Name shadowing and conflicts" | get-combo -after [get-label "Duplicated variable name"] 
+        | get-property selection | equals Info | verify-true
+}
+with [get-window Preferences | get-section "Unnecessary code"] {
+    get-combo -after [get-label "Empty settings definition"] | get-property selection | equals Info | verify-true
+    get-combo -after [get-label "Unrecognized header type"] | get-property selection | equals Ignore | verify-true
+    get-combo -after [get-label "Duplicated configuration path"] | get-property selection | equals Warning | verify-true
+}
+
+//check folding
+get-window Preferences | get-tree | select "Robot Framework/Editor/Folding"
+with [get-window Preferences] {
+    get-button "Sections (tables)" | get-property selected | equals true | verify-true
+    get-button "Test cases" | get-property selected | equals false | verify-true
+    get-button Keywords | get-property selected | equals false | verify-true
+    get-button "Documentations settings (of suites, keywords, cases)" | get-property selected | equals true 
+        | verify-true
+}
+get-window Preferences | get-button OK | click
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--

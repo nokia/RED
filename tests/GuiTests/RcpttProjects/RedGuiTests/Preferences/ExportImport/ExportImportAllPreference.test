@@ -1,0 +1,138 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Element-Name: ExportImportAllPreference
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _6SFBkKdNEeazyPh6f3_hNQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/10/16 3:17 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-preferences-menu | click
+with [get-window Preferences] {
+	
+	//content assist
+    get-tree | select "Robot Framework/Editor/Content Assist"
+    get-group "Auto activation" | get-button "Auto activation enabled" | uncheck
+    
+    //folding
+    get-tree | select "Robot Framework/Editor/Folding"
+    get-button "Sections (tables)" | uncheck
+    
+    //coloring
+    get-tree | select "Robot Framework/Editor/Syntax Coloring"
+    get-list | select Variables
+    get-button Bold | check
+    
+    //warnings
+    get-tree | select "Robot Framework/Errors\\/Warnings"
+    with [get-section "Robot version"] {
+        click
+        get-combo -after [get-label "Deprecated Robot Framework API used"] | select Info
+        get-combo -after [get-label "Duplicated definitions used"] | select Ignore
+    }
+    
+    //change to jython
+    get-tree | select "Robot Framework/Installed frameworks"
+    get-table | get-item "Robot Framework .*\(Jython .*\)" | check
+    get-button OK | click
+    get-window "Rebuild required" | get-button OK | click
+}
+
+//export preferences
+get-menu "File/Export..." | click
+with [get-window Export | get-tree] {
+    select General | double-click
+    select "General/Preferences" | double-click
+}
+with [get-window "Export Preferences"] {
+    get-combo -after [get-label "To preference file:"] | set-text [concat $RED_workspace_path "/exported_pref"]
+    get-button Finish | click
+}
+
+//restore to default
+get-preferences-menu | click
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Content Assist"
+    get-button "Restore Defaults" | click
+    get-tree | select "Robot Framework/Editor/Folding"
+    get-button "Restore Defaults" | click
+    get-tree | select "Robot Framework/Editor/Syntax Coloring"
+    get-button "Restore Defaults" | click
+    get-tree | select "Robot Framework/Errors\\/Warnings"
+    get-button "Restore Defaults" | click
+    get-tree | select "Robot Framework/Installed frameworks"
+    get-table | get-item  "Robot Framework .*\(Python .*\)" | check
+    get-button OK | click
+    get-window "Rebuild required" | get-button OK | click
+}
+
+//Import preferences
+get-menu "File/Import..." | click
+with [get-window Import | get-tree] {
+    select General | double-click
+    select "General/Preferences" | double-click
+}
+set-dialog-result File [concat $RED_workspace_path "/exported_pref"]
+with [get-window "Import Preferences"] {
+    get-button "Browse..." | click
+    get-button Finish | click
+}
+
+//check if all wa loaded
+get-preferences-menu | click
+
+//content assist
+get-window Preferences | get-tree | select "Robot Framework/Editor/Content Assist"
+get-window Preferences | get-group "Auto activation" | get-button "Auto activation enabled" | get-property selected 
+    | equals false | verify-true
+    
+//folding    
+get-window Preferences | get-tree | select "Robot Framework/Editor/Folding"
+with [get-window Preferences] {
+    get-button "Sections (tables)" | get-property selected | equals false | verify-true
+    get-button "Test cases" | get-property selected | equals true | verify-true
+    get-button Keywords | get-property selected | equals true | verify-true
+    get-button "Documentations settings (of suites, keywords, cases)" | get-property selected | equals true 
+        | verify-true
+    get-editbox -after [get-label "Minimum number of lines element must span"] | get-property text | equals 2 
+        | verify-true
+}
+
+//coloring
+with [get-window Preferences] {
+    get-tree | select "Robot Framework/Editor/Syntax Coloring"
+    get-list | select Variables
+}
+with [get-window Preferences] {
+    get-button Bold | get-property selected | equals true | verify-true
+    get-button Italic | get-property selected | equals false | verify-true
+}
+
+//warnings
+get-window Preferences | get-tree | select "Robot Framework/Errors\\/Warnings"
+with [get-window Preferences | get-section "Robot version"] {
+    get-combo -after [get-label "Removed Robot Framework API used"] | get-property selection | equals Error 
+        | verify-true
+    get-combo -after [get-label "Unsupported Robot Framework API used"] | get-property selection | equals Error 
+        | verify-true
+    get-combo -after [get-label "Deprecated Robot Framework API used"] | get-property selection | equals Info 
+        | verify-true
+    get-combo -after [get-label "Duplicated definitions used"] | get-property selection | equals Ignore | verify-true
+    get-combo -after [get-label "Incorrect variable initialization"] | get-property selection | equals Warning 
+        | verify-true
+}
+//framework
+get-window Preferences | get-tree | select "Robot Framework/Installed frameworks"
+get-window Preferences | get-table | get-item "Robot Framework .*\(Jython .*\)" 
+    | get-property selected | equals false | verify-true
+    
+get-window Preferences | get-button OK | click  
+
+  
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
