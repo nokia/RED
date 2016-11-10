@@ -62,7 +62,7 @@ public class KeywordsColumnsPropertyAccessor implements IColumnPropertyAccessor<
             final RobotKeywordDefinition keywordDef = (RobotKeywordDefinition) rowObject;
             if (columnIndex == 0) {
                 return keywordDef.getName();
-            } else if (columnIndex > 0 && columnIndex < (numberOfColumns - 1)) {
+            } else if (columnIndex > 0 && columnIndex <= (numberOfColumns - 1)) {
                 final RobotDefinitionSetting argumentsSetting = keywordDef.getArgumentsSetting();
                 if (argumentsSetting != null) {
                     final List<String> arguments = argumentsSetting.getArguments();
