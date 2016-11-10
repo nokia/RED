@@ -43,8 +43,10 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
             } else {
                 configLabels.addLabel(KEYWORD_ASSIST_REQUIRED);
             }
-        } else if (columnPosition > 0 && columnPosition < dataProvider.getColumnCount() - 1) {
-            if (rowObject instanceof RobotKeywordDefinition) {
+        } else if (columnPosition > 0 && columnPosition <= dataProvider.getColumnCount() - 1) {
+            if (columnPosition > 1 && isDocumentation(rowObject)) {
+                configLabels.addLabel(KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
+            } else if (rowObject instanceof RobotKeywordDefinition) {
                 configLabels.addLabel(KEYWORD_DEFINITION_ARGUMENT_CONFIG_LABEL);
                 configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
             } else if (rowObject instanceof RobotDefinitionSetting) {
@@ -64,8 +66,6 @@ public class KeywordElementsInTreeLabelAccumulator implements IConfigLabelAccumu
             } else {
                 configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
             }
-        } else if (columnPosition == (dataProvider.getColumnCount() - 1) && isDocumentation(rowObject)) {
-            configLabels.addLabel(KEYWORD_DEFINITION_SETTING_DOCUMENTATION_NOT_EDITABLE_LABEL);
         }
     }
 
