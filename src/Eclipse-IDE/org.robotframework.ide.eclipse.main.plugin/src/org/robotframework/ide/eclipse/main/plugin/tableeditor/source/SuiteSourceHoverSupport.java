@@ -41,7 +41,6 @@ import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.IRobotLineElement;
-import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.RobotLine;
 import org.rf.ide.core.testdata.text.read.RobotLine.PositionCheck;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -134,12 +133,7 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
                     PositionCheck.INSIDE);
             if (elementPositionInLine.isPresent()) {
                 final IRobotLineElement hoveredElement = robotLine.getLineElements().get(elementPositionInLine.get());
-                final List<IRobotTokenType> hoveredElementTypes = hoveredElement.getTypes();
-                if (hoveredElementTypes.contains(RobotTokenType.KEYWORD_ACTION_NAME)
-                        || hoveredElementTypes.contains(RobotTokenType.KEYWORD_NAME)
-                        || hoveredElementTypes.contains(RobotTokenType.TEST_CASE_ACTION_NAME)) {
-                    return true;
-                }
+                return (!hoveredElement.getTypes().contains(RobotTokenType.TEST_CASE_NAME));
             }
         }
 
