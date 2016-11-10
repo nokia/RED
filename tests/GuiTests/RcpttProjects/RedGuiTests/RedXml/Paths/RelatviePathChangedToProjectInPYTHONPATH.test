@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _a_1L4AfGEearkLC-7wHL-g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/20/16 10:04 AM
+Save-Time: 11/10/16 4:16 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -175,17 +175,18 @@ with [get-view Problems | get-tree] {
 //run test again    
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" 
     | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" | click
-    
+
+try -delay 1000 -times 5 -command{    
 //check message log    
-get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.Lib With Variable.test\n"
-    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{a\} = text\n"
-    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{b\} = 56\n"
-    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{c\} = 8\n"
-    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : text\n"
-    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : 56\n"
-    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : 8\n"
-    + "Ending test: RobotProject.Lib With Variable.test" | verify-true
-    
+	get-view "Message Log" | get-editbox | get-property text | equals "Starting test: RobotProject.Lib With Variable.test\n"
+	    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{a\} = text\n"
+	    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{b\} = 56\n"
+	    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : \$\{c\} = 8\n"
+	    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : text\n"
+	    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : 56\n"
+	    + "\d{8} (\d\d:){2}\d\d.\d{1,3} : INFO : 8\n"
+	    + "Ending test: RobotProject.Lib With Variable.test" | verify-true
+}	    
 //check console    
 get-view Console | get-text-viewer | get-property text 
     | equals "Command: .* -m .* -P .* --listener .* -s .*\n"
