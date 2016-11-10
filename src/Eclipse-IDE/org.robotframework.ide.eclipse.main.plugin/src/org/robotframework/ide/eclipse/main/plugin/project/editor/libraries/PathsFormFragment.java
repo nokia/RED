@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.ViewersConfigurator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Combo;
@@ -102,26 +103,23 @@ class PathsFormFragment implements ISectionFormFragment {
     public void initialize(final Composite parent) {
         final Section section = createSection(parent);
 
-        final Composite internalComposite = toolkit.createComposite(section);
-        section.setClient(internalComposite);
+        final ScrolledComposite scrolledParent = new ScrolledComposite(section, SWT.H_SCROLL | SWT.V_SCROLL);
+        toolkit.adapt(scrolledParent);
+        section.setClient(scrolledParent);
+        
+        final Composite internalComposite = toolkit.createComposite(scrolledParent);
+        scrolledParent.setContent(internalComposite);
+        scrolledParent.setExpandVertical(true);
+        scrolledParent.setExpandHorizontal(true);
+
         GridDataFactory.fillDefaults().grab(true, true).applyTo(internalComposite);
-        GridLayoutFactory.fillDefaults().margins(0, 5).applyTo(internalComposite);
+        GridLayoutFactory.fillDefaults().extendedMargins(0, 10, 0, 5).applyTo(internalComposite);
 
         createRelativityCombo(internalComposite);
 
-        final ViewerConfiguration pythonConfig = new PythonPathViewerConfiguration();
-        toolkit.createFormText(internalComposite, false)
-                .setText("<form><li>" + pythonConfig.getVariableName() + "</li></form>", true, false);
-        pythonPathViewer = createViewer(internalComposite, pythonConfig);
-        createColumns(pythonPathViewer, pythonConfig);
-        createContextMenu(pythonPathViewer, pythonConfig);
-
-        final ViewerConfiguration classConfig = new ClassPathViewerConfiguration();
-        toolkit.createFormText(internalComposite, false)
-                .setText("<form><li>" + classConfig.getVariableName() + "</li></form>", true, false);
-        classPathViewer = createViewer(internalComposite, classConfig);
-        createColumns(classPathViewer, classConfig);
-        createContextMenu(classPathViewer, classConfig);
+        pythonPathViewer = createPathViewer(internalComposite, new PythonPathViewerConfiguration());
+        classPathViewer = createPathViewer(internalComposite, new ClassPathViewerConfiguration());
+        scrolledParent.setMinSize(internalComposite.computeSize(-1, -1));
     }
 
     private Section createSection(final Composite parent) {
@@ -161,13 +159,26 @@ class PathsFormFragment implements ISectionFormFragment {
         });
     }
 
+    private RowExposingTableViewer createPathViewer(final Composite parent, final ViewerConfiguration config) {
+        toolkit.createFormText(parent, false)
+                .setText("<form><li>" + config.getVariableName() + "</li></form>", true, false);
+        RowExposingTableViewer viewer = createViewer(parent, config);
+        createColumns(viewer, config);
+        createContextMenu(viewer, config);
+        return viewer;
+    }
+
     private RowExposingTableViewer createViewer(final Composite parent, final ViewerConfiguration config) {
         final RowExposingTableViewer viewer = new RowExposingTableViewer(parent,
                 SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
         CellsActivationStrategy.addActivationStrategy(viewer, RowTabbingStrategy.MOVE_TO_NEXT);
         ColumnViewerToolTipSupport.enableFor(viewer, ToolTip.NO_RECREATE);
 
-        GridDataFactory.fillDefaults().grab(true, true).indent(10, 0).applyTo(viewer.getTable());
+        GridDataFactory.fillDefaults()
+                .grab(true, true)
+                .indent(10, 0)
+                .minSize(100, 100)
+                .applyTo(viewer.getTable());
         viewer.setUseHashlookup(true);
         viewer.getTable().setEnabled(false);
         viewer.getTable().setLinesVisible(false);
@@ -187,7 +198,7 @@ class PathsFormFragment implements ISectionFormFragment {
                 .labelsProvidedBy(new PathsLabelProvider(config.getVariableName(), editorInput))
                 .editingEnabledOnlyWhen(editorInput.isEditable())
                 .editingSupportedBy(new PathsEditingSupport(viewer, elementsCreator(config.getPathAddingStrategy()),
-                        eventBroker, config.getPathModifcationTopic()))
+                        eventBroker, config.getPathModificationTopic()))
                 .createFor(viewer);
     }
 
@@ -363,7 +374,7 @@ class PathsFormFragment implements ISectionFormFragment {
 
         String getVariableName();
 
-        String getPathModifcationTopic();
+        String getPathModificationTopic();
 
         PathAdder getPathAddingStrategy();
     }
@@ -381,7 +392,7 @@ class PathsFormFragment implements ISectionFormFragment {
         }
 
         @Override
-        public String getPathModifcationTopic() {
+        public String getPathModificationTopic() {
             return RobotProjectConfigEvents.ROBOT_CONFIG_PYTHONPATH_CHANGED;
         }
 
@@ -419,7 +430,7 @@ class PathsFormFragment implements ISectionFormFragment {
         }
 
         @Override
-        public String getPathModifcationTopic() {
+        public String getPathModificationTopic() {
             return RobotProjectConfigEvents.ROBOT_CONFIG_CLASSPATH_CHANGED;
         }
 
