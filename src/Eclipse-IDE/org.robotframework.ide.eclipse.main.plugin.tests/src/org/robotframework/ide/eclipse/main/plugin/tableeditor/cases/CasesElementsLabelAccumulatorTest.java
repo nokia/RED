@@ -25,6 +25,7 @@ public class CasesElementsLabelAccumulatorTest {
     private static final int NUMBER_OF_COLUMNS = 6;
 
     private IRowDataProvider<Object> dataProvider;
+
     private CasesElementsLabelAccumulator accumulator;
 
     @SuppressWarnings("unchecked")
@@ -42,16 +43,14 @@ public class CasesElementsLabelAccumulatorTest {
 
     @Test
     public void whenCaseIsTemplated_thereIsAProperLabelInCellWithItsName() {
-        labelIsAccumulatedAt(createTemplatedCase(),
-                CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL, 0);
+        labelIsAccumulatedAt(createTemplatedCase(), CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL, 0);
     }
 
     @Test
     public void caseShouldBeEditableOnlyInFirstColumn() {
-        labelIsAccumulatedAt(createTestCase(), CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL, 1, 2,
-                3, 4, 5);
-        labelIsAccumulatedAt(createTemplatedCase(), CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL,
-                1, 2, 3, 4, 5);
+        labelIsAccumulatedAt(createTestCase(), CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL, 1, 2, 3, 4, 5);
+        labelIsAccumulatedAt(createTemplatedCase(), CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL, 1, 2, 3, 4,
+                5);
     }
 
     @Test
@@ -78,8 +77,7 @@ public class CasesElementsLabelAccumulatorTest {
     public void callRequiresVariablesAssistInInternalColumns() {
         for (final RobotKeywordCall call : createTestCase().getChildren()) {
             if (call.getClass() == RobotKeywordCall.class) {
-                labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED, 1, 2, 3,
-                        4);
+                labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED, 1, 2, 3, 4, 5);
             }
         }
     }
@@ -114,11 +112,9 @@ public class CasesElementsLabelAccumulatorTest {
             if (call instanceof RobotDefinitionSetting) {
                 final RobotDefinitionSetting setting = (RobotDefinitionSetting) call;
                 if (setting.isKeywordBased()) {
-                    labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED, 2,
-                            3, 4);
+                    labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED, 2, 3, 4, 5);
                 } else {
-                    labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED, 1,
-                            2, 3, 4);
+                    labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED, 1, 2, 3, 4, 5);
                 }
             }
         }
@@ -128,7 +124,7 @@ public class CasesElementsLabelAccumulatorTest {
     public void documentationIsNotEditableForArgumentsColumnsOtherThatFirstOne() {
         for (final RobotKeywordCall call : createTestCase().getChildren()) {
             if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isDocumentation()) {
-                labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL, 2, 3, 4);
+                labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL, 2, 3, 4, 5);
             } else {
                 thereIsNoSuchLabel(call, CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL);
             }
