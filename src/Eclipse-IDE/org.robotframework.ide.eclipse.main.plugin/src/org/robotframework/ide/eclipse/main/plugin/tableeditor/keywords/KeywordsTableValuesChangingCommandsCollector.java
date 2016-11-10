@@ -17,7 +17,6 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.KeywordCallsT
 
 /**
  * @author Michal Anglart
- *
  */
 public class KeywordsTableValuesChangingCommandsCollector {
 
@@ -40,7 +39,7 @@ public class KeywordsTableValuesChangingCommandsCollector {
 
             if (column == 0) {
                 commands.add(new SetKeywordDefinitionNameCommand(keywordDef, value));
-            } else if (column > 0 && column < numberOfColumns - 1) {
+            } else if (column > 0 && column <= numberOfColumns - 1) {
                 commands.add(new SetKeywordDefinitionArgumentCommand(keywordDef, column - 1, value));
             }
         } else {
