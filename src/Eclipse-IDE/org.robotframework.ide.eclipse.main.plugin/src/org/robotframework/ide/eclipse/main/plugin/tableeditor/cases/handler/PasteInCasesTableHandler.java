@@ -35,8 +35,9 @@ public class PasteInCasesTableHandler extends DIParameterizedHandler<E4PasteInCa
             final List<EditorCommand> pasteCommands = new PasteCasesCellsCommandsCollector()
                     .collectPasteCommands(editor.getSelectionLayerAccessor(), selectedElements, clipboard);
 
-            final EditorCommand parentCommand = new EmptyCommand(); 
-            for (final EditorCommand command : pasteCommands) {
+            final EditorCommand parentCommand = new EmptyCommand();
+            for (int i = pasteCommands.size() - 1; i >= 0; i--) {
+                final EditorCommand command = pasteCommands.get(i);
                 command.setParent(parentCommand);
                 commandsStack.execute(command);
             }
