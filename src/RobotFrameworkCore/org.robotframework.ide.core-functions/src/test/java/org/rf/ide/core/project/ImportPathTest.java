@@ -44,15 +44,15 @@ public class ImportPathTest {
     public void testAbsolutePaths_unixPaths() {
         assumeFalse(RedSystemProperties.isWindowsPlatform());
 
-        assertThat(ImportPath.from("/absolute").isAbsolute()).isFalse();
-        assertThat(ImportPath.from("/absolute/to/dir").isAbsolute()).isFalse();
-        assertThat(ImportPath.from("/absolute/./to/dir").isAbsolute()).isFalse();
-        assertThat(ImportPath.from("/absolute/../to/dir").isAbsolute()).isFalse();
-        assertThat(ImportPath.from("/absolute/.././../to/dir").isAbsolute()).isFalse();
-        assertThat(ImportPath.from("/absolute/to/file.ext").isAbsolute()).isFalse();
-        assertThat(ImportPath.from("/absolute/./to/file.ext").isAbsolute()).isFalse();
-        assertThat(ImportPath.from("/absolute/../to/file.ext").isAbsolute()).isFalse();
-        assertThat(ImportPath.from("/absolute/.././../to/file.ext").isAbsolute()).isFalse();
+        assertThat(ImportPath.from("/absolute").isAbsolute()).isTrue();
+        assertThat(ImportPath.from("/absolute/to/dir").isAbsolute()).isTrue();
+        assertThat(ImportPath.from("/absolute/./to/dir").isAbsolute()).isTrue();
+        assertThat(ImportPath.from("/absolute/../to/dir").isAbsolute()).isTrue();
+        assertThat(ImportPath.from("/absolute/.././../to/dir").isAbsolute()).isTrue();
+        assertThat(ImportPath.from("/absolute/to/file.ext").isAbsolute()).isTrue();
+        assertThat(ImportPath.from("/absolute/./to/file.ext").isAbsolute()).isTrue();
+        assertThat(ImportPath.from("/absolute/../to/file.ext").isAbsolute()).isTrue();
+        assertThat(ImportPath.from("/absolute/.././../to/file.ext").isAbsolute()).isTrue();
     }
 
     @Test
