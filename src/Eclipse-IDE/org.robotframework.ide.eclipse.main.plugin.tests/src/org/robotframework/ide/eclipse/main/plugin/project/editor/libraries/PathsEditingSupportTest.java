@@ -19,7 +19,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.junit.Rule;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.junit.ShellProvider;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport.NewElementsCreator;

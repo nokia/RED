@@ -17,9 +17,9 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -48,7 +48,7 @@ public class ExcludedPathModifyChangeTest {
     @Test
     public void excludedPathIsModified_whenChangeIsPerfomed() throws Exception {
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addExcludedPath(new Path("a/b/c"));
+        config.addExcludedPath("a/b/c");
 
         final ExcludedFolderPath excludedPathToModify = config.getExcludedPath().get(0);
 

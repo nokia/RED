@@ -26,11 +26,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage.LogLevel;
 import org.rf.ide.core.testdata.model.RobotFileOutput.Status;
+import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -38,9 +40,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.SuiteFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
@@ -76,12 +76,12 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         // prepare
         when(toUpdateMessages.getStatus()).thenReturn(Status.PASSED);
 
-        List<BuildMessage> buildMsgs = new ArrayList<>();
-        BuildMessage infoMsg = mock(BuildMessage.class);
+        final List<BuildMessage> buildMsgs = new ArrayList<>();
+        final BuildMessage infoMsg = mock(BuildMessage.class);
         when(infoMsg.getType()).thenReturn(LogLevel.INFO);
-        BuildMessage warningMsg = mock(BuildMessage.class);
+        final BuildMessage warningMsg = mock(BuildMessage.class);
         when(warningMsg.getType()).thenReturn(LogLevel.WARN);
-        BuildMessage errorMsg = mock(BuildMessage.class);
+        final BuildMessage errorMsg = mock(BuildMessage.class);
         when(errorMsg.getType()).thenReturn(LogLevel.ERROR);
 
         buildMsgs.add(infoMsg);
@@ -94,7 +94,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, infoMsg, warningMsg, errorMsg);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, infoMsg, warningMsg, errorMsg);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
@@ -109,7 +109,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(2);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(-1)),
@@ -121,8 +121,8 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         // prepare
         when(toUpdateMessages.getStatus()).thenReturn(Status.PASSED);
 
-        List<BuildMessage> buildMsgs = new ArrayList<>();
-        BuildMessage infoMsg = mock(BuildMessage.class);
+        final List<BuildMessage> buildMsgs = new ArrayList<>();
+        final BuildMessage infoMsg = mock(BuildMessage.class);
         buildMsgs.add(infoMsg);
         when(infoMsg.getType()).thenReturn(LogLevel.INFO);
 
@@ -132,7 +132,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, infoMsg);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, infoMsg);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
@@ -140,7 +140,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(infoMsg, times(2)).getType();
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).isEmpty();
     }
 
@@ -149,8 +149,8 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         // prepare
         when(toUpdateMessages.getStatus()).thenReturn(Status.PASSED);
 
-        List<BuildMessage> buildMsgs = new ArrayList<>();
-        BuildMessage warningMsg = mock(BuildMessage.class);
+        final List<BuildMessage> buildMsgs = new ArrayList<>();
+        final BuildMessage warningMsg = mock(BuildMessage.class);
         buildMsgs.add(warningMsg);
         when(warningMsg.getType()).thenReturn(LogLevel.WARN);
 
@@ -160,7 +160,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, warningMsg);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, warningMsg);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
@@ -170,7 +170,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(warningMsg, times(1)).getMessage();
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(1);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays.asList(
                 new Problem[] { new Problem(SuiteFileProblem.BUILD_WARNING_MESSAGE, new ProblemPosition(-1)) }));
@@ -181,8 +181,8 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         // prepare
         when(toUpdateMessages.getStatus()).thenReturn(Status.PASSED);
 
-        List<BuildMessage> buildMsgs = new ArrayList<>();
-        BuildMessage errorMsg = mock(BuildMessage.class);
+        final List<BuildMessage> buildMsgs = new ArrayList<>();
+        final BuildMessage errorMsg = mock(BuildMessage.class);
         buildMsgs.add(errorMsg);
         when(errorMsg.getType()).thenReturn(LogLevel.ERROR);
 
@@ -192,7 +192,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, errorMsg);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, errorMsg);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
@@ -202,7 +202,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(errorMsg, times(1)).getMessage();
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(1);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.BUILD_ERROR_MESSAGE, new ProblemPosition(-1)) }));
@@ -217,14 +217,14 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
         order.verify(toUpdateMessages, times(1)).getBuildingMessages();
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).isEmpty();
     }
 
@@ -233,12 +233,12 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         // prepare
         when(toUpdateMessages.getStatus()).thenReturn(Status.FAILED);
 
-        List<BuildMessage> buildMsgs = new ArrayList<>();
-        BuildMessage infoMsg = mock(BuildMessage.class);
+        final List<BuildMessage> buildMsgs = new ArrayList<>();
+        final BuildMessage infoMsg = mock(BuildMessage.class);
         when(infoMsg.getType()).thenReturn(LogLevel.INFO);
-        BuildMessage warningMsg = mock(BuildMessage.class);
+        final BuildMessage warningMsg = mock(BuildMessage.class);
         when(warningMsg.getType()).thenReturn(LogLevel.WARN);
-        BuildMessage errorMsg = mock(BuildMessage.class);
+        final BuildMessage errorMsg = mock(BuildMessage.class);
         when(errorMsg.getType()).thenReturn(LogLevel.ERROR);
 
         buildMsgs.add(infoMsg);
@@ -251,7 +251,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, infoMsg, warningMsg, errorMsg);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, infoMsg, warningMsg, errorMsg);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
@@ -267,7 +267,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
 
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(3);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
@@ -280,8 +280,8 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         // prepare
         when(toUpdateMessages.getStatus()).thenReturn(Status.FAILED);
 
-        List<BuildMessage> buildMsgs = new ArrayList<>();
-        BuildMessage infoMsg = mock(BuildMessage.class);
+        final List<BuildMessage> buildMsgs = new ArrayList<>();
+        final BuildMessage infoMsg = mock(BuildMessage.class);
         buildMsgs.add(infoMsg);
         when(infoMsg.getType()).thenReturn(LogLevel.INFO);
 
@@ -291,7 +291,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, infoMsg);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, infoMsg);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
@@ -300,7 +300,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(infoMsg, times(2)).getType();
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(1);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)) }));
@@ -311,8 +311,8 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         // prepare
         when(toUpdateMessages.getStatus()).thenReturn(Status.FAILED);
 
-        List<BuildMessage> buildMsgs = new ArrayList<>();
-        BuildMessage warningMsg = mock(BuildMessage.class);
+        final List<BuildMessage> buildMsgs = new ArrayList<>();
+        final BuildMessage warningMsg = mock(BuildMessage.class);
         buildMsgs.add(warningMsg);
         when(warningMsg.getType()).thenReturn(LogLevel.WARN);
 
@@ -322,7 +322,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, warningMsg);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, warningMsg);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
@@ -333,7 +333,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(warningMsg, times(1)).getMessage();
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(2);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
@@ -345,8 +345,8 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         // prepare
         when(toUpdateMessages.getStatus()).thenReturn(Status.FAILED);
 
-        List<BuildMessage> buildMsgs = new ArrayList<>();
-        BuildMessage errorMsg = mock(BuildMessage.class);
+        final List<BuildMessage> buildMsgs = new ArrayList<>();
+        final BuildMessage errorMsg = mock(BuildMessage.class);
         buildMsgs.add(errorMsg);
         when(errorMsg.getType()).thenReturn(LogLevel.ERROR);
 
@@ -356,7 +356,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, errorMsg);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file, errorMsg);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
@@ -367,7 +367,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(errorMsg, times(1)).getMessage();
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(2);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)),
@@ -383,7 +383,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         rfv.validate(monitor);
 
         // validate
-        InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file);
+        final InOrder order = inOrder(suiteFile, coreModel, toUpdateMessages, file);
         order.verify(suiteFile, times(1)).getLinkedElement();
         order.verify(coreModel, times(1)).getParent();
         order.verify(toUpdateMessages, times(1)).getStatus();
@@ -391,7 +391,7 @@ public class RobotFileValidatorCheckBuildMessagesTest {
         order.verify(toUpdateMessages, times(1)).getBuildingMessages();
         order.verifyNoMoreInteractions();
 
-        Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
+        final Collection<Problem> reportedProblems = ((MockReporter) this.reporter).getReportedProblems();
         assertThat(reportedProblems).hasSize(1);
         assertThat(reportedProblems).containsOnlyElementsOf(Arrays
                 .asList(new Problem[] { new Problem(SuiteFileProblem.FILE_PARSING_FAILED, new ProblemPosition(-1)) }));
@@ -431,15 +431,15 @@ public class RobotFileValidatorCheckBuildMessagesTest {
     }
 
     private RobotSuiteFile createSuiteFile() {
-        RobotSuiteFile mySuiteFile = mock(RobotSuiteFile.class);
+        final RobotSuiteFile mySuiteFile = mock(RobotSuiteFile.class);
 
-        Optional<RobotCasesSection> cases = Optional.absent();
+        final Optional<RobotCasesSection> cases = Optional.absent();
         when(mySuiteFile.findSection(RobotCasesSection.class)).thenReturn(cases);
-        Optional<RobotSettingsSection> settings = Optional.absent();
+        final Optional<RobotSettingsSection> settings = Optional.absent();
         when(mySuiteFile.findSection(RobotSettingsSection.class)).thenReturn(settings);
-        Optional<RobotKeywordsSection> keywords = Optional.absent();
+        final Optional<RobotKeywordsSection> keywords = Optional.absent();
         when(mySuiteFile.findSection(RobotKeywordsSection.class)).thenReturn(keywords);
-        Optional<RobotVariablesSection> variables = Optional.absent();
+        final Optional<RobotVariablesSection> variables = Optional.absent();
         when(mySuiteFile.findSection(RobotVariablesSection.class)).thenReturn(variables);
 
         return mySuiteFile;

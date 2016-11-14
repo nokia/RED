@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.launch;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -22,13 +21,13 @@ import org.junit.ClassRule;
 import org.junit.Test;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.RelativeTo;
+import org.rf.ide.core.project.RobotProjectConfig.RelativityPoint;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RuntimeEnvironmentsMocks;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RelativeTo;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RelativityPoint;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.collect.Lists;

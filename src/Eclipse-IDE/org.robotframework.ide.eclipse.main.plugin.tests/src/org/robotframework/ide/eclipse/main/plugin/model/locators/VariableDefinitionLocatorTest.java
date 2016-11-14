@@ -16,6 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Rule;
 import org.junit.Test;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.imported.DictionaryRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ListRobotInternalVariable;
 import org.rf.ide.core.testdata.imported.ScalarRobotInternalVariable;
@@ -34,7 +35,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.collect.ImmutableMap;

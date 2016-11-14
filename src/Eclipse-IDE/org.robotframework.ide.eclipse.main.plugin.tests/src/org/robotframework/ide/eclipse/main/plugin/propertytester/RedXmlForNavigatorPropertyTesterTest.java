@@ -10,7 +10,7 @@ import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.red.junit.ProjectProvider;
 
 public class RedXmlForNavigatorPropertyTesterTest {
@@ -32,7 +32,7 @@ public class RedXmlForNavigatorPropertyTesterTest {
 
         projectProvider.addRobotNature();
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addExcludedPath(Path.fromPortableString("excluded_dir"));
+        config.addExcludedPath("excluded_dir");
         projectProvider.configure(config);
 
     }
