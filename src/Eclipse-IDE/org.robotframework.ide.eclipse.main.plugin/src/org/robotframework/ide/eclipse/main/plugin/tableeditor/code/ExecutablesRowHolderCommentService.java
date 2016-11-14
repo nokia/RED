@@ -149,7 +149,7 @@ public class ExecutablesRowHolderCommentService {
                                 "\\");
                         changeTmpName.execute();
                         executedCommands.add(changeTmpName);
-                    } else {
+                    } else if (column - 1 == i && execRowView.size() - 1 < i) {
                         final SetKeywordCallArgumentCommand2 argSetNotTheSameColumn = new SetKeywordCallArgumentCommand2(
                                 eventBroker, callToUse, column - 2, "\\");
                         argSetNotTheSameColumn.execute();
@@ -319,6 +319,7 @@ public class ExecutablesRowHolderCommentService {
             final AModelElement<?> modelElement = (AModelElement<?>) linkedElement;
 
             if (isExecutable(modelElement)) {
+                @SuppressWarnings("unchecked")
                 final RobotExecutableRowView view = RobotExecutableRowView
                         .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
                 toks.addAll(newArrayList(transform(modelElement.getElementTokens(),
