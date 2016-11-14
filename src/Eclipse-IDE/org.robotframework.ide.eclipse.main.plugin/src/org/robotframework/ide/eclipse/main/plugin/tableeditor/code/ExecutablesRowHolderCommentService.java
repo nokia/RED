@@ -258,7 +258,9 @@ public class ExecutablesRowHolderCommentService {
     private static String commentUpdatedValue(final ICommentHolder cmHolder, final int commentIndex,
             final String commentValue) {
         final List<RobotToken> comment = new ArrayList<>(cmHolder.getComment());
-        final int cmSize = comment.size();
+        final int actionAsHashAdditionalCommentValue = (cmHolder instanceof RobotExecutableRow<?>
+                && ((RobotExecutableRow<?>) cmHolder).getAction().getText().startsWith("#")) ? 1 : 0;
+        final int cmSize = comment.size() + actionAsHashAdditionalCommentValue;
         if (commentIndex >= cmSize) {
             for (int i = 0; i <= (commentIndex - cmSize); i++) {
                 comment.add(RobotToken.create("\\"));
@@ -268,7 +270,7 @@ public class ExecutablesRowHolderCommentService {
         if (commentValue == null) {
             comment.remove(commentIndex);
         } else {
-            comment.set(commentIndex, RobotToken.create(commentValue));
+            comment.set(commentIndex - actionAsHashAdditionalCommentValue, RobotToken.create(commentValue));
         }
 
         return commentViewBuild(comment);
@@ -284,6 +286,9 @@ public class ExecutablesRowHolderCommentService {
                     str.append(ETokenSeparator.PIPE_WRAPPED_WITH_SPACE.getSeparatorAsText());
                 }
                 str.append(comment.get(i).getText());
+                if (comment.get(i).getText().equals("\\")) {
+                    str.append(" ");
+                }
             }
 
             cmUpdated = str.toString();
