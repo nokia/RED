@@ -13,9 +13,9 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ImagesManager;
@@ -70,7 +70,16 @@ class ReferencedLibrariesLabelProvider extends RedCommonLabelProvider {
             } else if (!problems.isEmpty()) {
                 return ImagesManager.getImage(RedImages.getRobotLibraryWarnImage());
             } else {
-                return ImagesManager.getImage(library.getImage());
+                switch (library.provideType()) {
+                    case JAVA:
+                        return ImagesManager.getImage(RedImages.getJavaLibraryImage());
+                    case PYTHON:
+                        return ImagesManager.getImage(RedImages.getPythonLibraryImage());
+                    case VIRTUAL:
+                        return ImagesManager.getImage(RedImages.getVirtualLibraryImage());
+                    default:
+                        return ImagesManager.getImage(RedImages.getLibraryImage());
+                }
             }
         } else if (element instanceof RemoteLocation) {
             final RemoteLocation location = (RemoteLocation) element;

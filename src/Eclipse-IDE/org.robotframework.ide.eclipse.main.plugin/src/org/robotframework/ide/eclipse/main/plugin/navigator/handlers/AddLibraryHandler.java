@@ -18,15 +18,15 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.AddLibraryHandler.E4AddLibraryHandler;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
@@ -54,7 +54,7 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
                 RobotProjectConfig config = robotProject.getOpenedProjectConfig();
                 final boolean inEditor = config != null;
                 if (config == null) {
-                    config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
+                    config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
                 }
 
                 final Shell shell = Display.getCurrent().getActiveShell();
@@ -75,7 +75,7 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
                     eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_LIBRARIES_STRUCTURE_CHANGED, eventData);
 
                     if (!inEditor) {
-                        new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
+                        new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
                     }
                 }
             }

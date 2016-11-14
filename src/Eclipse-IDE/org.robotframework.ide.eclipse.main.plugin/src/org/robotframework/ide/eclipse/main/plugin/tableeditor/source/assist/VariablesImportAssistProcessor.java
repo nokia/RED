@@ -17,8 +17,8 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
 import org.robotframework.red.graphics.ImagesManager;
@@ -93,7 +93,7 @@ public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
     }
 
     private String createCurrentFileRelativePath(final IPath resourcePath) {
-        return PathsConverter.fromWorkspaceRelativeToResourceRelative(assist.getFile(), resourcePath).toString();
+        return RedWorkspace.Paths.fromWorkspaceRelativeToResourceRelative(assist.getFile(), resourcePath).toString();
     }
 
     private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)

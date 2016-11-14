@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 
 public class RobotProjectNature implements IProjectNature {
@@ -81,7 +82,7 @@ public class RobotProjectNature implements IProjectNature {
 	@Override
 	public void configure() throws CoreException {
         addToBuildSpec(project, ROBOT_LIBRARIES_BUILDER);
-        new RobotProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
+        new RedEclipseProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
 	}
 
 	@Override

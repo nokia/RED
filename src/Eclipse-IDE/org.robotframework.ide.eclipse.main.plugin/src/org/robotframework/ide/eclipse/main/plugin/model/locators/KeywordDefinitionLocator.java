@@ -72,7 +72,7 @@ public class KeywordDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        final List<IPath> resources = PathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile);
+        final List<IPath> resources = ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile);
         shouldContinue = locateInResourceFiles(resources, newHashSet(startingFile.getFile()), startingFile, detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -105,7 +105,7 @@ public class KeywordDefinitionLocator {
             alreadyVisited.add((IFile) resourceFile);
 
             final RobotSuiteFile resourceSuiteFile = model.createSuiteFile((IFile) resourceFile);
-            final List<IPath> nestedResources = PathsResolver.getWorkspaceRelativeResourceFilesPaths(resourceSuiteFile);
+            final List<IPath> nestedResources = ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(resourceSuiteFile);
             ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, alreadyVisited, startingFile,
                     detector);
             if (shouldContinue == ContinueDecision.STOP) {

@@ -53,11 +53,11 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile.ImportedVariablesFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.Settings.ImportArguments;
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.viewers.Selections;
 
@@ -161,8 +161,8 @@ public class ImportVariablesComposite {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 final Settings variables = (Settings) variablesViewer.getInput();
-                final ImportedVariablesFile variablesFile = Selections.getSingleElement(
-                        (IStructuredSelection) variablesViewer.getSelection(), ImportedVariablesFile.class);
+                final ImportArguments variablesFile = Selections
+                        .getSingleElement((IStructuredSelection) variablesViewer.getSelection(), ImportArguments.class);
                 final List<String> args = variablesFile.getArgs();
                 final Shell newShell = new Shell(shell);
                 if (args != null && !args.isEmpty()) {
@@ -209,8 +209,8 @@ public class ImportVariablesComposite {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 final Settings variables = (Settings) variablesViewer.getInput();
-                final ImportedVariablesFile variablesFile = Selections.getSingleElement(
-                        (IStructuredSelection) variablesViewer.getSelection(), ImportedVariablesFile.class);
+                final ImportArguments variablesFile = Selections
+                        .getSingleElement((IStructuredSelection) variablesViewer.getSelection(), ImportArguments.class);
                 if (!variablesFile.getArgs().isEmpty()) {
                     final List<String> args = variablesFile.getArgs().subList(1, variablesFile.getArgs().size());
                     final Shell newShell = new Shell(shell);
@@ -232,8 +232,8 @@ public class ImportVariablesComposite {
             @Override
             public void widgetSelected(final SelectionEvent e) {
                 final Settings variables = (Settings) variablesViewer.getInput();
-                final List<ImportedVariablesFile> paths = Selections.getElements(
-                        (IStructuredSelection) variablesViewer.getSelection(), ImportedVariablesFile.class);
+                final List<ImportArguments> paths = Selections
+                        .getElements((IStructuredSelection) variablesViewer.getSelection(), ImportArguments.class);
                 handleVariableRemove(variables, paths);
             }
         });
@@ -266,36 +266,37 @@ public class ImportVariablesComposite {
     }
 
     private void handleVariableAdd(final List<String> paths) {
-        final List<ImportedVariablesFile> currentVariables = ((Settings) variablesViewer.getInput()).getImportedVariables();
+        final List<ImportArguments> currentVariables = ((Settings) variablesViewer.getInput())
+                .getImportedVariablesArguments();
         for (final String newPathString : paths) {
             if (!newPathString.isEmpty()) {
                 final ArrayList<String> args = newArrayList(newPathString);
                 commandsStack.execute(new CreateFreshSettingCommand(settingsSection, "Variables", args));
-                currentVariables.add(new ImportedVariablesFile(args));
+                currentVariables.add(new ImportArguments(args));
             }
         }
         variablesViewer.refresh();
     }
 
     private void handleVariableRemove(final Settings importedSettings,
-            final List<ImportedVariablesFile> resourcesToRemove) {
+            final List<ImportArguments> resourcesToRemove) {
         final List<RobotSetting> settingsToRemove = newArrayList();
         final List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
         for (final RobotElement element : currentVariables) {
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
             if (!args.isEmpty()) {
-                if (resourcesToRemove.contains(new ImportedVariablesFile(args))) {
+                if (resourcesToRemove.contains(new ImportArguments(args))) {
                     settingsToRemove.add(setting);
                 }
             }
         }
-        importedSettings.getImportedVariables().removeAll(resourcesToRemove);
+        importedSettings.getImportedVariablesArguments().removeAll(resourcesToRemove);
         commandsStack.execute(new DeleteSettingCommand(settingsToRemove));
         variablesViewer.refresh();
     }
 
-    private void handleVariablesPathEdit(final Settings importedSettings, final ImportedVariablesFile variablesFile,
+    private void handleVariablesPathEdit(final Settings importedSettings, final ImportArguments variablesFile,
             final String newPath) {
         final List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
         for (final RobotElement element : currentVariables) {
@@ -311,7 +312,7 @@ public class ImportVariablesComposite {
         variablesViewer.refresh();
     }
 
-    private void handleVariablesArgsEdit(final Settings importedSettings, final ImportedVariablesFile variablesFile,
+    private void handleVariablesArgsEdit(final Settings importedSettings, final ImportArguments variablesFile,
             final List<String> newArgs) {
         final List<RobotKeywordCall> currentVariables = settingsSection.getVariablesSettings();
         for (final RobotElement element : currentVariables) {
@@ -346,7 +347,7 @@ public class ImportVariablesComposite {
     }
 
     protected void setInitialSelection(final RobotSetting initialSetting) {
-        final ImportedVariablesFile selectedImport = new ImportedVariablesFile(
+        final ImportArguments selectedImport = new ImportArguments(
                 initialSetting.getArguments());
         variablesViewer.setSelection(new StructuredSelection(selectedImport));
     }
@@ -370,7 +371,7 @@ public class ImportVariablesComposite {
         }
 
         public StyledString getStyledText(final Object element) {
-            final ImportedVariablesFile importedVariable = (ImportedVariablesFile) element;
+            final ImportArguments importedVariable = (ImportArguments) element;
             final List<String> args = importedVariable.getArgs();
             final StyledString text = new StyledString("");
             if (args != null && !args.isEmpty()) {
@@ -411,11 +412,11 @@ public class ImportVariablesComposite {
 
         @Override
         public Object[] getElements(final Object inputElement) {
-            final List<ImportedVariablesFile> variables = ((Settings) inputElement).getImportedVariables();
-//            Collections.sort(variables, new Comparator<ImportedVariablesFile>() {
+            final List<ImportArguments> variables = ((Settings) inputElement).getImportedVariablesArguments();
+            // Collections.sort(variables, new Comparator<ImportArguments>() {
 //
 //                @Override
-//                public int compare(final ImportedVariablesFile spec1, final ImportedVariablesFile spec2) {
+            // public int compare(final ImportArguments spec1, final ImportArguments spec2) {
 //                    return spec1.compareTo(spec2);
 //                }
 //            });

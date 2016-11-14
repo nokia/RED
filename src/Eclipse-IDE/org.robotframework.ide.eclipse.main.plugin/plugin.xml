@@ -2557,7 +2557,7 @@
                    ifEmpty="false"
                    operator="and">
                 <instanceof
-                      value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$VariableMapping">
+                      value="org.rf.ide.core.project.RobotProjectConfig$VariableMapping">
                 </instanceof>
              </iterate>
           </with>
@@ -2578,7 +2578,7 @@
                    ifEmpty="false"
                    operator="and">
                 <instanceof
-                      value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$ReferencedVariableFile">
+                      value="org.rf.ide.core.project.RobotProjectConfig$ReferencedVariableFile">
                 </instanceof>
              </iterate>
           </with>
@@ -2600,10 +2600,10 @@
                    operator="and">
                 <or>
                    <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$ReferencedLibrary">
+                         value="org.rf.ide.core.project.RobotProjectConfig$ReferencedLibrary">
                    </instanceof>
                    <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$RemoteLocation">
+                         value="org.rf.ide.core.project.RobotProjectConfig$RemoteLocation">
                    </instanceof>
                 </or>
              </iterate>
@@ -2626,7 +2626,7 @@
                    operator="and">
                 <and>
                    <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$SearchPath">
+                         value="org.rf.ide.core.project.RobotProjectConfig$SearchPath">
                    </instanceof>
                    <test
                          property="org.robotframework.redxml.libraries.isSystemPath"
@@ -2653,7 +2653,7 @@
                    operator="and">
                 <and>
                    <instanceof
-                         value="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$SearchPath">
+                         value="org.rf.ide.core.project.RobotProjectConfig$SearchPath">
                    </instanceof>
                    <test
                          property="org.robotframework.redxml.libraries.isSystemPath"
@@ -4043,7 +4043,7 @@
           id="org.robotframework.redxml.searchPathsConfigPropertyTester"
           namespace="org.robotframework.redxml.libraries"
           properties="isSystemPath"
-          type="org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig$SearchPath">
+          type="org.rf.ide.core.project.RobotProjectConfig$SearchPath">
     </propertyTester>
     <propertyTester
           class="org.robotframework.ide.eclipse.main.plugin.propertytester.RedXmlForNavigatorPropertyTester"

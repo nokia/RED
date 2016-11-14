@@ -25,21 +25,21 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
+import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
+import org.rf.ide.core.validation.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RelativityPoint;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -68,7 +68,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     @Override
     public void validate(final IProgressMonitor monitor) throws CoreException {
         try {
-            final RobotProjectConfigWithLines config = new RobotProjectConfigReader()
+            final RobotProjectConfigWithLines config = new RedEclipseProjectConfigReader()
                     .readConfigurationWithLines(configFile);
             validate(monitor, config);
         } catch (final CannotReadProjectConfigurationException e) {
@@ -91,10 +91,10 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             index++;
         }
         for (final SearchPath path : model.getPythonPath()) {
-            validateSearchPath(monitor, path, model.getRelativityPoint(), linesMapping);
+            validateSearchPath(monitor, path, model, linesMapping);
         }
         for (final SearchPath path : model.getClassPath()) {
-            validateSearchPath(monitor, path, model.getRelativityPoint(), linesMapping);
+            validateSearchPath(monitor, path, model, linesMapping);
         }
         for (final ReferencedVariableFile variableFile : model.getReferencedVariableFiles()) {
             validateReferencedVariableFile(monitor, variableFile, linesMapping);
@@ -169,7 +169,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
         }
         javaLibProblems.addAll(validatePath(libraryPath, ConfigFileProblem.MISSING_LIBRARY_FILE));
 
-        final IPath absolutePath = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
+        final IPath absolutePath = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(libraryPath);
         final RobotProject robotProject = context.getModel().createRobotProject(configFile.getProject());
         boolean containsClass = false;
         final List<JarClass> classes = new JarStructureBuilder(robotProject.getRuntimeEnvironment(),
@@ -221,13 +221,13 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
     }
 
     private void validateSearchPath(final IProgressMonitor monitor, final SearchPath searchPath,
-            final RelativityPoint relativityPoint,
-            final Map<Object, ProblemPosition> linesMapping) {
+            final RobotProjectConfig config, final Map<Object, ProblemPosition> linesMapping) {
         if (monitor.isCanceled()) {
             return;
         }
         try {
-            final File location = searchPath.toAbsolutePath(configFile.getProject(), relativityPoint);
+            final File location = new RedEclipseProjectConfig(config).toAbsolutePath(searchPath,
+                    configFile.getProject());
             if (!location.exists()) {
                 final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_SEARCH_PATH)
                         .formatMessageWith(location.toString());
@@ -261,7 +261,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
             return;
         }
         final IProject project = configFile.getProject();
-        final IPath asExcludedPath = excludedPath.asPath();
+        final IPath asExcludedPath = Path.fromPortableString(excludedPath.getPath());
         final Path projectPath = new Path(project.getName());
         if (!project.exists(asExcludedPath)) {
             final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.MISSING_EXCLUDED_FOLDER)
@@ -271,7 +271,7 @@ public class RobotProjectConfigFileValidator implements ModelUnitValidator {
 
         for (final ExcludedFolderPath otherPath : allExcluded) {
             if (otherPath != excludedPath) {
-                final IPath otherAsPath = otherPath.asPath();
+                final IPath otherAsPath = Path.fromPortableString(otherPath.getPath());
                 if (otherAsPath.isPrefixOf(asExcludedPath)) {
                     final RobotProblem problem = RobotProblem.causedBy(ConfigFileProblem.USELESS_FOLDER_EXCLUSION)
                             .formatMessageWith(projectPath.append(asExcludedPath), projectPath.append(otherAsPath));

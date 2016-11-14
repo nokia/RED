@@ -8,9 +8,9 @@ package org.robotframework.ide.eclipse.main.plugin.propertytester;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -54,7 +54,7 @@ public class RedXmlForNavigatorPropertyTester extends PropertyTester {
         if (config == null) {
             config = robotProject.getRobotProjectConfig();
         }
-        return config.isExcludedFromValidation(projectElement.getProjectRelativePath());
+        return config.isExcludedFromValidation(projectElement.getProjectRelativePath().toPortableString());
     }
 
 }

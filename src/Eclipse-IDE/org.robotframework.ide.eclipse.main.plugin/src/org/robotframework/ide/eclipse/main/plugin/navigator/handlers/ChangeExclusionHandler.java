@@ -17,14 +17,14 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IDecoratorManager;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Selections;
 
@@ -73,7 +73,7 @@ abstract class ChangeExclusionHandler {
 
         final boolean inEditor = config != null;
         if (config == null) {
-            config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
+            config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
         }
 
         for (final IPath pathToChange : toChange) {
@@ -81,7 +81,7 @@ abstract class ChangeExclusionHandler {
         }
 
         if (!inEditor) {
-            new RobotProjectConfigWriter().writeConfiguration(config, project);
+            new RedEclipseProjectConfigWriter().writeConfiguration(config, project);
         }
         try {
             project.refreshLocal(IResource.DEPTH_INFINITE, null);

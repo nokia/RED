@@ -12,12 +12,12 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
+import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProblemCategory.Severity;
 
@@ -60,7 +60,7 @@ public class RedProjectEditorInput {
 
     public void refreshProjectConfiguration(final IFile file) {
         this.file = Optional.fromNullable(file);
-        projectConfiguration = new RobotProjectConfigReader().readConfigurationWithLines(file);
+        projectConfiguration = new RedEclipseProjectConfigReader().readConfigurationWithLines(file);
     }
 
     public List<RedXmlProblem> getProblemsFor(final Object modelPart) {

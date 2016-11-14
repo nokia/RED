@@ -7,11 +7,11 @@ package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Iterables.filter;
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Maps.newLinkedHashMap;
 import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -28,23 +28,23 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
-import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesWatchHandler;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
@@ -68,8 +68,6 @@ public class RobotProject extends RobotContainer {
     
     private RobotProjectConfig configuration;
 
-    private List<File> modulesSearchPath;
-    
     private final LibrariesWatchHandler librariesWatchHandler;
 
     RobotProject(final IProject project) {
@@ -80,20 +78,17 @@ public class RobotProject extends RobotContainer {
     public synchronized RobotProjectHolder getRobotProjectHolder() {
         if (projectHolder == null) {
             projectHolder = new RobotProjectHolder(getRuntimeEnvironment());
-            return projectHolder;
         }
-        if (projectHolder.getVariableMappings().isEmpty()) {
-            projectHolder.setVariableMappings(extractVariableMappingsFromProjectConfiguration());
-        }
+        projectHolder.configure(getRobotProjectConfig(), getProject().getLocation().toFile());
         return projectHolder;
     }
 
     public RobotParser getEagerRobotParser() {
-        return RobotParser.createEager(getRobotProjectHolder());
+        return RobotParser.createEager(getRobotProjectHolder(), createPathsProvider());
     }
     
     public RobotParser getRobotParser() {
-        return RobotParser.create(getRobotProjectHolder());
+        return RobotParser.create(getRobotProjectHolder(), createPathsProvider());
     }
 
     public IProject getProject() {
@@ -245,7 +240,7 @@ public class RobotProject extends RobotContainer {
     private synchronized RobotProjectConfig readProjectConfigurationIfNeeded() {
         if (configuration == null) {
             try {
-                configuration = new RobotProjectConfigReader().readConfiguration(getProject());
+                configuration = new RedEclipseProjectConfigReader().readConfiguration(getProject());
             } catch (final CannotReadProjectConfigurationException e) {
                 // oh well...
             }
@@ -327,15 +322,16 @@ public class RobotProject extends RobotContainer {
         return getProject().getFile(filename);
     }
 
+    public PathsProvider createPathsProvider() {
+        return new ProjectPathsProvider();
+    }
+
     public void setModuleSearchPaths(final List<File> paths) {
-        this.modulesSearchPath = paths;
+        getRobotProjectHolder().setModuleSearchPaths(paths);
     }
 
     public synchronized List<File> getModuleSearchPaths() {
-        if (modulesSearchPath == null) {
-            modulesSearchPath = getRuntimeEnvironment().getModuleSearchPaths();
-        }
-        return modulesSearchPath;
+        return getRobotProjectHolder().getModuleSearchPaths();
     }
     
     public synchronized List<String> getPythonpath() {
@@ -344,15 +340,15 @@ public class RobotProject extends RobotContainer {
             final Set<String> pp = newLinkedHashSet();
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
                 if (lib.provideType() == LibraryType.PYTHON) {
-                    final String path = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
+                    final String path = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(
                             new Path(lib.getPath())).toOSString();
                     pp.add(path);
                 }
             }
+            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
             for (final SearchPath searchPath : configuration.getPythonPath()) {
                 try {
-                    final String path = searchPath
-                            .toAbsolutePath(getProject(), getRobotProjectConfig().getRelativityPoint()).getPath();
+                    final String path = redConfig.toAbsolutePath(searchPath, getProject()).getPath();
                     pp.add(path);
                 } catch (final PathResolvingException e) {
                     // we don't want to add syntax-problematic paths
@@ -370,15 +366,15 @@ public class RobotProject extends RobotContainer {
             cp.add(".");
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
                 if (lib.provideType() == LibraryType.JAVA) {
-                    final IPath absPath = PathsConverter
+                    final IPath absPath = RedWorkspace.Paths
                             .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(lib.getPath()));
                     cp.add(absPath.toOSString());
                 }
             }
             for (final SearchPath searchPath : configuration.getClassPath()) {
                 try {
-                    final String path = searchPath
-                            .toAbsolutePath(getProject(), getRobotProjectConfig().getRelativityPoint()).getPath();
+                    final String path = new RedEclipseProjectConfig(configuration)
+                            .toAbsolutePath(searchPath, getProject()).getPath();
                     cp.add(path);
                 } catch (final PathResolvingException e) {
                     // we don't want to add syntax-problematic paths
@@ -416,7 +412,7 @@ public class RobotProject extends RobotContainer {
         if (configuration != null) {
             for (final ReferencedLibrary lib : configuration.getLibraries()) {
                 if (lib.provideType() == LibraryType.PYTHON && lib.getName().equals(libName)) {
-                    return PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(
+                    return RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(
                             new Path(lib.getPath()).append(lib.getName() + ".py")).toPortableString();
                 }
             }
@@ -426,18 +422,18 @@ public class RobotProject extends RobotContainer {
     
     public List<String> getVariableFilePaths() {
         readProjectConfigurationIfNeeded();
+
+        final List<String> list = new ArrayList<>();
         if (configuration != null) {
-            final List<String> list = newArrayList();
             for (final ReferencedVariableFile variableFile : configuration.getReferencedVariableFiles()) {
-                final String path = PathsConverter
+                final String path = RedWorkspace.Paths
                         .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(variableFile.getPath())).toOSString();
                 final List<String> args = variableFile.getArguments();
                 final String arguments = args == null || args.isEmpty() ? "" : ":" + Joiner.on(":").join(args);
                 list.add(path + arguments);
             }
-            return list;
         }
-        return newArrayList();
+        return list;
     }
     
     @VisibleForTesting
@@ -474,30 +470,9 @@ public class RobotProject extends RobotContainer {
     }
 
     public String resolve(final String expression) {
-        readProjectConfigurationIfNeeded();
-        return RobotExpressions.resolve(extractVariableMappingsFromProjectConfiguration(), expression);
+        return RobotExpressions.resolve(getRobotProjectHolder().getVariableMappings(), expression);
     }
 
-    private synchronized Map<String, String> extractVariableMappingsFromProjectConfiguration() {
-        final Map<String, String> knownVariables = newHashMap();
-        knownVariables.put("${/}", File.separator);
-        knownVariables.put("${curdir}", ".");
-        knownVariables.put("${space}", " ");
-        final IPath projectLocationPath = getProject().getLocation();
-        if(projectLocationPath != null) {
-            final String projectLocation = projectLocationPath.toPortableString();
-            knownVariables.put("${execdir}", projectLocation);
-            knownVariables.put("${outputdir}", projectLocation);
-        }
-        if (configuration != null) {
-            for (final VariableMapping mapping : configuration.getVariableMappings()) {
-                knownVariables.put(VariableNamesSupport.extractUnifiedVariableName(mapping.getName()),
-                        mapping.getValue());
-            }
-        }
-        return knownVariables;
-    }
-    
     private void removeUnusedLibspecFiles(final Map<ReferencedLibrary, LibrarySpecification> refLibsSpecs) {
         if(!librariesWatchHandler.getRemovedSpecs().isEmpty()) {
             for (final LibrarySpecification removedSpec : librariesWatchHandler.getRemovedSpecs()) {
@@ -515,5 +490,31 @@ public class RobotProject extends RobotContainer {
             getRuntimeEnvironment().resetCommandExecutors();    //needed when user will add a library again after removal
         }
     }
-    
+
+    private class ProjectPathsProvider implements PathsProvider {
+
+        @Override
+        public List<File> providePythonModulesSearchPaths() {
+            return getModuleSearchPaths();
+        }
+
+        @Override
+        public List<File> provideUserSearchPaths() {
+            final RobotProjectConfig configuration = getRobotProjectConfig();
+            if (configuration == null) {
+                return new ArrayList<>();
+            }
+            final List<File> paths = new ArrayList<>();
+            final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(configuration);
+            for (final SearchPath searchPath : configuration.getPythonPath()) {
+                try {
+                    final File searchPathParent = redConfig.toAbsolutePath(searchPath, getProject());
+                    paths.add(searchPathParent);
+                } catch (final PathResolvingException e) {
+                    continue;
+                }
+            }
+            return paths;
+        }
+    }
 }

@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.project.library.KeywordSpecification;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 

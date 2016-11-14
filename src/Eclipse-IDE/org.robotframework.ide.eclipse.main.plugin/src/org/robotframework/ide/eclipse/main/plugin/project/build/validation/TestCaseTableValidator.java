@@ -40,12 +40,12 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -433,7 +433,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
                     if (isInvalidVariableDeclaration(validationContext, definedVariables, lineDescription,
                             variableDeclaration)) {
                         String variableName = variableDeclaration.getVariableName().getText();
-                        Optional<TextPosition> extractVariableName = new VariableComputationHelper()
+                        final Optional<TextPosition> extractVariableName = new VariableComputationHelper()
                                 .extractVariableName(variableDeclaration);
                         if (extractVariableName.isPresent()) {
                             variableName = extractVariableName.get().getText();

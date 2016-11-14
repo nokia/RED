@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
@@ -90,7 +90,8 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
                 final List<ReferencedVariableFile> variableFiles  = new ArrayList<>();
                 final String[] chosenFiles = dialog.getFileNames();
                 for (final String file : chosenFiles) {
-                    final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(dialog.getFilterPath()))
+                    final IPath path = RedWorkspace.Paths
+                            .toWorkspaceRelativeIfPossible(new Path(dialog.getFilterPath()))
                             .addTrailingSeparator() //add separator when filterPath is e.g. 'D:'
                             .append(file);
 
@@ -110,13 +111,13 @@ class VariableFilesPathEditingSupport extends ElementsAddingEditingSupport {
         ReferencedVariableFile modifyExisting(final ReferencedVariableFile varFile) {
             final FileDialog dialog = new FileDialog(shell, SWT.OPEN | SWT.MULTI);
             dialog.setFilterExtensions(new String[] { "*.py", "*.*" });
-            final IPath startingPath = PathsConverter
+            final IPath startingPath = RedWorkspace.Paths
                     .toAbsoluteFromWorkspaceRelativeIfPossible(new Path(varFile.getPath())).removeLastSegments(1);
             dialog.setFilterPath(startingPath.toPortableString());
 
             final String chosenFile = dialog.open();
             if (chosenFile != null) {
-                final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(chosenFile));
+                final IPath path = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(chosenFile));
                 varFile.setPath(path.toPortableString());
 
                 getEventBroker().send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_PATH_CHANGED, varFile);

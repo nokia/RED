@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
+import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 import org.robotframework.ide.eclipse.main.plugin.validation.ProblemsReportingStrategyFactory.HeadlessValidationReportingStrategy;
 

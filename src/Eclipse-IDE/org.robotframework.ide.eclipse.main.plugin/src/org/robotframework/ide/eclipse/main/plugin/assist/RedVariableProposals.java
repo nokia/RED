@@ -13,6 +13,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -20,7 +21,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecision;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 
 
 public class RedVariableProposals {

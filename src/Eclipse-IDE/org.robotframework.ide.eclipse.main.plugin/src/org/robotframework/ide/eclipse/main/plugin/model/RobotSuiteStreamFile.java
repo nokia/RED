@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.eclipse.core.runtime.content.IContentDescriber;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
@@ -75,8 +76,9 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
             @Override
             public RobotFileOutput parse() {
-                final RobotParser parser = RobotParser
-                        .create(new RobotProjectHolder(RedPlugin.getDefault().getActiveRobotInstallation()));
+                final RobotParser parser = RobotParser.create(
+                        new RobotProjectHolder(RedPlugin.getDefault().getActiveRobotInstallation()),
+                        (PathsProvider) null);
                 return parser.parseEditorContent("", new File(name));
             }
         });
@@ -88,8 +90,9 @@ public class RobotSuiteStreamFile extends RobotSuiteFile {
 
             @Override
             public RobotFileOutput parse() {
-                final RobotParser parser = RobotParser
-                        .create(new RobotProjectHolder(RedPlugin.getDefault().getActiveRobotInstallation()));
+                final RobotParser parser = RobotParser.create(
+                        new RobotProjectHolder(RedPlugin.getDefault().getActiveRobotInstallation()),
+                        (PathsProvider) null);
                 return parser.parseEditorContent(newContent, new File(name));
             }
         };

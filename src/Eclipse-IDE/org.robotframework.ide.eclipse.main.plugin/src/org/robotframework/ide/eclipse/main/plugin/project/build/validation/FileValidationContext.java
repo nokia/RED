@@ -17,14 +17,14 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 

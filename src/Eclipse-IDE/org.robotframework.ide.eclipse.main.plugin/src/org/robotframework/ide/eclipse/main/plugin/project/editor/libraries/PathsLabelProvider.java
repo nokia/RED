@@ -14,8 +14,10 @@ import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ImagesManager;
@@ -80,10 +82,17 @@ class PathsLabelProvider extends RedCommonLabelProvider {
             final SearchPath path = (SearchPath) element;
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(element);
             if (problems.isEmpty()) {
-                final String tooltipPath = path.toAbsolutePath(editorInput.getRobotProject().getProject(),
-                        editorInput.getProjectConfiguration().getRelativityPoint()).getPath();
-                return path.isSystem() ? tooltipPath + " [already defined in " + pathVariableName + " variable]"
-                        : tooltipPath;
+                final RedEclipseProjectConfig redConfig = new RedEclipseProjectConfig(
+                        editorInput.getProjectConfiguration());
+
+                try {
+                    final String tooltipPath = redConfig
+                            .toAbsolutePath(path, editorInput.getRobotProject().getProject()).getPath();
+                    return path.isSystem() ? tooltipPath + " [already defined in " + pathVariableName + " variable]"
+                            : tooltipPath;
+                } catch (final PathResolvingException e) {
+                    return "";
+                }
             } else {
                 final String descriptions = Joiner.on('\n').join(transform(problems, RedXmlProblem.toDescriptions()));
                 return descriptions;

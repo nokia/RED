@@ -38,17 +38,19 @@ import org.rf.ide.core.dryrun.RobotDryRunLibraryImport;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryImportStatus;
 import org.rf.ide.core.dryrun.RobotDryRunLibraryImport.DryRunLibraryType;
 import org.rf.ide.core.dryrun.RobotDryRunOutputParser;
+import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.ILineHandler;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.RunCommandLineCallBuilder.RunCommandLine;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.launch.RobotLaunchConfigurationDelegate;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder;
@@ -229,7 +231,7 @@ public class LibrariesAutoDiscoverer {
             RobotProjectConfig config = robotProject.getOpenedProjectConfig();
             final boolean inEditor = config != null;
             if (config == null) {
-                config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
+                config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
             }
             final List<RobotDryRunLibraryImport> dryRunLibrariesToAdd = filterExistingReferencedLibraries(
                     dryRunLibrariesImports, config);
@@ -251,7 +253,7 @@ public class LibrariesAutoDiscoverer {
             if (!addedLibs.isEmpty()) {
                 sendProjectConfigChangedEvent(addedLibs);
                 if (!inEditor) {
-                    new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
+                    new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
                 }
             }
             subMonitor.worked(1);
@@ -341,8 +343,9 @@ public class LibrariesAutoDiscoverer {
             final RobotDryRunLibraryImport dryRunLibraryImport, final List<ReferencedLibrary> addedLibs) {
         Optional<File> modulePath = Optional.absent();
         try {
+            final EnvironmentSearchPaths envSearchPaths = new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(robotProject.getProject());
             modulePath = robotProject.getRuntimeEnvironment().getModulePath(dryRunLibraryImport.getName(),
-                    config.createEnvironmentSearchPaths(robotProject.getProject()));
+                    envSearchPaths);
         } catch (final RobotEnvironmentException e1) {
             // that's fine
         }
@@ -441,7 +444,7 @@ public class LibrariesAutoDiscoverer {
                     suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
                 }
                 if (suiteFile != null && suiteFile.isResourceFile()) {
-                    final IPath resourceFilePath = PathsConverter
+                    final IPath resourceFilePath = RedWorkspace.Paths
                             .toWorkspaceRelativeIfPossible(resource.getProjectRelativePath());
                     resourcesPaths.add(resourceFilePath.toString());
                 } else {
