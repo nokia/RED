@@ -61,7 +61,7 @@ public final class ResolvedImportPath {
     private static ResolvedImportPath create(final ImportPath importPath, final String path) throws URISyntaxException {
         final String escapedPath = URI_SPECIAL_CHARS_ESCAPER.escape(path);
         final String escapedPathWithScheme = importPath.isAbsolute() ? "file:/" + escapedPath : escapedPath;
-        return new ResolvedImportPath(new URI(escapedPathWithScheme));
+        return new ResolvedImportPath(new URI(escapedPathWithScheme.replaceAll("\\\\", "/")));
     }
 
     private final URI uri;
