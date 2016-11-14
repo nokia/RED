@@ -15,9 +15,24 @@ import org.junit.Test;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ITokenSeparatorPresenter;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 public class CommentServiceHandlerTest {
+
+    @Test
+    public void test_updateRobotExecutable_withSixCommentParts_whereFourInTheMiddleAreJustEmptyCells_withoutAnySpecialEscape() {
+        // prepare
+        final RobotExecutableRow<UserKeyword> fComment = new RobotExecutableRow<>();
+
+        // execute
+        CommentServiceHandler.update(fComment, ETokenSeparator.PIPE_WRAPPED_WITH_SPACE,
+                "#cm1 | \\  | \\  | \\  | \\  | ddd");
+
+        // verify
+        assertThat(text(fComment.getComment())).containsExactly("#cm1", "\\", "\\", "\\", "\\", "ddd");
+    }
 
     @Test
     public void test_update_withOneCommentElement_with2ValuesToUnescape() {
