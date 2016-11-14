@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.propertytester;
 
 import org.eclipse.core.expressions.PropertyTester;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;

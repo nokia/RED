@@ -15,7 +15,7 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.ui.IMarkerResolution;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.CreateConfigurationFileFixer;
 
 public enum ProjectConfigurationProblem implements IProblemCause {

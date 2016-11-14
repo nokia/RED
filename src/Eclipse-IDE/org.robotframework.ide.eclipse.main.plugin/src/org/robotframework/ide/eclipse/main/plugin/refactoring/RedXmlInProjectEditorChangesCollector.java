@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.refactoring;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.CompositeChange;
 import org.eclipse.ui.IEditorPart;
@@ -14,8 +15,8 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.red.swt.SwtThread;
@@ -83,7 +84,7 @@ class RedXmlInProjectEditorChangesCollector {
 
         for (final ExcludedFolderPath excluded : config.getExcludedPath()) {
 
-            final IPath potentiallyAffectedPath = excluded.asPath();
+            final IPath potentiallyAffectedPath = Path.fromPortableString(excluded.getPath());
             final IPath adjustedPathBeforeRefactoring = Changes
                     .excapeXmlCharacters(pathBeforeRefactoring.removeFirstSegments(1));
             if (pathAfterRefactoring.isPresent()) {

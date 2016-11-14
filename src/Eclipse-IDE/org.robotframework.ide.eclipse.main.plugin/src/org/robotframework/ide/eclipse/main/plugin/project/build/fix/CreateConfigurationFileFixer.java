@@ -13,9 +13,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
 
 
@@ -30,7 +30,7 @@ public class CreateConfigurationFileFixer implements IMarkerResolution {
     public void run(final IMarker marker) {
         final IProject project = marker.getResource().getProject();
         try {
-            new RobotProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
+            new RedEclipseProjectConfigWriter().writeConfiguration(RobotProjectConfig.create(), project);
             marker.getResource().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
         } catch (final CoreException e) {
             StatusManager.getManager().handle(new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, e.getMessage()),

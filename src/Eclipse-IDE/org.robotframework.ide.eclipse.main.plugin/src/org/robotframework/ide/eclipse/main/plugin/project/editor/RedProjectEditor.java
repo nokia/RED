@@ -42,12 +42,13 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.project.RobotProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.navigator.RobotValidationExcludedDecorator;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedXmlFileChangeListener.OnRedConfigFileChange;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.general.GeneralProjectConfigurationEditorPart;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibrariesProjectConfigurationEditorPart;
@@ -81,7 +82,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
             setPartName(file.getProject().getName() + "/" + input.getName());
 
             editorInput = new RedProjectEditorInput(Optional.of(file), !file.isReadOnly(),
-                    new RobotProjectConfigReader().readConfigurationWithLines(file));
+                    new RedEclipseProjectConfigReader().readConfigurationWithLines(file));
             installResourceListener();
         } else {
             final IStorage storage = (IStorage) input.getAdapter(IStorage.class);
@@ -243,7 +244,7 @@ public class RedProjectEditor extends MultiPageEditorPart {
         }
         final RobotProject project = editorInput.getRobotProject();
         project.clearAll();
-        new RobotProjectConfigWriter().writeConfiguration(editorInput.getProjectConfiguration(), project);
+        new RedEclipseProjectConfigWriter().writeConfiguration(editorInput.getProjectConfiguration(), project);
     }
 
     private List<? extends IEditorPart> getDirtyEditors() {

@@ -10,7 +10,7 @@ import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.TextCellEditor;
 import org.eclipse.swt.widgets.Composite;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.viewers.ElementsAddingEditingSupport;
 
 

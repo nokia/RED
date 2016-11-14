@@ -13,11 +13,10 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.IPath;
-import org.rf.ide.core.testdata.ValuesEscapes;
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ATags;
+import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.presenter.update.SettingTableModelUpdater;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
@@ -206,29 +205,29 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return null;
     }
 
-    public List<IPath> getResourcesPaths() {
+    public List<String> getResourcesPaths() {
         final List<RobotKeywordCall> resources = getResourcesSettings();
-        final List<IPath> paths = newArrayList();
+        final List<String> paths = newArrayList();
         for (final RobotElement element : resources) {
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
             if (!args.isEmpty()) {
-                final String escapedPath = ValuesEscapes.unescapeSpaces(args.get(0));
-                paths.add(new org.eclipse.core.runtime.Path(escapedPath));
+                final String escapedPath = RobotExpressions.unescapeSpaces(args.get(0));
+                paths.add(escapedPath);
             }
         }
         return paths;
     }
 
-    public List<IPath> getVariablesPaths() {
+    public List<String> getVariablesPaths() {
         final List<RobotKeywordCall> variables = getVariablesSettings();
-        final List<IPath> paths = newArrayList();
+        final List<String> paths = newArrayList();
         for (final RobotElement element : variables) {
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
             if (!args.isEmpty()) {
-                final String escapedPath = ValuesEscapes.unescapeSpaces(args.get(0));
-                paths.add(new org.eclipse.core.runtime.Path(escapedPath));
+                final String escapedPath = RobotExpressions.unescapeSpaces(args.get(0));
+                paths.add(escapedPath);
             }
         }
         return paths;
@@ -241,8 +240,8 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
             if (!args.isEmpty()) {
-                final String unescapedNameOrPath = ValuesEscapes.unescapeSpaces(args.get(0));
-                toImport.put(unescapedNameOrPath, extractLibraryAlias(setting));
+                final String escapedNameOrPath = RobotExpressions.unescapeSpaces(args.get(0));
+                toImport.put(escapedNameOrPath, extractLibraryAlias(setting));
             }
         }
         return toImport;

@@ -27,11 +27,11 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 
 /**
@@ -71,14 +71,14 @@ public abstract class RedConfigFileCompletionProposal implements ICompletionProp
 
             final boolean isEditorOpened = config != null;
             if (config == null) {
-                config = new RobotProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
+                config = new RedEclipseProjectConfigReader().readConfiguration(robotProject.getConfigurationFile());
             }
 
             if (apply(externalFile, config)) {
                 marker.delete();
 
                 if (!isEditorOpened) {
-                    new RobotProjectConfigWriter().writeConfiguration(config, externalFile.getProject());
+                    new RedEclipseProjectConfigWriter().writeConfiguration(config, externalFile.getProject());
                 }
 
                 final RedProjectEditor redXmlEditor = openEditor();

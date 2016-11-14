@@ -14,11 +14,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.BadLocationException;
@@ -32,8 +30,8 @@ import org.eclipse.ui.console.PatternMatchEvent;
 import org.eclipse.ui.console.TextConsole;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 
@@ -138,32 +136,30 @@ class RobotConsolePatternsListener implements IPatternMatchListener {
                 return;
             }
 
-            final IPath fileAsPath = new Path(file.getAbsolutePath());
-            final IPath wsRelative = PathsConverter.toWorkspaceRelativeIfPossible(fileAsPath);
-            final boolean wasConverted = !wsRelative.equals(fileAsPath);
+            final IWorkspaceRoot root = project.getWorkspace().getRoot();
+            final RedWorkspace workspace = new RedWorkspace(root);
+            IFile wsFile = (IFile) workspace.forUri(file.toURI());
 
-            IFile wsFile;
-            if (!wasConverted) {
-                wsFile = LibspecsFolder.get(project).getFile(fileAsPath.lastSegment());
+            if (wsFile == null) {
+                wsFile = LibspecsFolder.get(project).getFile(file.getName());
                 try {
-                    wsFile.createLink(wsRelative, IResource.REPLACE | IResource.HIDDEN, null);
+                    wsFile.createLink(file.toURI(), IResource.REPLACE | IResource.HIDDEN, null);
                 } catch (final CoreException e) {
                     throw new IllegalArgumentException("Unable to open file", e);
                 }
-            } else {
-                final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-                wsFile = (IFile) root.findMember(wsRelative);
-            }
-
-            final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-
-            try {
-                if (wsFile == null) {
-                    wsFile = refreshAllNeededResources(root, wsRelative);
+            } else if (!wsFile.exists()) {
+                try {
+                    refreshAllNeededResources(root, wsFile.getFullPath());
+                    refreshFile(wsFile);
+                } catch (final CoreException e) {
+                    final String message = "Unable to open editor for file: " + wsFile.getName();
+                    ErrorDialog.openError(workbenchWindow.getShell(), "Error opening file", message,
+                            new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e));
                 }
-                refreshFile(wsFile);
+            }
+            try {
                 openInEditor(workbenchWindow, wsFile);
-            } catch (final CoreException e) {
+            } catch (final PartInitException e) {
                 final String message = "Unable to open editor for file: " + wsFile.getName();
                 ErrorDialog.openError(workbenchWindow.getShell(), "Error opening file", message,
                         new Status(IStatus.ERROR, RedPlugin.PLUGIN_ID, message, e));

@@ -12,10 +12,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.ui.IMarkerResolution;
 import org.eclipse.ui.statushandlers.StatusManager;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 
 
@@ -37,13 +37,11 @@ public class RemoveLibraryFromConfigurationFileFixer implements IMarkerResolutio
             return;
         }
         
-        final RobotProjectConfigReader reader = new RobotProjectConfigReader();
-        final RobotProjectConfig config = reader.readConfiguration(redFile.getProject());
+        final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration(redFile.getProject());
         if (indexOfLibrary < config.getLibraries().size()) {
             config.getLibraries().remove(indexOfLibrary);
         }
-        final RobotProjectConfigWriter writer = new RobotProjectConfigWriter();
-        writer.writeConfiguration(config, redFile.getProject());
+        new RedEclipseProjectConfigWriter().writeConfiguration(config, redFile.getProject());
         try {
             marker.delete();
         } catch (final CoreException e) {

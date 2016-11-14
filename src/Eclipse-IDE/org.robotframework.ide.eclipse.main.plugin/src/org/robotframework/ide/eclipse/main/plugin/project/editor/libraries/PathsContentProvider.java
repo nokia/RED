@@ -11,7 +11,7 @@ import static com.google.common.collect.Lists.transform;
 import java.io.File;
 import java.util.List;
 
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.viewers.ElementAddingToken;
 import org.robotframework.red.viewers.StructuredContentProvider;
 

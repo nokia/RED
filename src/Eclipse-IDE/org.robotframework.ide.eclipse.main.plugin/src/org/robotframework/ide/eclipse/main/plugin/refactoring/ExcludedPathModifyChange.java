@@ -13,12 +13,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -69,10 +70,10 @@ class ExcludedPathModifyChange extends Change {
 
     @Override
     public Change perform(final IProgressMonitor pm) throws CoreException {
-        final IPath oldPath = excludedPath.asPath();
+        final IPath oldPath = Path.fromPortableString(excludedPath.getPath());
         excludedPath.setPath(newPath.toPortableString());
 
-        final Collection<IPath> changedPaths = new ArrayList<IPath>();
+        final Collection<IPath> changedPaths = new ArrayList<>();
         final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
                 redXmlFile, changedPaths);
 

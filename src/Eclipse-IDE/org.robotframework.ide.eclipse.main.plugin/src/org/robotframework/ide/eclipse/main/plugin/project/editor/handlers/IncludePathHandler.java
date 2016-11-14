@@ -44,7 +44,7 @@ public class IncludePathHandler extends DIParameterizedHandler<E4IncludePathHand
 
             for (final ProjectTreeElement locationToInclude : locationsToInclude) {
                 final IPath toRemove = locationToInclude.getPath();
-                input.getProjectConfiguration().removeExcludedPath(toRemove);
+                input.getProjectConfiguration().removeExcludedPath(toRemove.toPortableString());
             }
 
             final Collection<IPath> includedPaths = transform(locationsToInclude,

@@ -27,6 +27,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.e4.core.di.annotations.Optional;
 import org.eclipse.e4.tools.services.IDirtyProviderService;
 import org.eclipse.e4.ui.di.UIEventTopic;
@@ -64,17 +65,17 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.Environments;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.CellsActivationStrategy.RowTabbingStrategy;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.HeaderFilterMatchesCollection;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.ISectionFormFragment;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.swt.SwtThread;
 import org.robotframework.red.viewers.Viewers;
@@ -284,7 +285,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         }
 
         final boolean isExcluded = editorInput.getProjectConfiguration()
-                .isExcludedFromValidation(resource.getProjectRelativePath());
+                .isExcludedFromValidation(resource.getProjectRelativePath().toPortableString());
         
         final ProjectTreeElement wrappedChild = new ProjectTreeElement(resource, isExcluded);
         parent.addChild(wrappedChild);
@@ -305,7 +306,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
                 excludedShownInTree);
 
         for (final ExcludedFolderPath excludedNotShown : excludedNotShownInTree) {
-            wrappedRoot.createVirtualNodeFor(excludedNotShown.asPath());
+            wrappedRoot.createVirtualNodeFor(Path.fromPortableString(excludedNotShown.getPath()));
         }
     }
 
@@ -326,7 +327,7 @@ public class ProjectValidationFormFragment implements ISectionFormFragment {
         for (final ExcludedFolderPath excludedPath : allExcluded) {
             boolean isInTree = false;
             for (final ProjectTreeElement element : excludedShownInTree) {
-                if (element.getPath().equals(excludedPath.asPath())) {
+                if (element.getPath().equals(Path.fromPortableString(excludedPath.getPath()))) {
                     isInTree = true;
                     break;
                 }

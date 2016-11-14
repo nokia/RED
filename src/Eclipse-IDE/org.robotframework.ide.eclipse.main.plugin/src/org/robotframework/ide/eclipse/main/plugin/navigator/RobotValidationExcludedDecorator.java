@@ -9,9 +9,9 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 import org.robotframework.red.graphics.ColorsManager;
 
 public class RobotValidationExcludedDecorator implements ILightweightLabelDecorator {
@@ -50,7 +50,7 @@ public class RobotValidationExcludedDecorator implements ILightweightLabelDecora
                 config = robotProject.getRobotProjectConfig();
             }
 
-            if (config != null && config.isExcludedFromValidation(folder.getProjectRelativePath())) {
+            if (config != null && config.isExcludedFromValidation(folder.getProjectRelativePath().toPortableString())) {
                 decoration.addSuffix(" [excluded]");
                 decoration.setForegroundColor(ColorsManager.getColor(200, 200, 200));
             }

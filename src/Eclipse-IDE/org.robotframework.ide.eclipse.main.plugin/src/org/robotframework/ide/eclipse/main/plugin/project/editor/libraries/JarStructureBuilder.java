@@ -18,10 +18,10 @@ import java.util.zip.ZipInputStream;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 
 import com.google.common.base.Optional;
@@ -115,7 +115,7 @@ public class JarStructureBuilder {
 
         public ReferencedLibrary toReferencedLibrary(final String fullLibraryPath) {
             return ReferencedLibrary.create(LibraryType.JAVA, qualifiedName,
-                    PathsConverter.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath)).toPortableString());
+                    RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath)).toPortableString());
         }
     }
 }

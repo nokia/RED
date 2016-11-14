@@ -17,9 +17,9 @@ import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.ltk.core.refactoring.Change;
 import org.eclipse.ltk.core.refactoring.RefactoringStatus;
 import org.eclipse.ui.PlatformUI;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -73,7 +73,7 @@ class ExcludedPathAddChange extends Change {
     public Change perform(final IProgressMonitor pm) throws CoreException {
         config.getExcludedPath().add(excludedPathToAdd);
         
-        final Collection<IPath> changedPaths = new ArrayList<IPath>();
+        final Collection<IPath> changedPaths = new ArrayList<>();
         final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
                 redXmlFile, changedPaths);
 

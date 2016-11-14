@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IMarker;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
 
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Function;
@@ -225,12 +225,12 @@ public enum ProblemCategory {
     }
 
     public static Map<ProblemCategoryType, Collection<ProblemCategory>> getAllCategories() {
-        List<ProblemCategory> categories = Arrays.asList(ProblemCategory.values());
-        Multimap<ProblemCategoryType, ProblemCategory> groupedCategories = Multimaps.index(categories,
+        final List<ProblemCategory> categories = Arrays.asList(ProblemCategory.values());
+        final Multimap<ProblemCategoryType, ProblemCategory> groupedCategories = Multimaps.index(categories,
                 new Function<ProblemCategory, ProblemCategoryType>() {
 
                     @Override
-                    public ProblemCategoryType apply(ProblemCategory category) {
+                    public ProblemCategoryType apply(final ProblemCategory category) {
                         return category.type;
                     }
                 });

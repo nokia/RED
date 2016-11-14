@@ -22,8 +22,8 @@ import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -43,9 +43,10 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
                 @Override
                 public boolean visit(final IResource resource) throws CoreException {
                     if (resource.getType() == IResource.FILE && resource.getFullPath().lastSegment().equals(lastSegment)) {
-                        final IPath resRelativePath = PathsConverter.fromWorkspaceRelativeToResourceRelative(
-                                problematicFile, resource.getFullPath().makeRelative());
-                        
+                        final IPath resRelativePath = RedWorkspace.Paths
+                                .fromWorkspaceRelativeToResourceRelative(problematicFile,
+                                        resource.getFullPath().makeRelative());
+
                         fixers.add(new ChangeImportedPathFixer(invalidPath, resource.getFullPath(), resRelativePath));
                     }
                     return true;

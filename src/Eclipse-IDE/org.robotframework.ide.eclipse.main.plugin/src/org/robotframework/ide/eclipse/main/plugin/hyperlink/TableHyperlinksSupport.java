@@ -16,6 +16,7 @@ import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.ViewerColumnsFactory;
@@ -323,7 +324,8 @@ public class TableHyperlinksSupport {
 
                 @Override
                 public void widgetDefaultSelected(final SelectionEvent e) {
-                    openHyperlink(Selections.getSingleElement(viewer.getStructuredSelection(), IHyperlink.class));
+                    openHyperlink(Selections.getSingleElement((IStructuredSelection) viewer.getSelection(),
+                            IHyperlink.class));
                 }
             });
 

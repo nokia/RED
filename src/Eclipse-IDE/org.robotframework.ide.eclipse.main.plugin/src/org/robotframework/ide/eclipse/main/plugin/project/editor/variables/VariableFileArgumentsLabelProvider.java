@@ -9,7 +9,7 @@ import static org.eclipse.jface.viewers.Stylers.withForeground;
 
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.robotframework.red.viewers.RedCommonLabelProvider;
 
 class VariableFileArgumentsLabelProvider extends RedCommonLabelProvider {

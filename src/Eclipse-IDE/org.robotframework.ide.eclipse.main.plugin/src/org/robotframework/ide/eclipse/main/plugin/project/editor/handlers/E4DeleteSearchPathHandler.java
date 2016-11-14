@@ -9,7 +9,7 @@ import java.util.List;
 
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.red.viewers.Selections;
 
 /**

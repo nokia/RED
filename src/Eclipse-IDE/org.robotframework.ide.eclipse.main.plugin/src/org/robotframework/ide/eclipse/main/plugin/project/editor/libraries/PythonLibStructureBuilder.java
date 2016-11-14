@@ -19,10 +19,11 @@ import org.eclipse.core.runtime.Path;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -39,7 +40,7 @@ public class PythonLibStructureBuilder {
     public PythonLibStructureBuilder(final RobotRuntimeEnvironment environment, final RobotProjectConfig config,
             final IProject project) {
         this.environment = environment;
-        this.additionalSearchPaths = config.createEnvironmentSearchPaths(project);
+        this.additionalSearchPaths = new RedEclipseProjectConfig(config).createEnvironmentSearchPaths(project);
     }
 
     public Collection<PythonClass> provideEntriesFromFile(final String path, final Optional<String> moduleName,
@@ -64,7 +65,7 @@ public class PythonLibStructureBuilder {
             this.qualifiedName = qualifiedName;
         }
 
-        static PythonClass create(final String name, boolean allowDuplicationOfFileAndClassName) {
+        static PythonClass create(final String name, final boolean allowDuplicationOfFileAndClassName) {
             final List<String> splitted = newArrayList(Splitter.on('.').splitToList(name));
             if (splitted.size() > 1) {
                 final String last = splitted.get(splitted.size() - 1);
@@ -93,7 +94,7 @@ public class PythonLibStructureBuilder {
                     : path.removeLastSegments(1);
 
             return ReferencedLibrary.create(LibraryType.PYTHON, qualifiedName,
-                    PathsConverter.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
+                    RedWorkspace.Paths.toWorkspaceRelativeIfPossible(pathWithoutModuleName).toPortableString());
         }
 
         @Override

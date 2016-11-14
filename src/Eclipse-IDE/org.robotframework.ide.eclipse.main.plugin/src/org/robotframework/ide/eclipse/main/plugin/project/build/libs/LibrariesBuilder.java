@@ -19,14 +19,15 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
 import org.rf.ide.core.executor.SuiteExecutor;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -67,7 +68,8 @@ public class LibrariesBuilder {
                 try {
                     if (project.exists()) {
                         generatorWithSource.generator.generateLibdocForcibly(runtimeEnvironment,
-                                robotProject.getRobotProjectConfig().createEnvironmentSearchPaths(project));
+                                new RedEclipseProjectConfig(robotProject.getRobotProjectConfig())
+                                        .createEnvironmentSearchPaths(project));
                     }
                 } catch (final RobotEnvironmentException e) {
                     final IPath libspecFileLocation = generatorWithSource.sourceLibdocFile.getLocation();
@@ -98,12 +100,12 @@ public class LibrariesBuilder {
             if (type == LibraryType.VIRTUAL) {
                 return new VirtualLibraryLibdocGenerator(Path.fromPortableString(path), libspecSourceFile);
             } else if (type == LibraryType.PYTHON) {
-                final String libPath = PathsConverter
+                final String libPath = RedWorkspace.Paths
                         .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(refLib.getPath()))
                         .toOSString();
                 return new PythonLibraryLibdocGenerator(refLib.getName(), libPath, libspecSourceFile);
             } else if (type == LibraryType.JAVA) {
-                final String libPath = PathsConverter
+                final String libPath = RedWorkspace.Paths
                         .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(path)).toOSString();
                 return new JavaLibraryLibdocGenerator(specification.getName(), libPath, libspecSourceFile);
             }
@@ -138,8 +140,8 @@ public class LibrariesBuilder {
             logger.log("BUILDING: " + generator.getMessage());
             monitor.subTask(generator.getMessage());
             try {
-                generator.generateLibdoc(runtimeEnvironment,
-                        configuration.createEnvironmentSearchPaths(robotProject.getProject()));
+                generator.generateLibdoc(runtimeEnvironment, new RedEclipseProjectConfig(configuration)
+                        .createEnvironmentSearchPaths(robotProject.getProject()));
             } catch (final RobotEnvironmentException e) {
                 final RobotProblem problem = RobotProblem.causedBy(
                         ProjectConfigurationProblem.LIBRARY_SPEC_CANNOT_BE_GENERATED).formatMessageWith(e.getMessage());
@@ -196,7 +198,7 @@ public class LibrariesBuilder {
                 final String libName = lib.getName();
                 final IFile specFile = libspecsFolder.getSpecFile(libName);
                 if (!specFile.exists()) {
-                    final String libPath = PathsConverter
+                    final String libPath = RedWorkspace.Paths
                             .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(lib.getPath()))
                             .toOSString();
                     generators.add(new PythonLibraryLibdocGenerator(libName, libPath, specFile));
@@ -215,7 +217,7 @@ public class LibrariesBuilder {
                 final String libName = lib.getName();
                 final IFile specFile = libspecsFolder.getSpecFile(libName);
                 if (!specFile.exists()) {
-                    final String jarPath = PathsConverter
+                    final String jarPath = RedWorkspace.Paths
                             .toAbsoluteFromWorkspaceRelativeIfPossible(Path.fromPortableString(lib.getPath()))
                             .toOSString();
                     generators.add(new JavaLibraryLibdocGenerator(libName, jarPath, specFile));

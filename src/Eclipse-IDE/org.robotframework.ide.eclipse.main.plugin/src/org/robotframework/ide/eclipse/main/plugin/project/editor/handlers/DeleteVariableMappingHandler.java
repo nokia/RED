@@ -12,7 +12,7 @@ import javax.inject.Named;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.e4.core.services.events.IEventBroker;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.VariableMapping;
+import org.rf.ide.core.project.RobotProjectConfig.VariableMapping;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.handlers.DeleteVariableMappingHandler.E4DeleteVariableMappingHandler;
