@@ -83,7 +83,7 @@ public class ResolvedImportPathTest {
         final ResolvedImportPath resolvedPath = createResolved("/abspath", parameters).get();
         final URI uri = resolvedPath.resolveInRespectTo(new File("/some/location").toURI());
 
-        assertThat(uri).isEqualTo(new File("/abspath").toURI());
+        assertThat(uri).isEqualTo(new File("//abspath").toURI());
     }
 
     @Test
