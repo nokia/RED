@@ -159,11 +159,22 @@ public class RobotKeywordCall implements RobotFileInternalElement, Serializable 
 
             @Override
             public String apply(final RobotToken token) {
+                return tokenViaExecutableViewUpdateToken(view).apply(token).getText();
+            }
+        };
+    }
+
+    public static Function<RobotToken, RobotToken> tokenViaExecutableViewUpdateToken(
+            final RobotExecutableRowView view) {
+        return new Function<RobotToken, RobotToken>() {
+
+            @Override
+            public RobotToken apply(final RobotToken token) {
                 if (wasAlreadyUpdatedWithAssignment(token)) {
                     final String text = view.getTokenRepresentation(token);
                     token.setText(text);
                 }
-                return token.getText();
+                return token;
             }
 
             private boolean wasAlreadyUpdatedWithAssignment(final RobotToken token) {
