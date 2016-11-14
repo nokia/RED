@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotProjectHolder;
@@ -31,8 +32,14 @@ public class RobotModelTestProvider {
         final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
         when(runEnv.getVersion()).thenReturn("3.0a1");
         final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
-        final RobotParser parser = RobotParser.createEager(robotProject);
-        return parser;
+        return RobotParser.create(robotProject, RobotParserConfig.allImportsEager());
+    }
+
+    public static RobotParser getLazyParser() {
+        final RobotRuntimeEnvironment runEnv = mock(RobotRuntimeEnvironment.class);
+        when(runEnv.getVersion()).thenReturn("3.0a1");
+        final RobotProjectHolder robotProject = new RobotProjectHolder(runEnv);
+        return RobotParser.create(robotProject, RobotParserConfig.allImportsLazy());
     }
 
     public static RobotFile getModelFile(final String fileContent, final FileFormat format, final RobotParser parser) {

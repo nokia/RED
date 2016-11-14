@@ -43,7 +43,7 @@ public abstract class ATestCaseNotChangedDumperTest {
         final String fileContent = DumperTestHelper.getINSTANCE().readWithLineSeparatorPresave(inputFile);
 
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(fileContent, getFormat(),
-                RobotModelTestProvider.getParser());
+                RobotModelTestProvider.getLazyParser());
         final RobotFileDumper dumper = new RobotFileDumper();
         final DumpContext ctx = new DumpContext();
         ctx.setDirtyFlag(false);

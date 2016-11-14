@@ -11,6 +11,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.importer.ResourceImporter;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.importer.VariablesImporter;
@@ -42,9 +43,7 @@ public class RobotParser {
 
     private final RobotProjectHolder robotProject;
 
-    public static RobotParser create(final RobotProjectHolder projectHolder, final RobotParserConfig cfg) {
-        return new RobotParser(projectHolder, cfg);
-    }
+    private final PathsProvider pathsProvider;
 
     /**
      * Creates parser which eagerly parses given file with all dependent
@@ -53,10 +52,10 @@ public class RobotParser {
      * @param projectHolder
      * @return eager parser
      */
-    public static RobotParser createEager(final RobotProjectHolder projectHolder) {
-        RobotParserConfig cfg = new RobotParserConfig();
+    public static RobotParser createEager(final RobotProjectHolder projectHolder, final PathsProvider pathsProvider) {
+        final RobotParserConfig cfg = new RobotParserConfig();
         cfg.setEagerImport(true);
-        return create(projectHolder, cfg);
+        return create(projectHolder, cfg, pathsProvider);
     }
 
     /**
@@ -65,12 +64,23 @@ public class RobotParser {
      * @param projectHolder
      * @return normal parser
      */
-    public static RobotParser create(final RobotProjectHolder projectHolder) {
-        return new RobotParser(projectHolder, new RobotParserConfig());
+    public static RobotParser create(final RobotProjectHolder projectHolder, final PathsProvider pathsProvider) {
+        return new RobotParser(projectHolder, new RobotParserConfig(), pathsProvider);
     }
 
-    private RobotParser(final RobotProjectHolder robotProject, final RobotParserConfig cfg) {
+    public static RobotParser create(final RobotProjectHolder projectHolder, final RobotParserConfig cfg,
+            final PathsProvider pathsProvider) {
+        return new RobotParser(projectHolder, cfg, pathsProvider);
+    }
+
+    public static RobotParser create(final RobotProjectHolder projectHolder, final RobotParserConfig cfg) {
+        return new RobotParser(projectHolder, cfg, null);
+    }
+
+    private RobotParser(final RobotProjectHolder robotProject, final RobotParserConfig cfg,
+            final PathsProvider pathsProvider) {
         this.robotProject = robotProject;
+        this.pathsProvider = pathsProvider;
         this.robotVersionFromCommand = robotProject.getRobotRuntime() != null
                 ? robotProject.getRobotRuntime().getVersion() : null;
         this.robotVersion = robotVersionFromCommand != null ? RobotVersion.from(robotVersionFromCommand) : null;
@@ -106,9 +116,9 @@ public class RobotParser {
 
             parserToUse.parse(robotFile, bais, fileOrDir);
 
-            RobotFile fileModel = robotFile.getFileModel();
+            final RobotFile fileModel = robotFile.getFileModel();
             if (fileModel.containsAnyRobotSection()) {
-                List<File> alreadyImported = new ArrayList<File>();
+                final List<File> alreadyImported = new ArrayList<>();
                 alreadyImported.add(fileOrDir);
                 importExternal(robotFile);
             } else {
@@ -159,7 +169,7 @@ public class RobotParser {
                     parserToUse.parse(robotFile, fileOrDir);
                     robotProject.addModelFile(robotFile);
 
-                    RobotFile fileModel = robotFile.getFileModel();
+                    final RobotFile fileModel = robotFile.getFileModel();
                     if (fileModel.containsAnyRobotSection()) {
                         importExternal(robotFile);
                     } else {
@@ -188,7 +198,7 @@ public class RobotParser {
             if (parserCfg.shouldImportVariables()) {
                 final VariablesImporter varImporter = new VariablesImporter();
                 final List<VariablesFileImportReference> varsImported = varImporter
-                        .importVariables(robotProject.getRobotRuntime(), robotProject, robotFile);
+                        .importVariables(pathsProvider, robotProject, robotFile);
                 robotFile.setVariablesImportReferences(varsImported);
             }
         }
@@ -208,6 +218,20 @@ public class RobotParser {
     }
 
     public static class RobotParserConfig {
+
+        public static RobotParserConfig allImportsEager() {
+            final RobotParserConfig config = new RobotParserConfig();
+            config.shouldEagerImport = true;
+            config.shouldImportVariables = true;
+            return config;
+        }
+
+        public static RobotParserConfig allImportsLazy() {
+            final RobotParserConfig config = new RobotParserConfig();
+            config.shouldEagerImport = false;
+            config.shouldImportVariables = false;
+            return config;
+        }
 
         private boolean shouldEagerImport = false;
 

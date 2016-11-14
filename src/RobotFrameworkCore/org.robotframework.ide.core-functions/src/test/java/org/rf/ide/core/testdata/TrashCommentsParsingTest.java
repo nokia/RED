@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
@@ -35,16 +36,16 @@ public class TrashCommentsParsingTest {
     public void test_givenMultipleRobotExecutableLines_withCommentsJoinedByPreviouseLineContinue_shouldGives_4RobotExecutableLines()
             throws Exception {
         // prepare
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
         final String mainPath = "parser/bugs/";
         final File file = new File(this.getClass().getResource(mainPath + "TrashCommentsAtTheBeginning.robot").toURI());
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder);
+        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify
@@ -78,10 +79,10 @@ public class TrashCommentsParsingTest {
 
     private void assertLine(final RobotLine toTest, final IRobotLineElement... toks) {
         final List<IRobotLineElement> lineElements = toTest.getLineElements();
-        int size = toks.length;
+        final int size = toks.length;
         assertThat(lineElements).hasSize(size);
         for (int i = 0; i < size; i++) {
-            IRobotLineElement elem = lineElements.get(i);
+            final IRobotLineElement elem = lineElements.get(i);
             final IRobotLineElement expToken = toks[i];
             assertThat(expToken).hasSameClassAs(elem);
             assertThat(expToken.getRaw()).isEqualTo(elem.getRaw());

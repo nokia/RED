@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.importer.VariablesImporter;
@@ -119,7 +120,7 @@ public class RobotFileOutput {
     }
 
     public void setProcessedFile(final File processedFile) {
-        String fileExtension = getFileExtension(processedFile);
+        final String fileExtension = getFileExtension(processedFile);
         format = FileFormat.getByExtension(fileExtension);
         this.processedFile = processedFile;
         this.lastModificationEpoch = processedFile.lastModified();
@@ -128,8 +129,8 @@ public class RobotFileOutput {
     private String getFileExtension(final File processedFile) {
         String fileExtension = null;
         if (processedFile != null) {
-            String filename = processedFile.getName();
-            int lastDot = filename.lastIndexOf('.');
+            final String filename = processedFile.getName();
+            final int lastDot = filename.lastIndexOf('.');
             if (lastDot > -1) {
                 fileExtension = filename.substring(lastDot + 1);
             }
@@ -209,12 +210,13 @@ public class RobotFileOutput {
         this.variablesReferenced = varReferences;
     }
 
-    public List<VariablesFileImportReference> getVariablesImportReferences(final RobotProjectHolder robotProject) {
+    public List<VariablesFileImportReference> getVariablesImportReferences(final RobotProjectHolder robotProject,
+            final PathsProvider pathsProvider) {
         if (variablesReferenced == null) {
             variablesReferenced = new ArrayList<>();
 
             final List<VariablesFileImportReference> varsImported = new VariablesImporter()
-                    .importVariables(robotProject.getRobotRuntime(), robotProject, this);
+                    .importVariables(pathsProvider, robotProject, this);
             variablesReferenced.addAll(varsImported);
         }
         return Collections.unmodifiableList(variablesReferenced);

@@ -38,7 +38,8 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         final String inFileName = PRETTY_NEW_DIR_LOCATION + "InputOneKeywordWithExecMultiline." + getExtension();
         final String outputFileName = PRETTY_NEW_DIR_LOCATION + "OutputOneKeywordWithExecMultiline." + getExtension();
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getLazyParser());
 
         final DumpContext ctx = new DumpContext();
         ctx.setPreferedSeparator(" | ");
@@ -61,7 +62,8 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Output_OneKeyword_andOneExec_whenAddNewParameterPipe."
                 + getExtension();
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getLazyParser());
 
         final DumpContext ctx = new DumpContext();
         ctx.setPreferedSeparator("\t");
@@ -84,7 +86,8 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Output_OneKeyword_andOneExec_whenAddNewParameterPipe."
                 + getExtension();
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getLazyParser());
 
         final DumpContext ctx = new DumpContext();
         ctx.setPreferedSeparator(" | ");
@@ -105,7 +108,8 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         final String inFileName = PRETTY_NEW_DIR_LOCATION + "Input_OneKeyword_andThenAddNewExec." + getExtension();
         final String outputFileName = PRETTY_NEW_DIR_LOCATION + "Output_OneKeyword_andThenAddNewExec." + getExtension();
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getLazyParser());
 
         final DumpContext ctx = new DumpContext();
         ctx.setPreferedSeparator(" | ");
@@ -113,7 +117,7 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();
         final UserKeyword keyword = keywordTable.getKeywords().get(0);
-        RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<>();
+        final RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<>();
         executionRow.setAction(RobotToken.create("Log"));
         executionRow.addArgument(RobotToken.create("done EON"));
         keyword.addKeywordExecutionRow(executionRow);
@@ -131,7 +135,8 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         final String outputFileName = PRETTY_NEW_DIR_LOCATION
                 + "Output_OnlyHeaderOfKeyword_andThenAddNewKeyword_andOneExecLine_sepSpacePipeSpace." + getExtension();
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getLazyParser());
 
         final DumpContext ctx = new DumpContext();
         ctx.setPreferedSeparator(" | ");
@@ -139,7 +144,7 @@ public abstract class ACreationOfKeywordsWithSeparatorCheckTest {
         // test data prepare
         final KeywordTable keywordTable = modelFile.getKeywordTable();
         final UserKeyword keyword = keywordTable.createUserKeyword("KeywordT");
-        RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<>();
+        final RobotExecutableRow<UserKeyword> executionRow = new RobotExecutableRow<>();
         executionRow.setAction(RobotToken.create("Log"));
         executionRow.addArgument(RobotToken.create("done EON"));
         keyword.addKeywordExecutionRow(executionRow);
