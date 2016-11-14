@@ -6,16 +6,18 @@
 package org.rf.ide.core.testdata.importer;
 
 import java.io.File;
+import java.net.URI;
 import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.testdata.ValuesEscapes;
+import org.rf.ide.core.project.ImportPath;
+import org.rf.ide.core.project.ImportSearchPaths;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.project.ResolvedImportPath;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -28,13 +30,22 @@ import org.rf.ide.core.testdata.model.table.setting.VariablesImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 
 public class VariablesImporter {
 
     private static final Pattern ILLEGAL_PATH_TEXT = Pattern.compile("\\s+([\\\\]|/)");
 
-    public List<VariablesFileImportReference> importVariables(final RobotRuntimeEnvironment robotRunEnv,
+    public List<VariablesFileImportReference> importVariables(final PathsProvider pathsProvider,
+            final RobotProjectHolder robotProject,
+            final RobotFileOutput robotFile) {
+        return importVariables(pathsProvider, robotProject.getRobotRuntime(), robotProject, robotFile);
+    }
+
+    public List<VariablesFileImportReference> importVariables(final PathsProvider pathsProvider,
+            final RobotRuntimeEnvironment robotRunEnv,
             final RobotProjectHolder robotProject, final RobotFileOutput robotFile) {
+
         final List<VariablesFileImportReference> varsImported = new ArrayList<>();
         final SettingTable settingTable = robotFile.getFileModel().getSettingTable();
         if (settingTable.isPresent()) {
@@ -46,38 +57,36 @@ public class VariablesImporter {
                     if (varImport.getPathOrName() == null) {
                         continue;
                     }
-                    String path = varImport.getPathOrName().getRaw().toString();
+                    final String path = varImport.getPathOrName().getRaw().toString();
                     if (!isCorrectPath(path)) {
                         continue;
                     }
 
                     final Map<String, String> variableMappings = robotProject.getVariableMappings();
-
-                    path = replaceRobotSpecificArguments(path, variableMappings);
-
                     final List<String> varFileArguments = convertTokensToArguments(varImport, variableMappings);
 
+                    URI importUri = null;
                     final File currentRobotFile = robotFile.getProcessedFile().getAbsoluteFile();
-                    if (currentRobotFile.exists()) {
-                        try {
-                            final Path joinPath = Paths.get(currentRobotFile.getAbsolutePath()).resolveSibling(path);
-                            path = joinPath.normalize().toAbsolutePath().toFile().getAbsolutePath();
-                        } catch (final InvalidPathException ipe) {
-                            final BuildMessage errorMsg = BuildMessage.createErrorMessage(
-                                    "Problem with importing variable file " + path + " with error stack: " + ipe,
-                                    "" + currentRobotFile);
-                            errorMsg.setFileRegion(
-                                    new FileRegion(varImport.getBeginPosition(), varImport.getEndPosition()));
-                            robotFile.addBuildMessage(errorMsg);
+                    try {
+                        importUri = findAbsoluteVariableImportUri(pathsProvider, currentRobotFile, path,
+                                variableMappings);
 
-                            continue;
-                        }
+                    } catch (final Exception e) {
+                        final BuildMessage errorMsg = BuildMessage.createErrorMessage(
+                                "Problem with importing variable file " + path + " with error stack: " + e,
+                                "" + currentRobotFile);
+                        errorMsg.setFileRegion(
+                                new FileRegion(varImport.getBeginPosition(), varImport.getEndPosition()));
+                        robotFile.addBuildMessage(errorMsg);
+
+                        continue;
                     }
 
-                    final File varFile = new File(path);
+
+                    final File varFile = new File(importUri);
                     VariablesFileImportReference varImportRef;
                     try {
-                        varImportRef = findInProjectVariablesImport(robotProject, varImport,
+                        varImportRef = findInProjectVariablesImport(pathsProvider, robotProject, varImport,
                                 varFile.toPath().normalize().toFile());
                     } catch (final InvalidPathException ipe) {
                         final BuildMessage errorMsg = BuildMessage.createErrorMessage(
@@ -90,7 +99,8 @@ public class VariablesImporter {
                     }
 
                     if (varImportRef == null) {
-                        final Map<?, ?> variablesFromFile = robotRunEnv.getVariablesFromFile(path, varFileArguments);
+                        final Map<?, ?> variablesFromFile = robotRunEnv.getVariablesFromFile(varFile.getAbsolutePath(),
+                                varFileArguments);
                         varImportRef = new VariablesFileImportReference(varImport);
                         varImportRef.setVariablesFile(varFile.getAbsoluteFile());
                         varImportRef.map(variablesFromFile);
@@ -106,29 +116,43 @@ public class VariablesImporter {
         return varsImported;
     }
 
+    private URI findAbsoluteVariableImportUri(final PathsProvider pathsProvider, final File currentFile,
+            final String varImportPath, final Map<String, String> variableMappings) {
+
+        if (!currentFile.exists()) {
+            throw new IllegalStateException("Current file should exist");
+        }
+        final ImportPath importPath = ImportPath.from(varImportPath);
+        final Optional<ResolvedImportPath> resolvedImportPath = ResolvedImportPath.from(importPath, variableMappings);
+        if (!resolvedImportPath.isPresent()) {
+            throw new IllegalStateException("Unable to resolve parameterized import path '" + varImportPath + "'");
+        }
+        final Optional<URI> absoluteUri = new ImportSearchPaths(pathsProvider).findAbsoluteUri(currentFile.toURI(),
+                resolvedImportPath.get());
+        if (!absoluteUri.isPresent()) {
+            throw new IllegalStateException("Unable to find variable file to import '" + varImportPath + "'");
+        }
+        return absoluteUri.get();
+    }
+
     @VisibleForTesting
     protected boolean isCorrectPath(final String path) {
         if (path != null && !path.trim().isEmpty()) {
-            final String convertedPath = ValuesEscapes.unescapeSpaces(path);
+            final String convertedPath = RobotExpressions.unescapeSpaces(path);
             return !ILLEGAL_PATH_TEXT.matcher(convertedPath).find();
         }
         return false;
     }
 
-    private String replaceRobotSpecificArguments(final String path, final Map<String, String> variableMappings) {
-        final String resultPath = RobotExpressions.isParameterized(path)
-                ? RobotExpressions.resolve(variableMappings, path) : path;
-        return ValuesEscapes.unescapeSpaces(resultPath);
-    }
-
-    private VariablesFileImportReference findInProjectVariablesImport(final RobotProjectHolder robotProject,
-            final VariablesImport varImport, final File varFile) {
+    private VariablesFileImportReference findInProjectVariablesImport(final PathsProvider pathsProvider,
+            final RobotProjectHolder robotProject, final VariablesImport varImport, final File varFile) {
 
         final List<RobotFileOutput> filesWhichImportingVariables = robotProject
-                .findFilesWithImportedVariableFile(varFile);
+                .findFilesWithImportedVariableFile(pathsProvider, varFile);
         VariablesFileImportReference varImportRef = null;
         for (final RobotFileOutput rfo : filesWhichImportingVariables) {
-            final VariablesFileImportReference variableFile = findVariableFileByPath(robotProject, rfo, varFile);
+            final VariablesFileImportReference variableFile = findVariableFileByPath(pathsProvider, robotProject, rfo,
+                    varFile);
             if (variableFile != null) {
                 if (checkIfImportDeclarationAreTheSame(varImport, variableFile.getImportDeclaration())) {
                     if (varFile.lastModified() == varFile.lastModified()) {
@@ -142,11 +166,12 @@ public class VariablesImporter {
     }
 
     @VisibleForTesting
-    protected VariablesFileImportReference findVariableFileByPath(final RobotProjectHolder robotProject,
-            final RobotFileOutput rfo, final File varFile) {
+    protected VariablesFileImportReference findVariableFileByPath(final PathsProvider pathsProvider,
+            final RobotProjectHolder robotProject, final RobotFileOutput rfo, final File varFile) {
+
         VariablesFileImportReference varFileImportReference = null;
         final List<VariablesFileImportReference> variablesImportReferences = rfo
-                .getVariablesImportReferences(robotProject);
+                .getVariablesImportReferences(robotProject, pathsProvider);
         for (final VariablesFileImportReference varFileImport : variablesImportReferences) {
             if (varFileImport.getVariablesFile().getAbsolutePath().equals(varFile.getAbsolutePath())) {
                 varFileImportReference = varFileImport;

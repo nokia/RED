@@ -59,7 +59,7 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // test prepare
-        KeywordTable table = modelFile.getKeywordTable();
+        final KeywordTable table = modelFile.getKeywordTable();
         table.createUserKeyword("key 3");
 
         // execute & verify
@@ -74,9 +74,9 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // test prepare
-        KeywordTable table = modelFile.getKeywordTable();
-        List<UserKeyword> keywords = table.getKeywords();
-        UserKeyword userKeyword = keywords.get(0);
+        final KeywordTable table = modelFile.getKeywordTable();
+        final List<UserKeyword> keywords = table.getKeywords();
+        final UserKeyword userKeyword = keywords.get(0);
         userKeyword.getKeywordExecutionRows().get(0).setAction(RobotToken.create("keyAdded"));
 
         // execute & verify
@@ -93,9 +93,9 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // test prepare
-        KeywordTable table = modelFile.getKeywordTable();
-        List<UserKeyword> keywords = table.getKeywords();
-        UserKeyword userKeyword = keywords.get(0);
+        final KeywordTable table = modelFile.getKeywordTable();
+        final List<UserKeyword> keywords = table.getKeywords();
+        final UserKeyword userKeyword = keywords.get(0);
         userKeyword.getKeywordExecutionRows().get(0).getArguments().get(1).setText("d_new");
 
         // execute & verify
@@ -111,11 +111,11 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
 
         // test prepare
-        KeywordTable table = modelFile.getKeywordTable();
-        List<UserKeyword> keywords = table.getKeywords();
-        UserKeyword userKeyword = keywords.get(0);
+        final KeywordTable table = modelFile.getKeywordTable();
+        final List<UserKeyword> keywords = table.getKeywords();
+        final UserKeyword userKeyword = keywords.get(0);
 
-        KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
+        final KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
 
         final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getKeywordExecutionRows().get(0);
         execOneRow.getAction().setText("${c} =");
@@ -131,14 +131,15 @@ public abstract class AUpdateExecRowWithCommentOnlySameLineAsKeywordName {
         // prepare
         final String filePath = convert("InKeywordsWithPrettyAlignWithThreeEmptyLinesBefore");
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(filePath);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getLazyParser());
 
         // test prepare
-        KeywordTable table = modelFile.getKeywordTable();
-        List<UserKeyword> keywords = table.getKeywords();
-        UserKeyword userKeyword = keywords.get(0);
+        final KeywordTable table = modelFile.getKeywordTable();
+        final List<UserKeyword> keywords = table.getKeywords();
+        final UserKeyword userKeyword = keywords.get(0);
 
-        KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
+        final KeywordExecutableRowModelOperation execKeyUpdater = new KeywordExecutableRowModelOperation();
 
         final RobotExecutableRow<UserKeyword> execOneRow = userKeyword.getKeywordExecutionRows().get(0);
         execOneRow.getAction().setText("${c} =");

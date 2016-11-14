@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
@@ -36,16 +37,16 @@ public class RobotParserSimpleExecutableContinueTest {
     public void givenTwoKeywords_oneWithNormalName_andSecondWithTripleDotsName_shouldReturnTwoKeywords()
             throws Exception {
         // prepare
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
         final String mainPath = "parser/bugs/";
         final File file = new File(this.getClass().getResource(mainPath + "KeywordNameAsTripleDots.robot").toURI());
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder);
+        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify
@@ -67,9 +68,9 @@ public class RobotParserSimpleExecutableContinueTest {
     public void test_givenMultipleRobotExecutableLines_withCommentsJoinedByPreviouseLineContinue_shouldGives_4RobotExecutableLines()
             throws Exception {
         // prepare
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
         final String mainPath = "parser/bugs/";
         final File file = new File(this.getClass()
@@ -78,7 +79,7 @@ public class RobotParserSimpleExecutableContinueTest {
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder);
+        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify
@@ -109,17 +110,17 @@ public class RobotParserSimpleExecutableContinueTest {
             assertToken(robotExecutableRow.getAction(), actionText, RobotTokenType.KEYWORD_ACTION_NAME);
         }
         final List<RobotToken> arguments = robotExecutableRow.getArguments();
-        int argsSize = args.size();
+        final int argsSize = args.size();
         assertThat(arguments).hasSize(argsSize);
         for (int i = 0; i < argsSize; i++) {
             assertToken(arguments.get(i), args.get(i), RobotTokenType.KEYWORD_ACTION_ARGUMENT);
         }
 
         final List<RobotToken> comments = robotExecutableRow.getComment();
-        int commentsSize = comment.size();
+        final int commentsSize = comment.size();
         assertThat(comments).hasSize(commentsSize);
         for (int i = 0; i < commentsSize; i++) {
-            RobotToken token = comments.get(i);
+            final RobotToken token = comments.get(i);
             assertThat(token.getText()).isEqualTo(comment.get(i));
             assertThat(token.getRaw()).isEqualTo(comment.get(i));
             assertThat(token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)

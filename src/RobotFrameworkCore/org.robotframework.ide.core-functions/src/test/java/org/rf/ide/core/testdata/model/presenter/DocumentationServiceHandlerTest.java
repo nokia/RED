@@ -105,7 +105,8 @@ public class DocumentationServiceHandlerTest {
             final String expectedText) throws Exception {
         // prepare
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getLazyParser());
         final SuiteDocumentation suiteDoc = modelFile.getSettingTable().documentation().get();
 
         // execute
@@ -121,7 +122,7 @@ public class DocumentationServiceHandlerTest {
 
     private List<String> text(final List<RobotToken> toks) {
         final List<String> wholeText = new ArrayList<>();
-        for (RobotToken r : toks) {
+        for (final RobotToken r : toks) {
             wholeText.add(r.getText());
         }
         return wholeText;
