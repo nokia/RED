@@ -15,9 +15,9 @@ import org.eclipse.ltk.core.refactoring.Change;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Optional;
@@ -33,9 +33,9 @@ public class RedXmlInFileChangesCollectorTest {
     public void beforeTest() throws Exception {
         projectProvider.addRobotNature();
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addExcludedPath(new Path("a"));
-        config.addExcludedPath(new Path("a/b"));
-        config.addExcludedPath(new Path("c"));
+        config.addExcludedPath("a");
+        config.addExcludedPath("a/b");
+        config.addExcludedPath("c");
         projectProvider.configure(config);
 
         projectProvider.createDir(new Path("a"));
@@ -75,8 +75,7 @@ public class RedXmlInFileChangesCollectorTest {
         assertThat(change.isPresent()).isTrue();
 
         change.get().perform(new NullProgressMonitor());
-        final RobotProjectConfigReader reader = new RobotProjectConfigReader();
-        final RobotProjectConfig config = reader.readConfiguration(redXmlFile);
+        final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration(redXmlFile);
         assertThat(config.getExcludedPath()).containsOnly(ExcludedFolderPath.create("c"));
     }
 
@@ -91,8 +90,7 @@ public class RedXmlInFileChangesCollectorTest {
         assertThat(change.isPresent()).isTrue();
 
         change.get().perform(new NullProgressMonitor());
-        final RobotProjectConfigReader reader = new RobotProjectConfigReader();
-        final RobotProjectConfig config = reader.readConfiguration(redXmlFile);
+        final RobotProjectConfig config = new RedEclipseProjectConfigReader().readConfiguration(redXmlFile);
         assertThat(config.getExcludedPath()).containsOnly(ExcludedFolderPath.create("moved"),
                 ExcludedFolderPath.create("moved/b"), ExcludedFolderPath.create("c"));
     }

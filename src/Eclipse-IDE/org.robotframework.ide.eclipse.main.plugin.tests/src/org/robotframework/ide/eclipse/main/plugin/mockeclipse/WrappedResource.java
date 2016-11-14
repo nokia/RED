@@ -17,8 +17,9 @@ public class WrappedResource implements IAdaptable {
         this.resourceToWrap = resourceToWrap;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public <T> T getAdapter(final Class<T> adapter) {
+    public Object getAdapter(@SuppressWarnings("rawtypes") final Class adapter) {
         if (adapter.isInstance(resourceToWrap)) {
             return adapter.cast(resourceToWrap);
         }
