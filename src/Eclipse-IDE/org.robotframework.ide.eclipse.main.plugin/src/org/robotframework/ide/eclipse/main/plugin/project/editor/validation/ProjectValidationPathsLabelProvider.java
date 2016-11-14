@@ -14,8 +14,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditorInput.RedXmlProblem;
 import org.robotframework.red.graphics.ImagesManager;
@@ -37,7 +37,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
         
         if (projectTreeElement.isExcluded()) {
             final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
-                    .getExcludedPath(projectTreeElement.getPath());
+                    .getExcludedPath(projectTreeElement.getPath().toPortableString());
             final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
             if (!problems.isEmpty()) {
                 return new StyledString(projectTreeElement.getLabel() + " [excluded]", Stylers.Common.WARNING_STYLER);
@@ -55,7 +55,8 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
     public Image getImage(final Object element) {
         final ProjectTreeElement projectTreeElement = (ProjectTreeElement) element;
 
-        final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration().getExcludedPath(projectTreeElement.getPath());
+        final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
+                .getExcludedPath(projectTreeElement.getPath().toPortableString());
         final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
         if (!problems.isEmpty()) {
             return ImagesManager.getImage(RedImages.getBigWarningImage());
@@ -74,7 +75,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
         final ProjectTreeElement projectTreeElement = (ProjectTreeElement) element;
 
         final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
-                .getExcludedPath(projectTreeElement.getPath());
+                .getExcludedPath(projectTreeElement.getPath().toPortableString());
         final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
 
         final String descriptions = Joiner.on('\n').join(transform(problems, RedXmlProblem.toDescriptions()));
@@ -86,7 +87,7 @@ class ProjectValidationPathsLabelProvider extends RedCommonLabelProvider {
         final ProjectTreeElement projectTreeElement = (ProjectTreeElement) element;
 
         final ExcludedFolderPath excludedPath = editorInput.getProjectConfiguration()
-                .getExcludedPath(projectTreeElement.getPath());
+                .getExcludedPath(projectTreeElement.getPath().toPortableString());
         final List<RedXmlProblem> problems = editorInput.getProblemsFor(excludedPath);
 
         return problems.isEmpty() ? null : ImagesManager.getImage(RedImages.getWarningImage());

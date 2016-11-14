@@ -16,12 +16,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.CannotReadProjectConfigurationException;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigReader;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy.ReportingInterruptedException;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ProjectConfigurationProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.libs.LibrariesBuilder;
@@ -125,7 +125,7 @@ public class RobotArtifactsBuilder {
                         .causedBy(ProjectConfigurationProblem.CONFIG_FILE_MISSING);
                 reporter.handleProblem(problem, robotProject.getFile(".project"), 1);
             }
-            return new RobotProjectConfigReader().readConfiguration(robotProject);
+            return new RedEclipseProjectConfigReader().readConfiguration(robotProject.getProject());
         } catch (final CannotReadProjectConfigurationException e) {
             final RobotProblem problem = RobotProblem.causedBy(
                     ProjectConfigurationProblem.CONFIG_FILE_READING_PROBLEM)

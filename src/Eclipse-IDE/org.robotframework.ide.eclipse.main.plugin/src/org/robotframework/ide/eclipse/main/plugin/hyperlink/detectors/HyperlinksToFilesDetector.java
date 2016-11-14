@@ -5,20 +5,24 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
-import org.rf.ide.core.testdata.ValuesEscapes;
+import org.rf.ide.core.project.ImportPath;
+import org.rf.ide.core.project.ImportSearchPaths;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.project.ResolvedImportPath;
+import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
+import org.rf.ide.core.testdata.model.RobotExpressions;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.FileHyperlink;
-import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths;
-import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths.MarkedPath;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 
 import com.google.common.base.Optional;
@@ -29,52 +33,45 @@ abstract class HyperlinksToFilesDetector {
             final String pathAsString, final boolean isLibraryImport) {
         final List<IHyperlink> hyperlinks = new ArrayList<>();
 
-        final String normalizedPath = ValuesEscapes.unescapeSpaces(pathAsString);
+        final String normalizedPath = RobotExpressions.unescapeSpaces(pathAsString);
         if (isLibraryImport && !isPath(normalizedPath)) {
             return hyperlinks;
         }
 
-        final IPath absolutePath = createAbsolutePath(suiteFile, normalizedPath);
-        if (absolutePath == null) {
+        final Optional<URI> absoluteUri = createAbsoluteUri(suiteFile, normalizedPath);
+        if (!absoluteUri.isPresent()) {
             return hyperlinks;
         }
 
-        final Optional<IHyperlink> hyperlink = createLink(suiteFile, fromRegion, absolutePath);
+        final Optional<IHyperlink> hyperlink = createLink(suiteFile, fromRegion, absoluteUri.get());
         if (hyperlink.isPresent()) {
             hyperlinks.add(hyperlink.get());
         }
         return hyperlinks;
     }
 
-    private IPath createAbsolutePath(final RobotSuiteFile suiteFile, final String pathAsString) {
-        final String resolved = suiteFile.getProject().resolve(pathAsString);
-        final IPath path = new Path(resolved);
-        if (path.isAbsolute()) {
-            return path;
-        } else {
-            final ImportSearchPaths searchPaths = new ImportSearchPaths(suiteFile.getProject());
-            final Optional<MarkedPath> markedPath = searchPaths.getAbsolutePath(suiteFile, path);
-            return markedPath.isPresent() ? markedPath.get().getPath() : null;
+    private Optional<URI> createAbsoluteUri(final RobotSuiteFile suiteFile, final String path) {
+        final Map<String, String> variablesMapping = suiteFile.getProject()
+                .getRobotProjectHolder()
+                .getVariableMappings();
+        try {
+            final Optional<ResolvedImportPath> resolvedPath = ResolvedImportPath.from(ImportPath.from(path),
+                    variablesMapping);
+            if (!resolvedPath.isPresent()) {
+                return Optional.absent();
+            }
+            final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
+            final ImportSearchPaths searchPaths = new ImportSearchPaths(pathsProvider);
+            return searchPaths.findAbsoluteUri(suiteFile.getFile().getLocationURI(), resolvedPath.get());
+        } catch (final MalformedPathImportException e) {
+            return Optional.absent();
         }
     }
 
-    private Optional<IHyperlink> createLink(final RobotSuiteFile suiteFile, final IRegion fromRegion,
-            final IPath absolutePath) {
+    private Optional<IHyperlink> createLink(final RobotSuiteFile suiteFile, final IRegion fromRegion, final URI path) {
         final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
-        // FIXME : linked folders!
-        final IPath wsRelativePath = absolutePath.makeRelativeTo(wsRoot.getLocation());
-        if (wsRoot.getLocation().isPrefixOf(absolutePath)
-                || wsRoot.findFilesForLocationURI(absolutePath.toFile().toURI()).length > 0) {
-            // points into the workspace
-            IResource resource = wsRoot.findMember(wsRelativePath);
-            if (resource == null) {
-                resource = wsRoot.findFilesForLocationURI(absolutePath.toFile().toURI())[0];
-            }
-            if (resource != null) {
-                return createHyperlink(fromRegion, resource);
-            }
-        }
-        return Optional.absent();
+        final IResource resource = new RedWorkspace(wsRoot).forUri(path);
+        return resource != null ? createHyperlink(fromRegion, resource) : Optional.<IHyperlink> absent();
     }
 
     private Optional<IHyperlink> createHyperlink(final IRegion fromRegion, final IResource destination) {

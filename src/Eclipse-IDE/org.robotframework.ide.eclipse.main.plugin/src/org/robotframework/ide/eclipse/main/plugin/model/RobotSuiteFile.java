@@ -12,8 +12,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -33,15 +33,20 @@ import org.eclipse.core.runtime.content.IContentType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.Position;
 import org.eclipse.ui.IWorkbenchPage;
+import org.rf.ide.core.project.ImportPath;
+import org.rf.ide.core.project.ImportSearchPaths;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.project.ResolvedImportPath;
+import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Charsets;
@@ -433,23 +438,25 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return imported;
     }
 
-    private LibrarySpecification findSpecForPath(final String toImportPathOrName) {
-        final IPath path = new Path(toImportPathOrName);
-        final IPath resolvedPath = PathsResolver.isParameterized(path)
-                ? PathsResolver.resolveParametrizedPath(getProject(), path) : path;
-        if (PathsResolver.isParameterized(resolvedPath)) {
-            return null;
-        }
+    private LibrarySpecification findSpecForPath(final String pathOrName) {
+        final ImportPath importPath = ImportPath.from(pathOrName);
         
-        final Collection<IPath> possiblePaths = new ArrayList<>();
-        if (resolvedPath.isAbsolute()) {
-            possiblePaths.add(resolvedPath);
-        } else {
-            final Collection<IPath> paths = new ImportSearchPaths(getProject()).getAbsolutePaths(this, resolvedPath);
-            possiblePaths.addAll(paths);
-        }
-        if (possiblePaths.isEmpty()) {
+        final Optional<ResolvedImportPath> resolvedImportPath = getResolvedPath(importPath);
+        if (!resolvedImportPath.isPresent()) {
             return null;
+        }
+
+        final IPath possiblePath;
+        if (importPath.isAbsolute()) {
+            possiblePath = new Path(resolvedImportPath.get().getUri().getPath());
+        } else {
+            final PathsProvider pathsProvider = getProject().createPathsProvider();
+            final Optional<URI> markedUri = new ImportSearchPaths(pathsProvider)
+                    .findAbsoluteUri(getFile().getLocationURI(), resolvedImportPath.get());
+            if (!markedUri.isPresent()) {
+                return null;
+            }
+            possiblePath = new Path(markedUri.get().getPath());
         }
 
         for (final Entry<ReferencedLibrary, LibrarySpecification> entry : getProject().getReferencedLibraries()
@@ -457,17 +464,24 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             if (entry.getValue() == null) {
                 continue;
             }
-            final IPath entryPath = entry.getKey().getFilepath();
-            final IPath libPath1 = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
-            final IPath libPath2 = PathsConverter
+            final IPath entryPath = new Path(entry.getKey().getFilepath().getPath());
+            final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
+            final IPath libPath2 = RedWorkspace.Paths
                     .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
-            for (final IPath candidate : possiblePaths) {
-                if (candidate.equals(libPath1) || candidate.equals(libPath2)) {
-                    return entry.getValue();
-                }
+            if (possiblePath.equals(libPath1) || possiblePath.equals(libPath2)) {
+                return entry.getValue();
             }
         }
         return null;
+    }
+
+    private Optional<ResolvedImportPath> getResolvedPath(final ImportPath importPath) {
+        try {
+            return ResolvedImportPath.from(importPath,
+                getProject().getRobotProjectHolder().getVariableMappings());
+        } catch (final MalformedPathImportException e) {
+            return Optional.absent();
+        }
     }
 
     public List<RobotKeywordDefinition> getUserDefinedKeywords() {
@@ -478,7 +492,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return newArrayList();
     }
 
-    public List<IPath> getResourcesPaths() {
+    public List<String> getResourcesPaths() {
         final Optional<RobotSettingsSection> optionalSettings = findSection(RobotSettingsSection.class);
         if (optionalSettings.isPresent()) {
             return optionalSettings.get().getResourcesPaths();
@@ -486,7 +500,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return newArrayList();
     }
 
-    public List<IPath> getVariablesPaths() {
+    public List<String> getVariablesPaths() {
         final Optional<RobotSettingsSection> optionalSettings = findSection(RobotSettingsSection.class);
         if (optionalSettings.isPresent()) {
             return optionalSettings.get().getVariablesPaths();
@@ -495,52 +509,10 @@ public class RobotSuiteFile implements RobotFileInternalElement {
     }
 
     public List<VariablesFileImportReference> getVariablesFromLocalReferencedFiles() {
-        return fileOutput != null ? fileOutput.getVariablesImportReferences(getProject().getRobotProjectHolder())
+        final RobotProjectHolder projectHolder = getProject().getRobotProjectHolder();
+        final PathsProvider pathsProvider = getProject().createPathsProvider();
+        return fileOutput != null ? fileOutput.getVariablesImportReferences(projectHolder, pathsProvider)
                 : new ArrayList<VariablesFileImportReference>();
-    }
-
-    public List<ImportedVariablesFile> getImportedVariables() {
-        final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
-        final List<ImportedVariablesFile> alreadyImported = newArrayList();
-        if (section.isPresent()) {
-            for (final RobotElement element : section.get().getVariablesSettings()) {
-                final RobotSetting setting = (RobotSetting) element;
-                alreadyImported.add(new ImportedVariablesFile(setting.getArguments()));
-            }
-            return alreadyImported;
-        }
-        return newArrayList();
-    }
-
-    public static class ImportedVariablesFile {
-
-        private List<String> args;
-
-        public ImportedVariablesFile(final List<String> args) {
-            this.args = args;
-        }
-
-        public List<String> getArgs() {
-            return args;
-        }
-
-        public void setArgs(final List<String> args) {
-            this.args = args;
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj != null && obj.getClass() == ImportedVariablesFile.class) {
-                final ImportedVariablesFile other = (ImportedVariablesFile) obj;
-                return Objects.equals(args, other.args);
-            }
-            return false;
-        }
-
-        @Override
-        public int hashCode() {
-            return args.hashCode();
-        }
     }
 
     interface ParsingStrategy {

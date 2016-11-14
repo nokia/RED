@@ -49,6 +49,9 @@ import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.model.BaseWorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
@@ -62,10 +65,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.CreateFreshSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.DeleteSettingCommand;
 import org.robotframework.ide.eclipse.main.plugin.model.cmd.settings.SetSettingArgumentCommand;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.red.graphics.ImagesManager;
@@ -295,7 +295,7 @@ public class ImportLibraryComposite {
                 path.toPortableString());
         config.addReferencedLibrary(referencedLibrary);
         robotProject.clearConfiguration();
-        new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
+        new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");
     }
 
@@ -397,7 +397,7 @@ public class ImportLibraryComposite {
             }
         }
         robotProject.clearConfiguration();
-        new RobotProjectConfigWriter().writeConfiguration(config, robotProject);
+        new RedEclipseProjectConfigWriter().writeConfiguration(config, robotProject);
         eventBroker.send(RobotModelEvents.ROBOT_SETTING_LIBRARY_CHANGED_IN_SUITE, "");
     }
 

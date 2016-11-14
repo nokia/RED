@@ -43,7 +43,7 @@ public class ExcludePathHandler extends DIParameterizedHandler<E4ExcludePathHand
 
             for (final ProjectTreeElement locationToExclude : locationsToExclude) {
                 final IPath toRemove = locationToExclude.getPath();
-                input.getProjectConfiguration().addExcludedPath(toRemove);
+                input.getProjectConfiguration().addExcludedPath(toRemove.toPortableString());
             }
 
             final Collection<IPath> excludedPaths = transform(locationsToExclude,

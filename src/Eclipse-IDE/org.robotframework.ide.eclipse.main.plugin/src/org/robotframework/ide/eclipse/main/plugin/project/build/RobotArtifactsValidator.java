@@ -26,16 +26,17 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ExcludedFolderPath;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
@@ -248,7 +249,7 @@ public class RobotArtifactsValidator {
             final List<ExcludedFolderPath> excludedPaths = robotProjectConfig.getExcludedPath();
             for (final ExcludedFolderPath excludedPath : excludedPaths) {
 
-                if (excludedPath.asPath().isPrefixOf(resource.getProjectRelativePath())) {
+                if (Path.fromPortableString(excludedPath.getPath()).isPrefixOf(resource.getProjectRelativePath())) {
                     return false;
                 }
             }

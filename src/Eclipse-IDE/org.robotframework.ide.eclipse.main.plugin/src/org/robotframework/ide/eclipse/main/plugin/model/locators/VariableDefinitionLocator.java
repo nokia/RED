@@ -14,6 +14,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.imported.ARobotInternalVariable;
 import org.rf.ide.core.testdata.importer.AVariableImported;
 import org.rf.ide.core.testdata.importer.VariablesFileImportReference;
@@ -35,7 +36,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
 
 import com.google.common.base.Optional;
 
@@ -69,7 +69,7 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        shouldContinue = locateInResourceFiles(PathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile),
+        shouldContinue = locateInResourceFiles(ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile),
                 newHashSet(startingFile.getFile()), detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -93,7 +93,7 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        shouldContinue = locateInResourceFiles(PathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile),
+        shouldContinue = locateInResourceFiles(ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile),
                 newHashSet(startingFile.getFile()), detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -111,7 +111,7 @@ public class VariableDefinitionLocator {
         if (shouldContinue == ContinueDecision.STOP) {
             return;
         }
-        shouldContinue = locateInResourceFiles(PathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile),
+        shouldContinue = locateInResourceFiles(ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(startingFile),
                 newHashSet(startingFile.getFile()), detector);
         if (shouldContinue == ContinueDecision.STOP) {
             return;
@@ -218,13 +218,13 @@ public class VariableDefinitionLocator {
     }
     
     private ContinueDecision locateInLocalVariableFiles(final RobotSuiteFile file, final VariableDetector detector) {
-        for (final VariablesFileImportReference variablesFileImportReference : file.getVariablesFromLocalReferencedFiles()) {
-            final String path = variablesFileImportReference.getImportDeclaration()
+        for (final VariablesFileImportReference varFileImportRef : file.getVariablesFromLocalReferencedFiles()) {
+            final String path = varFileImportRef.getImportDeclaration()
                     .getPathOrName()
                     .getText()
                     .toString();
             final ReferencedVariableFile localReferencedFile = ReferencedVariableFile.create(path);
-            for (final AVariableImported<?> aVariableImported : variablesFileImportReference.getVariables()) {
+            for (final AVariableImported<?> aVariableImported : varFileImportRef.getVariables()) {
                 final ContinueDecision shouldContinue = detector.varFileVariableDetected(localReferencedFile,
                         aVariableImported.getRobotRepresentation(), aVariableImported.getValue());
                 if (shouldContinue == ContinueDecision.STOP) {
@@ -247,7 +247,7 @@ public class VariableDefinitionLocator {
             alreadyVisited.add((IFile) resourceFile);
 
             final RobotSuiteFile resourceSuiteFile = model.createSuiteFile((IFile) resourceFile);
-            final List<IPath> nestedResources = PathsResolver.getWorkspaceRelativeResourceFilesPaths(resourceSuiteFile);
+            final List<IPath> nestedResources = ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(resourceSuiteFile);
             ContinueDecision result = locateInResourceFiles(nestedResources, alreadyVisited, detector);
             if (result == ContinueDecision.STOP) {
                 return ContinueDecision.STOP;

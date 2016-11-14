@@ -111,7 +111,7 @@ public class RedPlugin extends AbstractUIPlugin {
         if (adapterClass.isInstance(adaptee)) {
             return adapterClass.cast(adaptee);
         } else if (adaptee instanceof IAdaptable) {
-            return ((IAdaptable) adaptee).getAdapter(adapterClass);
+            return (T) ((IAdaptable) adaptee).getAdapter(adapterClass);
         } else {
             return null;
         }

@@ -6,9 +6,10 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.io.File;
-import java.util.EnumSet;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
@@ -16,15 +17,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.rf.ide.core.testdata.ValuesEscapes;
+import org.rf.ide.core.project.ImportPath;
+import org.rf.ide.core.project.ImportSearchPaths;
+import org.rf.ide.core.project.ImportSearchPaths.MarkedUri;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.project.ResolvedImportPath;
+import org.rf.ide.core.project.ResolvedImportPath.MalformedPathImportException;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths;
-import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths.MarkedPath;
-import org.robotframework.ide.eclipse.main.plugin.model.ImportSearchPaths.PathRelativityPoint;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidator;
@@ -39,6 +42,8 @@ import com.google.common.collect.ImmutableMap;
  * @author Michal Anglart
  */
 abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
+
+    private static final Pattern UNESCAPED_WINDOWS_PATH_SEPARATOR = Pattern.compile("^.*[^\\\\][\\\\]{1}[^\\\\ ].*$");
 
     protected final FileValidationContext validationContext;
 
@@ -73,7 +78,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         if (pathOrNameToken == null) {
             reportMissingImportArgument(imported.getDeclaration());
         } else {
-            final String pathOrName = ValuesEscapes.unescapeSpaces(pathOrNameToken.getText());
+            final String pathOrName = RobotExpressions.unescapeSpaces(pathOrNameToken.getText());
             if (RobotExpressions.isParameterized(pathOrName)) {
                 final String resolved = suiteFile.getProject().resolve(pathOrName);
                 if (RobotExpressions.isParameterized(resolved)) {
@@ -116,7 +121,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     protected void validatePathImport(final String path, final RobotToken pathToken, final boolean isParametrized,
             final List<RobotToken> arguments) throws CoreException {
 
-        if (PathsResolver.hasNotEscapedWindowsPathSeparator(pathToken.getText())) {
+        if (hasNotEscapedWindowsPathSeparator(pathToken.getText())) {
             reportWindowsPathImport(pathToken);
             return;
         }
@@ -126,7 +131,7 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             reportAbsolutePathImport(pathToken, path);
         }
         
-        final Optional<MarkedPath> absoluteMarkedPath = calculateAbsolutePath(importPath);
+        final Optional<MarkedUri> absoluteMarkedPath = calculateAbsoluteUri(path);
         if (!absoluteMarkedPath.isPresent()) {
             reportMissingImportPath(path, pathToken, importPath);
             return;
@@ -137,15 +142,14 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             reportModuleSearchPathRelativeness(path, pathToken, importPath, absoluteMarkedPath);
         }
 
-        final IPath absoluteImportPath = absoluteMarkedPath.get().getPath();
-        final IWorkspaceRoot wsRoot = validationContext.getFile().getWorkspace().getRoot();
+        final URI absoluteImportUri = absoluteMarkedPath.get().getPath();
+        final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
+        final RedWorkspace redWorkspace = new RedWorkspace(wsRoot);
 
-        if (destinationIsInWorkspace(wsRoot, absoluteImportPath)) {
+        final IResource resource = redWorkspace.forUri(absoluteImportUri);
+        if (resource != null) {
 
-            final IResource resource = getResourceFor(wsRoot, absoluteImportPath);
-            if (resource == null) {
-                reportNonExistingResource(path, pathToken, null);
-            } else if (!resource.exists()) {
+            if (!resource.exists()) {
                 reportNonExistingResource(path, pathToken, resource.getFullPath().toPortableString());
             } else {
                 validateResource(resource, path, pathToken, arguments);
@@ -154,13 +158,18 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         } else {
             reportFileOutsideOfWorkspace(path, pathToken);
 
-            final File importAsFile = absoluteImportPath.toFile();
+            final File importAsFile = new File(absoluteImportUri);
             if (!importAsFile.exists()) {
                 reportNonExistingResource(path, pathToken, null);
             } else {
                 validateFile(importAsFile, path, pathToken, arguments);
             }
         }
+    }
+
+    private boolean hasNotEscapedWindowsPathSeparator(final String path) {
+        // e.g. c:\lib.py, but space escape is allowed e.g. c:/folder \ with2spaces/file.robot
+        return UNESCAPED_WINDOWS_PATH_SEPARATOR.matcher(path).find();
     }
 
     private void reportFileOutsideOfWorkspace(final String path, final RobotToken pathToken) {
@@ -178,22 +187,12 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 validationContext.getFile(), pathToken, attributes);
     }
 
-    private IResource getResourceFor(final IWorkspaceRoot root, final IPath absoluteImportPath) {
-        if (root.getLocation().isPrefixOf(absoluteImportPath)) {
-            final IPath wsRelativePath = absoluteImportPath.makeRelativeTo(root.getLocation());
-            return root.findMember(wsRelativePath);
-        } else {
-            return root.findFilesForLocationURI(absoluteImportPath.toFile().toURI())[0];
-        }
-    }
-
-    private boolean isRelativeToModuleSearchPath(final Optional<MarkedPath> absoluteMarkedPath) {
-        return EnumSet.of(PathRelativityPoint.MODULE_SEARCH_PATH, PathRelativityPoint.PROJECT_CONFIG_PATH)
-                .contains(absoluteMarkedPath.get().getRelativity());
+    private boolean isRelativeToModuleSearchPath(final Optional<MarkedUri> markedUri) {
+        return markedUri.isPresent() && markedUri.get().isRelativeGlobally();
     }
 
     private void reportModuleSearchPathRelativeness(final String path, final RobotToken pathToken,
-            final IPath importPath, final Optional<MarkedPath> absoluteMarkedPath) {
+            final IPath importPath, final Optional<MarkedUri> absoluteMarkedPath) {
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH,
                 importPath.toPortableString());
         reporter.handleProblem(
@@ -202,15 +201,22 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
                 validationContext.getFile(), pathToken, attributes);
     }
 
-    private Optional<MarkedPath> calculateAbsolutePath(final IPath importPath) {
-        final Optional<MarkedPath> absoluteMarkedPath;
-        if (importPath.isAbsolute()) {
-            absoluteMarkedPath = Optional.of(new MarkedPath(importPath, PathRelativityPoint.NONE));
-        } else {
-            absoluteMarkedPath = new ImportSearchPaths(suiteFile.getProject())
-                    .getAbsolutePath(suiteFile, importPath);
+    private Optional<MarkedUri> calculateAbsoluteUri(final String path) {
+        final Map<String, String> variablesMapping = suiteFile.getProject()
+                .getRobotProjectHolder()
+                .getVariableMappings();
+        try {
+            final Optional<ResolvedImportPath> resolvedPath = ResolvedImportPath.from(ImportPath.from(path),
+                    variablesMapping);
+            if (!resolvedPath.isPresent()) {
+                return Optional.absent();
+            }
+            final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
+            final ImportSearchPaths searchPaths = new ImportSearchPaths(pathsProvider);
+            return searchPaths.findAbsoluteMarkedUri(suiteFile.getFile().getLocationURI(), resolvedPath.get());
+        } catch (final MalformedPathImportException e) {
+            return Optional.absent();
         }
-        return absoluteMarkedPath;
     }
 
     protected void reportMissingImportPath(final String path, final RobotToken pathToken, final IPath importPath) {
@@ -230,11 +236,6 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         final RobotProblem problem = RobotProblem
                 .causedBy(GeneralSettingsProblem.IMPORT_PATH_USES_SINGLE_WINDOWS_SEPARATORS);
         reporter.handleProblem(problem, validationContext.getFile(), pathToken);
-    }
-
-    private boolean destinationIsInWorkspace(final IWorkspaceRoot root, final IPath destinationAbsolutePath) {
-        return root.getLocation().isPrefixOf(destinationAbsolutePath)
-                || root.findFilesForLocationURI(destinationAbsolutePath.toFile().toURI()).length > 0;
     }
 
     @SuppressWarnings("unused")

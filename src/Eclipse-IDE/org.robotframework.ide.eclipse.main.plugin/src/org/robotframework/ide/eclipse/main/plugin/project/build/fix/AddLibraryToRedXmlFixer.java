@@ -6,9 +6,11 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.fix;
 
 import java.io.File;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -22,16 +24,20 @@ import org.eclipse.swt.widgets.Display;
 import org.rf.ide.core.executor.EnvironmentSearchPaths;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
+import org.rf.ide.core.project.ImportPath;
+import org.rf.ide.core.project.ImportSearchPaths;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
+import org.rf.ide.core.project.ResolvedImportPath;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.RedProjectConfigEventData;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigEvents;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.RedProjectEditor;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.ReferencedLibraryImporter;
@@ -91,7 +97,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
             Optional<File> modulePath = Optional.absent();
             try {
                 final String currentFileDirectoryPath = suiteFile.getFile().getParent().getLocation().toOSString();
-                final EnvironmentSearchPaths searchPaths = config.createEnvironmentSearchPaths(project.getProject());
+                final EnvironmentSearchPaths searchPaths = new RedEclipseProjectConfig(config)
+                        .createEnvironmentSearchPaths(project.getProject());
                 searchPaths.addPythonPath(currentFileDirectoryPath);
                 searchPaths.addClassPath(currentFileDirectoryPath);
 
@@ -100,8 +107,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                     throw new RobotEnvironmentException("No path found");
                 }
                 if (modulePath.get().getAbsolutePath().endsWith(".jar")) {
-                    final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile,
-                            modulePath.get().getAbsolutePath());
+                    final IPath resolvedAbsPath = new Path(modulePath.get().getAbsolutePath());
                     final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
                     final RobotProject robotProject = suiteFile.getProject();
                     addedLibraries.addAll(importer.importJavaLib(Display.getCurrent().getActiveShell(),
@@ -140,12 +146,21 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
 
         private boolean importLibraryByPath(final RobotProjectConfig config, final String path) {
             if (path.endsWith("/") || path.endsWith(".py")) {
-                final IPath resolvedAbsPath = PathsResolver.resolveToAbsolutePath(suiteFile, path);
+                final Map<String, String> vars = suiteFile.getProject().getRobotProjectHolder().getVariableMappings();
+                final ResolvedImportPath resolvedPath = ResolvedImportPath.from(ImportPath.from(path), vars).get();
+
+                final PathsProvider pathsProvider = suiteFile.getProject().createPathsProvider();
+                final Optional<URI> absolutePath = new ImportSearchPaths(pathsProvider)
+                        .findAbsoluteUri(suiteFile.getFile().getLocationURI(), resolvedPath);
+                if (!absolutePath.isPresent()) {
+                    throw new ProposalApplyingException("Unable to apply proposal");
+                }
+
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
                 final RobotProject robotProject = suiteFile.getProject();
                 addedLibraries.addAll(importer.importPythonLib(Display.getCurrent().getActiveShell(),
                         robotProject.getRuntimeEnvironment(), robotProject.getProject(), config,
-                        resolvedAbsPath.toString()));
+                        new File(absolutePath.get()).getAbsolutePath()));
 
                 if (addedLibraries.isEmpty()) {
                     throw new ProposalApplyingException("Unable to apply proposal");

@@ -11,7 +11,7 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.runtime.CoreException;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig;
 
 class RedXmlFileChangeListener implements IResourceChangeListener {
 

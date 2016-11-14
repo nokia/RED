@@ -14,12 +14,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.project.build.AdditionalMarkerAttributes;
 import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemsReportingStrategy;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotProblem;
@@ -79,9 +79,9 @@ public class GeneralSettingsLibrariesImportValidator extends GeneralSettingsImpo
     private LibrarySpecification findSpecification(final IPath candidate) {
         final Map<ReferencedLibrary, LibrarySpecification> libs = validationContext.getReferencedLibrarySpecifications();
         for (final ReferencedLibrary refLib : libs.keySet()) {
-            final IPath entryPath = refLib.getFilepath();
-            final IPath libPath1 = PathsConverter.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
-            final IPath libPath2 = PathsConverter
+            final IPath entryPath = new Path(refLib.getFilepath().getPath());
+            final IPath libPath1 = RedWorkspace.Paths.toAbsoluteFromWorkspaceRelativeIfPossible(entryPath);
+            final IPath libPath2 = RedWorkspace.Paths
                     .toAbsoluteFromWorkspaceRelativeIfPossible(entryPath.addFileExtension("py"));
             if (candidate.equals(libPath1) || candidate.equals(libPath2)) {
                 return libs.get(refLib);

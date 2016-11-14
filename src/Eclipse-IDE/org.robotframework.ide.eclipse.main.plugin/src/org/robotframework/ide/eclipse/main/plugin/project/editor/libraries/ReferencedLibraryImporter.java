@@ -28,12 +28,12 @@ import org.eclipse.ui.dialogs.ElementListSelectionDialog;
 import org.eclipse.ui.statushandlers.StatusManager;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment.RobotEnvironmentException;
-import org.robotframework.ide.eclipse.main.plugin.PathsConverter;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
+import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.JarStructureBuilder.JarClass;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PythonLibStructureBuilder.PythonClass;
 import org.robotframework.red.graphics.ImagesManager;
@@ -146,7 +146,7 @@ public class ReferencedLibraryImporter {
     }
 
     public ReferencedLibrary importLibFromSpecFile(final String fullLibraryPath) {
-        final IPath path = PathsConverter.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath));
+        final IPath path = RedWorkspace.Paths.toWorkspaceRelativeIfPossible(new Path(fullLibraryPath));
         return ReferencedLibrary.create(LibraryType.VIRTUAL, path.lastSegment(), path.toPortableString());
     }
 
