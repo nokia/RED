@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _x2ENoKdEEeazyPh6f3_hNQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/10/16 3:11 PM
+Save-Time: 11/14/16 5:42 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -80,7 +80,7 @@ with [get-window "Export Preferences" | get-group "" | get-tree] {
 set-dialog-result File
 with [get-window "Export Preferences"] {
     get-button "Browse..." | click
-    get-combo -after [get-label "To preference file:"] | set-text [concat $RED_workspace_path "/exported_pref"]
+    get-combo -after [get-label "To preference file:"] | set-text [concat $RED_workspace_path "/exported_pref.epf"]
     get-button Finish | click
 }
 
@@ -108,8 +108,8 @@ with [get-window Import | get-tree] {
     select General | double-click
     select "General/Preferences" | double-click
 }
-//get-window "Import Preferences" | get-combo -after [get-label "From preference file:"] | set-text "D:\\abc\\jjj"
-set-dialog-result File [concat $RED_workspace_path "/exported_pref"]
+
+set-dialog-result File [concat $RED_workspace_path "/exported_pref.epf"]
 with [get-window "Import Preferences"] {
     get-button "Browse..." | click
     with [get-group "" | get-tree] {
