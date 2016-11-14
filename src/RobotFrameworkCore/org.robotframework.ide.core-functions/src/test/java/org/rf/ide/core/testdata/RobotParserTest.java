@@ -15,6 +15,7 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.model.FilePosition;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -43,13 +44,13 @@ public class RobotParserTest {
         // prepare
         final String fileContent = "*** Test Cases ***\nTest1\n\tLog\t\tc";
 
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder);
+        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
         // verify
@@ -66,13 +67,13 @@ public class RobotParserTest {
         // prepare
         final String fileContent = "*** Test Cases ***\nTest1\n\tLog\t\tc\n";
 
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder);
+        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
         final RobotFileOutput editorContent = parser.parseEditorContent(fileContent, new File("f.robot"));
 
         // verify
@@ -102,16 +103,16 @@ public class RobotParserTest {
     @Test
     public void test_create_when_robotFramework_correct29() {
         // prepare
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
         // execute
-        RobotParser parser = RobotParser.create(projectHolder);
+        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
 
         // verify
-        RobotVersion robotVersion = parser.getRobotVersion();
+        final RobotVersion robotVersion = parser.getRobotVersion();
         assertThat(robotVersion).isNotNull();
         assertThat(robotVersion.isEqualTo(new RobotVersion(2, 9))).isTrue();
     }
@@ -119,13 +120,13 @@ public class RobotParserTest {
     @Test
     public void test_create_when_robotFramework_isNotPresent() {
         // prepare
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn(null);
-        RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
         // execute
-        RobotParser parser = RobotParser.create(projectHolder);
+        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
 
         // verify
         assertThat(parser.getRobotVersion()).isNull();
@@ -134,12 +135,12 @@ public class RobotParserTest {
     @Test(timeout = 10000)
     public void test_loopedResources_shouldPassFastAndWithoutAny_reReadFiles_BUG_RED_352_GITHUB_23() throws Exception {
         // prepare
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
-        RobotParser parser = spy(RobotParser.createEager(projectHolder));
+        final RobotParser parser = spy(RobotParser.create(projectHolder, RobotParserConfig.allImportsEager()));
 
         //// prepare paths
         final String mainPath = "parser/bugs/RED_352_ReadManyTimesPrevReadReferenceFile_LoopPrevent/";
@@ -152,64 +153,64 @@ public class RobotParserTest {
         final File theFirst = new File(this.getClass().getResource(mainPath + "resources/theFirst.robot").toURI());
 
         // execute
-        List<RobotFileOutput> output = parser.parse(startFile);
+        final List<RobotFileOutput> output = parser.parse(startFile);
 
         // verify content
         //// StartFile.robot
         assertThat(output).hasSize(1);
-        RobotFileOutput startFileOutput = output.get(0);
+        final RobotFileOutput startFileOutput = output.get(0);
         assertThat(startFileOutput.getProcessedFile()).isEqualTo(startFile);
 
-        List<ResourceImportReference> resourceImportReferences = startFileOutput.getResourceImportReferences();
+        final List<ResourceImportReference> resourceImportReferences = startFileOutput.getResourceImportReferences();
         assertThat(resourceImportReferences).hasSize(3);
 
-        ResourceImportReference theFirstImportMain = resourceImportReferences.get(0);
+        final ResourceImportReference theFirstImportMain = resourceImportReferences.get(0);
         assertThat(theFirstImportMain.getImportDeclaration().getPathOrName().getText()).isEqualTo("NormalFile.robot");
         assertThat(theFirstImportMain.getReference().getProcessedFile()).isEqualTo(normalFile);
 
-        ResourceImportReference anotherFileResource = resourceImportReferences.get(1);
+        final ResourceImportReference anotherFileResource = resourceImportReferences.get(1);
         assertThat(anotherFileResource.getImportDeclaration().getPathOrName().getText()).isEqualTo("anotherLoop.robot");
         assertThat(anotherFileResource.getReference().getProcessedFile()).isEqualTo(anotherLoop);
 
-        ResourceImportReference res_theFirst = resourceImportReferences.get(2);
+        final ResourceImportReference res_theFirst = resourceImportReferences.get(2);
         assertThat(res_theFirst.getImportDeclaration().getPathOrName().getText()).isEqualTo("resources/theFirst.robot");
         assertThat(res_theFirst.getReference().getProcessedFile()).isEqualTo(theFirst);
 
         //// NormalFile.robot
-        RobotFileOutput normalFileOutput = theFirstImportMain.getReference();
+        final RobotFileOutput normalFileOutput = theFirstImportMain.getReference();
         assertThat(normalFileOutput.getResourceImportReferences()).hasSize(0);
 
         //// anotherLoop.robot
-        RobotFileOutput anotherFileOutput = anotherFileResource.getReference();
+        final RobotFileOutput anotherFileOutput = anotherFileResource.getReference();
         final List<ResourceImportReference> anotherLoopRefs = anotherFileOutput.getResourceImportReferences();
         assertThat(anotherLoopRefs).hasSize(1);
 
-        ResourceImportReference loopEndRef = anotherLoopRefs.get(0);
+        final ResourceImportReference loopEndRef = anotherLoopRefs.get(0);
         assertThat(loopEndRef.getImportDeclaration().getPathOrName().getText())
                 .isEqualTo("resources/loopEndWithRefToFirst.robot");
         assertThat(loopEndRef.getReference().getProcessedFile()).isEqualTo(loopEndWithRefToFirst);
 
         //// loopEndWithRefToFirst.robot
-        RobotFileOutput loopEndOutput = loopEndRef.getReference();
-        List<ResourceImportReference> loopEndRefs = loopEndOutput.getResourceImportReferences();
+        final RobotFileOutput loopEndOutput = loopEndRef.getReference();
+        final List<ResourceImportReference> loopEndRefs = loopEndOutput.getResourceImportReferences();
         assertThat(loopEndRefs).hasSize(1);
 
-        ResourceImportReference middleRef = loopEndRefs.get(0);
+        final ResourceImportReference middleRef = loopEndRefs.get(0);
         assertThat(middleRef.getImportDeclaration().getPathOrName().getText()).isEqualTo("../resources/Middle.robot");
         assertThat(middleRef.getReference().getProcessedFile()).isEqualTo(middle);
 
         //// middle.robot
-        RobotFileOutput middleOutput = middleRef.getReference();
-        List<ResourceImportReference> middleRefs = middleOutput.getResourceImportReferences();
+        final RobotFileOutput middleOutput = middleRef.getReference();
+        final List<ResourceImportReference> middleRefs = middleOutput.getResourceImportReferences();
         assertThat(middleRefs).hasSize(1);
 
-        ResourceImportReference res_theFirstAgain = middleRefs.get(0);
+        final ResourceImportReference res_theFirstAgain = middleRefs.get(0);
         assertThat(res_theFirstAgain.getImportDeclaration().getPathOrName().getText())
                 .isEqualTo("../resources/theFirst.robot");
         assertThat(res_theFirstAgain.getReference()).isSameAs(res_theFirst.getReference());
 
         // verify order
-        InOrder order = inOrder(projectHolder, parser);
+        final InOrder order = inOrder(projectHolder, parser);
         order.verify(projectHolder, times(1)).shouldBeLoaded(startFile);
         order.verify(projectHolder, times(1)).addModelFile(output.get(0));
         order.verify(projectHolder, times(1)).shouldBeLoaded(normalFile);
@@ -244,18 +245,18 @@ public class RobotParserTest {
     private void assertOneCorrectAndOneWrongVariable_ifAllWasReadAndWillBePresented(final String filename)
             throws Exception {
         // prepare
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
-        RobotParser parser = spy(RobotParser.createEager(projectHolder));
+        final RobotParser parser = spy(RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy()));
 
         //// prepare paths
         final File startFile = new File(this.getClass().getResource(filename).toURI());
 
         // execute
-        List<RobotFileOutput> output = parser.parse(startFile);
+        final List<RobotFileOutput> output = parser.parse(startFile);
 
         // verify
         assertThat(output).hasSize(1);
@@ -263,16 +264,16 @@ public class RobotParserTest {
         final RobotFile robotModel = file.getFileModel();
         assertThatVariableTableIsIncluded(robotModel);
         final VariableTable variableTable = robotModel.getVariableTable();
-        List<AVariable> variables = variableTable.getVariables();
+        final List<AVariable> variables = variableTable.getVariables();
         assertThat(variables).hasSize(2);
-        AVariable varCorrect = variables.get(0);
+        final AVariable varCorrect = variables.get(0);
         assertThat(varCorrect).isInstanceOf(ScalarVariable.class);
         assertThat(varCorrect.getDeclaration().getText()).isEqualTo("${var_ok}");
         assertThat(varCorrect.getDeclaration().getRaw()).isEqualTo("${var_ok}");
         assertThat(varCorrect.getType()).isEqualTo(VariableType.SCALAR);
         assertThat(varCorrect.getName()).isEqualTo("var_ok");
 
-        AVariable varIncorrect = variables.get(1);
+        final AVariable varIncorrect = variables.get(1);
         assertThat(varIncorrect).isInstanceOf(UnknownVariable.class);
         assertThat(varIncorrect.getDeclaration().getText()).isEqualTo("${var} data");
         assertThat(varIncorrect.getDeclaration().getRaw()).isEqualTo("${var} data");
@@ -298,26 +299,26 @@ public class RobotParserTest {
     public void test_givenTwoTestCasesInTsvFile_oneIsEmpty_andSecondIsJustVariableName_withEmptyExecute()
             throws Exception {
         // prepare
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = spy(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
 
-        RobotParser parser = spy(RobotParser.createEager(projectHolder));
+        final RobotParser parser = spy(RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy()));
 
         //// prepare paths
         final File startFile = new File(this.getClass().getResource("parser/bugs/tsv_positionCheck.tsv").toURI());
 
         // execute
-        List<RobotFileOutput> output = parser.parse(startFile);
+        final List<RobotFileOutput> output = parser.parse(startFile);
 
         // verify
         assertThat(output).hasSize(1);
         final RobotFileOutput file = output.get(0);
         final RobotFile robotModel = file.getFileModel();
         assertThatTestCaseTableIsIncluded(robotModel);
-        TestCaseTable testCaseTable = robotModel.getTestCaseTable();
-        List<TestCase> testCases = testCaseTable.getTestCases();
+        final TestCaseTable testCaseTable = robotModel.getTestCaseTable();
+        final List<TestCase> testCases = testCaseTable.getTestCases();
         assertThat(testCases).hasSize(2);
         final TestCase testCaseT3 = testCases.get(0);
 
@@ -340,8 +341,8 @@ public class RobotParserTest {
         final IExecutableRowDescriptor<TestCase> xTestFirstLineDescription = xTestExecutionList.get(0)
                 .buildLineDescription();
 
-        RobotAction action = xTestFirstLineDescription.getAction();
-        RobotToken emptyAction = action.getToken();
+        final RobotAction action = xTestFirstLineDescription.getAction();
+        final RobotToken emptyAction = action.getToken();
         assertThat(emptyAction.getText()).isEmpty();
         assertThat(emptyAction.getRaw()).isEmpty();
         final FilePosition emptyActionPosition = emptyAction.getFilePosition();

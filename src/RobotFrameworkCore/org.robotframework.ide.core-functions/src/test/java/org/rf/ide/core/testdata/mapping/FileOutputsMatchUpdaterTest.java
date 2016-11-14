@@ -19,6 +19,7 @@ import java.util.List;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.mapping.TwoModelReferencesLinker.DifferentOutputFile;
 import org.rf.ide.core.testdata.mapping.collect.RobotTokensCollector;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -43,7 +44,7 @@ public class FileOutputsMatchUpdaterTest {
         final String fContentNew = "*** Settings ***\nLibrary\tnowy2\tok2\t#bad2";
 
         final RobotProjectHolder holder = new RobotProjectHolder();
-        final RobotParser parser = RobotParser.create(holder);
+        final RobotParser parser = RobotParser.create(holder, RobotParserConfig.allImportsLazy());
         final RobotFileOutput oldContent = parser.parseEditorContent(fContentOld, new File("fake.txt"));
         final RobotFileOutput newContent = parser.parseEditorContent(fContentNew, new File("fake.txt"));
 
@@ -66,13 +67,13 @@ public class FileOutputsMatchUpdaterTest {
             final ListMultimap<RobotTokenType, RobotToken> oldViewAboutTokensPrev, final RobotFileOutput newContent) {
 
         final RobotTokensCollector robotTokensCollector = new RobotTokensCollector();
-        ListMultimap<RobotTokenType, RobotToken> oldViewAboutTokens = robotTokensCollector
+        final ListMultimap<RobotTokenType, RobotToken> oldViewAboutTokens = robotTokensCollector
                 .extractRobotTokens(oldContent);
-        ListMultimap<RobotTokenType, RobotToken> newViewAboutTokens = robotTokensCollector
+        final ListMultimap<RobotTokenType, RobotToken> newViewAboutTokens = robotTokensCollector
                 .extractRobotTokens(newContent);
 
         assertThat(oldViewAboutTokens.keySet()).containsOnlyElementsOf(newViewAboutTokens.keySet());
-        for (RobotTokenType type : oldViewAboutTokens.keySet()) {
+        for (final RobotTokenType type : oldViewAboutTokens.keySet()) {
             final List<RobotToken> oldOutputForType = oldViewAboutTokens.get(type);
             final List<RobotToken> newOutputForType = newViewAboutTokens.get(type);
 
@@ -100,7 +101,7 @@ public class FileOutputsMatchUpdaterTest {
             final List<IRobotLineElement> newLineElements = newRobotLine.getLineElements();
             assertThat(newRobotLine).isSameAs(rl);
 
-            int size = lineElements.size();
+            final int size = lineElements.size();
             for (int i = 0; i < size; i++) {
                 final IRobotLineElement elem = lineElements.get(i);
                 if (elem instanceof RobotToken) {
@@ -246,9 +247,9 @@ public class FileOutputsMatchUpdaterTest {
         final RobotFileOutput oldModifiedOutput = mock(RobotFileOutput.class);
         final RobotFileOutput alreadyDumpedContent = mock(RobotFileOutput.class);
         final RobotTokensCollector collector = mock(RobotTokensCollector.class);
-        ListMultimap<RobotTokenType, RobotToken> oldView = ArrayListMultimap.create();
+        final ListMultimap<RobotTokenType, RobotToken> oldView = ArrayListMultimap.create();
         when(collector.extractRobotTokens(oldModifiedOutput)).thenReturn(oldView);
-        ListMultimap<RobotTokenType, RobotToken> newView = ArrayListMultimap.create();
+        final ListMultimap<RobotTokenType, RobotToken> newView = ArrayListMultimap.create();
         when(collector.extractRobotTokens(alreadyDumpedContent)).thenReturn(newView);
 
         final TwoModelReferencesLinker tested = spy(new TwoModelReferencesLinker(collector));
@@ -265,7 +266,7 @@ public class FileOutputsMatchUpdaterTest {
         }
 
         // verify
-        InOrder order = inOrder(tested, collector);
+        final InOrder order = inOrder(tested, collector);
         if (fallbackAllowed) {
             order.verify(tested, times(1)).update(oldModifiedOutput, alreadyDumpedContent, true);
         }

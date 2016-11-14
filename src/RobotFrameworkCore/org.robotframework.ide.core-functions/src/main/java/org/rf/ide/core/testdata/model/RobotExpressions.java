@@ -21,6 +21,31 @@ import com.google.common.collect.Range;
 
 public class RobotExpressions {
 
+    /**
+     * Removes escaping characters proceeding spaces (multiple spaces may
+     * be escaped in robot format cells)
+     * 
+     * @param str
+     * @return
+     */
+    public static String unescapeSpaces(final String str) {
+        int backslashes = 0;
+        final StringBuilder escaped = new StringBuilder();
+        for (int i = 0; i < str.length(); i++) {
+            final char c = str.charAt(i);
+            escaped.append(c);
+            if (c == '\\') {
+                backslashes++;
+            } else if (c == ' ' && backslashes % 2 == 1) {
+                backslashes = 0;
+                escaped.deleteCharAt(escaped.length() - 2);
+            } else {
+                backslashes = 0;
+            }
+        }
+        return escaped.toString();
+    }
+
     public static List<Range<Integer>> getVariablesPositions(final String expression) {
         final List<Range<Integer>> ranges = newArrayList();
 

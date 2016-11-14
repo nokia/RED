@@ -17,6 +17,7 @@ import java.util.List;
 import org.junit.Test;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
@@ -78,13 +79,13 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
         assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR);
         assertExecutableLine(executionContext.get(1), "\\", Arrays.asList("Log", "ok"), Arrays.asList("#cm1"));
         assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
-        ForLoopContinueRowDescriptor<UserKeyword> forLineOne = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
+        final ForLoopContinueRowDescriptor<UserKeyword> forLineOne = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
                 .get(1).buildLineDescription();
         assertThat(forLineOne.getKeywordAction().getToken().getText()).isEqualTo("Log");
         assertThat(forLineOne.getAction().getToken().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("Log", "ok2"), Arrays.asList("#cm2"));
         assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
-        ForLoopContinueRowDescriptor<UserKeyword> forLineTwo = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
+        final ForLoopContinueRowDescriptor<UserKeyword> forLineTwo = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
                 .get(2).buildLineDescription();
         assertThat(forLineTwo.getKeywordAction().getToken().getText()).isEqualTo("Log");
         assertThat(forLineTwo.getAction().getToken().getText()).isEqualTo("\\");
@@ -111,13 +112,13 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
         assertThat(executionContext.get(0).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR);
         assertExecutableLine(executionContext.get(1), "\\", Arrays.asList("Log", "ok"), Arrays.asList("#cm1"));
         assertThat(executionContext.get(1).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
-        ForLoopContinueRowDescriptor<UserKeyword> forLineOne = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
+        final ForLoopContinueRowDescriptor<UserKeyword> forLineOne = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
                 .get(1).buildLineDescription();
         assertThat(forLineOne.getKeywordAction().getToken().getText()).isEqualTo("Log");
         assertThat(forLineOne.getAction().getToken().getText()).isEqualTo("\\");
         assertExecutableLine(executionContext.get(2), "\\", Arrays.asList("Log", "ok2"), Arrays.asList("#cm2"));
         assertThat(executionContext.get(2).buildLineDescription().getRowType()).isEqualTo(ERowType.FOR_CONTINUE);
-        ForLoopContinueRowDescriptor<UserKeyword> forLineTwo = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
+        final ForLoopContinueRowDescriptor<UserKeyword> forLineTwo = (ForLoopContinueRowDescriptor<UserKeyword>) executionContext
                 .get(1).buildLineDescription();
         assertThat(forLineTwo.getKeywordAction().getToken().getText()).isEqualTo("Log");
         assertThat(forLineTwo.getAction().getToken().getText()).isEqualTo("\\");
@@ -326,17 +327,17 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
             assertToken(robotExecutableRow.getAction(), actionText, RobotTokenType.KEYWORD_ACTION_NAME);
         }
         final List<RobotToken> arguments = robotExecutableRow.getArguments();
-        int argsSize = args.size();
+        final int argsSize = args.size();
         assertThat(arguments).hasSize(argsSize);
         for (int i = 0; i < argsSize; i++) {
             assertToken(arguments.get(i), args.get(i), RobotTokenType.KEYWORD_ACTION_ARGUMENT);
         }
 
         final List<RobotToken> comments = robotExecutableRow.getComment();
-        int commentsSize = comment.size();
+        final int commentsSize = comment.size();
         assertThat(comments).hasSize(commentsSize);
         for (int i = 0; i < commentsSize; i++) {
-            RobotToken token = comments.get(i);
+            final RobotToken token = comments.get(i);
             assertThat(token.getText()).isEqualTo(comment.get(i));
             assertThat(token.getRaw()).isEqualTo(comment.get(i));
             assertThat(token.getTypes().contains(RobotTokenType.START_HASH_COMMENT)
@@ -359,16 +360,16 @@ public class OutputCheckRelatedToForWithDifferentForItemContinueTest {
 
     private RobotFile getModelFile(final String fileName) throws Exception {
         // prepare
-        RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
+        final RobotRuntimeEnvironment runtime = mock(RobotRuntimeEnvironment.class);
         when(runtime.getVersion()).thenReturn("2.9");
-        RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
+        final RobotProjectHolder projectHolder = mock(RobotProjectHolder.class);
         when(projectHolder.getRobotRuntime()).thenReturn(runtime);
         final String mainPath = "parser/bugs/for/";
         final File file = new File(RobotParser.class.getResource(mainPath + fileName).toURI());
         when(projectHolder.shouldBeLoaded(file)).thenReturn(true);
 
         // execute
-        final RobotParser parser = RobotParser.create(projectHolder);
+        final RobotParser parser = RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy());
         final List<RobotFileOutput> parsed = parser.parse(file);
 
         // verify

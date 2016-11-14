@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.rf.ide.core.execution.context.RobotDebugExecutableLineChecker;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotFile;
 
@@ -20,7 +19,7 @@ public class RobotDebugExecutableLineCheckerTest {
     @Test
     public void test() throws URISyntaxException {
 
-        RobotParser parser = RobotModelTestProvider.getParser();
+        final RobotParser parser = RobotModelTestProvider.getLazyParser();
         modelFile = RobotModelTestProvider.getModelFile("test_ExeChecker_1.robot", parser);
 
         checkExecutableLines(new int[] { 2, 3, 4, 5, 13, 14, 16, 17, 18, 22, 23, 24, 26, 29, 32, 36, 38, 41, 43 });

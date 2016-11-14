@@ -20,6 +20,7 @@ import org.junit.Test;
 import org.rf.ide.core.execution.context.RobotModelTestProvider;
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
 import org.rf.ide.core.testdata.RobotParser;
+import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
@@ -45,7 +46,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
     @Test
     public void test_checkForOffsetLessThanFileLength() {
         // given
-        long offset = -1;
+        final long offset = -1;
 
         // when
         final Optional<IDocumentationHolder> docFound = out.findDocumentationForOffset((int) offset);
@@ -57,7 +58,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
     @Test
     public void test_checkForOffsetOutsideFileLength() {
         // given
-        long offset = out.getProcessedFile().length() + 10;
+        final long offset = out.getProcessedFile().length() + 10;
 
         // when
         final Optional<IDocumentationHolder> docFound = out.findDocumentationForOffset((int) offset);
@@ -92,8 +93,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final TestDocumentation testTC2Documentation = testCaseTable.getTestCases().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docTC1Found = out.findDocumentationForOffset(middleOffset(testTC1Documentation));
-        Optional<IDocumentationHolder> docTC2Found = out.findDocumentationForOffset(middleOffset(testTC2Documentation));
+        final Optional<IDocumentationHolder> docTC1Found = out.findDocumentationForOffset(middleOffset(testTC1Documentation));
+        final Optional<IDocumentationHolder> docTC2Found = out.findDocumentationForOffset(middleOffset(testTC2Documentation));
 
         // then
         assertThat(docTC1Found.isPresent()).isTrue();
@@ -109,9 +110,9 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final TestDocumentation testTC2Documentation = testCaseTable.getTestCases().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docTC1Found = out
+        final Optional<IDocumentationHolder> docTC1Found = out
                 .findDocumentationForOffset(testTC1Documentation.getEndPosition().getOffset() + 1);
-        Optional<IDocumentationHolder> docTC2Found = out
+        final Optional<IDocumentationHolder> docTC2Found = out
                 .findDocumentationForOffset(testTC2Documentation.getEndPosition().getOffset() + 1);
 
         // then
@@ -126,9 +127,9 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final TestDocumentation testTC2Documentation = testCaseTable.getTestCases().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docTC1Found = out
+        final Optional<IDocumentationHolder> docTC1Found = out
                 .findDocumentationForOffset(testTC1Documentation.getEndPosition().getOffset());
-        Optional<IDocumentationHolder> docTC2Found = out
+        final Optional<IDocumentationHolder> docTC2Found = out
                 .findDocumentationForOffset(testTC2Documentation.getEndPosition().getOffset());
 
         // then
@@ -145,9 +146,9 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final TestDocumentation testTC2Documentation = testCaseTable.getTestCases().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docTC1Found = out
+        final Optional<IDocumentationHolder> docTC1Found = out
                 .findDocumentationForOffset(testTC1Documentation.getBeginPosition().getOffset());
-        Optional<IDocumentationHolder> docTC2Found = out
+        final Optional<IDocumentationHolder> docTC2Found = out
                 .findDocumentationForOffset(testTC2Documentation.getBeginPosition().getOffset());
 
         // then
@@ -164,9 +165,9 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final TestDocumentation testTC2Documentation = testCaseTable.getTestCases().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docTC1Found = out
+        final Optional<IDocumentationHolder> docTC1Found = out
                 .findDocumentationForOffset(testTC1Documentation.getBeginPosition().getOffset() - 1);
-        Optional<IDocumentationHolder> docTC2Found = out
+        final Optional<IDocumentationHolder> docTC2Found = out
                 .findDocumentationForOffset(testTC2Documentation.getBeginPosition().getOffset() - 1);
 
         // then
@@ -181,8 +182,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final KeywordDocumentation keyKW2Documentation = keywordTable.getKeywords().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docKW1Found = out.findDocumentationForOffset(middleOffset(keyKW1Documentation));
-        Optional<IDocumentationHolder> docKW2Found = out.findDocumentationForOffset(middleOffset(keyKW2Documentation));
+        final Optional<IDocumentationHolder> docKW1Found = out.findDocumentationForOffset(middleOffset(keyKW1Documentation));
+        final Optional<IDocumentationHolder> docKW2Found = out.findDocumentationForOffset(middleOffset(keyKW2Documentation));
 
         // then
         assertThat(docKW1Found.isPresent()).isTrue();
@@ -198,9 +199,9 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final KeywordDocumentation keyKW2Documentation = keywordTable.getKeywords().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docKW1Found = out
+        final Optional<IDocumentationHolder> docKW1Found = out
                 .findDocumentationForOffset(keyKW1Documentation.getEndPosition().getOffset() + 1);
-        Optional<IDocumentationHolder> docKW2Found = out
+        final Optional<IDocumentationHolder> docKW2Found = out
                 .findDocumentationForOffset(keyKW2Documentation.getEndPosition().getOffset() + 1);
 
         // then
@@ -215,9 +216,9 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final KeywordDocumentation keyKW2Documentation = keywordTable.getKeywords().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docKW1Found = out
+        final Optional<IDocumentationHolder> docKW1Found = out
                 .findDocumentationForOffset(keyKW1Documentation.getEndPosition().getOffset());
-        Optional<IDocumentationHolder> docKW2Found = out
+        final Optional<IDocumentationHolder> docKW2Found = out
                 .findDocumentationForOffset(keyKW2Documentation.getEndPosition().getOffset());
 
         // then
@@ -234,9 +235,9 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final KeywordDocumentation keyKW2Documentation = keywordTable.getKeywords().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docKW1Found = out
+        final Optional<IDocumentationHolder> docKW1Found = out
                 .findDocumentationForOffset(keyKW1Documentation.getBeginPosition().getOffset());
-        Optional<IDocumentationHolder> docKW2Found = out
+        final Optional<IDocumentationHolder> docKW2Found = out
                 .findDocumentationForOffset(keyKW2Documentation.getBeginPosition().getOffset());
 
         // then
@@ -253,9 +254,9 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final KeywordDocumentation keyKW2Documentation = keywordTable.getKeywords().get(1).getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docKW1Found = out
+        final Optional<IDocumentationHolder> docKW1Found = out
                 .findDocumentationForOffset(keyKW1Documentation.getBeginPosition().getOffset() - 1);
-        Optional<IDocumentationHolder> docKW2Found = out
+        final Optional<IDocumentationHolder> docKW2Found = out
                 .findDocumentationForOffset(keyKW2Documentation.getBeginPosition().getOffset() - 1);
 
         // then
@@ -269,7 +270,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final SuiteDocumentation suiteDocumentation = settingTable.getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docFound = out.findDocumentationForOffset(middleOffset(suiteDocumentation));
+        final Optional<IDocumentationHolder> docFound = out.findDocumentationForOffset(middleOffset(suiteDocumentation));
 
         // then
         assertThat(docFound.isPresent()).isTrue();
@@ -282,7 +283,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final SuiteDocumentation suiteDocumentation = settingTable.getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docFound = out
+        final Optional<IDocumentationHolder> docFound = out
                 .findDocumentationForOffset(suiteDocumentation.getEndPosition().getOffset() + 1);
 
         // then
@@ -295,7 +296,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final SuiteDocumentation suiteDocumentation = settingTable.getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docFound = out
+        final Optional<IDocumentationHolder> docFound = out
                 .findDocumentationForOffset(suiteDocumentation.getEndPosition().getOffset());
 
         // then
@@ -309,7 +310,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final SuiteDocumentation suiteDocumentation = settingTable.getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docFound = out
+        final Optional<IDocumentationHolder> docFound = out
                 .findDocumentationForOffset(suiteDocumentation.getBeginPosition().getOffset());
 
         // then
@@ -323,7 +324,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final SuiteDocumentation suiteDocumentation = settingTable.getDocumentation().get(0);
 
         // when
-        Optional<IDocumentationHolder> docFound = out
+        final Optional<IDocumentationHolder> docFound = out
                 .findDocumentationForOffset(suiteDocumentation.getBeginPosition().getOffset() - 1);
 
         // then
@@ -335,7 +336,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
         final RobotRuntimeEnvironment robotRuntime = mock(RobotRuntimeEnvironment.class);
         final RobotProjectHolder projectHolder = new RobotProjectHolder(robotRuntime);
         final RobotFile modelFile = RobotModelTestProvider.getModelFile(getFile("presenter//DocPositionsFind.robot"),
-                RobotParser.create(projectHolder));
+                RobotParser.create(projectHolder, RobotParserConfig.allImportsLazy()));
         out = modelFile.getParent();
         assertThat(out).isNotNull();
 
@@ -349,8 +350,8 @@ public class DocumentationCacherInsideRobotFileOutputTest {
     }
 
     private int middleOffset(final IDocumentationHolder holder) {
-        int startOffset = holder.getBeginPosition().getOffset();
-        int endOffset = holder.getContinuousRegions()
+        final int startOffset = holder.getBeginPosition().getOffset();
+        final int endOffset = holder.getContinuousRegions()
                 .get(holder.getContinuousRegions().size() - 1)
                 .getEnd()
                 .getOffset();
@@ -359,7 +360,7 @@ public class DocumentationCacherInsideRobotFileOutputTest {
     }
 
     private static Path getFile(final String path) throws URISyntaxException {
-        URL resource = DocumentationCacherInsideRobotFileOutputTest.class.getResource(path);
+        final URL resource = DocumentationCacherInsideRobotFileOutputTest.class.getResource(path);
         return Paths.get(resource.toURI());
     }
 }

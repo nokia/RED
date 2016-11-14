@@ -42,7 +42,8 @@ public abstract class AHeadersOrderDumpTest {
         final String inFileName = HEADERS_UPDATE_DIR + "Input_TestCaseExists_addingSettings." + getExtension();
         final String outputFileName = HEADERS_UPDATE_DIR + "Output_TestCaseExists_addingSettings." + getExtension();
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getLazyParser());
 
         // action
         modelFile.includeSettingTableSection();
@@ -60,7 +61,8 @@ public abstract class AHeadersOrderDumpTest {
         final String outputFileName = HEADERS_UPDATE_DIR + "Output_TestCaseExists_addingSettingsAndVariables."
                 + getExtension();
         final Path inputFile = DumperTestHelper.getINSTANCE().getFile(inFileName);
-        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile, RobotModelTestProvider.getParser());
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(inputFile,
+                RobotModelTestProvider.getLazyParser());
 
         // action
         modelFile.includeVariableTableSection();
