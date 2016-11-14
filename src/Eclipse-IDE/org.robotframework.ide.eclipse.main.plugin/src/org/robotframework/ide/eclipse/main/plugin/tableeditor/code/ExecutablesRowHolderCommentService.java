@@ -5,6 +5,9 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.code;
 
+import static com.google.common.collect.Iterables.transform;
+import static com.google.common.collect.Lists.newArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -13,6 +16,9 @@ import org.rf.ide.core.testdata.model.AModelElement;
 import org.rf.ide.core.testdata.model.ICommentHolder;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.presenter.CommentServiceHandler.ETokenSeparator;
+import org.rf.ide.core.testdata.model.table.IExecutableStepsHolder;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRowView;
 import org.rf.ide.core.testdata.text.read.IRobotTokenType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
@@ -311,9 +317,12 @@ public class ExecutablesRowHolderCommentService {
         final Object linkedElement = element.getLinkedElement();
         if (linkedElement instanceof AModelElement) {
             final AModelElement<?> modelElement = (AModelElement<?>) linkedElement;
-            toks.addAll(modelElement.getElementTokens());
 
             if (isExecutable(modelElement)) {
+                final RobotExecutableRowView view = RobotExecutableRowView
+                        .buildView((RobotExecutableRow<? extends IExecutableStepsHolder<?>>) linkedElement);
+                toks.addAll(newArrayList(transform(modelElement.getElementTokens(),
+                        RobotKeywordCall.tokenViaExecutableViewUpdateToken(view))));
                 if (toks.size() >= 2) {
                     final RobotToken actionToken = toks.get(0);
                     if (actionToken.getFilePosition().isNotSet() && actionToken.getText().isEmpty()) {
@@ -324,6 +333,8 @@ public class ExecutablesRowHolderCommentService {
                         }
                     }
                 }
+            } else {
+                toks.addAll(modelElement.getElementTokens());
             }
         }
 
