@@ -43,11 +43,11 @@ public class ExecutablesRowHolderCommentService {
             final int indexOfComment = findIndexOfTheFirstCommentBefore(execRowView, column);
             if (looksLikeComment(value) && (indexOfComment > column || indexOfComment < 0)) {
                 // conversion to comment
-                commands.add(new ConversionToCommentCommand(call, value, column, execRowView));
+                commands.add(new ConversionToCommentCommand(call, value, column));
                 handled = true;
             } else if (indexOfComment == column) {
                 // conversion from comment
-                commands.add(new ConversionFromCommentCommand(call, value, column, execRowView));
+                commands.add(new ConversionFromCommentCommand(call, value, column));
                 handled = true;
             } else if (indexOfComment == 0) {
                 // update comment begin in action token
@@ -74,16 +74,12 @@ public class ExecutablesRowHolderCommentService {
 
         private final int column;
 
-        private final List<RobotToken> execRowView;
-
         private List<EditorCommand> executedCommands;
 
-        public ConversionToCommentCommand(final RobotKeywordCall call, final String value, final int column,
-                final List<RobotToken> execRowView) {
+        public ConversionToCommentCommand(final RobotKeywordCall call, final String value, final int column) {
             this.call = call;
             this.column = column;
             this.value = value;
-            this.execRowView = execRowView;
         }
 
         @Override
@@ -92,6 +88,7 @@ public class ExecutablesRowHolderCommentService {
 
             List<RobotToken> commentToken = new ArrayList<>(0);
 
+            List<RobotToken> execRowView = execRowView(call);
             RobotKeywordCall callToUse = call;
             int startColumn = column;
             if (column == 0) {
@@ -122,7 +119,7 @@ public class ExecutablesRowHolderCommentService {
                 }
             }
 
-            fillMissingColumns(callToUse);
+            fillMissingColumns(callToUse, execRowView);
 
             if (column > 0 && commentToken.isEmpty()) {
                 commentToken.add(RobotToken.create(value));
@@ -140,7 +137,7 @@ public class ExecutablesRowHolderCommentService {
             call.resetStored();
         }
 
-        private void fillMissingColumns(RobotKeywordCall callToUse) {
+        private void fillMissingColumns(final RobotKeywordCall callToUse, final List<RobotToken> execRowView) {
             final int columnsInView = execRowView.size() - 1;
             if (columnsInView < column) {
                 for (int i = columnsInView; i < column; i++) {
@@ -178,16 +175,12 @@ public class ExecutablesRowHolderCommentService {
 
         private final int column;
 
-        private final List<RobotToken> execRowView;
-
         private List<EditorCommand> executedCommands;
 
-        public ConversionFromCommentCommand(final RobotKeywordCall call, final String value, final int column,
-                final List<RobotToken> execRowView) {
+        public ConversionFromCommentCommand(final RobotKeywordCall call, final String value, final int column) {
             this.call = call;
             this.column = column;
             this.value = value;
-            this.execRowView = execRowView;
         }
 
         @Override
@@ -196,6 +189,8 @@ public class ExecutablesRowHolderCommentService {
 
             Stack<EditorCommand> executionContext = new Stack<>();
             call.resetStored();
+
+            List<RobotToken> execRowView = execRowView(call);
             int startColumn = column;
             if (column == 0) {
                 final SetKeywordCallNameCommand changeTmpName = new SetKeywordCallNameCommand(eventBroker, call,

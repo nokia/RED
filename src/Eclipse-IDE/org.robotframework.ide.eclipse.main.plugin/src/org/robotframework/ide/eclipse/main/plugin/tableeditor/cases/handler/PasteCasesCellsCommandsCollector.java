@@ -6,12 +6,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.rf.ide.core.testdata.model.IDocumentationHolder;
 import org.rf.ide.core.testdata.model.ModelType;
+import org.rf.ide.core.testdata.model.presenter.DocumentationServiceHandler;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.EditorCommand;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesTableValuesChangingCommandsCollector;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.ExecutablesRowHolderCommentService;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.RedClipboard;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.handler.PasteRobotElementCellsCommandsCollector;
 
@@ -37,8 +41,8 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
     }
 
     @Override
-    protected List<String> findValuesToPaste(final RobotElement elementFromClipboard, final int clipboardElementColumnIndex,
-            final int tableColumnsCount) {
+    protected List<String> findValuesToPaste(final RobotElement elementFromClipboard,
+            final int clipboardElementColumnIndex, final int tableColumnsCount) {
         if (elementFromClipboard instanceof RobotKeywordCall) {
             return getValuesFromKeywordCall((RobotKeywordCall) elementFromClipboard, clipboardElementColumnIndex,
                     tableColumnsCount);
@@ -64,20 +68,26 @@ public class PasteCasesCellsCommandsCollector extends PasteRobotElementCellsComm
 
     private List<String> getValuesFromKeywordCall(final RobotKeywordCall keywordCall,
             final int clipboardElementColumnIndex, final int tableColumnsCount) {
-        if (clipboardElementColumnIndex == 0) {
-            final ModelType modelType = keywordCall.getLinkedElement().getModelType();
-            return keywordCall.isExecutable() || modelType == ModelType.UNKNOWN
-                    ? newArrayList(keywordCall.getName()) : newArrayList("[" + keywordCall.getName() + "]");
-        } else if (clipboardElementColumnIndex > 0 && clipboardElementColumnIndex < tableColumnsCount - 1) {
-            final List<String> arguments = keywordCall.getArguments();
-            final int argIndex = clipboardElementColumnIndex - 1;
-            if (argIndex < arguments.size()) {
-                return newArrayList(arguments.get(argIndex));
+        final ModelType modelType = keywordCall.getLinkedElement().getModelType();
+
+        if (clipboardElementColumnIndex > 0 && modelType == ModelType.TEST_CASE_DOCUMENTATION) {
+            if (clipboardElementColumnIndex == 1) {
+                return newArrayList(getDocumentationText(keywordCall));
+            } else {
+                return newArrayList();
             }
-        } else if (clipboardElementColumnIndex == tableColumnsCount - 1) {
-            return newArrayList(keywordCall.getComment());
         }
+
+        final List<RobotToken> execRowView = ExecutablesRowHolderCommentService.execRowView(keywordCall);
+        if (clipboardElementColumnIndex < execRowView.size()) {
+            return newArrayList(execRowView.get(clipboardElementColumnIndex).getText());
+        }
+
         return newArrayList();
+    }
+
+    private String getDocumentationText(final RobotKeywordCall keywordCall) {
+        return DocumentationServiceHandler.toEditConsolidated((IDocumentationHolder) keywordCall.getLinkedElement());
     }
 
     private List<String> getValuesFromTestCase(final RobotCase testCase, final int clipboardElementColumnIndex) {

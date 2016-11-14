@@ -40,8 +40,9 @@ public class PasteInKeywordTableHandler extends DIParameterizedHandler<E4PasteIn
             final List<EditorCommand> pasteCommands = new PasteKeywordsCellsCommandsCollector()
                     .collectPasteCommands(editor.getSelectionLayerAccessor(), selectedKeywords, clipboard);
 
-            final EditorCommand parentCommand = new EmptyCommand(); 
-            for (final EditorCommand command : pasteCommands) {
+            final EditorCommand parentCommand = new EmptyCommand();
+            for (int i = pasteCommands.size() - 1; i >= 0; i--) {
+                final EditorCommand command = pasteCommands.get(i);
                 command.setParent(parentCommand);
                 commandsStack.execute(command);
             }
