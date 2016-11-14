@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.ICommentHolder;
+import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 
 import com.google.common.base.Joiner;
@@ -59,7 +60,13 @@ public class CommentServiceHandler {
 
                 for (final String tok : toBeConvertedToTokens) {
                     RobotToken cTok = new RobotToken();
-                    cTok.setText(unescape(tok, separator));
+                    String commentPartText = unescape(tok, separator);
+                    if (comment instanceof RobotExecutableRow<?>) {
+                        if (commentPartText.trim().equals("\\")) {
+                            commentPartText = "\\";
+                        }
+                    }
+                    cTok.setText(commentPartText);
                     comment.addCommentPart(cTok);
                 }
             }
