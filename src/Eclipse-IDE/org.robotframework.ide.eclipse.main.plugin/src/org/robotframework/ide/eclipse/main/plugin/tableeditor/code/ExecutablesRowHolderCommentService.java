@@ -34,7 +34,6 @@ public class ExecutablesRowHolderCommentService {
         boolean handled = false;
         final List<RobotToken> execRowView = execRowView(call);
         if (!execRowView.isEmpty()) {
-
             final int indexOfComment = findIndexOfTheFirstCommentBefore(execRowView, column);
             if (looksLikeComment(value) && (indexOfComment > column || indexOfComment < 0)) {
                 // conversion to comment
@@ -117,6 +116,12 @@ public class ExecutablesRowHolderCommentService {
                 }
             }
 
+            fillMissingColumns(callToUse);
+
+            if (column > 0 && commentToken.isEmpty()) {
+                commentToken.add(RobotToken.create(value));
+            }
+
             String newComment = null;
             if (!commentToken.isEmpty()) {
                 newComment = commentViewBuild(commentToken);
@@ -127,6 +132,26 @@ public class ExecutablesRowHolderCommentService {
             commentUpdate.execute();
             executedCommands.add(commentUpdate);
             call.resetStored();
+        }
+
+        private void fillMissingColumns(RobotKeywordCall callToUse) {
+            final int columnsInView = execRowView.size() - 1;
+            if (columnsInView < column) {
+                for (int i = columnsInView; i < column; i++) {
+                    if (i == 0) {
+                        final SetKeywordCallNameCommand changeTmpName = new SetKeywordCallNameCommand(eventBroker, call,
+                                "\\");
+                        changeTmpName.execute();
+                        executedCommands.add(changeTmpName);
+                    } else {
+                        final SetKeywordCallArgumentCommand2 argSetNotTheSameColumn = new SetKeywordCallArgumentCommand2(
+                                eventBroker, callToUse, column - 2, "\\");
+                        argSetNotTheSameColumn.execute();
+                        executedCommands.add(argSetNotTheSameColumn);
+                        break;
+                    }
+                }
+            }
         }
 
         @Override
