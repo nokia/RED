@@ -138,7 +138,7 @@ public class ExecutablesRowHolderCommentService {
             final int columnsInView = execRowView.size() - 1;
             if (columnsInView < column) {
                 for (int i = columnsInView; i < column; i++) {
-                    if (i == 0) {
+                    if (i == 0 && (execRowView.size() == 0 || execRowView.get(0).getText().isEmpty())) {
                         final SetKeywordCallNameCommand changeTmpName = new SetKeywordCallNameCommand(eventBroker, call,
                                 "\\");
                         changeTmpName.execute();
