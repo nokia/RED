@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.hyperlink;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.robotframework.ide.eclipse.main.plugin.hyperlink.Conditions.shellWithText;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class CompoundHyperlinkTest {
 
     @Test
     public void testCompundHyperlinkProperties() {
-        final List<RedHyperlink> links = newArrayList(mock(RedHyperlink.class), mock(RedHyperlink.class));
+        final List<RedHyperlink> links = newArrayList(mockHyperlink(), mockHyperlink());
 
         final CompoundHyperlink link = new CompoundHyperlink("name", new Region(20, 50), links, "Link label");
         assertThat(link.getTypeLabel()).isNull();
@@ -35,7 +36,7 @@ public class CompoundHyperlinkTest {
         final Display display = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay();
         assertThat(display.getShells()).doesNotHave(shellWithText(HyperlinkDialog.POPUP_TEXT));
 
-        final List<RedHyperlink> links = newArrayList(mock(RedHyperlink.class), mock(RedHyperlink.class));
+        final List<RedHyperlink> links = newArrayList(mockHyperlink(), mockHyperlink());
 
         final CompoundHyperlink link = new CompoundHyperlink("name", new Region(20, 50), links, "Link label");
         link.open();
@@ -46,5 +47,12 @@ public class CompoundHyperlinkTest {
                 shell.close();
             }
         }
+    }
+
+    private static RedHyperlink mockHyperlink() {
+        final RedHyperlink mock = mock(RedHyperlink.class);
+        when(mock.getLabelForCompoundHyperlinksDialog()).thenReturn("");
+        when(mock.additionalLabelDecoration()).thenReturn("");
+        return mock;
     }
 }

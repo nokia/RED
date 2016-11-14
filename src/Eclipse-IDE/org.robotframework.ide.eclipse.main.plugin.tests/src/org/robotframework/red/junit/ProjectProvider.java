@@ -21,8 +21,8 @@ import org.eclipse.core.runtime.Path;
 import org.junit.rules.TestRule;
 import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigWriter;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfigWriter;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
 
 import com.google.common.base.Charsets;
@@ -71,8 +71,7 @@ public class ProjectProvider implements TestRule {
 
     public void configure(final RobotProjectConfig config) throws IOException, CoreException {
         createFile(Path.fromPortableString("red.xml"), "");
-        final RobotProjectConfigWriter configWriter = new RobotProjectConfigWriter();
-        configWriter.writeConfiguration(config, project);
+        new RedEclipseProjectConfigWriter().writeConfiguration(config, project);
     }
 
     public void deconfigure() throws CoreException {

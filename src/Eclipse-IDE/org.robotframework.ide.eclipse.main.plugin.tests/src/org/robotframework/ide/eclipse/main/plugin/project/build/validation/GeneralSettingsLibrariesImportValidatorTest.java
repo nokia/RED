@@ -21,33 +21,34 @@ import java.util.Set;
 import org.assertj.core.api.Condition;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.junit.rules.TemporaryFolder;
 import org.junit.rules.TestRule;
 import org.rf.ide.core.executor.SuiteExecutor;
+import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.table.setting.LibraryImport;
+import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.LibraryType;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedLibrary;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ArgumentProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.GeneralSettingsProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibraryConstructor;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 import org.robotframework.red.junit.ProjectProvider;
+import org.robotframework.red.junit.ResourceCreator;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
@@ -61,6 +62,9 @@ public class GeneralSettingsLibrariesImportValidatorTest {
 
     @ClassRule
     public static TestRule rulesChain = RuleChain.outerRule(projectProvider).around(tempFolder);
+
+    @Rule
+    public ResourceCreator resourceCreator = new ResourceCreator();
 
     private RobotModel model;
 
@@ -372,17 +376,14 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final String libPath = tmpFile.getParent().replaceAll("\\\\", "/");
         final String libName = "external_nested_lib";
 
-        final IFile link = projectProvider.getFile("link.py");
-        link.createLink(tmpFile.toURI(), IResource.REPLACE, null);
+        resourceCreator.createLink(tmpFile.toURI(), projectProvider.getFile("link.py"));
 
         final LibrarySpecification spec = createNewLibrarySpecification(libName);
         final Map<ReferencedLibrary, LibrarySpecification> refLibs = new HashMap<>();
         refLibs.put(ReferencedLibrary.create(LibraryType.PYTHON, libName, libPath), spec);
 
-        validateLibraryImport("link.py", refLibs);
-        assertThat(reporter.getReportedProblems()).isEmpty();
-
-        link.delete(true, null);
+        validateLibraryImport(tmpFile.getAbsolutePath().replaceAll("\\\\", "/"), refLibs);
+        assertThat(reporter.getReportedProblems()).are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_ABSOLUTE));
     }
 
     @Test
@@ -429,8 +430,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final String libPath = projectProvider.getProject().getName() + "/linking_dir";
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
 
-        final IFolder linkingFolder = projectProvider.getProject().getFolder("linking_dir");
-        linkingFolder.createLink(dir.toURI(), IResource.REPLACE, null);
+        resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setModuleSearchPaths(newArrayList(dir));
@@ -442,8 +442,6 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("external_nested_lib.py", refLibs);
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH));
-
-        linkingFolder.delete(true, null);
     }
 
     @Test
@@ -496,8 +494,7 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         final String libPath = projectProvider.getProject().getName() + "/linking_dir";
         final File dir = getFile(tempFolder.getRoot(), "external_dir");
 
-        final IFolder linkingFolder = projectProvider.getProject().getFolder("linking_dir");
-        linkingFolder.createLink(dir.toURI(), IResource.REPLACE, null);
+        resourceCreator.createLink(dir.toURI(), projectProvider.getProject().getFolder("linking_dir"));
 
         final RobotProject robotProject = model.createRobotProject(projectProvider.getProject());
         robotProject.setModuleSearchPaths(new ArrayList<File>());
@@ -512,8 +509,6 @@ public class GeneralSettingsLibrariesImportValidatorTest {
         validateLibraryImport("external_nested_lib.py", refLibs);
         assertThat(reporter.getReportedProblems())
                 .are(onlyCausedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH));
-
-        linkingFolder.delete(true, null);
     }
 
     private Condition<Problem> onlyCausedBy(final GeneralSettingsProblem... causes) {

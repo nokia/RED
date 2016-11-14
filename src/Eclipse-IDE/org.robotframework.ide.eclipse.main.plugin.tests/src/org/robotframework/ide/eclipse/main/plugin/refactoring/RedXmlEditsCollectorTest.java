@@ -19,7 +19,7 @@ import org.eclipse.text.edits.TextEdit;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig;
 import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.base.Optional;
@@ -35,9 +35,9 @@ public class RedXmlEditsCollectorTest {
     public static void beforeSuite() throws Exception {
         projectProvider.addRobotNature();
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addExcludedPath(new Path("a"));
-        config.addExcludedPath(new Path("a/b"));
-        config.addExcludedPath(new Path("c"));
+        config.addExcludedPath("a");
+        config.addExcludedPath("a/b");
+        config.addExcludedPath("c");
         projectProvider.configure(config);
 
         projectProvider.createDir(new Path("a"));

@@ -22,13 +22,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.rf.ide.core.project.RobotProjectConfig;
+import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
+import org.rf.ide.core.project.RobotProjectConfig.RemoteLocation;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
+import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.ReferencedVariableFile;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.RemoteLocation;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfigReader.RobotProjectConfigWithLines;
-import org.robotframework.ide.eclipse.main.plugin.project.build.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.project.build.causes.ConfigFileProblem;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.MockReporter.Problem;
 import org.robotframework.red.junit.ProjectProvider;
@@ -270,7 +270,7 @@ public class RobotProjectConfigFileValidatorTest {
         projectProvider.createDir(Path.fromPortableString("directory"));
 
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addExcludedPath(Path.fromPortableString("does/not/exist"));
+        config.addExcludedPath("does/not/exist");
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
         locations.put(config.getExcludedPath().get(0), new ProblemPosition(42));
@@ -287,7 +287,7 @@ public class RobotProjectConfigFileValidatorTest {
         projectProvider.createDir(Path.fromPortableString("directory"));
 
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addExcludedPath(Path.fromPortableString("directory"));
+        config.addExcludedPath("directory");
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
         locations.put(config.getExcludedPath().get(0), new ProblemPosition(42));
@@ -307,8 +307,8 @@ public class RobotProjectConfigFileValidatorTest {
         projectProvider.createDir(Path.fromPortableString("directory/nested/1/2/3"));
 
         final RobotProjectConfig config = new RobotProjectConfig();
-        config.addExcludedPath(Path.fromPortableString("directory/nested"));
-        config.addExcludedPath(Path.fromPortableString("directory/nested/1/2"));
+        config.addExcludedPath("directory/nested");
+        config.addExcludedPath("directory/nested/1/2");
 
         final Map<Object, ProblemPosition> locations = new HashMap<>();
         locations.put(config.getExcludedPath().get(0), new ProblemPosition(42));

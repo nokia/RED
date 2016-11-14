@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectConfig.SearchPath;
+import org.rf.ide.core.project.RobotProjectConfig.SearchPath;
 import org.robotframework.ide.eclipse.main.plugin.project.editor.libraries.PathsContentProvider.SystemVariableAccessor;
 import org.robotframework.red.viewers.ElementAddingToken;
 

@@ -3,27 +3,27 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.robotframework.ide.eclipse.main.plugin.model.locators;
+package org.robotframework.ide.eclipse.main.plugin.project;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.model.locators.PathsResolver.PathResolvingException;
+import org.robotframework.ide.eclipse.main.plugin.project.RedEclipseProjectConfig.PathResolvingException;
 
-public class PathsResolverTest {
+public class RedEclipseProjectConfigTest {
 
     @Test(expected = PathResolvingException.class)
     public void cannotResolveAbsolutePath_whenBasePathIsNull() {
-        PathsResolver.resolveToAbsolutePath(null, path("path/pointing/somewhere"));
+        RedEclipseProjectConfig.resolveToAbsolutePath(null, path("path/pointing/somewhere"));
     }
 
     @Test(expected = PathResolvingException.class)
     public void cannotResolveAbsolutePath_whenRelativeIsParameterized() {
         absoluteOf("/base", "dir/${PARAM}/file");
     }
-    
+
     @Test
     public void childPathIsReturned_whenItIsAlreadyAbsolutePath() {
         assertThat(absoluteOf("/base", "/absolute")).isEqualTo(path("/absolute"));
@@ -51,7 +51,7 @@ public class PathsResolverTest {
     }
 
     private static IPath absoluteOf(final String path1, final String path2) {
-        return PathsResolver.resolveToAbsolutePath(new Path(path1), new Path(path2));
+        return RedEclipseProjectConfig.resolveToAbsolutePath(new Path(path1), new Path(path2));
     }
 
     private static IPath path(final String path) {
