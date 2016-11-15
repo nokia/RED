@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _euLGgFWREeaLgpF-R5GRxw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/11/16 10:50 PM
+Save-Time: 11/15/16 10:16 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -23,7 +23,7 @@ get-editor "TestFile.robot" | get-text-viewer | set-text  "*** Test Case ***\n"
     + "my kw\n"
     + "    [Documentation]    my doc\n"
     + "    Should Be Equal As Integers    3333333564    secon43423498 \n"
-    + "    Convert To Binary    42442\n"
+    + "    Convert To Binary    text42442\n"
     + "    [Teardown]    Log    \n"
     + "    \n"
     + "second\n"
@@ -41,13 +41,8 @@ get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
 
 get-editor "TestFile.robot"|     get-tab-folder | get-tab-item Keywords | click
 
-with [get-view Outline | get-tree] {
-    select "TestFile.robot/Keywords/my kw" | click
-}
-
-
-
-get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw"
+get-view Outline | get-tree | select "TestFile.robot/Keywords/my kw" | click
+wait 200
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
 	//goto KW name an copy it
     key-type Right
@@ -82,23 +77,35 @@ with [get-editor "TestFile.robot"] {
         key-type Down -times 3
         key-type "M1+v"
         
-        //paste as comment to teradown
-        key-type Down
-        key-type Right -times 4
-        key-type "M1+v"
-        
-        //paste as comment for Log Variables
-        key-type Down
-        key-type "M1+v"
+        //copy comment
+	    key-type Down -times 6
+	    key-type "M1+c"
+	    
+	    //psate as argument for last Log
+	    key-type Left
+	    key-type Down -times 2
+	    key-type "M1+v"
+	    
+	    //paste as 2.nd are (\ will be added)
+	    key-type Up -times 6
+	    key-type Right
+	    key-type "M1+v"
+	    
+	    //paste as KW name (Conver to binary)
+	    key-type Up -times 4
+	    key-type Left -times 2
+	    key-type "M1+v"
         
     }
 }
 
-//
+get-view Outline | get-tree | select "TestFile.robot/Keywords/last" | click
+wait 200
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
 	// copy param $EMPTY
-    key-type Left -times 5
-    key-type Down -times 3
+    
+    key-type Down 
+    key-type Right
     key-type "M1+c"
     
     //paste as KW name ()
@@ -122,27 +129,27 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"
     key-type "M1+v"
 }
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 1 -ref_table [list "my kw"  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 2 -ref_table [list "[Documentation]"  "my kw"  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 3 -ref_table [list "[Teardown]"  "Log"  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 4 -ref_table [list  "Should Be Equal As Integers"  "3333333564"  "secon43423498"  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 5 -ref_table [list "Convert To Binary"  "42442"  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 6 -ref_table [list "..."  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 1 -ref_table [list "my kw"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 2 -ref_table [list "[Documentation]"  "my kw"  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 3 -ref_table [list "[Teardown]"  "Log"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 4 -ref_table [list  "Should Be Equal As Integers"  "3333333564"  "secon43423498"  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 5 -ref_table [list "#com12"  "#text42442"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 6 -ref_table [list "..."  ""  ""  ""  ""  ""]
 
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 7 -ref_table [list "second"  "${a}"  "secon43423498"  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 8 -ref_table [list "[Teardown]"  ""  ""  ""  ""  ""  "#secon43423498" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 9 -ref_table [list "Log Variables"  ""  ""  ""  ""  ""  "#secon43423498" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 10 -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 7 -ref_table [list "second"  "${a}"  "secon43423498"  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 8 -ref_table [list "[Teardown]"  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 9 -ref_table [list "Log Variables"  "\\"  "#com12"  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 10 -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ]
 
 
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 11 -ref_table [list "${EMPTY}"  ""  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 12 -ref_table [list "[Return]"  "${EMPTY}"  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 13 -ref_table [list  "log"  "12"  ""  ""  ""  ""  "#com12" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 14 -ref_table [list  "log"  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 15 -ref_table [list  "\\"  "14"  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 16 -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 17 -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 11 -ref_table [list "${EMPTY}"  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 12 -ref_table [list "[Return]"  "${EMPTY}"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 13 -ref_table [list  "log"  "12" "#com12" ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 14 -ref_table [list  "log"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 15 -ref_table [list  ""  "#com12"  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 16 -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 17 -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""]
 
 
 
@@ -152,7 +159,7 @@ with [get-editor "TestFile.robot"] {
 }
 
 //check if slash was added after save
-compare-row-with-list -file "TestFile.robot" -col_amount 7 -row 15 -ref_table [list  "\\"  "14"  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 15 -ref_table [list  "\\"  "#com12"  ""  ""  ""  ""  ""  ]
 
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Source | click
@@ -165,18 +172,17 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "my kw\n"
     + "    [Documentation]    my kw\n"
     + "    Should Be Equal As Integers    3333333564    secon43423498 \n"
-    + "    Convert To Binary    42442\n"
+    + "    #com12    #text42442\n"
     + "    [Teardown]    Log    \n"
     + "second\n"
     + "    [Arguments]    ${a}    secon43423498\n"
-    + "    Log Variables    #secon43423498\n"
-    + "    [Teardown]    #secon43423498\n"
+    + "    Log Variables    \\    #com12\n"
+    + "    [Teardown]\n"
     + "${EMPTY}\n"
     + "    log  12    #com12\n"
     + "    log\n"
-    + "    \\  14\n"
+    + "    \\  #com12\n"
     + "    [Return]    ${EMPTY}" | verify-true
-
 
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
