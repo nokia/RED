@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _mnMpkGhbEeahDKoeWWpvig
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/2/16 2:50 PM
+Save-Time: 11/15/16 1:38 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -153,21 +153,16 @@ with [get-editor "TestFile.robot"] {
         wait 200
         key-type Enter
     }
-    //go to comment
-    with [get-editbox -after [get-label "Test Cases"] -index 1] {
-        key-type "M1+SPACE"
-    }
 }
 
-//check that in comment there is no CA
-verify-error {get-window -class ContentProposalPopup | get-table}   
-get-editor "TestFile.robot" | get-editbox -after [get-label "Test Cases"] -index 1 
-    | verify-error { get-property "decorators[0].description" | equals "Press Ctrl+Space for content assist" | verify-true}
-
 check-test_case-row -file "TestFile.robot" -row 1 -tc "new test"
-check-test_case-row -file "TestFile.robot" -row 2 -tc "Continue For Loop" -c1 "${EXECDIR}"-c2 "${CURDIR}" -c3 "${a1}" -c4 "${True}" -c5 "${SUITE_DOCUMENTATION}" -comment ""
-check-test_case-row -file "TestFile.robot" -row 3 -tc "..."
-check-test_case-row -file "TestFile.robot" -row 4 -tc "...add new case"
+check-test_case-row -file "TestFile.robot" -row 2 -tc "Continue For Loop" -c1 "${EXECDIR}"-c2 "${CURDIR}" -c3 "${a1}" -c4 "${True}" -c5 "${SUITE_DOCUMENTATION}"
+check-test_case-row -file "TestFile.robot" -row 3 -tc ""
+check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
+check-test_case-row -file "TestFile.robot" -row 5 -tc "...add new case"
+
+get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -index 1 | get-menu "Row/Delete row" | click
+
 
 //go to Source
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
@@ -181,7 +176,6 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    Continue For Loop    ${EXECDIR}    ${CURDIR}    ${a1}    ${True}    ${SUITE_DOCUMENTATION}" | verify-true
     
 //add kw section with one new kw    
-   
 with [get-editor "TestFile.robot"] {
     with [get-text-viewer] {
         set-caret-pos 4 16
@@ -259,7 +253,7 @@ with [get-editor "TestFile.robot"] {
 
 
 check-test_case-row -file "TestFile.robot" -row 1 -tc "new test"
-check-test_case-row -file "TestFile.robot" -row 2 -tc "\\" -c1 "${EXECDIR}"-c2 "${CURDIR}" -c3 "${a1}" -c4 "${True}" -c5 "${SUITE_DOCUMENTATION}" -comment ""
+check-test_case-row -file "TestFile.robot" -row 2 -tc "\\" -c1 "${EXECDIR}"-c2 "${CURDIR}" -c3 "${a1}" -c4 "${True}" -c5 "${SUITE_DOCUMENTATION}"
 check-test_case-row -file "TestFile.robot" -row 3 -tc "Should Be Empty" -c1 "${DEBUG_FILE}"
 check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
 check-test_case-row -file "TestFile.robot" -row 5 -tc "...add new case"
