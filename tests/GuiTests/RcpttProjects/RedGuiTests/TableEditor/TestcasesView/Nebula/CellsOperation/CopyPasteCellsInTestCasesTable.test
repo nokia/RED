@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _qc8gsHXQEeaTdNH0nRm1gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/2/16 2:52 PM
+Save-Time: 11/15/16 10:39 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -82,24 +82,23 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
     
     //copy comment "#log command"
     key-type Down
-    key-type Left
+    key-type Left -times 2
     key-type Down
     key-type "M1+c"
     
-    //paste in comment col
+    //paste in row below
     key-type Down
+    key-type Right
     key-type "M1+v"
     
     //copy empty cell
     key-type Down
-    key-type Left
+    key-type Left -times 2
     key-type "M1+c"
     
     //paste on value "1" in [Setup]
-    key-type Down -times 2
-    key-type Left -times 2
-    key-type Down
-    key-type Left
+    key-type Down -times 3
+    key-type Left 
     key-type "M1+v"
 }
 
@@ -114,9 +113,9 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "Test Cases"] -
 }
 
 check-test_case-row -file "TestFile.robot"  -row 1 -tc "5"
-check-test_case-row -file "TestFile.robot"  -row 2 -tc "log" -c1 1 -c2 2 -c3 3 -comment "#log command"
-check-test_case-row -file "TestFile.robot"  -row 3 -tc "Call Method" -c1 "my_method" -c2 "2" -comment "#log command"
-check-test_case-row -file "TestFile.robot"  -row 4 -tc "Convert To Bytes" -c1 8 -comment "#cov to bytes"
+check-test_case-row -file "TestFile.robot"  -row 2 -tc "log" -c1 1 -c2 2 -c3 3 -c4 "#log command"
+check-test_case-row -file "TestFile.robot"  -row 3 -tc "Call Method" -c1 "my_method" -c2 "2" -c3 "\\" -c4  "\\" -c5 "#log command"
+check-test_case-row -file "TestFile.robot"  -row 4 -tc "Convert To Bytes" -c1 8 -c2 "#cov to bytes"
 check-test_case-row -file "TestFile.robot"  -row 5 -tc "..."
 
 check-test_case-row -file "TestFile.robot"  -row 6 -tc "test 22"
@@ -134,7 +133,7 @@ check-test_case-row -file "TestFile.robot"  -row 13 -tc "..."
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Case ***\n5\n"
     + "    log    1    2    3    #log command\n"
-    + "    Call Method    my_method    2    #log command\n"
+    + "    Call Method    my_method    2    \\    \\    #log command\n"
     + "    Convert To Bytes    8    #cov to bytes\n"
     + "test 22\n"
     + "    [Setup]    test 22    \\    5\n"
@@ -142,4 +141,6 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "\\\n"
     + "    \\\n"
     + "    [Setup]    who" | verify-true
+    
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
