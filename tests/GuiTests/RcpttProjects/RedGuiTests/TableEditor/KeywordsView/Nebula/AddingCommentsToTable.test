@@ -1,0 +1,346 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _WC2-oGOnEeayWasF5RXANg,_VzYJ0KEAEea9Cvae3yWo1A,_haK1EKs4Eea8FqgKy4fLvA
+Element-Name: AddingCommentsToTable
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _m9ukQKs4Eea8FqgKy4fLvA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/15/16 4:38 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "CommentsProject/TestFile.robot" 
+    | select "CommentsProject/TestFile.robot" | double-click
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item "Test Cases" | click
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 2/Should Be True" | click
+wait 200
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+    	//add entire line with comments
+        key-type Down
+        key-type Enter
+        key-type "M2+3" "#"
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "x1"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text x2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text x3
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text x4
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text x5
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | set-text x6
+    
+    //add new kw in last line
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+        key-type Down -times 5
+        key-type Enter
+        wait 300
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text log
+        key-type Enter
+    }
+    //add comment
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "#new"
+        key-type Enter
+    }
+    //next columns should not have #
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text new2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text new3
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text new
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text new5
+        key-type "NUMPAD_ENTER" "\\u000D"
+    }
+    
+    //add new KW
+    get-canvas -after [get-label "Test Cases"] -index 1 | type-text l
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text og
+        key-type Enter
+    }
+    //add arg
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text 90
+        key-type Enter
+    }
+    //add comment
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "#z1"
+        key-type Enter
+    }
+    //add empty cell
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type Enter
+    
+    //add commanet in 3rd column
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text z3
+        key-type Enter
+    }
+    get-editbox -after [get-label "Test Cases"] -index 1 | key-type "TRAVERSE_ESCAPE"
+}
+
+
+get-view Outline | get-tree | select "TestFile.robot/Test Cases/test 1/Log"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "Test Cases"] -index 1] {
+    
+    	//add comment in 3rd column
+        key-type Right -times 3
+        key-type "M2+3" "#"
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "y1"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "Test Cases"] -index 1] {
+        type-text "#y2"
+        key-type Enter
+    }
+}
+
+check-test_case-row -file "TestFile.robot" -row 1 -tc "test 1" 
+check-test_case-row -file "TestFile.robot" -row 2 -tc "# first column" -c1   "#second column" -c2  "#3rd column"  -c3  "# 4th columns"
+check-test_case-row -file "TestFile.robot" -row 3 -tc "Log" -c1 "12" -c2 "\\" -c3 "#y1"  -c4 "#y2"
+check-test_case-row -file "TestFile.robot" -row 4 -tc "..."
+
+check-test_case-row -file "TestFile.robot" -row 5 -tc "test 2"
+check-test_case-row -file "TestFile.robot" -row 6 -tc "#ijk"  -c1 "lmn" -c2 "#opr"
+check-test_case-row -file "TestFile.robot" -row 7 -tc "Should Be True" -c1 "yes"
+check-test_case-row -file "TestFile.robot" -row 8 -tc "#x1" -c1 "#x2" -c2 "x3" -c3 "x4" -c4 "x5" -c5 "x6"
+check-test_case-row -file "TestFile.robot" -row 9 -tc "..."
+
+check-test_case-row -file "TestFile.robot" -row 10 -tc "test 3"
+check-test_case-row -file "TestFile.robot" -row 11 -tc "Log" -c1 "67" -c2 "#log is here"
+check-test_case-row -file "TestFile.robot" -row 12 -tc "#single comment"
+check-test_case-row -file "TestFile.robot" -row 13 -tc "log" -c1 "#new" -c2 "new2" -c3 "new3" -c4 "new" -c5 "new5"
+check-test_case-row -file "TestFile.robot" -row 14 -tc "log" -c1 "90"  -c2 "#z1" -c3  "\\" -c4 "z3"
+check-test_case-row -file "TestFile.robot" -row 15 -tc "..."
+
+
+
+//============================================== Keywords ===============================================================
+
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+wait 500
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw 1/Sleep" | click
+wait 200
+
+with [get-editor "TestFile.robot"] {
+	//add comment in Sleep
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Right -times 2
+        key-type "M2+3" "#"
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "g1"
+        key-type Enter
+    }
+    //next without #
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text g2
+        key-type Enter
+    }
+    //next with #
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "#g3"
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    
+    //add new line
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down -times 2
+        key-type Enter
+        wait 200
+        key-type Enter
+    }
+    //add KW log
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text log
+        key-type Enter
+    }
+    //add value
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text 12
+        key-type Enter
+    }
+    //add comment with space
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "#h1 h2"
+        key-type Enter
+    }
+    //add comment with double # in the middle
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "#double #slash"
+        key-type Enter
+    }
+    //add plain text
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text text
+        key-type Enter
+    }
+    
+    //switch to Source and back
+    with [get-tab-folder] {
+        get-tab-item Source | click
+        get-tab-item Keywords | click
+    }
+    
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Up -times 6
+        key-type Left -times 3
+        key-type Del
+        key-type Down -times 3
+        key-type Left -times 2
+        key-type Del
+    }
+}
+
+check-keyword-row -file "TestFile.robot"  -row  1 -kw kw
+check-keyword-row -file "TestFile.robot"  -row  2 -kw "Call Method" -c1 "object" -c2 "method_name"
+check-keyword-row -file "TestFile.robot"  -row  3 -kw "#x1" -c1 x2 -c2 x4 -c3 x5 -c4 x6
+check-keyword-row -file "TestFile.robot"  -row  4 -kw "..."
+
+check-keyword-row -file "TestFile.robot"  -row  5 -kw "kw 1" -c1 "${a}"
+check-keyword-row -file "TestFile.robot"  -row  6 -kw "#yes it is"
+check-keyword-row -file "TestFile.robot"  -row  7 -kw "Sleep" -c1 1 -c2 "#g1" -c3 "g2" -c4 "#g3"
+check-keyword-row -file "TestFile.robot"  -row  8 -kw "\\" -c1 "\\" -c2 "#here should be kw"
+check-keyword-row -file "TestFile.robot"  -row  9 -kw "log" -c1 12 -c2 "#h1 h2" -c3 "#double #slash" -c4 text
+check-keyword-row -file "TestFile.robot"  -row  10 -kw "..."
+
+
+
+//=================================================== resource TSV ======================================================
+
+get-view "Project Explorer" | get-tree | select "CommentsProject/res.tsv" | double-click
+wait 500
+get-editor "res.tsv" | get-tab-folder | get-tab-item Keywords | click
+wait 200
+get-view Outline | get-tree | select "res.tsv/Keywords/kw/Log" | click
+wait 200
+
+with [get-editor "res.tsv"] {
+	//add new line - first arg is comment
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type "M2+3" "#"
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "line1"
+        key-type Enter
+    }
+    //here is added #
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text line2
+        key-type Enter
+    }
+    //new comment
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text line3
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "line 4"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "#line 5"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "line 6"
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+
+//check Source
+get-editor "res.tsv" | get-text-viewer | get-property text | equals "*** Keywords ***\n"
+    + "kw\n"
+    + "\tLog\t#wrong place\n"
+    + "\t#line1\t#line2\tline3\tline 4\t#line 5\tline 6\n"
+    + "\t\\" | verify-true
+    
+//add new line    
+with [get-editor "res.tsv"] {
+    get-tab-folder | get-tab-item Keywords | click
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M2+3" "#"
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "k1"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "#k2"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "#k3"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "#k4"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "#k5"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "#k6"
+        key-type Enter
+    }
+    get-tab-folder | get-tab-item Source | click
+}
+get-editor "res.tsv" | get-text-viewer | get-property text | equals "*** Keywords ***\n"
+    + "kw\n"
+    + "\tLog\t#wrong place\n"
+    + "\t#line1\t#line2\tline3\tline 4\t#line 5\tline 6\n"
+    + "\t#k1\t#k2\t#k3\t#k4\t#k5\t#k6\n"
+    + "\t\\" | verify-true
+    
+    
+get-editor "res.tsv" | get-tab-folder | get-tab-item Keywords | click
+
+check-keyword-row -file "res.tsv" -row 1 -kw "kw" 
+check-keyword-row -file "res.tsv" -row 2 -kw "Log"  -c1 "#wrong place"
+check-keyword-row -file "res.tsv" -row 3 -kw "#line1" -c1 "#line2" -c2 "line3" -c3 "line 4" -c4	"#line 5" -c5 "line 6"
+check-keyword-row -file "res.tsv" -row 4 -kw "#k1" -c1 "#k2"  -c2 "#k3" -c3 "#k4" -c4 "#k5" -c5 "#k6"
+check-keyword-row -file "res.tsv" -row 5 -kw "\\" 
+check-keyword-row -file "res.tsv" -row 6 -kw "..." 
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
