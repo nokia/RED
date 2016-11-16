@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _YI1vUFJyEea8WJ7bbC6OBw
+Contexts: _VzYJ0KEAEea9Cvae3yWo1A
 Element-Name: CopyPasteCellsInKeywords
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _euLGgFWREeaLgpF-R5GRxw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/15/16 10:16 AM
+Save-Time: 11/16/16 11:14 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -129,27 +129,27 @@ with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"
     key-type "M1+v"
 }
 
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 1 -ref_table [list "my kw"  ""  ""  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 2 -ref_table [list "[Documentation]"  "my kw"  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 3 -ref_table [list "[Teardown]"  "Log"  ""  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 4 -ref_table [list  "Should Be Equal As Integers"  "3333333564"  "secon43423498"  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 5 -ref_table [list "#com12"  "#text42442"  ""  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 6 -ref_table [list "..."  ""  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 1 -ref_table [list "my kw"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 2 -ref_table [list "[Documentation]"  "my kw"  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 3 -ref_table [list "[Teardown]"  "Log"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 4 -ref_table [list  "Should Be Equal As Integers"  "3333333564"  "secon43423498"  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 5 -ref_table [list "#com12"  "#text42442"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 6 -ref_table [list "..."  ""  ""  ""  ""  ""]
 
 
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 7 -ref_table [list "second"  "${a}"  "secon43423498"  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 8 -ref_table [list "[Teardown]"  ""  ""  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 9 -ref_table [list "Log Variables"  "\\"  "#com12"  ""  ""  ""  "" ]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 10 -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 7 -ref_table [list "second"  "${a}"  "secon43423498"  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 8 -ref_table [list "[Teardown]"  ""  ""  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 9 -ref_table [list "Log Variables"  "\\"  "#com12"  ""  ""  ""  "" ]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 10 -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ]
 
 
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 11 -ref_table [list "${EMPTY}"  ""  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 12 -ref_table [list "[Return]"  "${EMPTY}"  ""  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 13 -ref_table [list  "log"  "12" "#com12" ""  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 14 -ref_table [list  "log"  ""  ""  ""  ""  ""]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 15 -ref_table [list  ""  "#com12"  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 16 -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ]
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 17 -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 11 -ref_table [list "${EMPTY}"  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 12 -ref_table [list "[Return]"  "${EMPTY}"  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 13 -ref_table [list  "log"  "12" "#com12" ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 14 -ref_table [list  "log"  ""  ""  ""  ""  ""]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 15 -ref_table [list  ""  "#com12"  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 16 -ref_table [list "..."  ""  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 17 -ref_table [list "...add new keyword"  ""  ""  ""  ""  ""]
 
 
 
@@ -159,7 +159,7 @@ with [get-editor "TestFile.robot"] {
 }
 
 //check if slash was added after save
-compare-row-with-list -file "TestFile.robot" -col_amount 6 -row 15 -ref_table [list  "\\"  "#com12"  ""  ""  ""  ""  ""  ]
+compare-row-with-list -file "TestFile.robot"  -table "User Keywords" -col_amount 6 -row 15 -ref_table [list  "\\"  "#com12"  ""  ""  ""  ""  ""  ]
 
 with [get-editor "TestFile.robot"] {
     get-tab-folder | get-tab-item Source | click
