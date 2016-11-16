@@ -1,0 +1,162 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _YI1vUFJyEea8WJ7bbC6OBw
+Element-Name: UndoAndRedoInKeywords
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _qUH7MJuIEeaF69zyQwob4Q
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/15/16 6:00 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+
+get-editor "TestFile.robot" | get-text-viewer | set-text "*** Test Cases ***\n"
+    + "test 1\n"
+    + "    Log  12    \\    #y1    #y2\n\n"
+    + "*** Variables ***\n"
+    + "${s}    4\n"
+    + "*** Keywords ***\n"
+    + "kw\n"
+    + "    [Tags]    tag1    tag2\n"
+    + "    Set Test Message    message    \n"
+    + "    [Return]    ${s}\n"
+    + "    \n"
+    + "next kw\n"
+    + "    [Arguments]    ${value 1}   ${value 2}\n"
+    + "    Catenate    1    2    3    4" 
+    
+get-editor "TestFile.robot" | get-text-viewer | key-type "M1+s"
+    
+get-editor "TestFile.robot" | get-tab-folder | get-tab-item Keywords | click
+
+
+get-view Outline | get-tree | select "TestFile.robot/Keywords/kw" | click
+wait 200
+
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+    	//copy Tags
+        key-type Down
+        key-type "M1+c"
+        
+        //add new line and paste Tags (will be moved up)
+        key-type Down -times 6
+        key-type Enter
+        key-type "M1+v"
+        
+        //add new tag
+        key-type Up -times 3
+        key-type Right -times 3
+        key-type Up -times 2
+        type-text t
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text ag3
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type Esc
+    }
+    //remove parameter in Return
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Left -times 3
+        key-type Down
+        key-type Del
+        
+        //copy param {value1}
+        key-type Down -times 3
+        key-type "M1+c"
+        
+        //paste in 3rd column
+        key-type Right -times 2
+        key-type "M1+v"
+        
+        //add comment in tags
+        key-type Down
+        key-type "M2+3" "#"
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "new"
+        key-type Enter
+    }
+    get-editbox -after [get-label "User Keywords"] -index 1 | key-type "TRAVERSE_ESCAPE"
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down -times 2
+        key-type Enter
+    }
+} 
+
+check-keyword-row -file "TestFile.robot" -row 1 -kw "kw"
+check-keyword-row -file "TestFile.robot" -row 2 -kw "[Tags]" -c1 tag1 -c2 tag2 -c3 tag3
+check-keyword-row -file "TestFile.robot" -row 3 -kw "[Return]"
+check-keyword-row -file "TestFile.robot" -row 4 -kw "Set Test Message" -c1 "message"
+check-keyword-row -file "TestFile.robot" -row 5 -kw "..."
+
+check-keyword-row -file "TestFile.robot" -row 6 -kw "next kw" -c1 "${value 1}" -c2 "${value 2}" -c3 "${value 1}"
+check-keyword-row -file "TestFile.robot" -row 7 -kw "[Tags]" -c1 "\\" -c2 "\\" -c3 "#new"
+check-keyword-row -file "TestFile.robot" -row 8 -kw "Catenate"  -c1 "1"  -c2 "2" -c3 "3" -c4 "4"
+check-keyword-row -file "TestFile.robot" -row 9 -kw  ""
+check-keyword-row -file "TestFile.robot" -row 10 -kw  "..."
+
+
+//undo adding new line
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+check-keyword-row -file "TestFile.robot" -row 9 -kw  "..."
+
+//undo adding comment
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+check-keyword-row -file "TestFile.robot" -row 7 -kw "[Tags]"
+
+//redo adding comment
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+y"
+check-keyword-row -file "TestFile.robot" -row 7 -kw "[Tags]" -c1 "\\" -c2 "\\" -c3 "#new"
+
+//undo adding variable
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z" -times 2
+check-keyword-row -file "TestFile.robot" -row 6 -kw "next kw" -c1 "${value 1}" -c2 "${value 2}" 
+
+//undo removing variable
+get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z" 
+check-keyword-row -file "TestFile.robot" -row 3 -kw "[Return]" -c1 "${s}"
+
+
+get-view Outline | get-tree | select "TestFile.robot/Keywords/next kw/Catenate"
+with [get-editor "TestFile.robot"] {
+    with [get-canvas -after [get-label "User Keywords"] -index 1] {
+        key-type Down
+        key-type Enter
+        key-type "M2+3" "#"
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text "com1"
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        type-text com2
+        key-type Enter
+    }
+    with [get-editbox -after [get-label "User Keywords"] -index 1] {
+        key-type "TRAVERSE_ESCAPE"
+    }
+    get-canvas -after [get-label "User Keywords"] -index 1 | key-type "M1+z"
+}
+
+check-keyword-row -file "TestFile.robot" -row 1 -kw "kw"
+check-keyword-row -file "TestFile.robot" -row 2 -kw "[Tags]" -c1 tag1 -c2 tag2 -c3 tag3
+check-keyword-row -file "TestFile.robot" -row 3 -kw "[Return]" -c1 "${s}"
+check-keyword-row -file "TestFile.robot" -row 4 -kw "Set Test Message" -c1 "message"
+check-keyword-row -file "TestFile.robot" -row 5 -kw "..."
+
+check-keyword-row -file "TestFile.robot" -row 6 -kw "next kw" -c1 "${value 1}" -c2 "${value 2}" 
+check-keyword-row -file "TestFile.robot" -row 7 -kw "[Tags]"
+check-keyword-row -file "TestFile.robot" -row 8 -kw "Catenate"  -c1 "1"  -c2 "2" -c3 "3" -c4 "4"
+check-keyword-row -file "TestFile.robot" -row 9 -kw "#com1"
+check-keyword-row -file "TestFile.robot" -row 10 -kw  "..."
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
