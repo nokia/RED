@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _YI1vUFJyEea8WJ7bbC6OBw
+Contexts: _VzYJ0KEAEea9Cvae3yWo1A
 Element-Name: MoveUpDownKeywords
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _VT-NwF1kEeaRBaqqj0N1Gg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/8/16 5:59 PM
+Save-Time: 11/16/16 11:11 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -57,7 +57,7 @@ with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords
     get-menu "Row/Move up" | click
 }
 wait 500
-is-row-fully-selected -row 6
+is-row-fully-selected -row 6  -table "User Keywords"
 
 
 with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -65,14 +65,14 @@ with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords
     get-menu "Row/Move up" | click
 }
 
-is-row-fully-selected -row 5
+is-row-fully-selected -row 5 -table "User Keywords"
 
 with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords"] -index 1] {
 	//move line with "/" down
     key-type Down -times 3
     get-menu "Row/Move down" | click
 }
-is-row-fully-selected -row 9
+is-row-fully-selected -row 9  -table "User Keywords"
 
 //move kw_3 up by shortcut
 with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -86,7 +86,7 @@ with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords
     key-type Right -times 5
     key-type "M1+ARROW_DOWN"
 }    
-is-row-fully-selected -row 2
+is-row-fully-selected -row 2  -table "User Keywords"
 
 //select empty_kw and move it down by shortcut  
 with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -94,7 +94,7 @@ with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords
     key-type "M1+ARROW_DOWN"
 }
 wait 500
-is-row-fully-selected -row 17
+is-row-fully-selected -row 17 -table "User Keywords"
 
 //set focus on "..."
 with [get-editor "TestFile.robot"  | get-canvas -after [get-label "User Keywords"] -index 1] {
@@ -128,12 +128,12 @@ get-view Outline | get-tree | select "TestFile.robot/Keywords/kw_3/abc" | click
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type "M1+ARROW_UP" -times 2
 }   
-is-row-fully-selected -row 5 
+is-row-fully-selected -row 5 -table "User Keywords"
 
 with [get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1] {
     key-type "M1+ARROW_DOWN" -times 2
 }   
-is-row-fully-selected -row 5 
+is-row-fully-selected -row 5 -table "User Keywords"
 
 get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Test Cases ***\n"
@@ -153,4 +153,5 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     + "    new line\n"
     + "    \\        #no line here\n"
     + "empty_kw" | verify-true
+    
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
