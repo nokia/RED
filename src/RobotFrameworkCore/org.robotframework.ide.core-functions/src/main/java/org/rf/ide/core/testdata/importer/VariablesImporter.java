@@ -70,6 +70,9 @@ public class VariablesImporter {
                     try {
                         importUri = findAbsoluteVariableImportUri(pathsProvider, currentRobotFile, path,
                                 variableMappings);
+                        if (importUri == null) {
+                            continue;
+                        }
 
                     } catch (final Exception e) {
                         final BuildMessage errorMsg = BuildMessage.createErrorMessage(
@@ -130,7 +133,7 @@ public class VariablesImporter {
         final Optional<URI> absoluteUri = new ImportSearchPaths(pathsProvider).findAbsoluteUri(currentFile.toURI(),
                 resolvedImportPath.get());
         if (!absoluteUri.isPresent()) {
-            throw new IllegalStateException("Unable to find variable file to import '" + varImportPath + "'");
+            return null;
         }
         return absoluteUri.get();
     }
