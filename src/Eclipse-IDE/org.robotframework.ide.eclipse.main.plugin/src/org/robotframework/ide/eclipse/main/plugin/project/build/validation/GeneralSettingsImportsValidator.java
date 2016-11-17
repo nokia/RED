@@ -195,10 +195,10 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
             final IPath importPath, final Optional<MarkedUri> absoluteMarkedPath) {
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH,
                 importPath.toPortableString());
-        reporter.handleProblem(
-                RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH)
-                        .formatMessageWith(path, absoluteMarkedPath.get().getPath().toString()),
-                validationContext.getFile(), pathToken, attributes);
+        final String absolutePath = ResolvedImportPath
+                .reverseUriSpecialCharsEscapes(absoluteMarkedPath.get().getPath().toString());
+        reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH)
+                .formatMessageWith(path, absolutePath), validationContext.getFile(), pathToken, attributes);
     }
 
     private Optional<MarkedUri> calculateAbsoluteUri(final String path) {

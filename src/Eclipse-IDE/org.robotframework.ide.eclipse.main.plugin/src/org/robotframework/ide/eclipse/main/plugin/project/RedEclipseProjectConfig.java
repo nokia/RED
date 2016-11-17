@@ -65,7 +65,7 @@ public class RedEclipseProjectConfig {
                 final String portablePath = base.toPortableString();
                 final URI filePath = new URI(escaper.escape(portablePath));
                 final URI pathUri = filePath.resolve(escaper.escape(child.toString()));
-                return new Path(reverseUriSpecialCharsEscapes(pathUri.toString()));
+                return new Path(ResolvedImportPath.reverseUriSpecialCharsEscapes(pathUri.toString()));
             } catch (final Exception e) {
                 throw new PathResolvingException("Unable to parse path", e);
             }
@@ -77,21 +77,6 @@ public class RedEclipseProjectConfig {
         final IPath result = relativityPoint.getRelativeTo() == RelativeTo.WORKSPACE
                 ? containingProject.getWorkspace().getRoot().getLocation() : containingProject.getLocation();
         return result.addTrailingSeparator();
-    }
-
-    private static String reverseUriSpecialCharsEscapes(final String uriWithEscapedChars) {
-        return uriWithEscapedChars.replaceAll("%20", " ")
-                .replaceAll("%21", "!")
-                .replaceAll("%22", "\"")
-                .replaceAll("%23", "#")
-                .replaceAll("%24", "\\$")
-                .replaceAll("%25", "%")
-                .replaceAll("%26", "&")
-                .replaceAll("%28", "\\(")
-                .replaceAll("%29", "\\)")
-                .replaceAll("%3b", ";")
-                .replaceAll("%40", "@")
-                .replaceAll("%5e", "\\^");
     }
 
     public EnvironmentSearchPaths createEnvironmentSearchPaths(final IProject project) {
