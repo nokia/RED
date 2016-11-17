@@ -54,7 +54,11 @@ public class ImportSearchPaths {
     }
 
     private static boolean targetExist(final URI uri) {
-        return new File(uri).exists();
+        try {
+            return new File(uri).exists();
+        } catch (final IllegalArgumentException e) {
+            return false;
+        }
     }
 
     /**
