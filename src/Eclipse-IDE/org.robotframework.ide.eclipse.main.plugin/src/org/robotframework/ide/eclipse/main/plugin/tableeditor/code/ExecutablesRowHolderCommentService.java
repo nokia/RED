@@ -139,20 +139,18 @@ public class ExecutablesRowHolderCommentService {
 
         private void fillMissingColumns(final RobotKeywordCall callToUse, final List<RobotToken> execRowView) {
             final int columnsInView = execRowView.size() - 1;
-            if (columnsInView < column) {
-                for (int i = columnsInView; i < column; i++) {
-                    if (i == 0 && (execRowView.size() == 0 || execRowView.get(0).getText().isEmpty())) {
-                        final SetKeywordCallNameCommand changeTmpName = new SetKeywordCallNameCommand(eventBroker, call,
-                                "\\");
-                        changeTmpName.execute();
-                        executedCommands.add(changeTmpName);
-                    } else if (column - 1 == i && execRowView.size() - 1 < i) {
-                        final SetKeywordCallArgumentCommand2 argSetNotTheSameColumn = new SetKeywordCallArgumentCommand2(
-                                eventBroker, callToUse, column - 2, "\\");
-                        argSetNotTheSameColumn.execute();
-                        executedCommands.add(argSetNotTheSameColumn);
-                        break;
-                    }
+            for (int i = columnsInView; i < column; i++) {
+                if (i == 0 && (execRowView.size() == 0 || execRowView.get(0).getText().isEmpty())) {
+                    final SetKeywordCallNameCommand changeTmpName = new SetKeywordCallNameCommand(eventBroker, call,
+                            "\\");
+                    changeTmpName.execute();
+                    executedCommands.add(changeTmpName);
+                } else if (column - 1 == i && execRowView.size() - 1 < i) {
+                    final SetKeywordCallArgumentCommand2 argSetNotTheSameColumn = new SetKeywordCallArgumentCommand2(
+                            eventBroker, callToUse, column - 2, "\\");
+                    argSetNotTheSameColumn.execute();
+                    executedCommands.add(argSetNotTheSameColumn);
+                    break;
                 }
             }
         }
