@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.project;
 
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Collections;
@@ -33,6 +34,21 @@ public final class ResolvedImportPath {
             .addEscape('^', "%5e")
             .build();
 
+    public static String reverseUriSpecialCharsEscapes(final String uriWithEscapedChars) {
+        return uriWithEscapedChars.replaceAll("%20", " ")
+                .replaceAll("%21", "!")
+                .replaceAll("%22", "\"")
+                .replaceAll("%23", "#")
+                .replaceAll("%24", "\\$")
+                .replaceAll("%25", "%")
+                .replaceAll("%26", "&")
+                .replaceAll("%28", "\\(")
+                .replaceAll("%29", "\\)")
+                .replaceAll("%3b", ";")
+                .replaceAll("%40", "@")
+                .replaceAll("%5e", "\\^");
+    }
+
     public static Optional<ResolvedImportPath> from(final ImportPath importPath) {
         return from(importPath, Collections.<String, String> emptyMap());
     }
@@ -47,10 +63,10 @@ public final class ResolvedImportPath {
                 if (RobotExpressions.isParameterized(resolvedPath)) {
                     return Optional.<ResolvedImportPath> absent();
                 } else {
-                    return Optional.of(create(importPath, resolvedPath));
+                    return Optional.of(create(resolvedPath));
                 }
             } else {
-                return Optional.of(create(importPath, path));
+                return Optional.of(create(path));
             }
 
         } catch (final URISyntaxException e) {
@@ -58,9 +74,9 @@ public final class ResolvedImportPath {
         }
     }
 
-    private static ResolvedImportPath create(final ImportPath importPath, final String path) throws URISyntaxException {
+    private static ResolvedImportPath create(final String path) throws URISyntaxException {
         final String escapedPath = URI_SPECIAL_CHARS_ESCAPER.escape(path);
-        final String escapedPathWithScheme = importPath.isAbsolute() ? "file:/" + escapedPath : escapedPath;
+        final String escapedPathWithScheme = new File(path).isAbsolute() ? "file:/" + escapedPath : escapedPath;
         return new ResolvedImportPath(new URI(escapedPathWithScheme.replaceAll("\\\\", "/")));
     }
 
