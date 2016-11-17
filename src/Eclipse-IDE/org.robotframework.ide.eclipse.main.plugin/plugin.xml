@@ -760,6 +760,11 @@
                 label="Exclude from validation"
                 style="push">
           </command>
+          <command
+                commandId="org.robotframework.red.runStaticAnalysis"
+                label="Run static analysis"
+                style="push">
+          </command>
           <separator
                 name="navigation"
                 visible="true">
@@ -973,6 +978,60 @@
 		  	</with>
          </enabledWhen>
 	</handler>
+ <handler
+       class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.StaticAnalysisHandler"
+       commandId="org.robotframework.red.runStaticAnalysis">
+    <activeWhen>
+       <with
+             variable="selection">
+          <iterate
+                ifEmpty="false"
+                operator="and">
+             <adapt
+                   type="org.eclipse.core.resources.IResource">
+                <test
+                      property="org.eclipse.core.resources.projectNature"
+                      value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+                </test>
+             </adapt>
+          </iterate>
+       </with>
+    </activeWhen>
+    <enabledWhen>
+       <with
+             variable="selection">
+          <iterate
+                ifEmpty="false"
+                operator="or">
+             <or>
+                <adapt
+                      type="org.eclipse.core.resources.IFile">
+                   <or>
+                      <test
+                            property="org.eclipse.core.resources.name"
+                            value="*.robot">
+                      </test>
+                      <test
+                            property="org.eclipse.core.resources.name"
+                            value="*.txt">
+                      </test>
+                      <test
+                            property="org.eclipse.core.resources.name"
+                            value="*.tsv">
+                      </test>
+                   </or>
+                </adapt>
+                <adapt
+                      type="org.eclipse.core.resources.IFolder">
+                </adapt>
+                <adapt
+                      type="org.eclipse.core.resources.IProject">
+                </adapt>
+             </or>
+          </iterate>
+       </with>
+    </enabledWhen>
+ </handler>
 	
  </extension>
  <extension
@@ -1382,6 +1441,11 @@
           categoryId="org.robotframework.ide.eclipse.robotCommands"
           id="org.robotframework.ide.eclipse.redoInTable"
           name="Redo">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.runStaticAnalysis"
+          name="Run Static Analysis">
     </command>
  </extension>
  <extension
