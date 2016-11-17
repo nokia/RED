@@ -683,7 +683,8 @@
           <command
                 commandId="org.robotframework.red.configureRobotNature"
                 label="Configure as Robot project"
-                style="push">
+                style="push"
+                tooltip="Configure as Robot project">
              <parameter
                    name="org.robotframework.red.configureRobotNature.enablement"
                    value="enable">
@@ -716,7 +717,8 @@
           <command
                 commandId="org.robotframework.red.configureRobotNature"
                 label="Deconfigure as Robot project"
-                style="push">
+                style="push"
+                tooltip="Deconfigure as Robot project">
              <parameter
                    name="org.robotframework.red.configureRobotNature.enablement"
                    value="disable">
