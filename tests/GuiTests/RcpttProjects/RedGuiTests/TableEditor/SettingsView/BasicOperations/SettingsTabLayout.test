@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __KaXoDPMEeat08T3d_ERug
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/29/16 5:59 PM
+Save-Time: 11/18/16 11:16 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -172,6 +172,7 @@ with [get-editor "__init__.robot"] {
     }
 }
 
+get-editor "__init__.robot" | maximize
 
 get-editor "__init__.robot" | get-section Metadata | click
 with [get-editor "__init__.robot"] {
@@ -261,6 +262,6 @@ get-editor "TestFile.robot" | get-tab-folder | get-tab-item Source | click
 get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** Setting ***\n"
     + "*** Test Cases ***" | verify-true  
     
-    
+get-editor "__init__.robot" | restore    
       
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
