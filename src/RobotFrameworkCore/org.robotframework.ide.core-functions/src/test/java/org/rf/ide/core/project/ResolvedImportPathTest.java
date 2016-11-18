@@ -54,17 +54,6 @@ public class ResolvedImportPathTest {
     }
 
     @Test
-    public void testPathsResolution_whenResolvedPathIsAbsolute_inWindows() {
-        assumeTrue(RedSystemProperties.isWindowsPlatform());
-        
-        final Map<String, String> parameters = Collections.<String, String> emptyMap();
-        final ResolvedImportPath resolvedPath = createResolved("c:/abspath", parameters).get();
-        final URI uri = resolvedPath.resolveInRespectTo(new File("c:/some/location").toURI());
-
-        assertThat(uri).isEqualTo(new File("c:/abspath").toURI());
-    }
-
-    @Test
     public void testPathsResolution_whenResolvedPathIsRelative_inWindows() {
         assumeTrue(RedSystemProperties.isWindowsPlatform());
 
@@ -73,17 +62,6 @@ public class ResolvedImportPathTest {
         final URI uri = resolvedPath.resolveInRespectTo(new File("c:/some/location").toURI());
 
         assertThat(uri).isEqualTo(new File("c:/some/relative/path/").toURI());
-    }
-
-    @Test
-    public void testPathsResolution_whenResolvedPathIsAbsolute_inUnix() throws Exception {
-        assumeFalse(RedSystemProperties.isWindowsPlatform());
-
-        final Map<String, String> parameters = Collections.<String, String> emptyMap();
-        final ResolvedImportPath resolvedPath = createResolved("/abspath", parameters).get();
-        final URI uri = resolvedPath.resolveInRespectTo(new File("/some/location").toURI());
-
-        assertThat(uri).isEqualTo(new URI("file", "abspath", "", null));
     }
 
     @Test
