@@ -1,11 +1,96 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _oF-W4KzGEea8FqgKy4fLvA
 Element-Name: VaribaleFilesFromLinkedFolder
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _wEuMwKzfEea8FqgKy4fLvA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/17/16 5:06 PM
+Save-Time: 11/18/16 2:12 PM
 Testcase-Type: ecl
 
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+//add new linked folder with variables
+
+get-view "Project Explorer" | get-tree | select RobotProject | get-menu "New/Folder" | click
+with [get-window "New Folder"] {
+    get-button "Advanced >>" | click
+    get-button "Link to alternate location (Linked Folder)" | click
+}
+set-dialog-result Folder [concat $user_folder "/external_variables/external/file_in_linked_folder"]
+with [get-window "New Folder"] {
+    get-button "Browse..." | click
+    get-button Finish | click
+}
+
+replace -input $user_folder -old "\\" -new "/" | let [val user_folder_unix_style -input]{
+
+	//add this folder to test
+	get-view "Project Explorer" | get-tree | select "RobotProject/TestFile.robot" | double-click
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    key-type Enter
+	    key-type Up
+	    key-type "M1+SPACE"
+	    key-type Down
+	    key-type Enter
+	    type-text [concat "Variables    " $user_folder_unix_style "/external_variables/external/file_in_linked_folder/linked_vars.py"]
+	    
+	}
+	
+	//add path to variable file that is outside and not linked
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    key-type "NUMPAD_ENTER" "\\u000D"
+	    type-text [concat "Variables    " $user_folder_unix_style "/external_variables/external/simple_variables/file_outside_ws.py"]
+	    key-type "M1+s"
+	}
+	//open declaration for linked folder
+	with [get-editor "TestFile.robot" | get-text-viewer] {
+	    hover-text 2 55
+	    set-caret-pos 2 24
+	    open-declaration
+	}
+	
+	//check if was opened
+	get-editor "linked_vars.py" | get-text-viewer | get-property text | equals "def get_variables(arg=None):\n"
+	    + "    variables = {'vars_linked_var' : '30'}\n"
+	    + "    return variables" | verify-true
+	    
+	//try to open second    
+	with [get-editor "TestFile.robot"] {
+	    click
+	    with [get-text-viewer] {
+	        set-caret-pos 3 30
+	        hover-text 3 52
+	        key-type F3
+	    }
+	}
+	//check that only one file is open
+	with [get-tab-folder -index 1] {
+	    get-property "pages[0]" | equals "TestFile.robot" | verify-true
+	    get-property "pages[1]" | equals "linked_vars.py" | verify-true
+	    get-property activePage | equals "TestFile.robot" | verify-true
+	    get-property tabCount | equals 2 | verify-true
+	}   
+	
+	//check problems
+	with [get-view Problems] {
+	    click
+	}
+	get-view Problems | get-tree | get-item "Errors \\(1 item\\)" | get-property "getItems().TreeItem[0].getText()" 
+	    | equals [format "Path '%s/external_variables/external/simple_variables/file_outside_ws.py' points to location outside your workspace" $user_folder_unix_style ]
+	    | verify-true
+	with [get-view Problems | get-tree] {
+	    get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	        | equals [format "Path '%s/external_variables/external/file_in_linked_folder/linked_vars.py' is absolute. It is preferred to use relative paths" $user_folder_unix_style]
+	        | verify-true
+	    get-item "Warnings \\(2 items\\)" | get-property "getItems().TreeItem[1].getText()" 
+	        | equals [format "Path '%s/external_variables/external/simple_variables/file_outside_ws.py' is absolute. It is preferred to use relative paths" $user_folder_unix_style]
+	        | verify-true
+	}
+}
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
