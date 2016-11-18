@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _a_1L4AfGEearkLC-7wHL-g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/10/16 4:16 PM
+Save-Time: 11/18/16 11:12 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -28,6 +28,9 @@ with [get-editor "RobotProject/red.xml" | get-section "Referenced libraries"
     uncheck
     key-type "M1+s"
 }
+//workaround for setting focus
+get-editor "RobotProject/red.xml" | get-section Paths | get-table 
+    | select ".*LibsFromPythonPath .*"
 
 //add res1.py to reference lib
 set-dialog-result File "platform:/resource/RobotProject/libs/for_resource/res1.py"
