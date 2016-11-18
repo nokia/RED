@@ -11,6 +11,7 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.Map;
 
+import org.rf.ide.core.executor.RedSystemProperties;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 
 import com.google.common.base.Optional;
@@ -76,7 +77,8 @@ public final class ResolvedImportPath {
 
     private static ResolvedImportPath create(final String path) throws URISyntaxException {
         final String escapedPath = URI_SPECIAL_CHARS_ESCAPER.escape(path);
-        final String escapedPathWithScheme = new File(path).isAbsolute() ? "file://" + escapedPath : escapedPath;
+        final String sep = RedSystemProperties.isWindowsPlatform() ? "/" : "//";
+        final String escapedPathWithScheme = new File(path).isAbsolute() ? "file:" + sep + escapedPath : escapedPath;
         return new ResolvedImportPath(new URI(escapedPathWithScheme.replaceAll("\\\\", "/")));
     }
 
