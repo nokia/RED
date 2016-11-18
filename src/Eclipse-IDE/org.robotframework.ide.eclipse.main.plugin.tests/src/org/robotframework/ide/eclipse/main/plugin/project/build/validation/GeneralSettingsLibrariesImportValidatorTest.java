@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -54,7 +53,6 @@ import org.robotframework.red.junit.ResourceCreator;
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
-@Ignore("fix under linux")
 public class GeneralSettingsLibrariesImportValidatorTest {
 
     public static final ProjectProvider projectProvider = new ProjectProvider(
