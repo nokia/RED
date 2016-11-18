@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __XyeQFJ2Eea8WJ7bbC6OBw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/16/16 10:57 AM
+Save-Time: 11/18/16 10:49 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -111,6 +111,8 @@ get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -ind
 get-editor "TestFile.robot" | get-canvas -after [get-label "User Keywords"] -index 1  | get-object | invoke getLayer | invoke getBodyLayer | invoke getScrollableLayer
 	| invoke getUnderlyingLayerByPosition 0 0 | invoke getLastSelectedCellPosition  | invoke  rowPosition | eq 5 | verify-true
 	
+get-editor "TestFile.robot" | maximize
+	
 check-keyword-row -file "TestFile.robot" -row 1 -kw	"very first kw"
 check-keyword-row -file "TestFile.robot" -row 2 -kw	"..."
 
@@ -137,5 +139,6 @@ check-keyword-row -file "TestFile.robot" -row 18 -kw	"Should Be Empty" -c1 "new"
 check-keyword-row -file "TestFile.robot" -row 19 -kw	"Should Not Match" -c1 "string" -c2 "pattern"
 check-keyword-row -file "TestFile.robot" -row 20 -kw	"..."
 
+get-editor "TestFile.robot" | restore
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
