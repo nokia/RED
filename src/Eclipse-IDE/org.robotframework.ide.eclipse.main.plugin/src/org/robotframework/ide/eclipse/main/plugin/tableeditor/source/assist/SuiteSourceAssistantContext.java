@@ -106,7 +106,7 @@ public class SuiteSourceAssistantContext {
         return getMatchingFiles(wsRoot, new FileMatcher() {
             @Override
             public boolean matches(final IFile file) {
-                return file.getFileExtension().equals("py");
+                return "py".equalsIgnoreCase(file.getFileExtension());
             }
         });
     }
