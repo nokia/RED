@@ -54,7 +54,7 @@ class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsVali
                     .formatMessageWith(path, ": given location does not point to a file"), validationContext.getFile(),
                     pathToken);
         } else if (!ASuiteFileDescriber.isResourceFile((IFile) resource)) {
-            if (resource.getFileExtension().equalsIgnoreCase("html")) {
+            if ("html".equalsIgnoreCase(resource.getFileExtension())) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.HTML_RESOURCE_IMPORT),
                         validationContext.getFile(), pathToken);
             } else {
@@ -74,7 +74,8 @@ class GeneralSettingsResourcesImportValidator extends GeneralSettingsImportsVali
                     .formatMessageWith(path, ": given location does not point to a file"), validationContext.getFile(),
                     pathToken);
         } else {
-            final String extension = new Path(file.getAbsolutePath()).getFileExtension().toLowerCase();
+            final String fileExtension = new Path(file.getAbsolutePath()).getFileExtension();
+            final String extension = fileExtension == null ? null : fileExtension.toLowerCase();
             if ("html".equals(extension)) {
                 reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.HTML_RESOURCE_IMPORT),
                         validationContext.getFile(), pathToken);
