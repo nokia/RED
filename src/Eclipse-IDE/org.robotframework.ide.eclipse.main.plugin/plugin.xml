@@ -762,7 +762,7 @@
           </command>
           <command
                 commandId="org.robotframework.red.runStaticAnalysis"
-                label="Run static analysis"
+                label="Revalidate"
                 style="push">
           </command>
           <separator
@@ -795,9 +795,15 @@
                    operator="and">
                <adapt
                      type="org.eclipse.core.resources.IResource">
-                  <instanceof
-                        value="org.eclipse.core.resources.IProject">
-                  </instanceof>
+                   <and>
+                      <instanceof
+                            value="org.eclipse.core.resources.IProject">
+                      </instanceof>
+                      <test
+                            property="org.eclipse.core.resources.open"
+                            value="open">
+                      </test>
+                   </and>
                </adapt>
              </iterate>
           </with>

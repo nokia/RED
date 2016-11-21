@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,9 +17,9 @@ import org.eclipse.core.resources.IResource;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
+
+import com.google.common.collect.Sets;
 
 public class StaticAnalysisHandlerTest {
 
@@ -63,7 +62,8 @@ public class StaticAnalysisHandlerTest {
         selectedResources.add(topLevelFile);
         selectedResources.add(initFile);
 
-        checkCollectedFiles(selectedResources, topLevelFile, initFile);
+        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile, initFile));
     }
 
     @Test
@@ -71,7 +71,8 @@ public class StaticAnalysisHandlerTest {
         List<IResource> selectedResources = new ArrayList<>();
         selectedResources.add(topLevelDirectory);
 
-        checkCollectedFiles(selectedResources, initFile, tsvFile, txtFile, robotFile);
+        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(Sets.newHashSet(initFile, tsvFile, txtFile, robotFile));
     }
 
     @Test
@@ -79,7 +80,8 @@ public class StaticAnalysisHandlerTest {
         List<IResource> selectedResources = new ArrayList<>();
         selectedResources.add(projectProvider.getProject());
 
-        checkCollectedFiles(selectedResources, topLevelFile, initFile, tsvFile, txtFile, robotFile);
+        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile, initFile, tsvFile, txtFile, robotFile));
     }
 
     @Test
@@ -89,7 +91,8 @@ public class StaticAnalysisHandlerTest {
         selectedResources.add(tsvFile);
         selectedResources.add(robotFile);
 
-        checkCollectedFiles(selectedResources, initFile, tsvFile, txtFile, robotFile);
+        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(Sets.newHashSet(initFile, tsvFile, txtFile, robotFile));
     }
 
     @Test
@@ -98,7 +101,8 @@ public class StaticAnalysisHandlerTest {
         selectedResources.add(nestedDirectory);
         selectedResources.add(topLevelFile);
 
-        checkCollectedFiles(selectedResources, topLevelFile, robotFile);
+        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile, robotFile));
     }
 
     @Test
@@ -107,15 +111,7 @@ public class StaticAnalysisHandlerTest {
         selectedResources.add(notRobotFile);
         selectedResources.add(topLevelFile);
 
-        checkCollectedFiles(selectedResources, topLevelFile);
-    }
-
-    private void checkCollectedFiles(List<IResource> selectedResources, IFile... expectedFiles) {
-        Set<RobotSuiteFile> suiteFiles = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        Set<RobotSuiteFile> expectedSuiteFiles = new HashSet<>();
-        for (IFile file : expectedFiles) {
-            expectedSuiteFiles.add(RedPlugin.getModelManager().createSuiteFile(file));
-        }
-        assertThat(suiteFiles).isEqualTo(expectedSuiteFiles);
+        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile));
     }
 }
