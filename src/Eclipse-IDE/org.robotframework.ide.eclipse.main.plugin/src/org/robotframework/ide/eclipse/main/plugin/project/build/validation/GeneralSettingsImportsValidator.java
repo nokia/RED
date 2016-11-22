@@ -135,14 +135,13 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
         if (!absoluteMarkedPath.isPresent()) {
             reportMissingImportPath(path, pathToken, importPath);
             return;
-
-        }
-
-        if (isRelativeToModuleSearchPath(absoluteMarkedPath)) {
-            reportModuleSearchPathRelativeness(path, pathToken, importPath, absoluteMarkedPath);
         }
 
         final URI absoluteImportUri = absoluteMarkedPath.get().getPath();
+        if (isRelativeToModuleSearchPath(absoluteMarkedPath)) {
+            reportModuleSearchPathRelativeness(path, pathToken, importPath, absoluteImportUri);
+        }
+
         final IWorkspaceRoot wsRoot = suiteFile.getFile().getWorkspace().getRoot();
         final RedWorkspace redWorkspace = new RedWorkspace(wsRoot);
 
@@ -192,11 +191,12 @@ abstract class GeneralSettingsImportsValidator implements ModelUnitValidator {
     }
 
     private void reportModuleSearchPathRelativeness(final String path, final RobotToken pathToken,
-            final IPath importPath, final Optional<MarkedUri> absoluteMarkedPath) {
+            final IPath importPath, final URI absoluteUri) {
         final Map<String, Object> attributes = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.PATH,
                 importPath.toPortableString());
         final String absolutePath = ResolvedImportPath
-                .reverseUriSpecialCharsEscapes(absoluteMarkedPath.get().getPath().toString());
+                .reverseUriSpecialCharsEscapes(
+                        new File(absoluteUri).getAbsolutePath().replaceAll("\\\\", "/"));
         reporter.handleProblem(RobotProblem.causedBy(GeneralSettingsProblem.IMPORT_PATH_RELATIVE_VIA_MODULES_PATH)
                 .formatMessageWith(path, absolutePath), validationContext.getFile(), pathToken, attributes);
     }
