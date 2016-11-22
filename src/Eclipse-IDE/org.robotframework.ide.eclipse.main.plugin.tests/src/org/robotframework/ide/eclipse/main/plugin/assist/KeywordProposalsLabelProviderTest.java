@@ -13,10 +13,10 @@ import org.eclipse.jface.viewers.Stylers;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.TextStyle;
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.RedTheme;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.KeywordType;
-import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 import org.robotframework.red.graphics.ImagesManager;
 

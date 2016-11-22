@@ -31,6 +31,7 @@ import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDecla
 import org.rf.ide.core.testdata.model.table.exec.descs.ast.mapping.VariableDeclaration.Number;
 import org.rf.ide.core.testdata.model.table.exec.descs.impl.ForLoopContinueRowDescriptor;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
+import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.testcases.TestCase;
@@ -41,7 +42,6 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.validation.ProblemPosition;
-import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
