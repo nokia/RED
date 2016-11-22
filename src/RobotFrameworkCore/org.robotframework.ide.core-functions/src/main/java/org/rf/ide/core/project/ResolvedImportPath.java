@@ -79,7 +79,10 @@ public final class ResolvedImportPath {
         final String escapedPath = URI_SPECIAL_CHARS_ESCAPER.escape(path);
         final String sep = RedSystemProperties.isWindowsPlatform() ? "/" : "//";
         final String escapedPathWithScheme = new File(path).isAbsolute() ? "file:" + sep + escapedPath : escapedPath;
-        return new ResolvedImportPath(new URI(escapedPathWithScheme.replaceAll("\\\\", "/")));
+        String normalizedPath = RedSystemProperties.isWindowsPlatform() ? 
+        		escapedPathWithScheme.replaceAll("\\\\", "/") :
+        		escapedPathWithScheme.replaceAll("\\\\", "%5c");
+		return new ResolvedImportPath(new URI(normalizedPath));
     }
 
     private final URI uri;
