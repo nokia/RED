@@ -13,8 +13,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
 import com.google.common.base.Optional;
@@ -70,8 +70,8 @@ public class AccessibleKeywordsEntities {
             // try to find keyword name with dots, ignore keyword source
             final QualifiedKeywordName qualifedNameWithDots = QualifiedKeywordName.fromOccurrenceWithDots(name);
             for (final KeywordEntity keyword : keywords) {
-                final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName.create(
-                        keyword.getNameFromDefinition(), keyword.getSourceNameInUse());
+                final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
+                        .create(keyword.getNameFromDefinition(), keyword.getSourceNameInUse());
                 if (qualifedNameWithDots.matchesIgnoringCase(candidateQualifiedName)) {
                     return Optional.of(keyword);
                 }
@@ -157,14 +157,13 @@ public class AccessibleKeywordsEntities {
 
     private Collection<? extends KeywordEntity> getPossibleEntities(final String name) {
         final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(name);
-        Collection<? extends KeywordEntity> keywords = getAccessibleKeywords()
-                .get(qualifiedName.getKeywordName());
-        
-        if (keywords == null && name.contains(".")) { 
+        Collection<? extends KeywordEntity> keywords = getAccessibleKeywords().get(qualifiedName.getKeywordName());
+
+        if (keywords == null && name.contains(".")) {
             // try to find keyword name with dots, ignore keyword source
             keywords = getAccessibleKeywords().get(QualifiedKeywordName.fromOccurrenceWithDots(name).getKeywordName());
         }
-        
+
         return keywords != null ? keywords : tryWithEmbeddedArguments(qualifiedName);
     }
 

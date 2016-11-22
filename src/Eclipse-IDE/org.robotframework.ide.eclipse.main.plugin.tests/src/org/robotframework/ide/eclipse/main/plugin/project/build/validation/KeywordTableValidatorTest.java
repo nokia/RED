@@ -22,7 +22,7 @@ import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
@@ -53,8 +53,7 @@ public class KeywordTableValidatorTest {
 
     @Test
     public void emptyKeywordIsReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .build();
 
@@ -67,11 +66,10 @@ public class KeywordTableValidatorTest {
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(KeywordsProblem.EMPTY_KEYWORD, new ProblemPosition(2, Range.closed(17, 24))));
     }
-    
+
     @Test
     public void emptyKeywordIsReported_whenThereIsAnEmptyReturn() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Return]")
                 .build();
@@ -86,11 +84,10 @@ public class KeywordTableValidatorTest {
                 new Problem(KeywordsProblem.EMPTY_KEYWORD, new ProblemPosition(2, Range.closed(17, 24))),
                 new Problem(KeywordsProblem.EMPTY_KEYWORD_SETTING, new ProblemPosition(3, Range.closed(27, 35))));
     }
-    
+
     @Test
     public void nothingIsReported_whenThereIsNonEmptyReturn() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Return]  42")
                 .build();
@@ -102,11 +99,10 @@ public class KeywordTableValidatorTest {
 
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
-    
+
     @Test
     public void nothingIsReported_whenThereIsALineToExecute() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  kw")
                 .build();
@@ -123,11 +119,10 @@ public class KeywordTableValidatorTest {
 
         assertThat(reporter.getReportedProblems()).isEmpty();
     }
-    
+
     @Test
     public void emptyKeywordIsReported_whenThereIsACommentedLine() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  # kw")
                 .build();
@@ -141,11 +136,10 @@ public class KeywordTableValidatorTest {
         assertThat(reporter.getReportedProblems()).containsExactly(
                 new Problem(KeywordsProblem.EMPTY_KEYWORD, new ProblemPosition(2, Range.closed(17, 24))));
     }
-    
+
     @Test
     public void keywordsAreReported_whenTheyAreDuplicated() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword 1")
                 .appendLine("  [Return]  42")
                 .appendLine("keyword 1")
@@ -162,11 +156,10 @@ public class KeywordTableValidatorTest {
                 new Problem(KeywordsProblem.DUPLICATED_KEYWORD, new ProblemPosition(2, Range.closed(17, 26))),
                 new Problem(KeywordsProblem.DUPLICATED_KEYWORD, new ProblemPosition(4, Range.closed(42, 51))));
     }
-    
+
     @Test
     public void keywordsAreReported_whenTheyAreDuplicated_2() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword 1")
                 .appendLine("  [Return]  1")
                 .appendLine("k e y w o r d 1")
@@ -187,56 +180,51 @@ public class KeywordTableValidatorTest {
                 new Problem(KeywordsProblem.DUPLICATED_KEYWORD, new ProblemPosition(6, Range.closed(71, 86))));
     }
 
-    
-
-	@Test
-	public void keywordDefinitionWithDotsIsReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+    @Test
+    public void keywordDefinitionWithDotsIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword.1")
                 .appendLine("    kw")
                 .build();
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
-		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
-		final FileValidationContext context = prepareContext(accessibleKws);
-		final KeywordTableValidator validator = new KeywordTableValidator(context,
-				file.findSection(RobotKeywordsSection.class), reporter);
-		validator.validate(null);
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
 
-		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-		assertThat(reporter.getReportedProblems()).containsExactly(
-				new Problem(KeywordsProblem.KEYWORD_NAME_WITH_DOTS, new ProblemPosition(2, Range.closed(17, 26))));
-	}
-	
-	@Test
-	public void keywordOccurrenceWithDotsIsNotReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(KeywordsProblem.KEYWORD_NAME_WITH_DOTS, new ProblemPosition(2, Range.closed(17, 26))));
+    }
+
+    @Test
+    public void keywordOccurrenceWithDotsIsNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("    k.w")
                 .build();
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "k.w",
                 new Path("/res.robot"));
-		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
-				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
-		final FileValidationContext context = prepareContext(accessibleKws);
-		final KeywordTableValidator validator = new KeywordTableValidator(context,
-				file.findSection(RobotKeywordsSection.class), reporter);
-		validator.validate(null);
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
 
-		assertThat(reporter.getReportedProblems().isEmpty());
-	}
-    
-	@Test
-	public void keywordOccurrenceWithDotsAndSourceIsReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        assertThat(reporter.getReportedProblems().isEmpty());
+    }
+
+    @Test
+    public void keywordOccurrenceWithDotsAndSourceIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("    res.k.w")
                 .appendLine("    res1.kw")
@@ -247,25 +235,24 @@ public class KeywordTableValidatorTest {
                 new Path("/res.robot"));
         final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
-		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
-				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "kw",
-				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("k.w",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "kw",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
 
-		final FileValidationContext context = prepareContext(accessibleKws);
-		final KeywordTableValidator validator = new KeywordTableValidator(context,
-				file.findSection(RobotKeywordsSection.class), reporter);
-		validator.validate(null);
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
 
-		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-		assertThat(reporter.getReportedProblems()).containsExactly(
-				new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(29, 36))),
-				new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(4, Range.closed(41, 48))));
-	}
-	
-	@Test
-	public void undeclaredVariableAndKeywordInTeardownAreReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(29, 36))),
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(4, Range.closed(41, 48))));
+    }
+
+    @Test
+    public void undeclaredVariableAndKeywordInTeardownAreReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Teardown]  kw1  ${var}")
                 .appendLine("  kw")
@@ -273,70 +260,68 @@ public class KeywordTableValidatorTest {
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"));
-		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
-		final FileValidationContext context = prepareContext(accessibleKws);
-		final KeywordTableValidator validator = new KeywordTableValidator(context,
-				file.findSection(RobotKeywordsSection.class), reporter);
-		validator.validate(null);
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
 
-		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
-		assertThat(reporter.getReportedProblems()).containsExactly(
-				new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(39, 42))),
-				new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(44, 50))));
-	}
-	
-	@Test
-	public void undeclaredVariableInReturnIsReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(39, 42))),
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(44, 50))));
+    }
+
+    @Test
+    public void undeclaredVariableInReturnIsReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Return]  ${var}")
                 .appendLine("  kw")
                 .build();
 
-		final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
-				new Path("/res.robot"));
-		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
-		final FileValidationContext context = prepareContext(accessibleKws);
-		final KeywordTableValidator validator = new KeywordTableValidator(context,
-				file.findSection(RobotKeywordsSection.class), reporter);
-		validator.validate(null);
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
 
-		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-		assertThat(reporter.getReportedProblems()).containsExactly(
-				new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(37, 43))));
-	}
-	
-	@Test
-	public void declaredVariableAndKeywordInKeywordSettingsAreNotReported() throws CoreException {
-        final RobotSuiteFile file = new RobotSuiteFileCreator()
-                .appendLine("*** Keywords ***")
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
+        assertThat(reporter.getReportedProblems()).containsExactly(
+                new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(37, 43))));
+    }
+
+    @Test
+    public void declaredVariableAndKeywordInKeywordSettingsAreNotReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
                 .appendLine("keyword")
                 .appendLine("  [Teardown]  kw  ${var}")
                 .appendLine("  [Return]  ${var}")
                 .appendLine("  ${var}=  Set Variable  1")
                 .build();
 
-		final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+        final KeywordEntity entity1 = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
                 new Path("/res.robot"), "var");
-		final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "BuiltIn", "Set Variable",
+        final KeywordEntity entity2 = newValidationKeywordEntity(KeywordScope.RESOURCE, "BuiltIn", "Set Variable",
                 new Path("/res.robot"), "arg");
-		final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
-				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "setvariable",
-				(Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity1), "setvariable",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity2));
 
-		final FileValidationContext context = prepareContext(accessibleKws);
-		final KeywordTableValidator validator = new KeywordTableValidator(context,
-				file.findSection(RobotKeywordsSection.class), reporter);
-		validator.validate(null);
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final KeywordTableValidator validator = new KeywordTableValidator(context,
+                file.findSection(RobotKeywordsSection.class), reporter);
+        validator.validate(null);
 
-		assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
-	}
-	
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+    }
+
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
             final String name, final IPath exposingPath, final String... args) {
         return new ValidationKeywordEntity(scope, sourceName, name, "", false, exposingPath, 0,
@@ -356,13 +341,14 @@ public class KeywordTableValidatorTest {
                 SuiteExecutor.Python, Maps.<String, LibrarySpecification> newHashMap(),
                 Maps.<ReferencedLibrary, LibrarySpecification> newHashMap());
         final FileValidationContext context = new FileValidationContext(parentContext, mock(IFile.class), collector,
-        		new HashSet<String>());
+                new HashSet<String>());
         return context;
     }
 
     private static AccessibleKeywordsCollector createKeywordsCollector(
             final Map<String, Collection<KeywordEntity>> map) {
         return new AccessibleKeywordsCollector() {
+
             @Override
             public Map<String, Collection<KeywordEntity>> collect() {
                 return map;

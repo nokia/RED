@@ -27,7 +27,7 @@ import org.rf.ide.core.project.RobotProjectConfig.LibraryType;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -72,9 +72,9 @@ public class ValidationContext {
     private final Map<ReferencedLibrary, LibrarySpecification> referencedAccessibleLibraries;
 
     private BuildLogger logger;
-    
+
     private boolean isValidatingChangedFiles;
-    
+
     private Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = Optional.absent();
 
     public ValidationContext(final IProject project, final BuildLogger logger) {
@@ -87,7 +87,7 @@ public class ValidationContext {
         final RobotProject robotProject = model.createRobotProject(project);
         this.projectConfig = robotProject.getRobotProjectConfig();
         final RobotRuntimeEnvironment runtimeEnvironment = robotProject.getRuntimeEnvironment();
-        
+
         if (projectConfig != null && projectConfig.isReferencedLibrariesAutoDiscoveringEnabled()) {
             librariesAutoDiscoverer = Optional
                     .of(new LibrariesAutoDiscoverer(robotProject, Collections.<IResource> emptyList(),

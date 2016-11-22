@@ -24,7 +24,7 @@ import org.junit.Test;
 import org.rf.ide.core.executor.SuiteExecutor;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
@@ -198,11 +198,12 @@ public class GeneralSettingsTableValidatorTest {
                 .appendLine("Suite Teardown  ${var}")
                 .appendLine("Test Teardown  ${var}")
                 .build();
-        
+
         final Set<String> accessibleVariables = new HashSet<>();
         accessibleVariables.add("${var}");
 
-        final FileValidationContext context = prepareContext(new HashMap<String, Collection<KeywordEntity>>(), accessibleVariables);
+        final FileValidationContext context = prepareContext(new HashMap<String, Collection<KeywordEntity>>(),
+                accessibleVariables);
         final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
                 file.findSection(RobotSettingsSection.class), reporter);
         validator.validate(null);
@@ -218,7 +219,7 @@ public class GeneralSettingsTableValidatorTest {
                 new Problem(GeneralSettingsProblem.VARIABLE_AS_KEYWORD_USAGE_IN_SETTING,
                         new ProblemPosition(5, Range.closed(94, 100))));
     }
-    
+
     @Test
     public void undeclaredVariableInTagsIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
@@ -240,7 +241,7 @@ public class GeneralSettingsTableValidatorTest {
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(39, 46))),
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(3, Range.closed(67, 74))));
     }
-    
+
     @Test
     public void undeclaredKeywordInTemplateIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
@@ -253,16 +254,16 @@ public class GeneralSettingsTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(1);
-        assertThat(reporter.getReportedProblems()).contains(
-                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(32, 42))));
+        assertThat(reporter.getReportedProblems())
+                .contains(new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(2, Range.closed(32, 42))));
     }
-    
+
     @Test
     public void declaredKeywordInTemplateIsNotReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
                 .appendLine("Test Template  kw1 ${arg}")
                 .build();
-        
+
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.LOCAL, "suite", "kw1 ${arg}",
                 new Path("/suite.robot"), "arg");
         final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw1 ${arg}",
@@ -275,7 +276,7 @@ public class GeneralSettingsTableValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
     }
-    
+
     @Test
     public void undeclaredVariableInTimeoutIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
@@ -291,7 +292,7 @@ public class GeneralSettingsTableValidatorTest {
         assertThat(reporter.getReportedProblems()).contains(
                 new Problem(VariablesProblem.UNDECLARED_VARIABLE_USE, new ProblemPosition(2, Range.closed(31, 37))));
     }
-    
+
     @Test
     public void undefinedTimeFormatInTimeoutIsReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
@@ -307,7 +308,7 @@ public class GeneralSettingsTableValidatorTest {
         assertThat(reporter.getReportedProblems()).contains(
                 new Problem(ArgumentProblem.INVALID_TIME_FORMAT, new ProblemPosition(2, Range.closed(31, 35))));
     }
-    
+
     @Test
     public void definedTimeFormatInTimeoutIsNotReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")
@@ -321,7 +322,7 @@ public class GeneralSettingsTableValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
     }
-    
+
     @Test
     public void declaredVariableInTimeoutIsNotReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Settings ***")

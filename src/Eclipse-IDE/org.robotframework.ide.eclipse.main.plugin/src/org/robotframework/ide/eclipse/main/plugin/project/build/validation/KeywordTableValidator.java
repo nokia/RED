@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.KeywordTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.exec.descs.VariableExtractor;
@@ -27,7 +28,6 @@ import org.rf.ide.core.testdata.model.table.keywords.KeywordTeardown;
 import org.rf.ide.core.testdata.model.table.keywords.KeywordTimeout;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
@@ -96,8 +96,10 @@ class KeywordTableValidator implements ModelUnitValidator {
             final RobotToken keywordName = keyword.getKeywordName();
             final String name = keywordName.getText();
             if (isReturnEmpty(keyword) && !hasAnythingToExecute(keyword)) {
-                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD).formatMessageWith(name);
-                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,name);
+                final RobotProblem problem = RobotProblem.causedBy(KeywordsProblem.EMPTY_KEYWORD)
+                        .formatMessageWith(name);
+                final Map<String, Object> arguments = ImmutableMap.<String, Object> of(AdditionalMarkerAttributes.NAME,
+                        name);
                 reporter.handleProblem(problem, validationContext.getFile(), keywordName, arguments);
             }
         }
@@ -223,7 +225,7 @@ class KeywordTableValidator implements ModelUnitValidator {
                     collectKeywordExeRowsForVariablesChecking(keyword), allVariables);
         }
     }
-    
+
     private List<? extends RobotExecutableRow<?>> collectKeywordExeRowsForVariablesChecking(final UserKeyword keyword) {
         final List<RobotExecutableRow<?>> exeRows = newArrayList();
         exeRows.addAll(keyword.getKeywordExecutionRows());
@@ -255,7 +257,7 @@ class KeywordTableValidator implements ModelUnitValidator {
         }
         return arguments;
     }
-    
+
     private void reportUnknownVariablesInTagsSetting(final UserKeyword keyword, final Set<String> variables) {
         final List<KeywordTags> tags = keyword.getTags();
         for (final KeywordTags keywordTags : tags) {
@@ -270,7 +272,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             }
         }
     }
-    
+
     private void reportUnknownVariablesInTimeoutSetting(final UserKeyword keyword, final Set<String> variables) {
         final List<KeywordTimeout> timeouts = keyword.getTimeouts();
         for (final KeywordTimeout keywordTimeout : timeouts) {

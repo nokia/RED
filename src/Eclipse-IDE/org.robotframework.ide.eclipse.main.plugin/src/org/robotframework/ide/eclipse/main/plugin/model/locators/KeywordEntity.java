@@ -6,13 +6,12 @@
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
 import org.eclipse.core.runtime.IPath;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 
 import com.google.common.base.Objects;
 
 /**
  * @author Michal Anglart
- *
  */
 public abstract class KeywordEntity {
 
@@ -29,8 +28,7 @@ public abstract class KeywordEntity {
     private final IPath exposingFilepath;
 
     protected KeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,
-            final String alias,
-            final boolean isDeprecated, final IPath exposingFilepath) {
+            final String alias, final boolean isDeprecated, final IPath exposingFilepath) {
         this.scope = scope;
         this.sourceName = sourceName;
         this.keywordName = keywordName;
@@ -63,6 +61,14 @@ public abstract class KeywordEntity {
         return isDeprecated;
     }
 
+    public String getAlias() {
+        return alias;
+    }
+
+    public String getSourceName() {
+        return sourceName;
+    }
+
     public boolean isSameAs(final KeywordEntity that, final IPath useplaceFilepath) {
         return Objects.equal(this.getSourceNameInUse(), that.getSourceNameInUse())
                 && Objects.equal(this.keywordName, that.keywordName)
@@ -77,9 +83,8 @@ public abstract class KeywordEntity {
         if (obj.getClass() == getClass()) {
             final KeywordEntity that = (KeywordEntity) obj;
             return Objects.equal(this.sourceName, that.sourceName) && Objects.equal(this.alias, that.alias)
-                    && Objects.equal(this.keywordName, that.keywordName)
-                    && this.scope == that.scope && this.isDeprecated == that.isDeprecated
-                    && this.exposingFilepath == that.exposingFilepath;
+                    && Objects.equal(this.keywordName, that.keywordName) && this.scope == that.scope
+                    && this.isDeprecated == that.isDeprecated && this.exposingFilepath == that.exposingFilepath;
         }
         return false;
     }
