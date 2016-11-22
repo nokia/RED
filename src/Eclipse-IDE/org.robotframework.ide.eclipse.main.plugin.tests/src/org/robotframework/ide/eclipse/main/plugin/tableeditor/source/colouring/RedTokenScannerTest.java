@@ -39,10 +39,7 @@ public class RedTokenScannerTest {
     public static void beforeSuite() {
         final RobotProject robotProject = new RobotModel().createRobotProject(projectProvider.getProject());
 
-        final RobotParserConfig cfg = new RobotParserConfig();
-        cfg.setEagerImport(false);
-        cfg.setIncludeImportVariables(false);
-        final RobotParser parser = RobotParser.create(robotProject.getRobotProjectHolder(), cfg);
+        final RobotParser parser = RobotParser.create(robotProject.getRobotProjectHolder(), RobotParserConfig.allImportsLazy());
         final File file = new File("file.robot");
 
         document = new RobotDocument(parser, file);
