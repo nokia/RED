@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -18,6 +19,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.LibspecsFolder;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotProject;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfigFactory;
 
 public class RobotProjectBuilder extends IncrementalProjectBuilder {
 
@@ -49,13 +52,15 @@ public class RobotProjectBuilder extends IncrementalProjectBuilder {
         try {
             final IProject project = robotProject.getProject();
             final LibspecsFolder libspecsFolder = LibspecsFolder.createIfNeeded(project);
-            final boolean rebuildNeeded = libspecsFolder.shouldRegenerateLibspecs(getDelta(project),
-                    kind);
+            final IResourceDelta delta = getDelta(project);
+            final boolean rebuildNeeded = libspecsFolder.shouldRegenerateLibspecs(delta, kind);
 
             final Job buildJob = new RobotArtifactsBuilder(project, logger).createBuildJob(rebuildNeeded, fatalReporter,
                     reporter);
+            final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(project, delta,
+                    kind, reporter);
             final Job validationJob = new RobotArtifactsValidator(project, logger).createValidationJob(buildJob,
-                    getDelta(project), kind, reporter);
+                    validatorConfig);
             try {
                 final String projectPath = project.getFullPath().toString();
 
