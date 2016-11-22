@@ -29,6 +29,8 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.StaticAnalysisHandler.E4StaticAnalysisHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfig;
+import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfigFactory;
 import org.robotframework.red.commands.DIParameterizedHandler;
 import org.robotframework.red.viewers.Selections;
 
@@ -50,8 +52,11 @@ public class StaticAnalysisHandler extends DIParameterizedHandler<E4StaticAnalys
             final Map<IProject, Collection<IFile>> grouped = RobotSuiteFileCollector
                     .collectGroupedByProject(selectedResources);
             for (Entry<IProject, Collection<IFile>> entry : grouped.entrySet()) {
-                final Job validationJob = new RobotArtifactsValidator(entry.getKey(), new BuildLogger())
-                        .createValidationJob(entry.getValue());
+                final IProject project = entry.getKey();
+                final Collection<IFile> files = entry.getValue();
+                final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(files);
+                final Job validationJob = new RobotArtifactsValidator(project, new BuildLogger())
+                        .createValidationJob(null, validatorConfig);
                 validationJob.schedule();
             }
 
