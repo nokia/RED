@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _qW9rQKJrEeWiTrudgyrHcQ
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/16/16 6:05 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/22/16 4:15 PM
 Tags: Unstable
 Testcase-Type: ecl
 
@@ -72,4 +72,146 @@ with [get-view "Project Explorer" | get-tree] {
     get-item "RobotProject/Robot Referenced libraries/SumTwoDigits RobotProject\\/libs \\(1\\)" 
         | get-property "getItems().TreeItem[0].getText()" | equals "Sum Change" | verify-true
 }
+
+
+
+//remove entire content of file
+get-view "Project Explorer" | get-tree | select "RobotProject/libs/SumTwoDigits.py" | get-menu "Open With/Text Editor" 
+    | click
+with [get-editor "SumTwoDigits.py" | get-text-viewer] {
+    set-caret-pos 4 26
+    select-range 5 29 1 1
+    key-type BackSpace
+    key-type "M1+s"
+}
+
+wait 1000
+get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | expand-all
+
+//check if kw doc was removed
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
+
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "SumTwoDigits RobotProject/libs (0)" | verify-true
+}
+
+//revert removing
+with [get-editor "SumTwoDigits.py" | get-text-viewer] {
+    key-type "M1+z"
+    key-type "M1+s"
+}
+
+//now kw has doc
+get-view "Project Explorer" | get-tree | select "RobotProject/Robot Referenced libraries"
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 1 | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItemCount()" 
+        | equals 1 | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "SumTwoDigits RobotProject/libs (1)" | verify-true
+}
+
+//add new lib, that will be created
+with [get-editor "Script.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 4 32
+        key-type "NUMPAD_ENTER" "\\u000D"
+        type-text "Library    here_is_class.Animal"
+        key-type "M1+s"
+    }
+}
+
+//add new class with method to python file
+get-view "Project Explorer" | get-tree | select "RobotProject/here_is_class.py" 
+    | select "RobotProject/here_is_class.py" | get-menu "Open With/Text Editor" | click
+with [get-editor "here_is_class.py" | get-text-viewer] {
+    set-caret-pos 19 22
+    key-type "NUMPAD_ENTER" "\\u000D" -times 2
+    key-type Left -times 2
+    type-text "class Animal():"
+    key-type Enter
+    key-type Tab
+    type-text "def zebra():"
+    key-type Enter
+    key-type Tab
+    type-text "return 7"
+    key-type "M1+s"
+}
+
+//use quick fix to add o red.xml
+with [get-editor "Script.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 5 26
+        hover-text 5 21
+        key-type "M1+1"
+    }
+}
+
+//add to red.xml
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table 
+    | select "Discover 'here_is_class.Animal' and add to configuration" | click -default
+get-window "Discovering libraries summary" | get-button OK | click
+
+
+//check if new class doc was added to libdoc
+get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | expand-all
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" | get-property childCount | equals 2 | verify-true
+    
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getText()" | equals "Robot Referenced libraries" 
+        | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getText()" 
+        | equals "here_is_class.Animal RobotProject (1)" | verify-true
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[0].getItems().length" 
+        | equals 1 | verify-true
+    get-item "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals Zebra | verify-true
+        
+        
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getText()" 
+        | equals "SumTwoDigits RobotProject/libs (1)" | verify-true
+
+    get-item "RobotProject/Robot Referenced libraries" | get-property "getItems().TreeItem[1].getItems().length" 
+        | equals 1 | verify-true
+    get-item "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[1].getItems().TreeItem[0].getText()" | equals "Sum Change" | verify-true
+}
+
+//removed added class
+with [get-editor "here_is_class.py"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 23 21
+        select-range 23 25 21 1
+        key-type BackSpace
+        key-type "M1+s"
+    }
+}
+
+//check if window with error was shown
+get-window "Regenerating library specification" 
+    | get-label "Problems occured during library specification generation: Unable to generate library specification file for library 'here_is_class.Animal'Detailed information:Importing test library 'here_is_class.Animal' failed: Module 'here_is_class' does not contain 'Animal'.Try --help for usage information." 
+    | get-property caption 
+    | equals "Problems occured during library specification generation: Unable to generate library specification file for library 'here_is_class.Animal'\n"
+    + "Detailed information:\n"
+    + "Importing test library 'here_is_class.Animal' failed: Module 'here_is_class' does not contain 'Animal'.\n\n"
+    + "Try --help for usage information." | verify-true
+get-window "Regenerating library specification" | get-button OK | click
+
+//revert
+with [get-editor "here_is_class.py" | get-text-viewer] {
+    set-caret-pos 21 1
+    key-type "M1+z"
+    key-type "M1+s"
+}
+
+get-view "Project Explorer" | get-tree | get-item "RobotProject/Robot Referenced libraries" | expand-all
+with [get-view "Project Explorer" | get-tree] {
+    get-item "RobotProject/Robot Referenced libraries" 
+        | get-property "getItems().TreeItem[0].getItems().TreeItem[0].getText()" | equals Zebra | verify-true
+}    
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
