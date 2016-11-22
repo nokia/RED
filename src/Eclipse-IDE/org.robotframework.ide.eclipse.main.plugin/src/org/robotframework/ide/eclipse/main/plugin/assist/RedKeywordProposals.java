@@ -16,8 +16,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -43,6 +43,7 @@ public class RedKeywordProposals {
 
     public static Comparator<RedKeywordProposal> sortedBySourcesAndNames() {
         return new Comparator<RedKeywordProposal>() {
+
             @Override
             public int compare(final RedKeywordProposal proposal1, final RedKeywordProposal proposal2) {
                 if (proposal1.getType() == proposal2.getType()) {
@@ -60,6 +61,7 @@ public class RedKeywordProposals {
 
     public static Comparator<RedKeywordProposal> sortedByNames() {
         return new Comparator<RedKeywordProposal>() {
+
             @Override
             public int compare(final RedKeywordProposal proposal1, final RedKeywordProposal proposal2) {
                 return proposal1.getLabel().compareTo(proposal2.getLabel());
@@ -103,6 +105,7 @@ public class RedKeywordProposals {
     private static final class ProposalsKeywordCollector implements AccessibleKeywordsCollector {
 
         private final RobotSuiteFile suiteFile;
+
         private final String prefix;
 
         private ProposalsKeywordCollector(final RobotSuiteFile suiteFile, final String prefix) {

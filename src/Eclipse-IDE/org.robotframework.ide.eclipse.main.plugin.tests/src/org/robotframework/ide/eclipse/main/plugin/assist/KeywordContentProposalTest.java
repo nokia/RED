@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.KeywordType;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
@@ -21,7 +21,7 @@ public class KeywordContentProposalTest {
     @Test
     public void checkPropertiesExposedByContentProposalBean() {
         final KeywordContentProposal proposal = new KeywordContentProposal(createProposalToWrap(), "&na");
-        
+
         assertThat(proposal.getContent()).isEqualTo("&name");
         assertThat(proposal.getCursorPosition()).isEqualTo(5);
         assertThat(proposal.getLabel()).isEqualTo("&name");
@@ -36,14 +36,15 @@ public class KeywordContentProposalTest {
 
     private RedKeywordProposal createProposalToWrap() {
         final Supplier<String> docSupplier = new Supplier<String>() {
+
             @Override
             public String get() {
                 return "<p>doc</p>";
             }
         };
         return new RedKeywordProposal("<source>", "source-alias", KeywordScope.LOCAL, KeywordType.LIBRARY, "&name",
-                "decoration", true, ArgumentsDescriptor.createDescriptor("arg<>"), docSupplier,
-                "documentation", false, new Path("path"));
+                "decoration", true, ArgumentsDescriptor.createDescriptor("arg<>"), docSupplier, "documentation", false,
+                new Path("path"));
     }
 
 }

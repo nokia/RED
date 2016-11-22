@@ -20,7 +20,7 @@ import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.project.RobotProjectConfig;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedLibrary;
 import org.rf.ide.core.testdata.model.RobotVersion;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
@@ -46,7 +46,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
     @VisibleForTesting
     public FileValidationContext(final ValidationContext context, final IFile file,
             final AccessibleKeywordsCollector accessibleKeywordsCollector, final Set<String> accessibleVariables) {
-        super(file.getFullPath(),accessibleKeywordsCollector);
+        super(file.getFullPath(), accessibleKeywordsCollector);
         this.context = context;
         this.file = file;
         this.accessibleVariables = accessibleVariables;
@@ -55,7 +55,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
     public IFile getFile() {
         return file;
     }
-    
+
     public RobotProjectConfig getProjectConfiguration() {
         return context.getProjectConfiguration();
     }
@@ -78,11 +78,11 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         }
         return accessibleVariables;
     }
-    
+
     public boolean isValidatingChangedFiles() {
         return context.isValidatingChangedFiles();
     }
-    
+
     public Optional<LibrariesAutoDiscoverer> getLibrariesAutoDiscoverer() {
         return context.getLibrariesAutoDiscoverer();
     }
