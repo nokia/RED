@@ -73,8 +73,8 @@ public class RobotArtifactsValidator {
         final ValidationContext context = new ValidationContext(file.getProject(), new BuildLogger());
 
         try {
-            final Optional<? extends ModelUnitValidator> validator = createValidationUnits(context, file,
-                    ProblemsReportingStrategy.reportOnly(), true);
+            final Optional<? extends ModelUnitValidator> validator = ModelUnitValidatorConfigFactory
+                    .createValidator(context, file, ProblemsReportingStrategy.reportOnly(), true);
             if (validator.isPresent()) {
                 final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
 
@@ -95,98 +95,8 @@ public class RobotArtifactsValidator {
         }
         return null;
     }
-    
-    public Job createValidationJob(final Job dependentJob, final IResourceDelta delta, final int kind,
-            final ProblemsReportingStrategy reporter) {
-        final IValidationConfig validationConfig;
-        if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
-            validationConfig = new IValidationConfig() {
 
-                @Override
-                public List<ModelUnitValidator> getValidationUnits(final ValidationContext context)
-                        throws CoreException {
-                    final List<ModelUnitValidator> validators = newArrayList();
-                    project.accept(new IResourceVisitor() {
-
-                        @Override
-                        public boolean visit(final IResource resource) throws CoreException {
-                            final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context,
-                                    resource, reporter, false);
-                            if (validationUnit.isPresent()) {
-                                validators.add(validationUnit.get());
-                            }
-                            return true;
-                        }
-                    });
-                    project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
-                    return validators;
-                }
-            };
-        } else {
-            validationConfig = new IValidationConfig() {
-
-                @Override
-                public List<ModelUnitValidator> getValidationUnits(final ValidationContext context)
-                        throws CoreException {
-                    final List<ModelUnitValidator> validators = newArrayList();
-                    delta.accept(new IResourceDeltaVisitor() {
-
-                        @Override
-                        public boolean visit(final IResourceDelta delta) throws CoreException {
-                            if (delta.getKind() != IResourceDelta.REMOVED
-                                    && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
-                                context.setIsValidatingChangedFiles(true);
-
-                                final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(
-                                        context, delta.getResource(), reporter, false);
-                                if (validationUnit.isPresent()) {
-                                    validators.add(validationUnit.get());
-                                }
-                            }
-                            return true;
-                        }
-                    });
-                    delta.getResource().deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
-                    return validators;
-                }
-            };
-        }
-        return createValidationJob(dependentJob, validationConfig);
-    }
-
-    public Job createValidationJob(final Collection<IFile> files) {
-        final IValidationConfig validationConfig = new IValidationConfig() {
-
-            @Override
-            public List<ModelUnitValidator> getValidationUnits(final ValidationContext context) throws CoreException {
-                final List<ModelUnitValidator> validators = newArrayList();
-                for (final IFile file : files) {
-                    file.accept(new IResourceVisitor() {
-
-                        @Override
-                        public boolean visit(final IResource resource) throws CoreException {
-                            final Optional<? extends ModelUnitValidator> validationUnit = createValidationUnits(context,
-                                    resource, ProblemsReportingStrategy.reportOnly(), false);
-                            if (validationUnit.isPresent()) {
-                                validators.add(validationUnit.get());
-                            }
-                            return true;
-                        }
-                    });
-                    file.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
-                }
-                return validators;
-            }
-        };
-        return createValidationJob(null, validationConfig);
-    }
-
-    private interface IValidationConfig {
-
-        List<ModelUnitValidator> getValidationUnits(final ValidationContext context) throws CoreException;
-    }
-
-    private Job createValidationJob(final Job dependentJob, final IValidationConfig validationConfig) {
+    public Job createValidationJob(final Job dependentJob, final ModelUnitValidatorConfig validatorConfig) {
         return new Job("Validating") {
 
             @Override
@@ -204,7 +114,7 @@ public class RobotArtifactsValidator {
 
                     final ValidationContext context = new ValidationContext(project, logger);
                     final Queue<ModelUnitValidator> unitValidators = Queues
-                            .newArrayDeque(validationConfig.getValidationUnits(context));
+                            .newArrayDeque(validatorConfig.createValidators(context));
 
                     final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
                     subMonitor.beginTask("Validating files", 100);
@@ -266,76 +176,185 @@ public class RobotArtifactsValidator {
         };
     }
 
-    private static Optional<? extends ModelUnitValidator> createValidationUnits(final ValidationContext context,
-            final IResource resource, final ProblemsReportingStrategy reporter, final boolean isRevalidating)
-            throws CoreException {
-        return shouldValidate(context.getProjectConfiguration(), resource, isRevalidating) ? createProperValidator(
-                context, (IFile) resource, reporter) : Optional.<ModelUnitValidator> absent();
+    public interface ModelUnitValidator {
+
+        void validate(IProgressMonitor monitor) throws CoreException;
     }
 
-    private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource,
-            final boolean isRevalidating) {
-        if (robotProjectConfig != null && resource.getType() == IResource.FILE
-                && !isInsideEclipseHiddenDirectory(resource)
-                && hasRequiredFileSize(robotProjectConfig, resource, isRevalidating)) {
-            final List<ExcludedFolderPath> excludedPaths = robotProjectConfig.getExcludedPath();
-            for (final ExcludedFolderPath excludedPath : excludedPaths) {
+    public interface ModelUnitValidatorConfig {
 
-                if (Path.fromPortableString(excludedPath.getPath()).isPrefixOf(resource.getProjectRelativePath())) {
-                    return false;
+        List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException;
+    }
+    
+    public static class ModelUnitValidatorConfigFactory {
+
+        public static ModelUnitValidatorConfig create(final IProject project, final IResourceDelta delta,
+                final int kind, final ProblemsReportingStrategy reporter) {
+            if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {
+                return createForWholeProject(project, reporter);
+            } else {
+                return createForChangedFiles(delta, reporter);
+            }
+        }
+
+        public static ModelUnitValidatorConfig create(final Collection<IFile> files) {
+            return new ModelUnitValidatorConfig() {
+
+                @Override
+                public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
+                    final List<ModelUnitValidator> validators = newArrayList();
+                    for (final IFile file : files) {
+                        file.accept(new IResourceVisitor() {
+
+                            @Override
+                            public boolean visit(final IResource resource) throws CoreException {
+                                final Optional<? extends ModelUnitValidator> validator = createValidator(context,
+                                        resource, ProblemsReportingStrategy.reportOnly(), false);
+                                if (validator.isPresent()) {
+                                    validators.add(createValidatorWithMarkerDelete(resource, validator.get()));
+                                }
+                                return true;
+                            }
+                        });
+                    }
+                    return validators;
+                }
+            };
+        }
+
+        private static ModelUnitValidatorConfig createForWholeProject(final IProject project,
+                final ProblemsReportingStrategy reporter) {
+            return new ModelUnitValidatorConfig() {
+
+                @Override
+                public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
+                    final List<ModelUnitValidator> validators = newArrayList();
+                    project.accept(new IResourceVisitor() {
+
+                        @Override
+                        public boolean visit(final IResource resource) throws CoreException {
+                            final Optional<? extends ModelUnitValidator> validator = createValidator(context, resource,
+                                    reporter, false);
+                            if (validator.isPresent()) {
+                                validators.add(validator.get());
+                            }
+                            return true;
+                        }
+                    });
+                    project.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_INFINITE);
+                    return validators;
+                }
+            };
+        }
+
+        private static ModelUnitValidatorConfig createForChangedFiles(final IResourceDelta delta,
+                final ProblemsReportingStrategy reporter) {
+            return new ModelUnitValidatorConfig() {
+
+                @Override
+                public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
+                    final List<ModelUnitValidator> validators = newArrayList();
+                    delta.accept(new IResourceDeltaVisitor() {
+
+                        @Override
+                        public boolean visit(final IResourceDelta delta) throws CoreException {
+                            if (delta.getKind() != IResourceDelta.REMOVED
+                                    && (delta.getFlags() & IResourceDelta.CONTENT) != 0) {
+                                context.setIsValidatingChangedFiles(true);
+
+                                final IResource resource = delta.getResource();
+                                final Optional<? extends ModelUnitValidator> validator = createValidator(context,
+                                        resource, reporter, false);
+                                if (validator.isPresent()) {
+                                    validators.add(createValidatorWithMarkerDelete(resource, validator.get()));
+                                }
+                            }
+                            return true;
+                        }
+                    });
+                    return validators;
+                }
+            };
+        }
+
+        private static ModelUnitValidator createValidatorWithMarkerDelete(final IResource resource,
+                final ModelUnitValidator validator) {
+            return new ModelUnitValidator() {
+
+                @Override
+                public void validate(final IProgressMonitor monitor) throws CoreException {
+                    resource.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
+                    validator.validate(monitor);
+                }
+            };
+        }
+
+        private static Optional<? extends ModelUnitValidator> createValidator(final ValidationContext context,
+                final IResource resource, final ProblemsReportingStrategy reporter, final boolean isRevalidating)
+                throws CoreException {
+            return shouldValidate(context.getProjectConfiguration(), resource, isRevalidating) ? createProperValidator(
+                    context, (IFile) resource, reporter) : Optional.<ModelUnitValidator> absent();
+        }
+
+        private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource,
+                final boolean isRevalidating) {
+            if (robotProjectConfig != null && resource.getType() == IResource.FILE
+                    && !isInsideEclipseHiddenDirectory(resource)
+                    && hasRequiredFileSize(robotProjectConfig, resource, isRevalidating)) {
+                final List<ExcludedFolderPath> excludedPaths = robotProjectConfig.getExcludedPath();
+                for (final ExcludedFolderPath excludedPath : excludedPaths) {
+
+                    if (Path.fromPortableString(excludedPath.getPath()).isPrefixOf(resource.getProjectRelativePath())) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        private static boolean isInsideEclipseHiddenDirectory(final IResource resource) {
+            for (final String segment : resource.getFullPath().segments()) {
+                if (!segment.isEmpty() && segment.charAt(0) == '.') {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private static boolean hasRequiredFileSize(final RobotProjectConfig robotProjectConfig,
+                final IResource resource, final boolean isRevalidating) {
+            if (!isRevalidating && robotProjectConfig.isValidatedFileSizeCheckingEnabled()) {
+                final IPath fileLocation = resource.getLocation();
+                if (fileLocation != null) {
+                    final long fileSizeInKilobytes = fileLocation.toFile().length() / 1024;
+                    long maxFileSize = 0L;
+                    try {
+                        maxFileSize = Long.parseLong(robotProjectConfig.getValidatedFileMaxSize());
+                    } catch (final NumberFormatException e) {
+                        maxFileSize = Long.parseLong(robotProjectConfig.getValidatedFileDefaultMaxSize());
+                    }
+                    if (fileSizeInKilobytes > maxFileSize) {
+                        return false;
+                    }
                 }
             }
             return true;
         }
-        return false;
-    }
 
-    private static boolean isInsideEclipseHiddenDirectory(final IResource resource) {
-        for (final String segment : resource.getFullPath().segments()) {
-            if (!segment.isEmpty() && segment.charAt(0) == '.') {
-                return true;
+        private static Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext context,
+                final IFile file, final ProblemsReportingStrategy reporter) {
+
+            if (ASuiteFileDescriber.isSuiteFile(file)) {
+                return Optional.of(new RobotSuiteFileValidator(context, file, reporter));
+            } else if (ASuiteFileDescriber.isResourceFile(file)) {
+                return Optional.of(new RobotResourceFileValidator(context, file, reporter));
+            } else if (ASuiteFileDescriber.isInitializationFile(file)) {
+                return Optional.of(new RobotInitFileValidator(context, file, reporter));
+            } else if (file.getName().equals("red.xml") && file.getParent() == file.getProject()) {
+                return Optional.of(new RobotProjectConfigFileValidator(context, file, reporter));
             }
+            return Optional.absent();
         }
-        return false;
-    }
-    
-    private static boolean hasRequiredFileSize(final RobotProjectConfig robotProjectConfig, final IResource resource,
-            final boolean isRevalidating) {
-        if (!isRevalidating && robotProjectConfig.isValidatedFileSizeCheckingEnabled()) {
-            final IPath fileLocation = resource.getLocation();
-            if (fileLocation != null) {
-                final long fileSizeInKilobytes = fileLocation.toFile().length() / 1024;
-                long maxFileSize = 0L;
-                try {
-                    maxFileSize = Long.parseLong(robotProjectConfig.getValidatedFileMaxSize());
-                } catch (final NumberFormatException e) {
-                    maxFileSize = Long.parseLong(robotProjectConfig.getValidatedFileDefaultMaxSize());
-                }
-                if (fileSizeInKilobytes > maxFileSize) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public static Optional<? extends ModelUnitValidator> createProperValidator(final ValidationContext context,
-            final IFile file, final ProblemsReportingStrategy reporter) {
-
-        if (ASuiteFileDescriber.isSuiteFile(file)) {
-            return Optional.of(new RobotSuiteFileValidator(context, file, reporter));
-        } else if (ASuiteFileDescriber.isResourceFile(file)) {
-            return Optional.of(new RobotResourceFileValidator(context, file, reporter));
-        } else if (ASuiteFileDescriber.isInitializationFile(file)) {
-            return Optional.of(new RobotInitFileValidator(context, file, reporter));
-        } else if (file.getName().equals("red.xml") && file.getParent() == file.getProject()) {
-            return Optional.of(new RobotProjectConfigFileValidator(context, file, reporter));
-        }
-        return Optional.absent();
-    }
-
-    public interface ModelUnitValidator {
-
-        void validate(IProgressMonitor monitor) throws CoreException;
     }
 }
