@@ -23,6 +23,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.hyperlink.IHyperlink;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
+import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.CompoundHyperlink;
@@ -30,7 +31,6 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordDocumentation
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.KeywordInLibrarySourceHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.RedHyperlink;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.UserKeywordDocumentationHyperlink;
-import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotFileInternalElement.DefinitionPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;

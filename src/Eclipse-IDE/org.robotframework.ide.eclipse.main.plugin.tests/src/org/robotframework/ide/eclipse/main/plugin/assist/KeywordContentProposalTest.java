@@ -9,9 +9,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.eclipse.core.runtime.Path;
 import org.junit.Test;
+import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.KeywordType;
-import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
 import com.google.common.base.Supplier;
