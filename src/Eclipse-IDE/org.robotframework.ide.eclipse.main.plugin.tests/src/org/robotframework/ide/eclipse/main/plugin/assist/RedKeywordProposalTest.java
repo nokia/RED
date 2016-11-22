@@ -15,7 +15,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal.KeywordType;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -39,14 +39,8 @@ public class RedKeywordProposalTest {
 
     @BeforeClass
     public static void beforeSuite() throws Exception {
-        file = projectProvider.createFile(new Path("suite.robot"),
-                "*** Keywords ***", 
-                "kw1", 
-                "  [Arguments]  ${x}  @{list}",
-                "  [Documentation]  myDocumentation",
-                "  Log  10",
-                "kw2", 
-                "  Log  20");
+        file = projectProvider.createFile(new Path("suite.robot"), "*** Keywords ***", "kw1",
+                "  [Arguments]  ${x}  @{list}", "  [Documentation]  myDocumentation", "  Log  10", "kw2", "  Log  20");
     }
 
     @AfterClass
@@ -58,10 +52,7 @@ public class RedKeywordProposalTest {
     public void verifyProposalPropertiesMadeFromUserKeyword() throws Exception {
         final RobotSuiteFile fileModel = new RobotModel().createSuiteFile(file);
 
-        final RobotKeywordDefinition kw1 = fileModel.findSection(RobotKeywordsSection.class)
-                .get()
-                .getChildren()
-                .get(0);
+        final RobotKeywordDefinition kw1 = fileModel.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
 
         final RedKeywordProposal proposal = RedKeywordProposal.create(fileModel, kw1, KeywordScope.LOCAL,
                 "suite.robot");

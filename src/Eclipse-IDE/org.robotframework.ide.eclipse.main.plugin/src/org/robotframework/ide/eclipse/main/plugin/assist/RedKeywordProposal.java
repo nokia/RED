@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -31,11 +31,17 @@ import com.google.common.xml.XmlEscapers;
 public class RedKeywordProposal extends KeywordEntity {
 
     private final String sourceName;
+
     private final KeywordType type;
+
     private final String name;
+
     private final String decoration;
+
     private final boolean hasDescription;
+
     private final String documentation;
+
     private final String sourcePrefix;
 
     private final ArgumentsDescriptor argumentsDescriptor;
@@ -65,6 +71,7 @@ public class RedKeywordProposal extends KeywordEntity {
     static RedKeywordProposal create(final LibrarySpecification spec, final KeywordSpecification keyword,
             final KeywordScope scope, final String sourcePrefix, final IPath exposingFilepath) {
         final Supplier<String> htmlDocuProvider = new Supplier<String>() {
+
             @Override
             public String get() {
                 return keyword.getDocumentationAsHtml();
@@ -79,6 +86,7 @@ public class RedKeywordProposal extends KeywordEntity {
     static RedKeywordProposal create(final RobotSuiteFile file, final RobotKeywordDefinition userKeyword,
             final KeywordScope scope, final String sourcePrefix) {
         final Supplier<String> htmlDocuProvider = new Supplier<String>() {
+
             @Override
             public String get() {
                 return "<p>" + XmlEscapers.xmlAttributeEscaper().escape(userKeyword.getDocumentation()) + "</p>";
@@ -133,6 +141,7 @@ public class RedKeywordProposal extends KeywordEntity {
 
     public List<String> getRequiredArguments() {
         return newArrayList(transform(argumentsDescriptor.getRequiredArguments(), new Function<Argument, String>() {
+
             @Override
             public String apply(final Argument arg) {
                 return arg.getName();

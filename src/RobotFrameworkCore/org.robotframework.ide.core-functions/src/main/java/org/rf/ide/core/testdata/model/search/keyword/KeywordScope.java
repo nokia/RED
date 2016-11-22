@@ -3,7 +3,7 @@
  * Licensed under the Apache License, Version 2.0,
  * see license.txt file for details.
  */
-package org.rf.ide.core.testdata.model.table.keywords.names;
+package org.rf.ide.core.testdata.model.search.keyword;
 
 import static com.google.common.collect.Lists.newArrayList;
 

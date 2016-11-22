@@ -22,9 +22,9 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.Region;
 import org.eclipse.jface.text.contentassist.ContextInformation;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
 import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedKeywordProposal;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.KeywordEntity;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
@@ -37,10 +37,8 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.Range;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
 
@@ -152,8 +150,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
     }
 
     private boolean keywordIsNotInLocalScope(final RedKeywordProposal keywordProposal) {
-        return keywordProposal
-                .getScope(assist.getFile().getFullPath()) != KeywordScope.LOCAL;
+        return keywordProposal.getScope(assist.getFile().getFullPath()) != KeywordScope.LOCAL;
     }
 
     private Collection<IRegion> calculateRegionsForLinkedModeForEmbeddedKeyword(final int beginOffset,
@@ -189,9 +186,11 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
             return new ArrayList<>();
         }
         final Runnable operation = new Runnable() {
+
             @Override
             public void run() {
                 SwtThread.asyncExec(new Runnable() {
+
                     @Override
                     public void run() {
                         RedEditorLinkedModeUI.enableLinkedMode(viewer, regionsToLinkedEdit);
@@ -215,7 +214,7 @@ public class KeywordCallsAssistProcessor extends RedContentAssistProcessor {
     protected String getSeparatorToFollow() {
         return assist.getSeparatorToFollow();
     }
-    
+
     protected boolean isKeywordPrefixAutoAdditionEnabled() {
         return assist.isKeywordPrefixAutoAdditionEnabled();
     }
