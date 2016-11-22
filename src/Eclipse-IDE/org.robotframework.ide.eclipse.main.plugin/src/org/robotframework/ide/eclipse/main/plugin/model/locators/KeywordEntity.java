@@ -6,7 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
 import org.eclipse.core.runtime.IPath;
-import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
+import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 
 import com.google.common.base.Objects;
 

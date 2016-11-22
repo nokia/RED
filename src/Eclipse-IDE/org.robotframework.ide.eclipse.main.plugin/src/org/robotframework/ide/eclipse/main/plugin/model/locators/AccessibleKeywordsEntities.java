@@ -14,8 +14,8 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.table.keywords.names.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
-import org.robotframework.ide.eclipse.main.plugin.model.KeywordScope;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
