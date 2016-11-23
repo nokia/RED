@@ -191,8 +191,8 @@ public class RobotParser {
         if (robotFile.getStatus() == Status.PASSED) {
             if (parserCfg.isEagerImportOn()) {
                 // eager get resources example
-                final ResourceImporter resImporter = new ResourceImporter();
-                resImporter.importResources(this, robotFile);
+                final ResourceImporter resImporter = new ResourceImporter(this);
+                resImporter.importResources(pathsProvider, robotProject, robotFile);
             }
 
             if (parserCfg.shouldImportVariables()) {

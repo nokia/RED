@@ -34,8 +34,6 @@ public class RobotDebugExecutionContext {
 
     private RobotParser robotParser;
 
-    private final ResourceImporter resourceImporter;
-
     private final List<String> resourceImportPaths;
 
     private final List<KeywordContext> currentKeywords;
@@ -55,12 +53,11 @@ public class RobotDebugExecutionContext {
         testCaseExecutionRowCounter = new TestCaseExecutionRowCounter();
         executableRowFindersManager = new ExecutableRowFindersManager();
         resourceImportPaths = new ArrayList<>();
-        resourceImporter = new ResourceImporter();
     }
 
     public void resourceImport(final String path) {
         if (currentModel != null) { // import during suite execution
-            resourceImporter.importDebugResource(robotParser, currentModel.getParent(), path);
+            new ResourceImporter(robotParser).importDebugResource(currentModel.getParent(), path);
             executableRowFindersManager
                     .updateResourceImportReferences(currentModel.getParent().getResourceImportReferences());
         } else { // import before suite start
@@ -73,7 +70,7 @@ public class RobotDebugExecutionContext {
         this.robotParser = robotParser;
 
         for (final String path : resourceImportPaths) {
-            resourceImporter.importDebugResource(robotParser, robotFileOutput, path);
+            new ResourceImporter(robotParser).importDebugResource(robotFileOutput, path);
         }
         resourceImportPaths.clear();
 

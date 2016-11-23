@@ -14,10 +14,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.rf.ide.core.executor.RobotRuntimeEnvironment;
-import org.rf.ide.core.project.ImportPath;
-import org.rf.ide.core.project.ImportSearchPaths;
 import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
-import org.rf.ide.core.project.ResolvedImportPath;
 import org.rf.ide.core.testdata.model.FileRegion;
 import org.rf.ide.core.testdata.model.RobotExpressions;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
@@ -35,6 +32,8 @@ import com.google.common.base.Optional;
 public class VariablesImporter {
 
     private static final Pattern ILLEGAL_PATH_TEXT = Pattern.compile("\\s+([\\\\]|/)");
+
+    private final AbsoluteUriFinder uriFinder = new AbsoluteUriFinder();
 
     public List<VariablesFileImportReference> importVariables(final PathsProvider pathsProvider,
             final RobotProjectHolder robotProject,
@@ -68,9 +67,11 @@ public class VariablesImporter {
                     URI importUri = null;
                     final File currentRobotFile = robotFile.getProcessedFile().getAbsoluteFile();
                     try {
-                        importUri = findAbsoluteVariableImportUri(pathsProvider, currentRobotFile, path,
-                                variableMappings);
-                        if (importUri == null) {
+                        final Optional<URI> foundUri = uriFinder.find(pathsProvider, variableMappings, currentRobotFile,
+                                path);
+                        if (foundUri.isPresent()) {
+                            importUri = foundUri.get();
+                        } else {
                             continue;
                         }
 
@@ -117,25 +118,6 @@ public class VariablesImporter {
         }
 
         return varsImported;
-    }
-
-    private URI findAbsoluteVariableImportUri(final PathsProvider pathsProvider, final File currentFile,
-            final String varImportPath, final Map<String, String> variableMappings) {
-
-        if (!currentFile.exists()) {
-            throw new IllegalStateException("Current file should exist");
-        }
-        final ImportPath importPath = ImportPath.from(varImportPath);
-        final Optional<ResolvedImportPath> resolvedImportPath = ResolvedImportPath.from(importPath, variableMappings);
-        if (!resolvedImportPath.isPresent()) {
-            throw new IllegalStateException("Unable to resolve parameterized import path '" + varImportPath + "'");
-        }
-        final Optional<URI> absoluteUri = new ImportSearchPaths(pathsProvider).findAbsoluteUri(currentFile.toURI(),
-                resolvedImportPath.get());
-        if (!absoluteUri.isPresent()) {
-            return null;
-        }
-        return absoluteUri.get();
     }
 
     @VisibleForTesting
