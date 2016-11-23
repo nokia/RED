@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocumentListener;
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.RobotParser.RobotParserConfig;
 import org.rf.ide.core.testdata.model.RobotFile;
@@ -215,11 +216,17 @@ public class RobotDocument extends Document {
     }
 
     private static RobotParser createParser(final RobotSuiteFile model) {
-        final RobotProjectHolder holder = model.getFile() == null ? new RobotProjectHolder()
+        final RobotProjectHolder holder = isNonFileModel(model) ? new RobotProjectHolder()
                 : model.getProject().getRobotProjectHolder();
-        return RobotParser.create(holder, RobotParserConfig.allImportsLazy(), model.getProject().createPathsProvider());
+        final PathsProvider pathsProvider = isNonFileModel(model) ? null : model.getProject().createPathsProvider();
+        return RobotParser.create(holder, RobotParserConfig.allImportsLazy(), pathsProvider);
     }
     
+    private static boolean isNonFileModel(final RobotSuiteFile model) {
+        // e.g. history revision
+        return model.getFile() == null;
+    }
+
     public static interface IRobotDocumentParsingListener {
 
         void reparsingFinished(RobotFileOutput parsedOutput);
