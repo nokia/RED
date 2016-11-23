@@ -6,74 +6,119 @@
 package org.rf.ide.core.testdata.importer;
 
 import java.io.File;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.rf.ide.core.project.ImportSearchPaths.PathsProvider;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.BuildMessage;
+import org.rf.ide.core.testdata.model.RobotProjectHolder;
 import org.rf.ide.core.testdata.model.table.SettingTable;
 import org.rf.ide.core.testdata.model.table.setting.AImported;
 import org.rf.ide.core.testdata.model.table.setting.AImported.Type;
 import org.rf.ide.core.testdata.model.table.setting.ResourceImport;
 
+import com.google.common.base.Optional;
+
 public class ResourceImporter {
 
-    public List<ResourceImportReference> importResources(final RobotParser parser, final RobotFileOutput robotFile) {
-        final List<ResourceImportReference> importedReferences = new ArrayList<>();
+    private final RobotParser parser;
+
+    private final AbsoluteUriFinder uriFinder;
+
+    public ResourceImporter(final RobotParser parser) {
+        this.parser = parser;
+        this.uriFinder = new AbsoluteUriFinder();
+    }
+
+    public List<ResourceImportReference> importResources(final PathsProvider pathsProvider,
+            final RobotProjectHolder robotProject, final RobotFileOutput robotFile) {
 
         final SettingTable settingTable = robotFile.getFileModel().getSettingTable();
-        if (settingTable.isPresent()) {
-            final List<AImported> imports = settingTable.getImports();
-            for (final AImported imported : imports) {
-                final Type type = imported.getType();
-                if (type == Type.RESOURCE) {
-                    String path = imported.getPathOrName().getRaw().toString();
+        if (!settingTable.isPresent()) {
+            return new ArrayList<>();
+        }
 
-                    final File currentFile = robotFile.getProcessedFile().getAbsoluteFile();
-                    if (currentFile.exists()) {
-                        try {
-                            final Path joinPath = Paths.get(currentFile.getAbsolutePath()).resolveSibling(path);
-                            path = joinPath.normalize().toAbsolutePath().toFile().getAbsolutePath();
-                        } catch (final InvalidPathException ipe) {
-                            robotFile.addBuildMessage(BuildMessage.createErrorMessage(
-                                    "Problem with importing resource file " + currentFile + " with error stack: " + ipe,
-                                    "" + robotFile.getProcessedFile()));
-                            continue;
-                        }
-                    }
+        final File importingFile = robotFile.getProcessedFile().getAbsoluteFile();
+        final Map<String, String> variableMappings = robotProject.getVariableMappings();
 
-                    final File toImport = new File(path);
-                    final List<RobotFileOutput> parsed = parser.parse(toImport);
-                    if (parsed.isEmpty()) {
-                        robotFile.addBuildMessage(BuildMessage.createErrorMessage("Couldn't import resource file.",
-                                toImport.getAbsolutePath()));
-                    } else {
-                        importedReferences.add(new ResourceImportReference((ResourceImport) imported, parsed.get(0)));
-                    }
+        final List<ResourceImportReference> importedReferences = new ArrayList<>();
+        for (final AImported imported : settingTable.getImports()) {
+
+            try {
+                final Optional<ResourceImportReference> importRef = createImportReference(imported, importingFile,
+                        pathsProvider, variableMappings);
+                if (importRef.isPresent()) {
+                    importedReferences.add(importRef.get());
                 }
+            } catch (final UnableToImportException e) {
+                robotFile.addBuildMessage(e.buildMessage);
             }
         }
         robotFile.addResourceReferences(importedReferences);
-
         return importedReferences;
     }
 
-    public void importDebugResource(final RobotParser parser, final RobotFileOutput robotFile, final String path) {
+    private Optional<ResourceImportReference> createImportReference(final AImported imported, final File importingFile,
+            final PathsProvider pathsProvider, final Map<String, String> variableMappings) {
+
+        if (imported.getType() == Type.RESOURCE) {
+            final String path = imported.getPathOrName().getRaw();
+
+            URI importUri = null;
+            try {
+                final Optional<URI> foundUri = uriFinder.find(pathsProvider, variableMappings, importingFile, path);
+                if (foundUri.isPresent()) {
+                    importUri = foundUri.get();
+                } else {
+                    throw new UnableToImportException(BuildMessage
+                            .createErrorMessage("Couldn't import resource file " + path, "" + importingFile));
+                }
+
+            } catch (final Exception e) {
+                throw new UnableToImportException(BuildMessage.createErrorMessage(
+                        "Problem with importing resource file " + importingFile + " with error stack: " + e,
+                        "" + importingFile));
+            }
+
+            final File toImport = new File(importUri);
+            final List<RobotFileOutput> parsed = parser.parse(toImport);
+            if (parsed.isEmpty()) {
+                throw new UnableToImportException(
+                        BuildMessage.createErrorMessage("Couldn't import resource file.", toImport.getAbsolutePath()));
+            } else {
+                return Optional.of(new ResourceImportReference((ResourceImport) imported, parsed.get(0)));
+            }
+        }
+        return Optional.absent();
+    }
+
+    public void importDebugResource(final RobotFileOutput robotFile, final String path) {
         final File toImport = new File(path);
         final List<RobotFileOutput> parsedFiles = parser.parse(toImport);
         if (parsedFiles.isEmpty()) {
             robotFile.addBuildMessage(
                     BuildMessage.createErrorMessage("Couldn't import resource file.", toImport.getAbsolutePath()));
         } else {
-            ResourceImportReference resourceReference = new ResourceImportReference(null, parsedFiles.get(0));
-            int position = robotFile.findResourceReferencePositionToReplace(resourceReference);
+            final ResourceImportReference resourceReference = new ResourceImportReference(null, parsedFiles.get(0));
+            final int position = robotFile.findResourceReferencePositionToReplace(resourceReference);
             if (position < 0) {
                 robotFile.addResourceReference(resourceReference);
             }
+        }
+    }
+
+    private class UnableToImportException extends RuntimeException {
+
+        private static final long serialVersionUID = 1L;
+
+        private final BuildMessage buildMessage;
+
+        public UnableToImportException(final BuildMessage buildMessage) {
+            this.buildMessage = buildMessage;
         }
     }
 }
