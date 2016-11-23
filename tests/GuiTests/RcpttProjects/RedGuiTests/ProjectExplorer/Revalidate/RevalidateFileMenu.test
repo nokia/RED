@@ -1,0 +1,189 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _rPXCQK_-EeaOOtfbYFWVRw
+Element-Name: RevalidateFileMenu
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _uuVDgK_-EeaOOtfbYFWVRw
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/23/16 4:54 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-errors" [val nr_of_errors ] [val childCount ]{
+	get-view Problems | get-tree | get-item "Errors \\(.*\\)" | get-property childCount  | equals $childCount| verify-true
+	
+	list "Errors \\(.*\\)/Unknown '..\\/only_function.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" //0
+		"Errors \\(.*\)/Unknown 'here_is_class.Cat' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"   //1
+		"Errors \\(.*\\)/Unknown 'libs\\/SumTwoDigits.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"  //2 
+		"Errors \\(.*\\)/Unknown keyword 'garfield'"     //3
+		"Errors \\(.*\\)/Unknown keyword 'news'" 		//4
+		"Errors \\(.*\\)/Unknown keyword 'no_kw'"		//5
+		"Errors \\(.*\\)/Unknown keyword 'sum'" 		//6
+			| let [val all_errors -input]{
+				$nr_of_errors | each [val error_nr]{
+					get-view Problems | get-tree | get-item [$all_errors| get $error_nr]
+						| get-property enablement | equals false | verify-true
+			}
+	
+	}
+}	
+
+proc "wait-for-discover-window"{
+	try -times 4 -delay 1000 -command{
+		get-window "Discovering libraries summary"
+	}
+}
+check-errors -nr_of_errors [list 0 1 2 3 4 5 6] -childCount 7
+
+//autpdiscover to add pytohn file to red.xml
+get-view "Project Explorer" | get-tree | select ProjectForAnalysis 
+    | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
+    
+wait-for-discover-window
+   
+get-window "Discovering libraries summary" | get-button OK | click
+
+//check that still are 7 errors
+get-view Problems | get-tree | get-item "Errors \\(7 items\\)" | get-property childCount | equals 7 | verify-true
+
+//revalidate entire project
+get-view "Project Explorer" | get-tree | select ProjectForAnalysis | get-menu "Robot Framework/Revalidate" | click
+
+//now only one error is
+check-errors -nr_of_errors [list 5] -childCount 1
+
+//remove all libs from red.xml
+get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/red.xml" | double-click
+
+try -times 10 -delay 1000 -command{
+	get-editor "ProjectForAnalysis/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
+    | verify-true
+}   
+get-editor "ProjectForAnalysis/red.xml" | get-tab-folder | get-tab-item "Referenced libraries" | click
+with [get-editor "ProjectForAnalysis/red.xml" | get-section "Referenced libraries"] {
+    with [get-table] {
+        select "here_is_class.Cat - ProjectForAnalysis" | key-type "M2+ARROW_DOWN"
+        select "here_is_class.Cat - ProjectForAnalysis" "SumTwoDigits - ProjectForAnalysis\\/libs"
+        key-type "M2+ARROW_DOWN"
+        select "here_is_class.Cat - ProjectForAnalysis" "SumTwoDigits - ProjectForAnalysis\\/libs" "only_function - ProjectForAnalysis"
+        key-type Del
+    }
+}
+
+//check that no validation is run
+get-button "Save (M1+S)" | click
+get-view Problems | get-tree | get-item "Errors \\(1 item\\)" | get-property childCount | equals 1 | verify-true
+
+//revalidate only one file
+get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/Script.robot" 
+    | get-menu "Robot Framework/Revalidate" | click
+    
+//check that 5 errors from this file are shown    
+check-errors -nr_of_errors [list 1 2 3 5] -childCount 5
+
+//add 2 libs to red.xml
+set-dialog-result File
+get-editor "ProjectForAnalysis/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/Script.robot" | double-click
+get-editor "ProjectForAnalysis/red.xml" | click
+set-dialog-result File "platform:/resource/ProjectForAnalysis/here_is_class.py"
+get-editor "ProjectForAnalysis/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+get-window "Select library class" | get-table | select "here_is_class.Cat" | click -default
+
+
+set-dialog-result File "platform:/resource/ProjectForAnalysis/libs/SumTwoDigits.py"
+get-editor "ProjectForAnalysis/red.xml" | get-section "Referenced libraries" | get-button "Add Python library" | click
+
+//save and check that errors amount is the same
+get-button "Save (M1+S)" | click
+get-view Problems | get-tree | get-item "Errors \\(5 items\\)" | get-property childCount | equals 5 | verify-true
+
+//select 2 files and run validattion
+with [get-view "Project Explorer" | get-tree] {
+    select "ProjectForAnalysis/Script.robot" 
+        | select "ProjectForAnalysis/tests/test1.robot" "ProjectForAnalysis/Script.robot"
+    get-menu "Robot Framework/Revalidate" | click
+}
+
+//errors from test1.robot
+check-errors -nr_of_errors [list 0 4 5] -childCount 3
+
+//====================================================== check enablement ===================================================
+
+//check if on empty project this menu in enabled
+get-view "Project Explorer" | get-tree | select empty
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Revalidate" | get-property enablement | equals true 
+    | verify-true
+
+//jpg
+get-view "Project Explorer" | get-tree | select "NextProject/photo.jpg"
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Revalidate" | get-property enablement | equals false 
+    | verify-true
+
+//tsv res
+get-view "Project Explorer" | get-tree | select "NextProject/kw/radio.tsv"
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Revalidate" | get-property enablement | equals true 
+    | verify-true
+
+//txt res    
+get-view "Project Explorer" | get-tree | select "NextProject/kw/tv.txt"
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Revalidate" | get-property enablement | equals true 
+    | verify-true   
+
+//.py    
+get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/here_is_class.py"
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Revalidate" | get-property enablement | equals false 
+    | verify-true  
+
+//red.xml    
+get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/red.xml"  
+get-view "Project Explorer" | get-tree | get-menu "Robot Framework/Revalidate" | get-property enablement | equals false 
+    | verify-true          
+    
+//=========================================================================================================================    
+
+//remove all items in red.xml
+get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/red.xml" | double-click
+with [get-editor "ProjectForAnalysis/red.xml" | get-section "Referenced libraries" | get-table] {
+    select "here_is_class.Cat - ProjectForAnalysis" | key-type "M2+ARROW_DOWN"
+    select "here_is_class.Cat - ProjectForAnalysis" "SumTwoDigits - ProjectForAnalysis\\/libs"
+    key-type Del
+}
+
+//add lib needed for test1.robot
+set-dialog-result File "platform:/resource/ProjectForAnalysis/only_function.py"
+with [get-editor "ProjectForAnalysis/red.xml" | get-section "Referenced libraries" | get-button "Add Python library"] {
+    click
+    key-type "M1+s"
+}
+
+//uncoment line from file in next project
+get-view "Project Explorer" | get-tree | select "NextProject/kw/radio.tsv" | double-click
+with [get-editor "radio.tsv" | get-text-viewer] {
+    set-caret-pos 2 2
+    key-type "M1+/"
+    set-caret-pos 6 8
+    key-type "M1+/"
+    key-type "M1+s"
+}
+
+wait-for-discover-window
+get-window "Discovering libraries summary" | get-button OK | click
+
+// 2 new errors from uncommented file
+get-view Problems | get-tree | get-item "Errors \\(5 items\\)" | get-property childCount | equals 5 | verify-true
+
+//revalid 2 files from 2 different projects
+with [get-view "Project Explorer" | get-tree] {
+    select "NextProject/kw/radio.tsv" "ProjectForAnalysis/tests/test1.robot"
+    get-menu "Robot Framework/Revalidate" | click
+}
+
+check-errors -nr_of_errors [list 5] -childCount 1
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
