@@ -153,7 +153,8 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                 final Optional<URI> absolutePath = new ImportSearchPaths(pathsProvider)
                         .findAbsoluteUri(suiteFile.getFile().getLocationURI(), resolvedPath);
                 if (!absolutePath.isPresent()) {
-                    throw new ProposalApplyingException("Unable to apply proposal");
+                    MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
+                            "Unable to find library under '" + path + "' location.");
                 }
 
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
