@@ -215,13 +215,9 @@ public class RobotDocument extends Document {
     }
 
     private static RobotParser createParser(final RobotSuiteFile model) {
-        final RobotParserConfig parserCfg = new RobotParserConfig();
-        parserCfg.setEagerImport(false);
-        parserCfg.setIncludeImportVariables(false);
-
         final RobotProjectHolder holder = model.getFile() == null ? new RobotProjectHolder()
                 : model.getProject().getRobotProjectHolder();
-        return RobotParser.create(holder, parserCfg);
+        return RobotParser.create(holder, RobotParserConfig.allImportsLazy(), model.getProject().createPathsProvider());
     }
     
     public static interface IRobotDocumentParsingListener {
