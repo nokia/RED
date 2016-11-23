@@ -49,6 +49,43 @@ public class AccessibleKeywordsEntities {
     }
 
     public boolean isKeywordAccessible(final String keywordName) {
+        // List<KeywordEntity> hereKeywords = new ArrayList<>();
+        // for (Collection<KeywordEntity> k : getAccessibleKeywords().values()) {
+        // hereKeywords.addAll(k);
+        // }
+        //
+        // ListMultimap<String, KeywordEntity> foundKeywords = new KeywordSearcher()
+        // .findKeywords(filterDuplicates(hereKeywords), new Extractor<KeywordEntity>() {
+        //
+        // @Override
+        // public KeywordScope scope(KeywordEntity keyword) {
+        // return keyword.getScope(getFilepath());
+        // }
+        //
+        // @Override
+        // public Path path(KeywordEntity keyword) {
+        // return keyword.getExposingFilepath().toFile().toPath();
+        // }
+        //
+        // @Override
+        // public String alias(KeywordEntity keyword) {
+        // return keyword.getAlias();
+        // }
+        //
+        // @Override
+        // public String keywordName(KeywordEntity keyword) {
+        // return keyword.getNameFromDefinition();
+        // }
+        //
+        // @Override
+        // public String sourceName(KeywordEntity keyword) {
+        // return keyword.getSourceName();
+        // }
+        // }, keywordName);
+        //
+        // return (foundKeywords.containsKey(keywordName) ||
+        // foundKeywords.containsKey(keywordName.toLowerCase())
+        // || foundKeywords.containsKey(QualifiedKeywordName.unifyDefinition(keywordName)));
         return findKeyword(keywordName).isPresent();
     }
 
@@ -93,6 +130,49 @@ public class AccessibleKeywordsEntities {
     }
 
     public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(final String keywordName) {
+
+        // List<KeywordEntity> hereKeywords = new ArrayList<>();
+        // hereKeywords.addAll(getPossibleKeywords().values());
+        // // for (Collection<KeywordEntity> k : getPossibleKeywords().v) {
+        // // hereKeywords.addAll(k);
+        // // }
+        //
+        // ListMultimap<String, KeywordEntity> foundKeywords = new KeywordSearcher()
+        // .findKeywords(filterDuplicates(hereKeywords), new Extractor<KeywordEntity>() {
+        //
+        // @Override
+        // public KeywordScope scope(KeywordEntity keyword) {
+        // return keyword.getScope(getFilepath());
+        // }
+        //
+        // @Override
+        // public Path path(KeywordEntity keyword) {
+        // return keyword.getExposingFilepath().toFile().toPath();
+        // }
+        //
+        // @Override
+        // public String alias(KeywordEntity keyword) {
+        // return keyword.getAlias();
+        // }
+        //
+        // @Override
+        // public String keywordName(KeywordEntity keyword) {
+        // return keyword.getNameFromDefinition();
+        // }
+        //
+        // @Override
+        // public String sourceName(KeywordEntity keyword) {
+        // return keyword.getSourceName();
+        // }
+        // }, keywordName);
+        // List<KeywordEntity> keywords = foundKeywords.get(keywordName);
+        // if (keywords.isEmpty()) {
+        // keywords = foundKeywords.get(keywordName.toLowerCase());
+        // }
+        // if (keywords.isEmpty()) {
+        // keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(keywordName));
+        // }
+
         final List<KeywordEntity> keywords = findMatchingKeywords(keywordName);
         final ListMultimap<KeywordScope, KeywordEntity> scopedKeywords = ArrayListMultimap.create();
 

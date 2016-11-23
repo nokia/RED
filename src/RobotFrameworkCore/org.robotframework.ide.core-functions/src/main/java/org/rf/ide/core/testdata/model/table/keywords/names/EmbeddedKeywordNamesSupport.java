@@ -35,7 +35,7 @@ public class EmbeddedKeywordNamesSupport {
         return false;
     }
 
-    private static boolean matchesWithLowerCase(final String definitionName, final String occurrenceNameInNormalForm,
+    public static boolean matchesWithLowerCase(final String definitionName, final String occurrenceNameInNormalForm,
             final String occurrenceNameInEmbeddedForm) {
         if (definitionName.equals(occurrenceNameInNormalForm)) {
             return true;
@@ -72,13 +72,14 @@ public class EmbeddedKeywordNamesSupport {
 
         return wholeRegex.toString();
     }
-    
+
     public static boolean hasEmbeddedArguments(final String definitionName) {
         return VARIABLE_MATCHER.matcher(definitionName).find();
     }
 
     public static Function<String, String> removeRegexFunction() {
         return new Function<String, String>() {
+
             @Override
             public String apply(final String variable) {
                 return removeRegex(variable);
