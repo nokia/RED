@@ -155,6 +155,7 @@ public class AddLibraryToRedXmlFixer extends RedXmlConfigMarkerResolution {
                 if (!absolutePath.isPresent()) {
                     MessageDialog.openError(Display.getCurrent().getActiveShell(), "Library import problem",
                             "Unable to find library under '" + path + "' location.");
+                    return false;
                 }
 
                 final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
