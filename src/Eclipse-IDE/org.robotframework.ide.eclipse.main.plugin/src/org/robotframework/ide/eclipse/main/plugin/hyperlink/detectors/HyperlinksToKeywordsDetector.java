@@ -62,13 +62,14 @@ abstract class HyperlinksToKeywordsDetector {
         final List<IHyperlink> hyperlinks = new ArrayList<>();
 
         final AccessibleKeywordsEntities context = createEntities(suiteFile);
+        final ListMultimap<String, KeywordEntity> keywordProposal = context.findPossibleKeywords(keywordName);
         final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(keywordName,
                 new NameTransformation<String>() {
 
                     @Override
                     public Optional<String> transform(final String gherkinNameVariant) {
-                        return context.isKeywordAccessible(gherkinNameVariant) ? Optional.of(gherkinNameVariant)
-                                : Optional.<String> absent();
+                        return context.isKeywordAccessible(keywordProposal, gherkinNameVariant)
+                                ? Optional.of(gherkinNameVariant) : Optional.<String> absent();
                     }
                 });
 
@@ -81,7 +82,7 @@ abstract class HyperlinksToKeywordsDetector {
         final IRegion adjustedFromRegion = new Region(fromRegion.getOffset() + lengthOfRemovedPrefix,
                 fromRegion.getLength() - lengthOfRemovedPrefix);
 
-        final ListMultimap<KeywordScope, KeywordEntity> keywords = context.getPossibleKeywords(name);
+        final ListMultimap<KeywordScope, KeywordEntity> keywords = context.getPossibleKeywords(keywordProposal, name);
 
         final List<IHyperlink> definitionHyperlinks = new ArrayList<>();
         final List<IHyperlink> documentationHyperlinks = new ArrayList<>();
