@@ -36,15 +36,7 @@ public class KeywordSearcher {
         for (final T keyword : keywords) {
             final String alias = extractor.alias(keyword).toLowerCase();
             final String sourceName = extractor.sourceName(keyword).toLowerCase();
-            // TODO: check if we need below
-            final String fullFileName = extractor.path(keyword).getFileName().toString();
-            final int lastDotIndex = fullFileName.lastIndexOf('.');
-            final String fileNameWithoutExtension;
-            if (lastDotIndex > -1) {
-                fileNameWithoutExtension = fullFileName.substring(0, lastDotIndex).toLowerCase();
-            } else {
-                fileNameWithoutExtension = "";// fullFileName;
-            }
+            final String fileNameWithoutExtension = getFileNameWithoutExtension(extractor, keyword);
 
             final String keywordName = QualifiedKeywordName.unifyDefinition(extractor.keywordName(keyword))
                     .toLowerCase();
@@ -53,57 +45,30 @@ public class KeywordSearcher {
                 if (!isEmbeddedKeywordName) {
                     nameCombination = QualifiedKeywordName.unifyDefinition(nameCombination);
                 }
-                if (nameCombination.equalsIgnoreCase(keywordName)) {
-                    foundByMatch.put(nameCombination, keyword);
-                    continue;
-                } else if (EmbeddedKeywordNamesSupport.matchesWithLowerCase(keywordName, nameCombination,
-                        nameCombination.toLowerCase())) {
-                    foundByMatch.put(nameCombination, keyword);
+
+                if (matchNameDirectlyOrAsEmbbededName(foundByMatch, keyword, keywordName, null, isEmbeddedKeywordName,
+                        nameCombination)) {
                     continue;
                 }
 
                 if (!alias.isEmpty()) {
-                    String withAlias = alias + "." + keywordName;
-                    if (!isEmbeddedKeywordName) {
-                        withAlias = QualifiedKeywordName.unifyDefinition(withAlias);
-                    }
-                    if (nameCombination.equalsIgnoreCase(withAlias)) {
-                        foundByMatch.put(nameCombination, keyword);
-                        continue;
-                    } else if (EmbeddedKeywordNamesSupport.matchesWithLowerCase(withAlias, nameCombination,
-                            nameCombination.toLowerCase())) {
-                        foundByMatch.put(nameCombination, keyword);
+                    if (matchNameDirectlyOrAsEmbbededName(foundByMatch, keyword, keywordName, alias,
+                            isEmbeddedKeywordName, nameCombination)) {
                         continue;
                     }
                 }
 
                 if (!sourceName.isEmpty()) {
-                    String withSourceName = sourceName + "." + keywordName;
-                    if (!isEmbeddedKeywordName) {
-                        withSourceName = QualifiedKeywordName.unifyDefinition(withSourceName);
-                    }
-                    if (nameCombination.equalsIgnoreCase(withSourceName)) {
-                        foundByMatch.put(nameCombination, keyword);
-                        continue;
-                    } else if (EmbeddedKeywordNamesSupport.matchesWithLowerCase(withSourceName, nameCombination,
-                            nameCombination.toLowerCase())) {
-                        foundByMatch.put(nameCombination, keyword);
+                    if (matchNameDirectlyOrAsEmbbededName(foundByMatch, keyword, keywordName, sourceName,
+                            isEmbeddedKeywordName, nameCombination)) {
                         continue;
                     }
                 }
 
                 if (!fileNameWithoutExtension.isEmpty() && !sourceName.equals(fileNameWithoutExtension)
                         && !alias.equals(fileNameWithoutExtension)) {
-                    String withFileName = fileNameWithoutExtension + "." + keywordName;
-                    if (!isEmbeddedKeywordName) {
-                        withFileName = QualifiedKeywordName.unifyDefinition(withFileName);
-                    }
-                    if (nameCombination.equalsIgnoreCase(withFileName)) {
-                        foundByMatch.put(nameCombination, keyword);
-                        continue;
-                    } else if (EmbeddedKeywordNamesSupport.matchesWithLowerCase(withFileName, nameCombination,
-                            nameCombination.toLowerCase())) {
-                        foundByMatch.put(nameCombination, keyword);
+                    if (matchNameDirectlyOrAsEmbbededName(foundByMatch, keyword, keywordName, fileNameWithoutExtension,
+                            isEmbeddedKeywordName, nameCombination)) {
                         continue;
                     }
                 }
@@ -111,6 +76,42 @@ public class KeywordSearcher {
         }
 
         return foundByMatch;
+    }
+
+    private <T> boolean matchNameDirectlyOrAsEmbbededName(final ListMultimap<String, T> foundByMatch, final T keyword,
+            final String keywordName, final String prefixName, boolean isEmbeddedKeywordName,
+            final String nameCombination) {
+        String withPrefix;
+        if (prefixName != null) {
+            withPrefix = prefixName + "." + keywordName;
+        } else {
+            withPrefix = keywordName;
+        }
+        if (!isEmbeddedKeywordName) {
+            withPrefix = QualifiedKeywordName.unifyDefinition(withPrefix);
+        }
+        if (nameCombination.equalsIgnoreCase(withPrefix)) {
+            foundByMatch.put(nameCombination, keyword);
+            return true;
+        } else if (EmbeddedKeywordNamesSupport.matchesWithLowerCase(withPrefix, nameCombination,
+                nameCombination.toLowerCase())) {
+            foundByMatch.put(nameCombination, keyword);
+            return true;
+        }
+
+        return false;
+    }
+
+    private <T> String getFileNameWithoutExtension(final Extractor<T> extractor, final T keyword) {
+        final String fullFileName = extractor.path(keyword).getFileName().toString();
+        final int lastDotIndex = fullFileName.lastIndexOf('.');
+        final String fileNameWithoutExtension;
+        if (lastDotIndex > -1) {
+            fileNameWithoutExtension = fullFileName.substring(0, lastDotIndex).toLowerCase();
+        } else {
+            fileNameWithoutExtension = "";// fullFileName;
+        }
+        return fileNameWithoutExtension;
     }
 
     public static interface Extractor<T> {
@@ -129,12 +130,12 @@ public class KeywordSearcher {
 
     private List<String> getNamesToCheck(final String usageName) {
         final List<String> possibleNameCombination = new ArrayList<>(possibleNameCombination(usageName));
-        Collections.sort(possibleNameCombination, new LengthComperator());
+        Collections.sort(possibleNameCombination, new FromLongestLengthComperator());
 
         return possibleNameCombination;
     }
 
-    private class LengthComperator implements Comparator<String> {
+    private class FromLongestLengthComperator implements Comparator<String> {
 
         @Override
         public int compare(final String o1, final String o2) {

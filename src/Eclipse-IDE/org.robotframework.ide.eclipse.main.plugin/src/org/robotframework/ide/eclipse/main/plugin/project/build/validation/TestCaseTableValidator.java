@@ -259,12 +259,14 @@ class TestCaseTableValidator implements ModelUnitValidator {
     static void validateExistingKeywordCall(final FileValidationContext validationContext,
             final ProblemsReportingStrategy reporter, final RobotToken keywordName,
             final Optional<List<RobotToken>> arguments) {
+        final ListMultimap<String, KeywordEntity> keywordProposal = validationContext
+                .findPossibleKeywords(keywordName.getText());
         final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(keywordName.getText(),
                 new NameTransformation<String>() {
 
                     @Override
                     public Optional<String> transform(final String gherkinNameVariant) {
-                        return validationContext.isKeywordAccessible(gherkinNameVariant)
+                        return validationContext.isKeywordAccessible(keywordProposal, gherkinNameVariant)
                                 ? Optional.of(gherkinNameVariant) : Optional.<String> absent();
                     }
                 });
@@ -282,7 +284,8 @@ class TestCaseTableValidator implements ModelUnitValidator {
             return;
         }
 
-        final ListMultimap<KeywordScope, KeywordEntity> keywords = validationContext.getPossibleKeywords(name);
+        final ListMultimap<KeywordScope, KeywordEntity> keywords = validationContext
+                .getPossibleKeywords(keywordProposal, name);
 
         for (final KeywordScope scope : KeywordScope.defaultOrder()) {
             final List<KeywordEntity> keywordEntities = keywords.get(scope);
