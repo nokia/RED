@@ -36,7 +36,7 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
         private IEventBroker eventBroker;
 
         @Execute
-        public Object addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
+        public void addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
             final List<IResource> suitesList = new ArrayList<>();
@@ -47,7 +47,7 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
                     final IProject project = (IProject) resource;
                     final RobotProject robotProject = RedPlugin.getModelManager().createProject(project);
                     new LibrariesAutoDiscoverer(robotProject, Collections.<IResource> emptyList(), eventBroker).start();
-                    return null;
+                    return;
 
                 } else if (resource.getType() == IResource.FILE || resource.getType() == IResource.FOLDER) {
                     if (suitesProject == null) {
@@ -63,8 +63,6 @@ public class LibrariesAutoDiscoverHandler extends DIParameterizedHandler<E4Libra
                 final RobotProject robotProject = RedPlugin.getModelManager().createProject(suitesProject);
                 new LibrariesAutoDiscoverer(robotProject, suitesList, eventBroker).start();
             }
-
-            return null;
         }
     }
 }

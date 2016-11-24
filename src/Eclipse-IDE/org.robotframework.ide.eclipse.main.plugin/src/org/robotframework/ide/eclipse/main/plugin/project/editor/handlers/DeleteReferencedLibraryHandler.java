@@ -35,7 +35,7 @@ public class DeleteReferencedLibraryHandler extends DIParameterizedHandler<E4Del
     public static class E4DeleteReferencedLibraryHandler {
 
         @Execute
-        public Object deleteLibraries(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void deleteLibraries(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
             final List<ReferencedLibrary> libraries = Selections.getElements(selection, ReferencedLibrary.class);
             input.getProjectConfiguration().removeLibraries(libraries);
@@ -55,7 +55,6 @@ public class DeleteReferencedLibraryHandler extends DIParameterizedHandler<E4Del
                         input.getRobotProject().getConfigurationFile(), locations);
                 eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_REMOTE_STRUCTURE_CHANGED, eventData);
             }
-            return null;
         }
     }
 }

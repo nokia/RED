@@ -34,7 +34,7 @@ public class OpenDeclarationHandler extends DIParameterizedHandler<E4OpenDeclara
     public static class E4OpenDeclarationHandler {
 
         @Execute
-        public Object openDeclaration(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
+        public void openDeclaration(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final SourceViewer viewer = editor.getSourceEditor().getViewer();
 
             final IRegion hyperlinkRegion = new Region(viewer.getTextWidget().getCaretOffset(), 0);
@@ -46,7 +46,6 @@ public class OpenDeclarationHandler extends DIParameterizedHandler<E4OpenDeclara
             if (hyperlink.isPresent()) {
                 hyperlink.get().open();
             }
-            return null;
         }
     }
 

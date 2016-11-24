@@ -39,7 +39,7 @@ public class ReloadPythonModulesHandler extends DIParameterizedHandler<E4ReloadP
     public static class E4ReloadPythonModulesHandler {
 
         @Execute
-        public Object reloadProject(final @Named(Selections.SELECTION) IStructuredSelection selection) {
+        public void reloadProject(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IProject> projects = Selections.getAdaptableElements(selection, IProject.class);
 
             final Set<RobotRuntimeEnvironment> envsToReset = new HashSet<>();
@@ -56,8 +56,6 @@ public class ReloadPythonModulesHandler extends DIParameterizedHandler<E4ReloadP
             }
 
             reparseModelsInOpenedEditors();
-
-            return null;
         }
 
         private void reparseModelsInOpenedEditors() {

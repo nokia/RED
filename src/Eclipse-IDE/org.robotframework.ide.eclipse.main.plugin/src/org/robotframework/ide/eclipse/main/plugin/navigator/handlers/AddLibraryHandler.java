@@ -44,7 +44,7 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
         private IEventBroker eventBroker;
 
         @Execute
-        public Object addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
+        public void addLibs(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IFile> selectedFiles = Selections.getAdaptableElements(selection, IFile.class);
 
             final ReferencedLibraryImporter importer = new ReferencedLibraryImporter();
@@ -79,8 +79,6 @@ public class AddLibraryHandler extends DIParameterizedHandler<E4AddLibraryHandle
                     }
                 }
             }
-
-            return null;
         }
     }
 }

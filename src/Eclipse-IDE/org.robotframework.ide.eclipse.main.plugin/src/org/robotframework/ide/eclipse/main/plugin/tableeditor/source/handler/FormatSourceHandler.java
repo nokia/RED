@@ -26,10 +26,8 @@ public class FormatSourceHandler extends DIParameterizedHandler<E4FormatSourceHa
     public static class E4FormatSourceHandler {
 
         @Execute
-        public Object formatSource(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
+        public void formatSource(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             editor.getSourceEditor().getViewer().doOperation(ISourceViewer.FORMAT);
-
-            return null;
         }
     }
 }
