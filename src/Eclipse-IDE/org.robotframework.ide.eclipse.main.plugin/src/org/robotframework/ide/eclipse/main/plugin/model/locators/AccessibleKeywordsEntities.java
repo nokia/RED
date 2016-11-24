@@ -5,19 +5,19 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
-import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordSearcher;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordSearcher.Extractor;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 
@@ -48,73 +48,22 @@ public class AccessibleKeywordsEntities {
         return this.filepath;
     }
 
-    public boolean isKeywordAccessible(final String keywordName) {
-        // List<KeywordEntity> hereKeywords = new ArrayList<>();
-        // for (Collection<KeywordEntity> k : getAccessibleKeywords().values()) {
-        // hereKeywords.addAll(k);
-        // }
-        //
-        // ListMultimap<String, KeywordEntity> foundKeywords = new KeywordSearcher()
-        // .findKeywords(filterDuplicates(hereKeywords), new Extractor<KeywordEntity>() {
-        //
-        // @Override
-        // public KeywordScope scope(KeywordEntity keyword) {
-        // return keyword.getScope(getFilepath());
-        // }
-        //
-        // @Override
-        // public Path path(KeywordEntity keyword) {
-        // return keyword.getExposingFilepath().toFile().toPath();
-        // }
-        //
-        // @Override
-        // public String alias(KeywordEntity keyword) {
-        // return keyword.getAlias();
-        // }
-        //
-        // @Override
-        // public String keywordName(KeywordEntity keyword) {
-        // return keyword.getNameFromDefinition();
-        // }
-        //
-        // @Override
-        // public String sourceName(KeywordEntity keyword) {
-        // return keyword.getSourceName();
-        // }
-        // }, keywordName);
-        //
-        // return (foundKeywords.containsKey(keywordName) ||
-        // foundKeywords.containsKey(keywordName.toLowerCase())
-        // || foundKeywords.containsKey(QualifiedKeywordName.unifyDefinition(keywordName)));
-        return findKeyword(keywordName).isPresent();
+    public boolean isKeywordAccessible(final ListMultimap<String, KeywordEntity> foundKeywords,
+            final String keywordName) {
+        return (foundKeywords.containsKey(keywordName) || foundKeywords.containsKey(keywordName.toLowerCase())
+                || foundKeywords.containsKey(QualifiedKeywordName.unifyDefinition(keywordName)));
     }
 
-    private Optional<KeywordEntity> findKeyword(final String name) {
-        final Collection<KeywordEntity> keywords = getFilteredPossibleEntities(name);
-        if (keywords == null) {
-            return Optional.absent();
+    public ListMultimap<String, KeywordEntity> findPossibleKeywords(final String keywordName) {
+        List<KeywordEntity> hereKeywords = new ArrayList<>();
+        for (Collection<KeywordEntity> k : getAccessibleKeywords().values()) {
+            hereKeywords.addAll(k);
         }
 
-        final QualifiedKeywordName qualifedName = QualifiedKeywordName.fromOccurrence(name);
-        for (final KeywordEntity keyword : keywords) {
-            final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
-                    .create(qualifedName.getKeywordName(), keyword.getSourceNameInUse());
-            if (qualifedName.matchesIgnoringCase(candidateQualifiedName)) {
-                return Optional.of(keyword);
-            }
-        }
-        if (name.contains(".")) {
-            // try to find keyword name with dots, ignore keyword source
-            final QualifiedKeywordName qualifedNameWithDots = QualifiedKeywordName.fromOccurrenceWithDots(name);
-            for (final KeywordEntity keyword : keywords) {
-                final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
-                        .create(keyword.getNameFromDefinition(), keyword.getSourceNameInUse());
-                if (qualifedNameWithDots.matchesIgnoringCase(candidateQualifiedName)) {
-                    return Optional.of(keyword);
-                }
-            }
-        }
-        return Optional.absent();
+        ListMultimap<String, KeywordEntity> foundKeywords = new KeywordSearcher()
+                .findKeywords(filterDuplicates(hereKeywords), new KeywordEntityExtractor(), keywordName);
+
+        return foundKeywords;
     }
 
     public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords() {
@@ -129,51 +78,16 @@ public class AccessibleKeywordsEntities {
         return scopedKeywords;
     }
 
-    public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(final String keywordName) {
+    public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(
+            final ListMultimap<String, KeywordEntity> foundKeywords, final String keywordName) {
+        List<KeywordEntity> keywords = foundKeywords.get(keywordName);
+        if (keywords.isEmpty()) {
+            keywords = foundKeywords.get(keywordName.toLowerCase());
+        }
+        if (keywords.isEmpty()) {
+            keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(keywordName));
+        }
 
-        // List<KeywordEntity> hereKeywords = new ArrayList<>();
-        // hereKeywords.addAll(getPossibleKeywords().values());
-        // // for (Collection<KeywordEntity> k : getPossibleKeywords().v) {
-        // // hereKeywords.addAll(k);
-        // // }
-        //
-        // ListMultimap<String, KeywordEntity> foundKeywords = new KeywordSearcher()
-        // .findKeywords(filterDuplicates(hereKeywords), new Extractor<KeywordEntity>() {
-        //
-        // @Override
-        // public KeywordScope scope(KeywordEntity keyword) {
-        // return keyword.getScope(getFilepath());
-        // }
-        //
-        // @Override
-        // public Path path(KeywordEntity keyword) {
-        // return keyword.getExposingFilepath().toFile().toPath();
-        // }
-        //
-        // @Override
-        // public String alias(KeywordEntity keyword) {
-        // return keyword.getAlias();
-        // }
-        //
-        // @Override
-        // public String keywordName(KeywordEntity keyword) {
-        // return keyword.getNameFromDefinition();
-        // }
-        //
-        // @Override
-        // public String sourceName(KeywordEntity keyword) {
-        // return keyword.getSourceName();
-        // }
-        // }, keywordName);
-        // List<KeywordEntity> keywords = foundKeywords.get(keywordName);
-        // if (keywords.isEmpty()) {
-        // keywords = foundKeywords.get(keywordName.toLowerCase());
-        // }
-        // if (keywords.isEmpty()) {
-        // keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(keywordName));
-        // }
-
-        final List<KeywordEntity> keywords = findMatchingKeywords(keywordName);
         final ListMultimap<KeywordScope, KeywordEntity> scopedKeywords = ArrayListMultimap.create();
 
         for (final KeywordEntity keyword : keywords) {
@@ -182,32 +96,15 @@ public class AccessibleKeywordsEntities {
         return scopedKeywords;
     }
 
-    private List<KeywordEntity> findMatchingKeywords(final String name) {
-        final Collection<KeywordEntity> keywords = getFilteredPossibleEntities(name);
-        if (keywords == null) {
-            return new ArrayList<>();
-        }
+    public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(final String keywordName) {
 
-        final List<KeywordEntity> matchingKeywords = new ArrayList<>();
-        final QualifiedKeywordName qualifedName = QualifiedKeywordName.fromOccurrence(name);
-        for (final KeywordEntity keyword : keywords) {
-            final QualifiedKeywordName candidateQualifiedName = QualifiedKeywordName
-                    .create(keyword.getNameFromDefinition(), keyword.getSourceNameInUse());
-            if (qualifedName.matchesIgnoringCase(candidateQualifiedName) || ((qualifedName.getKeywordSource().isEmpty()
-                    || keyword.getSourceNameInUse().toLowerCase().equals(qualifedName.getKeywordSource().toLowerCase()))
-                    && EmbeddedKeywordNamesSupport.matches(keyword.getNameFromDefinition(), qualifedName))) {
-                matchingKeywords.add(keyword);
-            }
-        }
-        return matchingKeywords;
-    }
+        List<KeywordEntity> hereKeywords = new ArrayList<>();
+        hereKeywords.addAll(getPossibleKeywords().values());
 
-    private Collection<KeywordEntity> getFilteredPossibleEntities(final String name) {
-        final Collection<? extends KeywordEntity> candidates = getPossibleEntities(name);
-        if (candidates == null) {
-            return null;
-        }
-        return filterDuplicates(candidates);
+        ListMultimap<String, KeywordEntity> foundKeywords = new KeywordSearcher()
+                .findKeywords(filterDuplicates(hereKeywords), new KeywordEntityExtractor(), keywordName);
+
+        return getPossibleKeywords(foundKeywords, keywordName);
     }
 
     private Collection<KeywordEntity> filterDuplicates(final Collection<? extends KeywordEntity> candidates) {
@@ -235,26 +132,32 @@ public class AccessibleKeywordsEntities {
         return null;
     }
 
-    private Collection<? extends KeywordEntity> getPossibleEntities(final String name) {
-        final QualifiedKeywordName qualifiedName = QualifiedKeywordName.fromOccurrence(name);
-        Collection<? extends KeywordEntity> keywords = getAccessibleKeywords().get(qualifiedName.getKeywordName());
+    private final class KeywordEntityExtractor implements Extractor<KeywordEntity> {
 
-        if (keywords == null && name.contains(".")) {
-            // try to find keyword name with dots, ignore keyword source
-            keywords = getAccessibleKeywords().get(QualifiedKeywordName.fromOccurrenceWithDots(name).getKeywordName());
+        @Override
+        public KeywordScope scope(final KeywordEntity keyword) {
+            return keyword.getScope(getFilepath());
         }
 
-        return keywords != null ? keywords : tryWithEmbeddedArguments(qualifiedName);
-    }
-
-    private Collection<? extends KeywordEntity> tryWithEmbeddedArguments(final QualifiedKeywordName qualifiedName) {
-        final List<KeywordEntity> matchingKeywordsWithEmbeddedArguments = new ArrayList<>();
-        for (final Entry<String, Collection<KeywordEntity>> entry : getAccessibleKeywords().entrySet()) {
-            if (EmbeddedKeywordNamesSupport.matches(entry.getKey(), qualifiedName)) {
-                matchingKeywordsWithEmbeddedArguments.addAll(entry.getValue());
-            }
+        @Override
+        public Path path(final KeywordEntity keyword) {
+            return keyword.getExposingFilepath().toFile().toPath();
         }
-        return matchingKeywordsWithEmbeddedArguments;
+
+        @Override
+        public String alias(final KeywordEntity keyword) {
+            return keyword.getAlias();
+        }
+
+        @Override
+        public String keywordName(final KeywordEntity keyword) {
+            return keyword.getNameFromDefinition();
+        }
+
+        @Override
+        public String sourceName(final KeywordEntity keyword) {
+            return keyword.getSourceName();
+        }
     }
 
     public interface AccessibleKeywordsCollector {
