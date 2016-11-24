@@ -28,6 +28,19 @@ import com.google.common.collect.ListMultimap;
  */
 public class KeywordSearcher {
 
+    public <T> List<T> getBestMatchingKeyword(final ListMultimap<String, T> foundKeywords, final String keywordName) {
+
+        List<T> keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(keywordName));
+        if (keywords.isEmpty()) {
+            keywords = foundKeywords.get(keywordName);
+        }
+        if (keywords.isEmpty()) {
+            keywords = foundKeywords.get(keywordName.toLowerCase());
+        }
+
+        return keywords;
+    }
+
     public <T> ListMultimap<String, T> findKeywords(final Collection<T> keywords, final Extractor<T> extractor,
             final String usageName) {
         final ListMultimap<String, T> foundByMatch = ArrayListMultimap.create();

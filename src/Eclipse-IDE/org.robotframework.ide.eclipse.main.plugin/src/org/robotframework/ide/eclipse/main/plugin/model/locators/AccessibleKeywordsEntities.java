@@ -30,11 +30,14 @@ public class AccessibleKeywordsEntities {
 
     private final AccessibleKeywordsCollector collector;
 
+    private final KeywordSearcher keywordSearcher;
+
     private Map<String, Collection<KeywordEntity>> accessibleKeywords;
 
     public AccessibleKeywordsEntities(final IPath filepath, final AccessibleKeywordsCollector collector) {
         this.filepath = filepath;
         this.collector = collector;
+        this.keywordSearcher = new KeywordSearcher();
     }
 
     public Map<String, Collection<KeywordEntity>> getAccessibleKeywords() {
@@ -60,8 +63,8 @@ public class AccessibleKeywordsEntities {
             hereKeywords.addAll(k);
         }
 
-        ListMultimap<String, KeywordEntity> foundKeywords = new KeywordSearcher()
-                .findKeywords(filterDuplicates(hereKeywords), new KeywordEntityExtractor(), keywordName);
+        ListMultimap<String, KeywordEntity> foundKeywords = keywordSearcher.findKeywords(filterDuplicates(hereKeywords),
+                new KeywordEntityExtractor(), keywordName);
 
         return foundKeywords;
     }
@@ -81,13 +84,7 @@ public class AccessibleKeywordsEntities {
     public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(
             final ListMultimap<String, KeywordEntity> foundKeywords, final String keywordName) {
 
-        List<KeywordEntity> keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(keywordName));
-        if (keywords.isEmpty()) {
-            keywords = foundKeywords.get(keywordName);
-        }
-        if (keywords.isEmpty()) {
-            keywords = foundKeywords.get(keywordName.toLowerCase());
-        }
+        List<KeywordEntity> keywords = keywordSearcher.getBestMatchingKeyword(foundKeywords, keywordName);
 
         final ListMultimap<KeywordScope, KeywordEntity> scopedKeywords = ArrayListMultimap.create();
 
@@ -102,8 +99,8 @@ public class AccessibleKeywordsEntities {
         List<KeywordEntity> hereKeywords = new ArrayList<>();
         hereKeywords.addAll(getPossibleKeywords().values());
 
-        ListMultimap<String, KeywordEntity> foundKeywords = new KeywordSearcher()
-                .findKeywords(filterDuplicates(hereKeywords), new KeywordEntityExtractor(), keywordName);
+        ListMultimap<String, KeywordEntity> foundKeywords = keywordSearcher.findKeywords(filterDuplicates(hereKeywords),
+                new KeywordEntityExtractor(), keywordName);
 
         return getPossibleKeywords(foundKeywords, keywordName);
     }
