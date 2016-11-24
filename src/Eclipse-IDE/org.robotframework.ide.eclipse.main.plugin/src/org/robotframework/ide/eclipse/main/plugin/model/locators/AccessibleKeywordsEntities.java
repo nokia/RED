@@ -80,12 +80,13 @@ public class AccessibleKeywordsEntities {
 
     public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(
             final ListMultimap<String, KeywordEntity> foundKeywords, final String keywordName) {
-        List<KeywordEntity> keywords = foundKeywords.get(keywordName);
+
+        List<KeywordEntity> keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(keywordName));
         if (keywords.isEmpty()) {
-            keywords = foundKeywords.get(keywordName.toLowerCase());
+            keywords = foundKeywords.get(keywordName);
         }
         if (keywords.isEmpty()) {
-            keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(keywordName));
+            keywords = foundKeywords.get(keywordName.toLowerCase());
         }
 
         final ListMultimap<KeywordScope, KeywordEntity> scopedKeywords = ArrayListMultimap.create();
