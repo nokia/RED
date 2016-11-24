@@ -113,29 +113,9 @@ public class RobotArtifactsValidator {
                     logger.log("VALIDATING: gathering files to be validated");
 
                     final ValidationContext context = new ValidationContext(project, logger);
-                    final Queue<ModelUnitValidator> unitValidators = Queues
-                            .newArrayDeque(validatorConfig.createValidators(context));
+                    final List<ModelUnitValidator> validators = validatorConfig.createValidators(context);
 
-                    final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-                    subMonitor.beginTask("Validating files", 100);
-
-                    final SubMonitor validationSubMonitor = subMonitor.newChild(100);
-                    validationSubMonitor.setWorkRemaining(unitValidators.size());
-
-                    final int threadPoolSize = Runtime.getRuntime().availableProcessors();
-                    logger.log("VALIDATING: " + threadPoolSize + " threads will be used");
-                    final ExecutorService threadPool = Executors.newFixedThreadPool(threadPoolSize);
-
-                    int current = 1;
-                    final int total = unitValidators.size();
-                    while (!unitValidators.isEmpty()) {
-                        final ModelUnitValidator validator = unitValidators.poll();
-                        threadPool.submit(
-                                createValidationRunnable(monitor, validationSubMonitor, current, total, validator));
-                        current++;
-                    }
-                    threadPool.shutdown();
-                    threadPool.awaitTermination(1, TimeUnit.HOURS);
+                    validateModelUnits(monitor, Queues.newArrayDeque(validators));
 
                     final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = context.getLibrariesAutoDiscoverer();
                     if (librariesAutoDiscoverer.isPresent() && librariesAutoDiscoverer.get().hasSuiteFilesToDiscovering()) {
@@ -149,6 +129,30 @@ public class RobotArtifactsValidator {
                 } finally {
                     monitor.done();
                 }
+            }
+
+            private void validateModelUnits(final IProgressMonitor monitor, final Queue<ModelUnitValidator> validators)
+                    throws InterruptedException {
+                final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+                subMonitor.beginTask("Validating files", 100);
+
+                final SubMonitor validationSubMonitor = subMonitor.newChild(100);
+                validationSubMonitor.setWorkRemaining(validators.size());
+
+                final int threadPoolSize = Runtime.getRuntime().availableProcessors();
+                logger.log("VALIDATING: " + threadPoolSize + " threads will be used");
+                final ExecutorService threadPool = Executors.newFixedThreadPool(threadPoolSize);
+
+                int current = 1;
+                final int total = validators.size();
+                while (!validators.isEmpty()) {
+                    final ModelUnitValidator validator = validators.poll();
+                    threadPool.submit(
+                            createValidationRunnable(monitor, validationSubMonitor, current, total, validator));
+                    current++;
+                }
+                threadPool.shutdown();
+                threadPool.awaitTermination(1, TimeUnit.HOURS);
             }
 
             private Runnable createValidationRunnable(final IProgressMonitor monitor,
