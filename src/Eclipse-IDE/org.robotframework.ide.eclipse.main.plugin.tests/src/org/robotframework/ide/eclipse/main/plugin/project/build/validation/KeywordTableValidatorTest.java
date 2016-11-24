@@ -246,7 +246,8 @@ public class KeywordTableValidatorTest {
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(2);
         assertThat(reporter.getReportedProblems()).containsExactly(
-                new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(3, Range.closed(29, 36))),
+                new Problem(KeywordsProblem.KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION,
+                        new ProblemPosition(3, Range.closed(29, 36))),
                 new Problem(KeywordsProblem.UNKNOWN_KEYWORD, new ProblemPosition(4, Range.closed(41, 48))));
     }
 
