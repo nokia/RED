@@ -40,7 +40,7 @@ public class ToggleBreakpointHandler extends DIParameterizedHandler<E4ToggleBrea
     public static class E4ToggleBreakpointHandler {
 
         @Execute
-        public Object toggleBreakpoint(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
+        public void toggleBreakpoint(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
                 @Optional @Named(ISources.ACTIVE_MENU_NAME) final Set<String> menuName)
                 throws CoreException {
 
@@ -57,8 +57,6 @@ public class ToggleBreakpointHandler extends DIParameterizedHandler<E4ToggleBrea
             final IFile file = (IFile) sourceEditor.getEditorInput().getAdapter(IResource.class);
             
             toggle(file, line);
-
-            return null;
         }
 
         public static void toggle(final IResource file, final int line) throws CoreException {

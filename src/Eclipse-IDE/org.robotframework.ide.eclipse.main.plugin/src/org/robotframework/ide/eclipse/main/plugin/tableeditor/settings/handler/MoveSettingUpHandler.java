@@ -25,15 +25,13 @@ public class MoveSettingUpHandler extends DIParameterizedHandler<E4MoveSettingUp
     public static class E4MoveSettingUpHandler {
 
         @Execute
-        public Object moveSettingUp(final RobotEditorCommandsStack stack,
+        public void moveSettingUp(final RobotEditorCommandsStack stack,
                 @Named(Selections.SELECTION) final IStructuredSelection selection) {
 
             final RobotSetting selectedSetting = Selections.getSingleElement(selection, RobotSetting.class);
             if (selectedSetting.getGroup() != SettingsGroup.NO_GROUP) {
                 stack.execute(new MoveSettingUpCommand(selectedSetting));
             }
-
-            return null;
         }
     }
 }

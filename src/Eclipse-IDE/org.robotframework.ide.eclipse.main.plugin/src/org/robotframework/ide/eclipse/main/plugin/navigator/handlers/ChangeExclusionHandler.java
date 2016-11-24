@@ -37,7 +37,7 @@ import com.google.common.collect.Multimap;
  */
 abstract class ChangeExclusionHandler {
 
-    public Object changeExclusion(final IEventBroker eventBroker, final IStructuredSelection selection) {
+    public void changeExclusion(final IEventBroker eventBroker, final IStructuredSelection selection) {
         final List<IFolder> foldersToChange = Selections.getAdaptableElements(selection, IFolder.class);
         final Multimap<IProject, IPath> groupedPaths = groupByProject(foldersToChange);
 
@@ -56,7 +56,6 @@ abstract class ChangeExclusionHandler {
                 manager.update(RobotValidationExcludedDecorator.ID);
             }
         });
-        return null;
     }
 
     private Multimap<IProject, IPath> groupByProject(final List<IFolder> foldersToChange) {

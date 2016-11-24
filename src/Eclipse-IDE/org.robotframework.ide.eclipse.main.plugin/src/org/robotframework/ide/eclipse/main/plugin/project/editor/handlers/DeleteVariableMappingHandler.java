@@ -33,15 +33,13 @@ public class DeleteVariableMappingHandler extends DIParameterizedHandler<E4Delet
     public static class E4DeleteVariableMappingHandler {
 
         @Execute
-        public Object deleteMappings(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void deleteMappings(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
             final List<VariableMapping> mappings = Selections.getElements(selection, VariableMapping.class);
             input.getProjectConfiguration().removeVariableMappings(mappings);
 
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_MAP_STRUCTURE_CHANGED,
                     input.getProjectConfiguration().getVariableMappings());
-            
-            return null;
         }
     }
 }

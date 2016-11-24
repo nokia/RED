@@ -26,9 +26,9 @@ public class IncludeFolderForValidationHandler extends DIParameterizedHandler<E4
 
         @Override
         @Execute
-        public Object changeExclusion(final IEventBroker eventBroker,
+        public void changeExclusion(final IEventBroker eventBroker,
                 final @Named(Selections.SELECTION) IStructuredSelection selection) {
-            return super.changeExclusion(eventBroker, selection);
+            super.changeExclusion(eventBroker, selection);
         }
 
         @Override

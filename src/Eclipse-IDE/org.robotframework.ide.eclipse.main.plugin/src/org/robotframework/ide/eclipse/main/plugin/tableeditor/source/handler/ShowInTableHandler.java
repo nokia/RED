@@ -31,7 +31,7 @@ public class ShowInTableHandler extends DIParameterizedHandler<E4ShowInTableHand
     public static class E4ShowInTableHandler {
 
         @Execute
-        public Object openDeclaration(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
+        public void openDeclaration(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
                 @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile suiteModel) {
 
             final SuiteSourceEditor sourceEditor = editor.getSourceEditor();
@@ -47,8 +47,6 @@ public class ShowInTableHandler extends DIParameterizedHandler<E4ShowInTableHand
                     activatedPage.revealElement(e);
                 }
             }
-            
-            return null;
         }
 
         private RobotSuiteFileSection getSection(final RobotFileInternalElement element) {

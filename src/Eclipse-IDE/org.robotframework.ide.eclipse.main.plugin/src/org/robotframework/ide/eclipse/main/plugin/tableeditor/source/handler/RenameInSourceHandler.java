@@ -39,7 +39,7 @@ public class RenameInSourceHandler extends DIParameterizedHandler<E4RenameInSour
     public static class E4RenameInSourceHandler {
 
         @Execute
-        public Object formatSource(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
+        public void formatSource(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor,
                 @Named(RobotEditorSources.SUITE_FILE_MODEL) final RobotSuiteFile fileModel) {
             final SourceViewer viewer = editor.getSourceEditor().getViewer();
             final int offset = viewer.getTextWidget().getCaretOffset();
@@ -65,8 +65,6 @@ public class RenameInSourceHandler extends DIParameterizedHandler<E4RenameInSour
             } catch (final BadLocationException e) {
                 // nothing to do
             }
-
-            return null;
         }
 
 //        private void foo(final RobotSuiteFile fileModel) {

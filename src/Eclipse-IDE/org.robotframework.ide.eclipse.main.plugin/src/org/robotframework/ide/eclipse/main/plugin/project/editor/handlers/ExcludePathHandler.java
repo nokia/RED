@@ -35,7 +35,7 @@ public class ExcludePathHandler extends DIParameterizedHandler<E4ExcludePathHand
     public static class E4ExcludePathHandler {
 
         @Execute
-        public Object exclude(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void exclude(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
 
             final List<ProjectTreeElement> locationsToExclude = Selections.getElements(selection,
@@ -56,8 +56,6 @@ public class ExcludePathHandler extends DIParameterizedHandler<E4ExcludePathHand
             final RedProjectConfigEventData<Collection<IPath>> eventData = new RedProjectConfigEventData<>(
                     input.getRobotProject().getConfigurationFile(), excludedPaths);
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VALIDATION_EXCLUSIONS_STRUCTURE_CHANGED, eventData);
-
-            return null;
         }
     }
 }
