@@ -46,7 +46,7 @@ public class StaticAnalysisHandler extends DIParameterizedHandler<E4StaticAnalys
     public static class E4StaticAnalysisHandler {
 
         @Execute
-        public Object runStaticAnalysis(final @Named(Selections.SELECTION) IStructuredSelection selection) {
+        public void runStaticAnalysis(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
             final Map<IProject, Collection<IFile>> grouped = RobotSuiteFileCollector
@@ -59,8 +59,6 @@ public class StaticAnalysisHandler extends DIParameterizedHandler<E4StaticAnalys
                         .createValidationJob(null, validatorConfig);
                 validationJob.schedule();
             }
-
-            return null;
         }
     }
 

@@ -29,12 +29,10 @@ public class EditSettingsHandler extends DIParameterizedHandler<E4EditSettingsHa
         protected IEventBroker eventBroker;
 
         @Execute
-        public Object editSettings(@Named(Selections.SELECTION) final IStructuredSelection selection) {
+        public void editSettings(@Named(Selections.SELECTION) final IStructuredSelection selection) {
             final RobotSetting setting = Selections.getSingleElement(selection, RobotSetting.class);
             
             eventBroker.send(RobotModelEvents.ROBOT_SETTING_IMPORTS_EDIT, setting);
-            
-            return null;
         }
     }
 }

@@ -36,14 +36,12 @@ public class ToggleCommentHandler extends DIParameterizedHandler<E4ToggleComment
     public static class E4ToggleCommentHandler {
 
         @Execute
-        public Object toggleComment(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
+        public void toggleComment(final @Named(ISources.ACTIVE_EDITOR_NAME) RobotFormEditor editor) {
             final SourceViewer viewer = editor.getSourceEditor().getViewer();
             final IDocument document = viewer.getDocument();
             final ITextSelection selection = (ITextSelection) viewer.getSelection();
 
             toggleComment(document, selection);
-
-            return null;
         }
 
         @VisibleForTesting

@@ -28,7 +28,7 @@ public class DeleteReferencedVariableFileHandler extends DIParameterizedHandler<
     public static class E4DeleteVariableFileHandler {
 
         @Execute
-        public Object deleteFile(@Named(Selections.SELECTION) final IStructuredSelection selection,
+        public void deleteFile(@Named(Selections.SELECTION) final IStructuredSelection selection,
                 final RedProjectEditorInput input, final IEventBroker eventBroker) {
             final List<ReferencedVariableFile> varFiles = Selections.getElements(selection,
                     ReferencedVariableFile.class);
@@ -36,8 +36,6 @@ public class DeleteReferencedVariableFileHandler extends DIParameterizedHandler<
 
             eventBroker.send(RobotProjectConfigEvents.ROBOT_CONFIG_VAR_FILE_STRUCTURE_CHANGED,
                     input.getProjectConfiguration().getReferencedVariableFiles());
-
-            return null;
         }
     }
 }
