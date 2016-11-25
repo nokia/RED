@@ -1,13 +1,51 @@
 <html>
 <head>
 <link
-	href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
-	rel="stylesheet" type="text/css" />
+  href="PLUGINS_ROOT/org.robotframework.ide.eclipse.main.plugin.doc.user/style.css"
+  rel="stylesheet" type="text/css" />
 </head>
 
 
 <body>
 <h2>Validation - setting issues severity level</h2>
 <h3>General information</h3>
+Validation findings levels can be customized in Preferences (Window-&gtPreferences-&gtRobot Framework-&gtErrors/Warnings).<br>
+Each issue can be reported as error/warning/info/ignore. In case of setting ignore level, such validation issue type will not be visible in Problems view.<br>
+There are RED specific validation types group under Project configuration which are essential for RED thus everything under Project configuration group is hardcoded to be reported as Fatal level.<br>
+<h3>Error/Warnings types with examples</h3>
+<h4>Code style</h4>
+Keyword from nested library<br>
+Keyword occurrence not consistent with definition<br>
+Keyword name with dots<br>
+Variable given as keyword name<br>
+Collection size should be equal to keyword arguments number<br>
+Invalid time format<br>
+<h4>Name shadowing and conflicts</h4>
+Duplicated variable name<br>
+Duplicated test case name<br>
+Masked keyword name<br>
+<h4>Unnecessary code</h4>
+Empty settings definition<br>
+Unrecognized header type<br> 
+Duplicated configuration path<br>
+Missing configuration path<br>
+<h4>Import</h4>
+Absolute path is used<br>
+HTML format is used<br>
+Import path relative via modules path<br>
+<h4>Robot version</h4>
+Removed Robot Framework API used<br> 
+Unsupported Robot Framework API used<br>
+Deprecated Robot Framework API used<br>
+Duplicated definitions used<br>
+Incorrect variable initialization<br>
+<h4>Runtime</h4>
+RED parser warning<br>
+Robot Framework runtime error<br>
+
+<h4>Project configuration</h4>
+Project configuration file (red.xml) cannot be read<br>
+Python Robot Framework environment missing<br>
+Library configuration file cannot be generated<br>
 </body>
 </html>
