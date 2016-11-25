@@ -29,13 +29,20 @@ import com.google.common.collect.ListMultimap;
 public class KeywordSearcher {
 
     public <T> List<T> getBestMatchingKeyword(final ListMultimap<String, T> foundKeywords, final String keywordName) {
+        List<T> keywords = new ArrayList<T>(0);
+        final List<String> namesToCheck = getNamesToCheck(keywordName);
+        for (final String name : namesToCheck) {
+            keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(name));
+            if (keywords.isEmpty()) {
+                keywords = foundKeywords.get(name);
+            }
+            if (keywords.isEmpty()) {
+                keywords = foundKeywords.get(name.toLowerCase());
+            }
 
-        List<T> keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(keywordName));
-        if (keywords.isEmpty()) {
-            keywords = foundKeywords.get(keywordName);
-        }
-        if (keywords.isEmpty()) {
-            keywords = foundKeywords.get(keywordName.toLowerCase());
+            if (!keywords.isEmpty()) {
+                break;
+            }
         }
 
         return keywords;
