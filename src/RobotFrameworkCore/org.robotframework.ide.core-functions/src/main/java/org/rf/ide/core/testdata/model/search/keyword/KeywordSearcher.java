@@ -28,24 +28,34 @@ import com.google.common.collect.ListMultimap;
  */
 public class KeywordSearcher {
 
-    public <T> List<T> getBestMatchingKeyword(final ListMultimap<String, T> foundKeywords, final String keywordName) {
+    public <T> List<T> getBestMatchingKeyword(final ListMultimap<String, T> foundKeywords, final Extractor<T> extractor,
+            final String keywordName) {
         List<T> keywords = new ArrayList<T>(0);
         final List<String> namesToCheck = getNamesToCheck(keywordName);
         for (final String name : namesToCheck) {
-            keywords = foundKeywords.get(QualifiedKeywordName.unifyDefinition(name));
-            if (keywords.isEmpty()) {
-                keywords = foundKeywords.get(name);
-            }
-            if (keywords.isEmpty()) {
-                keywords = foundKeywords.get(name.toLowerCase());
-            }
+            keywords.addAll(foundKeywords.get(name.toLowerCase()));
+            keywords.addAll(foundKeywords.get(name));
+            keywords.addAll(foundKeywords.get(QualifiedKeywordName.unifyDefinition(name)));
 
             if (!keywords.isEmpty()) {
+                final List<T> matchNameWhole = new ArrayList<>(0);
+                for (int i = 0; i < keywords.size(); i++) {
+                    final T keyword = keywords.get(i);
+                    final String keywordNameFromKeywordDefintion = extractor.keywordName(keyword);
+                    if (name.equalsIgnoreCase(keywordNameFromKeywordDefintion)) {
+                        matchNameWhole.add(keyword);
+                    }
+                }
+                if (!matchNameWhole.isEmpty()) {
+                    keywords = matchNameWhole;
+                }
+
                 break;
             }
         }
 
         return keywords;
+
     }
 
     public <T> ListMultimap<String, T> findKeywords(final Collection<T> keywords, final Extractor<T> extractor,

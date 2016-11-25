@@ -84,7 +84,8 @@ public class AccessibleKeywordsEntities {
     public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(
             final ListMultimap<String, KeywordEntity> foundKeywords, final String keywordName) {
 
-        List<KeywordEntity> keywords = keywordSearcher.getBestMatchingKeyword(foundKeywords, keywordName);
+        List<KeywordEntity> keywords = new ArrayList<>(filterDuplicates(
+                keywordSearcher.getBestMatchingKeyword(foundKeywords, new KeywordEntityExtractor(), keywordName)));
 
         final ListMultimap<KeywordScope, KeywordEntity> scopedKeywords = ArrayListMultimap.create();
 
