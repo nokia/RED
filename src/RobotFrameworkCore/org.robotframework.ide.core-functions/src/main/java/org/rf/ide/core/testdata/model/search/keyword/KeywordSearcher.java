@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +32,7 @@ public class KeywordSearcher {
 
     public <T> List<T> getBestMatchingKeyword(final ListMultimap<String, T> foundKeywords, final Extractor<T> extractor,
             final String keywordName) {
-        List<T> keywords = new ArrayList<T>(0);
+        Set<T> keywords = new LinkedHashSet<T>(0);
         final List<String> namesToCheck = getNamesToCheck(keywordName);
         for (final String name : namesToCheck) {
             keywords.addAll(foundKeywords.get(name.toLowerCase()));
@@ -38,9 +40,10 @@ public class KeywordSearcher {
             keywords.addAll(foundKeywords.get(QualifiedKeywordName.unifyDefinition(name)));
 
             if (!keywords.isEmpty()) {
-                final List<T> matchNameWhole = new ArrayList<>(0);
-                for (int i = 0; i < keywords.size(); i++) {
-                    final T keyword = keywords.get(i);
+                final Set<T> matchNameWhole = new LinkedHashSet<>(0);
+                Iterator<T> iterator = keywords.iterator();
+                for (int i = 0; i < keywords.size() && iterator.hasNext(); i++) {
+                    final T keyword = iterator.next();
                     final String keywordNameFromKeywordDefinition = extractor.keywordName(keyword);
                     if (name.equalsIgnoreCase(keywordNameFromKeywordDefinition)) {
                         matchNameWhole.add(keyword);
@@ -54,7 +57,7 @@ public class KeywordSearcher {
             }
         }
 
-        return keywords;
+        return new ArrayList<>(keywords);
 
     }
 
