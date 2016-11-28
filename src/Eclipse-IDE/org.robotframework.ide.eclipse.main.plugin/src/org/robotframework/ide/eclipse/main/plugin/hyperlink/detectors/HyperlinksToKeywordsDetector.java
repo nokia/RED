@@ -62,7 +62,7 @@ abstract class HyperlinksToKeywordsDetector {
         final List<IHyperlink> hyperlinks = new ArrayList<>();
 
         final AccessibleKeywordsEntities context = createEntities(suiteFile);
-        final ListMultimap<String, KeywordEntity> keywordProposal = context.findPossibleKeywords(keywordName);
+        final ListMultimap<String, KeywordEntity> keywordProposal = context.findPossibleKeywords(keywordName, false);
         final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(keywordName,
                 new NameTransformation<String>() {
 
