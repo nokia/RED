@@ -62,7 +62,7 @@ public class KeywordSearcher {
     }
 
     public <T> ListMultimap<String, T> findKeywords(final Collection<T> keywords, final Extractor<T> extractor,
-            final String usageName) {
+            final String usageName, boolean stopIfOneWasMatching) {
         final ListMultimap<String, T> foundByMatch = ArrayListMultimap.create();
 
         final List<String> possibleNameCombination = getNamesToCheck(usageName);
@@ -81,20 +81,32 @@ public class KeywordSearcher {
 
                 if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, null, isEmbeddedKeywordName,
                         nameCombination)) {
-                    continue;
+                    if (stopIfOneWasMatching) {
+                        break;
+                    } else {
+                        continue;
+                    }
                 }
 
                 if (!alias.isEmpty()) {
                     if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, alias,
                             isEmbeddedKeywordName, nameCombination)) {
-                        continue;
+                        if (stopIfOneWasMatching) {
+                            break;
+                        } else {
+                            continue;
+                        }
                     }
                 }
 
                 if (!sourceName.isEmpty()) {
                     if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, sourceName,
                             isEmbeddedKeywordName, nameCombination)) {
-                        continue;
+                        if (stopIfOneWasMatching) {
+                            break;
+                        } else {
+                            continue;
+                        }
                     }
                 }
 
@@ -102,7 +114,11 @@ public class KeywordSearcher {
                         && !alias.equals(fileNameWithoutExtension)) {
                     if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, fileNameWithoutExtension,
                             isEmbeddedKeywordName, nameCombination)) {
-                        continue;
+                        if (stopIfOneWasMatching) {
+                            break;
+                        } else {
+                            continue;
+                        }
                     }
                 }
             }

@@ -87,7 +87,7 @@ public class RedKeywordProposals {
     public RedKeywordProposal getBestMatchingKeywordProposal(final String keywordName) {
         final AccessibleKeywordsEntities accessibleKeywordsEntities = getAccessibleKeywordsEntities(suiteFile, "");
         final ListMultimap<KeywordScope, KeywordEntity> keywords = accessibleKeywordsEntities
-                .getPossibleKeywords(keywordName);
+                .getPossibleKeywords(keywordName, false);
 
         for (final KeywordScope scope : KeywordScope.defaultOrder()) {
             for (final KeywordEntity keyword : keywords.get(scope)) {
