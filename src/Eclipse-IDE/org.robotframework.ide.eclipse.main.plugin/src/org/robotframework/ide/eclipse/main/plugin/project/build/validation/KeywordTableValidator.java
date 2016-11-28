@@ -124,7 +124,7 @@ class KeywordTableValidator implements ModelUnitValidator {
             final RobotToken keywordName = keyword.getKeywordName();
             final String name = keywordName.getText();
             final ListMultimap<KeywordScope, KeywordEntity> possibleKeywords = validationContext
-                    .getPossibleKeywords(name);
+                    .getPossibleKeywords(name, true);
             for (final KeywordScope scope : KeywordScope.defaultOrder()) {
                 if (scope != KeywordScope.LOCAL && !possibleKeywords.get(scope).isEmpty()) {
                     final KeywordEntity maskedKeyword = possibleKeywords.get(scope).get(0);

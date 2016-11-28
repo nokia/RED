@@ -47,6 +47,8 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
     private ListMultimap<KeywordScope, KeywordEntity> allPossibleKeywords;
 
+    private Collection<KeywordEntity> hereKeywords;
+
     public FileValidationContext(final ValidationContext context, final IFile file) {
         this(context, file, new ValidationKeywordCollector(file, context), null);
     }
@@ -91,7 +93,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         ListMultimap<String, KeywordEntity> listMultimap = alreadyUsedKeywords
                 .get(QualifiedKeywordName.unifyDefinition(keywordName));
         if (listMultimap == null) {
-            listMultimap = super.findPossibleKeywords(keywordName);
+            listMultimap = super.findPossibleKeywords(keywordName, true);
             alreadyUsedKeywords.put(QualifiedKeywordName.unifyDefinition(keywordName), listMultimap);
         }
 
@@ -116,6 +118,14 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         }
 
         return allPossibleKeywords;
+    }
+
+    protected Collection<KeywordEntity> getAccessibleKeywordsDeduplicated() {
+        if (hereKeywords == null) {
+            hereKeywords = super.getAccessibleKeywordsDeduplicated();
+        }
+
+        return hereKeywords;
     }
 
     public boolean isValidatingChangedFiles() {

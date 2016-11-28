@@ -261,6 +261,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
             final Optional<List<RobotToken>> arguments) {
         final ListMultimap<String, KeywordEntity> keywordProposal = validationContext
                 .findPossibleKeywords(keywordName.getText());
+
         final Optional<String> nameToUse = GherkinStyleSupport.firstNameTransformationResult(keywordName.getText(),
                 new NameTransformation<String>() {
 
@@ -506,7 +507,7 @@ class TestCaseTableValidator implements ModelUnitValidator {
             final String keywordName) {
 
         for (final KeywordScope scope : KeywordScope.defaultOrder()) {
-            final List<KeywordEntity> possible = validationContext.getPossibleKeywords(keywordName).get(scope);
+            final List<KeywordEntity> possible = validationContext.getPossibleKeywords(keywordName, true).get(scope);
             if (scope != KeywordScope.STD_LIBRARY && !possible.isEmpty()) {
                 return false;
             } else if (scope == KeywordScope.STD_LIBRARY) {
