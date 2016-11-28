@@ -41,8 +41,8 @@ public class KeywordSearcher {
                 final List<T> matchNameWhole = new ArrayList<>(0);
                 for (int i = 0; i < keywords.size(); i++) {
                     final T keyword = keywords.get(i);
-                    final String keywordNameFromKeywordDefintion = extractor.keywordName(keyword);
-                    if (name.equalsIgnoreCase(keywordNameFromKeywordDefintion)) {
+                    final String keywordNameFromKeywordDefinition = extractor.keywordName(keyword);
+                    if (name.equalsIgnoreCase(keywordNameFromKeywordDefinition)) {
                         matchNameWhole.add(keyword);
                     }
                 }
@@ -76,20 +76,20 @@ public class KeywordSearcher {
                     nameCombination = QualifiedKeywordName.unifyDefinition(nameCombination);
                 }
 
-                if (matchNameDirectlyOrAsEmbbededName(foundByMatch, keyword, keywordName, null, isEmbeddedKeywordName,
+                if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, null, isEmbeddedKeywordName,
                         nameCombination)) {
                     continue;
                 }
 
                 if (!alias.isEmpty()) {
-                    if (matchNameDirectlyOrAsEmbbededName(foundByMatch, keyword, keywordName, alias,
+                    if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, alias,
                             isEmbeddedKeywordName, nameCombination)) {
                         continue;
                     }
                 }
 
                 if (!sourceName.isEmpty()) {
-                    if (matchNameDirectlyOrAsEmbbededName(foundByMatch, keyword, keywordName, sourceName,
+                    if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, sourceName,
                             isEmbeddedKeywordName, nameCombination)) {
                         continue;
                     }
@@ -97,7 +97,7 @@ public class KeywordSearcher {
 
                 if (!fileNameWithoutExtension.isEmpty() && !sourceName.equals(fileNameWithoutExtension)
                         && !alias.equals(fileNameWithoutExtension)) {
-                    if (matchNameDirectlyOrAsEmbbededName(foundByMatch, keyword, keywordName, fileNameWithoutExtension,
+                    if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, fileNameWithoutExtension,
                             isEmbeddedKeywordName, nameCombination)) {
                         continue;
                     }
@@ -108,7 +108,7 @@ public class KeywordSearcher {
         return foundByMatch;
     }
 
-    private <T> boolean matchNameDirectlyOrAsEmbbededName(final ListMultimap<String, T> foundByMatch, final T keyword,
+    private <T> boolean matchNameDirectlyOrAsEmbeddedName(final ListMultimap<String, T> foundByMatch, final T keyword,
             final String keywordName, final String prefixName, boolean isEmbeddedKeywordName,
             final String nameCombination) {
         String withPrefix;
@@ -160,12 +160,12 @@ public class KeywordSearcher {
 
     private List<String> getNamesToCheck(final String usageName) {
         final List<String> possibleNameCombination = new ArrayList<>(possibleNameCombination(usageName));
-        Collections.sort(possibleNameCombination, new FromLongestLengthComperator());
+        Collections.sort(possibleNameCombination, new FromLongestLengthComparator());
 
         return possibleNameCombination;
     }
 
-    private class FromLongestLengthComperator implements Comparator<String> {
+    private class FromLongestLengthComparator implements Comparator<String> {
 
         @Override
         public int compare(final String o1, final String o2) {
