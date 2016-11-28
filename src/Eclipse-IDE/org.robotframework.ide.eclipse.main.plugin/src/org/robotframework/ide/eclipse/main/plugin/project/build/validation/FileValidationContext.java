@@ -11,6 +11,7 @@
 package org.robotframework.ide.eclipse.main.plugin.project.build.validation;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -30,6 +31,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
+import com.google.common.collect.ListMultimap;
 
 public class FileValidationContext extends AccessibleKeywordsEntities {
 
@@ -38,6 +40,10 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
     private final IFile file;
 
     private Set<String> accessibleVariables;
+
+    private Map<String, ListMultimap<String, KeywordEntity>> alreadyUsedKeywords = new HashMap<>();
+
+    private Map<String, ListMultimap<KeywordScope, KeywordEntity>> possibleKeywords = new HashMap<>();
 
     public FileValidationContext(final ValidationContext context, final IFile file) {
         this(context, file, new ValidationKeywordCollector(file, context), null);
@@ -77,6 +83,29 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
             accessibleVariables = context.collectAccessibleVariables(file);
         }
         return accessibleVariables;
+    }
+
+    public ListMultimap<String, KeywordEntity> findPossibleKeywords(final String keywordName) {
+        ListMultimap<String, KeywordEntity> listMultimap = alreadyUsedKeywords
+                .get(QualifiedKeywordName.unifyDefinition(keywordName));
+        if (listMultimap == null) {
+            listMultimap = super.findPossibleKeywords(keywordName);
+            alreadyUsedKeywords.put(QualifiedKeywordName.unifyDefinition(keywordName), listMultimap);
+        }
+
+        return listMultimap;
+    }
+
+    public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(
+            final ListMultimap<String, KeywordEntity> foundKeywords, final String keywordName) {
+        ListMultimap<KeywordScope, KeywordEntity> pos = possibleKeywords
+                .get(QualifiedKeywordName.unifyDefinition(keywordName));
+        if (pos == null) {
+            pos = super.getPossibleKeywords(foundKeywords, keywordName);
+            possibleKeywords.put(QualifiedKeywordName.unifyDefinition(keywordName), pos);
+        }
+
+        return pos;
     }
 
     public boolean isValidatingChangedFiles() {
