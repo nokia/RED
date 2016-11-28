@@ -45,6 +45,8 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
     private Map<String, ListMultimap<KeywordScope, KeywordEntity>> possibleKeywords = new HashMap<>();
 
+    private ListMultimap<KeywordScope, KeywordEntity> allPossibleKeywords;
+
     public FileValidationContext(final ValidationContext context, final IFile file) {
         this(context, file, new ValidationKeywordCollector(file, context), null);
     }
@@ -106,6 +108,14 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         }
 
         return pos;
+    }
+
+    public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords() {
+        if (allPossibleKeywords == null) {
+            allPossibleKeywords = super.getPossibleKeywords();
+        }
+
+        return allPossibleKeywords;
     }
 
     public boolean isValidatingChangedFiles() {
