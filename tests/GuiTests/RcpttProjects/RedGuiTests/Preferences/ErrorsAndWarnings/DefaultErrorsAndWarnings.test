@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _VMj88KTbEeazyPh6f3_hNQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/8/16 12:19 PM
+Save-Time: 11/29/16 2:02 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -80,22 +80,22 @@ with [get-window Preferences] {
 
 get-window Preferences | get-section "Code style" | click
 
-check-combobox-list-and-selection -section "Code style" -label "Keyword from nested library" -text  "This problem occurs when keyword imported by dependency is used in test suite." 
+check-combobox-list-and-selection -section "Code style" -label "Keyword from nested library" -text  "Occurs when keyword imported by dependency is used in test suite." 
 
-check-combobox-list-and-selection -section "Code style" -label "Keyword occurence not consistent with definition"
-	 -text  "This problem occurs when name in keyword call is different than in definition. Use spaes in the same place like in definition."
+check-combobox-list-and-selection -section "Code style" -label "Keyword occurrence not consistent with definition"
+	 -text  "Occurs when name in keyword call is different than in definition. Use name the same as in definition."
 
 check-combobox-list-and-selection -section "Code style" -label "Keyword name with dots"
-	-text "This problem occurs when keyword name contains dots. It may be confused with fully qualified name." 
+	-text "Occurs when keyword name contains dots. It may be confused with fully qualified name." 
 
 check-combobox-list-and-selection -section "Code style" -label "Variable given as keyword name"
-	 -text  "This problem occurs when variable is used as keyword call in test suite setup or teardown." 
+	 -text  "Occurs when variable is used as keyword call in test suite setup or teardown." 
 
 check-combobox-list-and-selection -section "Code style" -label  "Collection size should be equal to keyword arguments number" 
-	  -text "This problems occurs when collection variable is used in keyword call."
+	  -text "Occurs when collection variable is used in keyword call and collection elements number is different than keyword arguments number."
 
 check-combobox-list-and-selection -section "Code style" -label "Invalid time format"
-	 -text "This problems occurs when time is not formatted correctly. Use number, time string or timer string." 
+	 -text "Occurs when time is not formatted correctly. Use number, time string or timer string." 
 
 
 //====================================== Name shadowing and conflict =============================
@@ -108,13 +108,13 @@ with [get-window Preferences] {
 get-window Preferences | get-section "Name shadowing and conflicts" | get-control Any -index 2 | get-property "getChildren().length" | equals 6 | verify-true
 
 check-combobox-list-and-selection -section "Name shadowing and conflicts" -label "Duplicated variable name"
-	 -text "This problems occurs when variable name is duplicated and one variable value overrides another." 
+	 -text "Occurs when variable name is duplicated and one variable value overrides another." 
 
 check-combobox-list-and-selection -section "Name shadowing and conflicts" -label "Duplicated test case name" 
-	 -text "This problems occurs when test case name is duplicated and both test cases can be run."  
+	 -text "Occurs when test case name is duplicated and both test cases can be run."  
 
 check-combobox-list-and-selection -section "Name shadowing and conflicts" -label "Masked keyword name"
-	-text "This problems occurs when keyword defined in test suite has tse same name like keyword from imported library.\n"
+	-text "Occurs when keyword defined in test suite has the same name like keyword from imported library.\n"
             + "You can use fully qualified name when calling masked keyword." 
 
 
@@ -128,17 +128,17 @@ with [get-window Preferences] {
 get-window Preferences | get-section "Unnecessary code" | get-control Any -index 2 | get-property "getChildren().length" | equals 8 | verify-true
 
 check-combobox-list-and-selection -section "Unnecessary code" -label "Empty settings definition"
-	-text "This problems occurs when suite, test case or keyword setting is defined with empty content." 
+	-text "Occurs when suite, test case or keyword setting is defined with empty content." 
 
 check-combobox-list-and-selection -section "Unnecessary code" -label "Unrecognized header type" 
-	-text "This problems occurs when Robot Framework does not recognize section header.\n"
+	-text "Occurs when Robot Framework does not recognize section header.\n"
             + "Only ***Settings***, ***Variables***, ***Test Cases*** or ***Keywords*** sections are valid."
 
 check-combobox-list-and-selection -section "Unnecessary code" -label "Duplicated configuration path"
-	-text "This problem occurs when path defined in configuration is subpath of different one. Such path is skipped." 
+	-text "Occurs when path defined in configuration is subpath of different one. Such path is skipped." 
 
 check-combobox-list-and-selection -section "Unnecessary code" -label "Missing configuration path"
-	-text "This problem occurs when missing path is defined in configuration. Such path is skipped." 
+	-text "Occurs when missing path is defined in configuration. Such path is skipped." 
 
 
 
@@ -151,14 +151,14 @@ with [get-window Preferences] {
 
 get-window Preferences | get-section "Import" | get-control Any -index 2 | get-property "getChildren().length" | equals 6 | verify-true
 
-check-combobox-list-and-selection -section "Import" -label "Absoulte path is used"
-  	-text "This problems occurs when absoulte path is used. Workspace-relative paths are preferred in RED." 
+check-combobox-list-and-selection -section "Import" -label "Absolute path used"
+  	-text "Occurs when absolute path is used. Workspace-relative paths are preferred in RED." 
   	
-check-combobox-list-and-selection -section "Import" -label "HTML format is used"
-  	-text "This problems occurs when imported file is in HTML format. Use supported formats only." 
+check-combobox-list-and-selection -section "Import" -label "HTML format used"
+  	-text "Occurs when imported file is in HTML format. Use supported formats only." 
   	
 check-combobox-list-and-selection -section "Import" -label "Import path relative via modules path"
-  	-text  "This problems occurs when imported path is relative to python path." 
+  	-text  "Occurs when imported path is relative to python path." 
   	
 //====================================== Robot version  =============================  		
 
@@ -168,19 +168,19 @@ with [get-window Preferences] {
 }  	
 get-window Preferences | get-section "Robot version" | get-control Any -index 2 | get-property "getChildren().length" | equals 10 | verify-true
 check-combobox-list-and-selection -section "Robot version" -label "Removed Robot Framework API used"
-  	-text "This problems occurs when removed syntax is used. Use Robot Framework 3.0 syntax instead."  -selected "Error"
+  	-text "Occurs when syntax from older Robot Framework version is not available in current version."  -selected "Error"
   	
 check-combobox-list-and-selection -section "Robot version" -label "Unsupported Robot Framework API used"
-  	-text "This problems occurs when syntax from newer Robot Framework version is not available in older version."  -selected "Error"  	 
+  	-text "Occurs when syntax from newer Robot Framework version is not available in older version."  -selected "Error"  	 
 
 check-combobox-list-and-selection -section "Robot version" -label "Deprecated Robot Framework API used"
-  	-text  "This problems occurs when deprecated syntax is used. Use Robot Framework 3.0 syntax instead." 
+  	-text  "Occurs when deprecated syntax is used. Use current Robot Framework syntax instead." 
   	 	
 check-combobox-list-and-selection -section "Robot version" -label "Duplicated definitions used"
-  	-text "This problems occurs when duplicated definition is used. It occures in older Robot Framework versions." 
+  	-text "Occurs when testcase or keywords definitions names are not unique." 
   
 check-combobox-list-and-selection -section "Robot version" -label "Incorrect variable initialization"
-  	-text "This problems occurs when variable is incorrectly initialized. It occures in older Robot Framework versions." 
+  	-text "Occurs when there is syntax error in variable initialization." 
   	
 
 //====================================== Runtime  =============================  
@@ -191,16 +191,16 @@ with [get-window Preferences] {
 }
 
 check-combobox-list-and-selection -section Runtime -label "RED parser warning"
-  	-text "This problems occurs when for some reason RED parser reports warning." 
+  	-text "Occurs when for some reason RED parser reports warning." 
 
 //check that runtime error cannoytbe change  	
 with [get-window Preferences | get-section Runtime] {
-    get-label "Robort Framework runtime error" | get-property "getToolTipText()" 
-        | equals "This problems occurs when incorrect Robot Framework syntax is isused. Such syntax will fail test in runtime." 
+    get-label "Robot Framework runtime error" | get-property "getToolTipText()" 
+        | equals "Occurs when incorrect Robot Framework syntax is issued. Such syntax will fail test in runtime." 
         | verify-true
-    with [get-combo -after [get-label "Robort Framework runtime error"]] {
+    with [get-combo -after [get-label "Runtime"]] {
         get-property "values[0]" | equals Error | verify-true
-        get-property "isEnabled()" | equals false | verify-true
+        get-property "isEnabled()" | equals true | verify-true
     }
 }
 
@@ -210,14 +210,14 @@ with [get-window Preferences | get-section Runtime] {
 get-window Preferences | get-section "Project configuration" | click
 with [get-window Preferences | get-section "Project configuration"] {
     get-label "Project configuration file (red.xml) cannot be read" | get-property "getToolTipText()" 
-        | equals "This problem occurs when project has no red.xml configuration file or it cannot be read.\n"
+        | equals "Occurs when project has no red.xml configuration file or it cannot be read.\n"
         + "Either there is a problem accessing the file or its structure is broken." | verify-true
     get-label "Python Robot Framework environment missing" | get-property "getToolTipText()" 
-        | equals "This problems occurs when there is no Robot Environment defined.\n"
+        | equals "Occurs when there is no Robot Environment defined.\n"
         + "Python main directory with Robot modules installed should be defined in preferences.\n"
         + "Project may override this setting in its configuration file." | verify-true
-    get-label "Library configuration file cannot be generated" | get-property "getToolTipText()" 
-        | equals "This problems occurs when for some reason Robot framework is unable to generate library specification file." 
+    get-label "Library documentation file cannot be generated" | get-property "getToolTipText()" 
+        | equals "Occurs when for some reason Robot framework is unable to generate library specification file,probably due to missing library dependencies or errors in library source code." 
         | verify-true
     with [get-combo -after [get-label "Project configuration file (red.xml) cannot be read"]] {
         get-property selection | equals Fatal | verify-true
@@ -229,7 +229,7 @@ with [get-window Preferences | get-section "Project configuration"] {
         get-property readOnly | equals true | verify-true
         get-property "values[0]" | equals Fatal | verify-true
     }
-    with [get-combo -after [get-label "Library configuration file cannot be generated"]] {
+    with [get-combo -after [get-label "Library documentation file cannot be generated"]] {
         get-property selection | equals Fatal | verify-true
         get-property readOnly | equals true | verify-true
         get-property "values[0]" | equals Fatal | verify-true
