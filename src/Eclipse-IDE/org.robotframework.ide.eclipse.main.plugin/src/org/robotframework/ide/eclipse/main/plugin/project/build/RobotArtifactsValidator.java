@@ -192,6 +192,10 @@ public class RobotArtifactsValidator {
     
     public static class ModelUnitValidatorConfigFactory {
 
+        public static ModelUnitValidatorConfig create(final IProject project) {
+            return createForWholeProject(project, ProblemsReportingStrategy.reportOnly());
+        }
+
         public static ModelUnitValidatorConfig create(final IProject project, final IResourceDelta delta,
                 final int kind, final ProblemsReportingStrategy reporter) {
             if (delta == null || kind == IncrementalProjectBuilder.FULL_BUILD) {

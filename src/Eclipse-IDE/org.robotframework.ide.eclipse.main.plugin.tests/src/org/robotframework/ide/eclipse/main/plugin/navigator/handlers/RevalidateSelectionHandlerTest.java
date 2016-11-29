@@ -21,10 +21,10 @@ import org.robotframework.red.junit.ProjectProvider;
 
 import com.google.common.collect.Sets;
 
-public class StaticAnalysisHandlerTest {
+public class RevalidateSelectionHandlerTest {
 
     @ClassRule
-    public static ProjectProvider projectProvider = new ProjectProvider(StaticAnalysisHandlerTest.class);
+    public static ProjectProvider projectProvider = new ProjectProvider(RevalidateSelectionHandlerTest.class);
 
     private static IFolder topLevelDirectory;
 
@@ -62,7 +62,7 @@ public class StaticAnalysisHandlerTest {
         selectedResources.add(topLevelFile);
         selectedResources.add(initFile);
 
-        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
         assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile, initFile));
     }
 
@@ -71,7 +71,7 @@ public class StaticAnalysisHandlerTest {
         List<IResource> selectedResources = new ArrayList<>();
         selectedResources.add(topLevelDirectory);
 
-        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
         assertThat(files).isEqualTo(Sets.newHashSet(initFile, tsvFile, txtFile, robotFile));
     }
 
@@ -80,7 +80,7 @@ public class StaticAnalysisHandlerTest {
         List<IResource> selectedResources = new ArrayList<>();
         selectedResources.add(projectProvider.getProject());
 
-        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
         assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile, initFile, tsvFile, txtFile, robotFile));
     }
 
@@ -91,7 +91,7 @@ public class StaticAnalysisHandlerTest {
         selectedResources.add(tsvFile);
         selectedResources.add(robotFile);
 
-        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
         assertThat(files).isEqualTo(Sets.newHashSet(initFile, tsvFile, txtFile, robotFile));
     }
 
@@ -101,7 +101,7 @@ public class StaticAnalysisHandlerTest {
         selectedResources.add(nestedDirectory);
         selectedResources.add(topLevelFile);
 
-        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
         assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile, robotFile));
     }
 
@@ -111,7 +111,7 @@ public class StaticAnalysisHandlerTest {
         selectedResources.add(notRobotFile);
         selectedResources.add(topLevelFile);
 
-        Set<IFile> files = StaticAnalysisHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
         assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile));
     }
 }
