@@ -61,8 +61,8 @@ public class AccessibleKeywordsEntities {
             final boolean stopIfOneWasMatching) {
         final Collection<KeywordEntity> filterAgainstDuplications = getAccessibleKeywordsDeduplicated();
 
-        ListMultimap<String, KeywordEntity> foundKeywords = keywordSearcher.findKeywords(filterAgainstDuplications,
-                new KeywordEntityExtractor(), keywordName, stopIfOneWasMatching);
+        ListMultimap<String, KeywordEntity> foundKeywords = keywordSearcher.findKeywords(getAccessibleKeywords(),
+                filterAgainstDuplications, new KeywordEntityExtractor(), keywordName, stopIfOneWasMatching);
 
         return foundKeywords;
     }
@@ -108,8 +108,8 @@ public class AccessibleKeywordsEntities {
         List<KeywordEntity> hereKeywords = new ArrayList<>();
         hereKeywords.addAll(getPossibleKeywords().values());
 
-        ListMultimap<String, KeywordEntity> foundKeywords = keywordSearcher.findKeywords(filterDuplicates(hereKeywords),
-                new KeywordEntityExtractor(), keywordName, stopIfOneWasMatching);
+        ListMultimap<String, KeywordEntity> foundKeywords = keywordSearcher.findKeywords(getAccessibleKeywords(),
+                filterDuplicates(hereKeywords), new KeywordEntityExtractor(), keywordName, stopIfOneWasMatching);
 
         return getPossibleKeywords(foundKeywords, keywordName);
     }
