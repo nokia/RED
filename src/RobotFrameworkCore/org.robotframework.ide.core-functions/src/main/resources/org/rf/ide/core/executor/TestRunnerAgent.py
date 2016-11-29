@@ -281,8 +281,12 @@ class TestRunnerAgent:
             range_fun = xrange if sys.version_info < (3, 0, 0) else range
             for i in range_fun(0, len(data)):
                 data[i] = self.fix_unicode(data[i])
+        elif inspect.ismodule(data) or inspect.isfunction(data) or inspect.isclass(data):
+            data = self.fix_unicode(str(data))
         elif data is None:
             data = self.fix_unicode('None')
+        else:
+            data = self.fix_unicode(str(data))
         return data
 
     def _check_breakpoint(self):
