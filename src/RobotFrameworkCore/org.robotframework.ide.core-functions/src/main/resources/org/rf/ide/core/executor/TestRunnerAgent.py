@@ -250,7 +250,7 @@ class TestRunnerAgent:
                 if not inspect.ismodule(value) and not inspect.isfunction(value) and not inspect.isclass(value):
                     try:
                         if (type(value) is list) or (isinstance(value, dict)):
-                            data[k] = self.fix_unicode(value)
+                            data[k] = self.fix_unicode(copy.copy(value))
                         else:
                             data[k] = str(self.fix_unicode(value))
                     except:
