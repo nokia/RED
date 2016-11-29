@@ -761,7 +761,7 @@
                 style="push">
           </command>
           <command
-                commandId="org.robotframework.red.runStaticAnalysis"
+                commandId="org.robotframework.red.revalidateSelection"
                 label="Revalidate"
                 style="push">
           </command>
@@ -984,60 +984,60 @@
 		  	</with>
          </enabledWhen>
 	</handler>
- <handler
-       class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.StaticAnalysisHandler"
-       commandId="org.robotframework.red.runStaticAnalysis">
-    <activeWhen>
-       <with
-             variable="selection">
-          <iterate
-                ifEmpty="false"
-                operator="and">
-             <adapt
-                   type="org.eclipse.core.resources.IResource">
-                <test
-                      property="org.eclipse.core.resources.projectNature"
-                      value="org.robotframework.ide.eclipse.main.plugin.robotNature">
-                </test>
-             </adapt>
-          </iterate>
-       </with>
-    </activeWhen>
-    <enabledWhen>
-       <with
-             variable="selection">
-          <iterate
-                ifEmpty="false"
-                operator="or">
-             <or>
-                <adapt
-                      type="org.eclipse.core.resources.IFile">
-                   <or>
-                      <test
-                            property="org.eclipse.core.resources.name"
-                            value="*.robot">
-                      </test>
-                      <test
-                            property="org.eclipse.core.resources.name"
-                            value="*.txt">
-                      </test>
-                      <test
-                            property="org.eclipse.core.resources.name"
-                            value="*.tsv">
-                      </test>
-                   </or>
-                </adapt>
-                <adapt
-                      type="org.eclipse.core.resources.IFolder">
-                </adapt>
-                <adapt
-                      type="org.eclipse.core.resources.IProject">
-                </adapt>
-             </or>
-          </iterate>
-       </with>
-    </enabledWhen>
- </handler>
+	 <handler
+	       class="org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RevalidateSelectionHandler"
+	       commandId="org.robotframework.red.revalidateSelection">
+	    <activeWhen>
+	       <with
+	             variable="selection">
+	          <iterate
+	                ifEmpty="false"
+	                operator="and">
+	             <adapt
+	                   type="org.eclipse.core.resources.IResource">
+	                <test
+	                      property="org.eclipse.core.resources.projectNature"
+	                      value="org.robotframework.ide.eclipse.main.plugin.robotNature">
+	                </test>
+	             </adapt>
+	          </iterate>
+	       </with>
+	    </activeWhen>
+	    <enabledWhen>
+	       <with
+	             variable="selection">
+	          <iterate
+	                ifEmpty="false"
+	                operator="or">
+	             <or>
+	                <adapt
+	                      type="org.eclipse.core.resources.IFile">
+	                   <or>
+	                      <test
+	                            property="org.eclipse.core.resources.name"
+	                            value="*.robot">
+	                      </test>
+	                      <test
+	                            property="org.eclipse.core.resources.name"
+	                            value="*.txt">
+	                      </test>
+	                      <test
+	                            property="org.eclipse.core.resources.name"
+	                            value="*.tsv">
+	                      </test>
+	                   </or>
+	                </adapt>
+	                <adapt
+	                      type="org.eclipse.core.resources.IFolder">
+	                </adapt>
+	                <adapt
+	                      type="org.eclipse.core.resources.IProject">
+	                </adapt>
+	             </or>
+	          </iterate>
+	       </with>
+	    </enabledWhen>
+	 </handler>
 	
  </extension>
  <extension
@@ -1450,8 +1450,18 @@
     </command>
     <command
           categoryId="org.robotframework.ide.eclipse.robotCommands"
-          id="org.robotframework.red.runStaticAnalysis"
-          name="Run Static Analysis">
+          id="org.robotframework.red.revalidateSelection"
+          name="Revalidate selection">
+    </command>
+    <command
+          categoryId="org.robotframework.ide.eclipse.robotCommands"
+          id="org.robotframework.red.revalidateEditor"
+          name="Revalidate project">
+       <commandParameter
+             id="org.robotframework.red.revalidateEditor.mode"
+             name="Mode"
+             optional="false">
+       </commandParameter>
     </command>
  </extension>
  <extension
@@ -2610,6 +2620,15 @@
           </reference>
        </activeWhen>
     </handler>
+    <handler
+          class="org.robotframework.ide.eclipse.main.plugin.tableeditor.source.handler.RevalidateEditorHandler"
+          commandId="org.robotframework.red.revalidateEditor">
+       <activeWhen>
+          <reference
+                definitionId="org.robotframework.sourcePartIsActiveAndEditable">
+          </reference>
+       </activeWhen>
+    </handler>
  </extension>
  <extension
        name="Red xml editor handlers"
@@ -2980,6 +2999,32 @@
           contextId="org.robotframework.ide.eclipse.tableeditor.tables.context"
           schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
           sequence="M1+Y">
+    </key>
+    <key
+          commandId="org.robotframework.red.revalidateSelection"
+          contextId="org.eclipse.ui.contexts.window"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+F5">
+    </key>
+    <key
+          commandId="org.robotframework.red.revalidateEditor"
+          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+F5">
+       <parameter
+             id="org.robotframework.red.revalidateEditor.mode"
+             value="FILE">
+       </parameter>
+    </key>
+    <key
+          commandId="org.robotframework.red.revalidateEditor"
+          contextId="org.robotframework.ide.eclipse.tableeditor.sources.context"
+          schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+          sequence="M1+M2+F5">
+       <parameter
+             id="org.robotframework.red.revalidateEditor.mode"
+             value="PROJECT">
+       </parameter>
     </key>
  </extension>
  <extension
