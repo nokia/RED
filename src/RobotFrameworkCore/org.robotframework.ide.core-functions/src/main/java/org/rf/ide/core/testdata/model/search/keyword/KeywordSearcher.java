@@ -15,6 +15,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
@@ -61,9 +62,19 @@ public class KeywordSearcher {
 
     }
 
-    public <T> ListMultimap<String, T> findKeywords(final Collection<T> keywords, final Extractor<T> extractor,
-            final String usageName, boolean stopIfOneWasMatching) {
+    public <T> ListMultimap<String, T> findKeywords(final Map<String, Collection<T>> accessibleKeywords,
+            final Collection<T> keywords, final Extractor<T> extractor, final String usageName,
+            boolean stopIfOneWasMatching) {
         final ListMultimap<String, T> foundByMatch = ArrayListMultimap.create();
+
+        if (stopIfOneWasMatching) {
+            Collection<T> collection = accessibleKeywords.get(QualifiedKeywordName.unifyDefinition(usageName));
+            if (collection != null && collection.size() == 1) {
+                foundByMatch.putAll(QualifiedKeywordName.unifyDefinition(usageName), collection);
+
+                return foundByMatch;
+            }
+        }
 
         final List<String> possibleNameCombination = getNamesToCheck(usageName);
         for (final T keyword : keywords) {
