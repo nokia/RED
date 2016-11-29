@@ -24,9 +24,9 @@ public enum ProblemCategory {
     PROJECT_CONFIGURATION_FILE(
             ProblemCategoryType.PROJECT_CONFIGURATION,
             "Project configuration file (" + RobotProjectConfig.FILENAME + ") cannot be read",
-            "This problem occurs when project has no " + RobotProjectConfig.FILENAME
+            "Occurs when project has no " + RobotProjectConfig.FILENAME
                     + " configuration file or it cannot be read.\n"
-                    + "Either there is a problem accessing the file or its structure is broken.\n") {
+                    + "Either there is a problem accessing the file or its structure is broken.\n" ) {
 
         @Override
         public Severity getDefaultSeverity() {
@@ -41,7 +41,7 @@ public enum ProblemCategory {
     MISSING_ROBOT_ENVIRONMENT(
             ProblemCategoryType.PROJECT_CONFIGURATION,
             "Python Robot Framework environment missing",
-            "This problems occurs when there is no Robot Environment defined.\n"
+            "Occurs when there is no Robot Environment defined.\n"
                     + "Python main directory with Robot modules installed should be defined in preferences.\n"
                     + "Project may override this setting in its configuration file.") {
 
@@ -57,8 +57,8 @@ public enum ProblemCategory {
     },
     LIBRARY_SPECIFICATION_FILE(
             ProblemCategoryType.PROJECT_CONFIGURATION,
-            "Library configuration file cannot be generated",
-            "This problems occurs when for some reason Robot framework is unable to generate library specification file.") {
+            "Library documentation file cannot be generated",
+            "Occurs when for some reason Robot framework is unable to generate library specification file,probably due to missing library dependencies or errors in library source code.\n") {
 
         @Override
         public Severity getDefaultSeverity() {
@@ -73,7 +73,7 @@ public enum ProblemCategory {
     REMOVED_API(
             ProblemCategoryType.ROBOT_VERSION,
             "Removed Robot Framework API used",
-            "This problems occurs when removed syntax is used. Use Robot Framework 3.0 syntax instead.") {
+            "Occurs when syntax from older Robot Framework version is not available in current version.") {
 
         @Override
         public Severity getDefaultSeverity() {
@@ -83,7 +83,7 @@ public enum ProblemCategory {
     UNSUPPORTED_API(
             ProblemCategoryType.ROBOT_VERSION,
             "Unsupported Robot Framework API used",
-            "This problems occurs when syntax from newer Robot Framework version is not available in older version.") {
+            "Occurs when syntax from newer Robot Framework version is not available in older version.") {
 
         @Override
         public Severity getDefaultSeverity() {
@@ -93,89 +93,89 @@ public enum ProblemCategory {
     DEPRECATED_API(
             ProblemCategoryType.ROBOT_VERSION,
             "Deprecated Robot Framework API used",
-            "This problems occurs when deprecated syntax is used. Use Robot Framework 3.0 syntax instead."),
+            "Occurs when deprecated syntax is used. Use current Robot Framework syntax instead."),
     DUPLICATED_DEFINITION(
             ProblemCategoryType.ROBOT_VERSION,
             "Duplicated definitions used",
-            "This problems occurs when duplicated definition is used. It occures in older Robot Framework versions."),
+            "Occurs when testcase or keywords definitions names are not unique."),
     INCORRECT_INITIALIZATION(
             ProblemCategoryType.ROBOT_VERSION,
             "Incorrect variable initialization",
-            "This problems occurs when variable is incorrectly initialized. It occures in older Robot Framework versions."),
+            "Occurs when there is syntax error in variable initialization."),
     DUPLICATED_VARIABLE(
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
             "Duplicated variable name",
-            "This problems occurs when variable name is duplicated and one variable value overrides another."),   
+            "Occurs when variable name is duplicated and one variable value overrides another."),   
     DUPLICATED_TEST_CASE(
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
             "Duplicated test case name",
-            "This problems occurs when test case name is duplicated and both test cases can be run."),  
+            "Occurs when test case name is duplicated and both test cases can be run."),  
     MASKED_KEYWORD(
             ProblemCategoryType.NAME_SHADOWING_AND_CONFLICTS,
             "Masked keyword name",
-            "This problems occurs when keyword defined in test suite has tse same name like keyword from imported library.\n"
+            "Occurs when keyword defined in test suite has the same name like keyword from imported library.\n"
                     + "You can use fully qualified name when calling masked keyword."), 
     EMPTY_SETTINGS(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Empty settings definition",
-            "This problems occurs when suite, test case or keyword setting is defined with empty content."),
+            "Occurs when suite, test case or keyword setting is defined with empty content."),
     UNRECOGNIZED_HEADER(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Unrecognized header type",
-            "This problems occurs when Robot Framework does not recognize section header.\n"
+            "Occurs when Robot Framework does not recognize section header.\n"
                     + "Only ***Settings***, ***Variables***, ***Test Cases*** or ***Keywords*** sections are valid."),
     DUPLICATED_PATH(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Duplicated configuration path", 
-            "This problem occurs when path defined in configuration is subpath of different one. Such path is skipped."),
+            "Occurs when path defined in configuration is subpath of different one. Such path is skipped."),
     MISSING_PATH(
             ProblemCategoryType.UNNECESSARY_CODE,
             "Missing configuration path", 
-            "This problem occurs when missing path is defined in configuration. Such path is skipped."),
+            "Occurs when missing path is defined in configuration. Such path is skipped."),
     KEYWORD_FROM_NESTED_LIBRARY(
             ProblemCategoryType.CODE_STYLE,
             "Keyword from nested library",
-            "This problem occurs when keyword imported by dependency is used in test suite."),
+            "Occurs when keyword imported by dependency is used in test suite."),
     KEYWORD_OCCURRENCE_NOT_CONSISTENT_WITH_DEFINITION(
             ProblemCategoryType.CODE_STYLE,
-            "Keyword occurence not consistent with definition",
-            "This problem occurs when name in keyword call is different than in definition. Use spaes in the same place like in definition."),
+            "Keyword occurrence not consistent with definition",
+            "Occurs when name in keyword call is different than in definition. Use name the same as in definition."),
     KEYWORD_NAME_WITH_DOTS(
             ProblemCategoryType.CODE_STYLE,
             "Keyword name with dots",
-            "This problem occurs when keyword name contains dots. It may be confused with fully qualified name."),
+            "Occurs when keyword name contains dots. It may be confused with fully qualified name."),
     VARIABLE_AS_KEYWORD_USAGE(
             ProblemCategoryType.CODE_STYLE,
             "Variable given as keyword name", 
-            "This problem occurs when variable is used as keyword call in test suite setup or teardown."),
+            "Occurs when variable is used as keyword call in test suite setup or teardown."),
     COLLECTION_ARGUMENT_SIZE(
             ProblemCategoryType.CODE_STYLE,
             "Collection size should be equal to keyword arguments number",
-            "This problems occurs when collection variable is used in keyword call."),
+            "Occurs when collection variable is used in keyword call and collection elements number is different than keyword arguments number."),
     TIME_FORMAT(
             ProblemCategoryType.CODE_STYLE,
             "Invalid time format",
-            "This problems occurs when time is not formatted correctly. Use number, time string or timer string."), 
+            "Occurs when time is not formatted correctly. Use number, time string or timer string."), 
     ABSOLUTE_PATH(
             ProblemCategoryType.IMPORT,
-            "Absoulte path is used", 
-            "This problems occurs when absoulte path is used. Workspace-relative paths are preferred in RED."),
+            "Absolute path used", 
+            "Occurs when absolute path is used. Workspace-relative paths are preferred in RED."),
     HTML_FORMAT(
             ProblemCategoryType.IMPORT,
-            "HTML format is used", 
-            "This problems occurs when imported file is in HTML format. Use supported formats only."),
+            "HTML format used", 
+            "Occurs when imported file is in HTML format. Use supported formats only."),
     IMPORT_PATH_RELATIVE_VIA_MODULES_PATH(
             ProblemCategoryType.IMPORT,
             "Import path relative via modules path", 
-            "This problems occurs when imported path is relative to python path."),
+            "Occurs when imported path is relative to python path."),
     PARSER_WARNING( 
             ProblemCategoryType.RUNTIME,
             "RED parser warning",
-            "This problems occurs when for some reason RED parser reports warning."),
+            "Occurs when for some reason RED parser reports warning."),
     RUNTIME_ERROR(
             ProblemCategoryType.RUNTIME,
-            "Robort Framework runtime error",
-            "This problems occurs when incorrect Robot Framework syntax is isused. Such syntax will fail test in runtime.") {
+            "Robot Framework runtime error",
+            "Occurs when incorrect Robot Framework syntax is issued. Such syntax will fail test in runtime.") {
 
         @Override
         public Severity getDefaultSeverity() {
