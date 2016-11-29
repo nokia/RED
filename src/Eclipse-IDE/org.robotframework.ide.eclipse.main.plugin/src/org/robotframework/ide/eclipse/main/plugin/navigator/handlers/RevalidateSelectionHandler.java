@@ -26,7 +26,7 @@ import org.eclipse.e4.core.di.annotations.Execute;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.StaticAnalysisHandler.E4StaticAnalysisHandler;
+import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RevalidateSelectionHandler.E4RevalidateSelectionHandler;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfig;
@@ -37,16 +37,16 @@ import org.robotframework.red.viewers.Selections;
 import com.google.common.base.Function;
 import com.google.common.collect.Multimaps;
 
-public class StaticAnalysisHandler extends DIParameterizedHandler<E4StaticAnalysisHandler> {
+public class RevalidateSelectionHandler extends DIParameterizedHandler<E4RevalidateSelectionHandler> {
 
-    public StaticAnalysisHandler() {
-        super(E4StaticAnalysisHandler.class);
+    public RevalidateSelectionHandler() {
+        super(E4RevalidateSelectionHandler.class);
     }
 
-    public static class E4StaticAnalysisHandler {
+    public static class E4RevalidateSelectionHandler {
 
         @Execute
-        public void runStaticAnalysis(final @Named(Selections.SELECTION) IStructuredSelection selection) {
+        public void revalidate(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
             final Map<IProject, Collection<IFile>> grouped = RobotSuiteFileCollector
