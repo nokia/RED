@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _UUQjsLrCEeW29Kbu_epUIA
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 4/4/16 11:58 AM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/30/16 4:55 PM
 Testcase-Type: ecl
 Verifications: _ERtq8NWOEeWy4ZEoqcgipg,_KRyuULrEEeW29Kbu_epUIA
 
@@ -133,5 +133,26 @@ if [$is_product | eq true]{
 	}
 }	
 
-		
+//double click on problems
+get-view Problems | get-tree 
+    | select "Errors \\(95 items\\)/Invalid number of arguments. Keyword 'Close Aplication' expects 0 arguments, but 1 is provided" 
+    | double-click
+    
+with [get-editor "all_settings.robot" | get-text-viewer] {
+    get-property "getSelectionText()" | equals "Test Teardown" | verify-true
+}    		
+
+//double click on problems	
+get-view Problems | get-tree | select "Errors (95 items)/Test case 'Empty test' contains no keywords to execute" 
+    | select "Errors \\(95 items\\)/Test case 'Empty test' contains no keywords to execute" | double-click
+    
+get-editor "empty_TC_KW.robot" | get-text-viewer | get-property "getSelectionText()" | equals "Empty test" | verify-true	
+
+with [get-view Problems | get-tree] {
+    select "Warnings \\(9 items\\)/Dictionary argument '&{f 1}' has to provide 1 value in order to ensure \\[message\\] arguments of keyword definition" 
+        | double-click
+}	
+
+get-editor "empty_TC_KW.robot" | get-text-viewer | get-property "getSelectionText()" | equals "Log" | verify-true
+
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
