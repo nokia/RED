@@ -6,8 +6,8 @@ Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _gCszcJREEeWNpL9oeriwCw
-Runtime-Version: 2.0.0.201506120617
-Save-Time: 11/27/15 12:50 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 11/30/16 1:44 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -66,7 +66,9 @@ with [get-window "Debug Configurations"] {
 }
 // run and verify if 2 tests were run
 get-eclipse-window | key-type "F11"
-get-view Console | get-text-viewer | get-property text |  matches "2 critical test, 2 passed"
+try -times 4 -delay 1000 -command{
+	get-view Console | get-text-viewer | get-property text |  matches "2 critical test, 2 passed"
+}
 
 // add Tag OnlyThis to first script 
 with [get-editor "Script.robot"] {
