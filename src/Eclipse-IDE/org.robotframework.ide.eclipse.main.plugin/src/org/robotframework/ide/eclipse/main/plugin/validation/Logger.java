@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.validation;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 
 /**
@@ -21,8 +22,11 @@ class Logger extends BuildLogger {
     }
 
     @Override
-    public void logError(final String message) {
+    public void logError(final String message, final Throwable cause) {
         System.err.println(getTimestamp() + " " + message);
+        if (cause != null) {
+            RedPlugin.logError(message, cause);
+        }
     }
 
     private String getTimestamp() {

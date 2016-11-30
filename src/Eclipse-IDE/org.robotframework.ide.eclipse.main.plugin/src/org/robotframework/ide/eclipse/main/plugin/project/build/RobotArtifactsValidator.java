@@ -52,6 +52,7 @@ import com.google.common.collect.Queues;
 public class RobotArtifactsValidator {
 
     private final BuildLogger logger;
+
     private final IProject project;
 
     public RobotArtifactsValidator(final IProject project, final BuildLogger logger) {
@@ -108,7 +109,7 @@ public class RobotArtifactsValidator {
                             return Status.CANCEL_STATUS;
                         }
                     }
-                    
+
                     logger.log("VALIDATING: validation of '" + project.getName() + "' project started");
                     logger.log("VALIDATING: gathering files to be validated");
 
@@ -117,11 +118,13 @@ public class RobotArtifactsValidator {
 
                     validateModelUnits(monitor, Queues.newArrayDeque(validators));
 
-                    final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = context.getLibrariesAutoDiscoverer();
-                    if (librariesAutoDiscoverer.isPresent() && librariesAutoDiscoverer.get().hasSuiteFilesToDiscovering()) {
+                    final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = context
+                            .getLibrariesAutoDiscoverer();
+                    if (librariesAutoDiscoverer.isPresent()
+                            && librariesAutoDiscoverer.get().hasSuiteFilesToDiscovering()) {
                         librariesAutoDiscoverer.get().start();
                     }
-                    
+
                     return Status.OK_STATUS;
                 } catch (final CoreException | InterruptedException e) {
                     RedPlugin.logError("Project validation was corrupted", e);
@@ -147,8 +150,8 @@ public class RobotArtifactsValidator {
                 final int total = validators.size();
                 while (!validators.isEmpty()) {
                     final ModelUnitValidator validator = validators.poll();
-                    threadPool.submit(
-                            createValidationRunnable(monitor, validationSubMonitor, current, total, validator));
+                    threadPool
+                            .submit(createValidationRunnable(monitor, validationSubMonitor, current, total, validator));
                     current++;
                 }
                 threadPool.shutdown();
@@ -159,6 +162,7 @@ public class RobotArtifactsValidator {
                     final SubMonitor validationSubMonitor, final int id, final int total,
                     final ModelUnitValidator validator) {
                 return new Runnable() {
+
                     @Override
                     public void run() {
                         try {
@@ -170,7 +174,7 @@ public class RobotArtifactsValidator {
                             logger.log("VALIDATING: done (" + id + "/" + total + ")");
                         } catch (final Exception e) {
                             logger.log("VALIDATING: error (" + id + "/" + total + ")");
-                            logger.logError("VALIDATING: error\n" + e.getMessage());
+                            logger.logError("VALIDATING: error\n" + e.getMessage(), e);
                         } finally {
                             validationSubMonitor.worked(1);
                         }
@@ -189,7 +193,7 @@ public class RobotArtifactsValidator {
 
         List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException;
     }
-    
+
     public static class ModelUnitValidatorConfigFactory {
 
         public static ModelUnitValidatorConfig create(final IProject project) {
@@ -300,8 +304,9 @@ public class RobotArtifactsValidator {
         private static Optional<? extends ModelUnitValidator> createValidator(final ValidationContext context,
                 final IResource resource, final ProblemsReportingStrategy reporter, final boolean isRevalidating)
                 throws CoreException {
-            return shouldValidate(context.getProjectConfiguration(), resource, isRevalidating) ? createProperValidator(
-                    context, (IFile) resource, reporter) : Optional.<ModelUnitValidator> absent();
+            return shouldValidate(context.getProjectConfiguration(), resource, isRevalidating)
+                    ? createProperValidator(context, (IFile) resource, reporter)
+                    : Optional.<ModelUnitValidator> absent();
         }
 
         private static boolean shouldValidate(final RobotProjectConfig robotProjectConfig, final IResource resource,
