@@ -228,7 +228,7 @@ public class KeywordSearcher {
             names.add(Joiner.on('.').join(asList.subList(dotIndex, splittedLength)));
         }
 
-        return splitted[splittedLength - 1];
+        return (splittedLength > 0) ? splitted[splittedLength - 1] : "";
     }
 
     private String gherkinSyntaxCombination(final Set<String> names, final String usageName) {
