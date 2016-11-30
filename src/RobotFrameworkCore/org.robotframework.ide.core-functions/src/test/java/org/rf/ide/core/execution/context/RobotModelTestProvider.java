@@ -47,8 +47,12 @@ public class RobotModelTestProvider {
     }
 
     public static RobotFile getModelFile(final String filename, final RobotParser parser) throws URISyntaxException {
-        final Path path = Paths.get(getInstance().getClass().getResource(filename).toURI());
+        final Path path = getFilePath(filename);
         return getModelFile(path, parser);
+    }
+
+    public static Path getFilePath(final String filename) throws URISyntaxException {
+        return Paths.get(getInstance().getClass().getResource(filename).toURI());
     }
 
     public static RobotFile getModelFile(final Path path, final RobotParser parser) {
