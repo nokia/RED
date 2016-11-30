@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _uTxjELYgEeazMIT-6yPcSw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/29/16 3:49 PM
+Save-Time: 11/30/16 1:41 PM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -37,12 +37,17 @@ exec-with-options -disableJobWaiting -command {
 	//script dill be stopped at 10th line		
 	get-button "Step Into (F5)" | click
 	check-debug-marker-on-ruler -line 10 -script_name "test.robot"
-	wait 500
 	
 	//click to set focus (to see on screenshot if fail)
-	get-view Variables | get-tree | select "@{List_elems}"
 	
+	//get-view Variables | maximize
+	wait 2000
+//	with [get-view Variables | get-tree] {
+//	    get-item ".*" -index 1 | key-type Home
+//	    select "@{List_elems}"
+//	}
 	//check if list of object is shown in variables
+	get-view Variables | get-tree | get-item ".*" -index 0 | expand-all
 	with [get-view Variables | get-tree] {
 	    get-item "@{List_elems}/\\[0\\]" | get-property "values['Name']" | equals "[0]" | verify-true
 	    get-item "@{List_elems}/\\[0\\]" | get-property "values['Value']" 
@@ -52,7 +57,7 @@ exec-with-options -disableJobWaiting -command {
 	        | equals "<lib_returns_obj.A object at .*>" | verify-true
 	    get-item "@{List_elems}" | get-property childCount | equals 2 | verify-true
 	}
-	
+	get-view Variables | restore
 	//go to single object assign to variable
 	get-button "Step Into (F5)" | click
 	check-debug-marker-on-ruler -line 11 -script_name "test.robot"
@@ -68,7 +73,7 @@ exec-with-options -disableJobWaiting -command {
 	get-button "Step Into (F5)" | click
 	check-debug-marker-on-ruler -line 12 -script_name "test.robot"
 	
-	get-view Variables | get-tree | select "&{map}"
+	get-view Variables | get-tree | get-item ".*" -index 0 | expand-all
 	
 	with [get-view Variables | get-tree] {
 	    get-item "&{map}/<lib_returns_obj.A object at .*>" | get-property "values['Name']" 
@@ -102,10 +107,11 @@ exec-with-options -disableJobWaiting -command {
 
 }
 
+    
 get-view "Message Log" | get-editbox | get-property text | matches "Starting test: ReturnObjects.Test.test\n"
     + ".* : INFO : @\{List_elems\} = \[ <lib_returns_obj.A object at .*> \| <lib_returns_obj.A object at .*> \]\n"
     + ".* : INFO : \$\{one_elem\} = <lib_returns_obj.A object at .*>\n"
-    + ".* : INFO : &\{map\} = \{ key2=<lib_returns_obj.A object at .*> \| <lib_returns_obj.A object at .*>=<lib_returns_obj.A object at .*> \| key=<lib_returns_obj.A object at .*> \}\n"
+    + ".* : INFO : &\{map\} = \{.*\}\n"
     + ".* : INFO : text\n"
     + ".* : INFO : \$\{val\} = 7\n"
     + ".* : INFO : 7\n"
