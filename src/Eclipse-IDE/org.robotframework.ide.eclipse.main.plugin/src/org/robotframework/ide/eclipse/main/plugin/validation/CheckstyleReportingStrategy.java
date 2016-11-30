@@ -21,11 +21,11 @@ import com.google.common.collect.Multimap;
 
 /**
  * @author Michal Anglart
- *
  */
 public class CheckstyleReportingStrategy extends HeadlessValidationReportingStrategy {
 
     private final Logger logger;
+
     private final String reportFilepath;
 
     private int numberOfProblems;
@@ -61,7 +61,7 @@ public class CheckstyleReportingStrategy extends HeadlessValidationReportingStra
         if (reportFilepath != null) {
             if (numberOfProblems != problems.size()) {
                 logger.logError("There is an invalid number of problems handled: " + numberOfProblems + " counted, but "
-                        + problems.size() + " stored");
+                        + problems.size() + " stored", null);
             }
             generateFile(new File(reportFilepath), problems.asMap());
         }
@@ -75,7 +75,8 @@ public class CheckstyleReportingStrategy extends HeadlessValidationReportingStra
             checkstyleReporter.writeFooter();
             logger.log("Report file '" + file.getAbsolutePath() + "' has been generated");
         } catch (final IOException e) {
-            logger.logError("Unable to create report file '" + file.getAbsolutePath() + "'. Reason: " + e.getMessage());
+            logger.logError("Unable to create report file '" + file.getAbsolutePath() + "'. Reason: " + e.getMessage(),
+                    e);
         }
     }
 

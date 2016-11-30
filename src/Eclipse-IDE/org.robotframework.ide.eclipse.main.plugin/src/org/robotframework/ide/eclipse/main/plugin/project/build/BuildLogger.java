@@ -7,7 +7,6 @@ package org.robotframework.ide.eclipse.main.plugin.project.build;
 
 /**
  * @author Michal Anglart
- *
  */
 public class BuildLogger {
 
@@ -15,7 +14,7 @@ public class BuildLogger {
         // nothing to do
     }
 
-    public void logError(final String message) {
+    public void logError(final String message, final Throwable cause) {
         // nothing to do
     }
 }
