@@ -11,8 +11,11 @@ import java.util.List;
 import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.importer.ResourceImporter;
+import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
+import org.rf.ide.core.testdata.model.table.ARobotSectionTable;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.TestCaseTable;
 import org.rf.ide.core.testdata.model.table.exec.descs.IExecutableRowDescriptor;
@@ -27,7 +30,7 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCase;
 public class RobotDebugExecutionContext {
 
     public static final String MAIN_KEYWORD_TYPE = "Keyword";
-    
+
     public static final String FOR_LOOP_ITEM_KEYWORD_TYPE = "For Item";
 
     private RobotFile currentModel;
@@ -145,9 +148,31 @@ public class RobotDebugExecutionContext {
     }
 
     private KeywordPosition createNewKeywordPosition(final RobotExecutableRow<?> executableRow) {
-        final String path = getFirstResourceImportPath();
+        final ARobotSectionTable table = getTableFromWhichExecutableRowCome(executableRow);
+
+        final RobotFileOutput robotFileOutput = table.getParent().getParent();
+        final String path;
+        if (robotFileOutput.getType() == RobotFileType.RESOURCE) {
+            path = getFirstResourceImportPath();
+        } else {
+            path = robotFileOutput.getProcessedFile().getAbsolutePath();
+        }
         final int line = getLine(executableRow);
         return new KeywordPosition(path, line);
+    }
+
+    private ARobotSectionTable getTableFromWhichExecutableRowCome(final RobotExecutableRow<?> executableRow) {
+        final ARobotSectionTable table;
+        if (executableRow.getModelType() == ModelType.USER_KEYWORD_EXECUTABLE_ROW) {
+            @SuppressWarnings("unchecked")
+            RobotExecutableRow<UserKeyword> executableRowKeyword = (RobotExecutableRow<UserKeyword>) executableRow;
+            table = executableRowKeyword.getParent().getParent();
+        } else {
+            @SuppressWarnings("unchecked")
+            RobotExecutableRow<TestCase> executableRowKeyword = (RobotExecutableRow<TestCase>) executableRow;
+            table = executableRowKeyword.getParent().getParent();
+        }
+        return table;
     }
 
     private int getLine(final RobotExecutableRow<?> executableRow) {
@@ -195,7 +220,7 @@ public class RobotDebugExecutionContext {
             isSetupTeardownKeywordStarted = false;
         }
     }
-    
+
     private boolean isMainKeyword(final String keywordType) {
         return keywordType.equalsIgnoreCase(MAIN_KEYWORD_TYPE);
     }
@@ -203,7 +228,7 @@ public class RobotDebugExecutionContext {
     private boolean isForLoopKeyword(final String keywordType) {
         return ForLoopKeywordTypes.isForLoopKeywordType(keywordType);
     }
-    
+
     private boolean isForLoopItemKeyword(final String keywordType) {
         return keywordType.equalsIgnoreCase(FOR_LOOP_ITEM_KEYWORD_TYPE);
     }
@@ -302,6 +327,39 @@ public class RobotDebugExecutionContext {
         public String getFilePath() {
             return filePath;
         }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((filePath == null) ? 0 : filePath.hashCode());
+            result = prime * result + lineNumber;
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            KeywordPosition other = (KeywordPosition) obj;
+            if (filePath == null) {
+                if (other.filePath != null)
+                    return false;
+            } else if (!filePath.equals(other.filePath))
+                return false;
+            if (lineNumber != other.lineNumber)
+                return false;
+            return true;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("KeywordPosition [lineNumber=%s, filePath=%s]", lineNumber, filePath);
+        }
     }
 
     protected static class TestCaseExecutionRowCounter {
@@ -320,31 +378,31 @@ public class RobotDebugExecutionContext {
             return counter;
         }
     }
-    
+
     protected enum ForLoopKeywordTypes {
         NEW_FOR("For"), // since Robot 3.0 a2
         TEST_FOR("Test For"),
         SUITE_FOR("Suite For");
-        
+
         private String typeName;
-        
+
         private ForLoopKeywordTypes(final String typeName) {
             this.typeName = typeName;
         }
-        
+
         private String getTypeName() {
             return typeName;
         }
-        
+
         public static boolean isForLoopKeywordType(final String keywordType) {
             final ForLoopKeywordTypes[] values = ForLoopKeywordTypes.values();
             for (int i = 0; i < values.length; i++) {
-                if(values[i].getTypeName().equalsIgnoreCase(keywordType)) {
+                if (values[i].getTypeName().equalsIgnoreCase(keywordType)) {
                     return true;
                 }
             }
             return false;
         }
-        
+
     }
 }
