@@ -5,84 +5,118 @@
  */
 package org.rf.ide.core.execution.context;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
+import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordSearcher;
+import org.rf.ide.core.testdata.model.search.keyword.KeywordSearcher.Extractor;
 import org.rf.ide.core.testdata.model.table.RobotExecutableRow;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameTransformation;
+import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 
-import com.google.common.base.Optional;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.io.Files;
 
 /**
  * @author mmarzec
- *
  */
 public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder {
 
     private List<UserKeyword> userKeywords;
 
-    private List<ResourceImportReference> resourceImportReferences;
+    private List<ResourceImportReference> resourceImportReferences = new ArrayList<>();
+
+    private ListMultimap<String, UserKeyword> accessibleKeywords = ArrayListMultimap.create();
+
+    private KeywordSearcher keywordSearcher;
+
+    private UserKeywordExtractor userKeywordExtractor;
 
     public UserKeywordExecutableRowFinder(final List<UserKeyword> userKeywords,
-            final List<ResourceImportReference> resourceImportReferences) {
+            final List<ResourceImportReference> resourceImportReferencesTestSuite) {
         this.userKeywords = userKeywords;
-        this.resourceImportReferences = resourceImportReferences;
+        this.userKeywordExtractor = new UserKeywordExtractor();
+        this.keywordSearcher = new KeywordSearcher();
+        collectAllReferences(new HashSet<Path>(0), resourceImportReferencesTestSuite);
+        fillAllKeywordsMap(null, getLocalTestSuiteKeywords());
+        addKeywordsFromReferences(resourceImportReferences);
     }
 
     @Override
     public RobotExecutableRow<?> findExecutableRow(final List<KeywordContext> currentKeywords) {
         RobotExecutableRow<UserKeyword> executionRow = null;
         final KeywordContext parentKeywordContext = currentKeywords.get(currentKeywords.size() - 2);
-        // search in keywords from Keywords section
-        final UserKeyword userKeyword = findUserKeyword(parentKeywordContext);
-        if (userKeyword != null) {
-            if (parentKeywordContext.getUserKeyword() == null) {
-                parentKeywordContext.setUserKeyword(userKeyword);
-            }
-            executionRow = findKeywordExecutionRow(userKeyword, parentKeywordContext);
-        } else {
-            // search in resources from Settings section
-            ResourceImportReference resourceImportReference = findResource(parentKeywordContext);
-            if (resourceImportReference == null) {
-                // if keyword is in other keyword in resource file
-                resourceImportReference = findLastResourceImportReferenceInCurrentKeywords(currentKeywords);
-            }
-            if (resourceImportReference != null) {
-                if (parentKeywordContext.getResourceImportReference() == null) {
-                    parentKeywordContext.setResourceImportReference(resourceImportReference);
-                }
-                final UserKeyword userResourceKeyword = findResourceKeyword(resourceImportReference,
-                        parentKeywordContext); // search in keywords from Keywords section in
-                                               // resource file
-                if (userResourceKeyword != null) {
-                    if (parentKeywordContext.getUserKeyword() == null) {
-                        parentKeywordContext.setUserKeyword(userResourceKeyword);
+
+        UserKeyword newUserKeyword = parentKeywordContext.getUserKeyword();
+
+        if (newUserKeyword == null) {
+            final String keywordName = extractIfNameIsFromVariableDeclaration(parentKeywordContext.getName());
+            ListMultimap<String, UserKeyword> foundKeywords = keywordSearcher.findKeywords(accessibleKeywords.asMap(),
+                    accessibleKeywords.values(), userKeywordExtractor, keywordName, true);
+            List<UserKeyword> bestMatchingKeywords = keywordSearcher.getBestMatchingKeyword(foundKeywords,
+                    userKeywordExtractor, keywordName);
+
+            if (bestMatchingKeywords.size() == 1) {
+                newUserKeyword = bestMatchingKeywords.get(0);
+            } else if (bestMatchingKeywords.size() > 1) {
+                // find local
+                for (final UserKeyword currentUserKeyword : bestMatchingKeywords) {
+                    if (userKeywordExtractor.scope(currentUserKeyword) == KeywordScope.LOCAL) {
+                        newUserKeyword = currentUserKeyword;
+                        break;
                     }
-                    executionRow = findKeywordExecutionRow(userResourceKeyword, parentKeywordContext);
                 }
             }
         }
+
+        if (newUserKeyword != null) {
+            if (userKeywordExtractor.scope(newUserKeyword) == KeywordScope.RESOURCE) {
+                ResourceImportReference reference = findResource(parentKeywordContext, newUserKeyword);
+
+                if (reference != null) {
+                    parentKeywordContext.setResourceImportReference(reference);
+                }
+            }
+
+            parentKeywordContext.setUserKeyword(newUserKeyword);
+            executionRow = findKeywordExecutionRow(newUserKeyword, parentKeywordContext);
+        }
+
         return executionRow;
     }
 
-    private UserKeyword findUserKeyword(final KeywordContext keywordContext) {
-        if (keywordContext.getUserKeyword() != null) {
-            return keywordContext.getUserKeyword();
+    private ResourceImportReference findResource(final KeywordContext parentKeywordContext,
+            UserKeyword newUserKeyword) {
+        ResourceImportReference reference = null;
+        if (parentKeywordContext.getResourceImportReference() != null) {
+            reference = parentKeywordContext.getResourceImportReference();
+        } else {
+            for (final ResourceImportReference refImp : resourceImportReferences) {
+                if (refImp.getReference().getFileModel().getKeywordTable().getKeywords().contains(newUserKeyword)) {
+                    reference = refImp;
+                    break;
+                }
+            }
         }
-        final String keywordName = extractIfNameIsFromVariableDeclaration(keywordContext.getName());
-        return findKeywordByName(userKeywords, keywordName);
+        return reference;
     }
 
     private RobotExecutableRow<UserKeyword> findKeywordExecutionRow(final UserKeyword userKeyword,
             final KeywordContext parentKeywordContext) {
         final List<RobotExecutableRow<UserKeyword>> executableRows = userKeyword.getKeywordExecutionRows();
         if (parentKeywordContext.getKeywordExecutableRowCounter() < executableRows.size()) {
-            final RobotExecutableRow<UserKeyword> executableRow = executableRows.get(parentKeywordContext.getKeywordExecutableRowCounter());
+            final RobotExecutableRow<UserKeyword> executableRow = executableRows
+                    .get(parentKeywordContext.getKeywordExecutableRowCounter());
             parentKeywordContext.incrementKeywordExecutableRowCounter();
             if (executableRow.isExecutable()) {
                 return executableRow;
@@ -93,26 +127,9 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         return null;
     }
 
-    private ResourceImportReference findResource(final KeywordContext keywordContext) {
-        if (keywordContext.getResourceImportReference() != null) {
-            return keywordContext.getResourceImportReference();
-        }
-        final String[] nameElements = keywordContext.getName().split("\\.");
-        if (nameElements.length > 0) {
-            final String resourceName = extractIfNameIsFromVariableDeclaration(nameElements[0]);
-            final List<ResourceImportReference> referencesByFileName = new ArrayList<>();
-            if(resourceImportReferences != null) {
-                final List<ResourceImportReference> visitedReferences = new ArrayList<>();
-                findImportReferencesByFileName(resourceName, resourceImportReferences, visitedReferences, referencesByFileName);
-            }
-            return findImportReferenceByKeywordName(keywordContext.getName(), referencesByFileName);
-        }
-        return null;
-    }
-
     private String extractIfNameIsFromVariableDeclaration(final String keywordOrResourceName) {
         String name = keywordOrResourceName;
-        if (name.charAt(0) == '$' || name.charAt(0) == '@' || name.charAt(0) == '&' || name.charAt(0) == '%') { 
+        if (name.charAt(0) == '$' || name.charAt(0) == '@' || name.charAt(0) == '&' || name.charAt(0) == '%') {
             // e.g. ${var}= resource1.MyKeyword
             final int variableDeclarationIndex = name.lastIndexOf("=");
             if (variableDeclarationIndex >= 0) {
@@ -122,91 +139,43 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         return name;
     }
 
-    private void findImportReferencesByFileName(final String name, final List<ResourceImportReference> references,
-            final List<ResourceImportReference> visitedReferences,
-            final List<ResourceImportReference> resultReferences) {
-        for (final ResourceImportReference resourceImportReference : references) {
-            if (name.equalsIgnoreCase(Files.getNameWithoutExtension(
-                    resourceImportReference.getReference().getProcessedFile().getAbsolutePath()))) {
-                resultReferences.add(resourceImportReference);
-            }
-
-            if (!visitedReferences.contains(resourceImportReference)) {
-                visitedReferences.add(resourceImportReference);
-                // try to find in nested resource files
-                findImportReferencesByFileName(name,
-                        resourceImportReference.getReference().getResourceImportReferences(), visitedReferences,
-                        resultReferences);
-            }
-        }
-    }
-    
-    private ResourceImportReference findImportReferenceByKeywordName(final String name,
-            final List<ResourceImportReference> references) {
-        if (references.size() == 1) {
-            return references.get(0);
-        } else { //resource files with the same name
-            for (final ResourceImportReference resourceImportReference : references) {
-                if (findResourceKeyword(resourceImportReference, new KeywordContext(name, "")) != null) {
-                    return resourceImportReference;
+    private void collectAllReferences(final Set<Path> visitedPaths,
+            final List<ResourceImportReference> currentReferences) {
+        for (final ResourceImportReference ref : currentReferences) {
+            Path referencePath = ref.getReference().getProcessedFile().toPath().toAbsolutePath();
+            if (!visitedPaths.contains(referencePath)) {
+                visitedPaths.add(referencePath);
+                resourceImportReferences.add(ref);
+                List<ResourceImportReference> referencesOfReference = ref.getReference().getResourceImportReferences();
+                if (!referencesOfReference.isEmpty()) {
+                    collectAllReferences(visitedPaths, referencesOfReference);
                 }
             }
         }
-        return null;
     }
 
-    private ResourceImportReference findLastResourceImportReferenceInCurrentKeywords(
-            final List<KeywordContext> currentKeywords) {
-        for (int i = currentKeywords.size() - 1; i >= 0; i--) {
-            if (currentKeywords.get(i).getResourceImportReference() != null) {
-                return currentKeywords.get(i).getResourceImportReference();
+    private void addKeywordsFromReferences(final List<ResourceImportReference> resourceImportReferences) {
+        for (final ResourceImportReference refImport : resourceImportReferences) {
+            final String fullFileName = refImport.getReference().getProcessedFile().getName();
+            fillAllKeywordsMap(Files.getNameWithoutExtension(fullFileName).toLowerCase(),
+                    refImport.getReference().getFileModel().getKeywordTable().getKeywords());
+        }
+    }
+
+    private void fillAllKeywordsMap(final String fileNamePrefixForResources, final List<UserKeyword> userKeywords) {
+        for (final UserKeyword userKeyword : userKeywords) {
+            final String keywordName = userKeyword.getName().getText();
+            accessibleKeywords.put(QualifiedKeywordName.unifyDefinition(keywordName), userKeyword);
+            if (fileNamePrefixForResources != null && !fileNamePrefixForResources.trim().isEmpty()) {
+                accessibleKeywords.put(
+                        QualifiedKeywordName.unifyDefinition(fileNamePrefixForResources + "." + keywordName),
+                        userKeyword);
             }
         }
-
-        return null;
     }
 
-    private UserKeyword findResourceKeyword(final ResourceImportReference resourceImportReference,
-            final KeywordContext keywordContext) {
-        if (keywordContext.getUserKeyword() != null) {
-            return keywordContext.getUserKeyword();
-        }
-        String name = keywordContext.getName();
-        final String[] nameElements = keywordContext.getName().split("\\.");    //e.g. resource1.MyKeyword
-        if (nameElements.length > 1) {
-            name = nameElements[1];
-        }
-
-        final List<UserKeyword> keywords = resourceImportReference.getReference()
-                .getFileModel()
-                .getKeywordTable()
-                .getKeywords();
-        return findKeywordByName(keywords, name);
-    }
-    
-    private UserKeyword findKeywordByName(final List<UserKeyword> keywords, final String name) {
-        if (keywords != null) {
-            for (final UserKeyword userKeyword : keywords) {
-                final Optional<String> keywordName = GherkinStyleSupport.firstNameTransformationResult(name,
-                        new NameTransformation<String>() {
-
-                            @Override
-                            public Optional<String> transform(final String gherkinNameVariant) {
-                                if (userKeyword.getKeywordName()
-                                        .getText()
-                                        .toString()
-                                        .equalsIgnoreCase(gherkinNameVariant))
-                                    return Optional.fromNullable(gherkinNameVariant);
-                                else
-                                    return Optional.absent();
-                            }
-                        });
-                if (keywordName.isPresent()) {
-                    return userKeyword;
-                }
-            }
-        }
-        return null;
+    private List<UserKeyword> getLocalTestSuiteKeywords() {
+        return Collections.unmodifiableList(this.userKeywords);
     }
 
     public void setUserKeywords(final List<UserKeyword> userKeywords) {
@@ -217,4 +186,36 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
         this.resourceImportReferences = resourceImportReferences;
     }
 
+    private class UserKeywordExtractor implements Extractor<UserKeyword> {
+
+        @Override
+        public KeywordScope scope(final UserKeyword keyword) {
+            return (getRobotFileOutputFrom(keyword).getType() == RobotFileType.RESOURCE) ? KeywordScope.RESOURCE
+                    : KeywordScope.LOCAL;
+        }
+
+        @Override
+        public Path path(final UserKeyword keyword) {
+            return getRobotFileOutputFrom(keyword).getProcessedFile().toPath();
+        }
+
+        @Override
+        public String alias(final UserKeyword keyword) {
+            return "";
+        }
+
+        @Override
+        public String keywordName(final UserKeyword keyword) {
+            return keyword.getName().getText();
+        }
+
+        @Override
+        public String sourceName(final UserKeyword keyword) {
+            return Files.getNameWithoutExtension(path(keyword).toFile().getName()).toLowerCase();
+        }
+
+        private RobotFileOutput getRobotFileOutputFrom(final UserKeyword keyword) {
+            return keyword.getParent().getParent().getParent();
+        }
+    }
 }

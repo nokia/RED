@@ -25,6 +25,7 @@ import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.io.Files;
 
 /**
  * @author wypych
@@ -164,14 +165,7 @@ public class KeywordSearcher {
 
     private <T> String getFileNameWithoutExtension(final Extractor<T> extractor, final T keyword) {
         final String fullFileName = extractor.path(keyword).getFileName().toString();
-        final int lastDotIndex = fullFileName.lastIndexOf('.');
-        final String fileNameWithoutExtension;
-        if (lastDotIndex > -1) {
-            fileNameWithoutExtension = fullFileName.substring(0, lastDotIndex).toLowerCase();
-        } else {
-            fileNameWithoutExtension = "";// fullFileName;
-        }
-        return fileNameWithoutExtension;
+        return Files.getNameWithoutExtension(fullFileName);
     }
 
     public static interface Extractor<T> {
@@ -210,11 +204,17 @@ public class KeywordSearcher {
         final Set<String> names = new HashSet<>(1);
         names.add(usageName); // original name
 
-        // gherking BDD syntax extraction if any
-        String lastNameUsage = gherkinSyntaxCombination(names, usageName);
+        int beforeSize = 0;
+        String lastNameUsage = usageName;
 
-        // dot resource or library syntax
-        lastNameUsage = extractResourceAndLibraryNameCombination(names, lastNameUsage);
+        while (beforeSize < names.size()) {
+            beforeSize = names.size();
+            // gherking BDD syntax extraction if any
+            lastNameUsage = gherkinSyntaxCombination(names, lastNameUsage);
+
+            // dot resource or library syntax
+            lastNameUsage = extractResourceAndLibraryNameCombination(names, lastNameUsage);
+        }
 
         return names;
     }
