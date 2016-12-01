@@ -1,0 +1,145 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _DEDucLe-EeaN18-GwBb_GA
+Element-Name: LinksToKeywordsWithDots
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _98rk8Le9EeaN18-GwBb_GA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/1/16 2:10 PM
+Testcase-Type: ecl
+Verifications: _YCCOILfHEeaN18-GwBb_GA
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RED_56/EmbeddedArguments.robot" | double-click
+
+//set caret on fist KW    
+with [get-editor "EmbeddedArguments.robot" | get-text-viewer] {
+    set-caret-pos 10 13
+    key-type F3
+}
+
+//check if KW is selected
+with [get-editor "EmbeddedArguments.robot" | get-text-viewer] {
+    get-property "getSelectionText()" | equals "total fee is '${total_fee}'" | verify-true
+}
+
+//select next KW
+with [get-editor "EmbeddedArguments.robot" | get-text-viewer] {
+    set-caret-pos 11 18
+    hover-text 11 17
+    key-type F3
+}
+get-editor "res.robot" | get-text-viewer | get-property "getSelectionText()" | equals "And total fee is '${total_fee}'" 
+    | verify-true
+    
+//check line 12    
+with [get-editor "EmbeddedArguments.robot"] {
+    click
+    with [get-text-viewer] {
+        hover-text 12 23
+        set-caret-pos 12 25
+        key-type F3
+    }
+} 
+get-editor "res.robot" | get-text-viewer | get-property "getSelectionText()" | equals "And total fee is '${total_fee}'" 
+    | verify-true
+    
+//check line 13    
+with [get-editor "EmbeddedArguments.robot"] {   
+    click
+    with [get-text-viewer] {
+        hover-text 13 15
+        set-caret-pos 13 10
+        key-type F3
+    }
+}
+get-editor "EmbeddedArguments.robot" | get-text-viewer | get-property "getSelectionText()" | equals "And value is ${c}" 
+    | verify-true
+    
+//check line 14    
+with [get-editor "EmbeddedArguments.robot" | get-text-viewer] {
+    set-caret-pos 14 9
+    hover-text 14 9
+    key-type F3
+    
+} 
+get-editor "EmbeddedArguments.robot" | get-text-viewer | get-property "getSelectionText()" | equals "test.txt" 
+    | verify-true
+
+//check line 16    
+with [get-editor "EmbeddedArguments.robot" | get-text-viewer] {   
+    set-caret-pos 16 8
+    hover-text 16 11
+    key-type F3
+}  
+get-editor "EmbeddedArguments.robot" | get-text-viewer | get-property "getSelectionText()" | equals "res.test.txt" 
+    | verify-true
+
+//check line 18      
+with [get-editor "EmbeddedArguments.robot" | get-text-viewer] {      
+    hover-text 18 12
+    set-caret-pos 18 11
+    key-type F3
+}
+get-editor "res.data.robot" | get-text-viewer | get-property "getSelectionText()" | equals Pysia | verify-true
+
+//check line 19
+with [get-editor "EmbeddedArguments.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 19 15
+        hover-text 19 13
+        key-type F3
+    }
+}
+get-editor "EmbeddedArguments.robot" | get-text-viewer | get-property "getSelectionText()" | equals "res.test.txt" 
+    | verify-true
+    
+//check line 20    
+with [get-editor "EmbeddedArguments.robot" | get-text-viewer] {
+    hover-text 20 12
+    set-caret-pos 20 13
+    key-type F3
+}
+
+//check line 21 - python file
+get-editor "EmbeddedArguments.robot" | get-text-viewer | get-property "getSelectionText()" | equals "res.data.nonDot" 
+    | verify-true
+with [get-editor "EmbeddedArguments.robot" | get-text-viewer] {
+    set-caret-pos 21 8
+    hover-text 21 12
+    key-type F3
+}
+get-editor "Lib.py" | get-text-viewer | get-property text | equals "from robot.api.deco import keyword\n\n"
+    + "class Lib(object):\n\n"
+    + "    ROBOT_LIBRARY_VERSION = 1.0\n\n"
+    + "    def __init__(self):\n"
+    + "        pass\n\n"
+    + "    @keyword(name='opa.opa_hop')\n"
+    + "    def keyword(self):\n"
+    + "        pass" | verify-true
+    
+//check line 22 - python file    
+with [get-editor "EmbeddedArguments.robot"] {
+    click
+    with [get-text-viewer] {
+        set-caret-pos 22 19
+        hover-text 22 18
+        key-type F3
+    }
+}
+get-editor "LibA.py" | get-text-viewer | get-property text | equals "from robot.api.deco import keyword\n\n"
+    + "class LibA(object):\n\n"
+    + "    ROBOT_LIBRARY_VERSION = 1.0\n\n"
+    + "    def __init__(self):\n"
+    + "        pass\n\n"
+    + "    @keyword(name='opa.opa_hop')\n"
+    + "    def keyword(self):\n"
+    + "        pass" | verify-true
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
