@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.navigator.handlers.RevalidateSelectionHandler.E4RevalidateSelectionHandler;
-import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfigFactory;
@@ -55,8 +54,7 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
                 final IProject project = entry.getKey();
                 final Collection<IFile> files = entry.getValue();
                 final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(files);
-                final Job validationJob = new RobotArtifactsValidator(project, new BuildLogger())
-                        .createValidationJob(null, validatorConfig);
+                final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
                 validationJob.schedule();
             }
         }

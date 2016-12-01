@@ -15,7 +15,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Execute;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.project.build.BuildLogger;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfig;
 import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsValidator.ModelUnitValidatorConfigFactory;
@@ -39,8 +38,7 @@ public class RevalidateEditorHandler extends DIParameterizedHandler<E4Revalidate
 
             final IProject project = suiteModel.getProject().getProject();
             final ModelUnitValidatorConfig validatorConfig = createValidatorConfig(suiteModel, Mode.valueOf(mode));
-            final Job validationJob = new RobotArtifactsValidator(project, new BuildLogger()).createValidationJob(null,
-                    validatorConfig);
+            final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
             validationJob.schedule();
         }
 
