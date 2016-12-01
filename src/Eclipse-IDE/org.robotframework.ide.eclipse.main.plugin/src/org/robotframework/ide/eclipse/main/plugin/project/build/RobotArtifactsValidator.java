@@ -97,6 +97,10 @@ public class RobotArtifactsValidator {
         return null;
     }
 
+    public static Job createValidationJob(final IProject project, final ModelUnitValidatorConfig validatorConfig) {
+        return new RobotArtifactsValidator(project, new BuildLogger()).createValidationJob((Job) null, validatorConfig);
+    }
+
     public Job createValidationJob(final Job dependentJob, final ModelUnitValidatorConfig validatorConfig) {
         return new Job("Validating") {
 
