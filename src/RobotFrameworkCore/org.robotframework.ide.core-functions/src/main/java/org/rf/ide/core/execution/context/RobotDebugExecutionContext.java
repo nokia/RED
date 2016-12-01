@@ -148,14 +148,18 @@ public class RobotDebugExecutionContext {
     }
 
     private KeywordPosition createNewKeywordPosition(final RobotExecutableRow<?> executableRow) {
-        final ARobotSectionTable table = getTableFromWhichExecutableRowCome(executableRow);
-
-        final RobotFileOutput robotFileOutput = table.getParent().getParent();
         final String path;
-        if (robotFileOutput.getType() == RobotFileType.RESOURCE) {
-            path = getFirstResourceImportPath();
+        if (executableRow != null) {
+            final ARobotSectionTable table = getTableFromWhichExecutableRowCome(executableRow);
+
+            final RobotFileOutput robotFileOutput = table.getParent().getParent();
+            if (robotFileOutput.getType() == RobotFileType.RESOURCE) {
+                path = getFirstResourceImportPath();
+            } else {
+                path = robotFileOutput.getProcessedFile().getAbsolutePath();
+            }
         } else {
-            path = robotFileOutput.getProcessedFile().getAbsolutePath();
+            path = getFirstResourceImportPath();
         }
         final int line = getLine(executableRow);
         return new KeywordPosition(path, line);
