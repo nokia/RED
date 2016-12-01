@@ -9,6 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -62,6 +63,198 @@ public class RobotDebugExecutionContextTest {
     public void setUp() {
         linesCounter = 0;
         debugExecutionContext = new RobotDebugExecutionContext();
+    }
+
+    @Test
+    public void test_keywordsWithGherkingStyleEmbeddedSyntaxAndMultipleJumpsBetweenSuiteAndResources_inTestSuitesAndResource_thenCorrectLinesShouldBeHit()
+            throws URISyntaxException {
+        // prepare
+        final String pathToTestCase = RobotModelTestProvider
+                .getFilePath("GitHub_58and59_embeddedKeywords" + File.separatorChar + "EmbeddedArguments.robot")
+                .toAbsolutePath()
+                .toString();
+        final String res_nestedPath = RobotModelTestProvider
+                .getFilePath("GitHub_58and59_embeddedKeywords" + File.separatorChar + "res_nested.robot")
+                .toAbsolutePath()
+                .toString();
+        final String res_dot_dataPath = RobotModelTestProvider
+                .getFilePath("GitHub_58and59_embeddedKeywords" + File.separatorChar + "res.data.robot")
+                .toAbsolutePath()
+                .toString();
+        final String resPath = RobotModelTestProvider
+                .getFilePath("GitHub_58and59_embeddedKeywords" + File.separatorChar + "res.robot")
+                .toAbsolutePath()
+                .toString();
+        @SuppressWarnings("unused")
+        final String res2Path = RobotModelTestProvider
+                .getFilePath("GitHub_58and59_embeddedKeywords" + File.separatorChar + "res2.robot")
+                .toAbsolutePath()
+                .toString();
+
+        final KeywordPosition[] linesSequenceToHit = new KeywordPosition[] { new KeywordPosition(pathToTestCase, 10),
+                new KeywordPosition(resPath, 12), new KeywordPosition(resPath, 13),
+                new KeywordPosition(pathToTestCase, 11), new KeywordPosition(resPath, 12),
+                new KeywordPosition(resPath, 13), new KeywordPosition(pathToTestCase, 12),
+                new KeywordPosition(pathToTestCase, 30), new KeywordPosition(pathToTestCase, 13),
+                new KeywordPosition(pathToTestCase, 32), new KeywordPosition(pathToTestCase, 14),
+                new KeywordPosition(pathToTestCase, 39), new KeywordPosition(pathToTestCase, 15),
+                new KeywordPosition(resPath, 8), new KeywordPosition(resPath, 9),
+                new KeywordPosition(pathToTestCase, 39), new KeywordPosition(pathToTestCase, 16),
+                new KeywordPosition(pathToTestCase, 36), new KeywordPosition(pathToTestCase, 17),
+                new KeywordPosition(resPath, 8), new KeywordPosition(resPath, 9),
+                new KeywordPosition(pathToTestCase, 39), new KeywordPosition(pathToTestCase, 18),
+                new KeywordPosition(res_dot_dataPath, 6), new KeywordPosition(pathToTestCase, 19),
+                new KeywordPosition(pathToTestCase, 36), new KeywordPosition(pathToTestCase, 20),
+                new KeywordPosition(pathToTestCase, 44), new KeywordPosition(pathToTestCase, 21),
+                new KeywordPosition(pathToTestCase, 22), new KeywordPosition(pathToTestCase, 23),
+                new KeywordPosition(res_nestedPath, 3) };
+
+        final RobotFile modelFile = RobotModelTestProvider.getModelFile(
+                "GitHub_58and59_embeddedKeywords" + File.separatorChar + "EmbeddedArguments.robot", parser);
+
+        // execute & verify
+        debugExecutionContext.startSuite(modelFile.getParent(), parser);
+        debugExecutionContext.startTest("Test");
+
+        debugExecutionContext.startKeyword("res.Given And total fee is 'nie'", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("here"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("BuiltIn.Set Test Variable", "Keyword",
+                Arrays.asList("${total_fee}", "${total_fee}"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("res.And total fee is '10.00'", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("here"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("BuiltIn.Set Test Variable", "Keyword",
+                Arrays.asList("${total_fee}", "${total_fee}"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("and value is 10.00", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Should Be Equal", "Keyword", Arrays.asList("10.00", "${c}"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("value is 10.00", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("${c}"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("test.txt", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("txt"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("res.test", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("doNow"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("test.txt", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("txt"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("res.test.txt", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("hahaha res.test.txt")); // here
+                                                                                                            // could
+                                                                                                            // be
+                                                                                                            // inconsistency
+                                                                                                            // and
+                                                                                                            // call
+                                                                                                            // res.robot/test.txt
+                                                                                                            // keyword
+                                                                                                            // which
+                                                                                                            // is
+                                                                                                            // the
+                                                                                                            // bug
+                                                                                                            // https://github.com/robotframework/robotframework/issues/2475
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("res.test", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("doNow"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.startKeyword("test.txt", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("txt"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("res.data.Put", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("put"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("And res.test.txt", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("hahaha res.test.txt")); // here
+        // could
+        // be
+        // inconsistency
+        // and
+        // call
+        // res.robot/test.txt
+        // keyword
+        // which
+        // is
+        // the
+        // bug
+        // https://github.com/robotframework/robotframework/issues/2475
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("res.data.NonDot", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("jupi here"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("Lib.opa.opa_hop", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("dataAccessLayer.opa.opa_hop", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.startKeyword("res_nested.KeyNested", "Keyword", Arrays.asList(""));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.startKeyword("BuiltIn.Log", "Keyword", Arrays.asList("ok"));
+        checkLineIfWasHit(linesSequenceToHit);
+        debugExecutionContext.endKeyword("Keyword");
+        debugExecutionContext.endKeyword("Keyword");
+
+        debugExecutionContext.endTest();
+        debugExecutionContext.endSuite();
     }
 
     @Test
