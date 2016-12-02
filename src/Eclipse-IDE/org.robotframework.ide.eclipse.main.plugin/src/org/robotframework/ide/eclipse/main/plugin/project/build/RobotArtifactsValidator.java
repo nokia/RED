@@ -98,7 +98,14 @@ public class RobotArtifactsValidator {
     }
 
     public static Job createValidationJob(final IProject project, final ModelUnitValidatorConfig validatorConfig) {
-        return new RobotArtifactsValidator(project, new BuildLogger()).createValidationJob((Job) null, validatorConfig);
+        return new WorkspaceJob("Validating") {
+
+            @Override
+            public IStatus runInWorkspace(final IProgressMonitor monitor) {
+                final RobotArtifactsValidator validator = new RobotArtifactsValidator(project, new BuildLogger());
+                return validator.runValidation(null, validatorConfig, monitor);
+            }
+        };
     }
 
     public Job createValidationJob(final Job dependentJob, final ModelUnitValidatorConfig validatorConfig) {
@@ -106,84 +113,85 @@ public class RobotArtifactsValidator {
 
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                try {
-                    if (dependentJob != null) {
-                        dependentJob.join();
-                        if (!dependentJob.getResult().isOK()) {
-                            return Status.CANCEL_STATUS;
-                        }
-                    }
+                return runValidation(dependentJob, validatorConfig, monitor);
+            }
+        };
+    }
 
-                    logger.log("VALIDATING: validation of '" + project.getName() + "' project started");
-                    logger.log("VALIDATING: gathering files to be validated");
-
-                    final ValidationContext context = new ValidationContext(project, logger);
-                    final List<ModelUnitValidator> validators = validatorConfig.createValidators(context);
-
-                    validateModelUnits(monitor, Queues.newArrayDeque(validators));
-
-                    final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = context
-                            .getLibrariesAutoDiscoverer();
-                    if (librariesAutoDiscoverer.isPresent()
-                            && librariesAutoDiscoverer.get().hasSuiteFilesToDiscovering()) {
-                        librariesAutoDiscoverer.get().start();
-                    }
-
-                    return Status.OK_STATUS;
-                } catch (final CoreException | InterruptedException e) {
-                    RedPlugin.logError("Project validation was corrupted", e);
+    private IStatus runValidation(final Job dependentJob, final ModelUnitValidatorConfig validatorConfig,
+            final IProgressMonitor monitor) {
+        try {
+            if (dependentJob != null) {
+                dependentJob.join();
+                if (!dependentJob.getResult().isOK()) {
                     return Status.CANCEL_STATUS;
-                } finally {
-                    monitor.done();
                 }
             }
 
-            private void validateModelUnits(final IProgressMonitor monitor, final Queue<ModelUnitValidator> validators)
-                    throws InterruptedException {
-                final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
-                subMonitor.beginTask("Validating files", 100);
+            logger.log("VALIDATING: validation of '" + project.getName() + "' project started");
+            logger.log("VALIDATING: gathering files to be validated");
 
-                final SubMonitor validationSubMonitor = subMonitor.newChild(100);
-                validationSubMonitor.setWorkRemaining(validators.size());
+            final ValidationContext context = new ValidationContext(project, logger);
+            final List<ModelUnitValidator> validators = validatorConfig.createValidators(context);
 
-                final int threadPoolSize = Runtime.getRuntime().availableProcessors();
-                logger.log("VALIDATING: " + threadPoolSize + " threads will be used");
-                final ExecutorService threadPool = Executors.newFixedThreadPool(threadPoolSize);
+            validateModelUnits(monitor, Queues.newArrayDeque(validators));
 
-                int current = 1;
-                final int total = validators.size();
-                while (!validators.isEmpty()) {
-                    final ModelUnitValidator validator = validators.poll();
-                    threadPool
-                            .submit(createValidationRunnable(monitor, validationSubMonitor, current, total, validator));
-                    current++;
-                }
-                threadPool.shutdown();
-                threadPool.awaitTermination(1, TimeUnit.HOURS);
+            final Optional<LibrariesAutoDiscoverer> librariesAutoDiscoverer = context.getLibrariesAutoDiscoverer();
+            if (librariesAutoDiscoverer.isPresent() && librariesAutoDiscoverer.get().hasSuiteFilesToDiscovering()) {
+                librariesAutoDiscoverer.get().start();
             }
 
-            private Runnable createValidationRunnable(final IProgressMonitor monitor,
-                    final SubMonitor validationSubMonitor, final int id, final int total,
-                    final ModelUnitValidator validator) {
-                return new Runnable() {
+            return Status.OK_STATUS;
+        } catch (final CoreException | InterruptedException e) {
+            RedPlugin.logError("Project validation was corrupted", e);
+            return Status.CANCEL_STATUS;
+        } finally {
+            monitor.done();
+        }
+    }
 
-                    @Override
-                    public void run() {
-                        try {
-                            if (monitor.isCanceled()) {
-                                logger.log("VALIDATING: cancelled (" + id + "/" + total + ")");
-                                return;
-                            }
-                            validator.validate(monitor);
-                            logger.log("VALIDATING: done (" + id + "/" + total + ")");
-                        } catch (final Exception e) {
-                            logger.log("VALIDATING: error (" + id + "/" + total + ")");
-                            logger.logError("VALIDATING: error\n" + e.getMessage(), e);
-                        } finally {
-                            validationSubMonitor.worked(1);
-                        }
+    private void validateModelUnits(final IProgressMonitor monitor, final Queue<ModelUnitValidator> validators)
+            throws InterruptedException {
+        final SubMonitor subMonitor = SubMonitor.convert(monitor, 100);
+        subMonitor.beginTask("Validating files", 100);
+
+        final SubMonitor validationSubMonitor = subMonitor.newChild(100);
+        validationSubMonitor.setWorkRemaining(validators.size());
+
+        final int threadPoolSize = Runtime.getRuntime().availableProcessors();
+        logger.log("VALIDATING: " + threadPoolSize + " threads will be used");
+        final ExecutorService threadPool = Executors.newFixedThreadPool(threadPoolSize);
+
+        int current = 1;
+        final int total = validators.size();
+        while (!validators.isEmpty()) {
+            final ModelUnitValidator validator = validators.poll();
+            threadPool.submit(createValidationRunnable(monitor, validationSubMonitor, current, total, validator));
+            current++;
+        }
+        threadPool.shutdown();
+        threadPool.awaitTermination(1, TimeUnit.HOURS);
+    }
+
+    private Runnable createValidationRunnable(final IProgressMonitor monitor, final SubMonitor validationSubMonitor,
+            final int id, final int total, final ModelUnitValidator validator) {
+        return new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    if (monitor.isCanceled()) {
+                        logger.log("VALIDATING: cancelled (" + id + "/" + total + ")");
+                        return;
                     }
-                };
+                    validator.validate(monitor);
+                    logger.log("VALIDATING: done (" + id + "/" + total + ")");
+                } catch (final Exception e) {
+                    logger.log("VALIDATING: error (" + id + "/" + total + ")");
+                    logger.logError("VALIDATING: error\n" + e.getMessage(), e);
+                } finally {
+                    validationSubMonitor.worked(1);
+                }
             }
         };
     }
