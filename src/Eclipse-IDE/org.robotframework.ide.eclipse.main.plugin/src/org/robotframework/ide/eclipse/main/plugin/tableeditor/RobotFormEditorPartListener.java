@@ -20,7 +20,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.RobotArtifactsVa
 
 class RobotFormEditorPartListener implements IPartListener {
 
-    private static final int REVALIDATE_JOB_DELAY = 1500;
+    private static final int REVALIDATE_JOB_DELAY = 2000;
 
     @Override
     public void partOpened(IWorkbenchPart part) {
