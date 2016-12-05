@@ -119,7 +119,7 @@ public class RobotFormEditor extends FormEditor {
             ResourcesPlugin.getWorkspace().addResourceChangeListener(validationListener,
                     IResourceChangeEvent.POST_CHANGE);
             
-            initRobotFormEditorPartListener();
+            initRobotFormEditorPartListener(site.getPage());
         } catch (final IllegalRobotEditorInputException e) {
             throw new PartInitException("Unable to open editor", e);
         }
@@ -141,13 +141,10 @@ public class RobotFormEditor extends FormEditor {
         ContextInjectionFactory.inject(validationListener, eclipseContext);
     }
 
-    private void initRobotFormEditorPartListener() {
+    private void initRobotFormEditorPartListener(final IWorkbenchPage page) {
         if (robotFormEditorPartListener == null) {
             robotFormEditorPartListener = new RobotFormEditorPartListener();
-            PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow()
-                    .getActivePage()
-                    .addPartListener(robotFormEditorPartListener);
+            page.addPartListener(robotFormEditorPartListener);
         }
     }
 
