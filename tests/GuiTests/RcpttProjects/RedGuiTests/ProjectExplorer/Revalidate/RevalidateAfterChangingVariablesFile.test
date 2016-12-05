@@ -7,14 +7,14 @@ Element-Version: 3.0
 External-Reference: 
 Id: _5-cpQLVWEeazMIT-6yPcSw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/30/16 1:56 PM
+Save-Time: 12/5/16 1:56 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
 Content-Type: text/ecl
 Entry-Name: .content
 
-//this is to reload variables when test is run again
+//this is workaround to reload variables when test is run again
 get-view "Project Explorer" | get-tree | select Revalidate | select Revalidate 
     | get-menu "Robot Framework/Reset Robot Environment" | click
     
@@ -31,7 +31,7 @@ try -times 4 -delay 1000 -command{
 }
 
 
-//change in pytohn file variable name
+//change in python file variable name
 get-view "Project Explorer" | get-tree | select "Revalidate/get_variables.py" 
     | select "Revalidate/get_variables.py" | get-menu "Open With/Text Editor" | click
 with [get-editor "get_variables.py" | get-text-viewer] {
@@ -51,7 +51,7 @@ with [get-editor "simple_var.py" | get-text-viewer] {
     key-type "M1+s"
 }
 
-//revalidate - nothin is happening - first must be Reset
+//revalidate - nothing is happening - first must be Reset
 with [get-view "Project Explorer" | get-tree] {
     select "Revalidate/TestFile.robot" | double-click
     select "Revalidate/TestFile.robot" | get-menu "Robot Framework/Revalidate" | click
