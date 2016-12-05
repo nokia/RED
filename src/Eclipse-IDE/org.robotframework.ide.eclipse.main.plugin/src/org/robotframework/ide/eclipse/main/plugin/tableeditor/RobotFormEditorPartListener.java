@@ -39,11 +39,13 @@ class RobotFormEditorPartListener implements IPartListener {
         if (part instanceof RobotFormEditor) {
             final RobotFormEditor editor = (RobotFormEditor) part;
             final RobotSuiteFile suiteModel = editor.provideSuiteModel();
-            final IProject project = suiteModel.getProject().getProject();
-            final List<IFile> files = Collections.singletonList(suiteModel.getFile());
-            final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(files);
-            final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
-            validationJob.schedule(REVALIDATE_JOB_DELAY);
+            if (suiteModel.getParent() != null) {
+                final IProject project = suiteModel.getProject().getProject();
+                final List<IFile> files = Collections.singletonList(suiteModel.getFile());
+                final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(files);
+                final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
+                validationJob.schedule(REVALIDATE_JOB_DELAY);
+            }
         }
     }
 
