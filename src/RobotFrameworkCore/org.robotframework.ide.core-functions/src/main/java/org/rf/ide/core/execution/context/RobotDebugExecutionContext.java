@@ -77,8 +77,8 @@ public class RobotDebugExecutionContext {
         }
         resourceImportPaths.clear();
 
-        executableRowFindersManager.initFindersAtSuiteStart(currentModel, currentModel.getKeywordTable().getKeywords(),
-                robotFileOutput.getResourceImportReferences());
+        executableRowFindersManager.initFindersAtSuiteStart(robotParser, currentModel,
+                currentModel.getKeywordTable().getKeywords(), robotFileOutput.getResourceImportReferences());
     }
 
     public boolean startTest(final String testName) {

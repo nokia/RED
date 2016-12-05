@@ -8,6 +8,7 @@ package org.rf.ide.core.execution.context;
 import java.util.List;
 
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.TestCaseExecutionRowCounter;
+import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.model.table.keywords.UserKeyword;
@@ -20,6 +21,8 @@ public class ExecutableRowFindersManager {
 
     public ExecutableRowFindersManager() {
     }
+
+    private RobotParser robotParser;
 
     private TestCase currentTestCase;
 
@@ -56,7 +59,8 @@ public class ExecutableRowFindersManager {
 
     public IRobotExecutableRowFinder provideUserKeywordExecutableRowFinder() {
         if (userKeywordExecutableRowFinder == null) {
-            userKeywordExecutableRowFinder = new UserKeywordExecutableRowFinder(userKeywords, resourceImportReferences);
+            userKeywordExecutableRowFinder = new UserKeywordExecutableRowFinder(robotParser, userKeywords,
+                    resourceImportReferences);
         }
         return userKeywordExecutableRowFinder;
     }
@@ -71,20 +75,21 @@ public class ExecutableRowFindersManager {
     }
 
     public void clearForLoopState() {
-        if(forLoopExecutableRowFinder != null) {
+        if (forLoopExecutableRowFinder != null) {
             forLoopExecutableRowFinder.clear();
         }
     }
-    
+
     public void clearAtTestCaseEnd() {
         this.currentTestCase = null;
-        if(setupTeardownExecutableRowFinder != null) {
+        if (setupTeardownExecutableRowFinder != null) {
             setupTeardownExecutableRowFinder.setCurrentTestCase(null);
         }
     }
 
-    public void initFindersAtSuiteStart(final RobotFile currentModel, final List<UserKeyword> userKeywords,
-            final List<ResourceImportReference> resourceImportReferences) {
+    public void initFindersAtSuiteStart(final RobotParser robotParser, final RobotFile currentModel,
+            final List<UserKeyword> userKeywords, final List<ResourceImportReference> resourceImportReferences) {
+        this.robotParser = robotParser;
         this.currentModel = currentModel;
         this.userKeywords = userKeywords;
         this.resourceImportReferences = resourceImportReferences;
@@ -94,6 +99,7 @@ public class ExecutableRowFindersManager {
         if (userKeywordExecutableRowFinder != null) {
             userKeywordExecutableRowFinder.setUserKeywords(userKeywords);
             userKeywordExecutableRowFinder.setResourceImportReferences(resourceImportReferences);
+            userKeywordExecutableRowFinder.setRobotParser(this.robotParser);
         }
     }
 
@@ -109,14 +115,14 @@ public class ExecutableRowFindersManager {
             forLoopExecutableRowFinder.setCurrentTestCase(currentTestCase);
         }
     }
-    
+
     public void updateResourceImportReferences(final List<ResourceImportReference> resourceImportReferences) {
         this.resourceImportReferences = resourceImportReferences;
         if (userKeywordExecutableRowFinder != null) {
             userKeywordExecutableRowFinder.setResourceImportReferences(resourceImportReferences);
         }
     }
-    
+
     public boolean hasCurrentTestCase() {
         return currentTestCase != null;
     }
