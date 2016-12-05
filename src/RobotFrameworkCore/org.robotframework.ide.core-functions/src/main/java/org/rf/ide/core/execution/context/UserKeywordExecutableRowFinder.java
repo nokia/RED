@@ -5,6 +5,7 @@
  */
 package org.rf.ide.core.execution.context;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.rf.ide.core.execution.context.RobotDebugExecutionContext.KeywordContext;
+import org.rf.ide.core.testdata.RobotParser;
 import org.rf.ide.core.testdata.importer.ResourceImportReference;
 import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.rf.ide.core.testdata.model.RobotFileOutput.RobotFileType;
@@ -42,8 +44,11 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
 
     private UserKeywordExtractor userKeywordExtractor;
 
-    public UserKeywordExecutableRowFinder(final List<UserKeyword> userKeywords,
+    private RobotParser robotParser;
+
+    public UserKeywordExecutableRowFinder(final RobotParser robotParser, final List<UserKeyword> userKeywords,
             final List<ResourceImportReference> resourceImportReferencesTestSuite) {
+        this.robotParser = robotParser;
         this.userKeywords = userKeywords;
         this.userKeywordExtractor = new UserKeywordExtractor();
         this.keywordSearcher = new KeywordSearcher();
@@ -142,10 +147,18 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
     private void collectAllReferences(final Set<Path> visitedPaths,
             final List<ResourceImportReference> currentReferences) {
         for (final ResourceImportReference ref : currentReferences) {
-            Path referencePath = ref.getReference().getProcessedFile().toPath().toAbsolutePath();
+            final File processedFile = ref.getReference().getProcessedFile();
+            Path referencePath = processedFile.toPath().toAbsolutePath();
             if (!visitedPaths.contains(referencePath)) {
                 visitedPaths.add(referencePath);
                 resourceImportReferences.add(ref);
+                if (this.robotParser != null
+                        && processedFile.lastModified() != ref.getReference().getLastModificationEpochTime()) {
+                    final List<RobotFileOutput> parse = this.robotParser.parse(processedFile);
+                    if (!parse.isEmpty()) {
+                        ref.updateReference(parse.get(0));
+                    }
+                }
                 List<ResourceImportReference> referencesOfReference = ref.getReference().getResourceImportReferences();
                 if (!referencesOfReference.isEmpty()) {
                     collectAllReferences(visitedPaths, referencesOfReference);
@@ -184,6 +197,10 @@ public class UserKeywordExecutableRowFinder implements IRobotExecutableRowFinder
 
     public void setResourceImportReferences(final List<ResourceImportReference> resourceImportReferences) {
         this.resourceImportReferences = resourceImportReferences;
+    }
+
+    public void setRobotParser(final RobotParser robotParser) {
+        this.robotParser = robotParser;
     }
 
     private class UserKeywordExtractor implements Extractor<UserKeyword> {
