@@ -1,0 +1,198 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _rPXCQK_-EeaOOtfbYFWVRw
+Element-Name: RevalidateAfterChangingFocusForLibs
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _KgAS4LfPEeaN18-GwBb_GA
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/5/16 1:41 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+proc "check-errors" [val nr_of_errors ] [val childCount ]{
+	get-view Problems | get-tree | get-item "Errors \\(.*\\)" | get-property childCount  | equals $childCount| verify-true
+	
+	list "Errors \\(.*\\)/Unknown '..\\/only_function.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation" //0
+		"Errors \\(.*\)/Unknown 'here_is_class.Cat' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"   //1
+		"Errors \\(.*\\)/Unknown 'libs\\/SumTwoDigits.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"  //2 
+		"Errors \\(.*\\)/Unknown keyword 'garfield'"     //3
+		"Errors \\(.*\\)/Unknown keyword 'news'" 		//4
+		"Errors \\(.*\\)/Unknown keyword 'no_kw'"		//5
+		"Errors \\(.*\\)/Unknown keyword 'sum'" 		//6
+		"Errors \\(.*\\)/Unknown keyword 'radio'" 		//7
+		"Errors \\(.*\\)/Unknown '..\\/libs\\/lib1.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"  //8
+		"Errors \\(.*\\)/Unknown '..\\/libs\\/lib2.py' library. Try to use Quick Fix \\(Ctrl\\+1\\) or add library to red.xml for proper validation"  //9
+		"Errors \\(.*\\)/Unknown keyword 'television'" 	//10
+			| let [val all_errors -input]{
+				$nr_of_errors | each [val error_nr]{
+					get-view Problems | get-tree | get-item [$all_errors| get $error_nr]
+						| get-property enablement | equals false | verify-true
+			}
+	
+	}
+}	
+
+proc "wait-for-discover-window"{
+	try -times 4 -delay 1000 -command{
+		get-window "Discovering libraries summary"
+	}
+}
+proc "wait-for-problems" [val count]{
+	try -times 4 -delay 1000 -command{
+		get-view Problems | get-tree | get-item "Errors? \\(.* items?\\)" | get-property childCount | equals $count | verify-true
+	}	
+}
+check-errors -nr_of_errors [list 0 1 2 3 4 5 6] -childCount 7
+
+//open editor
+get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/Script.robot" | double-click
+
+//autodiscover to remove error
+get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/Script.robot" 
+    | get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
+    
+wait-for-discover-window    
+get-window "Discovering libraries summary" | get-button OK | click
+
+//clik to set focus
+get-editor "Script.robot" | get-text-viewer | set-caret-pos 13 10
+
+check-errors -nr_of_errors [list 0 4 5 ] -childCount 3
+
+//===============================================================================================================
+//checking if correcting error in imported resource corrects error in main script too aftre switching focus
+
+//open second editor
+get-view "Project Explorer" | get-tree | select "NextProject/Script.robot" | select "NextProject/Script.robot" 
+    | double-click
+    
+//uncomment line with error    
+with [get-editor "Script.robot" -index 1 | get-text-viewer] {
+    set-caret-pos 7 8
+    hover-text 7 7
+    key-type "M1+/"
+    key-type "M1+s"
+}
+check-errors -nr_of_errors [list 0 4 5 7] -childCount 4
+//open resource where is lib that cause error in Sript.robot
+get-view "Project Explorer" | get-tree | select "NextProject/kw/radio.tsv" | double-click
+
+//uncomment lib and KW
+with [get-editor "radio.tsv" | get-text-viewer] {
+    set-caret-pos 2 9
+    key-type "M1+/"
+    set-caret-pos 6 11
+    key-type "M1+/"
+    key-type "M1+s"
+}
+wait-for-discover-window
+get-window "Discovering libraries summary" | get-button OK | click
+
+//click on script and check if error is changed for warning
+get-editor "Script.robot" -index 1 | click
+
+try -times 3 -delay 1000 -command{
+	get-view Problems | get-tree 
+	    | get-item "Warnings \\(1 item\\)/Keyword 'radio' is from a library nested in a resource file" 
+	    | get-property "getText()" | equals "Keyword 'radio' is from a library nested in a resource file" | verify-true
+}    
+check-errors -nr_of_errors [list 0 4 5 7 8] -childCount 5
+
+//click on tsv file
+get-editor "radio.tsv" | click
+
+wait-for-problems -count 3	
+check-errors -nr_of_errors [list 0 4 5] -childCount 3
+
+get-view Problems | get-tree 
+    | get-item "Warnings \\(1 item\\)/Keyword 'radio' is from a library nested in a resource file" 
+    | get-property "getText()" | equals "Keyword 'radio' is from a library nested in a resource file" | verify-true
+    
+    
+//===================================================================================================
+//checking if switching other than corrected editors is not refresh errors
+
+//open red.xml and remove all libs
+get-view "Project Explorer" | get-tree | select "ProjectForAnalysis/Script.robot" | select "ProjectForAnalysis/red.xml" 
+    | double-click
+    
+with [get-editor "ProjectForAnalysis/red.xml"] {
+    get-tab-folder | get-tab-item "Referenced libraries" | click
+    with [get-section "Referenced libraries" | get-table] {
+        select "here_is_class.Cat - ProjectForAnalysis" | key-type "M2+ARROW_DOWN"
+        select "here_is_class.Cat - ProjectForAnalysis" "SumTwoDigits - ProjectForAnalysis\\/libs"
+        key-type Del
+        key-type Enter
+        key-type "M1+s"
+    }
+}
+//close red.xml
+get-editor "Script.robot" -index 1 | click
+get-editor "ProjectForAnalysis/red.xml" | close
+get-editor "Script.robot" | click
+
+//select 2 tests with errors and use autodiscover
+with [get-view "Project Explorer" | get-tree] {
+    select "ProjectForAnalysis/tests/test1.robot" | double-click
+    select "ProjectForAnalysis/tests/test1.robot" "ProjectForAnalysis/Script.robot"
+    get-menu "Robot Framework/Automatically discover and add libraries to red.xml" | click
+}
+
+wait-for-discover-window
+get-window "Discovering libraries summary" | get-button OK | click
+
+//check amount of errors
+wait-for-problems -count 7
+check-errors -nr_of_errors [list 0 1 2 3 4 5 6] -childCount 7
+
+//switch between editors that are not connected to errors
+get-editor "radio.tsv" | click
+get-editor "Script.robot" -index 1 | click
+get-editor "radio.tsv" | click
+get-editor "Script.robot" -index 1| click
+
+check-errors -nr_of_errors [list 0 1 2 3 4 5 6] -childCount 7
+
+//go to test with corrected error
+get-editor "test1.robot" | click
+wait-for-problems -count 5
+check-errors -nr_of_errors [list 1 2 3 5 6] -childCount 5
+
+//go to test with corrected error
+get-editor "Script.robot" | click
+wait-for-problems -count 1
+check-errors -nr_of_errors [list 5] -childCount 1
+
+
+//==================================================================================================
+//checking if errors are refreshed if editor is dirty
+
+//uncomment lib and kw in test - not save, file is dirty
+get-view "Project Explorer" | get-tree | select "NextProject/kw/tv.txt" | double-click
+with [get-editor "tv.txt" | get-text-viewer] {
+    set-caret-pos 2 22
+    key-type "M1+/"
+    set-caret-pos 6 10
+    key-type "M1+/"
+}
+
+check-errors -nr_of_errors [list 5 9 10] -childCount 3
+
+// to add lib2 to red.xml
+with [get-view "Project Explorer" | get-tree] {
+    select "NextProject/libs/lib2.py" | get-menu "Robot Framework/Add Library to red.xml" | click
+}
+//click to set focus
+get-editor "test1.robot" | click
+get-editor "tv.txt" | click
+
+wait-for-problems -count 1
+check-errors -nr_of_errors [list 5] -childCount 1
+
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
