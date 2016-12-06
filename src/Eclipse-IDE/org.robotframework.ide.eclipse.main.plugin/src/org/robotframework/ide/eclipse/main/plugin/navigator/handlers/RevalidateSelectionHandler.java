@@ -48,12 +48,12 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
         public void revalidate(final @Named(Selections.SELECTION) IStructuredSelection selection) {
             final List<IResource> selectedResources = Selections.getAdaptableElements(selection, IResource.class);
 
-            final Map<IProject, Collection<IFile>> grouped = RobotSuiteFileCollector
+            final Map<IProject, Collection<RobotSuiteFile>> grouped = RobotSuiteFileCollector
                     .collectGroupedByProject(selectedResources);
-            for (Entry<IProject, Collection<IFile>> entry : grouped.entrySet()) {
+            for (Entry<IProject, Collection<RobotSuiteFile>> entry : grouped.entrySet()) {
                 final IProject project = entry.getKey();
-                final Collection<IFile> files = entry.getValue();
-                final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(files);
+                final Collection<RobotSuiteFile> suiteModels = entry.getValue();
+                final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
                 final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
                 validationJob.schedule();
             }
@@ -62,25 +62,25 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
 
     static class RobotSuiteFileCollector {
 
-        static Map<IProject, Collection<IFile>> collectGroupedByProject(final Collection<IResource> resources) {
-            final Set<IFile> files = collectFiles(resources);
-            return Multimaps.index(files, new Function<IFile, IProject>() {
+        static Map<IProject, Collection<RobotSuiteFile>> collectGroupedByProject(final Collection<IResource> resources) {
+            final Set<RobotSuiteFile> files = collectFiles(resources);
+            return Multimaps.index(files, new Function<RobotSuiteFile, IProject>() {
 
                 @Override
-                public IProject apply(final IFile file) {
-                    return file.getProject();
+                public IProject apply(final RobotSuiteFile file) {
+                    return file.getProject().getProject();
                 }
             }).asMap();
         }
 
-        static Set<IFile> collectFiles(final Collection<IResource> resources) {
-            final Set<IFile> files = new HashSet<>();
+        static Set<RobotSuiteFile> collectFiles(final Collection<IResource> resources) {
+            final Set<RobotSuiteFile> files = new HashSet<>();
 
             for (final IResource resource : resources) {
                 if (resource.getType() == IResource.FILE) {
                     final RobotSuiteFile suiteFile = RedPlugin.getModelManager().createSuiteFile((IFile) resource);
                     if (suiteFile.isSuiteFile() || suiteFile.isResourceFile() || suiteFile.isInitializationFile()) {
-                        files.add((IFile) resource);
+                        files.add(suiteFile);
                     }
                 } else if (resource.getType() == IResource.FOLDER || resource.getType() == IResource.PROJECT) {
                     files.addAll(collectNestedFiles((IContainer) resource));
@@ -90,7 +90,7 @@ public class RevalidateSelectionHandler extends DIParameterizedHandler<E4Revalid
             return files;
         }
 
-        private static Set<IFile> collectNestedFiles(final IContainer container) {
+        private static Set<RobotSuiteFile> collectNestedFiles(final IContainer container) {
             try {
                 return collectFiles(Arrays.asList(container.members()));
             } catch (CoreException e) {

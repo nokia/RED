@@ -10,7 +10,6 @@ import java.util.List;
 
 import javax.inject.Named;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.e4.core.di.annotations.Execute;
@@ -47,8 +46,8 @@ public class RevalidateEditorHandler extends DIParameterizedHandler<E4Revalidate
                 final IProject project = suiteModel.getProject().getProject();
                 return ModelUnitValidatorConfigFactory.create(project);
             } else {
-                final List<IFile> files = Collections.singletonList(suiteModel.getFile());
-                return ModelUnitValidatorConfigFactory.create(files);
+                final List<RobotSuiteFile> suiteFiles = Collections.singletonList(suiteModel);
+                return ModelUnitValidatorConfigFactory.create(suiteFiles);
             }
         }
     }

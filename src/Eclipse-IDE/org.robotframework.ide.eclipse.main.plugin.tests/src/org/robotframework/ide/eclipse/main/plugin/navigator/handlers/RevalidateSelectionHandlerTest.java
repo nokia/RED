@@ -8,6 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -17,9 +18,9 @@ import org.eclipse.core.resources.IResource;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
-
-import com.google.common.collect.Sets;
 
 public class RevalidateSelectionHandlerTest {
 
@@ -62,8 +63,8 @@ public class RevalidateSelectionHandlerTest {
         selectedResources.add(topLevelFile);
         selectedResources.add(initFile);
 
-        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile, initFile));
+        Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(suiteFiles(topLevelFile, initFile));
     }
 
     @Test
@@ -71,8 +72,8 @@ public class RevalidateSelectionHandlerTest {
         List<IResource> selectedResources = new ArrayList<>();
         selectedResources.add(topLevelDirectory);
 
-        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(Sets.newHashSet(initFile, tsvFile, txtFile, robotFile));
+        Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(suiteFiles(initFile, tsvFile, txtFile, robotFile));
     }
 
     @Test
@@ -80,8 +81,8 @@ public class RevalidateSelectionHandlerTest {
         List<IResource> selectedResources = new ArrayList<>();
         selectedResources.add(projectProvider.getProject());
 
-        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile, initFile, tsvFile, txtFile, robotFile));
+        Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(suiteFiles(topLevelFile, initFile, tsvFile, txtFile, robotFile));
     }
 
     @Test
@@ -91,8 +92,8 @@ public class RevalidateSelectionHandlerTest {
         selectedResources.add(tsvFile);
         selectedResources.add(robotFile);
 
-        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(Sets.newHashSet(initFile, tsvFile, txtFile, robotFile));
+        Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(suiteFiles(initFile, tsvFile, txtFile, robotFile));
     }
 
     @Test
@@ -101,8 +102,8 @@ public class RevalidateSelectionHandlerTest {
         selectedResources.add(nestedDirectory);
         selectedResources.add(topLevelFile);
 
-        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile, robotFile));
+        Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(suiteFiles(topLevelFile, robotFile));
     }
 
     @Test
@@ -111,7 +112,15 @@ public class RevalidateSelectionHandlerTest {
         selectedResources.add(notRobotFile);
         selectedResources.add(topLevelFile);
 
-        Set<IFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(Sets.newHashSet(topLevelFile));
+        Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
+        assertThat(files).isEqualTo(suiteFiles(topLevelFile));
+    }
+
+    private Set<RobotSuiteFile> suiteFiles(IFile... files) {
+        Set<RobotSuiteFile> robotSuiteFiles = new HashSet<>();
+        for (IFile file : files) {
+            robotSuiteFiles.add(RedPlugin.getModelManager().createSuiteFile(file));
+        }
+        return robotSuiteFiles;
     }
 }
