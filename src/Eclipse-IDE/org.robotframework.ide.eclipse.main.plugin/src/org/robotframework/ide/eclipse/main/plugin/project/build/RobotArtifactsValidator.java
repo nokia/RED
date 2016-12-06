@@ -61,40 +61,46 @@ public class RobotArtifactsValidator {
     }
 
     public static Job revalidate(final RobotSuiteFile suiteModel) {
+        if (shouldValidate(suiteModel)) {
+            final IFile file = suiteModel.getFile();
+            final ValidationContext context = new ValidationContext(file.getProject(), new BuildLogger());
+
+            try {
+                final Optional<? extends ModelUnitValidator> validator = ModelUnitValidatorConfigFactory
+                        .createValidator(context, file, ProblemsReportingStrategy.reportOnly(), true);
+                if (validator.isPresent()) {
+                    final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
+
+                        @Override
+                        public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
+                            file.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
+                            ((RobotFileValidator) validator.get()).validate(suiteModel, new NullProgressMonitor());
+
+                            return Status.OK_STATUS;
+                        }
+                    };
+                    wsJob.setSystem(true);
+                    wsJob.schedule();
+                    return wsJob;
+                }
+            } catch (final CoreException e) {
+                // so we won't revalidate
+            }
+        }
+        return null;
+    }
+
+    private static boolean shouldValidate(final RobotSuiteFile suiteModel) {
         final IFile file = suiteModel.getFile();
         if (file == null || !file.exists() || file.getProject() == null || !file.getProject().exists()
                 || !RobotProjectNature.hasRobotNature(file.getProject())) {
-            return null;
+            return false;
         }
         final RobotRuntimeEnvironment runtimeEnvironment = suiteModel.getProject().getRuntimeEnvironment();
         if (runtimeEnvironment == null || runtimeEnvironment.getVersion() == null) {
-            return null;
+            return false;
         }
-
-        final ValidationContext context = new ValidationContext(file.getProject(), new BuildLogger());
-
-        try {
-            final Optional<? extends ModelUnitValidator> validator = ModelUnitValidatorConfigFactory
-                    .createValidator(context, file, ProblemsReportingStrategy.reportOnly(), true);
-            if (validator.isPresent()) {
-                final WorkspaceJob wsJob = new WorkspaceJob("Revalidating model") {
-
-                    @Override
-                    public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                        file.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
-                        ((RobotFileValidator) validator.get()).validate(suiteModel, new NullProgressMonitor());
-
-                        return Status.OK_STATUS;
-                    }
-                };
-                wsJob.setSystem(true);
-                wsJob.schedule();
-                return wsJob;
-            }
-        } catch (final CoreException e) {
-            // so we won't revalidate
-        }
-        return null;
+        return true;
     }
 
     public static Job createValidationJob(final IProject project, final ModelUnitValidatorConfig validatorConfig) {
@@ -221,25 +227,27 @@ public class RobotArtifactsValidator {
             }
         }
 
-        public static ModelUnitValidatorConfig create(final Collection<IFile> files) {
+        public static ModelUnitValidatorConfig create(final Collection<RobotSuiteFile> suiteModels) {
             return new ModelUnitValidatorConfig() {
 
                 @Override
                 public List<ModelUnitValidator> createValidators(final ValidationContext context) throws CoreException {
                     final List<ModelUnitValidator> validators = newArrayList();
-                    for (final IFile file : files) {
-                        file.accept(new IResourceVisitor() {
+                    for (final RobotSuiteFile suiteModel : suiteModels) {
+                        if (RobotArtifactsValidator.shouldValidate(suiteModel)) {
+                            suiteModel.getFile().accept(new IResourceVisitor() {
 
-                            @Override
-                            public boolean visit(final IResource resource) throws CoreException {
-                                final Optional<? extends ModelUnitValidator> validator = createValidator(context,
-                                        resource, ProblemsReportingStrategy.reportOnly(), false);
-                                if (validator.isPresent()) {
-                                    validators.add(createValidatorWithMarkerDelete(resource, validator.get()));
+                                @Override
+                                public boolean visit(final IResource resource) throws CoreException {
+                                    final Optional<? extends ModelUnitValidator> validator = createValidator(context,
+                                            resource, ProblemsReportingStrategy.reportOnly(), false);
+                                    if (validator.isPresent()) {
+                                        validators.add(createValidatorWithMarkerDelete(resource, validator.get()));
+                                    }
+                                    return true;
                                 }
-                                return true;
-                            }
-                        });
+                            });
+                        }
                     }
                     return validators;
                 }
@@ -376,7 +384,7 @@ public class RobotArtifactsValidator {
                 return Optional.of(new RobotResourceFileValidator(context, file, reporter));
             } else if (ASuiteFileDescriber.isInitializationFile(file)) {
                 return Optional.of(new RobotInitFileValidator(context, file, reporter));
-            } else if (file.getName().equals("red.xml") && file.getParent() == file.getProject()) {
+            } else if (file.getName().equals(RobotProjectConfig.FILENAME) && file.getParent() == file.getProject()) {
                 return Optional.of(new RobotProjectConfigFileValidator(context, file, reporter));
             }
             return Optional.absent();

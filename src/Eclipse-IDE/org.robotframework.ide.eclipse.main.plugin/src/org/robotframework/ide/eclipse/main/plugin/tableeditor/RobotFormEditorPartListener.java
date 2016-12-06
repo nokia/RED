@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.ui.IPartListener;
@@ -41,8 +40,8 @@ class RobotFormEditorPartListener implements IPartListener {
             final RobotSuiteFile suiteModel = editor.provideSuiteModel();
             if (suiteModel.getParent() != null) {
                 final IProject project = suiteModel.getProject().getProject();
-                final List<IFile> files = Collections.singletonList(suiteModel.getFile());
-                final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(files);
+                final List<RobotSuiteFile> suiteModels = Collections.singletonList(suiteModel);
+                final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
                 final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
                 validationJob.schedule(REVALIDATE_JOB_DELAY);
             }
