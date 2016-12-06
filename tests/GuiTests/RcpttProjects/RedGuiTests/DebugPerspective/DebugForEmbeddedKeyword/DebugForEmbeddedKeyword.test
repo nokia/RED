@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: __cffsLrPEeaIos8Jik5jow
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/6/16 10:12 AM
+Save-Time: 12/6/16 10:45 AM
 Tags: Debug
 Testcase-Type: ecl
 
@@ -74,7 +74,7 @@ with [get-editor "Test.robot" | get-left-ruler | get-ruler-column AnnotationColu
 exec-with-options -disableJobWaiting -command{
 	get-editor "Test.robot" | get-editbox | get-menu "Debug test: 'TestEmbeeded'" | click
 	
-	try -times 10 -delay 300 -command{
+	try -times 10 -delay 700 -command{
 		get-view Debug | get-tree |get-item "New Configuration \\[Robot\\]/Robot Test at 127.0.0.1:\d{1,5}/Thread \\[main\\]" | get-property childCount -raw | gt 0 | verify-true
 	}
 	
