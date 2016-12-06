@@ -151,10 +151,10 @@ class TestRunnerAgent:
         self.streamhandler = None
         self._connect()
         self._send_pid()
-        self._create_debugger((len(args) >= 2) and (args[1] == 'True'))
+        self._create_debugger((len(args) >= 2) and (args[1].lower() == 'true'))
         self._create_kill_server()
         self._is_robot_paused = False
-        self._is_debug_enabled = (args[1] == 'True')
+        self._is_debug_enabled = (args[1].lower() == 'true')
 
     def _create_debugger(self, pause_on_failure):
         self._debugger = RobotDebugger(pause_on_failure)
