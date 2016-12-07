@@ -90,7 +90,8 @@ def get_variables(dir, arguments):
     vars = robot.variables.Variables()
     try:
         vars.set_from_file(dir, arguments)
-    except:
+    except Exception as e:
+        print str(e)
         pass
     
     vars_from_file = {}
@@ -106,6 +107,9 @@ def get_variables(dir, arguments):
                 filtered_vars[k] = _extract_dot_dict(v)
             elif not inspect.ismodule(v) and not inspect.isfunction(v) and not inspect.isclass(v):
                 filtered_vars[k] = _escape_unicode(v)
+            #we do not support modules, functions or classes as variables
+            #else:
+            #    filtered_vars[k] = _escape_unicode(str(v))
         except Exception as e:
             filtered_vars[k] = 'None'
     return filtered_vars
@@ -121,34 +125,38 @@ def _escape_unicode(data):
     if py_version < (3,0,0) and isinstance(data, unicode):
         import unicodedata
         return unicodedata.normalize('NFKD', data).encode('ascii','ignore') # for XML-RPC problems with unicode characters
-    if py_version >= (3,0,0) and isinstance(data, str):
+    elif py_version >= (3,0,0) and isinstance(data, str):
         escaped_data = data.encode('unicode_escape')
         if isinstance(escaped_data, bytes):
             escaped_data = escaped_data.decode()
         return escaped_data
-    if py_version < (3,0,0) and isinstance(data, basestring):
+    elif py_version < (3,0,0) and isinstance(data, basestring):
         return data.encode('unicode_escape')
-    if py_version < (3,0,0) and isinstance(data, long):  # for OverflowError in XML-RPC
+    elif py_version < (3,0,0) and isinstance(data, long):  # for OverflowError in XML-RPC
         return str(data)
-    if isinstance(data, int) and (data < -(2**31) or data > (2 ** 31) -1):
+    elif isinstance(data, int) and (data < -(2**31) or data > (2 ** 31) -1):
         return str(data)
-    if isinstance(data, dict):
+    elif isinstance(data, dict):
         data_result = {}
         for key, val in data.items():
             if isinstance(key, tuple):
                 return 'None'
             data_result[_escape_unicode(str(key))] = _escape_unicode(val)
         return data_result
-    if isinstance(data, list):
+    elif isinstance(data, list):
         data_result = copy(data)
         for index, item in enumerate(data_result):
             data_result[index] = _escape_unicode(item)
         return data_result
-    if isinstance(data, tuple):   
+    elif isinstance(data, tuple):   
         tuple_data = ()
         for item in data:
             tuple_data = tuple_data + tuple(_escape_unicode(item)) 
         return tuple_data
+    elif data is None:
+      return _escape_unicode('None')
+    else:
+      return _escape_unicode(str(data))
     return data
     
 if __name__ == '__main__':
