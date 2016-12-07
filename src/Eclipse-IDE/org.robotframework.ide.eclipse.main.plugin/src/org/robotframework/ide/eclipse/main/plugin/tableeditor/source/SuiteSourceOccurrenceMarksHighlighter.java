@@ -105,7 +105,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
                 }
             }
         } catch (final BadLocationException | InterruptedException e) {
-            RedPlugin.logError("Unable to create occurences markers", e);
+            RedPlugin.logError("Unable to create occurrences markers", e);
         }
     }
 
@@ -150,14 +150,14 @@ class SuiteSourceOccurrenceMarksHighlighter {
                 file.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ONE);
             }
         } catch (final CoreException e) {
-            RedPlugin.logError("Unable to remove occurences markers", e);
+            RedPlugin.logError("Unable to remove occurrences markers", e);
         }
     }
 
     private void highlightOccurrences(final IRegion selectedRegion, final Set<IRegion> regions)
             throws BadLocationException, InterruptedException {
         final String selectedText = document.get(selectedRegion.getOffset(), selectedRegion.getLength());
-        final WorkspaceJob wsJob = new WorkspaceJob("Creating occurences markers") {
+        final WorkspaceJob wsJob = new WorkspaceJob("Creating occurrences markers") {
 
             @Override
             public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
@@ -181,7 +181,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
                 marker.setAttribute(IMarker.CHAR_END, region.getOffset() + region.getLength());
             }
         } catch (final CoreException e) {
-            RedPlugin.logError("Unable to create occurences marker for '" + selectedText + "'", e);
+            RedPlugin.logError("Unable to create occurrences marker for '" + selectedText + "'", e);
         }
     }
 }

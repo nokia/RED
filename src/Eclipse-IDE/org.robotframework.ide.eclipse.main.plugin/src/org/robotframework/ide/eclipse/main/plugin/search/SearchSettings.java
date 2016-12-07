@@ -66,8 +66,8 @@ public class SearchSettings {
         return isCaseSensitive;
     }
 
-    public void setCaseSensitive(final boolean isCaseSesitive) {
-        this.isCaseSensitive = isCaseSesitive;
+    public void setCaseSensitive(final boolean isCaseSensitive) {
+        this.isCaseSensitive = isCaseSensitive;
     }
 
     public void setResourcesRoots(final List<IResource> resourcesRoots) {
@@ -96,7 +96,7 @@ public class SearchSettings {
     }
 
     public enum SearchLimitation {
-        NO_LIMITS("All occurences"),
+        NO_LIMITS("All occurrences"),
         ONLY_REFERENCES("References"),
         ONLY_DECLARATIONS("Declarations");
 
