@@ -5,15 +5,19 @@
  */
 package org.rf.ide.core.testdata.text.read;
 
+import static com.google.common.collect.Iterables.filter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.rf.ide.core.testdata.model.IChildElement;
 import org.rf.ide.core.testdata.model.RobotFile;
 import org.rf.ide.core.testdata.text.read.LineReader.Constant;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.rf.ide.core.testdata.text.read.separators.Separator.SeparatorType;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 
 public class RobotLine implements IChildElement<RobotFile> {
 
@@ -52,6 +56,10 @@ public class RobotLine implements IChildElement<RobotFile> {
 
     public List<IRobotLineElement> getLineElements() {
         return lineElements;
+    }
+
+    public List<RobotToken> getLineTokens() {
+        return ImmutableList.copyOf(filter(lineElements, RobotToken.class));
     }
 
     public void setLineElements(final List<IRobotLineElement> lineElements) {
