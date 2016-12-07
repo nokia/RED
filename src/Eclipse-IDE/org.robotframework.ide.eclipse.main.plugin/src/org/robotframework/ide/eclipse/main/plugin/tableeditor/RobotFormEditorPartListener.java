@@ -29,17 +29,21 @@ class RobotFormEditorPartListener implements IPartListener {
 
     @Override
     public void partDeactivated(IWorkbenchPart part) {
-    }
-
-    @Override
-    public void partClosed(IWorkbenchPart part) {
         if (part instanceof RobotFormEditor) {
             cancelValidationJobIfScheduled();
         }
     }
 
     @Override
+    public void partClosed(IWorkbenchPart part) {
+    }
+
+    @Override
     public void partBroughtToTop(IWorkbenchPart part) {
+    }
+
+    @Override
+    public void partActivated(IWorkbenchPart part) {
         if (part instanceof RobotFormEditor) {
             final RobotFormEditor editor = (RobotFormEditor) part;
             final RobotSuiteFile suiteModel = editor.provideSuiteModel();
@@ -48,10 +52,6 @@ class RobotFormEditorPartListener implements IPartListener {
                 scheduleValidationJob(suiteModel);
             }
         }
-    }
-
-    @Override
-    public void partActivated(IWorkbenchPart part) {
     }
 
     private void cancelValidationJobIfScheduled() {
