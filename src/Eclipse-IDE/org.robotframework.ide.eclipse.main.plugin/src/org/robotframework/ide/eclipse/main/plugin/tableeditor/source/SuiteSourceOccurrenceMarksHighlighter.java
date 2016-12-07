@@ -43,7 +43,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
 
     private final FindReplaceDocumentAdapter findAdapter;
 
-    private Set<IRegion> occurencesRegions;
+    private Set<IRegion> occurrencesRegions;
 
     private Job refreshingJob;
 
@@ -51,7 +51,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
         this.document = document;
         this.file = editedFile;
         this.findAdapter = new FindReplaceDocumentAdapter(document);
-        this.occurencesRegions = newHashSet();
+        this.occurrencesRegions = newHashSet();
         this.refreshingJob = null;
     }
 
@@ -81,7 +81,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
 
             @Override
             protected IStatus run(final IProgressMonitor monitor) {
-                refreshOccurences(offset);
+                refreshOccurrences(offset);
                 return Status.OK_STATUS;
             }
         };
@@ -89,19 +89,19 @@ class SuiteSourceOccurrenceMarksHighlighter {
         refreshingJob.schedule(50);
     }
 
-    private void refreshOccurences(final int offset) {
+    private void refreshOccurrences(final int offset) {
         try {
             final Optional<IRegion> currentRegion = offset == -1 ? Optional.<IRegion> absent()
                     : getCurrentRegion(offset);
             if (!currentRegion.isPresent()) {
-                removeOccurencesHighlighting();
-                occurencesRegions = newHashSet();
+                removeOccurrencesHighlighting();
+                occurrencesRegions = newHashSet();
             } else {
-                final Set<IRegion> regions = findOccurencesRegions(currentRegion.get());
-                if (!Objects.equals(occurencesRegions, regions)) {
-                    removeOccurencesHighlighting();
-                    highlightOccurences(currentRegion.get(), regions);
-                    occurencesRegions = regions;
+                final Set<IRegion> regions = findOccurrencesRegions(currentRegion.get());
+                if (!Objects.equals(occurrencesRegions, regions)) {
+                    removeOccurrencesHighlighting();
+                    highlightOccurrences(currentRegion.get(), regions);
+                    occurrencesRegions = regions;
                 }
             }
         } catch (final BadLocationException | InterruptedException e) {
@@ -119,7 +119,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
         return file.getFileExtension().equals("tsv");
     }
 
-    private Set<IRegion> findOccurencesRegions(final IRegion region) throws BadLocationException {
+    private Set<IRegion> findOccurrencesRegions(final IRegion region) throws BadLocationException {
         final Set<IRegion> regions = newHashSet();
 
         final String selectedText = document.get(region.getOffset(), region.getLength()).trim();
@@ -144,7 +144,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
         return Pattern.matches("[@$&%]\\{.+\\}", text);
     }
 
-    private void removeOccurencesHighlighting() {
+    private void removeOccurrencesHighlighting() {
         try {
             if (file.exists()) {
                 file.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ONE);
@@ -154,7 +154,7 @@ class SuiteSourceOccurrenceMarksHighlighter {
         }
     }
 
-    private void highlightOccurences(final IRegion selectedRegion, final Set<IRegion> regions)
+    private void highlightOccurrences(final IRegion selectedRegion, final Set<IRegion> regions)
             throws BadLocationException, InterruptedException {
         final String selectedText = document.get(selectedRegion.getOffset(), selectedRegion.getLength());
         final WorkspaceJob wsJob = new WorkspaceJob("Creating occurences markers") {
@@ -174,10 +174,12 @@ class SuiteSourceOccurrenceMarksHighlighter {
 
     private void createMarker(final IRegion region, final String selectedText) {
         try {
-            final IMarker marker = file.createMarker(MARKER_ID);
-            marker.setAttribute(IMarker.TRANSIENT, true);
-            marker.setAttribute(IMarker.CHAR_START, region.getOffset());
-            marker.setAttribute(IMarker.CHAR_END, region.getOffset() + region.getLength());
+            if (file.exists()) {
+                final IMarker marker = file.createMarker(MARKER_ID);
+                marker.setAttribute(IMarker.TRANSIENT, true);
+                marker.setAttribute(IMarker.CHAR_START, region.getOffset());
+                marker.setAttribute(IMarker.CHAR_END, region.getOffset() + region.getLength());
+            }
         } catch (final CoreException e) {
             RedPlugin.logError("Unable to create occurences marker for '" + selectedText + "'", e);
         }
