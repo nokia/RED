@@ -33,6 +33,9 @@ class RobotFormEditorPartListener implements IPartListener {
 
     @Override
     public void partClosed(IWorkbenchPart part) {
+        if (part instanceof RobotFormEditor) {
+            cancelValidationJobIfScheduled();
+        }
     }
 
     @Override
@@ -41,19 +44,28 @@ class RobotFormEditorPartListener implements IPartListener {
             final RobotFormEditor editor = (RobotFormEditor) part;
             final RobotSuiteFile suiteModel = editor.provideSuiteModel();
             if (suiteModel.getParent() != null) {
-                if (validationJob != null && validationJob.getState() == Job.SLEEPING) {
-                    validationJob.cancel();
-                }
-                final IProject project = suiteModel.getProject().getProject();
-                final List<RobotSuiteFile> suiteModels = Collections.singletonList(suiteModel);
-                final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
-                validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
-                validationJob.schedule(REVALIDATE_JOB_DELAY);
+                cancelValidationJobIfScheduled();
+                scheduleValidationJob(suiteModel);
             }
         }
     }
 
     @Override
     public void partActivated(IWorkbenchPart part) {
+    }
+
+    private void cancelValidationJobIfScheduled() {
+        if (validationJob != null && validationJob.getState() == Job.SLEEPING) {
+            validationJob.cancel();
+            validationJob = null;
+        }
+    }
+
+    private void scheduleValidationJob(final RobotSuiteFile suiteModel) {
+        final IProject project = suiteModel.getProject().getProject();
+        final List<RobotSuiteFile> suiteModels = Collections.singletonList(suiteModel);
+        final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
+        validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
+        validationJob.schedule(REVALIDATE_JOB_DELAY);
     }
 }
