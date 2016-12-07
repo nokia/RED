@@ -21,6 +21,8 @@ class RobotFormEditorPartListener implements IPartListener {
 
     private static final int REVALIDATE_JOB_DELAY = 2000;
 
+    private Job validationJob;
+
     @Override
     public void partOpened(IWorkbenchPart part) {
     }
@@ -39,10 +41,13 @@ class RobotFormEditorPartListener implements IPartListener {
             final RobotFormEditor editor = (RobotFormEditor) part;
             final RobotSuiteFile suiteModel = editor.provideSuiteModel();
             if (suiteModel.getParent() != null) {
+                if (validationJob != null && validationJob.getState() == Job.SLEEPING) {
+                    validationJob.cancel();
+                }
                 final IProject project = suiteModel.getProject().getProject();
                 final List<RobotSuiteFile> suiteModels = Collections.singletonList(suiteModel);
                 final ModelUnitValidatorConfig validatorConfig = ModelUnitValidatorConfigFactory.create(suiteModels);
-                final Job validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
+                validationJob = RobotArtifactsValidator.createValidationJob(project, validatorConfig);
                 validationJob.schedule(REVALIDATE_JOB_DELAY);
             }
         }
