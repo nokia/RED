@@ -91,7 +91,7 @@ def get_variables(dir, arguments):
     try:
         vars.set_from_file(dir, arguments)
     except Exception as e:
-        print str(e)
+        print(str(e))
         pass
     
     vars_from_file = {}
