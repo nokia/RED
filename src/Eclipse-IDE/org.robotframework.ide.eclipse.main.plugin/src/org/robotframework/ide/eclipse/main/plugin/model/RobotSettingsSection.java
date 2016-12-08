@@ -6,12 +6,10 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
-import static com.google.common.collect.Maps.newHashMap;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 
 import org.rf.ide.core.testdata.model.AKeywordBaseSetting;
 import org.rf.ide.core.testdata.model.AModelElement;
@@ -38,7 +36,9 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGro
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.SetMultimap;
 
 public class RobotSettingsSection extends RobotSuiteFileSection implements IRobotCodeHoldingElement {
 
@@ -233,9 +233,9 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         return paths;
     }
 
-    public Map<String, String> getLibrariesPathsOrNamesWithAliases() {
+    public SetMultimap<String, String> getLibrariesPathsOrNamesWithAliases() {
         final List<RobotKeywordCall> libraries = getLibrariesSettings();
-        final Map<String, String> toImport = newHashMap();
+        final SetMultimap<String, String> toImport = HashMultimap.create();
         for (final RobotKeywordCall element : libraries) {
             final RobotSetting setting = (RobotSetting) element;
             final List<String> args = setting.getArguments();
@@ -285,7 +285,7 @@ public class RobotSettingsSection extends RobotSuiteFileSection implements IRobo
         }
         return elements;
     }
-    
+
     private int countRowsOfGroupUpTo(final SettingsGroup group, final int toIndex) {
         int index = 0;
         int count = 0;

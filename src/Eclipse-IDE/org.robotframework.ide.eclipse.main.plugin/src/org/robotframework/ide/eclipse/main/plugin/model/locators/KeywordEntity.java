@@ -72,7 +72,8 @@ public abstract class KeywordEntity {
     public boolean isSameAs(final KeywordEntity that, final IPath useplaceFilepath) {
         return Objects.equal(this.getSourceNameInUse(), that.getSourceNameInUse())
                 && Objects.equal(this.keywordName, that.keywordName)
-                && this.getScope(useplaceFilepath) == that.getScope(useplaceFilepath);
+                && this.getScope(useplaceFilepath) == that.getScope(useplaceFilepath)
+                && Objects.equal(this.getAlias(), that.getAlias());
     }
 
     @Override
