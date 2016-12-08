@@ -100,9 +100,6 @@ public class KeywordSearcher {
                     }
                 }
 
-                KeywordScope scope = extractor.scope(keyword);
-                boolean isLibraryWithAlias = (scope == KeywordScope.REF_LIBRARY || scope == KeywordScope.STD_LIBRARY)
-                        && !alias.isEmpty();
                 if (!alias.isEmpty()) {
                     if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, alias,
                             isEmbeddedKeywordName, nameCombination)) {
@@ -114,7 +111,7 @@ public class KeywordSearcher {
                     }
                 }
 
-                if (!isLibraryWithAlias && !sourceName.isEmpty()) {
+                if (!sourceName.isEmpty()) {
                     if (matchNameDirectlyOrAsEmbeddedName(foundByMatch, keyword, keywordName, sourceName,
                             isEmbeddedKeywordName, nameCombination)) {
                         if (stopIfOneWasMatching) {

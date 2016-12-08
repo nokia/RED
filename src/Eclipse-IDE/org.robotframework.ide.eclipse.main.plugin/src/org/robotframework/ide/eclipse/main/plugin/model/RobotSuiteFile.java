@@ -6,6 +6,7 @@
 package org.robotframework.ide.eclipse.main.plugin.model;
 
 import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Maps.newHashMap;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 
@@ -49,9 +51,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.SetMultimap;
 import com.google.common.io.CharStreams;
 
 public class RobotSuiteFile implements RobotFileInternalElement {
@@ -409,18 +409,18 @@ public class RobotSuiteFile implements RobotFileInternalElement {
         return Optional.of(this);
     }
 
-    public SetMultimap<LibrarySpecification, String> getImportedLibraries() {
+    public Map<LibrarySpecification, String> getImportedLibraries() {
         final Optional<RobotSettingsSection> section = findSection(RobotSettingsSection.class);
-        final SetMultimap<String, String> toImport = HashMultimap.create();
+        final Map<String, String> toImport = newHashMap();
         if (section.isPresent()) {
             toImport.putAll(section.get().getLibrariesPathsOrNamesWithAliases());
         }
 
-        final SetMultimap<LibrarySpecification, String> imported = HashMultimap.create();
+        final Map<LibrarySpecification, String> imported = newHashMap();
         for (final LibrarySpecification spec : getProject().getLibrariesSpecifications()) {
             if (toImport.containsKey(spec.getName())) {
-                imported.putAll(spec, toImport.get(spec.getName()));
-                toImport.removeAll(spec.getName());
+                imported.put(spec, toImport.get(spec.getName()));
+                toImport.remove(spec.getName());
             } else if (spec.isAccessibleWithoutImport()) {
                 imported.put(spec, "");
             }
@@ -429,7 +429,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
             try {
                 final LibrarySpecification spec = findSpecForPath(toImportPathOrName);
                 if (spec != null) {
-                    imported.putAll(spec, toImport.get(toImportPathOrName));
+                    imported.put(spec, toImport.get(toImportPathOrName));
                 }
             } catch (final PathResolvingException e) {
                 // ok we won't provide any spec, since we can't resolve uri
@@ -440,7 +440,7 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     private LibrarySpecification findSpecForPath(final String pathOrName) {
         final ImportPath importPath = ImportPath.from(pathOrName);
-
+        
         final Optional<ResolvedImportPath> resolvedImportPath = getResolvedPath(importPath);
         if (!resolvedImportPath.isPresent()) {
             return null;
@@ -477,7 +477,8 @@ public class RobotSuiteFile implements RobotFileInternalElement {
 
     private Optional<ResolvedImportPath> getResolvedPath(final ImportPath importPath) {
         try {
-            return ResolvedImportPath.from(importPath, getProject().getRobotProjectHolder().getVariableMappings());
+            return ResolvedImportPath.from(importPath,
+                getProject().getRobotProjectHolder().getVariableMappings());
         } catch (final MalformedPathImportException e) {
             return Optional.absent();
         }
