@@ -21,8 +21,8 @@ Instructions:
 
   * Include project path in PYTHONPATH environment variable.
 This can be done by editing variable on OS level or using PyDev Preferences:  
-_Windows -&gt; Preferences -&gt; PyDev -&gt; Interpreters -&gt; Python under
-Libraries_  
+_Windows -&gt; Preferences -&gt; PyDev -&gt; Interpreters -&gt; Python_ under
+_Libraries_  
   
 
   * Open Debug Configurations:
@@ -65,17 +65,17 @@ Using 2 Eclipse instances:
 #### Eclipse with Python Debug
 
   * Open Debug Configuration
-  * Cerate or edit any of Robot Debug Configuration to export TestRunner.py script
-TestRunner.py is a script to allow remote RED instance to connect to running
-Robot.  
+  * Create or edit any of Robot Debug Configuration to export TestRunnerAgent.py script
+TestRunnerAgent.py is a script to allow remote RED instance to connect to
+running Robot.  
 ![](python_red_debug/robot_python_export_deb_scrt.png)
 
   * Edit Python Debug Configuration: in Arguments include remote listener
 Remote listener allows to connect RED instance to running Robot execution
 which will be provided on this Eclipse instance:  
 _\--listener
-&amp;ltPATH;_TO_TESTRUNNER.PY&gt;:&amp;ltLOCAL;_PORT&gt;:TRUE:&amp;ltLOCAL;_IP&gt;_  
-**Note: arguments are position sensitive!** ![](python_red_debug/pyth_rob_listener.png)  
+&amp;ltPATH;_TO_TESTRUNNERAGENT.PY&gt;:&amp;ltLOCAL;_PORT&gt;:TRUE:&amp;ltLOCAL;_IP&gt;_  
+**Note: arguments are position sensitive! Port number should be selected with care - for Windows Vista and above port should be in ranges 1024-5000 and 49152-65535** ![](python_red_debug/pyth_rob_listener.png)  
   
 
   * Apply&amp;Close;
@@ -87,9 +87,6 @@ _\--listener
 _Right click on Workspace -&gt; Import -&gt; General -&gt; Existing Projects
 into Workspace_  
 ![](python_red_debug/import_project.png)  
-  
-Remember to select "Copy projects into workspace".  
-![](python_red_debug/import_project_copy_into.png)  
   
 
   * Edit Debug Configuration for Robot
@@ -103,6 +100,5 @@ In Main tab provide imported Project and testsuites:
 
 #### Running Python&amp;Robot; debug
 
-Start debug of Python Debug instance first than start debug of Robot Debug
-instance.
+Start Robot Debug instance first than start Python Debug one.
 

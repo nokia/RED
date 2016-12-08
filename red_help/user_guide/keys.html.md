@@ -18,3 +18,15 @@ Sets multi-line comments on the selected text in Source editor.
 
 Apply simple source code reformat in Source editor.
 
+###  Revalidate selected resources - CTRL+F5
+
+Revalidate selected resources in Project explorer.
+
+###  Revalidate current file - CTRL+F5
+
+Revalidate current file in Source editor.
+
+###  Revalidate current project - CTRL+SHIFT+F5
+
+Revalidate current project in Source editor.
+
