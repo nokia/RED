@@ -11,7 +11,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.rf.ide.core.project.RobotProjectConfig.ReferencedVariableFile;
@@ -34,6 +33,7 @@ import com.google.common.base.Function;
 
 /**
  * @author Michal Anglart
+ *
  */
 class SimilaritiesAnalyst {
 
@@ -62,11 +62,9 @@ class SimilaritiesAnalyst {
     private Collection<String> getAccessibleKeywords(final IFile suiteFile) {
         final List<String> names = new ArrayList<>();
         new KeywordDefinitionLocator(suiteFile).locateKeywordDefinition(new KeywordDetector() {
-
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final Set<String> libraryAlias,
-                    final RobotSuiteFile exposingFile) {
+                    final KeywordSpecification kwSpec, final String libraryAlias, final RobotSuiteFile exposingFile) {
                 names.add(kwSpec.getName());
                 return ContinueDecision.CONTINUE;
             }
