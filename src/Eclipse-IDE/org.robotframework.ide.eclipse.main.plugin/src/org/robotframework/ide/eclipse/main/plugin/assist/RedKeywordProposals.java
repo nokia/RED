@@ -9,12 +9,14 @@ import static com.google.common.collect.Maps.newHashMap;
 import static com.google.common.collect.Sets.newLinkedHashSet;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.keywords.names.EmbeddedKeywordNamesSupport;
@@ -124,14 +126,18 @@ public class RedKeywordProposals {
 
                 @Override
                 public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                        final KeywordSpecification kwSpec, final String libraryAlias,
+                        final KeywordSpecification kwSpec, final Set<String> libraryAliases,
                         final RobotSuiteFile exposingFile) {
                     final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
                             : KeywordScope.STD_LIBRARY;
-                    final String sourceName = libraryAlias.isEmpty() ? libSpec.getName() : libraryAlias;
-
-                    addAccessibleKeyword(kwSpec.getName(), RedKeywordProposal.create(libSpec, kwSpec, scope, sourceName,
-                            exposingFile.getFile().getFullPath()), prefix);
+                    final Set<String> sourceName = libraryAliases.isEmpty()
+                            ? newLinkedHashSet(Arrays.asList(libSpec.getName())) : libraryAliases;
+                    for (final String source : sourceName) {
+                        final String sourcePrefix = source.isEmpty() ? libSpec.getName() : source;
+                        addAccessibleKeyword(kwSpec.getName(), RedKeywordProposal.create(libSpec, kwSpec, scope,
+                                sourcePrefix, exposingFile.getFile().getFullPath()),
+                                prefix);
+                    }
                     return ContinueDecision.CONTINUE;
                 }
 
