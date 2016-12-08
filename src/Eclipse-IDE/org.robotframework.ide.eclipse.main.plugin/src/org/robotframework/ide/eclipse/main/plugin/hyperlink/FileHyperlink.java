@@ -17,10 +17,8 @@ import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 
-
 /**
  * @author Michal Anglart
- *
  */
 public class FileHyperlink implements IHyperlink {
 

@@ -10,7 +10,6 @@ import static com.google.common.collect.Sets.newHashSet;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -27,6 +26,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecifi
 
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
+import com.google.common.collect.SetMultimap;
 
 /**
  * @author Michal Anglart
@@ -57,7 +57,8 @@ public class KeywordDefinitionLocator {
             final KeywordDetector detector) {
         for (final LibrarySpecification libSpec : filter(collection, Predicates.notNull())) {
             for (final KeywordSpecification kwSpec : libSpec.getKeywords()) {
-                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec, "", null);
+                final ContinueDecision shouldContinue = detector.libraryKeywordDetected(libSpec, kwSpec, newHashSet(""),
+                        null);
                 if (shouldContinue == ContinueDecision.STOP) {
                     return ContinueDecision.STOP;
                 }
@@ -105,7 +106,8 @@ public class KeywordDefinitionLocator {
             alreadyVisited.add((IFile) resourceFile);
 
             final RobotSuiteFile resourceSuiteFile = model.createSuiteFile((IFile) resourceFile);
-            final List<IPath> nestedResources = ResourceImportsPathsResolver.getWorkspaceRelativeResourceFilesPaths(resourceSuiteFile);
+            final List<IPath> nestedResources = ResourceImportsPathsResolver
+                    .getWorkspaceRelativeResourceFilesPaths(resourceSuiteFile);
             ContinueDecision shouldContinue = locateInResourceFiles(nestedResources, alreadyVisited, startingFile,
                     detector);
             if (shouldContinue == ContinueDecision.STOP) {
@@ -123,9 +125,8 @@ public class KeywordDefinitionLocator {
         return ContinueDecision.CONTINUE;
     }
 
-    private ContinueDecision locateInLibraries(final RobotSuiteFile file,
-            final KeywordDetector detector) {
-        final Map<LibrarySpecification, String> librariesMap = file.getImportedLibraries();
+    private ContinueDecision locateInLibraries(final RobotSuiteFile file, final KeywordDetector detector) {
+        final SetMultimap<LibrarySpecification, String> librariesMap = file.getImportedLibraries();
         for (final LibrarySpecification libSpec : librariesMap.keySet()) {
             final List<KeywordSpecification> keywords = libSpec.getKeywords();
             for (final KeywordSpecification kwSpec : keywords) {
@@ -167,7 +168,7 @@ public class KeywordDefinitionLocator {
          * @return A decision whether detection should proceed
          */
         ContinueDecision libraryKeywordDetected(LibrarySpecification libSpec, KeywordSpecification kwSpec,
-                String libraryAlias, RobotSuiteFile exposingFile);
+                Set<String> libraryAlias, RobotSuiteFile exposingFile);
 
     }
 }

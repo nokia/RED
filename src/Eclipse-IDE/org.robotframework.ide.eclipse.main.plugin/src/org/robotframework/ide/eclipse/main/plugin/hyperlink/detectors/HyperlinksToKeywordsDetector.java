@@ -16,6 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
@@ -170,15 +171,17 @@ abstract class HyperlinksToKeywordsDetector {
 
                 @Override
                 public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                        final KeywordSpecification kwSpec, final String libraryAlias,
+                        final KeywordSpecification kwSpec, final Set<String> libraryAliases,
                         final RobotSuiteFile exposingFile) {
 
                     final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY
                             : KeywordScope.STD_LIBRARY;
-                    final KeywordHyperlinkEntity keyword = KeywordHyperlinkEntity.from(scope, libraryAlias,
-                            exposingFile, libSpec, kwSpec);
+                    for (final String libraryAlias : libraryAliases) {
+                        final KeywordHyperlinkEntity keyword = KeywordHyperlinkEntity.from(scope, libraryAlias,
+                                exposingFile, libSpec, kwSpec);
 
-                    addAccessibleKeyword(kwSpec.getName(), keyword);
+                        addAccessibleKeyword(kwSpec.getName(), keyword);
+                    }
                     return ContinueDecision.CONTINUE;
                 }
 
