@@ -40,6 +40,7 @@ import com.google.common.collect.Iterables;
 
 /**
  * @author Michal Anglart
+ *
  */
 public class ImportLibraryFixer extends RedSuiteMarkerResolution {
 
@@ -51,7 +52,6 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
                 createKeywordsDetector(keywordName, libs));
 
         return newArrayList(Iterables.transform(libs, new Function<String, IMarkerResolution>() {
-
             @Override
             public IMarkerResolution apply(final String libName) {
                 return new ImportLibraryFixer(libName);
@@ -64,17 +64,19 @@ public class ImportLibraryFixer extends RedSuiteMarkerResolution {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final Set<String> libraryAlias,
-                    final RobotSuiteFile exposingFile) {
-                if (QualifiedKeywordName.fromOccurrence(keywordName).matchesIgnoringCase(QualifiedKeywordName
-                        .create(QualifiedKeywordName.unifyDefinition(kwSpec.getName()), libSpec.getName()))) {
+                    final KeywordSpecification kwSpec, final String libraryAlias, final RobotSuiteFile exposingFile) {
+                if (QualifiedKeywordName.fromOccurrence(keywordName).matchesIgnoringCase(
+                        QualifiedKeywordName.create(QualifiedKeywordName.unifyDefinition(kwSpec.getName()),
+                                libSpec.getName()))) {
                     libs.add(libSpec.getName());
                 }
                 return ContinueDecision.CONTINUE;
             }
 
+
             @Override
-            public ContinueDecision keywordDetected(final RobotSuiteFile file, final RobotKeywordDefinition keyword) {
+            public ContinueDecision keywordDetected(final RobotSuiteFile file,
+                    final RobotKeywordDefinition keyword) {
                 return ContinueDecision.CONTINUE;
             }
         };
