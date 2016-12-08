@@ -9,6 +9,7 @@ import java.io.File;
 import java.net.URI;
 import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -36,14 +37,13 @@ public class VariablesImporter {
     private final AbsoluteUriFinder uriFinder = new AbsoluteUriFinder();
 
     public List<VariablesFileImportReference> importVariables(final PathsProvider pathsProvider,
-            final RobotProjectHolder robotProject,
-            final RobotFileOutput robotFile) {
+            final RobotProjectHolder robotProject, final RobotFileOutput robotFile) {
         return importVariables(pathsProvider, robotProject.getRobotRuntime(), robotProject, robotFile);
     }
 
     public List<VariablesFileImportReference> importVariables(final PathsProvider pathsProvider,
-            final RobotRuntimeEnvironment robotRunEnv,
-            final RobotProjectHolder robotProject, final RobotFileOutput robotFile) {
+            final RobotRuntimeEnvironment robotRunEnv, final RobotProjectHolder robotProject,
+            final RobotFileOutput robotFile) {
 
         final List<VariablesFileImportReference> varsImported = new ArrayList<>();
         final SettingTable settingTable = robotFile.getFileModel().getSettingTable();
@@ -86,7 +86,6 @@ public class VariablesImporter {
                         continue;
                     }
 
-
                     final File varFile = new File(importUri);
                     VariablesFileImportReference varImportRef;
                     try {
@@ -103,8 +102,19 @@ public class VariablesImporter {
                     }
 
                     if (varImportRef == null) {
-                        final Map<?, ?> variablesFromFile = robotRunEnv.getVariablesFromFile(varFile.getAbsolutePath(),
-                                varFileArguments);
+                        Map<?, ?> variablesFromFile = new HashMap<>();
+                        try {
+                            variablesFromFile = robotRunEnv.getVariablesFromFile(varFile.getAbsolutePath(),
+                                    varFileArguments);
+                        } catch (final Exception e) {
+                            final BuildMessage errorMsg = BuildMessage.createErrorMessage(
+                                    "Problem with importing variable file " + path + " with error stack: " + e,
+                                    "" + currentRobotFile);
+                            errorMsg.setFileRegion(
+                                    new FileRegion(varImport.getBeginPosition(), varImport.getEndPosition()));
+                            robotFile.addBuildMessage(errorMsg);
+                            continue;
+                        }
                         varImportRef = new VariablesFileImportReference(varImport);
                         varImportRef.setVariablesFile(varFile.getAbsoluteFile());
                         varImportRef.map(variablesFromFile);
