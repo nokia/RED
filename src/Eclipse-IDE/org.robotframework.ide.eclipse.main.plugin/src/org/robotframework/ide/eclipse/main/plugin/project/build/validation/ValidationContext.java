@@ -212,14 +212,17 @@ public class ValidationContext {
 
             @Override
             public ContinueDecision libraryKeywordDetected(final LibrarySpecification libSpec,
-                    final KeywordSpecification kwSpec, final String libraryAlias, final RobotSuiteFile exposingFile) {
+                    final KeywordSpecification kwSpec, final Set<String> libraryAliases,
+                    final RobotSuiteFile exposingFile) {
 
                 final KeywordScope scope = libSpec.isReferenced() ? KeywordScope.REF_LIBRARY : KeywordScope.STD_LIBRARY;
-                final ValidationKeywordEntity keyword = new ValidationKeywordEntity(scope, libSpec.getName(),
-                        kwSpec.getName(), libraryAlias, kwSpec.isDeprecated(), exposingFile.getFile().getFullPath(), 0,
-                        kwSpec.createArgumentsDescriptor());
+                for (final String libraryAlias : libraryAliases) {
+                    final ValidationKeywordEntity keyword = new ValidationKeywordEntity(scope, libSpec.getName(),
+                            kwSpec.getName(), libraryAlias, kwSpec.isDeprecated(), exposingFile.getFile().getFullPath(),
+                            0, kwSpec.createArgumentsDescriptor());
 
-                addAccessibleKeyword(kwSpec.getName(), keyword);
+                    addAccessibleKeyword(kwSpec.getName(), keyword);
+                }
                 return ContinueDecision.CONTINUE;
             }
 
