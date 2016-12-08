@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _xmkpUP_xEeWRL4nRKA71zA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 9/8/16 2:31 PM
+Save-Time: 12/8/16 4:11 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -101,6 +101,12 @@ get-button "Save \((Ctrl|M1)\+S\)" | click
 get-tab-folder -index 1 | get-tab-item "lib_with_variable.robot" | click
 get-view "Project Explorer" | get-tree | select "RobotProject/lib_with_variable.robot" | get-menu "Run As/1 Robot Test" 
     | click
+
+wait 500
+ 
+//expand erorrs
+get-view Problems | get-tree | get-item "Errors \\(.* items\\)" | expand-all
+get-view Problems | get-tree | get-item "Warnings \\(.* items\\)" | expand-all
     
 //check first line to see pythonapth (extarcted due to long syntax) 
 if [get-by-os -linux "Linux" -win "Windows"| equals "Windows"]{   
