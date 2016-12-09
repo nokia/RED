@@ -1,3 +1,35 @@
+RED 0.7.3 - 2016/12/08
+** Feature
+    * [RED-394] - [table] display comments-only line from left side with formatting
+    * [RED-560] - GitHub #50 - configurable list of problems/warnings
+** Enhancement
+    * [RED-77] - Provide user-friendly way of adding external Resources (libraries etc) in Settings section
+    * [RED-401] - Comment hash special function
+    * [RED-501] - Table when adding variable from "..add new" option, change name according to type
+    * [RED-520] - Source- Documentation tag - allow multi-line break with enter - add ... in new line when in Doc
+    * [RED-554] - Static Analysis in RED should NOT be performed ONLY when saving a file
+    * [RED-561] - Automatically add indentation after :FOR loop and [Documentation] line continuation
+    * [RED-585] - Problem severities help
+    * [RED-594] - Create generic keyword finder which contains support for BDD, embedded arguments and multiple dots in resource filename
+** Bug
+    * [RED-256] - Some expressions are still validated as it would be the variable
+    * [RED-521] - TC/KW Doc text is not multi-line in hover but is displayed correctly in Doc View
+    * [RED-538] - GitHub #45 - resolve resource files from PythonPath
+    * [RED-566] - GitHub #56 Unknown keyword when calling keyword and having '.'
+    * [RED-568] - RED.xml - Referenced Libraries tab - Classpath is not visible on small screen
+    * [RED-591] - GitHub issue #58 [Debug] No possibility to debug keywords with embedded arguments
+    * [RED-593] - GitHub issue #59 no possibility to step into when debug keyword resource file has name with dot
+    * [RED-606] - GitHub #60 Debugging is stuck and doesn't reach breakpoint if list variable has element with None value
+    * [RED-608] - GitHub issue #61 Variables unavailable when debugging if any are not serializable
+    * [RED-613] - GitHub issue #62 From scope reason issue debug is stuck in case the same keyword exists in test suite file and currently executed resource file
+    * [RED-627] - GitHub issue #63 RED gives validation error for variables file
+** Task
+    * [RED-65] - Check RED compatibility with other eclipse plug-ins
+    * [RED-528] - [table] CTRL+Z - tests in RCPTT 
+    * [RED-628] - Debian DEB package
+    * [RED-629] - Update RED&Python debug help
+
+
 RED 0.7.2 - 2016/10/21
 ** Enhancement
     * [RED-136] - Adding sorting ascending to resources in content assist
@@ -13,7 +45,7 @@ RED 0.7.2 - 2016/10/21
     * [RED-532] - LineBegin_Space_PIPE_Space shouldn't be treat as start of PIPE separated value
     * [RED-533] - LineContinue in Keywords and Test Cases should take in account if separator before exists
     * [RED-555] - #48 GitHub issue: Debugger not working if :FOR in main suite __init__ file.
-    * [RED-556] - #49 Github issue: Running sinlge test not possible if eclipse project named different than main test directory.
+    * [RED-556] - #49 Github issue: Running single test not possible if eclipse project named different than main test directory.
     * [RED-558] - PyDev & RED nature conflicts - unable to set RED nature when project is PyDev type
 
 
