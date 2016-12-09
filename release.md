@@ -13,7 +13,7 @@ Release contains Eclipse feature of RED Robot Editor to be installed into Eclips
 
 ## Updates
 - [table editors] display comments-only line from left side with formatting - this allows to create comment lines above executable row which describes arguments of executable row formatted row by row
-- #50 - configurable list of problems/warnings - from now on, levels of errors/warnings can changed, check Preferences/RobotFramework and help for info
+- #50 - configurable list of problems/warnings - from now on, levels of errors/warnings can be changed, check Preferences/RobotFramework and help for info
 - user-friendly way of adding external Resources (libraries etc) in Settings section - content assist provides list of resources and discovered libs
 - Re-validate file/folder/project without running Project/Clean - new action in right-click menu under Robot Framework,check RED key shortcuts for list hints
 - Automatically add indentation after :FOR loop and [Documentation] line continuation 
