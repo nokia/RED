@@ -8,7 +8,6 @@ package org.robotframework.ide.eclipse.main.plugin.navigator.handlers;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -19,6 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotModelManager;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.junit.ProjectProvider;
 
@@ -31,15 +31,15 @@ public class RevalidateSelectionHandlerTest {
 
     private static IFolder nestedDirectory;
 
-    private static IFile topLevelFile;
+    private static RobotSuiteFile topLevelFile;
 
-    private static IFile initFile;
+    private static RobotSuiteFile initFile;
 
-    private static IFile tsvFile;
+    private static RobotSuiteFile tsvFile;
 
-    private static IFile txtFile;
+    private static RobotSuiteFile txtFile;
 
-    private static IFile robotFile;
+    private static RobotSuiteFile robotFile;
 
     private static IFile notRobotFile;
 
@@ -47,12 +47,13 @@ public class RevalidateSelectionHandlerTest {
     public static void beforeSuite() throws Exception {
         topLevelDirectory = projectProvider.createDir("dir1");
         nestedDirectory = projectProvider.createDir("dir1/dir2");
-
-        topLevelFile = projectProvider.createFile("file1.robot", "*** Keywords ***");
-        initFile = projectProvider.createFile("dir1/__init__.robot", "*** Settings ***");
-        tsvFile = projectProvider.createFile("dir1/file2.tsv", "*** Keywords ***");
-        txtFile = projectProvider.createFile("dir1/file3.txt", "*** Test Cases ***");
-        robotFile = projectProvider.createFile("dir1/dir2/file4.robot", "*** Test Cases ***");
+        
+        final RobotModelManager modelManager = RedPlugin.getModelManager();
+        topLevelFile = modelManager.createSuiteFile(projectProvider.createFile("file1.robot", "*** Keywords ***"));
+        initFile = modelManager.createSuiteFile(projectProvider.createFile("dir1/__init__.robot", "*** Settings ***"));
+        tsvFile = modelManager.createSuiteFile(projectProvider.createFile("dir1/file2.tsv", "*** Keywords ***"));
+        txtFile = modelManager.createSuiteFile(projectProvider.createFile("dir1/file3.txt", "*** Test Cases ***"));
+        robotFile = modelManager.createSuiteFile(projectProvider.createFile("dir1/dir2/file4.robot", "*** Test Cases ***"));
 
         notRobotFile = projectProvider.createFile("lib.py", "def kw():", "  pass");
     }
@@ -60,11 +61,11 @@ public class RevalidateSelectionHandlerTest {
     @Test
     public void onlySelectedFileShouldBeCollected() throws Exception {
         List<IResource> selectedResources = new ArrayList<>();
-        selectedResources.add(topLevelFile);
-        selectedResources.add(initFile);
+        selectedResources.add(topLevelFile.getFile());
+        selectedResources.add(initFile.getFile());
 
         Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(suiteFiles(topLevelFile, initFile));
+        assertThat(files).containsOnly(topLevelFile, initFile);
     }
 
     @Test
@@ -73,7 +74,7 @@ public class RevalidateSelectionHandlerTest {
         selectedResources.add(topLevelDirectory);
 
         Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(suiteFiles(initFile, tsvFile, txtFile, robotFile));
+        assertThat(files).containsOnly(initFile, tsvFile, txtFile, robotFile);
     }
 
     @Test
@@ -82,45 +83,37 @@ public class RevalidateSelectionHandlerTest {
         selectedResources.add(projectProvider.getProject());
 
         Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(suiteFiles(topLevelFile, initFile, tsvFile, txtFile, robotFile));
+        assertThat(files).containsOnly(topLevelFile, initFile, tsvFile, txtFile, robotFile);
     }
 
     @Test
     public void filesShouldBeCollectedOnlyOnce() throws Exception {
         List<IResource> selectedResources = new ArrayList<>();
         selectedResources.add(topLevelDirectory);
-        selectedResources.add(tsvFile);
-        selectedResources.add(robotFile);
+        selectedResources.add(tsvFile.getFile());
+        selectedResources.add(robotFile.getFile());
 
         Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(suiteFiles(initFile, tsvFile, txtFile, robotFile));
+        assertThat(files).containsOnly(initFile, tsvFile, txtFile, robotFile);
     }
 
     @Test
     public void filesAndDirectoriesCanBeMixed() throws Exception {
         List<IResource> selectedResources = new ArrayList<>();
         selectedResources.add(nestedDirectory);
-        selectedResources.add(topLevelFile);
+        selectedResources.add(topLevelFile.getFile());
 
         Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(suiteFiles(topLevelFile, robotFile));
+        assertThat(files).containsOnly(topLevelFile, robotFile);
     }
 
     @Test
     public void notRobotFilesShouldBeIgnored() throws Exception {
         List<IResource> selectedResources = new ArrayList<>();
         selectedResources.add(notRobotFile);
-        selectedResources.add(topLevelFile);
+        selectedResources.add(topLevelFile.getFile());
 
         Set<RobotSuiteFile> files = RevalidateSelectionHandler.RobotSuiteFileCollector.collectFiles(selectedResources);
-        assertThat(files).isEqualTo(suiteFiles(topLevelFile));
-    }
-
-    private Set<RobotSuiteFile> suiteFiles(IFile... files) {
-        Set<RobotSuiteFile> robotSuiteFiles = new HashSet<>();
-        for (IFile file : files) {
-            robotSuiteFiles.add(RedPlugin.getModelManager().createSuiteFile(file));
-        }
-        return robotSuiteFiles;
+        assertThat(files).containsOnly(topLevelFile);
     }
 }
