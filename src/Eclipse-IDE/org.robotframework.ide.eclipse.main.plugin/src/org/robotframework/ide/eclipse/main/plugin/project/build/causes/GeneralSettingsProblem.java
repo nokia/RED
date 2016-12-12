@@ -546,7 +546,7 @@ public enum GeneralSettingsProblem implements IProblemCause {
 
         @Override
         public String getProblemDescription() {
-            return "Setting is not upper case '%s' is deprecated from Robot Framework 3.0.\nUse WITH NAME syntax instead of current.";
+            return "Setting is not upper case '%s' and is deprecated from Robot Framework 3.0.\nUse WITH NAME syntax instead of current.";
         }
 
         @Override
