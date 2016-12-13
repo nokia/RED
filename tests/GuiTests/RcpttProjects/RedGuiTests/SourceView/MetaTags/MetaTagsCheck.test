@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _oqiBUMD5EeWqU8ILayOzQw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/13/16 9:18 AM
+Save-Time: 12/13/16 12:59 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -89,8 +89,8 @@ if [$robot_version | matches "^Robot Framework 2\.9\.\d .*"] {
 	        | equals "Setting 'Test Precondition' is deprecated from Robot Framework 3.0. Use Test Setup syntax instead of current." 
 	        | verify-true
 	    get-item "Errors \\(15 items\\)" | get-property "getItems().TreeItem[10].getText()" 
-	        | equals "Setting is not upper case 'With Name' and is deprecated from Robot Framework 3.0.\n"
-	        + "Use WITH NAME syntax instead of current." | verify-true
+	        | equals "Setting 'With Name' not in upper case is deprecated from Robot Framework 3.0.\n"
+	        + "Use WITH NAME instead." | verify-true
 	    get-item "Errors \\(15 items\\)" | get-property "getItems().TreeItem[11].getText()" 
 	        | equals "Table header '*** Metadata ***' is deprecated from Robot Framework 3.0. Use *** Settings *** syntax instead of current." 
 	        | verify-true
@@ -161,8 +161,8 @@ if [$robot_version | matches "^Robot Framework 3\.0.*"] {
 	        | equals "Setting 'Test Precondition' is deprecated from Robot Framework 3.0. Use Test Setup syntax instead of current." 
 	        | verify-true
 	    get-item "Errors \\(19 items\\)" | get-property "getItems().TreeItem[12].getText()" 
-	        | equals "Setting is not upper case 'With Name' and is deprecated from Robot Framework 3.0.\n"
-	        + "Use WITH NAME syntax instead of current." | verify-true
+	        | equals "Setting 'With Name' not in upper case is deprecated from Robot Framework 3.0.\n"
+	        + "Use WITH NAME instead." | verify-true
 	    get-item "Errors \\(19 items\\)" | get-property "getItems().TreeItem[13].getText()" 
 	        | equals "Table header '*** Metadata ***' is deprecated from Robot Framework 3.0. Use *** Settings *** syntax instead of current." 
 	        | verify-true
