@@ -41,6 +41,7 @@ import org.rf.ide.core.testdata.model.table.testcases.TestCaseTeardown;
 import org.rf.ide.core.testdata.model.table.testcases.TestCaseTimeout;
 import org.rf.ide.core.testdata.model.table.variables.names.VariableNamesSupport;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
+import org.rf.ide.core.testdata.text.read.recognizer.RobotTokenType;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
@@ -434,6 +435,11 @@ class TestCaseTableValidator implements ModelUnitValidator {
                 final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
 
                 for (final VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
+                    if (variableDeclaration.asToken()
+                            .getTypes()
+                            .contains(RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION)) {
+                        continue;
+                    }
                     if (isInvalidVariableDeclaration(validationContext, definedVariables, lineDescription,
                             variableDeclaration)) {
                         String variableName = variableDeclaration.getVariableName().getText();
