@@ -80,7 +80,8 @@ public class RedVariableProposals {
         return new VariableDetector() {
             @Override
             public ContinueDecision variableDetected(final RobotVariable variable) {
-                final Optional<ProposalMatch> match = matcher.matches(userContent, variable.getName());
+                final Optional<ProposalMatch> match = matcher.matches(userContent,
+                        variable.getPrefix() + variable.getName() + variable.getSuffix());
                 if (match.isPresent()) {
                     proposals.add(AssistProposals.createUserVariableProposal(variable, match.get()));
                 }
