@@ -28,6 +28,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedC
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 import org.robotframework.red.graphics.ImagesManager;
 
+import com.google.common.base.Supplier;
+
 public class SectionsAssistProcessorTest {
 
     @Test
@@ -131,6 +133,12 @@ public class SectionsAssistProcessorTest {
     }
 
     private static SuiteSourceAssistantContext createAssitant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(model, new AssistPreferences(AcceptanceMode.SUBSTITUTE, true, "  "));
+        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
+
+            @Override
+            public RobotSuiteFile get() {
+                return model;
+            }
+        }, new AssistPreferences(AcceptanceMode.SUBSTITUTE, true, "  "));
     }
 }
