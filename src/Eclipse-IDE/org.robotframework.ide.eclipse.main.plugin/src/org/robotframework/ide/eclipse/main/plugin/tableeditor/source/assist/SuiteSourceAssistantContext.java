@@ -5,17 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
-import java.util.List;
-
 import org.eclipse.core.resources.IFile;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
-import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
-import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
-import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Supplier;
 
 /**
  * @author Michal Anglart
@@ -23,17 +19,18 @@ import com.google.common.annotations.VisibleForTesting;
  */
 public class SuiteSourceAssistantContext {
 
-    private final RobotSuiteFile suiteModel;
+    private final Supplier<RobotSuiteFile> modelSupplier;
 
     private final AssistPreferences assistPreferences;
 
-    public SuiteSourceAssistantContext(final RobotSuiteFile robotSuiteFile) {
-        this(robotSuiteFile, new AssistPreferences());
+    public SuiteSourceAssistantContext(final Supplier<RobotSuiteFile> modelSupplier) {
+        this(modelSupplier, new AssistPreferences());
     }
 
     @VisibleForTesting
-    public SuiteSourceAssistantContext(final RobotSuiteFile robotSuiteFile, final AssistPreferences assistPreferences) {
-        this.suiteModel = robotSuiteFile;
+    public SuiteSourceAssistantContext(final Supplier<RobotSuiteFile> modelSupplier,
+            final AssistPreferences assistPreferences) {
+        this.modelSupplier = modelSupplier;
         this.assistPreferences = assistPreferences;
     }
 
@@ -42,19 +39,19 @@ public class SuiteSourceAssistantContext {
     }
 
     public RobotSuiteFile getModel() {
-        return suiteModel;
+        return modelSupplier.get();
     }
 
     public IFile getFile() {
-        return suiteModel.getFile();
+        return getModel().getFile();
+    }
+
+    public boolean isTsvFile() {
+        return getModel().isTsvFile();
     }
 
     public String getSeparatorToFollow() {
         return assistPreferences.getSeparatorToFollow(isTsvFile());
-    }
-
-    public boolean isTsvFile() {
-        return suiteModel.isTsvFile();
     }
 
     public AcceptanceMode getAcceptanceMode() {
@@ -63,11 +60,6 @@ public class SuiteSourceAssistantContext {
     
     public boolean isKeywordPrefixAutoAdditionEnabled() {
         return assistPreferences.isKeywordPrefixAutoAdditionEnabled();
-    }
-
-    public List<? extends AssistProposal> getVariables(final String prefix,
-            final AssistProposalPredicate<String> globalVarPredicate, final int offset) {
-        return new RedVariableProposals(suiteModel, globalVarPredicate).getVariableProposals(prefix, offset);
     }
 
     public static class AssistPreferences {
@@ -121,6 +113,5 @@ public class SuiteSourceAssistantContext {
         public boolean isKeywordPrefixAutoAdditionEnabled() {
             return isKeywordPrefixAutoAdditionEnabled;
         }
-
     }
 }

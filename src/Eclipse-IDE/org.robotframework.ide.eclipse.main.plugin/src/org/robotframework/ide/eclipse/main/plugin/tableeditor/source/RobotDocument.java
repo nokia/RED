@@ -95,7 +95,7 @@ public class RobotDocument extends Document {
     protected void fireDocumentAboutToBeChanged(final DocumentEvent event) {
         createParserIfNeeded();
         reparseInSameThread = getNumberOfLines() < LIMIT;
-        if (!reparseInSameThread && hasNewestVersion.getAndSet(false)) {
+        if (!reparseInSameThread & hasNewestVersion.getAndSet(false)) {
             try {
                 // it will be acquired only by the first event
                 parsingSemaphore.acquire();
