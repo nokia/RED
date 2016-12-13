@@ -9,6 +9,8 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
@@ -23,19 +25,33 @@ public class CombinedAssistProcessor extends RedContentAssistProcessor {
     private final List<RedContentAssistProcessor> processors;
 
     public CombinedAssistProcessor(final RedContentAssistProcessor... assistProcessors) {
+        super(null);
         this.processors = newArrayList(assistProcessors);
-    }
-
-    @Override
-    protected List<String> getApplicableContentTypes() {
-        return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
-                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
-                SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
     @Override
     protected String getProposalsTitle() {
         return "Smart";
+    }
+
+    @Override
+    protected List<String> getApplicableContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION,
+                SuiteSourcePartitionScanner.SETTINGS_SECTION,
+                SuiteSourcePartitionScanner.VARIABLES_SECTION);
+    }
+
+    @Override
+    protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
+            throws BadLocationException {
+        return false;
+    }
+
+    @Override
+    protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
+            final int cellLength, final String prefix) throws BadLocationException {
+        return null;
     }
 
     @Override

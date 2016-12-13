@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newLinkedHashSet;
+import static org.robotframework.ide.eclipse.main.plugin.assist.AssistProposals.sortedByOriginAndNames;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,41 +23,67 @@ import org.robotframework.ide.eclipse.main.plugin.model.locators.ContinueDecisio
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.VariableDefinitionLocator.VariableDetector;
 
+import com.google.common.base.Optional;
 
 public class RedVariableProposals {
     
     private final RobotSuiteFile suiteFile;
+    private final ProposalMatcher matcher;
+    private final AssistProposalPredicate<String> globalVarPredicate;
 
-    public RedVariableProposals(final RobotSuiteFile suiteFile) {
-        this.suiteFile = suiteFile;
+    public RedVariableProposals(final RobotSuiteFile suiteFile,
+            final AssistProposalPredicate<String> globalVarPredicate) {
+        this(suiteFile, ProposalMatchers.prefixesMatcher(), globalVarPredicate);
     }
 
-    public List<RedVariableProposal> getVariableProposals(final Comparator<RedVariableProposal> comparator,
-            final int offset) {
+    RedVariableProposals(final RobotSuiteFile suiteFile, final ProposalMatcher matcher,
+            final AssistProposalPredicate<String> globalVarPredicate) {
+        this.suiteFile = suiteFile;
+        this.matcher = matcher;
+        this.globalVarPredicate = globalVarPredicate;
+    }
+
+    public List<? extends AssistProposal> getVariableProposals(final String userContent,
+            final RobotFileInternalElement element) {
+        return getVariableProposals(userContent, sortedByOriginAndNames(), element);
+    }
+
+    public List<? extends AssistProposal> getVariableProposals(final String userContent,
+            final Comparator<? super RedVariableProposal> comparator, final RobotFileInternalElement element) {
         final Set<RedVariableProposal> proposals = newLinkedHashSet();
 
         final VariableDefinitionLocator locator = new VariableDefinitionLocator(suiteFile.getFile());
-        final VariableDetector detector = createDetector(proposals);
-        if (offset == -1) {
-            locator.locateVariableDefinition(detector);
-        } else {
-            locator.locateVariableDefinitionWithLocalScope(detector, offset);
-        }
+        locator.locateVariableDefinitionWithLocalScope(createDetector(userContent, proposals), element);
 
         final List<RedVariableProposal> resultProposals = newArrayList(proposals);
         Collections.sort(resultProposals, comparator);
         return resultProposals;
     }
-    
-    public List<RedVariableProposal> getVariableProposals(final Comparator<RedVariableProposal> comparator) {
-        return getVariableProposals(comparator, -1);
+
+    public List<? extends AssistProposal> getVariableProposals(final String userContent, final int offset) {
+        return getVariableProposals(userContent, sortedByOriginAndNames(), offset);
     }
 
-    private VariableDetector createDetector(final Set<RedVariableProposal> proposals) {
+    public List<? extends AssistProposal> getVariableProposals(final String userContent,
+            final Comparator<? super RedVariableProposal> comparator, final int offset) {
+        final Set<RedVariableProposal> proposals = newLinkedHashSet();
+
+        final VariableDefinitionLocator locator = new VariableDefinitionLocator(suiteFile.getFile());
+        locator.locateVariableDefinitionWithLocalScope(createDetector(userContent, proposals), offset);
+
+        final List<RedVariableProposal> resultProposals = newArrayList(proposals);
+        Collections.sort(resultProposals, comparator);
+        return resultProposals;
+    }
+
+    private VariableDetector createDetector(final String userContent, final Set<RedVariableProposal> proposals) {
         return new VariableDetector() {
             @Override
             public ContinueDecision variableDetected(final RobotVariable variable) {
-                proposals.add(RedVariableProposal.create(variable));
+                final Optional<ProposalMatch> match = matcher.matches(userContent, variable.getName());
+                if (match.isPresent()) {
+                    proposals.add(AssistProposals.createUserVariableProposal(variable, match.get()));
+                }
                 return ContinueDecision.CONTINUE;
             }
 
@@ -64,20 +91,34 @@ public class RedVariableProposals {
             public ContinueDecision localVariableDetected(final RobotFileInternalElement element,
                     final RobotToken variable) {
                 final String varName = variable.getText().trim();
-                proposals.add(RedVariableProposal.createLocal(varName, element.getSuiteFile().getName()));
+                final Optional<ProposalMatch> match = matcher.matches(userContent, varName);
+                if (match.isPresent()) {
+                    proposals.add(AssistProposals.createLocalVariableProposal(varName, element.getSuiteFile().getName(),
+                            match.get()));
+                }
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
-            public ContinueDecision globalVariableDetected(final String name, final Object value) {
-                proposals.add(RedVariableProposal.createBuiltIn(name, value.toString()));
+            public ContinueDecision globalVariableDetected(final String variableName, final Object value) {
+                if (globalVarPredicate.apply(variableName)) {
+                    final Optional<ProposalMatch> match = matcher.matches(userContent, variableName);
+                    if (match.isPresent()) {
+                        proposals.add(AssistProposals.createBuiltInVariableProposal(variableName, value.toString(),
+                                match.get()));
+                    }
+                }
                 return ContinueDecision.CONTINUE;
             }
 
             @Override
             public ContinueDecision varFileVariableDetected(final ReferencedVariableFile file,
                     final String variableName, final Object value) {
-                proposals.add(RedVariableProposal.create(variableName, value.toString(), file.getPath()));
+                final Optional<ProposalMatch> match = matcher.matches(userContent, variableName);
+                if (match.isPresent()) {
+                    proposals.add(AssistProposals.createVarFileVariableProposal(variableName, value.toString(),
+                            file.getPath(), match.get()));
+                }
                 return ContinueDecision.CONTINUE;
             }
         };

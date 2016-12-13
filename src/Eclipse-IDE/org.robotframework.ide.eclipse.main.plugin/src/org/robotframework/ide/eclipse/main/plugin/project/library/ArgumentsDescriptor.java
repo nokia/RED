@@ -10,6 +10,7 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor.Argument;
 
@@ -118,6 +119,20 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
     }
 
     @Override
+    public boolean equals(final Object obj) {
+        if (obj instanceof ArgumentsDescriptor) {
+            final ArgumentsDescriptor that = (ArgumentsDescriptor) obj;
+            return this.arguments.equals(that.arguments);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return arguments.hashCode();
+    }
+
+    @Override
     public String toString() {
         return "[" + Joiner.on(", ").join(arguments) + "]";
     }
@@ -171,6 +186,21 @@ public class ArgumentsDescriptor implements Iterable<Argument> {
                 return "**";
             }
             return "";
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (obj instanceof Argument) {
+                final Argument that = (Argument) obj;
+                return this.type == that.type && this.argumentName.equals(that.argumentName)
+                        && this.defaultValue.equals(that.defaultValue);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type, argumentName, defaultValue);
         }
 
         @Override

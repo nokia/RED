@@ -7,6 +7,7 @@ package org.robotframework.ide.eclipse.main.plugin.model.locators;
 
 import org.eclipse.core.runtime.IPath;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
+import org.robotframework.ide.eclipse.main.plugin.project.library.ArgumentsDescriptor;
 
 import com.google.common.base.Objects;
 
@@ -25,15 +26,19 @@ public abstract class KeywordEntity {
 
     private final boolean isDeprecated;
 
+    private final ArgumentsDescriptor argumentsDescriptor;
+
     private final IPath exposingFilepath;
 
     protected KeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,
-            final String alias, final boolean isDeprecated, final IPath exposingFilepath) {
+            final String alias, final boolean isDeprecated, final ArgumentsDescriptor argumentsDescriptor,
+            final IPath exposingFilepath) {
         this.scope = scope;
         this.sourceName = sourceName;
         this.keywordName = keywordName;
         this.alias = alias;
         this.isDeprecated = isDeprecated;
+        this.argumentsDescriptor = argumentsDescriptor;
         this.exposingFilepath = exposingFilepath;
     }
 
@@ -67,6 +72,10 @@ public abstract class KeywordEntity {
 
     public String getSourceName() {
         return sourceName;
+    }
+
+    public ArgumentsDescriptor getArgumentsDescriptor() {
+        return argumentsDescriptor;
     }
 
     public boolean isSameAs(final KeywordEntity that, final IPath useplaceFilepath) {

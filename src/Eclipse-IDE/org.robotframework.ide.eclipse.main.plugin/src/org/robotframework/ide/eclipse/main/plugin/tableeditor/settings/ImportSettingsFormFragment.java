@@ -5,6 +5,8 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.tableeditor.settings;
 
+import static com.google.common.base.Predicates.instanceOf;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -26,6 +28,7 @@ import org.eclipse.nebula.widgets.nattable.coordinate.PositionCoordinate;
 import org.eclipse.nebula.widgets.nattable.data.IDataProvider;
 import org.eclipse.nebula.widgets.nattable.edit.editor.ICellEditor;
 import org.eclipse.nebula.widgets.nattable.extension.glazedlists.GlazedListsEventLayer;
+import org.eclipse.nebula.widgets.nattable.grid.cell.AlternatingRowConfigLabelAccumulator;
 import org.eclipse.nebula.widgets.nattable.grid.layer.ColumnHeaderLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.GridLayer;
 import org.eclipse.nebula.widgets.nattable.grid.layer.RowHeaderLayer;
@@ -72,9 +75,13 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.settings.popup.ImportSettingsPopup;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
+import org.robotframework.red.nattable.AddingElementLabelAccumulator;
+import org.robotframework.red.nattable.AssistanceLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
@@ -98,6 +105,7 @@ import org.robotframework.red.nattable.painter.RedTableTextPainter;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 
 public class ImportSettingsFormFragment implements ISectionFormFragment, ISettingsFormFragment {
@@ -183,7 +191,21 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
         final IDataProvider rowHeaderDataProvider = dataProvidersFactory.createRowHeaderDataProvider(dataProvider);
 
         // body layers
-        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider);
+        final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
+                new AssistanceLabelAccumulator(dataProvider,
+                        new Predicate<PositionCoordinateSerializer>() {
+                            @Override
+                            public boolean apply(final PositionCoordinateSerializer position) {
+                                return position.getColumnPosition() < dataProvider.getColumnCount() - 1;
+                            }
+                        }, new Predicate<Object>() {
+                            @Override
+                            public boolean apply(final Object rowObject) {
+                                return rowObject instanceof RobotElement;
+                            }
+                        }),
+                new AlternatingRowConfigLabelAccumulator(), 
+                new AddingElementLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotKeywordCall> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
         final HoverLayer bodyHoverLayer = factory.createHoverLayer(bodyEventLayer);
@@ -213,6 +235,7 @@ public class ImportSettingsFormFragment implements ISectionFormFragment, ISettin
                 cornerLayer);
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(bodySelectionLayer),
                 SettingsTableEditableRule.createEditableRule(fileModel)));
+        gridLayer.addConfiguration(new ImportsSettingsEditConfiguration(fileModel, dataProvider));
 
         table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 

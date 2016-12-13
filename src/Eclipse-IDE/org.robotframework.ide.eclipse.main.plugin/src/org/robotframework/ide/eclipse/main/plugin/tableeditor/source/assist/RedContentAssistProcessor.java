@@ -9,14 +9,26 @@ import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
+
+import com.google.common.base.Optional;
 
 /**
  * @author Michal Anglart
  *
  */
 public abstract class RedContentAssistProcessor extends DefaultContentAssistProcessor {
+
+    protected final SuiteSourceAssistantContext assist;
+
+    protected ITextViewer viewer;
+
+    public RedContentAssistProcessor(final SuiteSourceAssistantContext assist) {
+        this.assist = assist;
+    }
 
     protected abstract String getProposalsTitle();
 
@@ -28,16 +40,34 @@ public abstract class RedContentAssistProcessor extends DefaultContentAssistProc
         return proposals == null ? null : proposals.toArray(new ICompletionProposal[0]);
     }
 
-    protected abstract List<? extends ICompletionProposal> computeProposals(ITextViewer viewer, int offset);
+    protected List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
+        this.viewer = viewer;
+        final IDocument document = viewer.getDocument();
+        try {
+            final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
+            if (shouldShowProposals(document, offset, lineContent)) {
+                final boolean isTsv = assist.isTsvFile();
+                final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
+                final String prefix = DocumentUtilities.getPrefix(document, cellRegion, offset);
+                final int contentLength = cellRegion.isPresent() ? cellRegion.get().getLength() : 0;
+
+                return computeProposals(document, offset, contentLength, prefix);
+            }
+        } catch (final BadLocationException e) {
+            // we'll return nothing then
+        }
+        return null;
+    }
+
+    protected abstract boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
+            throws BadLocationException;
+
+    protected abstract List<? extends ICompletionProposal> computeProposals(IDocument document, final int offset,
+            final int cellLength, final String prefix) throws BadLocationException;
 
     protected final boolean isInApplicableContentType(final IDocument document, final int offset)
             throws BadLocationException {
-        // it is valid to show those proposals when we are in variables content type or in default
-        // section at the end of document when previous content type is a variable table
-        final String contentType = document.getContentType(offset);
-        return getApplicableContentTypes().contains(contentType)
-                || (contentType == IDocument.DEFAULT_CONTENT_TYPE && offset > 0 && offset == document.getLength()
-                        && getApplicableContentTypes().contains(document.getContentType(offset - 1)));
+        return getApplicableContentTypes().contains(getVirtualContentType(document, offset));
     }
 
     protected final String getVirtualContentType(final IDocument document, final int offset)

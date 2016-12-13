@@ -298,6 +298,6 @@ public class VariableDefinitionLocator {
 
         ContinueDecision varFileVariableDetected(ReferencedVariableFile file, String variableName, Object value);
 
-        ContinueDecision globalVariableDetected(String name, Object value);
+        ContinueDecision globalVariableDetected(String variableName, Object value);
     }
 }

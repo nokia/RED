@@ -53,13 +53,14 @@ import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHype
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.SourceHyperlinksToVariablesDetector;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CodeReservedWordsAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CombinedAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.CycledContentAssistProcessor.AssitantCallbacks;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ForLoopAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.GeneralSettingsAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ImportsInCodeAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsAssistProcessor;
-import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordsInSettingsAssistProcessor;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.KeywordCallsAssistProcessor.KeywordsAssistantTarget;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.LibrariesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.ResourcesImportAssistProcessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SectionsAssistProcessor;
@@ -195,8 +196,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 assistContext);
         final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(
                 assistContext);
-        final KeywordsInSettingsAssistProcessor keywordsAssistProcessor = new KeywordsInSettingsAssistProcessor(
-                assistContext);
+        final KeywordCallsAssistProcessor keywordsAssistProcessor = new KeywordCallsAssistProcessor(assistContext,
+                KeywordsAssistantTarget.SETTINGS);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(libraryImportsProcessor,
@@ -238,14 +239,17 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
-        final ForLoopAssistProcessor forLoopAssistProcessor = new ForLoopAssistProcessor(assistContext);
-        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
+        final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
+        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext,
+                KeywordsAssistantTarget.CODE);
+        final ImportsInCodeAssistProcessor importsInCodeAssistProcessor = new ImportsInCodeAssistProcessor(
+                assistContext);
         final SettingsAssistProcessor tcSettingsAssistProcessor = new SettingsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(sectionsAssistProcessor,
                 tcSettingsAssistProcessor, forLoopAssistProcessor, keywordCallsAssistProcessor,
-                variablesAssistProcessor);
+                importsInCodeAssistProcessor, variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
@@ -262,14 +266,17 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
         final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
-        final ForLoopAssistProcessor forLoopAssistProcessor = new ForLoopAssistProcessor(assistContext);
-        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
+        final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
+        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext,
+                KeywordsAssistantTarget.CODE);
+        final ImportsInCodeAssistProcessor importsInCodeAssistProcessor = new ImportsInCodeAssistProcessor(
+                assistContext);
         final SettingsAssistProcessor kwSettingsAssistProcessor = new SettingsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(sectionsAssistProcessor,
                 kwSettingsAssistProcessor, forLoopAssistProcessor, keywordCallsAssistProcessor,
-                variablesAssistProcessor);
+                importsInCodeAssistProcessor, variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
@@ -301,22 +308,27 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 assistContext);
         final ResourcesImportAssistProcessor resourceImportsProcessor = new ResourcesImportAssistProcessor(
                 assistContext);
-        final KeywordsInSettingsAssistProcessor keywordsAssistProcessor = new KeywordsInSettingsAssistProcessor(
+        final KeywordCallsAssistProcessor keywordCallsAssistProcessor1 = new KeywordCallsAssistProcessor(assistContext,
+                KeywordsAssistantTarget.SETTINGS);
+        final KeywordCallsAssistProcessor keywordCallsAssistProcessor2 = new KeywordCallsAssistProcessor(assistContext,
+                KeywordsAssistantTarget.CODE);
+        final ImportsInCodeAssistProcessor importsInCodeAssistProcessor = new ImportsInCodeAssistProcessor(
                 assistContext);
         final SettingsAssistProcessor settingsAssistProcessor = new SettingsAssistProcessor(assistContext);
-        final KeywordCallsAssistProcessor keywordCallsAssistProcessor = new KeywordCallsAssistProcessor(assistContext);
+        final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
         final VariablesAssistProcessor variablesAssistProcessor = new VariablesAssistProcessor(assistContext);
 
         final CombinedAssistProcessor combinedProcessor = new CombinedAssistProcessor(variableDefsAssistProcessor,
                 sectionsAssistProcessor, generalSettingNamesProcessor, libraryImportsProcessor,
-                variableImportsProcessor, resourceImportsProcessor, keywordsAssistProcessor, settingsAssistProcessor,
-                keywordCallsAssistProcessor, variablesAssistProcessor);
+                variableImportsProcessor, resourceImportsProcessor, keywordCallsAssistProcessor1,
+                settingsAssistProcessor, forLoopAssistProcessor, keywordCallsAssistProcessor2,
+                importsInCodeAssistProcessor, variablesAssistProcessor);
 
         final CycledContentAssistProcessor cycledProcessor = new CycledContentAssistProcessor(assistContext,
                 assistantAccessor);
         cycledProcessor.addProcessor(combinedProcessor);
         cycledProcessor.addProcessor(generalSettingNamesProcessor);
-        cycledProcessor.addProcessor(keywordCallsAssistProcessor);
+        cycledProcessor.addProcessor(keywordCallsAssistProcessor2);
         cycledProcessor.addProcessor(variablesAssistProcessor);
 
         contentAssistant.setContentAssistProcessor(cycledProcessor, IDocument.DEFAULT_CONTENT_TYPE);

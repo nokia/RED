@@ -120,10 +120,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.red.forms.RedFormToolkit;
 import org.robotframework.red.forms.Sections;
 import org.robotframework.red.graphics.ColorsManager;
 import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.nattable.AssistanceLabelAccumulator;
 import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
@@ -144,6 +146,7 @@ import org.robotframework.red.nattable.edit.CellEditorCloser;
 import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
+import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 import com.google.common.collect.Range;
 
@@ -521,7 +524,19 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
 
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
-                new GeneralSettingsAssistanceLabelAccumulator(dataProvider), new AlternatingRowConfigLabelAccumulator(),
+                new AssistanceLabelAccumulator(dataProvider,
+                        new Predicate<PositionCoordinateSerializer>() {
+                            @Override
+                            public boolean apply(final PositionCoordinateSerializer position) {
+                                return position.getColumnPosition() < dataProvider.getColumnCount() - 1;
+                            }
+                        }, new Predicate<Object>() {
+                            @Override
+                            public boolean apply(final Object rowObject) {
+                                return true;
+                            }
+                        }),
+                new AlternatingRowConfigLabelAccumulator(),
                 new EmptyGeneralSettingLabelAcumulator(dataProvider));
         final GlazedListsEventLayer<Entry<String, RobotElement>> bodyEventLayer = factory
                 .createGlazedListEventsLayer(bodyDataLayer, dataProvider.getSortedList());
@@ -552,7 +567,7 @@ public class GeneralSettingsFormFragment implements ISectionFormFragment, ISetti
                 cornerLayer);
         gridLayer.addConfiguration(
                 new RedTableEditConfiguration<>(null, SettingsTableEditableRule.createEditableRule(fileModel)));
-        gridLayer.addConfiguration(new GeneralSettingsEditConfiguration(fileModel));
+        gridLayer.addConfiguration(new GeneralSettingsEditConfiguration(fileModel, dataProvider));
 
         addGeneralSettingsConfigAttributes(configRegistry);
 
