@@ -32,7 +32,7 @@ public class LibraryAliasToUpperCaseReplacer extends RedSuiteMarkerResolution {
 
     @Override
     public String getLabel() {
-        return "Library alias declaration will be replace by WITH NAME";
+        return "Library alias declaration will be replaced by WITH NAME";
     }
 
     @Override
