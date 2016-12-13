@@ -49,6 +49,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.osgi.service.event.Event;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToKeywordsDetector;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
@@ -80,7 +81,12 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TreeLayerAccessor;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.cases.CasesMatchesCollection.CasesFilter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableContentTooltip;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableEditableRule;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.code.CodeTableSortingConfiguration;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
+import org.robotframework.red.nattable.AssistanceLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.RedColumnHeaderDataProvider;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
@@ -104,6 +110,8 @@ import org.robotframework.red.nattable.painter.RedTableTextPainter;
 import org.robotframework.services.event.Events;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.base.Supplier;
 
 @SuppressWarnings("restriction")
@@ -180,7 +188,16 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
-                new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider),
+                new AssistanceLabelAccumulator(dataProvider,
+                        Predicates.<PositionCoordinateSerializer> alwaysTrue(), 
+                        new Predicate<Object>() {
+                            @Override
+                            public boolean apply(final Object rowObject) {
+                                return rowObject instanceof RobotKeywordCall;
+                            }
+                        }),
+                new AlternatingRowConfigLabelAccumulator(),
+                new AddingElementLabelAccumulator(dataProvider),
                 new CasesElementsLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<Object> glazedListsEventLayer = new GlazedListsEventLayer<>(bodyDataLayer,
                 dataProvider.getTreeList());
@@ -217,8 +234,8 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         final GridLayer gridLayer = factory.createGridLayer(bodyViewportLayer, columnHeaderSortingLayer, rowHeaderLayer,
                 cornerLayer);
         gridLayer.addConfiguration(new RedTableEditConfiguration<>(newElementsCreator(),
-                CasesTableEditableRule.createEditableRule(fileModel)));
-        gridLayer.addConfiguration(new CasesTableEditConfiguration(fileModel));
+                CodeTableEditableRule.createEditableRule(fileModel)));
+        gridLayer.addConfiguration(new CasesTableEditConfiguration(fileModel, dataProvider));
 
         table = createTable(parent, theme, factory, gridLayer, bodyDataLayer, configRegistry);
 
@@ -230,7 +247,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
         selectionLayerAccessor = new SelectionLayerAccessor(dataProvider, bodySelectionLayer, selectionProvider);
         treeLayerAccessor = new TreeLayerAccessor(treeLayer);
 
-        new CasesTableContentTooltip(table, markersContainer, dataProvider);
+        new CodeTableContentTooltip(table, markersContainer, dataProvider, SettingTarget.TEST_CASE);
     }
 
     private NatTable createTable(final Composite parent, final TableTheme theme, final RedNattableLayersFactory factory,
@@ -270,7 +287,7 @@ public class CasesEditorFormFragment implements ISectionFormFragment {
 
         // sorting
         table.addConfiguration(new HeaderSortConfiguration());
-        table.addConfiguration(new CasesTableSortingConfiguration(dataProvider));
+        table.addConfiguration(new CodeTableSortingConfiguration(dataProvider));
 
         // popup menus
         table.addConfiguration(new CasesTableMenuConfiguration(site, table, selectionProvider));

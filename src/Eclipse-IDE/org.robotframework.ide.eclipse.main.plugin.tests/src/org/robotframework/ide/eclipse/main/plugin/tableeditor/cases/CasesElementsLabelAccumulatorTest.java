@@ -16,6 +16,7 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
 
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
@@ -48,8 +49,8 @@ public class CasesElementsLabelAccumulatorTest {
 
     @Test
     public void caseShouldBeEditableOnlyInFirstColumn() {
-        labelIsAccumulatedAt(createTestCase(), CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL, 1, 2, 3, 4, 5);
-        labelIsAccumulatedAt(createTemplatedCase(), CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL, 1, 2, 3, 4,
+        labelIsAccumulatedAt(createTestCase(), TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL, 1, 2, 3, 4, 5);
+        labelIsAccumulatedAt(createTemplatedCase(), TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL, 1, 2, 3, 4,
                 5);
     }
 
@@ -60,24 +61,6 @@ public class CasesElementsLabelAccumulatorTest {
                 labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.CASE_CALL_CONFIG_LABEL, 0);
             } else {
                 thereIsNoSuchLabel(call, CasesElementsLabelAccumulator.CASE_CALL_CONFIG_LABEL);
-            }
-        }
-    }
-
-    @Test
-    public void callRequiresKeywordsAssistInFirstColumn() {
-        for (final RobotKeywordCall call : createTestCase().getChildren()) {
-            if (call.getClass() == RobotKeywordCall.class) {
-                labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.KEYWORD_ASSIST_REQUIRED, 0);
-            }
-        }
-    }
-
-    @Test
-    public void callRequiresVariablesAssistInInternalColumns() {
-        for (final RobotKeywordCall call : createTestCase().getChildren()) {
-            if (call.getClass() == RobotKeywordCall.class) {
-                labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED, 1, 2, 3, 4, 5);
             }
         }
     }
@@ -94,39 +77,12 @@ public class CasesElementsLabelAccumulatorTest {
     }
 
     @Test
-    public void settingRequiresKeywordAssist_whenItIsKeywordBased() {
-        for (final RobotKeywordCall call : Iterables.concat(createTestCase().getChildren(),
-                createTemplatedCase().getChildren())) {
-
-            if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isKeywordBased()) {
-                labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.KEYWORD_ASSIST_REQUIRED, 1);
-            }
-        }
-    }
-
-    @Test
-    public void settingRequiresVariablesAssistInRestOfArgumentsColumns() {
-        for (final RobotKeywordCall call : Iterables.concat(createTestCase().getChildren(),
-                createTemplatedCase().getChildren())) {
-
-            if (call instanceof RobotDefinitionSetting) {
-                final RobotDefinitionSetting setting = (RobotDefinitionSetting) call;
-                if (setting.isKeywordBased()) {
-                    labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED, 2, 3, 4, 5);
-                } else {
-                    labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED, 1, 2, 3, 4, 5);
-                }
-            }
-        }
-    }
-
-    @Test
     public void documentationIsNotEditableForArgumentsColumnsOtherThatFirstOne() {
         for (final RobotKeywordCall call : createTestCase().getChildren()) {
             if (call instanceof RobotDefinitionSetting && ((RobotDefinitionSetting) call).isDocumentation()) {
-                labelIsAccumulatedAt(call, CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL, 2, 3, 4, 5);
+                labelIsAccumulatedAt(call, TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL, 2, 3, 4, 5);
             } else {
-                thereIsNoSuchLabel(call, CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL);
+                thereIsNoSuchLabel(call, TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
             }
         }
     }

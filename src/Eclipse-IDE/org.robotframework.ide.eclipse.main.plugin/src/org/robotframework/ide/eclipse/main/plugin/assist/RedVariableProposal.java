@@ -5,18 +5,14 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.assist;
 
-import java.util.Comparator;
+import java.util.Objects;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Objects;
 
-public final class RedVariableProposal {
-
-    private final String name;
+final class RedVariableProposal extends BaseAssistProposal {
 
     private final String source;
 
@@ -26,72 +22,42 @@ public final class RedVariableProposal {
 
     private final VariableOrigin origin;
 
-    @VisibleForTesting
     RedVariableProposal(final String name, final String source, final String value, final String comment,
-            final VariableOrigin origin) {
-        this.name = name;
+            final VariableOrigin origin, final ProposalMatch match) {
+        super(name, match);
         this.source = source;
         this.value = value;
         this.comment = comment;
         this.origin = origin;
     }
 
-    public static Comparator<RedVariableProposal> variablesSortedByOriginAndNames() {
-        return new Comparator<RedVariableProposal>() {
-
-            @Override
-            public int compare(final RedVariableProposal proposal1, final RedVariableProposal proposal2) {
-                if (proposal1.origin == proposal2.origin) {
-                    return proposal1.getName().compareToIgnoreCase(proposal2.getName());
-                } else {
-                    return proposal1.origin.compareTo(proposal2.origin);
-                }
-            }
-        };
+    VariableOrigin getOrigin() {
+        return origin;
     }
 
-    static RedVariableProposal create(final RobotVariable robotVariable) {
-        return new RedVariableProposal(robotVariable.getPrefix() + robotVariable.getName() + robotVariable.getSuffix(),
-                robotVariable.getSuiteFile().getName(), robotVariable.getValue(), robotVariable.getComment(),
-                VariableOrigin.LOCAL);
+    @Override
+    public boolean hasDescription() {
+        return true;
     }
 
-    static RedVariableProposal createLocal(final String name, final String path) {
-        if (name.contains("}=")) {
-            return new RedVariableProposal(name.substring(0, name.indexOf("}=") + 1), path, "", "", VariableOrigin.LOCAL);
-        } else {
-            return new RedVariableProposal(name, path, "", "", VariableOrigin.LOCAL);
+    @Override
+    public String getDescription() {
+        final StringBuilder description = new StringBuilder();
+        description.append("Source: " + source);
+        if (!value.isEmpty()) {
+            description.append("\nValue: " + value);
         }
+        if (!comment.isEmpty()) {
+            description.append("\nComment: " + comment);
+        }
+        return description.toString();
     }
 
-    static RedVariableProposal create(final String name, final String value, final String path) {
-        return new RedVariableProposal(name, path, value, "", VariableOrigin.IMPORTED);
-    }
-
-    public static RedVariableProposal createBuiltIn(final String name, final String value) {
-        return new RedVariableProposal(name, "built-in", value, "", VariableOrigin.BUILTIN);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
+    @Override
     public ImageDescriptor getImage() {
-        if (name.startsWith("&")) {
+        if (content.startsWith("&")) {
             return RedImages.getRobotDictionaryVariableImage();
-        } else if (name.startsWith("@")) {
+        } else if (content.startsWith("@")) {
             return RedImages.getRobotListVariableImage();
         } else {
             return RedImages.getRobotScalarVariableImage();
@@ -105,8 +71,7 @@ public final class RedVariableProposal {
         }
         if (obj.getClass() == RedVariableProposal.class) {
             final RedVariableProposal that = (RedVariableProposal) obj;
-            return Objects.equal(this.name, that.name) && Objects.equal(this.source, that.source)
-                    && Objects.equal(this.value, that.value) && Objects.equal(this.comment, that.comment)
+            return Objects.equals(this.content, that.content) && Objects.equals(this.source, that.source)
                     && this.origin == that.origin;
         }
         return false;
@@ -114,7 +79,7 @@ public final class RedVariableProposal {
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(name, source, value, comment, origin);
+        return Objects.hash(content, source, origin);
     }
 
     @VisibleForTesting

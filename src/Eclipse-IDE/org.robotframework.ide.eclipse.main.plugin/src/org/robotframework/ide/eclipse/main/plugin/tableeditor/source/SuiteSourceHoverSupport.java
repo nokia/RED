@@ -221,10 +221,9 @@ public class SuiteSourceHoverSupport implements ITextHover, ITextHoverExtension,
 
     private String getKeywordHoverInfo(final String keywordName) {
         final RedKeywordProposals proposals = new RedKeywordProposals(suiteFile);
-
         final RedKeywordProposal best = proposals.getBestMatchingKeywordProposal(keywordName);
         if (best != null) {
-            return best.getDocumentation();
+            return best.getDescription();
         }
         return null;
     }

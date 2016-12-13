@@ -11,6 +11,8 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.junit.Test;
@@ -31,6 +33,7 @@ public class CombinedAssistProcessorTest {
         private final List<? extends ICompletionProposal> proposalsToReturn;
 
         MockProcessor(final ICompletionProposal... proposalsToReturn) {
+            super(null);
             this.proposalsToReturn = newArrayList(proposalsToReturn);
         }
 
@@ -47,6 +50,18 @@ public class CombinedAssistProcessorTest {
         @Override
         protected List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
             return proposalsToReturn;
+        }
+
+        @Override
+        protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
+                final int cellLength, final String prefix) throws BadLocationException {
+            return null;
+        }
+
+        @Override
+        protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
+                throws BadLocationException {
+            return false;
         }
     }
 }

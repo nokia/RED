@@ -7,10 +7,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
+import org.eclipse.nebula.widgets.nattable.data.IRowDataProvider;
 import org.eclipse.nebula.widgets.nattable.style.ConfigAttribute;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 
 public class CasesTableEditConfigurationTest {
@@ -21,14 +23,11 @@ public class CasesTableEditConfigurationTest {
         final IConfigRegistry configRegistry = mock(IConfigRegistry.class);
 
         final CasesTableEditConfiguration configuration = new CasesTableEditConfiguration(
-                new RobotSuiteFileCreator().build());
+                new RobotSuiteFileCreator().build(), mock(IRowDataProvider.class));
         configuration.configureRegistry(configRegistry);
 
         verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class),
                 isA(RedTextCellEditor.class), eq(DisplayMode.NORMAL),
-                eq(CasesElementsLabelAccumulator.VARIABLES_ASSIST_REQUIRED));
-        verify(configRegistry, times(1)).registerConfigAttribute(isA(ConfigAttribute.class),
-                isA(RedTextCellEditor.class), eq(DisplayMode.NORMAL),
-                eq(CasesElementsLabelAccumulator.KEYWORD_ASSIST_REQUIRED));
+                eq(TableConfigurationLabels.ASSIST_REQUIRED));
     }
 }

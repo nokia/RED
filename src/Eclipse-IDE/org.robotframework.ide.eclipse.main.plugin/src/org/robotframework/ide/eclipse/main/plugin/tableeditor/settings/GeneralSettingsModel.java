@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
@@ -54,14 +53,6 @@ public class GeneralSettingsModel {
             }
         }
         return initialMapping;
-    }
-
-    static boolean isKeywordBased(final Entry<String, RobotElement> entry) {
-        return newArrayList(SUITE_SETUP, SUITE_TEARDOWN, TEST_SETUP, TEST_TEARDOWN).contains(entry.getKey());
-    }
-
-    static boolean isTemplate(final Entry<String, RobotElement> entry) {
-        return TEST_TEMPLATE.equals(entry.getKey());
     }
 
     static enum AccessibleSettings {

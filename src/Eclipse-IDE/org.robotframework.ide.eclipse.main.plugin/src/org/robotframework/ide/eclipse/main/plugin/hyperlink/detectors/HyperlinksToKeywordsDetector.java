@@ -245,7 +245,7 @@ abstract class HyperlinksToKeywordsDetector {
                 final String alias, final boolean isDeprecated, final RobotSuiteFile exposingResource,
                 final DefinitionPosition position, final RobotKeywordDefinition userKeyword,
                 final LibrarySpecification libSpec, final KeywordSpecification kwSpec) {
-            super(scope, sourceName, keywordName, alias, isDeprecated, exposingResource.getFile().getFullPath());
+            super(scope, sourceName, keywordName, alias, isDeprecated, null, exposingResource.getFile().getFullPath());
             this.destinationPosition = position;
             this.exposingResource = exposingResource;
             this.userKeyword = userKeyword;

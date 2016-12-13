@@ -27,22 +27,25 @@ public abstract class DetailCellEditorEntry<D> extends Canvas {
     protected static final int SPACING_AROUND_LINE = 5;
     protected static final int LINE_WIDTH = 2;
 
-    private final Color hoverColor;
+    protected final int column;
+    protected final int row;
 
+    private final Color hoverColor;
     private final Color selectionColor;
 
     private boolean hovered = false;
-
     private boolean selected = false;
-
     private boolean underEdit = false;
 
     private DetailEditorListener editorListener;
 
     protected CellEditorValueValidationJobScheduler<String> validationJobScheduler;
 
-    public DetailCellEditorEntry(final Composite parent, final Color hoverColor, final Color selectionColor) {
+    public DetailCellEditorEntry(final Composite parent, final int column, final int row, final Color hoverColor,
+            final Color selectionColor) {
         super(parent, SWT.NO_BACKGROUND);
+        this.column = column;
+        this.row = row;
         this.hoverColor = hoverColor;
         this.selectionColor = selectionColor;
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(getValidator());

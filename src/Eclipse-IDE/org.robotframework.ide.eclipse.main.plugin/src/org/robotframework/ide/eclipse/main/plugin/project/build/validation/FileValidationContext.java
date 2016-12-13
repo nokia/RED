@@ -41,9 +41,9 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
     private Set<String> accessibleVariables;
 
-    private Map<String, ListMultimap<String, KeywordEntity>> alreadyUsedKeywords = new HashMap<>();
+    private final Map<String, ListMultimap<String, KeywordEntity>> alreadyUsedKeywords = new HashMap<>();
 
-    private Map<String, ListMultimap<KeywordScope, KeywordEntity>> possibleKeywords = new HashMap<>();
+    private final Map<String, ListMultimap<KeywordScope, KeywordEntity>> possibleKeywords = new HashMap<>();
 
     private ListMultimap<KeywordScope, KeywordEntity> allPossibleKeywords;
 
@@ -100,6 +100,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         return listMultimap;
     }
 
+    @Override
     public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords(
             final ListMultimap<String, KeywordEntity> foundKeywords, final String keywordName) {
         ListMultimap<KeywordScope, KeywordEntity> pos = possibleKeywords
@@ -112,6 +113,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         return pos;
     }
 
+    @Override
     public ListMultimap<KeywordScope, KeywordEntity> getPossibleKeywords() {
         if (allPossibleKeywords == null) {
             allPossibleKeywords = super.getPossibleKeywords();
@@ -120,6 +122,7 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
         return allPossibleKeywords;
     }
 
+    @Override
     protected Collection<KeywordEntity> getAccessibleKeywordsDeduplicated() {
         if (hereKeywords == null) {
             hereKeywords = super.getAccessibleKeywordsDeduplicated();
@@ -157,19 +160,12 @@ public class FileValidationContext extends AccessibleKeywordsEntities {
 
         private final int position;
 
-        private final ArgumentsDescriptor argumentsDescriptor;
-
         @VisibleForTesting
         ValidationKeywordEntity(final KeywordScope scope, final String sourceName, final String keywordName,
                 final String alias, final boolean isDeprecated, final IPath exposingFilepath, final int position,
                 final ArgumentsDescriptor argumentsDescriptor) {
-            super(scope, sourceName, keywordName, alias, isDeprecated, exposingFilepath);
+            super(scope, sourceName, keywordName, alias, isDeprecated, argumentsDescriptor, exposingFilepath);
             this.position = position;
-            this.argumentsDescriptor = argumentsDescriptor;
-        }
-
-        public ArgumentsDescriptor getArgumentsDescriptor() {
-            return argumentsDescriptor;
         }
 
         public boolean hasInconsistentName(final String useplaceName) {

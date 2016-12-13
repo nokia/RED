@@ -8,10 +8,12 @@ package org.robotframework.ide.eclipse.main.plugin;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.model.IWorkbenchAdapter;
 
 @SuppressWarnings("PMD.GodClass")
 public class RedImages {
@@ -356,6 +358,10 @@ public class RedImages {
     
     public static ImageDescriptor getEditImage() {
         return RedPlugin.getImageDescriptor("resources/edit.png");
+    }
+    
+    public static ImageDescriptor getImageForResource(IResource resource) {
+        return ((IWorkbenchAdapter) resource.getAdapter(IWorkbenchAdapter.class)).getImageDescriptor(resource);
     }
 
     public static ImageDescriptor getImageForFileWithExtension(final String extension) {

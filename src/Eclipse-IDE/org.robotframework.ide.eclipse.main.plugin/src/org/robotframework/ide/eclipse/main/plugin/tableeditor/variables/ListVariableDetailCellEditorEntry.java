@@ -18,9 +18,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.red.graphics.ColorsManager;
-import org.robotframework.red.jface.assist.RedContentProposalAdapter;
+import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 import org.robotframework.red.nattable.edit.AssistanceSupport;
+import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DefaultRedCellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
@@ -44,9 +45,9 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
     private Text textEdit;
 
 
-    ListVariableDetailCellEditorEntry(final Composite parent, final AssistanceSupport assistSupport,
-            final Color hoverColor, final Color selectionColor) {
-        super(parent, hoverColor, selectionColor);
+    ListVariableDetailCellEditorEntry(final Composite parent, final int column, final int row,
+            final AssistanceSupport assistSupport, final Color hoverColor, final Color selectionColor) {
+        super(parent, column, row, hoverColor, selectionColor);
         this.assistSupport = assistSupport;
 
         addPaintListener(new ListElementPainter());
@@ -86,8 +87,8 @@ class ListVariableDetailCellEditorEntry extends DetailCellEditorEntry<RobotToken
             }
         });
         validationJobScheduler.armRevalidationOn(textEdit);
-        assistSupport.install(textEdit, Optional.<RedContentProposalListener> absent(),
-                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+        final AssistantContext context = new NatTableAssistantContext(column, row);
+        assistSupport.install(textEdit, context, Optional.<RedContentProposalListener> absent());
         GridDataFactory.fillDefaults().grab(true, false).indent(calculateControlIndent(), 2).applyTo(textEdit);
         layout();
 

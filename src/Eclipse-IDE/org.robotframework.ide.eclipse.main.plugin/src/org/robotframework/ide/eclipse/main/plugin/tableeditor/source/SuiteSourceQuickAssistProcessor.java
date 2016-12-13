@@ -35,6 +35,7 @@ import org.robotframework.ide.eclipse.main.plugin.project.build.fix.ProjectsFixe
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedSuiteMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.project.build.fix.RedXmlConfigMarkerResolution;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposal;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter;
 
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
@@ -163,19 +164,22 @@ public class SuiteSourceQuickAssistProcessor implements IQuickAssistProcessor, I
         // this method is called also for processors from which the proposal was not chosen
         // hence canReopenAssistantProgramatically is holding information which proccessor
         // is able to open proposals after accepting
-        if (proposal instanceof RedCompletionProposal) {
-            final RedCompletionProposal redCompletionProposal = (RedCompletionProposal) proposal;
+        if (shouldActivateAssist(proposal)) {
+            Display.getCurrent().asyncExec(new Runnable() {
 
-            if (redCompletionProposal.shouldActivateAssitantAfterAccepting()) {
-                Display.getCurrent().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        sourceViewer.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
-                    }
-                });
-            }
+                @Override
+                public void run() {
+                    sourceViewer.doOperation(ISourceViewer.CONTENTASSIST_PROPOSALS);
+                }
+            });
         }
+    }
 
+    private boolean shouldActivateAssist(final ICompletionProposal proposal) {
+        return proposal instanceof RedCompletionProposal
+                    && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()
+                || proposal instanceof RedCompletionProposalAdapter
+                    && ((RedCompletionProposalAdapter) proposal).shouldActivateAssitantAfterAccepting();
     }
 
     @Override

@@ -9,21 +9,15 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
+import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedFileLocationProposals;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSetting.SettingsGroup;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.red.graphics.ImagesManager;
-
-import com.google.common.base.Optional;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
 
 
 /**
@@ -32,15 +26,8 @@ import com.google.common.base.Optional;
  */
 public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
 
-    private final SuiteSourceAssistantContext assist;
-
     public VariablesImportAssistProcessor(final SuiteSourceAssistantContext assist) {
-        this.assist = assist;
-    }
-
-    @Override
-    protected List<String> getApplicableContentTypes() {
-        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
+        super(assist);
     }
 
     @Override
@@ -49,57 +36,32 @@ public class VariablesImportAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
-        final IDocument document = viewer.getDocument();
-        try {
-            final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-            final boolean shouldShowProposal = shouldShowProposals(lineContent, document, offset);
-
-            if (shouldShowProposal) {
-                final boolean isTsv = assist.isTsvFile();
-                final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
-                final String prefix = DocumentUtilities.getPrefix(document, region, offset);
-                final String content = region.isPresent()
-                        ? document.get(region.get().getOffset(), region.get().getLength()) : "";
-                final Image image = ImagesManager.getImage(RedImages.getImageForFileWithExtension(".py"));
-
-                final List<RedCompletionProposal> proposals = newArrayList();
-
-                for (final IFile varFile : assist.getVariableFiles()) {
-                    final String resourcePath = varFile.getFullPath().makeRelative().toString();
-                    if (resourcePath.toLowerCase().startsWith(prefix.toLowerCase())) {
-                        final String resourceRelativePath = createCurrentFileRelativePath(
-                                varFile.getFullPath().makeRelative());
-                        final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                                .will(assist.getAcceptanceMode())
-                                .theText(resourceRelativePath)
-                                .atOffset(offset - prefix.length())
-                                .givenThatCurrentPrefixIs(prefix)
-                                .andWholeContentIs(content)
-                                .thenCursorWillStopAtTheEndOfInsertion()
-                                .displayedLabelShouldBe(resourcePath)
-                                .currentPrefixShouldBeDecorated()
-                                .proposalsShouldHaveIcon(image)
-                                .create();
-                        proposals.add(proposal);
-                    }
-                }
-                return proposals;
-            }
-            return null;
-        } catch (final BadLocationException e) {
-            return null;
-        }
+    protected List<String> getApplicableContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
-    private String createCurrentFileRelativePath(final IPath resourcePath) {
-        return RedWorkspace.Paths.fromWorkspaceRelativeToResourceRelative(assist.getFile(), resourcePath).toString();
-    }
-
-    private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
+    @Override
+    protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
         return isInApplicableContentType(document, offset) && lineContent.toLowerCase().startsWith("variables")
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1;
     }
 
+    @Override
+    protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
+            final int cellLength, final String prefix) throws BadLocationException {
+
+        final List<ICompletionProposal> proposals = newArrayList();
+
+        final List<? extends AssistProposal> varFilesProposals = RedFileLocationProposals
+                .create(SettingsGroup.VARIABLES, assist.getModel()).getFilesLocationsProposals(prefix);
+
+        for (final AssistProposal proposal : varFilesProposals) {
+            final DocumentationModification modification = new DocumentationModification("",
+                    assist.getAcceptanceMode().positionToReplace(offset, prefix.length(), cellLength));
+
+            proposals.add(new RedCompletionProposalAdapter(proposal, modification));
+        }
+        return proposals;
+    }
 }

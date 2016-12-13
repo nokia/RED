@@ -10,10 +10,12 @@ import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.EditConfigAttributes;
 import org.eclipse.nebula.widgets.nattable.style.DisplayMode;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
-import org.robotframework.ide.eclipse.main.plugin.assist.VariablesContentProposingSupport;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.RobotEditorCommandsStack;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.CombinedProposalsProvider;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.assist.VariableProposalsProvider;
+import org.robotframework.red.jface.assist.RedContentProposalProvider;
 import org.robotframework.red.nattable.edit.DetailCellEditor;
 import org.robotframework.red.nattable.edit.RedTextCellEditor;
 import org.robotframework.red.nattable.edit.VariableNameRedCellEditorValidator;
@@ -38,50 +40,56 @@ class VariableValuesEditConfiguration extends AbstractRegistryConfiguration {
 
     @Override
     public void configureRegistry(final IConfigRegistry configRegistry) {
-        configureNamesCellEditors(configRegistry);
-        configureValuesCellEditors(configRegistry);
+        final CombinedProposalsProvider proposalProvider = new CombinedProposalsProvider(
+                new VariableProposalsProvider(suiteFile, dataProvider));
+
+        configureNamesCellEditors(configRegistry, proposalProvider);
+        configureValuesCellEditors(configRegistry, proposalProvider);
         configureCommentCellEditors(configRegistry);
     }
 
-    private void configureNamesCellEditors(final IConfigRegistry configRegistry) {
+    private void configureNamesCellEditors(final IConfigRegistry configRegistry,
+            final RedContentProposalProvider proposalsProvider) {
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator()), DisplayMode.NORMAL,
-                VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR));
+                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(), proposalsProvider),
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator()), DisplayMode.NORMAL,
+                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(), proposalsProvider),
+                DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.SCALAR_AS_LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator()), DisplayMode.NORMAL,
-                VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.LIST));
+                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(), proposalsProvider),
+                DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator()), DisplayMode.NORMAL,
+                new RedTextCellEditor(2, 1, new VariableNameRedCellEditorValidator(), proposalsProvider),
+                DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getNameColumnLabel(VariableType.DICTIONARY));
     }
 
-    private void configureValuesCellEditors(final IConfigRegistry configRegistry) {
-        final VariablesContentProposingSupport proposalsSupport = new VariablesContentProposingSupport(suiteFile);
+    private void configureValuesCellEditors(final IConfigRegistry configRegistry,
+            final RedContentProposalProvider proposalsProvider) {
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
-                new RedTextCellEditor(proposalsSupport), DisplayMode.NORMAL,
+                new RedTextCellEditor(proposalsProvider), DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack),
-                        proposalsSupport),
+                        proposalsProvider),
                 DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.SCALAR_AS_LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack),
-                        proposalsSupport),
+                        proposalsProvider),
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.LIST));
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new ListVariableDetailsEditingSupport(theme, dataProvider, commandsStack),
-                        proposalsSupport),
+                        proposalsProvider),
                 DisplayMode.NORMAL, VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.INVALID));
 
         configRegistry.registerConfigAttribute(EditConfigAttributes.CELL_EDITOR,
                 new DetailCellEditor<>(new DictVariableDetailsEditingSupport(theme, dataProvider, commandsStack),
-                        proposalsSupport),
+                        proposalsProvider),
                 DisplayMode.NORMAL,
                 VariableTypesAndColumnsLabelAccumulator.getValueColumnLabel(VariableType.DICTIONARY));
     }

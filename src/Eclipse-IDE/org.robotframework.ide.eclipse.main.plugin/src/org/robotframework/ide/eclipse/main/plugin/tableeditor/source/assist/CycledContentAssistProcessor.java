@@ -7,6 +7,8 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
@@ -125,23 +127,39 @@ public class CycledContentAssistProcessor extends DefaultContentAssistProcessor 
         // this method is called also for processors from which the proposal was not chosen
         // hence canReopenAssistantProgramatically is holding information which proccessor
         // is able to open proposals after accepting
-        if (canReopenAssitantProgramatically && proposal instanceof RedCompletionProposal) {
-            final RedCompletionProposal redCompletionProposal = (RedCompletionProposal) proposal;
-
-            if (redCompletionProposal.shouldActivateAssitantAfterAccepting()) {
-                canReopenAssitantProgramatically = false;
-                Display.getCurrent().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        assistant.openCompletionProposals();
-                    }
-                });
-            }
-
-            for (final Runnable operation : redCompletionProposal.operationsToPerformAfterAccepting()) {
-                operation.run();
-            }
+        if (!canReopenAssitantProgramatically) {
+            return;
         }
+        if (shouldActivateAssist(proposal)) {
+            canReopenAssitantProgramatically = false;
+            Display.getCurrent().asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    assistant.openCompletionProposals();
+                }
+            });
+        }
+
+        for (final Runnable operation : getOperationsAfterAccept(proposal)) {
+            operation.run();
+        }
+    }
+
+    private boolean shouldActivateAssist(final ICompletionProposal proposal) {
+        return proposal instanceof RedCompletionProposal
+                    && ((RedCompletionProposal) proposal).shouldActivateAssitantAfterAccepting()
+                || proposal instanceof RedCompletionProposalAdapter
+                    && ((RedCompletionProposalAdapter) proposal).shouldActivateAssitantAfterAccepting();
+    }
+
+    private Collection<Runnable> getOperationsAfterAccept(final ICompletionProposal proposal) {
+        if (proposal instanceof RedCompletionProposal) {
+            return ((RedCompletionProposal) proposal).operationsToPerformAfterAccepting();
+        } else if (proposal instanceof RedCompletionProposalAdapter) {
+            return ((RedCompletionProposalAdapter) proposal).operationsToPerformAfterAccepting();
+        }
+        return new ArrayList<>();
     }
 
     @Override

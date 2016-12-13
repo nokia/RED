@@ -5,15 +5,11 @@
  */
 package org.robotframework.red.nattable.edit;
 
-import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Text;
-import org.robotframework.ide.eclipse.main.plugin.assist.IContentProposingSupport;
+import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
+import org.robotframework.red.jface.assist.RedContentProposalProvider;
 
 import com.google.common.base.Optional;
 
@@ -23,45 +19,44 @@ import com.google.common.base.Optional;
  */
 public class AssistanceSupport {
 
-    private final IContentProposingSupport support;
+    private final RedContentProposalProvider proposalsProvider;
 
     private RedContentProposalAdapter adapter;
 
-
-    AssistanceSupport(final IContentProposingSupport support) {
-        this.support = support;
+    AssistanceSupport(final RedContentProposalProvider proposalsProvider) {
+        this.proposalsProvider = proposalsProvider;
     }
 
-    public void install(final Text textControl, final Optional<RedContentProposalListener> listener,
-            final int acceptanceStyle) {
-        if (support == null || textControl.isDisposed()) {
+    public void install(final Text textControl, final AssistantContext context,
+            final Optional<RedContentProposalListener> listener) {
+        if (proposalsProvider == null || textControl.isDisposed()) {
             return;
         }
-
-        adapter = new RedContentProposalAdapter(textControl, support.getControlAdapter(textControl),
-                support.getProposalProvider(), support.getKeyStroke(), support.getActivationKeys());
-        adapter.setProposalAcceptanceStyle(acceptanceStyle);
-        adapter.setLabelProvider(support.getLabelProvider());
-        adapter.setAutoActivationDelay(200);
-        if (listener.isPresent()) {
-            adapter.addContentProposalListener(listener.get());
-        }
-
-        final ControlDecoration decoration = new ControlDecoration(textControl, SWT.RIGHT | SWT.TOP);
-        decoration.setDescriptionText("Press Ctrl+Space for content assist");
-        decoration.setImage(FieldDecorationRegistry.getDefault()
-                .getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL)
-                .getImage());
-        textControl.addDisposeListener(new DisposeListener() {
-
-            @Override
-            public void widgetDisposed(final DisposeEvent e) {
-                decoration.dispose();
-            }
-        });
+        adapter = RedContentProposalAdapter.install(textControl, context, proposalsProvider, listener);
+        RedContentProposalAdapter.markControlWithDecoration(adapter);
     }
 
     public boolean areContentProposalsShown() {
         return adapter != null && adapter.isProposalPopupOpen();
+    }
+
+    public static class NatTableAssistantContext implements AssistantContext {
+
+        private final int column;
+
+        private final int row;
+
+        public NatTableAssistantContext(final int column, final int row) {
+            this.column = column;
+            this.row = row;
+        }
+
+        public int getColumn() {
+            return column;
+        }
+
+        public int getRow() {
+            return row;
+        }
     }
 }

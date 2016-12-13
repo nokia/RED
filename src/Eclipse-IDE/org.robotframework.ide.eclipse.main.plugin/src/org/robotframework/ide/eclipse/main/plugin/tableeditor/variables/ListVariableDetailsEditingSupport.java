@@ -78,12 +78,12 @@ public class ListVariableDetailsEditingSupport implements DetailCellEditorEditin
     }
 
     @Override
-    public DetailCellEditorEntry<RobotToken> createDetailEntry(final Composite parent, final RobotToken detail,
-            final AssistanceSupport assistSupport) {
+    public DetailCellEditorEntry<RobotToken> createDetailEntry(final Composite parent, final int column, final int row,
+            final RobotToken detail, final AssistanceSupport assistSupport) {
         final Color hoverColor = theme.getBodyHoveredCellBackground();
         final Color selectionColor = theme.getBodySelectedCellBackground();
-        final ListVariableDetailCellEditorEntry entry = new ListVariableDetailCellEditorEntry(parent, assistSupport,
-                hoverColor, selectionColor);
+        final ListVariableDetailCellEditorEntry entry = new ListVariableDetailCellEditorEntry(parent, column, row,
+                assistSupport, hoverColor, selectionColor);
         entry.update(detail);
         entry.setIndex(getDetailElements().size(), getDetailElements().indexOf(detail));
         return entry;
