@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _3DFlELkTEeWzJthH3JoEWQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/24/16 2:24 PM
+Save-Time: 12/13/16 3:30 PM
 Testcase-Type: ecl
 Verifications: _V3Dw8Lt3EeWNQsJ9kfZ-bA,_l1AbYLt3EeWNQsJ9kfZ-bA,_xVs3YLt3EeWNQsJ9kfZ-bA,_ufZ8gLtzEeW29Kbu_epUIA
 
@@ -88,13 +88,16 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     key-type "M1+SPACE"
     wait 300
     key-type Down
+    wait 100
     key-type Enter
     wait 100
     type-text "${SPACE}"
     key-type "M1+s"
 }
 
-try -times 10 -delay 1000 -command{
+get-view Outline | get-tree | get-item "tsv_file.tsv/Test Cases" | expand-all
+
+try -times 4 -delay 1000 -command{
 	get-view Outline | get-tree | get-item "tsv_file.tsv/Test Cases/test 2" | get-property childCount | equals 3 
 	    | verify-true
 	    
