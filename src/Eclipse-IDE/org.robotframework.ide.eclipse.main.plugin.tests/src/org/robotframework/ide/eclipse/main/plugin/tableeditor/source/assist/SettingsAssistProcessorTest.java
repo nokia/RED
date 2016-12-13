@@ -34,6 +34,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.Suit
 import org.robotframework.red.graphics.ImagesManager;
 import org.robotframework.red.junit.ProjectProvider;
 
+import com.google.common.base.Supplier;
+
 public class SettingsAssistProcessorTest {
 
     @ClassRule
@@ -208,7 +210,12 @@ public class SettingsAssistProcessorTest {
     }
 
     private static SuiteSourceAssistantContext createAssitant(final RobotSuiteFile model) {
-        return new SuiteSourceAssistantContext(model,
-                new AssistPreferences(AcceptanceMode.SUBSTITUTE, true, "  "));
+        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
+
+            @Override
+            public RobotSuiteFile get() {
+                return model;
+            }
+        }, new AssistPreferences(AcceptanceMode.SUBSTITUTE, true, "  "));
     }
 }
