@@ -189,7 +189,15 @@ public class RedContentProposalAdapter {
                         // If the popup is open, it gets first shot at the
                         // keystroke and should set the doit flags appropriately.
                         if (popup != null) {
-                            popup.getTargetControlListener().handleEvent(e);
+                            if (triggerKeyStroke.getNaturalKey() == e.keyCode
+                                    && (triggerKeyStroke.getModifierKeys() & e.stateMask) == triggerKeyStroke
+                                            .getModifierKeys()) {
+                                // do not propagate when triggers with modifiers are used
+                                e.doit = false;
+                            } else {
+                                popup.getTargetControlListener().handleEvent(e);
+                            }
+                            
                             // See
                             // https://bugs.eclipse.org/bugs/show_bug.cgi?id=192633
                             // If the popup is open and this is a valid character,
