@@ -22,6 +22,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSource
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 
+import com.google.common.base.Supplier;
+
 public class VariablesDefinitionsAssistProcessorTest {
 
     @Test
@@ -67,7 +69,13 @@ public class VariablesDefinitionsAssistProcessorTest {
     private static SuiteSourceAssistantContext createAssitant() {
         final RobotSuiteFile file = mock(RobotSuiteFile.class);
         when(file.getFileExtension()).thenReturn("robot");
-        return new SuiteSourceAssistantContext(file, new AssistPreferences(AcceptanceMode.INSERT, true, "  "));
+        return new SuiteSourceAssistantContext(new Supplier<RobotSuiteFile>() {
+
+            @Override
+            public RobotSuiteFile get() {
+                return file;
+            }
+        }, new AssistPreferences(AcceptanceMode.INSERT, true, "  "));
     }
 
 }
