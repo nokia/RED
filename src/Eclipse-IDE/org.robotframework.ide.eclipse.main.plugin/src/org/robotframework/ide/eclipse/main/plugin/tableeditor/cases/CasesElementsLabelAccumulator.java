@@ -11,6 +11,7 @@ import org.eclipse.nebula.widgets.nattable.layer.cell.IConfigLabelAccumulator;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotDefinitionSetting;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
 
 public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
 
@@ -21,12 +22,6 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
     public static final String CASE_SETTING_CONFIG_LABEL = "CASE_SETTING";
 
     public static final String CASE_CALL_CONFIG_LABEL = "CASE_CALL";
-
-    static final String KEYWORD_ASSIST_REQUIRED = "KEYWORD_ASSIST_REQUIRED";
-
-    static final String VARIABLES_ASSIST_REQUIRED = "VARIABLES_ASSIST_REQUIRED";
-
-    public static final String CELL_NOT_EDITABLE_LABEL = "CELL_NOT_EDITABLE";
 
     private final IRowDataProvider<Object> dataProvider;
 
@@ -43,7 +38,6 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
                 configLabels.addLabel(CASE_SETTING_CONFIG_LABEL);
             } else if (rowObject instanceof RobotKeywordCall) {
                 configLabels.addLabel(CASE_CALL_CONFIG_LABEL);
-                configLabels.addLabel(KEYWORD_ASSIST_REQUIRED);
             } else if (rowObject instanceof RobotCase) {
                 final RobotCase testCase = (RobotCase) rowObject;
                 if (testCase.getTemplateInUse().isPresent()) {
@@ -52,25 +46,13 @@ public class CasesElementsLabelAccumulator implements IConfigLabelAccumulator {
                     configLabels.addLabel(CASE_CONFIG_LABEL);
                 }
             }
-        } else if (columnPosition > 0 && columnPosition <= dataProvider.getColumnCount() - 1) {
-            if (rowObject instanceof RobotDefinitionSetting) {
-                final RobotDefinitionSetting setting = (RobotDefinitionSetting) rowObject;
-                if (columnPosition == 1) {
-                    if (setting.isKeywordBased()) {
-                        configLabels.addLabel(KEYWORD_ASSIST_REQUIRED);
-                    } else {
-                        configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
-                    }
-                } else {
-                    configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
-                    if (setting.isDocumentation()) {
-                        configLabels.addLabel(CELL_NOT_EDITABLE_LABEL);
-                    }
-                }
-            } else if (rowObject instanceof RobotKeywordCall) {
-                configLabels.addLabel(VARIABLES_ASSIST_REQUIRED);
+        } else if (columnPosition > 0) {
+            if (columnPosition > 1 && rowObject instanceof RobotDefinitionSetting
+                    && ((RobotDefinitionSetting) rowObject).isDocumentation()) {
+
+                configLabels.addLabel(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
             } else if (rowObject instanceof RobotCase) {
-                configLabels.addLabel(CELL_NOT_EDITABLE_LABEL);
+                configLabels.addLabel(TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
             }
         }
     }

@@ -8,7 +8,7 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.text.Position;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -38,19 +38,13 @@ public class RedCompletionBuilder {
 
         OptionalSettingsStep andWholeContentIs(String string);
 
-        OptionalSettingsStep secondaryPopupShouldBeDisplayed(String additionalInfo);
-
         OptionalSettingsStep secondaryPopupShouldBeDisplayedUsingHtml(String additionalInfo);
-
-        OptionalSettingsStep contextInformationShouldBeShownAfterAccepting(IContextInformation contextInformation);
 
         OptionalSettingsStep activateAssistantAfterAccepting(boolean activate);
 
         OptionalSettingsStep performAfterAccepting(Collection<Runnable> operations);
 
         DecorationsStep thenCursorWillStopAt(int position);
-
-        DecorationsStep thenCursorWillStopAt(int position, int length);
 
         DecorationsStep thenCursorWillStopAtTheEndOfInsertion();
 
@@ -61,17 +55,11 @@ public class RedCompletionBuilder {
 
         DecorationsStep displayedLabelShouldBe(String label);
 
-        DecorationsStep andItShouldBeStrikedout(boolean deprecated);
-
         DecorationsStep proposalsShouldHaveIcon(Image image);
 
         DecorationsStep currentPrefixShouldBeDecorated();
 
-        DecorationsStep labelShouldBeAugmentedWith(String additionalInfoInLabel);
-
         RedCompletionProposal create();
-
-        RedCompletionProposal createWithPriority(int priority);
     }
 
     private static class BuildingSteps implements ProposalAcceptanceModeStep, ProposalContentStep, LocationStep,
@@ -89,8 +77,6 @@ public class RedCompletionBuilder {
 
         private String additionalInfo;
 
-        private IContextInformation contextInformation;
-
         private int cursorPosition;
 
         private int cursorBackShift;
@@ -101,15 +87,11 @@ public class RedCompletionBuilder {
 
         private Image image;
 
-        private String additionalInfoInLabel;
-
         private boolean additionalInfoAsHtml;
 
         private boolean decoratePrefix;
 
         private boolean activateAssitant;
-
-        private boolean strikeout;
 
         private final Collection<Runnable> operationsAfterAccept = new ArrayList<>();
 
@@ -145,22 +127,9 @@ public class RedCompletionBuilder {
         }
 
         @Override
-        public OptionalSettingsStep secondaryPopupShouldBeDisplayed(final String additionalInfo) {
-            this.additionalInfo = additionalInfo;
-            return this;
-        }
-
-        @Override
         public OptionalSettingsStep secondaryPopupShouldBeDisplayedUsingHtml(final String additionalInfo) {
             this.additionalInfo = additionalInfo;
             this.additionalInfoAsHtml = true;
-            return this;
-        }
-
-        @Override
-        public OptionalSettingsStep contextInformationShouldBeShownAfterAccepting(
-                final IContextInformation contextInformation) {
-            this.contextInformation = contextInformation;
             return this;
         }
 
@@ -180,13 +149,6 @@ public class RedCompletionBuilder {
         public DecorationsStep thenCursorWillStopAt(final int position) {
             this.cursorPosition = position;
             this.selectionLength = 0;
-            return this;
-        }
-
-        @Override
-        public DecorationsStep thenCursorWillStopAt(final int position, final int length) {
-            this.cursorPosition = position;
-            this.selectionLength = length;
             return this;
         }
 
@@ -212,12 +174,6 @@ public class RedCompletionBuilder {
         }
 
         @Override
-        public DecorationsStep andItShouldBeStrikedout(final boolean strikeout) {
-            this.strikeout = strikeout;
-            return this;
-        }
-
-        @Override
         public DecorationsStep proposalsShouldHaveIcon(final Image image) {
             this.image = image;
             return this;
@@ -230,38 +186,24 @@ public class RedCompletionBuilder {
         }
 
         @Override
-        public DecorationsStep labelShouldBeAugmentedWith(final String additionalInfoInLabel) {
-            this.additionalInfoInLabel = additionalInfoInLabel;
-            return this;
-        }
-
-        @Override
         public RedCompletionProposal create() {
-            return createWithPriority(0);
-        }
-
-        @Override
-        public RedCompletionProposal createWithPriority(final int priority) {
             final int cursorPos = cursorPosition == -1 ? (contentToInsert.length() - cursorBackShift) : cursorPosition;
             if (mode == AcceptanceMode.INSERT) {
-                return new RedCompletionProposal(priority, contentToInsert, offset, currentPrefix.length(),
+                return new RedCompletionProposal(contentToInsert, offset, currentPrefix.length(),
                         currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
-                        activateAssitant, operationsAfterAccept, contextInformation, additionalInfo,
-                        additionalInfoAsHtml, additionalInfoInLabel, strikeout);
+                        activateAssitant, operationsAfterAccept, additionalInfo, additionalInfoAsHtml);
             } else if (mode == AcceptanceMode.SUBSTITUTE) {
                 if (wholeContent == null) {
                     throw new IllegalStateException("Unable to create proposal in substitution mode if there is no "
                             + "content to substitute specified");
                 }
-                return new RedCompletionProposal(priority, contentToInsert, offset, wholeContent.length(),
-                        currentPrefix.length(), cursorPos, selectionLength, image, decoratePrefix, labelToDisplay,
-                        activateAssitant, operationsAfterAccept, contextInformation, additionalInfo,
-                        additionalInfoAsHtml, additionalInfoInLabel, strikeout);
+                return new RedCompletionProposal(contentToInsert, offset, wholeContent.length(), currentPrefix.length(),
+                        cursorPos, selectionLength, image, decoratePrefix, labelToDisplay, activateAssitant,
+                        operationsAfterAccept, additionalInfo, additionalInfoAsHtml);
             } else {
                 throw new IllegalStateException("Unknown acceptance mode: " + mode.toString());
             }
         }
-
     }
 
     public static ProposalAcceptanceModeStep newProposal() {
@@ -269,7 +211,19 @@ public class RedCompletionBuilder {
     }
 
     public enum AcceptanceMode {
-        INSERT,
-        SUBSTITUTE
+        INSERT {
+            @Override
+            public Position positionToReplace(final int offset, final int prefixLength, final int wholeLength) {
+                return new Position(offset - prefixLength, prefixLength);
+            }
+        },
+        SUBSTITUTE {
+            @Override
+            public Position positionToReplace(final int offset, final int prefixLength, final int wholeLength) {
+                return new Position(offset - prefixLength, wholeLength);
+            }
+        };
+
+        public abstract Position positionToReplace(final int offset, final int prefixLength, final int wholeLength);
     }
 }

@@ -23,9 +23,10 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
-import org.robotframework.ide.eclipse.main.plugin.assist.IContentProposingSupport;
-import org.robotframework.red.jface.assist.RedContentProposalAdapter;
+import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
+import org.robotframework.red.jface.assist.RedContentProposalProvider;
+import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 
 import com.google.common.base.Optional;
 
@@ -48,14 +49,14 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
     private IContextActivation contextActivation;
 
     public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport,
-            final IContentProposingSupport support) {
-        this(editSupport, new DefaultRedCellEditorValueValidator(), support);
+            final RedContentProposalProvider proposalProvider) {
+        this(editSupport, new DefaultRedCellEditorValueValidator(), proposalProvider);
     }
 
     public DetailCellEditor(final DetailCellEditorEditingSupport<D> editSupport,
-            final CellEditorValueValidator<String> validator, final IContentProposingSupport support) {
+            final CellEditorValueValidator<String> validator, final RedContentProposalProvider proposalProvider) {
         this.editSupport = editSupport;
-        this.assistSupport = new AssistanceSupport(support);
+        this.assistSupport = new AssistanceSupport(proposalProvider);
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
     }
 
@@ -68,14 +69,17 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
     protected Control activateCell(final Composite parent, final Object originalCanonicalValue) {
         editMode = EditModeEnum.DIALOG;
 
-        composite = createEditorControl(parent);
-        composite.setInput(getColumnIndex(), getRowIndex());
+        final int column = getColumnIndex();
+        final int row = getRowIndex();
 
-        assistSupport.install(composite.getText(), Optional.<RedContentProposalListener> absent(),
-                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+        composite = createEditorControl(parent);
+        composite.setInput(column, row);
+
+        final AssistantContext context = new NatTableAssistantContext(column, row);
+        assistSupport.install(composite.getText(), context, Optional.<RedContentProposalListener> absent());
         parent.redraw();
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         contextActivation = service.activateContext(RedPlugin.DETAILS_EDITING_CONTEXT_ID);
         return composite;
     }
@@ -150,7 +154,7 @@ public class DetailCellEditor<D> extends AbstractCellEditor {
     public void close() {
         super.close();
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         service.deactivateContext(contextActivation);
     }
 

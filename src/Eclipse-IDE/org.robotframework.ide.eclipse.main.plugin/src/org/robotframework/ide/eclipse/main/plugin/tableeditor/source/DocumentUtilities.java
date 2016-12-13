@@ -97,21 +97,28 @@ public class DocumentUtilities {
             throws BadLocationException {
         final Optional<IRegion> cellRegion = findLiveCellRegion(document, isTsv, offset);
         if (cellRegion.isPresent()) {
-            final String cellContent = document.get(cellRegion.get().getOffset(), cellRegion.get().getLength());
 
-            final Matcher matcher = Pattern.compile("[@$&%].*").matcher(cellContent);
-            while (matcher.find()) {
-                final int start = matcher.start();
-                final int closingBracketIndex = cellContent.indexOf('}', start + 1);
-                final int end = closingBracketIndex == -1 ? matcher.end()
-                        : Math.min(matcher.end(), closingBracketIndex + 1);
-                final int shiftedStart = start + cellRegion.get().getOffset();
-                final int shiftedEnd = end + cellRegion.get().getOffset();
-                if (Range.closed(shiftedStart, shiftedEnd).contains(offset)) {
-                    return Optional.<IRegion> of(new Region(shiftedStart, shiftedEnd - shiftedStart));
-                }
+            final String cellContent = document.get(cellRegion.get().getOffset(), cellRegion.get().getLength());
+            return findLiveVariable(cellContent, offset - cellRegion.get().getOffset())
+                    .transform(new Function<IRegion, IRegion>() {
+                        @Override
+                        public IRegion apply(final IRegion region) {
+                            return new Region(region.getOffset() + cellRegion.get().getOffset(), region.getLength());
+                        }
+                    });
+        }
+        return Optional.absent();
+    }
+
+    public static Optional<IRegion> findLiveVariable(final String cellContent, final int offset) {
+        final Matcher matcher = Pattern.compile("[@$&%][^@$%&]*").matcher(cellContent);
+        while (matcher.find()) {
+            final int start = matcher.start();
+            final int closingBracketIndex = cellContent.indexOf('}', start + 1);
+            final int end = closingBracketIndex == -1 ? matcher.end() : Math.min(matcher.end(), closingBracketIndex);
+            if (Range.closed(start, end).contains(offset)) {
+                return Optional.<IRegion> of(new Region(start, end - start));
             }
-            return Optional.absent();
         }
         return Optional.absent();
     }
@@ -135,6 +142,9 @@ public class DocumentUtilities {
             throws BadLocationException {
         final String prev = offset > 0 ? document.get(offset - 1, 1) : "";
         final String next = offset < document.getLength() ? document.get(offset, 1) : "";
+        if (prev.equals("\n") && next.equals("\n")) {
+            return Optional.<IRegion> of(new Region(offset, 0));
+        }
         if (isInsideSeparator(prev, next, isTsv)) {
             return Optional.absent();
         }
@@ -160,7 +170,8 @@ public class DocumentUtilities {
         if (!firstCandidate.isPresent() && (offset > 0 ? document.get(offset - 1, 1) : "").equals("\t")) {
             return firstCandidate;
         }
-        final Optional<IRegion> region = firstCandidate.or(findCellRegion(document, isTsv, offset - 1));
+        final Optional<IRegion> region = firstCandidate.isPresent() ? firstCandidate
+                : findCellRegion(document, isTsv, offset - 1);
         if (region.isPresent()) {
             final int length = Math.max(offset - region.get().getOffset(), region.get().getLength());
             return Optional.<IRegion>of(new Region(region.get().getOffset(), length));
@@ -172,9 +183,10 @@ public class DocumentUtilities {
         if (isTsv) {
             return !prev.isEmpty() && (prev.charAt(0) == '\t' || prev.charAt(0) == '\n' || prev.charAt(0) == '\r')
                     && !next.isEmpty() && (next.charAt(0) == '\t' || next.charAt(0) == '\n' || prev.charAt(0) == '\r');
+        } else {
+            return !prev.isEmpty() && (Character.isWhitespace(prev.charAt(0)) || prev.charAt(0) == '|')
+                    && !next.isEmpty() && (Character.isWhitespace(next.charAt(0)) || next.charAt(0) == '|');
         }
-        return !prev.isEmpty() && (Character.isWhitespace(prev.charAt(0)) || prev.charAt(0) == '|') && !next.isEmpty()
-                && (Character.isWhitespace(next.charAt(0)) || next.charAt(0) == '|');
     }
 
     private static int calculateCellRegionBegin(final IDocument document, final boolean isTsv, final int caretOffset)

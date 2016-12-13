@@ -20,38 +20,63 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.mockdocument.Document;
+import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.SuiteSourceAssistantContext.AssistPreferences;
 
 public class RedContentAssistProcessorTest {
 
     @Test
     public void whenNullProposalsAreFound_nullIsReturnedAsProposalsArray() {
-        final RedContentAssistProcessor processor = createProcessorFindingProposalsForContentTypes(null);
+        final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
+        final SuiteSourceAssistantContext context = new SuiteSourceAssistantContext(model,
+                new AssistPreferences(AcceptanceMode.INSERT, false, "  "));
 
-        assertThat(processor.computeCompletionProposals(mock(ITextViewer.class), 0)).isNull();
+        final ITextViewer viewer = mock(ITextViewer.class);
+        when(viewer.getDocument()).thenReturn(new Document("0123456789"));
+
+        final RedContentAssistProcessor processor = createProcessorFindingProposalsForContentTypes(context, null);
+
+        assertThat(processor.computeCompletionProposals(viewer, 0)).isNull();
     }
 
     @Test
     public void whenNoProposalsAreFound_emptyArrayIsReturnedAsProposalsArray() {
-        final RedContentAssistProcessor processor = createProcessorFindingProposalsForContentTypes(
+        final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
+        final SuiteSourceAssistantContext context = new SuiteSourceAssistantContext(model,
+                new AssistPreferences(AcceptanceMode.INSERT, false, "  "));
+
+        final ITextViewer viewer = mock(ITextViewer.class);
+        when(viewer.getDocument()).thenReturn(new Document("0123456789"));
+
+        final RedContentAssistProcessor processor = createProcessorFindingProposalsForContentTypes(context,
                 new ArrayList<ICompletionProposal>());
 
-        assertThat(processor.computeCompletionProposals(mock(ITextViewer.class), 0)).isEmpty();
+        assertThat(processor.computeCompletionProposals(viewer, 0)).isEmpty();
     }
 
     @Test
     public void whenProposalsAreFound_theyAreReturnedInArray() {
+        final RobotSuiteFile model = new RobotSuiteFileCreator().buildReadOnly();
+        final SuiteSourceAssistantContext context = new SuiteSourceAssistantContext(model,
+                new AssistPreferences(AcceptanceMode.INSERT, false, "  "));
+
+        final ITextViewer viewer = mock(ITextViewer.class);
+        when(viewer.getDocument()).thenReturn(new Document("0123456789"));
+
         final ICompletionProposal proposal1 = mock(ICompletionProposal.class);
         final ICompletionProposal proposal2 = mock(ICompletionProposal.class);
-        final RedContentAssistProcessor processor = createProcessorFindingProposalsForContentTypes(
+        final RedContentAssistProcessor processor = createProcessorFindingProposalsForContentTypes(context,
                 newArrayList(proposal1, proposal2));
 
-        assertThat(processor.computeCompletionProposals(mock(ITextViewer.class), 0)).containsExactly(proposal1,
+        assertThat(processor.computeCompletionProposals(viewer, 0)).containsExactly(proposal1,
                 proposal2);
     }
 
     @Test
     public void trueIsReturnedForLocationQuery_whenLocatedInApplicableContentType() throws Exception {
-        final RedContentAssistProcessor processor = createProcessorForContentTypes("ct1", "ct2");
+        final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1", "ct2");
         final int offset = 5;
         final IDocument document = spy(new Document("0123456789"));
         when(document.getContentType(offset)).thenReturn("ct1");
@@ -61,7 +86,7 @@ public class RedContentAssistProcessorTest {
 
     @Test
     public void falseIsReturnedForLocationQuery_whenLocatedInNonApplicableContentType() throws Exception {
-        final RedContentAssistProcessor processor = createProcessorForContentTypes("ct1", "ct2");
+        final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1", "ct2");
         final int offset = 5;
         final IDocument document = spy(new Document("0123456789"));
         when(document.getContentType(offset)).thenReturn("ct3");
@@ -72,7 +97,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void trueIsReturnedForLocationQuery_whenLocatedAtTheEndOfDocumentInDefualtCTNeighboringApplicableCT()
             throws Exception {
-        final RedContentAssistProcessor processor = createProcessorForContentTypes("ct1", "ct2");
+        final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1", "ct2");
         final int offset = 10;
         final IDocument document = spy(new Document("0123456789"));
         when(document.getContentType(offset - 1)).thenReturn("ct2");
@@ -84,7 +109,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void falseIsReturnedForLocationQuery_whenLocatedAtTheEndOfDocumentInDefualtCTNeighboringNonApplicableCT()
             throws Exception {
-        final RedContentAssistProcessor processor = createProcessorForContentTypes("ct1", "ct2");
+        final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1", "ct2");
         final int offset = 10;
         final IDocument document = spy(new Document("0123456789"));
         when(document.getContentType(offset - 1)).thenReturn("ct3");
@@ -96,7 +121,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void falseIsReturnedForLocationQuery_whenLocatedAtTheEndOfEmptyDocumentInDefualtCT()
             throws Exception {
-        final RedContentAssistProcessor processor = createProcessorForContentTypes("ct1", "ct2");
+        final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1", "ct2");
         final int offset = 0;
         final IDocument document = spy(new Document());
         when(document.getContentType(offset)).thenReturn(IDocument.DEFAULT_CONTENT_TYPE);
@@ -106,7 +131,7 @@ public class RedContentAssistProcessorTest {
 
     @Test
     public void virtualContentTypeIsTheContentTypeItself_whenDifferentThanDefaultOne() throws BadLocationException {
-        final RedContentAssistProcessor processor = createProcessorForContentTypes("ct1");
+        final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1");
         final int offset = 5;
         final IDocument document = spy(new Document("0123456789"));
         when(document.getContentType(offset)).thenReturn("someCt");
@@ -117,7 +142,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void virtualContentTypeIsTheContentTypeItself_whenLocatedJustAfterNonDefaultOne()
             throws BadLocationException {
-        final RedContentAssistProcessor processor = createProcessorForContentTypes("ct1");
+        final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1");
         final int offset = 5;
         final IDocument document = spy(new Document("0123456789"));
         when(document.getContentType(offset - 1)).thenReturn("someCt");
@@ -129,7 +154,7 @@ public class RedContentAssistProcessorTest {
     @Test
     public void virtualContentTypeIsTheNeighboringContentTypeItself_whenLocatedJustAfterNonDefaultOneAtTheDocumentEnd()
             throws BadLocationException {
-        final RedContentAssistProcessor processor = createProcessorForContentTypes("ct1");
+        final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1");
         final int offset = 10;
         final IDocument document = spy(new Document("0123456789"));
         when(document.getContentType(offset - 1)).thenReturn("someCt");
@@ -140,7 +165,7 @@ public class RedContentAssistProcessorTest {
 
     @Test
     public void virtualContentTypeIsTheContentTypeItself_whenHavingEmptyDocument() throws Exception {
-        final RedContentAssistProcessor processor = createProcessorForContentTypes("ct1");
+        final RedContentAssistProcessor processor = createProcessorForContentTypes(null, "ct1");
         final int offset = 0;
         final IDocument document = spy(new Document());
         when(document.getContentType(offset)).thenReturn(IDocument.DEFAULT_CONTENT_TYPE);
@@ -148,22 +173,24 @@ public class RedContentAssistProcessorTest {
         assertThat(processor.getVirtualContentType(document, offset)).isEqualTo(IDocument.DEFAULT_CONTENT_TYPE);
     }
 
-    private static RedContentAssistProcessor createProcessorForContentTypes(final String... applicableContentTypes) {
-        return createProcessor(newArrayList(applicableContentTypes), null);
+    private static RedContentAssistProcessor createProcessorForContentTypes(final SuiteSourceAssistantContext context,
+            final String... applicableContentTypes) {
+        return createProcessor(context, newArrayList(applicableContentTypes), null);
     }
 
     private static RedContentAssistProcessor createProcessorFindingProposalsForContentTypes(
+            final SuiteSourceAssistantContext context,
             final List<? extends ICompletionProposal> proposalsToFind) {
-        return createProcessor(null, proposalsToFind);
+        return createProcessor(context, null, proposalsToFind);
     }
 
-    private static RedContentAssistProcessor createProcessor(final List<String> applicableContentTypes,
-            final List<? extends ICompletionProposal> foundProposals) {
-        return new RedContentAssistProcessor() {
+    private static RedContentAssistProcessor createProcessor(final SuiteSourceAssistantContext context,
+            final List<String> applicableContentTypes, final List<? extends ICompletionProposal> foundProposals) {
+        return new RedContentAssistProcessor(context) {
 
             @Override
             protected String getProposalsTitle() {
-                return "Mock processor";
+                return "Title";
             }
 
             @Override
@@ -172,7 +199,14 @@ public class RedContentAssistProcessorTest {
             }
 
             @Override
-            protected List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
+            protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
+                    throws BadLocationException {
+                return true;
+            }
+
+            @Override
+            protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
+                    final int cellLength, final String prefix) throws BadLocationException {
                 return foundProposals;
             }
         };

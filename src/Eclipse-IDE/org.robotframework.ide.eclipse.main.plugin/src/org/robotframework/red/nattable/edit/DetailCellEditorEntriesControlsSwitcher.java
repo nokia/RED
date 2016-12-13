@@ -107,8 +107,12 @@ class DetailCellEditorEntriesControlsSwitcher<D> {
         final DialogContentCreator contentCreator = new DialogContentCreator() {
             @Override
             public Control create(final Composite parent) {
+                final int column = panel.getColumn();
+                final int row = panel.getRow();
                 panel = new DetailCellEditorEntriesComposite<>(parent, editSupport, assistSupport, Mode.WINDOWED,
                         new EntriesChangeListener<D>(), mainControlChooseCallback);
+                panel.setColumn(column);
+                panel.setRow(row);
                 panel.addDisposeListener(new DisposeListener() {
                     @Override
                     public void widgetDisposed(final DisposeEvent e) {

@@ -30,8 +30,6 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
     /** The string to be displayed in the completion proposal popup. */
     private final String displayString;
 
-    private final boolean strikeout;
-
     /** The replacement string. */
     private final String replacementString;
 
@@ -51,19 +49,12 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
     /** The image to be displayed in the completion proposal popup. */
     private final Image image;
 
-    /** The context information of this proposal. */
-    private final IContextInformation contextInformation;
-
     /** The additional info of this proposal. */
     private final String additionalProposalInfo;
 
     private final boolean additionalInfoAsHtml;
 
-    private final String additionalInfoForStyledLabel;
-
     private final boolean decoratePrefix;
-
-    private final int priority;
 
     private final boolean activateAssistant;
 
@@ -96,18 +87,16 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
      * @param activateAssitant
      * @param additionalInfoAsHtml
      */
-    RedCompletionProposal(final int priority, final String replacementString, final int replacementOffset,
+    RedCompletionProposal(final String replacementString, final int replacementOffset,
             final int replacementLength, final int prefixLength, final int cursorPosition, final int selectionLength,
             final Image image, final boolean decoratePrefix, final String displayString, final boolean activateAssitant,
-            final Collection<Runnable> operationsAfterAccepting, final IContextInformation contextInformation,
-            final String additionalProposalInfo, final boolean additionalInfoAsHtml,
-            final String additionalInfoForStyledLabel, final boolean strikeout) {
+            final Collection<Runnable> operationsAfterAccepting, final String additionalProposalInfo,
+            final boolean additionalInfoAsHtml) {
         Preconditions.checkNotNull(replacementString);
         Preconditions.checkState(replacementOffset >= 0);
         Preconditions.checkState(replacementLength >= 0);
         Preconditions.checkState(cursorPosition >= 0);
 
-        this.priority = priority;
         this.replacementString = replacementString;
         this.replacementOffset = replacementOffset;
         this.replacementLength = replacementLength;
@@ -117,21 +106,15 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         this.selectionLength = selectionLength;
         this.image = image;
         this.displayString = displayString;
-        this.strikeout = strikeout;
-        this.contextInformation = contextInformation;
         this.activateAssistant = activateAssitant;
         this.operationsAfterAccepting = operationsAfterAccepting;
         this.additionalProposalInfo = additionalProposalInfo;
         this.additionalInfoAsHtml = additionalInfoAsHtml;
-        this.additionalInfoForStyledLabel = additionalInfoForStyledLabel;
     }
 
     @Override
     public int compareTo(final RedCompletionProposal that) {
-        if (this.priority == that.priority) {
-            return this.getDisplayString().compareTo(that.getDisplayString());
-        }
-        return Integer.valueOf(this.priority).compareTo(Integer.valueOf(that.priority));
+        return this.getDisplayString().compareTo(that.getDisplayString());
     }
 
     @Override
@@ -168,7 +151,7 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
 
     @Override
     public IContextInformation getContextInformation() {
-        return contextInformation;
+        return null;
     }
 
     @Override
@@ -199,15 +182,10 @@ public class RedCompletionProposal implements Comparable<RedCompletionProposal>,
         if (decoratePrefix) {
             final String alreadyWrittenPrefix = toDisplay.substring(0, prefixLength);
             final String suffixWhichWillBeAdded = toDisplay.substring(prefixLength);
-            styledString.append(alreadyWrittenPrefix,
-                    strikeout ? Stylers.Common.MARKED_STRIKEOUT_PREFIX_STYLER : Stylers.Common.MARKED_PREFIX_STYLER);
-            styledString.append(suffixWhichWillBeAdded,
-                    strikeout ? Stylers.Common.STRIKEOUT_STYLER : Stylers.Common.EMPTY_STYLER);
+            styledString.append(alreadyWrittenPrefix, Stylers.Common.MARKED_PREFIX_STYLER);
+            styledString.append(suffixWhichWillBeAdded);
         } else {
-            styledString.append(toDisplay, strikeout ? Stylers.Common.STRIKEOUT_STYLER : Stylers.Common.EMPTY_STYLER);
-        }
-        if (additionalInfoForStyledLabel != null) {
-            styledString.append(" " + additionalInfoForStyledLabel, StyledString.DECORATIONS_STYLER);
+            styledString.append(toDisplay);
         }
         return styledString;
     }

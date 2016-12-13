@@ -44,6 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorSite;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.TableHyperlinksSupport;
 import org.robotframework.ide.eclipse.main.plugin.hyperlink.detectors.TableHyperlinksToVariablesDetector;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElementChange.Kind;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModelEvents;
@@ -67,8 +68,10 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.SelectionLayerAcce
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.SuiteFileMarkersContainer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.dnd.PositionCoordinateTransfer.PositionCoordinateSerializer;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.variables.VariablesMatchesCollection.VariableFilter;
 import org.robotframework.red.nattable.AddingElementLabelAccumulator;
+import org.robotframework.red.nattable.AssistanceLabelAccumulator;
 import org.robotframework.red.nattable.NewElementsCreator;
 import org.robotframework.red.nattable.RedNattableDataProvidersFactory;
 import org.robotframework.red.nattable.RedNattableLayersFactory;
@@ -89,6 +92,7 @@ import org.robotframework.red.nattable.painter.RedNatGridLayerPainter;
 import org.robotframework.red.nattable.painter.RedTableTextPainter;
 
 import com.google.common.base.Function;
+import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
 
 public class VariablesEditorFormFragment implements ISectionFormFragment {
@@ -149,7 +153,20 @@ public class VariablesEditorFormFragment implements ISectionFormFragment {
 
         // body layers
         final DataLayer bodyDataLayer = factory.createDataLayer(dataProvider,
-                new AlternatingRowConfigLabelAccumulator(), new AddingElementLabelAccumulator(dataProvider, true),
+                new AssistanceLabelAccumulator(dataProvider,
+                        new Predicate<PositionCoordinateSerializer>() {
+                            @Override
+                            public boolean apply(final PositionCoordinateSerializer position) {
+                                return position.getColumnPosition() == 1;
+                            }
+                        }, new Predicate<Object>() {
+                            @Override
+                            public boolean apply(final Object rowObject) {
+                                return rowObject instanceof RobotElement;
+                            }
+                        }),
+                new AlternatingRowConfigLabelAccumulator(),
+                new AddingElementLabelAccumulator(dataProvider, true),
                 new VariableTypesAndColumnsLabelAccumulator(dataProvider));
         final GlazedListsEventLayer<RobotVariable> bodyEventLayer = factory.createGlazedListEventsLayer(bodyDataLayer,
                 dataProvider.getSortedList());

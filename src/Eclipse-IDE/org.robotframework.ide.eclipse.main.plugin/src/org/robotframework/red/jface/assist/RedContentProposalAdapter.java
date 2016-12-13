@@ -11,18 +11,19 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.fieldassist.IContentProposal;
-import org.eclipse.jface.fieldassist.IContentProposalProvider;
-import org.eclipse.jface.fieldassist.IControlContentAdapter;
-import org.eclipse.jface.fieldassist.IControlContentAdapter2;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.preference.JFacePreferences;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.util.Util;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TooltipsEnablingDelegatingStyledCellLabelProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.FocusAdapter;
@@ -38,20 +39,26 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.ui.forms.widgets.FormText;
+import org.eclipse.swt.widgets.Text;
+import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionBuilder.AcceptanceMode;
+import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.red.viewers.RedCommonLabelProvider;
 import org.robotframework.red.viewers.StructuredContentProvider;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 /**
- * This is slighlty modified version of
- * org.eclipse.jface.fieldassist.ContentProposalAdapter
- * Copy&Pasted with minor changes regarding look & feel.
+ * This is highly customized version of org.eclipse.jface.fieldassist.ContentProposalAdapter for our
+ * needs. Most of the code comes from mentioned class.
  */
 public class RedContentProposalAdapter {
 
@@ -69,23 +76,24 @@ public class RedContentProposalAdapter {
 
     private final ListenerList proposalListeners = new ListenerList();
 
-    private final IContentProposalProvider proposalProvider;
-    private ILabelProvider labelProvider;
+    private final RedContentProposalProvider proposalProvider;
+    private final ILabelProvider labelProvider;
 
     private final Control control;
-    private final IControlContentAdapter controlContentAdapter;
+    private final AssistantContext context;
+    private final RedControlContentAdapter controlContentAdapter;
 
     private ContentProposalPopup popup;
 
     private final KeyStroke triggerKeyStroke;
 
-    private String autoActivateString;
+    private final String autoActivateString;
 
-    private int proposalAcceptanceStyle = PROPOSAL_SHOULD_INSERT;
+    private final int proposalAcceptanceStyle;
 
     private Listener controlListener;
 
-    private int autoActivationDelay = 0;
+    private final int autoActivationDelay;
 
     private boolean receivedKeyDown;
 
@@ -97,118 +105,70 @@ public class RedContentProposalAdapter {
 
     private boolean watchModify = false;
 
-    /**
-     * Construct a content proposal adapter that can assist the user with
-     * choosing content for the field.
-     * 
-     * @param control
-     *            the control for which the adapter is providing content assist.
-     *            May not be <code>null</code>.
-     * @param controlContentAdapter
-     *            the <code>IControlContentAdapter</code> used to obtain and
-     *            update the control's contents as proposals are accepted. May
-     *            not be <code>null</code>.
-     * @param proposalProvider
-     *            the <code>IContentProposalProvider</code> used to obtain
-     *            content proposals for this control, or <code>null</code> if no
-     *            content proposal is available.
-     * @param keyStroke
-     *            the keystroke that will invoke the content proposal popup. If
-     *            this value is <code>null</code>, then proposals will be
-     *            activated automatically when any of the auto activation
-     *            characters are typed.
-     * @param autoActivationCharacters
-     *            An array of characters that trigger auto-activation of content
-     *            proposal. If specified, these characters will trigger
-     *            auto-activation of the proposal popup, regardless of whether
-     *            an explicit invocation keyStroke was specified. If this
-     *            parameter is <code>null</code>, then only a specified
-     *            keyStroke will invoke content proposal. If this parameter is
-     *            <code>null</code> and the keyStroke parameter is
-     *            <code>null</code>, then all alphanumeric characters will
-     *            auto-activate content proposal.
-     */
-    public RedContentProposalAdapter(final Control control, final IControlContentAdapter controlContentAdapter,
-            final IContentProposalProvider proposalProvider, final KeyStroke keyStroke,
-            final char[] autoActivationCharacters) {
-        this.control = Preconditions.checkNotNull(control);
-        this.controlContentAdapter = Preconditions.checkNotNull(controlContentAdapter);
+    public static RedContentProposalAdapter install(final Text text, final AssistantContext context,
+            final RedContentProposalProvider proposalsProvider) {
+        return install(text, context, proposalsProvider, Optional.<RedContentProposalListener> absent());
+    }
 
-        // The rest of these may be null
+    public static RedContentProposalAdapter install(final Text text, final AssistantContext context,
+            final RedContentProposalProvider proposalsProvider, final Optional<RedContentProposalListener> listener) {
+
+        final RedPreferences preferences = RedPlugin.getDefault().getPreferences();
+
+        final RedControlContentAdapter controlAdapter = new RedTextContentAdapter();
+        final KeyStroke activationStroke = KeyStroke.getInstance(SWT.CTRL, ' ');
+        final char[] activationChars = preferences.getAssistantAutoActivationChars();
+        final int autoActivationDelay = preferences.getAssistantAutoActivationDelay();
+        final int acceptanceStyle = preferences.getAssistantAcceptanceMode() == AcceptanceMode.INSERT
+                ? RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT : RedContentProposalAdapter.PROPOSAL_SHOULD_REPLACE;
+
+        final RedContentProposalAdapter adapter = new RedContentProposalAdapter(text, context, controlAdapter,
+                proposalsProvider, activationStroke, activationChars, autoActivationDelay, acceptanceStyle);
+        if (listener.isPresent()) {
+            adapter.addContentProposalListener(listener.get());
+        }
+        adapter.install();
+        return adapter;
+    }
+
+    public static void markControlWithDecoration(final RedContentProposalAdapter adapter) {
+        final Control control = adapter.control;
+        final ControlDecoration decoration = new ControlDecoration(control, SWT.RIGHT | SWT.TOP);
+        decoration.setDescriptionText("Press Ctrl+Space for content assist");
+        decoration.setImage(FieldDecorationRegistry.getDefault()
+                .getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL)
+                .getImage());
+        control.addDisposeListener(new DisposeListener() {
+
+            @Override
+            public void widgetDisposed(final DisposeEvent e) {
+                decoration.dispose();
+            }
+        });
+    }
+
+    private RedContentProposalAdapter(final Control control, final AssistantContext context,
+            final RedControlContentAdapter controlContentAdapter, final RedContentProposalProvider proposalProvider,
+            final KeyStroke keyStroke, final char[] autoActivationCharacters, final int autoActivationDelay,
+            final int acceptanceStyle) {
+        this.control = Preconditions.checkNotNull(control);
+        this.context = context;
+        this.controlContentAdapter = Preconditions.checkNotNull(controlContentAdapter);
+        this.labelProvider = new TooltipsEnablingDelegatingStyledCellLabelProvider(new ProposalsLabelProvider());
+
         this.proposalProvider = proposalProvider;
         this.triggerKeyStroke = keyStroke;
-        if (autoActivationCharacters != null) {
-            this.autoActivateString = new String(autoActivationCharacters);
-        }
+        this.autoActivateString = new String(autoActivationCharacters).intern();
+        this.autoActivationDelay = autoActivationDelay;
+        this.proposalAcceptanceStyle = acceptanceStyle;
+    }
+
+    private void addContentProposalListener(final RedContentProposalListener listener) {
+        proposalListeners.add(listener);
+    }
+
+    private void install() {
         addControlListener(control);
-    }
-
-    /**
-     * Set the label provider that is used to show proposals. The lifecycle of
-     * the specified label provider is not managed by this adapter. Clients must
-     * dispose the label provider when it is no longer needed.
-     * 
-     * @param labelProvider
-     *            the {@link ILabelProvider} used to show proposals.
-     */
-    public void setLabelProvider(final ILabelProvider labelProvider) {
-        if (labelProvider instanceof IStyledLabelProvider) {
-            this.labelProvider = new TooltipsEnablingDelegatingStyledCellLabelProvider(
-                    (IStyledLabelProvider) labelProvider);
-        } else {
-            this.labelProvider = labelProvider;
-        }
-    }
-
-    /**
-     * Set the delay, in milliseconds, used before autoactivation is triggered.
-     * 
-     * @param delay
-     *            the time in milliseconds that will pass before a popup is
-     *            automatically opened
-     */
-    public void setAutoActivationDelay(final int delay) {
-        autoActivationDelay = delay;
-    }
-
-    /**
-     * Get the integer style that indicates how an accepted proposal affects the
-     * control's content.
-     * 
-     * @return a constant indicating how an accepted proposal should affect the
-     *         control's content. Should be one of <code>PROPOSAL_INSERT</code>,
-     *         <code>PROPOSAL_REPLACE</code>, or <code>PROPOSAL_IGNORE</code>.
-     *         (Default is <code>PROPOSAL_INSERT</code>).
-     */
-    public int getProposalAcceptanceStyle() {
-        return proposalAcceptanceStyle;
-    }
-
-    /**
-     * Set the integer style that indicates how an accepted proposal affects the
-     * control's content.
-     * 
-     * @param acceptance
-     *            a constant indicating how an accepted proposal should affect
-     *            the control's content. Should be one of
-     *            <code>PROPOSAL_INSERT</code>, <code>PROPOSAL_REPLACE</code>,
-     *            or <code>PROPOSAL_IGNORE</code>
-     */
-    public void setProposalAcceptanceStyle(final int acceptance) {
-        proposalAcceptanceStyle = acceptance;
-    }
-
-    /**
-     * Return the content adapter that can get or retrieve the text contents
-     * from the adapter's control. This method is used when a client, such as a
-     * content proposal listener, needs to update the control's contents
-     * manually.
-     * 
-     * @return the {@link IControlContentAdapter} which can update the control
-     *         text.
-     */
-    public IControlContentAdapter getControlContentAdapter() {
-        return controlContentAdapter;
     }
 
     /*
@@ -373,7 +333,7 @@ public class RedContentProposalAdapter {
             if (popup == null) {
                 // Check whether there are any proposals to be shown.
                 recordCursorPosition(); // must be done before getting proposals
-                final IContentProposal[] proposals = getProposals();
+                final RedContentProposal[] proposals = getProposals();
                 if (proposals.length > 0) {
                     recordCursorPosition();
                     popup = new ContentProposalPopup(null, proposals);
@@ -405,13 +365,13 @@ public class RedContentProposalAdapter {
      * accordingly and notify any listeners.
      * @param proposal the accepted proposal
      */
-    private void proposalAccepted(final IContentProposal proposal) {
+    private void proposalAccepted(final RedContentProposal proposal) {
         switch (proposalAcceptanceStyle) {
             case PROPOSAL_SHOULD_REPLACE:
-                setControlContent(proposal.getContent(), proposal.getCursorPosition());
+                setControlContent(proposal);
                 break;
             case PROPOSAL_SHOULD_INSERT:
-                insertControlContent(proposal.getContent(), proposal.getCursorPosition());
+                insertControlContent(proposal);
                 break;
             default:
                 // do nothing. Typically a listener is installed to handle this in
@@ -425,11 +385,11 @@ public class RedContentProposalAdapter {
      * Set the text content of the control to the specified text, setting the
      * cursorPosition at the desired location within the new contents.
      */
-    private void setControlContent(final String text, final int cursorPosition) {
+    private void setControlContent(final RedContentProposal proposal) {
         if (isValid()) {
             // should already be false, but just in case.
             watchModify = false;
-            controlContentAdapter.setControlContents(control, text, cursorPosition);
+            controlContentAdapter.setControlContents(control, proposal);
         }
     }
 
@@ -437,7 +397,7 @@ public class RedContentProposalAdapter {
      * Insert the specified text into the control content, setting the
      * cursorPosition at the desired location within the new contents.
      */
-    private void insertControlContent(final String text, final int cursorPosition) {
+    private void insertControlContent(final RedContentProposal proposal) {
         if (isValid()) {
             // should already be false, but just in case.
             watchModify = false;
@@ -446,12 +406,12 @@ public class RedContentProposalAdapter {
             // the popup opened.
             // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=127108
             // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=139063
-            if (controlContentAdapter instanceof IControlContentAdapter2 && selectionRange.x != -1) {
-                ((IControlContentAdapter2) controlContentAdapter).setSelection(control, selectionRange);
+            if (selectionRange.x != -1) {
+                controlContentAdapter.setSelection(control, selectionRange);
             } else if (insertionPos != -1) {
                 controlContentAdapter.setCursorPosition(control, insertionPos);
             }
-            controlContentAdapter.insertControlContents(control, text, cursorPosition);
+            controlContentAdapter.insertControlContents(control, proposal);
         }
     }
 
@@ -467,13 +427,9 @@ public class RedContentProposalAdapter {
      */
     private void recordCursorPosition() {
         if (isValid()) {
-            final IControlContentAdapter adapter = getControlContentAdapter();
-            insertionPos = adapter.getCursorPosition(control);
+            insertionPos = controlContentAdapter.getCursorPosition(control);
             // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=139063
-            if (adapter instanceof IControlContentAdapter2) {
-                selectionRange = ((IControlContentAdapter2) adapter).getSelection(control);
-            }
-
+            selectionRange = controlContentAdapter.getSelection(control);
         }
     }
 
@@ -481,17 +437,16 @@ public class RedContentProposalAdapter {
      * Get the proposals from the proposal provider. Gets all of the proposals
      * without doing any filtering.
      */
-    private IContentProposal[] getProposals() {
+    private RedContentProposal[] getProposals() {
         if (proposalProvider == null || !isValid()) {
             return null;
         }
         int position = insertionPos;
         if (position == -1) {
-            position = getControlContentAdapter().getCursorPosition(control);
+            position = controlContentAdapter.getCursorPosition(control);
         }
-        final String contents = getControlContentAdapter().getControlContents(control);
-        final IContentProposal[] proposals = proposalProvider.getProposals(contents, position);
-        return proposals;
+        final String contents = controlContentAdapter.getControlContents(control);
+        return proposalProvider.getProposals(contents, position, context);
     }
 
     /**
@@ -546,7 +501,7 @@ public class RedContentProposalAdapter {
      * Return whether the control content is empty
      */
     private boolean isControlContentEmpty() {
-        return getControlContentAdapter().getControlContents(control).length() == 0;
+        return controlContentAdapter.getControlContents(control).length() == 0;
     }
 
     /*
@@ -573,7 +528,7 @@ public class RedContentProposalAdapter {
         if (autoActivateString == null || autoActivateString.length() == 0) {
             return true;
         }
-        final String content = getControlContentAdapter().getControlContents(control);
+        final String content = controlContentAdapter.getControlContents(control);
         for (int i = 0; i < autoActivateString.length(); i++) {
             if (content.indexOf(autoActivateString.charAt(i)) >= 0) {
                 return true;
@@ -824,7 +779,7 @@ public class RedContentProposalAdapter {
                                 e.doit = false;
                             } else {
                                 e.doit = true;
-                                final String contents = getControlContentAdapter().getControlContents(control);
+                                final String contents = controlContentAdapter.getControlContents(control);
                                 // If there are no contents, changes in cursor
                                 // position have no effect. Note also that we do
                                 // not affect the filter text on ARROW_LEFT as
@@ -884,7 +839,7 @@ public class RedContentProposalAdapter {
                         // clients provide their own filtering based on content.
                         // Recompute the proposals if the cursor position
                         // will change (is not at 0).
-                        final int pos = getControlContentAdapter().getCursorPosition(control);
+                        final int pos = controlContentAdapter.getCursorPosition(control);
                         // We rely on the fact that the contents and pos do not yet
                         // reflect the result of the BS. If the contents were
                         // already empty, then BS should not cause
@@ -915,7 +870,7 @@ public class RedContentProposalAdapter {
             /*
              * The text control that displays the text.
              */
-            private FormText text;
+            private StyledText text;
 
             /*
              * The String shown in the popup.
@@ -926,7 +881,8 @@ public class RedContentProposalAdapter {
              * Construct an info-popup with the specified parent.
              */
             InfoPopupDialog(final Shell parent) {
-                super(parent, PopupDialog.HOVER_SHELLSTYLE, false, false, false, false, false, null, null);
+                super(parent, PopupDialog.INFOPOPUPRESIZE_SHELLSTYLE | PopupDialog.HOVER_SHELLSTYLE, false, false,
+                        false, false, false, null, null);
             }
 
             /*
@@ -934,15 +890,13 @@ public class RedContentProposalAdapter {
              */
             @Override
             protected Control createDialogArea(final Composite parent) {
-                text = new FormText(parent, SWT.NONE);
+                text = new StyledText(parent, SWT.NONE);
 
                 // Use the compact margins employed by PopupDialog.
                 final GridData gd = new GridData(GridData.BEGINNING | GridData.FILL_BOTH);
                 gd.horizontalIndent = PopupDialog.POPUP_HORIZONTALSPACING;
                 gd.verticalIndent = PopupDialog.POPUP_VERTICALSPACING;
                 text.setLayoutData(gd);
-                text.setFont("monospace", JFaceResources.getTextFont());
-                // text.setText(contents, true, false);
 
                 // since SWT.NO_FOCUS is only a hint...
                 text.addFocusListener(new FocusAdapter() {
@@ -1009,7 +963,7 @@ public class RedContentProposalAdapter {
             void setContents(final String newContents) {
                 this.contents = Strings.nullToEmpty(newContents);
                 if (text != null && !text.isDisposed()) {
-                    text.setText(contents, true, false);
+                    text.setText(contents);
                 }
             }
 
@@ -1039,7 +993,7 @@ public class RedContentProposalAdapter {
         /*
          * The proposals to be shown (cached to avoid repeated requests).
          */
-        private IContentProposal[] proposals;
+        private RedContentProposal[] proposals;
 
         /*
          * Secondary popup used to show detailed information about the selected
@@ -1067,7 +1021,7 @@ public class RedContentProposalAdapter {
          *            Text to be shown in a lower info area, or
          *            <code>null</code> if there is no info area.
          */
-        ContentProposalPopup(final String infoText, final IContentProposal[] proposals) {
+        ContentProposalPopup(final String infoText, final RedContentProposal[] proposals) {
             // IMPORTANT: Use of SWT.ON_TOP is critical here for ensuring
             // that the target control retains focus on Mac and Linux. Without
             // it, the focus will disappear, keystrokes will not go to the
@@ -1131,6 +1085,14 @@ public class RedContentProposalAdapter {
                     acceptCurrentProposal();
                 }
             });
+
+            final Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
+            GridDataFactory.fillDefaults().applyTo(separator);
+
+            final Label lbl = new Label(parent, SWT.NONE);
+            lbl.setText("Press Ctrl+Space to show Keywords proposals");
+            GridDataFactory.fillDefaults().align(SWT.END, SWT.FILL).applyTo(lbl);
+
             return proposalTableViewer.getTable();
         }
 
@@ -1142,7 +1104,7 @@ public class RedContentProposalAdapter {
             int initialY = location.y + control.getSize().y + POPUP_OFFSET;
             // If we are inserting content, use the cursor position to
             // position the control.
-            if (getProposalAcceptanceStyle() == PROPOSAL_SHOULD_INSERT) {
+            if (proposalAcceptanceStyle == PROPOSAL_SHOULD_INSERT) {
                 final Rectangle insertionBounds = controlContentAdapter.getInsertionBounds(control);
                 initialX = initialX + insertionBounds.x;
                 initialY = location.y + insertionBounds.y + insertionBounds.height;
@@ -1187,8 +1149,9 @@ public class RedContentProposalAdapter {
          * Caches the specified proposals and repopulates the table if it has
          * been created.
          */
-        private void setProposals(final IContentProposal[] newProposals) {
-            this.proposals = newProposals == null || newProposals.length == 0 ? new IContentProposal[0] : newProposals;
+        private void setProposals(final RedContentProposal[] newProposals) {
+            this.proposals = newProposals == null || newProposals.length == 0 ? new RedContentProposal[0]
+                    : newProposals;
 
             // If there is a table
             if (popupExists()) {
@@ -1206,7 +1169,7 @@ public class RedContentProposalAdapter {
                     final TableItem[] items = proposalTableViewer.getTable().getItems();
                     for (int i = 0; i < items.length; i++) {
                         final TableItem item = items[i];
-                        final IRedContentProposal proposal = (IRedContentProposal) newProposals[i];
+                        final RedContentProposal proposal = newProposals[i];
                         item.setText(getString(proposal));
                         item.setImage(getImage(proposal));
                         item.setData(proposal);
@@ -1230,7 +1193,7 @@ public class RedContentProposalAdapter {
          * Get the string for the specified proposal. Always return a String of
          * some kind.
          */
-        private String getString(final IContentProposal proposal) {
+        private String getString(final RedContentProposal proposal) {
             if (proposal == null) {
                 return "";
             }
@@ -1244,7 +1207,7 @@ public class RedContentProposalAdapter {
          * Get the image for the specified proposal. If there is no image
          * available, return null.
          */
-        private Image getImage(final IContentProposal proposal) {
+        private Image getImage(final RedContentProposal proposal) {
             if (proposal == null || labelProvider == null) {
                 return null;
             }
@@ -1279,13 +1242,13 @@ public class RedContentProposalAdapter {
         /*
          * Return the current selected proposal.
          */
-        private IRedContentProposal getSelectedProposal() {
+        private RedContentProposal getSelectedProposal() {
             if (popupExists()) {
                 final int i = proposalTableViewer.getTable().getSelectionIndex();
                 if (proposals == null || i < 0 || i >= proposals.length) {
                     return null;
                 }
-                return (IRedContentProposal) proposals[i];
+                return proposals[i];
             }
             return null;
         }
@@ -1320,7 +1283,7 @@ public class RedContentProposalAdapter {
                 popupCloser = new PopupCloserListener();
             }
             popupCloser.installListeners();
-            final IContentProposal p = getSelectedProposal();
+            final RedContentProposal p = getSelectedProposal();
             if (p != null) {
                 showProposalDescription();
             }
@@ -1373,7 +1336,7 @@ public class RedContentProposalAdapter {
                             public void run() {
                                 // Query the current selection since we have
                                 // been delayed
-                                final IRedContentProposal p = getSelectedProposal();
+                                final RedContentProposal p = getSelectedProposal();
                                 if (p == null) {
                                     return;
                                 }
@@ -1410,7 +1373,7 @@ public class RedContentProposalAdapter {
             // so that the cursor position can be properly restored at
             // acceptance, which does not work without focus on some controls.
             // See https://bugs.eclipse.org/bugs/show_bug.cgi?id=127108
-            final IContentProposal proposal = getSelectedProposal();
+            final RedContentProposal proposal = getSelectedProposal();
             close();
             proposalAccepted(proposal);
         }
@@ -1420,9 +1383,9 @@ public class RedContentProposalAdapter {
          * caches. Repopulate the popup if it is open.
          */
         private void recomputeProposals(final String filterText) {
-            IContentProposal[] allProposals = getProposals();
+            RedContentProposal[] allProposals = getProposals();
             if (allProposals == null) {
-                allProposals = new IContentProposal[0];
+                allProposals = new RedContentProposal[0];
             }
             setProposals(filterProposals(allProposals, filterText));
         }
@@ -1451,14 +1414,14 @@ public class RedContentProposalAdapter {
          * Filter the provided list of content proposals according to the filter
          * text.
          */
-        private IContentProposal[] filterProposals(final IContentProposal[] proposals, final String filterString) {
+        private RedContentProposal[] filterProposals(final RedContentProposal[] proposals, final String filterString) {
             if (filterString.length() == 0) {
                 return proposals;
             }
 
             // Check each string for a match. Use the string displayed to the
             // user, not the proposal content.
-            final ArrayList<IContentProposal> list = new ArrayList<>();
+            final ArrayList<RedContentProposal> list = new ArrayList<>();
             for (int i = 0; i < proposals.length; i++) {
                 final String string = getString(proposals[i]);
                 if (string.length() >= filterString.length()
@@ -1467,7 +1430,7 @@ public class RedContentProposalAdapter {
                 }
 
             }
-            return list.toArray(new IContentProposal[list.size()]);
+            return list.toArray(new RedContentProposal[list.size()]);
         }
 
         Listener getTargetControlListener() {
@@ -1478,15 +1441,7 @@ public class RedContentProposalAdapter {
         }
     }
 
-    public void addContentProposalListener(final RedContentProposalListener listener) {
-        proposalListeners.add(listener);
-    }
-
-    public void removeContentProposalListener(final RedContentProposalListener listener) {
-        proposalListeners.remove(listener);
-    }
-
-    private void notifyProposalAccepted(final IContentProposal proposal) {
+    private void notifyProposalAccepted(final RedContentProposal proposal) {
         for (final Object listener : proposalListeners.getListeners()) {
             ((RedContentProposalListener) listener).proposalAccepted(proposal);
         }
@@ -1506,10 +1461,27 @@ public class RedContentProposalAdapter {
 
     public static interface RedContentProposalListener {
 
-        void proposalAccepted(final IContentProposal proposal);
+        void proposalAccepted(final RedContentProposal proposal);
 
         void proposalPopupClosed(final RedContentProposalAdapter adapter);
 
         void proposalPopupOpened(final RedContentProposalAdapter adapter);
+    }
+
+    private static class ProposalsLabelProvider extends RedCommonLabelProvider {
+
+        @Override
+        public StyledString getStyledText(final Object element) {
+            return ((RedContentProposal) element).getStyledLabel();
+        }
+
+        @Override
+        public Image getImage(final Object element) {
+            final ImageDescriptor descriptor = ((RedContentProposal) element).getImage();
+            if (descriptor == null) {
+                return null;
+            }
+            return ImagesManager.getImage(descriptor);
+        }
     }
 }

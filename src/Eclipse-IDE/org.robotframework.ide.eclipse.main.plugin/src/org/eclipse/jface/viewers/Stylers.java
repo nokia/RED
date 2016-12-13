@@ -8,6 +8,7 @@ package org.eclipse.jface.viewers;
 import org.eclipse.jface.resource.FontDescriptor;
 import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
@@ -75,18 +76,6 @@ public class Stylers {
             }
         };
 
-        public static final Styler MARKED_STRIKEOUT_PREFIX_STYLER = new Styler() {
-
-            @Override
-            public void applyStyles(final TextStyle style) {
-                style.foreground = ColorsManager.getColor(135, 150, 255);
-                style.background = ColorsManager.getColor(230, 240, 255);
-                style.borderColor = ColorsManager.getColor(135, 150, 255);
-                style.strikeout = true;
-                style.borderStyle = SWT.BORDER_DOT;
-            }
-        };
-
         public static final Styler MATCH_STYLER = new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
@@ -110,6 +99,28 @@ public class Stylers {
         return new Styler() {
             @Override
             public void applyStyles(final TextStyle textStyle) {
+                for (final Styler styler : stylers) {
+                    styler.applyStyles(textStyle);
+                }
+            }
+        };
+    }
+
+    public static Styler mixingStyler(final StyleRange styleRange, final Styler... stylers) {
+        return new Styler() {
+            @Override
+            public void applyStyles(final TextStyle textStyle) {
+                textStyle.background = styleRange.background;
+                textStyle.foreground = styleRange.foreground;
+                textStyle.borderColor = styleRange.borderColor;
+                textStyle.borderStyle = styleRange.borderStyle;
+                textStyle.font = styleRange.font;
+                textStyle.underline = styleRange.underline;
+                textStyle.underlineColor = styleRange.underlineColor;
+                textStyle.underlineStyle = styleRange.underlineStyle;
+                textStyle.strikeout = styleRange.strikeout;
+                textStyle.strikeoutColor = styleRange.strikeoutColor;
+
                 for (final Styler styler : stylers) {
                     styler.applyStyles(textStyle);
                 }

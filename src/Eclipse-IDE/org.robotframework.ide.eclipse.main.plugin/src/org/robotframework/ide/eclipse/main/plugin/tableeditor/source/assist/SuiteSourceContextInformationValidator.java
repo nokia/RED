@@ -19,16 +19,13 @@ public class SuiteSourceContextInformationValidator
         implements IContextInformationValidator, IContextInformationPresenter {
 	
 	private ITextViewer viewer;
-    private IContextInformation contextInformation;
 	
 	private int currentLine;
 	private int currentOffset;
 
-	
 	@Override
 	public void install(final IContextInformation contextInformation, final ITextViewer viewer, final int offset) {
 		this.viewer = viewer;
-        this.contextInformation = contextInformation;
 		
 		this.currentLine = viewer.getTextWidget().getLineAtOffset(offset);
         this.currentOffset = offset;

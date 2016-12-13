@@ -7,22 +7,19 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.Position;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
+import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedLibraryProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
 
-import com.google.common.base.Optional;
+import com.google.common.base.Joiner;
 
 
 /**
@@ -31,15 +28,8 @@ import com.google.common.base.Optional;
  */
 public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
 
-    private final SuiteSourceAssistantContext assist;
-
     public LibrariesImportAssistProcessor(final SuiteSourceAssistantContext assist) {
-        this.assist = assist;
-    }
-
-    @Override
-    protected List<String> getApplicableContentTypes() {
-        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
+        super(assist);
     }
 
     @Override
@@ -48,66 +38,37 @@ public class LibrariesImportAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    protected List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
-        final IDocument document = viewer.getDocument();
-        try {
-            final String lineContent = DocumentUtilities.lineContentBeforeCurrentPosition(document, offset);
-            final boolean shouldShowProposal = shouldShowProposals(lineContent, document, offset);
-
-            if (shouldShowProposal) {
-                final boolean isTsv = assist.isTsvFile();
-                final Optional<IRegion> region = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
-                final String prefix = DocumentUtilities.getPrefix(document, region, offset);
-                final String content = region.isPresent()
-                        ? document.get(region.get().getOffset(), region.get().getLength()) : "";
-                final String separator = assist.getSeparatorToFollow();
-
-                final List<RedCompletionProposal> proposals = newArrayList();
-                for (final LibrarySpecification library : assist.getLibraries()) {
-                    final String libraryName = library.getName();
-
-                    if (libraryName.toLowerCase().startsWith(prefix.toLowerCase())) {
-
-                        final String argument = library.isRemote() ? separator + library.getSecondaryKey() : "";
-                        final String textToInsert = libraryName + argument;
-                        final String labelToDisplay = libraryName
-                                + (library.isRemote() ? " " + library.getSecondaryKey() : "");
-
-                        final Image image = ImagesManager.getImage(RedImages.getLibraryImage());
-                        
-                        final boolean isImported = assist.isAlreadyImported(library);
-                        final String importedInfo = isImported ? "(already imported)" : null;
-                        
-                        final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                                .will(assist.getAcceptanceMode())
-                                .theText(textToInsert)
-                                .atOffset(offset - prefix.length())
-                                .givenThatCurrentPrefixIs(prefix)
-                                .andWholeContentIs(content)
-                                .secondaryPopupShouldBeDisplayed(library.getDocumentation())
-                                .thenCursorWillStopAtTheEndOfInsertion()
-                                .currentPrefixShouldBeDecorated()
-                                .displayedLabelShouldBe(labelToDisplay)
-                                .proposalsShouldHaveIcon(image)
-                                .labelShouldBeAugmentedWith(importedInfo)
-                                .createWithPriority(isImported ? 1 : 0);
-                        
-                        proposals.add(proposal);
-                    }
-                }
-                Collections.sort(proposals);
-                return proposals;
-            }
-            return null;
-        } catch (final BadLocationException e) {
-            return null;
-        }
+    protected List<String> getApplicableContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.SETTINGS_SECTION);
     }
 
-    private boolean shouldShowProposals(final String lineContent, final IDocument document, final int offset)
+    @Override
+    protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
         return isInApplicableContentType(document, offset) && lineContent.toLowerCase().startsWith("library")
                 && DocumentUtilities.getNumberOfCellSeparators(lineContent, assist.isTsvFile()) == 1;
     }
 
+    @Override
+    protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
+            final int cellLength, final String prefix) throws BadLocationException {
+
+        final List<? extends AssistProposal> librariesProposals = new RedLibraryProposals(assist.getModel())
+                .getLibrariesProposals(prefix);
+        final String separator = assist.getSeparatorToFollow();
+
+        final List<ICompletionProposal> proposals = newArrayList();
+        for (final AssistProposal libProposal : librariesProposals) {
+            final Position positionToReplace = assist.getAcceptanceMode().positionToReplace(offset, prefix.length(),
+                    cellLength);
+
+            final List<String> args = libProposal.getArguments();
+            final String contentSuffix = separator + (args.isEmpty() ? "" : Joiner.on(separator).join(args));
+            final DocumentationModification modification = new DocumentationModification(contentSuffix,
+                    positionToReplace);
+
+            proposals.add(new RedCompletionProposalAdapter(libProposal, modification));
+        }
+        return proposals;
+    }
 }

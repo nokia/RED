@@ -9,113 +9,137 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Objects;
 
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.Stylers;
+import org.eclipse.swt.graphics.TextStyle;
 import org.junit.Test;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.VariableOrigin;
-import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariable;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
+
+import com.google.common.collect.Range;
 
 public class RedVariableProposalTest {
 
     @Test
-    public void verifyProposalPropertiesMadeFromBuiltInVariable() {
-        final RedVariableProposal proposal = RedVariableProposal.createBuiltIn("${VAR}", "value");
+    public void originTest() {
+        final RedVariableProposal proposal1 = new RedVariableProposal("name", "source", "val", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
+        assertThat(proposal1.getOrigin()).isEqualTo(VariableOrigin.BUILTIN);
 
-        assertThat(proposal.getName()).isEqualTo("${VAR}");
-        assertThat(proposal.getValue()).isEqualTo("value");
-        assertThat(proposal.getSource()).isEqualTo("built-in");
-        assertThat(proposal.getComment()).isEmpty();
-        assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
+        final RedVariableProposal proposal2 = new RedVariableProposal("name", "source", "val", "comment",
+                VariableOrigin.IMPORTED, ProposalMatch.EMPTY);
+        assertThat(proposal2.getOrigin()).isEqualTo(VariableOrigin.IMPORTED);
+
+        final RedVariableProposal proposal3 = new RedVariableProposal("name", "source", "val", "comment",
+                VariableOrigin.LOCAL, ProposalMatch.EMPTY);
+        assertThat(proposal3.getOrigin()).isEqualTo(VariableOrigin.LOCAL);
     }
 
     @Test
-    public void verifyProposalPropertiesMadeFromVariableFiles() {
-        final RedVariableProposal proposal = RedVariableProposal.create("@{var}", "value", "varfile.py");
+    public void imagesTest() {
+        final RedVariableProposal proposal1 = new RedVariableProposal("${var}", "source", "val", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
+        assertThat(proposal1.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
 
-        assertThat(proposal.getName()).isEqualTo("@{var}");
-        assertThat(proposal.getValue()).isEqualTo("value");
-        assertThat(proposal.getSource()).isEqualTo("varfile.py");
-        assertThat(proposal.getComment()).isEmpty();
-        assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotListVariableImage());
+        final RedVariableProposal proposal2 = new RedVariableProposal("@{var}", "source", "val", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
+        assertThat(proposal2.getImage()).isEqualTo(RedImages.getRobotListVariableImage());
+
+        final RedVariableProposal proposal3 = new RedVariableProposal("&{var}", "source", "val", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
+        assertThat(proposal3.getImage()).isEqualTo(RedImages.getRobotDictionaryVariableImage());
     }
 
     @Test
-    public void verifyProposalPropertiesMadeFromLocalDefinition_1() {
-        final RedVariableProposal proposal = RedVariableProposal.createLocal("${var}=10", "resfile.robot");
+    public void descriptionsTest() {
+        final RedVariableProposal proposal0 = new RedVariableProposal("${var}", "", "", "", VariableOrigin.BUILTIN,
+                ProposalMatch.EMPTY);
+        assertThat(proposal0.hasDescription()).isTrue();
+        assertThat(proposal0.getDescription()).isEqualTo("Source: ");
 
-        assertThat(proposal.getName()).isEqualTo("${var}");
-        assertThat(proposal.getValue()).isEmpty();
-        assertThat(proposal.getSource()).isEqualTo("resfile.robot");
-        assertThat(proposal.getComment()).isEmpty();
-        assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
+        final RedVariableProposal proposal1 = new RedVariableProposal("${var}", "source", "", "",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
+        assertThat(proposal1.hasDescription()).isTrue();
+        assertThat(proposal1.getDescription()).isEqualTo("Source: source");
+
+        final RedVariableProposal proposal2 = new RedVariableProposal("@{var}", "source", "val", "",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
+        assertThat(proposal2.hasDescription()).isTrue();
+        assertThat(proposal2.getDescription()).isEqualTo("Source: source\nValue: val");
+
+        final RedVariableProposal proposal3 = new RedVariableProposal("&{var}", "source", "", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
+        assertThat(proposal3.hasDescription()).isTrue();
+        assertThat(proposal3.getDescription()).isEqualTo("Source: source\nComment: comment");
+
+        final RedVariableProposal proposal4 = new RedVariableProposal("&{var}", "source", "val", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
+        assertThat(proposal4.hasDescription()).isTrue();
+        assertThat(proposal4.getDescription()).isEqualTo("Source: source\nValue: val\nComment: comment");
     }
 
     @Test
-    public void verifyProposalPropertiesMadeFromLocalDefinition_2() {
-        final RedVariableProposal proposal = RedVariableProposal.createLocal("&{var}", "resfile.robot");
+    public void styledLabelIsMadeJustFromVariableName() {
+        final RedVariableProposal proposal = new RedVariableProposal("${var}", "source", "val", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
 
-        assertThat(proposal.getName()).isEqualTo("&{var}");
-        assertThat(proposal.getValue()).isEmpty();
-        assertThat(proposal.getSource()).isEqualTo("resfile.robot");
-        assertThat(proposal.getComment()).isEmpty();
-        assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotDictionaryVariableImage());
+        final StyledString label = proposal.getStyledLabel();
+
+        assertThat(label.getString()).isEqualTo("${var}");
+        assertThat(label.getStyleRanges()).hasSize(0);
     }
 
     @Test
-    public void verifyProposalPropertiesMadeFromModelPart() {
-        final RobotVariable variable = createVariable();
-        final RedVariableProposal proposal = RedVariableProposal.create(variable);
+    public void styledLabelIsMadeJustFromVariableName_andMatchIsHighlighted() {
+        final RedVariableProposal proposal = new RedVariableProposal("${var}", "source", "val", "comment",
+                VariableOrigin.BUILTIN, new ProposalMatch(Range.closedOpen(0, 2)));
 
-        assertThat(proposal.getName()).isEqualTo("${scalar}");
-        assertThat(proposal.getValue()).isEqualTo("0");
-        assertThat(proposal.getSource()).isEqualTo("file.robot");
-        assertThat(proposal.getComment()).isEqualTo("#something");
-        assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
+        final StyledString label = proposal.getStyledLabel();
+
+        assertThat(label.getString()).isEqualTo("${var}");
+        assertThat(label.getStyleRanges()).hasSize(1);
+
+        final TextStyle matchStyle = new TextStyle();
+        Stylers.Common.MARKED_PREFIX_STYLER.applyStyles(matchStyle);
+
+        assertThat(label.getStyleRanges()[0].background.getRGB()).isEqualTo(matchStyle.background.getRGB());
+        assertThat(label.getStyleRanges()[0].foreground.getRGB()).isEqualTo(matchStyle.foreground.getRGB());
+        assertThat(label.getStyleRanges()[0].borderColor.getRGB()).isEqualTo(matchStyle.borderColor.getRGB());
+        assertThat(label.getStyleRanges()[0].borderStyle).isEqualTo(matchStyle.borderStyle);
+        assertThat(label.getStyleRanges()[0].strikeout).isFalse();
+        assertThat(label.getStyleRanges()[0].start).isEqualTo(0);
+        assertThat(label.getStyleRanges()[0].length).isEqualTo(2);
     }
 
     @Test
-    public void hashCodeIsMadeFromAllFields() {
+    public void hashCodeIsMadeFromContentSourceAndOrigin() {
         final String name = "name";
         final String source = "source";
         final String value = "value";
         final String comment = "comment";
         final VariableOrigin origin = VariableOrigin.BUILTIN;
-        final RedVariableProposal proposal = new RedVariableProposal(name, source, value, comment, origin);
+        final RedVariableProposal proposal = new RedVariableProposal(name, source, value, comment, origin,
+                ProposalMatch.EMPTY);
 
-        assertThat(proposal.hashCode()).isEqualTo(Objects.hash(name, source, value, comment, origin));
+        assertThat(proposal.hashCode()).isEqualTo(Objects.hash(name, source, origin));
     }
 
     @Test
     public void equalityTests() {
         final RedVariableProposal proposal = new RedVariableProposal("name", "source", "value", "comment",
-                VariableOrigin.BUILTIN);
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY);
 
-        assertThat(proposal
-                .equals(new RedVariableProposal("other_name", "source", "value", "comment", VariableOrigin.BUILTIN)))
-                        .isFalse();
-        assertThat(proposal
-                .equals(new RedVariableProposal("name", "other_source", "value", "comment", VariableOrigin.BUILTIN)))
-                        .isFalse();
-        assertThat(proposal
-                .equals(new RedVariableProposal("name", "source", "other_value", "comment", VariableOrigin.BUILTIN)))
-                        .isFalse();
-        assertThat(proposal
-                .equals(new RedVariableProposal("name", "source", "value", "other_comment", VariableOrigin.BUILTIN)))
-                        .isFalse();
-        assertThat(
-                proposal.equals(new RedVariableProposal("name", "source", "value", "comment", VariableOrigin.IMPORTED)))
-                        .isFalse();
-        assertThat(
-                proposal.equals(new RedVariableProposal("name", "source", "value", "comment", VariableOrigin.BUILTIN)))
-                        .isTrue();
-    }
-
-    private static RobotVariable createVariable() {
-        final RobotSuiteFile model = new RobotSuiteFileCreator().appendLine("*** Variables ***")
-                .appendLine("${scalar}  0  #something")
-                .build();
-        return model.findSection(RobotVariablesSection.class).get().getChildren().get(0);
+        assertThat(proposal.equals(new RedVariableProposal("other_name", "source", "value", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY))).isFalse();
+        assertThat(proposal.equals(new RedVariableProposal("name", "other_source", "value", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY))).isFalse();
+        assertThat(proposal.equals(new RedVariableProposal("name", "source", "value", "comment",
+                VariableOrigin.IMPORTED, ProposalMatch.EMPTY))).isFalse();
+        assertThat(proposal.equals(new RedVariableProposal("name", "source", "value", "comment", VariableOrigin.BUILTIN,
+                ProposalMatch.EMPTY))).isTrue();
+        assertThat(proposal.equals(new RedVariableProposal("name", "source", "other_value", "comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY))).isTrue();
+        assertThat(proposal.equals(new RedVariableProposal("name", "source", "value", "other_comment",
+                VariableOrigin.BUILTIN, ProposalMatch.EMPTY))).isTrue();
     }
 }

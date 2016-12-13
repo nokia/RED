@@ -25,6 +25,7 @@ import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
 import org.robotframework.ide.eclipse.main.plugin.preferences.SyntaxHighlightingCategory;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.InactiveCellPainter;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableConfigurationLabels;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.TableThemes.TableTheme;
 import org.robotframework.red.graphics.FontsManager;
 import org.robotframework.red.graphics.ImagesManager;
@@ -85,7 +86,7 @@ class CasesElementsStyleConfiguration extends AbstractRegistryConfiguration {
                 DisplayMode.NORMAL, CasesElementsLabelAccumulator.CASE_WITH_TEMPLATE_CONFIG_LABEL);
         
         configRegistry.registerConfigAttribute(CellConfigAttributes.CELL_PAINTER, new InactiveCellPainter(),
-                DisplayMode.NORMAL, CasesElementsLabelAccumulator.CELL_NOT_EDITABLE_LABEL);
+                DisplayMode.NORMAL, TableConfigurationLabels.CELL_NOT_EDITABLE_LABEL);
     }
 
     private Style createStyle(final RedPreferences preferences, final SyntaxHighlightingCategory category) {

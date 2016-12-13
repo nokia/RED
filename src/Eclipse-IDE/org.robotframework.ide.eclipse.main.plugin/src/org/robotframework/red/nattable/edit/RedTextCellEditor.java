@@ -7,7 +7,6 @@ package org.robotframework.red.nattable.edit;
 
 import java.util.List;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.nebula.widgets.nattable.config.IConfigRegistry;
 import org.eclipse.nebula.widgets.nattable.edit.editor.TextCellEditor;
 import org.eclipse.nebula.widgets.nattable.selection.SelectionLayer.MoveDirectionEnum;
@@ -27,9 +26,12 @@ import org.eclipse.ui.contexts.IContextActivation;
 import org.eclipse.ui.contexts.IContextService;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.CellCommitBehavior;
-import org.robotframework.ide.eclipse.main.plugin.assist.IContentProposingSupport;
+import org.robotframework.red.jface.assist.AssistantContext;
+import org.robotframework.red.jface.assist.RedContentProposal;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
+import org.robotframework.red.jface.assist.RedContentProposalProvider;
+import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 import org.robotframework.red.swt.SwtThread;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -59,8 +61,8 @@ public class RedTextCellEditor extends TextCellEditor {
         this(0, 0, new DefaultRedCellEditorValueValidator(), null);
     }
 
-    public RedTextCellEditor(final IContentProposingSupport support) {
-        this(0, 0, new DefaultRedCellEditorValueValidator(), support);
+    public RedTextCellEditor(final RedContentProposalProvider proposalProvider) {
+        this(0, 0, new DefaultRedCellEditorValueValidator(), proposalProvider);
     }
 
     public RedTextCellEditor(final CellEditorValueValidator<String> validator) {
@@ -77,11 +79,11 @@ public class RedTextCellEditor extends TextCellEditor {
     }
 
     public RedTextCellEditor(final int selectionStartShift, final int selectionEndShift,
-            final CellEditorValueValidator<String> validator, final IContentProposingSupport support) {
+            final CellEditorValueValidator<String> validator, final RedContentProposalProvider proposalProvider) {
         super(true, true);
         this.selectionStartShift = selectionStartShift;
         this.selectionEndShift = selectionEndShift;
-        this.support = new AssistanceSupport(support);
+        this.support = new AssistanceSupport(proposalProvider);
         this.validationJobScheduler = new CellEditorValueValidationJobScheduler<>(validator);
     }
 
@@ -113,10 +115,11 @@ public class RedTextCellEditor extends TextCellEditor {
 
         final Text text = (Text) super.activateCell(parent, originalCanonicalValue);
 
-
         final RedContentProposalListener assistListener = new ContentProposalsListener(
                 (InlineFocusListener) focusListener);
-        support.install(text, Optional.of(assistListener), RedContentProposalAdapter.PROPOSAL_SHOULD_REPLACE);
+
+        final AssistantContext context = new NatTableAssistantContext(getColumnIndex(), getRowIndex());
+        support.install(text, context, Optional.of(assistListener));
         parent.redraw();
 
         if ((selectionStartShift > 0 || selectionEndShift > 0) && !text.isDisposed()) {
@@ -126,7 +129,7 @@ public class RedTextCellEditor extends TextCellEditor {
         }
         ((InlineFocusListener) focusListener).handleFocusChanges = true;
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         contextActivation = service.activateContext(RedPlugin.DETAILS_EDITING_CONTEXT_ID);
 
         return text;
@@ -152,7 +155,7 @@ public class RedTextCellEditor extends TextCellEditor {
     public void close() {
         super.close();
 
-        final IContextService service = (IContextService) PlatformUI.getWorkbench().getService(IContextService.class);
+        final IContextService service = PlatformUI.getWorkbench().getService(IContextService.class);
         service.deactivateContext(contextActivation);
     }
 
@@ -258,7 +261,7 @@ public class RedTextCellEditor extends TextCellEditor {
         }
 
         @Override
-        public void proposalAccepted(final IContentProposal proposal) {
+        public void proposalAccepted(final RedContentProposal proposal) {
             // nothing to do
         }
     }

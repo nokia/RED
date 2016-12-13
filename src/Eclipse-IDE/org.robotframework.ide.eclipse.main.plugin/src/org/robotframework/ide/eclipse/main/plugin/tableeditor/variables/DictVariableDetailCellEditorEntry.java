@@ -19,9 +19,10 @@ import org.eclipse.swt.widgets.Text;
 import org.rf.ide.core.testdata.model.table.variables.DictionaryVariable.DictionaryKeyValuePair;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
 import org.robotframework.red.graphics.ImagesManager;
-import org.robotframework.red.jface.assist.RedContentProposalAdapter;
+import org.robotframework.red.jface.assist.AssistantContext;
 import org.robotframework.red.jface.assist.RedContentProposalAdapter.RedContentProposalListener;
 import org.robotframework.red.nattable.edit.AssistanceSupport;
+import org.robotframework.red.nattable.edit.AssistanceSupport.NatTableAssistantContext;
 import org.robotframework.red.nattable.edit.CellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DefaultRedCellEditorValueValidator;
 import org.robotframework.red.nattable.edit.DetailCellEditorEntry;
@@ -42,10 +43,9 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
 
     private Text textEdit;
 
-
-    DictVariableDetailCellEditorEntry(final Composite parent, final AssistanceSupport assistSupport,
-            final Color hoverColor, final Color selectionColor) {
-        super(parent, hoverColor, selectionColor);
+    DictVariableDetailCellEditorEntry(final Composite parent, final int column, final int row,
+            final AssistanceSupport assistSupport, final Color hoverColor, final Color selectionColor) {
+        super(parent, column, row, hoverColor, selectionColor);
         this.assistSupport = assistSupport;
 
         addPaintListener(new DictElementPainter());
@@ -86,8 +86,8 @@ class DictVariableDetailCellEditorEntry extends DetailCellEditorEntry<Dictionary
             }
         });
         validationJobScheduler.armRevalidationOn(textEdit);
-        assistSupport.install(textEdit, Optional.<RedContentProposalListener> absent(),
-                RedContentProposalAdapter.PROPOSAL_SHOULD_INSERT);
+        final AssistantContext context = new NatTableAssistantContext(column, row);
+        assistSupport.install(textEdit, context, Optional.<RedContentProposalListener> absent());
         GridDataFactory.fillDefaults().grab(true, false).indent(5, 2).applyTo(textEdit);
         layout();
 

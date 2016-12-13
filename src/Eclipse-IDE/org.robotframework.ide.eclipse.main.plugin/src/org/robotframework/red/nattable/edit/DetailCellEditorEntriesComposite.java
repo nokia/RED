@@ -41,6 +41,9 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
     private final DetailCellEditorEditingSupport<D> editSupport;
 
     private final AssistanceSupport assistSupport;
+    
+    private int column;
+    private int row;
 
     private final MainControlChooser mainControlChooseCallback;
 
@@ -49,7 +52,6 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
     private Composite entriesComposite;
     private final DetailEntriesCollection<D> entries = new DetailEntriesCollection<>();
     private final EntriesChangeListener<D> entriesChangesListener;
-
 
     public DetailCellEditorEntriesComposite(final Composite parent, final DetailCellEditorEditingSupport<D> editSupport,
             final AssistanceSupport assistSupport,
@@ -118,7 +120,7 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
 
     private void createDetailEntryControls(final List<D> details) {
         for (final D detail : details) {
-            final DetailCellEditorEntry<D> entry = editSupport.createDetailEntry(entriesComposite, detail,
+            final DetailCellEditorEntry<D> entry = editSupport.createDetailEntry(entriesComposite, column, row, detail,
                     assistSupport);
             GridDataFactory.fillDefaults().hint(SWT.DEFAULT, 25).grab(true, false).applyTo(entry);
             entry.setBackground(getParent().getBackground());
@@ -161,8 +163,26 @@ public class DetailCellEditorEntriesComposite<D> extends Composite {
     }
 
     void setInput(final int column, final int row) {
+        setColumn(column);
+        setRow(row);
         entries.disposeEntries();
         createDetailEntryControls(editSupport.getInput(column, row));
+    }
+
+    int getColumn() {
+        return column;
+    }
+
+    void setColumn(final int column) {
+        this.column = column;
+    }
+
+    int getRow() {
+        return row;
+    }
+
+    void setRow(final int row) {
+        this.row = row;
     }
 
     void refresh() {

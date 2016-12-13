@@ -66,12 +66,12 @@ public class DictVariableDetailsEditingSupport implements DetailCellEditorEditin
     }
 
     @Override
-    public DetailCellEditorEntry<DictionaryKeyValuePair> createDetailEntry(final Composite parent,
-            final DictionaryKeyValuePair detail, final AssistanceSupport assistSupport) {
+    public DetailCellEditorEntry<DictionaryKeyValuePair> createDetailEntry(final Composite parent, final int column,
+            final int row, final DictionaryKeyValuePair detail, final AssistanceSupport assistSupport) {
         final Color hoverColor = theme.getBodyHoveredCellBackground();
         final Color selectionColor = theme.getBodySelectedCellBackground();
-        final DictVariableDetailCellEditorEntry entry = new DictVariableDetailCellEditorEntry(parent, assistSupport,
-                hoverColor, selectionColor);
+        final DictVariableDetailCellEditorEntry entry = new DictVariableDetailCellEditorEntry(parent, column, row,
+                assistSupport, hoverColor, selectionColor);
         entry.update(detail);
         return entry;
     }

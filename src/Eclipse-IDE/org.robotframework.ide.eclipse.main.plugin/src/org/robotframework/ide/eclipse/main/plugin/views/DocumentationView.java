@@ -61,7 +61,7 @@ public class DocumentationView {
 
     private CurrentlyDisplayedDocElement currentlyDisplayedDocElement;
     
-    private AtomicBoolean hasShowLibdocEnabled = new AtomicBoolean();
+    private final AtomicBoolean hasShowLibdocEnabled = new AtomicBoolean();
     
     private ShowLibdocAction showLibdocAction;
 
@@ -166,7 +166,7 @@ public class DocumentationView {
         final RedKeywordProposal proposal = new RedKeywordProposals(suiteFile)
                 .getBestMatchingKeywordProposal(elementName);
         if (proposal != null) {
-            SwtThread.asyncExec(new DocTextSetter(proposal.getDocumentation(), "", ""));
+            SwtThread.asyncExec(new DocTextSetter(proposal.getDescription(), "", ""));
         }
     }
 
@@ -222,11 +222,11 @@ public class DocumentationView {
 
     class DocTextSetter implements Runnable {
 
-        private String documentationText;
+        private final String documentationText;
 
-        private String documentationSettingParentName;
+        private final String documentationSettingParentName;
 
-        private String fileName;
+        private final String fileName;
         
         public DocTextSetter() {
             this("", "", "");
@@ -280,7 +280,7 @@ public class DocumentationView {
 
         public IDocumentationHolder getDocumentationHolder() {
             if (robotFileInternalElement.isPresent()) {
-                Object linkedElement = robotFileInternalElement.get().getLinkedElement();
+                final Object linkedElement = robotFileInternalElement.get().getLinkedElement();
                 if (linkedElement != null && linkedElement instanceof IDocumentationHolder) {
                     return (IDocumentationHolder) linkedElement;
                 }
@@ -348,12 +348,12 @@ public class DocumentationView {
         @Override
         public void run() {
             if (currentlyDisplayedDocElement != null) {
-                IEditorPart activeEditor = PlatformUI.getWorkbench()
+                final IEditorPart activeEditor = PlatformUI.getWorkbench()
                         .getActiveWorkbenchWindow()
                         .getActivePage()
                         .getActiveEditor();
                 if (activeEditor instanceof RobotFormEditor) {
-                    RobotFormEditor editor = (RobotFormEditor) activeEditor;
+                    final RobotFormEditor editor = (RobotFormEditor) activeEditor;
                     final SuiteSourceEditor suiteEditor = editor.activateSourcePage();
                     final ISelectionProvider selectionProvider = suiteEditor.getSite().getSelectionProvider();
 

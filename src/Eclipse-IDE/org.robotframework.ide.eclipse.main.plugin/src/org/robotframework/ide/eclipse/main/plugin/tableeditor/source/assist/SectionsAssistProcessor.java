@@ -7,19 +7,18 @@ package org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.swt.graphics.Image;
-import org.robotframework.ide.eclipse.main.plugin.RedImages;
+import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
+import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedSectionProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
-import org.robotframework.red.graphics.ImagesManager;
+import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.assist.RedCompletionProposalAdapter.DocumentationModification;
 
 import com.google.common.base.Optional;
 
@@ -30,20 +29,8 @@ import com.google.common.base.Optional;
  */
 public class SectionsAssistProcessor extends RedContentAssistProcessor {
 
-    private static final List<String> SECTION_NAMES = newArrayList("*** Keywords ***", "*** Settings ***",
-            "*** Test Cases ***", "*** Variables ***");
-
-    private final SuiteSourceAssistantContext assist;
-
     public SectionsAssistProcessor(final SuiteSourceAssistantContext assist) {
-        this.assist = assist;
-    }
-
-    @Override
-    protected List<String> getApplicableContentTypes() {
-        return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
-                SuiteSourcePartitionScanner.TEST_CASES_SECTION, SuiteSourcePartitionScanner.SETTINGS_SECTION,
-                SuiteSourcePartitionScanner.VARIABLES_SECTION);
+        super(assist);
     }
 
     @Override
@@ -52,66 +39,40 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
     }
 
     @Override
-    public List<? extends ICompletionProposal> computeProposals(final ITextViewer viewer, final int offset) {
-        final IDocument document = viewer.getDocument();
-        try {
-            final boolean isTsv = assist.isTsvFile();
-
-            final IRegion lineInformation = document.getLineInformationOfOffset(offset);
-            final boolean shouldShowProposal = shouldShowProposals(offset, document, isTsv, lineInformation);
-
-            if (shouldShowProposal) {
-                final String prefix = DocumentUtilities.getPrefix(document, Optional.of(lineInformation), offset);
-                final Optional<IRegion> cellRegion = DocumentUtilities.findCellRegion(document, isTsv, offset);
-                final String content = cellRegion.isPresent()
-                        ? document.get(cellRegion.get().getOffset(), cellRegion.get().getLength()) : "";
-
-                final List<ICompletionProposal> proposals = newArrayList();
-                final Image image = ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage());
-                for (final String sectionName : getPossibleSections()) {
-                    if (sectionName.toLowerCase().startsWith(prefix.toLowerCase())) {
-                        final String textToInsert = sectionName + DocumentUtilities.getDelimiter(document);
-                        
-                        final RedCompletionProposal proposal = RedCompletionBuilder.newProposal()
-                                .will(assist.getAcceptanceMode())
-                                .theText(textToInsert)
-                                .atOffset(lineInformation.getOffset())
-                                .givenThatCurrentPrefixIs(prefix)
-                                .andWholeContentIs(content)
-                                .thenCursorWillStopAtTheEndOfInsertion()
-                                .currentPrefixShouldBeDecorated()
-                                .displayedLabelShouldBe(sectionName)
-                                .proposalsShouldHaveIcon(image)
-                                .create();
-                        proposals.add(proposal);
-                    }
-                }
-                return proposals;
-
-            }
-            return null;
-        } catch (final BadLocationException e) {
-            return null;
-        }
+    protected List<String> getApplicableContentTypes() {
+        return newArrayList(SuiteSourcePartitionScanner.KEYWORDS_SECTION,
+                SuiteSourcePartitionScanner.TEST_CASES_SECTION,
+                SuiteSourcePartitionScanner.SETTINGS_SECTION,
+                SuiteSourcePartitionScanner.VARIABLES_SECTION);
     }
 
-    private List<String> getPossibleSections() {
-        if (assist.getModel().isSuiteFile()) {
-            return SECTION_NAMES;
-        } else {
-            final ArrayList<String> names = newArrayList(SECTION_NAMES);
-            names.remove("*** Test Cases ***");
-            return names;
-        }
-    }
-
-    private boolean shouldShowProposals(final int offset, final IDocument document, final boolean isTsv,
-            final IRegion lineInformation)
+    @Override
+    protected boolean shouldShowProposals(final IDocument document, final int offset, final String lineContent)
             throws BadLocationException {
-        if (offset != lineInformation.getOffset()) {
-            final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, isTsv, offset);
-            return cellRegion.isPresent() && lineInformation.getOffset() == cellRegion.get().getOffset();
+        final IRegion lineInfo = document.getLineInformationOfOffset(offset);
+        if (offset != lineInfo.getOffset()) {
+            final Optional<IRegion> cellRegion = DocumentUtilities.findLiveCellRegion(document, assist.isTsvFile(),
+                    offset);
+            return cellRegion.isPresent() && lineInfo.getOffset() == cellRegion.get().getOffset();
         }
         return true;
+    }
+
+    @Override
+    protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
+            final int cellLength, final String prefix) {
+
+        final List<? extends AssistProposal> sectionProposals = new RedSectionProposals(
+                AssistProposalPredicates.testCaseSectionPredicate(assist.getModel())).getSectionsProposals(prefix);
+
+        final List<ICompletionProposal> proposals = newArrayList();
+        for (final AssistProposal settingProposal : sectionProposals) {
+            final DocumentationModification modification = new DocumentationModification(
+                    DocumentUtilities.getDelimiter(document),
+                    assist.getAcceptanceMode().positionToReplace(offset, prefix.length(), cellLength));
+
+            proposals.add(new RedCompletionProposalAdapter(settingProposal, modification));
+        }
+        return proposals;
     }
 }
