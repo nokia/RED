@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _yxxmEJHxEeWEZYgZQ8Au9A
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/2/16 1:53 PM
+Save-Time: 12/13/16 11:19 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -32,10 +32,12 @@ with [get-editor "TestSuite.robot" | get-text-viewer] {
     type-text "${path}"
 }
 
-// error shows that resource path is parametrised 
-get-view Problems | get-tree | get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
-    | equals "The import name/path '${path}/res_1.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
-    | verify-true
+try -times 5 -delay 1000 -command{
+	// error shows that resource path is parametrised 
+	get-view Problems | get-tree | get-item "Errors \\(2 items\\)" | get-property "getItems().TreeItem[0].getText()" 
+	    | equals "The import name/path '${path}/res_1.robot' is parameterized. Some of used parameters cannot be resolved. Use Variable mappings in red.xml for parameter resolution" 
+	    | verify-true
+}
 
 // open red.xml and add Variable mapping  ${path} => resource_folder
 get-view "Project Explorer" | get-tree | select "ProjectWithResource/red.xml" | double-click
