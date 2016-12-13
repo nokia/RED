@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _nGl_0JByEea_J4BglwdxcA
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/17/16 9:29 AM
+Save-Time: 12/13/16 4:12 PM
 Testcase-Type: ecl
 
 ------=_.description-216f885c-d591-38ce-8ea2-e4f8cb4d6ffa
@@ -111,7 +111,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 7 16
 }
 wait-for-view_and-compare-text "Name: kw1_with_imported_kw\n"
-    + "Source: User Defined (/RobotProject/TestFile.robot)\n"
+    + "Source: User defined (/RobotProject/TestFile.robot)\n"
     + "Arguments: []\n\n"
     + "<not documented>"
     
@@ -126,7 +126,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 7 18
 }
 wait-for-view_and-compare-text "Name: kw1_with_imported_kw\n"
-    + "Source: User Defined (/RobotProject/TestFile.robot)\n"
+    + "Source: User defined (/RobotProject/TestFile.robot)\n"
     + "Arguments: []\n\n"
     + "<not documented>" 
     
@@ -134,8 +134,8 @@ wait-for-view_and-compare-text "Name: kw1_with_imported_kw\n"
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 26 10
 }
-wait-for-view_and-compare-text "Name: Catenate\n"
-    + "Source: BuiltIn\n"
+wait-for-view_and-compare-text -text "Name: Catenate\n"
+    + "Source: Library (BuiltIn)\n"
     + "Arguments: [*items]\n\n"
     + "Catenates the given items together and returns the resulted string.\n\n"
     + "By default, items are catenated with spaces, but if the first item\n"
@@ -149,14 +149,13 @@ wait-for-view_and-compare-text "Name: Catenate\n"
     + "| ${str1} = 'Hello world'\n"
     + "| ${str2} = 'Hello---world'\n"
     + "| ${str3} = 'Helloworld'"
-    
 //-----------------------------  checking if in doc view documentation is shown do after selecting KW name -----------------------------
 
 with [get-editor "TestFile.robot" | get-text-viewer] {
     set-caret-pos 31 5
 }
 wait-for-view_and-compare-text "Name: kw_with_only_doc\n"
-    + "Source: User Defined (/RobotProject/TestFile.robot)\n"
+    + "Source: User defined (/RobotProject/TestFile.robot)\n"
     + "Arguments: []\n\n"
     + "I have only doc, no args"   
     
