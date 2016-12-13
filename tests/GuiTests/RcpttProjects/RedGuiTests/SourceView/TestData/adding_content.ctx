@@ -6,7 +6,7 @@ Element-Type: context
 Element-Version: 2.0
 Id: _wdMmkIk5EeWHhtZu19MBKw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/24/16 2:11 PM
+Save-Time: 12/13/16 5:09 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -43,7 +43,13 @@ proc "add-init-content" [val file_name] [val is_tsv]{
 	    get-property "getItems().TableItem[3].getText()" | equals "[Tags]" | verify-true
 	    get-property "getItems().TableItem[4].getText()" | equals "[Teardown]" | verify-true
 	    get-property "getItems().TableItem[5].getText()" | equals "[Timeout]" | verify-true
-	    get-property "getItems().TableItem[6].getText()" | equals "Call Method - BuiltIn" | verify-true
+	    get-property "getItems().TableItem[6].getText()" | equals ":FOR" | verify-true
+	    get-property "getItems().TableItem[7].getText()" | equals And | verify-true
+	    get-property "getItems().TableItem[8].getText()" | equals But | verify-true
+	    get-property "getItems().TableItem[9].getText()" | equals Given | verify-true
+	    get-property "getItems().TableItem[10].getText()" | equals Then | verify-true
+	    get-property "getItems().TableItem[11].getText()" | equals When | verify-true
+	    get-property "getItems().TableItem[12].getText()" | equals "Call Method - BuiltIn" | verify-true
 	}
 	get-editor $file_name| get-text-viewer | key-type ESC
 	
@@ -62,9 +68,9 @@ proc "add-init-content" [val file_name] [val is_tsv]{
 	        }-else{
 	        	key-type BackSpace -times 7
 	        }
-	        //add kw
+	        //add kw catenate
 	        key-type "M1+SPACE"
-	        key-type Down -times 7
+	        key-type Down -times 13
 	        key-type Enter
 	        type-text "a  b"
 	        key-type Enter -times 2
