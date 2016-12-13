@@ -18,6 +18,7 @@ import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicate;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;
+import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposals;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
@@ -68,8 +69,9 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
         final int line = DocumentUtilities.getLine(document, offset);
         final AssistProposalPredicate<String> globalVarPredicate = createGlobalVarPredicate(offset, line,
                 assist.getModel());
-        final List<? extends AssistProposal> variableProposals = assist.getVariables(actualPrefix, globalVarPredicate,
-                offset);
+
+        final List<? extends AssistProposal> variableProposals = new RedVariableProposals(assist.getModel(),
+                globalVarPredicate).getVariableProposals(prefix, offset);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal varProposal : variableProposals) {

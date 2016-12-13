@@ -45,6 +45,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Shell;
+import org.rf.ide.core.testdata.model.RobotFileOutput;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences;
 import org.robotframework.ide.eclipse.main.plugin.RedPreferences.ColoringPreference;
@@ -89,6 +90,8 @@ import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.T
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableDefinitionRule;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.colouring.VariableUsageRule;
 import org.robotframework.red.graphics.ColorsManager;
+
+import com.google.common.base.Supplier;
 
 class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
 
@@ -178,16 +181,29 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
                 contentAssistant.showPossibleCompletions();
             }
         };
-        createSettingsAssist(contentAssistant, assistantAccessor);
-        createVariablesAssist(contentAssistant, assistantAccessor);
-        createKeywordsAssist(contentAssistant, assistantAccessor);
-        createTestCasesAssist(contentAssistant, assistantAccessor);
-        createDefaultAssist(contentAssistant, assistantAccessor);
+        final Supplier<RobotSuiteFile> modelSupplier = new Supplier<RobotSuiteFile>() {
+
+            @Override
+            public RobotSuiteFile get() {
+                final RobotDocument document = (RobotDocument) editor.getDocument();
+                final RobotFileOutput fileOutput = document.getNewestFileOutput();
+
+                final RobotSuiteFile suiteModel = editor.getFileModel();
+                suiteModel.dispose();
+                suiteModel.link(fileOutput);
+                return suiteModel;
+            }
+        };
+        createSettingsAssist(contentAssistant, modelSupplier, assistantAccessor);
+        createVariablesAssist(contentAssistant, modelSupplier, assistantAccessor);
+        createKeywordsAssist(contentAssistant, modelSupplier, assistantAccessor);
+        createTestCasesAssist(contentAssistant, modelSupplier, assistantAccessor);
+        createDefaultAssist(contentAssistant, modelSupplier, assistantAccessor);
     }
 
     private void createSettingsAssist(final ContentAssistant contentAssistant,
-            final AssitantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
+            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final GeneralSettingsAssistProcessor settingNamesProcessor = new GeneralSettingsAssistProcessor(assistContext);
@@ -215,8 +231,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void createVariablesAssist(final ContentAssistant contentAssistant,
-            final AssitantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
+            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final VariablesDefinitionsAssistProcessor variableDefsAssistProcessor = new VariablesDefinitionsAssistProcessor(assistContext);
@@ -235,8 +251,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void createTestCasesAssist(final ContentAssistant contentAssistant,
-            final AssitantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
+            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
@@ -262,8 +278,8 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void createKeywordsAssist(final ContentAssistant contentAssistant,
-            final AssitantCallbacks assistantAccessor) {
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
+            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final CodeReservedWordsAssistProcessor forLoopAssistProcessor = new CodeReservedWordsAssistProcessor(assistContext);
@@ -289,13 +305,13 @@ class SuiteSourceEditorConfiguration extends SourceViewerConfiguration {
     }
 
     private void createDefaultAssist(final ContentAssistant contentAssistant,
-            final AssitantCallbacks assistantAccessor) {
+            final Supplier<RobotSuiteFile> modelSupplier, final AssitantCallbacks assistantAccessor) {
         // we are adding all the assistants for default content type. Most of them (excluding
         // section headers assistant) are working in default content type only at the very last
         // position in file (this position always has default content type, but it can be actually
         // prepended with some valid meaningful content type
 
-        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(editor.getFileModel());
+        final SuiteSourceAssistantContext assistContext = new SuiteSourceAssistantContext(modelSupplier);
 
         final SectionsAssistProcessor sectionsAssistProcessor = new SectionsAssistProcessor(assistContext);
         final GeneralSettingsAssistProcessor generalSettingNamesProcessor = new GeneralSettingsAssistProcessor(
