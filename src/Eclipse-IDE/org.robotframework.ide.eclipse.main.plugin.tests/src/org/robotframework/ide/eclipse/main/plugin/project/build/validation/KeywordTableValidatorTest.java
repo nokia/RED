@@ -25,6 +25,7 @@ import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
+import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -321,6 +322,28 @@ public class KeywordTableValidatorTest {
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+    }
+
+    @Test
+    public void givenTestCaseWithEnvironmentVariable_whenNoMarkersShouldBeReported() throws CoreException {
+        final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Keywords ***")
+                .appendLine("key")
+                .appendLine("    [Teardown]    kw    %{foo}")
+                .appendLine("    kw    %{foo}")
+                .build();
+
+        final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
+                new Path("/res.robot"), "var");
+        final ImmutableMap<String, Collection<KeywordEntity>> accessibleKws = ImmutableMap.of("kw",
+                (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
+
+        final FileValidationContext context = prepareContext(accessibleKws);
+        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
+                file.findSection(RobotCasesSection.class), reporter);
+        validator.validate(null);
+
+        assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);
+        assertThat(reporter.getReportedProblems()).isEmpty();
     }
 
     private static KeywordEntity newValidationKeywordEntity(final KeywordScope scope, final String sourceName,
