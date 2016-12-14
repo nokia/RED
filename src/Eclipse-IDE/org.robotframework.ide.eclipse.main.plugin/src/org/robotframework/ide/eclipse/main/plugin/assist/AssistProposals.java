@@ -122,7 +122,7 @@ public class AssistProposals {
     static RedVariableProposal createUserVariableProposal(final RobotVariable robotVariable,
             final ProposalMatch match) {
         final String varName = robotVariable.getPrefix() + robotVariable.getName() + robotVariable.getSuffix();
-        final String sourceName = robotVariable.getSuiteFile().getName();
+        final String sourceName = robotVariable.getSuiteFile().getFile().getFullPath().toString();
         final String value = robotVariable.getValue();
         final String comment = robotVariable.getComment();
         return new RedVariableProposal(varName, sourceName, value, comment, VariableOrigin.LOCAL, match);
