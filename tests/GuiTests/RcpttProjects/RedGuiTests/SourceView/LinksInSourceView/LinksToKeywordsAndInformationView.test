@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _x5njgJeDEeaa4JtzzKMFzw
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/8/16 10:29 AM
+Save-Time: 12/14/16 10:53 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -172,15 +172,16 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 }
 
 check-information-window -expectedText "Name: CAPITAL LETTER\n"
-    + "Source: User Defined (/RobotProject/TestFile.robot)\n"
+    + "Source: User defined (/RobotProject/TestFile.robot)\n"
     + "Arguments: []\n\n"
-    + "Doc for my kw\nwith double doc"
+    + "Doc for my kw\n"
+    + "with double doc"
 
 //kw with special characters    
 get-editor "TestFile.robot" | get-text-viewer | hover-text 12 14
 
 check-information-window -expectedText "Name: kw with arg and doc\n"
-    + "Source: User Defined (/RobotProject/TestFile.robot)\n"
+    + "Source: User defined (/RobotProject/TestFile.robot)\n"
     + "Arguments: [y, **new]\n\n"
     + "doc with special sigh \n"
     + "\t and here was break"
@@ -194,7 +195,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 get-editor "TestFile.robot" | get-text-viewer | hover-text 18 7
 
 check-information-window -expectedText "Name: Catenate\n"
-    + "Source: BuiltIn\n"
+    + "Source: Library (BuiltIn)\n"
     + "Arguments: [*items]\n\n"
     + "Catenates the given items together and returns the resulted string.\n\n"
     + "By default, items are catenated with spaces, but if the first item\n"
@@ -207,7 +208,7 @@ check-information-window -expectedText "Name: Catenate\n"
     + "=>\n"
     + "| ${str1} = 'Hello world'\n"
     + "| ${str2} = 'Hello---world'\n"
-    + "| ${str3} = 'Helloworld'"
+    + "| ${str3} = 'Helloworld'" 
     
 //close window    
 with [get-editor "TestFile.robot" | get-text-viewer] {
@@ -216,7 +217,7 @@ with [get-editor "TestFile.robot" | get-text-viewer] {
 //hover on last char in kw
 get-editor "TestFile.robot" | get-text-viewer | hover-text 13 16
 check-information-window -expectedText "Name: kw from res\n"
-    + "Source: User Defined (/RobotProject/res/res.robot)\n"
+    + "Source: User defined (/RobotProject/res/res.robot)\n"
     + "Arguments: [a, b, c, d, e]\n\n"
     + "Doc for kw from resource file"  
     
@@ -228,7 +229,7 @@ with [get-editor "res.robot"] {
 }
 
 check-information-window -expectedText "Name: Combine Lists\n"
-    + "Source: Collections\n"
+    + "Source: Library (Collections)\n"
     + "Arguments: [*lists]\n\n"
     + "Combines the given ``lists`` together and returns the result.\n\n"
     + "The given lists are not altered by this keyword.\n\n"
@@ -248,7 +249,7 @@ with [get-editor "res.robot" | get-text-viewer] {
 //hover on main kw name 
 get-editor "res.robot" | get-text-viewer | hover-text 2 6
 check-information-window -expectedText "Name: kw from res\n"
-    + "Source: User Defined (/RobotProject/res/res.robot)\n"
+    + "Source: User defined (/RobotProject/res/res.robot)\n"
     + "Arguments: [a, b, c, d, e]\n\n"
     + "Doc for kw from resource file"
  
@@ -260,7 +261,7 @@ get-view "Project Explorer" | get-tree | select "RobotProject/n/t/folder/res2.ts
 
 get-editor "res2.tsv" | get-text-viewer | hover-text 3 3 -with Left
 check-information-window -expectedText "Name: kw 3\n"
-    + "Source: User Defined (/RobotProject/n/t/folder/res2.tsv)\n"
+    + "Source: User defined (/RobotProject/n/t/folder/res2.tsv)\n"
     + "Arguments: []\n\n"
     + "doc with \\n"
     + "\\t folder\n"
@@ -277,5 +278,5 @@ check-documentation-view -expectedText "kw 3\n"
     + "\\t folder\n"
     + "line 2"
     
-    
+        
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
