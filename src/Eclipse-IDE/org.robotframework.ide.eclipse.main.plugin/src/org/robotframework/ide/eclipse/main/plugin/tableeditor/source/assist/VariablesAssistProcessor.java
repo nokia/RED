@@ -86,9 +86,15 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
     private AssistProposalPredicate<String> createGlobalVarPredicate(final int offset, final int line,
             final RobotSuiteFile model) {
         final List<RobotLine> fileContent = model.getLinkedElement().getFileContent();
-        final List<RobotToken> lineTokens = fileContent.get(line).getLineTokens();
-        final int lastTokenOffset = lineTokens.isEmpty() ? offset
-                : lineTokens.get(lineTokens.size() - 1).getStartOffset();
+
+        int lastTokenOffset = offset;
+        for (int i = line; i >= 0; i--) {
+            final List<RobotToken> lineTokens = fileContent.get(i).getLineTokens();
+            if (!lineTokens.isEmpty()) {
+                lastTokenOffset = lineTokens.get(lineTokens.size() - 1).getStartOffset();
+                break;
+            }
+        }
 
         final Optional<? extends RobotElement> element = model.findElement(lastTokenOffset);
         return element.isPresent() ? AssistProposalPredicates.globalVariablePredicate(element.get())
