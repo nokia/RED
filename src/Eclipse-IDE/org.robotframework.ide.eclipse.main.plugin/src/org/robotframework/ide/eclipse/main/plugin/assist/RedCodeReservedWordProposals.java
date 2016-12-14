@@ -19,7 +19,7 @@ public class RedCodeReservedWordProposals {
     static final String FOR_LOOP_1 = ":FOR";
     static final String FOR_LOOP_2 = ": FOR";
 
-    static final List<String> GHERKIN_ELEMENTS = newArrayList("Given", "When", "And", "But", "Then");
+    public static final List<String> GHERKIN_ELEMENTS = newArrayList("Given", "When", "And", "But", "Then");
     private static final List<String> LOOP_ELEMENTS = newArrayList("IN", "IN ENUMERATE", "IN RANGE", "IN ZIP");
 
     private final ProposalMatcher matcher;

@@ -30,6 +30,8 @@ import com.google.common.collect.Range;
 
 public class RedKeywordProposal extends KeywordEntity implements AssistProposal {
 
+    private final String bddPrefix;
+
     private final String documentation;
 
     private final ProposalMatch match;
@@ -44,12 +46,13 @@ public class RedKeywordProposal extends KeywordEntity implements AssistProposal 
     private String content;
 
     @VisibleForTesting
-    RedKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope, final String name,
-            final ArgumentsDescriptor argumentsDescriptor, final String documentation, final boolean isDeprecated,
-            final IPath exposingFilePath, final Predicate<RedKeywordProposal> shouldUseQualifiedName,
-            final ProposalMatch match) {
+    RedKeywordProposal(final String sourceName, final String sourceAlias, final KeywordScope scope,
+            final String bddPrefix, final String name, final ArgumentsDescriptor argumentsDescriptor,
+            final String documentation, final boolean isDeprecated, final IPath exposingFilePath,
+            final Predicate<RedKeywordProposal> shouldUseQualifiedName, final ProposalMatch match) {
 
         super(scope, sourceName, name, sourceAlias, isDeprecated, argumentsDescriptor, exposingFilePath);
+        this.bddPrefix = bddPrefix;
 
         this.documentation = documentation;
 
@@ -61,9 +64,9 @@ public class RedKeywordProposal extends KeywordEntity implements AssistProposal 
     public String getContent() {
         if (content == null) {
             if (shouldUseQualifiedName.apply(this)) {
-                content = getAlias() + "." + getNameFromDefinition();
+                content = bddPrefix + getAlias() + "." + getNameFromDefinition();
             } else {
-                content = getNameFromDefinition();
+                content = bddPrefix + getNameFromDefinition();
             }
         }
         return content;
