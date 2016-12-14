@@ -17,16 +17,20 @@ class RedImportProposal extends BaseAssistProposal {
 
     private final ModelType modelType;
 
-    RedImportProposal(final String content, final ModelType modelType, final ProposalMatch match) {
+    private final String bddPrefix;
+
+    RedImportProposal(final String content, final String bddPrefix, final ModelType modelType,
+            final ProposalMatch match) {
         super(content, match);
         Preconditions.checkArgument(
                 EnumSet.of(ModelType.LIBRARY_IMPORT_SETTING, ModelType.RESOURCE_IMPORT_SETTING).contains(modelType));
         this.modelType = modelType;
+        this.bddPrefix = bddPrefix;
     }
 
     @Override
     public String getContent() {
-        return super.getContent() + ".";
+        return bddPrefix + super.getContent() + ".";
     }
 
     @Override

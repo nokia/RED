@@ -17,13 +17,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport;
-import org.rf.ide.core.testdata.model.table.keywords.names.GherkinStyleSupport.NameOperation;
 import org.rf.ide.core.testdata.model.table.keywords.names.QualifiedKeywordName;
 import org.robotframework.ide.eclipse.main.plugin.RedPlugin;
+import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.model.locators.AccessibleKeywordsEntities;
@@ -182,25 +180,28 @@ public class RedKeywordProposals {
                         final String aliasToUse = alias.isEmpty() ? libSpec.getName() : alias;
                         final String keywordName = kwSpec.getName();
 
-                        final BddAwareProposalMatch keywordMatch = findBddAwareMatch(keywordName);
+                        final BddMatchesHelper bddMatchesHelper = new BddMatchesHelper(matcher);
+                        final BddAwareProposalMatch keywordMatch = bddMatchesHelper.findBddAwareMatch(userContent,
+                                keywordName);
 
-                        if (keywordMatch.match.isPresent()) {
+                        if (keywordMatch.getMatch().isPresent()) {
                             final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(libSpec,
-                                    kwSpec, keywordMatch.bddPrefix, scope, aliasToUse,
+                                    kwSpec, keywordMatch.getBddPrefix(), scope, aliasToUse,
                                     exposingFile.getFile().getFullPath(), shouldUseQualifiedName,
-                                    keywordMatch.match.get());
+                                    keywordMatch.getMatch().get());
                             addAccessibleKeyword(keywordName, proposal);
                         } else {
                             final String qualifiedName = aliasToUse + "." + keywordName;
-                            final BddAwareProposalMatch qualifiedKeywordMatch = findBddAwareMatch(qualifiedName);
-                            if (qualifiedKeywordMatch.match.isPresent()) {
-                                final ProposalMatch match = qualifiedKeywordMatch.match.get();
+                            final BddAwareProposalMatch qualifiedKeywordMatch = bddMatchesHelper
+                                    .findBddAwareMatch(userContent, qualifiedName);
+                            if (qualifiedKeywordMatch.getMatch().isPresent()) {
+                                final ProposalMatch match = qualifiedKeywordMatch.getMatch().get();
                                 final Optional<ProposalMatch> inLabelMatch = match
                                         .mapToFragment(aliasToUse.length() + 1, keywordName.length());
 
                                 if (inLabelMatch.isPresent()) {
                                     final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(
-                                            libSpec, kwSpec, qualifiedKeywordMatch.bddPrefix, scope, aliasToUse,
+                                            libSpec, kwSpec, qualifiedKeywordMatch.getBddPrefix(), scope, aliasToUse,
                                             exposingFile.getFile().getFullPath(),
                                             AssistProposalPredicates.<RedKeywordProposal> alwaysTrue(),
                                             inLabelMatch.get());
@@ -220,22 +221,27 @@ public class RedKeywordProposals {
                     final String alias = Files.getNameWithoutExtension(file.getName());
                     final String keywordName = keyword.getName();
 
-                    final BddAwareProposalMatch keywordMatch = findBddAwareMatch(keywordName);
-                    if (keywordMatch.match.isPresent()) {
+                    final BddMatchesHelper bddMatchesHelper = new BddMatchesHelper(matcher);
+
+                    final BddAwareProposalMatch keywordMatch = bddMatchesHelper.findBddAwareMatch(userContent,
+                            keywordName);
+                    if (keywordMatch.getMatch().isPresent()) {
                         final RedKeywordProposal proposal = AssistProposals.createUserKeywordProposal(keyword,
-                                keywordMatch.bddPrefix, scope, alias, shouldUseQualifiedName, keywordMatch.match.get());
+                                keywordMatch.getBddPrefix(), scope, alias, shouldUseQualifiedName,
+                                keywordMatch.getMatch().get());
                         addAccessibleKeyword(keywordName, proposal);
                     } else {
                         final String qualifiedName = alias + "." + keywordName;
-                        final BddAwareProposalMatch qualifiedKeywordMatch = findBddAwareMatch(qualifiedName);
-                        if (qualifiedKeywordMatch.match.isPresent()) {
-                            final ProposalMatch match = qualifiedKeywordMatch.match.get();
+                        final BddAwareProposalMatch qualifiedKeywordMatch = bddMatchesHelper
+                                .findBddAwareMatch(userContent, qualifiedName);
+                        if (qualifiedKeywordMatch.getMatch().isPresent()) {
+                            final ProposalMatch match = qualifiedKeywordMatch.getMatch().get();
                             final Optional<ProposalMatch> inLabelMatch = match.mapToFragment(alias.length() + 1,
                                     keywordName.length());
                             
                             if (inLabelMatch.isPresent()) {
                                 final RedKeywordProposal proposal = AssistProposals.createUserKeywordProposal(keyword,
-                                        qualifiedKeywordMatch.bddPrefix, scope, alias,
+                                        qualifiedKeywordMatch.getBddPrefix(), scope, alias,
                                         AssistProposalPredicates.<RedKeywordProposal> alwaysTrue(), inLabelMatch.get());
                                 addAccessibleKeyword(keywordName, proposal);
                             }
@@ -252,43 +258,8 @@ public class RedKeywordProposals {
                     }
                     accessibleKeywords.get(unifiedName).add(keyword);
                 }
-
-                private BddAwareProposalMatch findBddAwareMatch(final String keywordName) {
-                    final StringBuilder gherkinPrefix = new StringBuilder();
-                    final AtomicReference<Optional<ProposalMatch>> match = new AtomicReference<>(
-                            Optional.<ProposalMatch> absent());
-                    GherkinStyleSupport.forEachPossibleGherkinName(userContent, new NameOperation() {
-
-                        @Override
-                        public void perform(final String gherkinNameVariant) {
-                            if (match.get().isPresent()) {
-                                return;
-                            }
-                            final Optional<ProposalMatch> keywordMatch = matcher.matches(gherkinNameVariant,
-                                    keywordName);
-                            if (keywordMatch.isPresent()) {
-                                match.set(keywordMatch);
-                                gherkinPrefix.append(
-                                        userContent.substring(0, userContent.length() - gherkinNameVariant.length()));
-                            }
-                        }
-                    });
-                    return new BddAwareProposalMatch(match.get(), gherkinPrefix.toString());
-                }
             });
             return accessibleKeywords;
-        }
-    }
-
-    private static class BddAwareProposalMatch {
-
-        private final Optional<ProposalMatch> match;
-
-        private final String bddPrefix;
-
-        public BddAwareProposalMatch(final Optional<ProposalMatch> match, final String bddPrefix) {
-            this.match = match;
-            this.bddPrefix = bddPrefix;
         }
     }
 }

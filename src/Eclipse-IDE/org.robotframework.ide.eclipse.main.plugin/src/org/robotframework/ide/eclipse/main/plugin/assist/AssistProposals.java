@@ -87,14 +87,14 @@ public class AssistProposals {
         return new RedCodeReservedWordProposal(word, match);
     }
 
-    static RedImportProposal createResourceImportInCodeProposal(final String nameToUse,
+    static RedImportProposal createResourceImportInCodeProposal(final String nameToUse, final String bddPrefix,
             final Optional<ProposalMatch> match) {
-        return new RedImportProposal(nameToUse, ModelType.RESOURCE_IMPORT_SETTING, match.get());
+        return new RedImportProposal(nameToUse, bddPrefix, ModelType.RESOURCE_IMPORT_SETTING, match.get());
     }
 
-    static RedImportProposal createLibraryImportInCodeProposal(final String nameToUse,
+    static RedImportProposal createLibraryImportInCodeProposal(final String nameToUse, final String bddPrefix,
             final Optional<ProposalMatch> match) {
-        return new RedImportProposal(nameToUse, ModelType.LIBRARY_IMPORT_SETTING, match.get());
+        return new RedImportProposal(nameToUse, bddPrefix, ModelType.LIBRARY_IMPORT_SETTING, match.get());
     }
 
     static RedSettingProposal createSettingProposal(final String settingName, final SettingTarget target,

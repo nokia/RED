@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.robotframework.ide.eclipse.main.plugin.assist.BddMatchesHelper.BddAwareProposalMatch;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
-import com.google.common.base.Optional;
 import com.google.common.io.Files;
 
 public class RedImportProposals {
@@ -47,10 +47,13 @@ public class RedImportProposals {
         for (final Entry<LibrarySpecification, Collection<String>> entry : libs.entrySet()) {
             for (final String name : entry.getValue()) {
                 final String nameToUse = name.isEmpty() ? entry.getKey().getName() : name;
-                final Optional<ProposalMatch> match = matcher.matches(userContent, nameToUse);
 
-                if (match.isPresent()) {
-                    proposals.add(AssistProposals.createLibraryImportInCodeProposal(nameToUse, match));
+                final BddMatchesHelper bddHelper = new BddMatchesHelper(matcher);
+                final BddAwareProposalMatch match = bddHelper.findBddAwareMatch(userContent, nameToUse);
+
+                if (match.getMatch().isPresent()) {
+                    proposals.add(AssistProposals.createLibraryImportInCodeProposal(nameToUse, match.getBddPrefix(),
+                            match.getMatch()));
                 }
             }
         }
@@ -58,10 +61,13 @@ public class RedImportProposals {
         final ArrayList<RedImportProposal> resProposals = new ArrayList<>();
         for (final String path : suiteFile.getResourcesPaths()) {
             final String nameToUse = Files.getNameWithoutExtension(path);
-            final Optional<ProposalMatch> match = matcher.matches(userContent, nameToUse);
 
-            if (match.isPresent()) {
-                resProposals.add(AssistProposals.createResourceImportInCodeProposal(nameToUse, match));
+            final BddMatchesHelper bddHelper = new BddMatchesHelper(matcher);
+            final BddAwareProposalMatch match = bddHelper.findBddAwareMatch(userContent, nameToUse);
+
+            if (match.getMatch().isPresent()) {
+                resProposals.add(AssistProposals.createResourceImportInCodeProposal(nameToUse, match.getBddPrefix(),
+                        match.getMatch()));
             }
         }
         proposals.sort(comparator);
