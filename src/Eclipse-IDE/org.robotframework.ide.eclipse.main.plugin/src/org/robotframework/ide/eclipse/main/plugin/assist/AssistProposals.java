@@ -62,24 +62,24 @@ public class AssistProposals {
     }
 
     static RedKeywordProposal createLibraryKeywordProposal(final LibrarySpecification spec,
-            final KeywordSpecification keyword, final KeywordScope scope, final String sourcePrefix,
-            final IPath exposingFilepath, final Predicate<RedKeywordProposal> shouldUseQualified,
-            final ProposalMatch match) {
+            final KeywordSpecification keyword, final String bddPrefix, final KeywordScope scope,
+            final String sourcePrefix, final IPath exposingFilepath,
+            final Predicate<RedKeywordProposal> shouldUseQualified, final ProposalMatch match) {
 
         final ArgumentsDescriptor argsDescriptor = keyword.createArgumentsDescriptor();
-        return new RedKeywordProposal(spec.getName(), sourcePrefix, scope, keyword.getName(),
+        return new RedKeywordProposal(spec.getName(), sourcePrefix, scope, bddPrefix, keyword.getName(),
                 argsDescriptor, keyword.getDocumentation(), keyword.isDeprecated(), exposingFilepath,
                 shouldUseQualified, match);
     }
 
     static RedKeywordProposal createUserKeywordProposal(final RobotKeywordDefinition userKeyword,
-            final KeywordScope scope, final String sourcePrefix,
+            final String bddPrefix, final KeywordScope scope, final String sourcePrefix,
             final Predicate<RedKeywordProposal> shouldUseQualified, final ProposalMatch match) {
 
         final RobotSuiteFile file = userKeyword.getSuiteFile();
         final ArgumentsDescriptor argsDescriptor = userKeyword.createArgumentsDescriptor();
         return new RedKeywordProposal(Files.getNameWithoutExtension(file.getFile().getName()), sourcePrefix, scope,
-                userKeyword.getName(), argsDescriptor, userKeyword.getDocumentation(),
+                bddPrefix, userKeyword.getName(), argsDescriptor, userKeyword.getDocumentation(),
                 userKeyword.isDeprecated(), file.getFile().getFullPath(), shouldUseQualified, match);
     }
 

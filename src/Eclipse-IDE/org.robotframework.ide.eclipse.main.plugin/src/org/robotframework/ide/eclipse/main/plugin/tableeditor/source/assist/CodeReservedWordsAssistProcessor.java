@@ -63,11 +63,12 @@ public class CodeReservedWordsAssistProcessor extends RedContentAssistProcessor 
         final AssistProposalPredicate<String> wordsPredicate = createPredicate(lineContent, line);
         final List<? extends AssistProposal> wordsProposals = new RedCodeReservedWordProposals(wordsPredicate)
                 .getReservedWordProposals(prefix);
-        final String separator = assist.getSeparatorToFollow();
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal proposal : wordsProposals) {
-            final DocumentationModification modification = new DocumentationModification(separator,
+            final String additional = RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(proposal.getLabel()) ? " "
+                    : assist.getSeparatorToFollow();
+            final DocumentationModification modification = new DocumentationModification(additional,
                     assist.getAcceptanceMode().positionToReplace(offset, prefix.length(), cellLength));
 
             proposals.add(new RedCompletionProposalAdapter(proposal, modification));
