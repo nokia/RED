@@ -61,22 +61,22 @@ public class AssistProposalPredicates {
                     // those are only available inside test case
                     return element instanceof RobotCase || element.getParent() instanceof RobotCase;
 
-                } else if (element instanceof RobotKeywordCall) {
-                    final RobotKeywordCall call = (RobotKeywordCall) element;
+                } else if (newHashSet("${SUITE_STATUS}", "${SUITE_MESSAGE}").contains(globalVarName)) {
+                    // those are only available for suite teardown
+                    return element instanceof RobotKeywordCall
+                            && ((RobotKeywordCall) element).getLinkedElement()
+                                    .getModelType() == ModelType.SUITE_TEARDOWN;
 
-                    if (newHashSet("${SUITE_STATUS}", "${SUITE_MESSAGE}").contains(globalVarName)) {
-                        // those are only available for suite teardown
-                        return call.getLinkedElement().getModelType() == ModelType.SUITE_TEARDOWN;
+                } else if (newHashSet("${TEST_STATUS}", "${TEST_MESSAGE}").contains(globalVarName)) {
+                    // those are only available for test teardown
+                    return element instanceof RobotKeywordCall &&
+                            (((RobotKeywordCall) element).getLinkedElement().getModelType() == ModelType.TEST_CASE_TEARDOWN
+                            || ((RobotKeywordCall) element).getLinkedElement().getModelType() == ModelType.SUITE_TEST_TEARDOWN);
 
-                    } else if (newHashSet("${TEST_STATUS}", "${TEST_MESSAGE}").contains(globalVarName)) {
-                        // those are only available for test teardown
-                        return call.getLinkedElement().getModelType() == ModelType.TEST_CASE_TEARDOWN
-                                || call.getLinkedElement().getModelType() == ModelType.SUITE_TEST_TEARDOWN;
-
-                    } else if (newHashSet("${KEYWORD_STATUS}", "${KEYWORD_MESSAGE}").contains(globalVarName)) {
-                        // those are only available for keyword teardown
-                        return call.getLinkedElement().getModelType() == ModelType.USER_KEYWORD_TEARDOWN;
-                    }
+                } else if (newHashSet("${KEYWORD_STATUS}", "${KEYWORD_MESSAGE}").contains(globalVarName)) {
+                    // those are only available for keyword teardown
+                    return element instanceof RobotKeywordCall && ((RobotKeywordCall) element).getLinkedElement()
+                            .getModelType() == ModelType.USER_KEYWORD_TEARDOWN;
                 }
                 return true;
             }
