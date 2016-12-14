@@ -234,30 +234,28 @@ public class RobotExecutableRow<T> extends AModelElement<T> implements ICommentH
 
     public boolean isExecutable() {
         boolean result = false;
-        if (action != null && !action.getFilePosition().isNotSet()) {
+        if (action != null) {
             if (getParent() instanceof IExecutableStepsHolder) {
                 @SuppressWarnings("unchecked")
                 final IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>> parent = (IExecutableStepsHolder<AModelElement<? extends ARobotSectionTable>>) getParent();
                 final FileFormat fileFormat = parent.getHolder().getParent().getParent().getParent().getFileFormat();
 
                 if (!action.getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
-                    final String raw = action.getRaw().trim();
+                    final String text = action.getText().trim();
                     final List<RobotToken> elementTokens = getElementTokens();
-                    if (raw.equals("\\")) {
+                    if (text.equals("\\")) {
                         if (elementTokens.size() > 1) {
                             if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
                                 result = true;
                             }
                         }
-                    } else if ("".equals(raw)) {
+                    } else if ("".equals(text)) {
                         if (fileFormat == FileFormat.TSV) {
                             if (elementTokens.size() > 1) {
                                 if (!elementTokens.get(1).getTypes().contains(RobotTokenType.START_HASH_COMMENT)) {
                                     result = true;
                                 }
                             }
-                        } else {
-                            result = true;
                         }
                     } else {
                         result = true;

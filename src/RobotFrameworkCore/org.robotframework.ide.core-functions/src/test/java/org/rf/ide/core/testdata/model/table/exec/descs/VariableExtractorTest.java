@@ -283,4 +283,31 @@ public class VariableExtractorTest {
         assertThat(asToken.getStartColumn()).isEqualTo(1);
         assertThat(asToken.getEndColumn()).isEqualTo("%{user.home}".length() + 1);
     }
+
+    @Test
+    public void test_extractionOf_ScalarVariable_ONLY_withoutPositionSet() {
+        // prepare
+        VariableExtractor extractor = new VariableExtractor();
+
+        RobotToken varToken = new RobotToken();
+        varToken.setText("${user}");
+
+        // execute
+        MappingResult mapResult = extractor.extract(varToken, "myFile.robot");
+
+        // verify
+        assertThat(mapResult.getMessages()).isEmpty();
+        assertThat(mapResult.getFilename()).isEqualTo("myFile.robot");
+
+        assertThat(mapResult.getMappedElements()).hasSize(1);
+        assertThat(mapResult.getTextElements()).isEmpty();
+        assertThat(mapResult.getCorrectVariables()).hasSize(1);
+        VariableDeclaration variableDeclaration = mapResult.getCorrectVariables().get(0);
+        assertThat(variableDeclaration.getRobotType()).isEqualTo(VariableType.SCALAR);
+        assertThat(variableDeclaration.getVariableText().getText()).isEqualTo("${user}");
+        assertThat(variableDeclaration.getVariableName().getText()).isEqualTo("user");
+        RobotToken asToken = variableDeclaration.asToken();
+        assertThat(asToken.getStartColumn()).isEqualTo(-1);
+        assertThat(asToken.getEndColumn()).isEqualTo(-1);
+    }
 }
