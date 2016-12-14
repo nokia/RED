@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _hmnS8I7CEeWetPU-dn-gxQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/9/16 7:50 AM
+Save-Time: 12/14/16 12:13 PM
 Testcase-Type: ecl
 Verifications: _qtiWAI7UEeWetPU-dn-gxQ
 
@@ -241,16 +241,15 @@ with [get-window "Quick Fix"] {
 get-window "Quick Fix" | get-button Finish | click
 
 wait-for-problems -count 6
-
+wait 1000
 //-----------------------------------------------------------------------------------------------------------
 open-quick-fix -errorText "Errors (6 items)/Resource import 'deep.resource' is invalid: file does not exist"
 
-try -times 3 -delay 1000 -command{
-	get-window "Quick Fix" 
-	    | get-label "No fixes available for 'Resource import 'deep.resource' is invalid: file does not exist'." 
-	    | get-property caption 
-	    | equals "No fixes available for 'Resource import 'deep.resource' is invalid: file does not exist'." | verify-true
-}
+get-window "Quick Fix" 
+    | get-label "No fixes available for 'Resource import 'deep.resource' is invalid: file does not exist'." 
+    | get-property caption 
+    | equals "No fixes available for 'Resource import 'deep.resource' is invalid: file does not exist'." | verify-true
+
 get-window "Quick Fix" | get-button OK | click
 
 
