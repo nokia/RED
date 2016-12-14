@@ -61,11 +61,11 @@ public class AssistProposalsTest {
 
         final RobotKeywordDefinition kw1 = fileModel.findSection(RobotKeywordsSection.class).get().getChildren().get(0);
 
-        final RedKeywordProposal proposal = AssistProposals.createUserKeywordProposal(kw1, KeywordScope.LOCAL, "suite",
-                AssistProposalPredicates.<RedKeywordProposal> alwaysFalse(), ProposalMatch.EMPTY);
+        final RedKeywordProposal proposal = AssistProposals.createUserKeywordProposal(kw1, "Given ", KeywordScope.LOCAL,
+                "suite", AssistProposalPredicates.<RedKeywordProposal> alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("kw1 - suite.robot");
-        assertThat(proposal.getContent()).isEqualTo("kw1");
+        assertThat(proposal.getContent()).isEqualTo("Given kw1");
         assertThat(proposal.getSourceName()).isEqualTo("suite");
         assertThat(proposal.getArguments()).containsExactly("x", "");
         assertThat(proposal.getArgumentsDescriptor()).isEqualTo(ArgumentsDescriptor.createDescriptor("x", "*list"));
@@ -84,12 +84,12 @@ public class AssistProposalsTest {
         kwSpec.setArguments(newArrayList("x", "*list"));
         kwSpec.setDocumentation("myDocumentation");
 
-        final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec,
+        final RedKeywordProposal proposal = AssistProposals.createLibraryKeywordProposal(libSpec, kwSpec, "Given ",
                 KeywordScope.STD_LIBRARY, "myLibrary", new Path("lib.py"),
                 AssistProposalPredicates.<RedKeywordProposal> alwaysFalse(), ProposalMatch.EMPTY);
 
         assertThat(proposal.getStyledLabel().getString()).isEqualTo("libKw - myLibrary");
-        assertThat(proposal.getContent()).isEqualTo("libKw");
+        assertThat(proposal.getContent()).isEqualTo("Given libKw");
         assertThat(proposal.getSourceName()).isEqualTo("myLibrary");
         assertThat(proposal.getArguments()).containsExactly("x", "");
         assertThat(proposal.getArgumentsDescriptor()).isEqualTo(ArgumentsDescriptor.createDescriptor("x", "*list"));
