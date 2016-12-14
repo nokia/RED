@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _a_1L4AfGEearkLC-7wHL-g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 11/18/16 11:12 AM
+Save-Time: 12/14/16 1:32 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -242,6 +242,13 @@ try -times 10 -delay 1000 -command{
 	get-editor "RobotProject/red.xml" | get-canvas -after [get-label "RED Project"] | get-property "isBusy()" | equals false 
     | verify-true
 }
+
+try -times 5 -delay 1000 -command{
+	get-editor "RobotProject/red.xml" | get-section Paths | get-combo 
+    	-after [get-label "Relative paths defined below are relative to:"] | get-property enablement | equals true 
+    	| verify-true
+}
+
 with [get-editor "RobotProject/red.xml"] {
     get-section Paths | get-combo -after [get-label "Relative paths defined below are relative to:"] | select WORKSPACE
     get-section "Referenced libraries" | get-table | select "res1 - RobotProject\\/libs\\/for_resource" 
