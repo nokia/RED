@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _cKvDgIbgEeaPRdjThepTww
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 10/6/16 4:36 PM
+Save-Time: 12/14/16 10:22 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -43,7 +43,7 @@ get-view "Message Log" | click
 get-editor "checking_doc.robot" | get-text-viewer | get-menu "Show in Doc View" | click
 
 get-view "Documentation View" | get-editbox | get-property text | equals "Name: kw1_with_imported_kw\n"
-    + "Source: User Defined (/RobotProject/checking_doc.robot)\n"
+    + "Source: User defined (/RobotProject/checking_doc.robot)\n"
     + "Arguments: []\n\n"
     + "<not documented>" | verify-true
 
@@ -61,7 +61,7 @@ get-view "Message Log" | click
 // check Show in Doc for bultin kw
 get-editor "checking_doc.robot" | get-text-viewer | get-menu "Show in Doc View" | click
 get-view "Documentation View" | get-editbox | get-property text | equals "Name: Log\n"
-    + "Source: BuiltIn\n"
+    + "Source: Library (BuiltIn)\n"
     + "Arguments: [message, level=INFO, html=False, console=False, repr=False]\n\n"
     + "Logs the given message with the given level.\n\n"
     + "Valid levels are TRACE, DEBUG, INFO (default), HTML, WARN, and ERROR.\n"
