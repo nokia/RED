@@ -167,8 +167,12 @@ public class DocumentUtilities {
     public static Optional<IRegion> findLiveCellRegion(final IDocument document, final boolean isTsv, final int offset)
             throws BadLocationException {
         final Optional<IRegion> firstCandidate = findCellRegion(document, isTsv, offset);
-        if (!firstCandidate.isPresent() && (offset > 0 ? document.get(offset - 1, 1) : "").equals("\t")) {
+        if ((!firstCandidate.isPresent() && (offset > 0 ? document.get(offset - 1, 1) : "").equals("\t"))) {
             return firstCandidate;
+        }
+
+        if (offset > 0 && document.getChar(offset - 1) == '\n') {
+            return Optional.<IRegion> of(new Region(offset, 0));
         }
         final Optional<IRegion> region = firstCandidate.isPresent() ? firstCandidate
                 : findCellRegion(document, isTsv, offset - 1);
