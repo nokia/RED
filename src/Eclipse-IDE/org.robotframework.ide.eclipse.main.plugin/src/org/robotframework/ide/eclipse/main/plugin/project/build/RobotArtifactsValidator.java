@@ -9,7 +9,9 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -39,7 +41,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.ASuiteFileDescriber;
 import org.robotframework.ide.eclipse.main.plugin.project.LibrariesAutoDiscoverer;
 import org.robotframework.ide.eclipse.main.plugin.project.RobotProjectNature;
-import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotInitFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotProjectConfigFileValidator;
 import org.robotframework.ide.eclipse.main.plugin.project.build.validation.RobotResourceFileValidator;
@@ -50,6 +51,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Queues;
 
 public class RobotArtifactsValidator {
+
+    private final static Map<IResource, Object> VALIDATION_LOCKS = new ConcurrentHashMap<>();
 
     private final BuildLogger logger;
 
@@ -73,9 +76,7 @@ public class RobotArtifactsValidator {
 
                         @Override
                         public IStatus runInWorkspace(final IProgressMonitor monitor) throws CoreException {
-                            file.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
-                            ((RobotFileValidator) validator.get()).validate(suiteModel, new NullProgressMonitor());
-
+                            createSynchronizedValidator(file, validator.get()).validate(new NullProgressMonitor());
                             return Status.OK_STATUS;
                         }
                     };
@@ -101,6 +102,29 @@ public class RobotArtifactsValidator {
             return false;
         }
         return true;
+    }
+    
+    private static synchronized ModelUnitValidator createSynchronizedValidator(final IResource resource,
+            final ModelUnitValidator validator) {
+        
+        return new ModelUnitValidator() {
+
+            @Override
+            public void validate(final IProgressMonitor monitor) throws CoreException {
+                synchronized (getLock(resource)) {
+                    resource.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
+                    validator.validate(monitor);
+                    VALIDATION_LOCKS.remove(resource);
+                }
+            }
+
+            private Object getLock(final IResource resource) {
+                if (!VALIDATION_LOCKS.containsKey(resource)) {
+                    VALIDATION_LOCKS.put(resource, new Object());
+                }
+                return VALIDATION_LOCKS.get(resource);
+            }
+        };
     }
 
     public static Job createValidationJob(final IProject project, final ModelUnitValidatorConfig validatorConfig) {
@@ -242,7 +266,7 @@ public class RobotArtifactsValidator {
                                     final Optional<? extends ModelUnitValidator> validator = createValidator(context,
                                             resource, ProblemsReportingStrategy.reportOnly(), false);
                                     if (validator.isPresent()) {
-                                        validators.add(createValidatorWithMarkerDelete(resource, validator.get()));
+                                        validators.add(createSynchronizedValidator(resource, validator.get()));
                                     }
                                     return true;
                                 }
@@ -298,25 +322,13 @@ public class RobotArtifactsValidator {
                                 final Optional<? extends ModelUnitValidator> validator = createValidator(context,
                                         resource, reporter, false);
                                 if (validator.isPresent()) {
-                                    validators.add(createValidatorWithMarkerDelete(resource, validator.get()));
+                                    validators.add(createSynchronizedValidator(resource, validator.get()));
                                 }
                             }
                             return true;
                         }
                     });
                     return validators;
-                }
-            };
-        }
-
-        private static ModelUnitValidator createValidatorWithMarkerDelete(final IResource resource,
-                final ModelUnitValidator validator) {
-            return new ModelUnitValidator() {
-
-                @Override
-                public void validate(final IProgressMonitor monitor) throws CoreException {
-                    resource.deleteMarkers(RobotProblem.TYPE_ID, true, IResource.DEPTH_ONE);
-                    validator.validate(monitor);
                 }
             };
         }
