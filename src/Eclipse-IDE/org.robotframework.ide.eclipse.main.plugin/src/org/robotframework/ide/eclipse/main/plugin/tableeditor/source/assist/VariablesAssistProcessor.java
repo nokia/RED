@@ -71,7 +71,7 @@ public class VariablesAssistProcessor extends RedContentAssistProcessor {
                 assist.getModel());
 
         final List<? extends AssistProposal> variableProposals = new RedVariableProposals(assist.getModel(),
-                globalVarPredicate).getVariableProposals(prefix, offset);
+                globalVarPredicate).getVariableProposals(actualPrefix, offset);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal varProposal : variableProposals) {
