@@ -142,7 +142,7 @@ public class AssistProposals {
 
     static RedVariableProposal createBuiltInVariableProposal(final String name, final String value,
             final ProposalMatch match) {
-        return new RedVariableProposal(name, "built-in", value, "", VariableOrigin.BUILTIN, match);
+        return new RedVariableProposal(name, "Built-in", value, "", VariableOrigin.BUILTIN, match);
     }
 
     public static Comparator<AssistProposal> sortedByLabels() {
