@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -52,7 +51,7 @@ import com.google.common.collect.Queues;
 
 public class RobotArtifactsValidator {
 
-    private final static Map<IResource, Object> VALIDATION_LOCKS = new ConcurrentHashMap<>();
+    private final static ConcurrentHashMap<IResource, Object> VALIDATION_LOCKS = new ConcurrentHashMap<>();
 
     private final BuildLogger logger;
 
@@ -119,10 +118,9 @@ public class RobotArtifactsValidator {
             }
 
             private Object getLock(final IResource resource) {
-                if (!VALIDATION_LOCKS.containsKey(resource)) {
-                    VALIDATION_LOCKS.put(resource, new Object());
-                }
-                return VALIDATION_LOCKS.get(resource);
+                Object newLock = new Object();
+                Object oldLock = VALIDATION_LOCKS.putIfAbsent(resource, newLock);
+                return oldLock != null ? oldLock : newLock;
             }
         };
     }
