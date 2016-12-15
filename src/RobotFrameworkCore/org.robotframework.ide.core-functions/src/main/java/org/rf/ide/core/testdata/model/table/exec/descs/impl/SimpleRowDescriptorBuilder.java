@@ -52,7 +52,20 @@ public class SimpleRowDescriptorBuilder implements IRowDescriptorBuilder {
         boolean isAfterFirstAction = false;
         final CommentedVariablesFilter filter = new CommentedVariablesFilter();
         for (final RobotToken elem : lineElements) {
-            final MappingResult mappingResult = varExtractor.extract(elem, fileName);
+            MappingResult mappingResult = null;
+            // just to revert issues with assignment for variables in table view
+            if (!isAfterFirstAction) {
+                final String text = elem.getText().replaceAll("\\s+", "");
+                final String raw = elem.getRaw().replaceAll("\\s+", "") + "=";
+                if (text.equals(raw)) {
+                    final RobotToken varPretend = elem.copy();
+                    varPretend.setText(elem.getRaw());
+                    mappingResult = varExtractor.extract(varPretend, fileName);
+                }
+            }
+            if (mappingResult == null) {
+                mappingResult = varExtractor.extract(elem, fileName);
+            }
             simple.addMessages(mappingResult.getMessages());
 
             // value is keyword if is on the first place and have in it nested
