@@ -1,0 +1,102 @@
+--- RCPTT testcase ---
+Format-Version: 1.0
+Contexts: _70F80MH6Eeat3OoBX2X2jQ,_gDZSgMjzEeWPuqMw6GC70Q,_UKJR8MkGEeWPuqMw6GC70Q
+Element-Name: ContenAssistForAutomaticVariableForTSV
+Element-Type: testcase
+Element-Version: 3.0
+External-Reference: 
+Id: _tCfYkMLdEeat3OoBX2X2jQ
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/15/16 5:35 PM
+Testcase-Type: ecl
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
+Content-Type: text/ecl
+Entry-Name: .content
+
+get-view "Project Explorer" | get-tree | select "RobotProject/checking_var.tsv" 
+    | select "RobotProject/checking_var.tsv" | double-click
+    
+//add Test Setup
+with [get-editor "checking_var.tsv" | get-text-viewer] {
+    set-caret-pos 2 1
+    type-text tes
+    key-type "M1+SPACE"
+    wait 200
+    key-type Enter
+    key-type "M1+SPACE" -times 2
+}
+
+check-all-variables-types
+
+//Test Teardown
+open-content_assist -file_name "checking_var.tsv" -row 3 -col 18 -set_char "$"
+check-automatic-variables-for-test-teardown
+close-content-assist -file_name "checking_var.tsv" 
+
+// Library
+open-content_assist -file_name "checking_var.tsv" -row 4 -col 8 -set_char "\t$"
+check_common-automatic-variables
+
+
+//[tags] in test
+with [get-editor "checking_var.tsv" | get-text-viewer] {
+    set-caret-pos 10 11
+    key-type Tab
+    key-type "M1+SPACE" -times 3
+    type-text "$"
+}
+check-automatic-variables-for-test-case
+
+//[return] in keyword
+with [get-editor "checking_var.tsv" | get-text-viewer] {
+    set-caret-pos 14 13
+    key-type Tab
+    type-text "@"
+    key-type "M1+SPACE"
+}
+
+check-automatic-lists
+close-content-assist -file_name "checking_var.tsv"
+
+
+//--------------------------------- yellow propsal window -----------------------------------------------
+
+with [get-editor "checking_var.tsv" | get-text-viewer] {
+    set-caret-pos 10 14
+    key-type "M1+SPACE"
+    wait 500
+}
+
+//check ${/} value 
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals [os-specific "Source: built-in\nValue: \\" "Source: built-in\nValue: /"] | verify-true
+
+//check "${:}" value    
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    select "${\\/}" | key-type Down
+    select "${:}"
+}
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals [os-specific "Source: built-in\nValue: ;" "Source: built-in\nValue: :"]| verify-true
+    
+//check empty var    
+with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
+    select "${:}" | key-type Down
+    select "${\\n"
+        + "}" | key-type Down
+    select "${CURDIR}" | key-type Down
+    select "${DEBUG_FILE}" | key-type Down
+    select "${EMPTY}" | key-type Down
+    select "${EXECDIR}" | key-type Down
+    select "${False}" | key-type Down
+    select "${LOG_FILE}"
+}
+wait 500
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-window -from "Information Window" 
+    | get-editbox | get-property text | equals "Source: built-in" | verify-true
+
+close-content-assist -file_name  "checking_var.tsv"
+
+------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
