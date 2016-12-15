@@ -5,11 +5,13 @@
  */
 package org.robotframework.ide.eclipse.main.plugin.debug.utils;
 
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IValue;
@@ -32,17 +34,17 @@ public class RobotDebugVariablesManager {
 
     private final RobotDebugTarget target;
 
-    private final LinkedList<RobotDebugVariablesContext> previousVariables;
+    private final ConcurrentLinkedDeque<RobotDebugVariablesContext> previousVariables;
 
     private Map<String, String> globalVariables;
-    
+
     private final Map<String, IVariable> nestedGlobalVars;
 
     private final LinkedList<String> sortedVariablesNames;
 
     public RobotDebugVariablesManager(final RobotDebugTarget target) {
         this.target = target;
-        this.previousVariables = new LinkedList<>();
+        this.previousVariables = new ConcurrentLinkedDeque<>();
         this.globalVariables = new HashMap<>();
         this.nestedGlobalVars = new LinkedHashMap<>();
         this.sortedVariablesNames = new LinkedList<String>();
@@ -64,16 +66,16 @@ public class RobotDebugVariablesManager {
 
         final RobotDebugVariablesContext currentVariablesContext = findCurrentVariablesContext(stackTraceId);
         Map<String, IVariable> previousVariablesMap = initPreviousVariablesState(currentVariablesContext);
-        
+
         final Map<String, IVariable> nonGlobalVariablesMap = new LinkedHashMap<>();
         if (previousVariablesMap == null) {
             initNewNonGlobalVariables(newVariables, nonGlobalVariablesMap);
         } else {
             initVariablesComparingWithPreviousState(newVariables, previousVariablesMap, nonGlobalVariablesMap);
         }
-        
+
         final LinkedList<IVariable> currentVariablesList = createCurrentVariablesList(nonGlobalVariablesMap);
-        
+
         saveCurrentVariablesState(stackTraceId, currentVariablesContext, nonGlobalVariablesMap);
 
         return currentVariablesList.toArray(new IVariable[currentVariablesList.size()]);
@@ -87,8 +89,9 @@ public class RobotDebugVariablesManager {
         }
         return null;
     }
-    
-    private Map<String, IVariable> initPreviousVariablesState(final RobotDebugVariablesContext currentVariablesContext) {
+
+    private Map<String, IVariable> initPreviousVariablesState(
+            final RobotDebugVariablesContext currentVariablesContext) {
         Map<String, IVariable> previousVariablesMap = null;
         if (currentVariablesContext != null) {
             previousVariablesMap = currentVariablesContext.getVariablesMap();
@@ -97,7 +100,7 @@ public class RobotDebugVariablesManager {
         }
         return previousVariablesMap;
     }
-    
+
     private void initNewNonGlobalVariables(final Map<String, Object> newVariables,
             final Map<String, IVariable> nonGlobalVariablesMap) {
         for (final String variableName : sortedVariablesNames) {
@@ -134,8 +137,9 @@ public class RobotDebugVariablesManager {
         if (previousVariablesMap.containsKey(newVarName)) {
             try {
                 final RobotDebugVariable previousVariable = (RobotDebugVariable) previousVariablesMap.get(newVarName);
-                if(newVariable.getValue().hasVariables() && previousVariable.getValue().hasVariables()) {
-                    return compareNestedVariables(newVariable.getValue().getVariables(), previousVariable.getValue().getVariables());
+                if (newVariable.getValue().hasVariables() && previousVariable.getValue().hasVariables()) {
+                    return compareNestedVariables(newVariable.getValue().getVariables(),
+                            previousVariable.getValue().getVariables());
                 }
                 final String variablePreviousValue = previousVariable.getValue().getValueString();
                 final String variableNewValue = newVariable.getValue().getValueString();
@@ -149,7 +153,7 @@ public class RobotDebugVariablesManager {
         }
         return false;
     }
-    
+
     private boolean compareNestedVariables(final IVariable[] newNestedVars, final IVariable[] prevNestedVars) {
 
         if (newNestedVars.length != prevNestedVars.length) {
@@ -173,11 +177,11 @@ public class RobotDebugVariablesManager {
         }
         return hasNestedValueChanged;
     }
-    
+
     private boolean isNewGlobalVariable(final Map<String, Object> newVariables, final String variableName) {
         return !newVariables.get(variableName).equals(globalVariables.get(variableName));
     }
-    
+
     private LinkedList<IVariable> createCurrentVariablesList(final Map<String, IVariable> nonGlobalVariablesMap) {
         final LinkedList<IVariable> currentVariablesList = new LinkedList<IVariable>();
         currentVariablesList.addAll(nonGlobalVariablesMap.values());
@@ -186,22 +190,23 @@ public class RobotDebugVariablesManager {
     }
 
     private void saveCurrentVariablesState(final int stackTraceId,
-            final RobotDebugVariablesContext currentVariablesContext, final Map<String, IVariable> nonGlobalVariablesMap) {
+            final RobotDebugVariablesContext currentVariablesContext,
+            final Map<String, IVariable> nonGlobalVariablesMap) {
         if (currentVariablesContext != null) {
             currentVariablesContext.setVariablesMap(nonGlobalVariablesMap);
         } else {
             previousVariables.add(new RobotDebugVariablesContext(stackTraceId, nonGlobalVariablesMap));
         }
     }
-    
-    public LinkedList<RobotDebugVariablesContext> getPreviousVariables() {
+
+    public Deque<RobotDebugVariablesContext> getPreviousVariables() {
         return previousVariables;
     }
 
     public void sortVariablesNames(final Map<String, Object> vars) {
 
         final String[] varArray = vars.keySet().toArray(new String[vars.keySet().size()]);
-        for (int i = varArray.length-1; i >=0; i--) {
+        for (int i = varArray.length - 1; i >= 0; i--) {
             final String varName = varArray[i];
             if (!sortedVariablesNames.contains(varName)) {
                 if (varName.contains(SUITE_VARIABLE_PREFIX)) {
@@ -231,11 +236,12 @@ public class RobotDebugVariablesManager {
             }
         }
     }
-    
+
     private RobotDebugVariable createGlobalVariable() {
         final RobotDebugVariable variable = new RobotDebugVariable(target, GLOBAL_VARIABLE_NAME, "", null);
         variable.setValueModificationEnabled(false);
-        final RobotDebugValue value = new RobotDebugValue(target, "", nestedGlobalVars.values().toArray(new IVariable[nestedGlobalVars.size()]));
+        final RobotDebugValue value = new RobotDebugValue(target, "",
+                nestedGlobalVars.values().toArray(new IVariable[nestedGlobalVars.size()]));
         variable.setRobotDebugValue(value);
 
         return variable;
