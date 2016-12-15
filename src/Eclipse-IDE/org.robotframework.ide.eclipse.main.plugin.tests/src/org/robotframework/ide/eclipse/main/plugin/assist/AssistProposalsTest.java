@@ -108,7 +108,7 @@ public class AssistProposalsTest {
         assertThat(proposal.getArguments()).isEmpty();
         assertThat(proposal.getImage()).isEqualTo(RedImages.getRobotScalarVariableImage());
         assertThat(proposal.hasDescription()).isTrue();
-        assertThat(proposal.getDescription()).isEqualTo("Source: built-in\nValue: value");
+        assertThat(proposal.getDescription()).isEqualTo("Source: Built-in\nValue: value");
     }
 
     @Test
