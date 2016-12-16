@@ -23,7 +23,6 @@ import org.eclipse.jface.text.contentassist.CompletionProposal;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.swt.graphics.Image;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.red.graphics.ImagesManager;
 
@@ -43,11 +42,9 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
                 @Override
                 public boolean visit(final IResource resource) throws CoreException {
                     if (resource.getType() == IResource.FILE && resource.getFullPath().lastSegment().equals(lastSegment)) {
-                        final IPath resRelativePath = RedWorkspace.Paths
-                                .fromWorkspaceRelativeToResourceRelative(problematicFile,
-                                        resource.getFullPath().makeRelative());
+                        final IPath resRelativePath = createCurrentFileRelativePath(problematicFile, (IFile) resource);
 
-                        fixers.add(new ChangeImportedPathFixer(invalidPath, resource.getFullPath(), resRelativePath));
+                        fixers.add(new ChangeImportedPathFixer(resource.getFullPath().makeRelative(), resRelativePath));
                     }
                     return true;
                 }
@@ -58,13 +55,14 @@ public class ChangeImportedPathFixer extends RedSuiteMarkerResolution {
         return fixers;
     }
 
-    private final IPath invalidPath;
+    private static IPath createCurrentFileRelativePath(final IFile from, final IFile to) {
+        return to.getLocation().makeRelativeTo(from.getLocation()).removeFirstSegments(1);
+    }
+
     private final IPath validWsRelativePath;
     private final IPath validFileRelativePath;
 
-    public ChangeImportedPathFixer(final IPath invalidPath, final IPath validWsRelativePath,
-            final IPath validFileRelativePath) {
-        this.invalidPath = invalidPath;
+    public ChangeImportedPathFixer(final IPath validWsRelativePath, final IPath validFileRelativePath) {
         this.validWsRelativePath = validWsRelativePath;
         this.validFileRelativePath = validFileRelativePath;
     }

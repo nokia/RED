@@ -49,20 +49,11 @@ public class RedWorkspace {
 
     public static class Paths {
 
-        public static IPath fromWorkspaceRelativeToResourceRelative(final IResource resource, final IPath path) {
-            if (path.isAbsolute()) {
-                throw new IllegalArgumentException("Unable to convert absolute path");
-            }
-            resource.getFullPath().toFile().toURI().relativize(path.toFile().toURI());
-            path.toFile().toURI().relativize(resource.getFullPath().toFile().toURI());
-            return path.makeRelativeTo(resource.getFullPath()).removeFirstSegments(1);
-        }
-
         public static IPath toWorkspaceRelativeIfPossible(final IPath fullPath) {
             return toRelativeIfPossible(ResourcesPlugin.getWorkspace().getRoot().getLocation(), fullPath);
         }
 
-        public static IPath toRelativeIfPossible(final IPath relativityPoint, final IPath fullPath) {
+        private static IPath toRelativeIfPossible(final IPath relativityPoint, final IPath fullPath) {
             if (relativityPoint.isPrefixOf(fullPath)) {
                 return fullPath.makeRelativeTo(relativityPoint);
             } else {
