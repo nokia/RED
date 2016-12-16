@@ -17,7 +17,6 @@ import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.testdata.model.table.variables.AVariable.VariableType;
 import org.robotframework.ide.eclipse.main.plugin.RedImages;
-import org.robotframework.ide.eclipse.main.plugin.RedWorkspace;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSettingProposals.SettingTarget;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedVariableProposal.VariableOrigin;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordDefinition;
@@ -39,10 +38,13 @@ public class AssistProposals {
 
     static RedFileLocationProposal createFileLocationProposal(final IFile fromFile, final IFile toFile,
             final ProposalMatch match) {
-        final IPath path = toFile.getFullPath().makeRelative();
-        final String label = path.toString();
-        final String content = createCurrentFileRelativePath(fromFile, path);
+        final String label = toFile.getFullPath().makeRelative().toString();
+        final String content = createCurrentFileRelativePath(fromFile, toFile);
         return new RedFileLocationProposal(content, label, toFile, match);
+    }
+
+    private static String createCurrentFileRelativePath(final IFile from, final IFile to) {
+        return to.getLocation().makeRelativeTo(from.getLocation()).removeFirstSegments(1).toString();
     }
 
     static RedLibraryProposal createLibraryProposal(final RobotSuiteFile suiteFile,
@@ -55,10 +57,6 @@ public class AssistProposals {
         }
         final boolean isImported = suiteFile.getImportedLibraries().containsKey(libSpec);
         return new RedLibraryProposal(libraryName, arguments, isImported, libSpec.getDocumentation(), match);
-    }
-
-    private static String createCurrentFileRelativePath(final IFile fromFile, final IPath resourcePath) {
-        return RedWorkspace.Paths.fromWorkspaceRelativeToResourceRelative(fromFile, resourcePath).toString();
     }
 
     static RedKeywordProposal createLibraryKeywordProposal(final LibrarySpecification spec,
