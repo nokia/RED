@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _Qxs1YJ2WEeWVv_UItyy1RQ,_u8fMELqtEeW29Kbu_epUIA
+Contexts: _Qxs1YJ2WEeWVv_UItyy1RQ,_cBeEIMN4Eeat3OoBX2X2jQ
 Element-Name: ContentAssistForPythonVariablesInTSV
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _88Mx8J2SEeWVv_UItyy1RQ
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/26/16 2:05 PM
+Save-Time: 12/16/16 4:10 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -48,12 +48,12 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
 
 }
 //check if autmatic var ar in list
-check-automatic-variables-for-settings -start_index 11 -count_items 0
-check-automatic-maps -start_index 42 -count_items 0
-check-automatic-lists -start_index 44 -count_items 0
+check_common-automatic-variables -start_index 11 -count_items 0
+check-automatic-dicts -start_index 36 -count_items 0
+check-automatic-lists -start_index 38 -count_items 0
 
 
-get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-property itemCount | equals 46 
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-property itemCount | equals 39 
     | verify-true
     
 get-eclipse-window | key-type "TRAVERSE_ESCAPE"
@@ -124,7 +124,7 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property "getItems().TableItem[7].getText()" | equals "${sumof2digit}" | verify-true
 }
 
-check-automatic-variables-in-test-cases -start_index 8
+check-automatic-variables-for-test-case -start_index 8
 
 
 //check yellow window
@@ -184,6 +184,7 @@ with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-
     get-property "getItems().TableItem[2].getText()" | equals "@{EMPTY}" | verify-true
     get-property "getItems().TableItem[3].getText()" | equals "@{TEST_TAGS}" | verify-true
 }
-
-
+with [get-editor "tsv_test.tsv"] {
+    get-text-viewer | key-type ESC
+}
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
