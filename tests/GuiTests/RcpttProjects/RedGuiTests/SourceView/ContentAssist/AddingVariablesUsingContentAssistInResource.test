@@ -1,12 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
+Contexts: _cBDNYMN4Eeat3OoBX2X2jQ
 Element-Name: AddingVariablesUsingContentAssistInResource
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _9rWNQHf-EeWYifgNPLzx_Q
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 3/8/16 12:03 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/16/16 5:26 PM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -27,21 +28,12 @@ with [get-window "New Robot Resource file"] {
 
 with [get-editor "resource_file.robot" | get-text-viewer] {
     key-type "M1+SPACE"
-    key-type Down -times 2
+    key-type Down -times 3
     key-type Enter
     
 	//add varaibles
     key-type "M1+SPACE"
- 
-	with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-	    get-property itemCount | equals 6 | verify-true
-	    get-property "getItems().TableItem[0].getText()" | equals "Fresh scalar" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "Fresh list" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "Fresh dictionary" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "*** Keywords ***" | verify-true
-	    get-property "getItems().TableItem[4].getText()" | equals "*** Settings ***" | verify-true
-	    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
-	}
+	check-content-assist-for-variables
 	key-type Esc
 }
 
@@ -109,16 +101,7 @@ with [get-editor "resource_file.robot" | get-text-viewer] {
     set-caret-pos 8 1
     key-type "NUMPAD_ENTER" "\\u000D" -times 2
     key-type "M1+SPACE"
-    
-    with [get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table] {
-	    get-property itemCount | equals 6 | verify-true
-	    get-property "getItems().TableItem[0].getText()" | equals "Fresh scalar" | verify-true
-	    get-property "getItems().TableItem[1].getText()" | equals "Fresh list" | verify-true
-	    get-property "getItems().TableItem[2].getText()" | equals "Fresh dictionary" | verify-true
-	    get-property "getItems().TableItem[3].getText()" | equals "*** Keywords ***" | verify-true
-	    get-property "getItems().TableItem[4].getText()" | equals "*** Settings ***" | verify-true
-	    get-property "getItems().TableItem[5].getText()" | equals "*** Variables ***" | verify-true
-	}
+    check-content-assist-for-variables
 	key-type Esc
 	
 }
