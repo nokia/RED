@@ -45,7 +45,7 @@ class RedLibraryProposal extends BaseAssistProposal {
 
     @Override
     public String getLabel() {
-        return super.getLabel() + " " + Joiner.on(' ').join(arguments);
+        return super.getLabel() + (arguments.isEmpty() ? "" : " " + Joiner.on(' ').join(arguments));
     }
 
     @Override
