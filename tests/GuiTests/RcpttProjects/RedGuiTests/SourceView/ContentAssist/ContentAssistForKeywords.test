@@ -6,7 +6,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _iyS6MNymEeWGC6qnJEsRYg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/13/16 4:50 PM
+Save-Time: 12/16/16 11:48 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -98,6 +98,8 @@ get-editor "TestFile.robot" | get-text-viewer | get-property text | equals "*** 
     
     
 //------------------------------------------------- tsv file --------------------------------------------------------------------
+
+
 get-view "Project Explorer" | get-tree | select RobotProject | select RobotProject | get-menu "New/Robot Test Suite" 
     | click
 with [get-window "New Robot Test Suite"] {
@@ -122,8 +124,7 @@ get-editor "tsv_file.tsv" | get-text-viewer | set-text "*** Settings ***\n\n\n"
     + "\t\n"
     + "kw with no args\n"
     + "\tlog\tno args"    
-  
-wait 2000    
+      
 with [get-editor "tsv_file.tsv" | get-text-viewer] {
 	// adding keyword without changing args
 	// add user keyword "two args" to test 2
@@ -134,11 +135,19 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     wait 200
     key-type Enter
     // add "args as list"
-    set-caret-pos 6 25
+    set-caret-pos 6 22
     key-type "NUMPAD_ENTER" "\\u000D" -times 2
     type-text arg
     key-type "M1+SPACE"
-    key-type Enter -times 2
+    key-type Enter
+    wait 200
+    
+    //close edit frame
+    key-type Enter
+    wait 100
+    
+    //got to new line
+    key-type Enter
     // add "kw with no args"
     type-text kw
     key-type "M1+SPACE"
@@ -158,6 +167,8 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     key-type "M1+SPACE"
     key-type Enter
     type-text "${my list}"
+    key-type Enter
+    wait 100
     key-type Enter
     
     // add Should Be Equal As Numbers with additional arg
@@ -182,7 +193,7 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     type-text Te
     key-type "M1+SPACE"
     key-type Enter
-    wait 300
+    wait 500
     key-type Enter
 }
 
@@ -207,16 +218,16 @@ with [get-editor "tsv_file.tsv" | get-text-viewer] {
     key-type Enter
 }
 get-editor "tsv_file.tsv" | get-text-viewer | get-property text | equals "*** Settings ***\n"
-    + "Test Setup\tCall Method\tobject\tmethod_name\t\n\n"
+    + "Test Setup\targs as list\t\n\n"
     + "*** Test Cases ***\n"
     + "test 2\n"
-    + "\ttwo args\ta\tb\t\n"
+    + "\ttwo args\ta\tb\n"
     + "\targs as list\t\n"
     + "\tkw with no args\n"
     + "\ttwo args\tmy arg 1\tsecond arg\n"
     + "\targs as list\t${my list}\n"
     + "\tShould Be Equal As Numbers\t67\t89\ttext\n"
-    + "\t\t\n\n"
+    + "\t\t\t\n\n"
     + "*** Keywords ***\n"
     + "two args\n"
     + "\t[Arguments]\t${a}\t${b}\t${op}=7\n"
@@ -233,5 +244,4 @@ get-editor "tsv_file.tsv" | get-text-viewer | get-property text | equals "*** Se
     + "\tNo Operation\n"
     + "\tGet Count\titem1\titem2\n"
     + "\ttwo args\ta\tb" | verify-true
-       
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac--
