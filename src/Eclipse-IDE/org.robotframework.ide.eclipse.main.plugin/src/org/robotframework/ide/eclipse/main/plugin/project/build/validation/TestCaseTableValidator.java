@@ -435,11 +435,6 @@ class TestCaseTableValidator implements ModelUnitValidator {
                 final IExecutableRowDescriptor<?> lineDescription = row.buildLineDescription();
 
                 for (final VariableDeclaration variableDeclaration : lineDescription.getUsedVariables()) {
-                    if (variableDeclaration.asToken()
-                            .getTypes()
-                            .contains(RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION)) {
-                        continue;
-                    }
                     if (isInvalidVariableDeclaration(validationContext, definedVariables, lineDescription,
                             variableDeclaration)) {
                         String variableName = variableDeclaration.getVariableName().getText();
@@ -468,7 +463,8 @@ class TestCaseTableValidator implements ModelUnitValidator {
 
     static boolean isInvalidVariableDeclaration(final Set<String> definedVariables,
             final VariableDeclaration variableDeclaration) {
-        return !variableDeclaration.isDynamic()
+        return !variableDeclaration.asToken().getTypes().contains(RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION)
+                && !variableDeclaration.isDynamic()
                 && !VariableNamesSupport.isDefinedVariable(variableDeclaration, definedVariables)
                 && !isSpecificVariableDeclaration(definedVariables, variableDeclaration);
     }
