@@ -5,8 +5,8 @@ Element-Name: open_close_content_assist
 Element-Type: context
 Element-Version: 2.0
 Id: _UKJR8MkGEeWPuqMw6GC70Q
-Runtime-Version: 2.0.2.201511100828
-Save-Time: 2/1/16 6:08 PM
+Runtime-Version: 2.1.0.201606221726
+Save-Time: 12/15/16 2:10 PM
 
 ------=_.ecl.context-718f04b4-ed39-33e3-af62-0995e4561998
 Content-Type: text/ecl
@@ -19,14 +19,14 @@ proc "close-content-assist" [val file_name]{
 	}
 }
 
-proc "open-content_assist" [val file_name] [val remove_previouse_char 0] [val first_char ""] [val row] [val col]{
+proc "open-content_assist" [val file_name] [val remove_previouse_char false] [val set_char ""] [val row] [val col]{
 	with [get-editor $file_name] {
 	    with [get-text-viewer] {
 	        set-caret-pos $row $col
-	        if [$remove_previouse_char| equals 1]{
+	        if [$remove_previouse_char| eq true]{
 	        	key-type BackSpace
 	        }
-	        type-text $first_char
+	        type-text $set_char
 	        key-type "M1+SPACE"
 	        wait 200
 	    }
