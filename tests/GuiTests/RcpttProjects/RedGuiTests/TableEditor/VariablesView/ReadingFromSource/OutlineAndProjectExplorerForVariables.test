@@ -7,7 +7,7 @@ Element-Version: 3.0
 External-Reference: 
 Id: _StWQQEN6EeaEVfxTnoQ14g
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 8/29/16 6:05 PM
+Save-Time: 12/16/16 5:32 PM
 Testcase-Type: ecl
 Verifications: _h9dwwETtEeaEVfxTnoQ14g
 
@@ -271,10 +271,12 @@ with [get-window "New Robot Resource file"] {
     get-editbox -after [get-label "File name:"] | set-text "text_file.txt"
     get-button Finish | click
 }
+
+//add variables
 with [get-editor "text_file.txt" | get-text-viewer] {
     key-type "M1+SPACE"
     wait 200
-    key-type Down -times 2
+    key-type Down -times 3
     key-type Enter
     //add list
     key-type "M1+SPACE"
@@ -287,12 +289,12 @@ with [get-editor "text_file.txt" | get-text-viewer] {
 }
 
 try -times 10 -delay 1000 -command{
-//check if after writing new list this list is in Outline and PE
-with [get-view Outline | get-tree] {
-    get-item "text_file.txt/Variables" | get-property childCount | equals 1 | verify-true
-    get-item "text_file.txt/Variables" | get-property "getText()" | equals Variables | verify-true
-    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList | verify-true
-}
+	//check if after writing new list this list is in Outline and PE
+	with [get-view Outline | get-tree] {
+	    get-item "text_file.txt/Variables" | get-property childCount | equals 1 | verify-true
+	    get-item "text_file.txt/Variables" | get-property "getText()" | equals Variables | verify-true
+	    get-item "text_file.txt/Variables" | get-property "getItems().TreeItem[0].getText()" | equals newList | verify-true
+	}
 }
 get-view "Project Explorer" | get-tree | select RobotProject
 with [get-view "Project Explorer" | get-tree] {
