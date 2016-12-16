@@ -99,7 +99,7 @@ public class AssistProposalPredicates {
 
             @Override
             public boolean apply(final String reservedWord) {
-                if (reservedWord.equals(RedCodeReservedWordProposals.FOR_LOOP_1)
+                if (RedCodeReservedWordProposals.FOR_LOOP_1.equals(reservedWord)
                         || RedCodeReservedWordProposals.GHERKIN_ELEMENTS.contains(reservedWord)) {
                     // we're in 2nd cell
                     return cellIndex == 1;
