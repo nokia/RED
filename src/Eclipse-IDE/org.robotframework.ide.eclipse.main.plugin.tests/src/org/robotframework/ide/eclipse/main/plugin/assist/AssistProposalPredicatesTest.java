@@ -9,7 +9,6 @@ import static com.google.common.collect.Lists.newArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -51,38 +50,6 @@ public class AssistProposalPredicatesTest {
         assertThat(predicate.apply("abc")).isFalse();
         assertThat(predicate.apply(newArrayList())).isFalse();
         assertThat(predicate.apply(newArrayList(1, 2, 3))).isFalse();
-    }
-
-    @Test
-    public void whenFileIsASuite_sectionsPredicateIsSatisfiedForAnyGivenSectionName() {
-        final RobotSuiteFile model = mock(RobotSuiteFile.class);
-        when(model.isSuiteFile()).thenReturn(true);
-
-        final AssistProposalPredicate<String> predicate = AssistProposalPredicates.testCaseSectionPredicate(model);
-
-        assertThat(predicate.apply(null)).isTrue();
-        assertThat(predicate.apply("")).isTrue();
-        assertThat(predicate.apply("foo")).isTrue();
-        assertThat(predicate.apply("Settings")).isTrue();
-        assertThat(predicate.apply("Variables")).isTrue();
-        assertThat(predicate.apply("Keywords")).isTrue();
-        assertThat(predicate.apply("Test Cases")).isTrue();
-    }
-
-    @Test
-    public void whenFileIsAResource_sectionsPredicateIsSatisfiedForAnyGivenSectionNameExceptTestCases() {
-        final RobotSuiteFile model = mock(RobotSuiteFile.class);
-        when(model.isSuiteFile()).thenReturn(false);
-
-        final AssistProposalPredicate<String> predicate = AssistProposalPredicates.testCaseSectionPredicate(model);
-
-        assertThat(predicate.apply(null)).isTrue();
-        assertThat(predicate.apply("")).isTrue();
-        assertThat(predicate.apply("foo")).isTrue();
-        assertThat(predicate.apply("Settings")).isTrue();
-        assertThat(predicate.apply("Variables")).isTrue();
-        assertThat(predicate.apply("Keywords")).isTrue();
-        assertThat(predicate.apply("Test Cases")).isFalse();
     }
 
     @Test
