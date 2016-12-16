@@ -14,7 +14,6 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposal;
-import org.robotframework.ide.eclipse.main.plugin.assist.AssistProposalPredicates;
 import org.robotframework.ide.eclipse.main.plugin.assist.RedSectionProposals;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.DocumentUtilities;
 import org.robotframework.ide.eclipse.main.plugin.tableeditor.source.SuiteSourcePartitionScanner;
@@ -62,8 +61,7 @@ public class SectionsAssistProcessor extends RedContentAssistProcessor {
     protected List<? extends ICompletionProposal> computeProposals(final IDocument document, final int offset,
             final int cellLength, final String prefix) {
 
-        final List<? extends AssistProposal> sectionProposals = new RedSectionProposals(
-                AssistProposalPredicates.testCaseSectionPredicate(assist.getModel())).getSectionsProposals(prefix);
+        final List<? extends AssistProposal> sectionProposals = new RedSectionProposals().getSectionsProposals(prefix);
 
         final List<ICompletionProposal> proposals = newArrayList();
         for (final AssistProposal settingProposal : sectionProposals) {
