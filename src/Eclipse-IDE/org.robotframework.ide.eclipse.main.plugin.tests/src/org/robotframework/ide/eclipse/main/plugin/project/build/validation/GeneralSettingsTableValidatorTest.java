@@ -27,7 +27,6 @@ import org.rf.ide.core.testdata.model.RobotVersion;
 import org.rf.ide.core.testdata.model.search.keyword.KeywordScope;
 import org.rf.ide.core.validation.ProblemPosition;
 import org.robotframework.ide.eclipse.main.plugin.mockmodel.RobotSuiteFileCreator;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotModel;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
@@ -178,8 +177,8 @@ public class GeneralSettingsTableValidatorTest {
                 (Collection<KeywordEntity>) Lists.<KeywordEntity> newArrayList(entity));
 
         final FileValidationContext context = prepareContext(accessibleKws);
-        final TestCaseTableValidator validator = new TestCaseTableValidator(context,
-                file.findSection(RobotCasesSection.class), reporter);
+        final GeneralSettingsTableValidator validator = new GeneralSettingsTableValidator(context,
+                file.findSection(RobotSettingsSection.class), reporter);
         validator.validate(null);
 
         assertThat(reporter.getNumberOfReportedProblems()).isEqualTo(0);

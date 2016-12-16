@@ -140,8 +140,10 @@ public class TestCaseTableValidatorTest {
     public void givenTestCaseWithEnvironmentVariable_whenNoMarkersShouldBeReported() throws CoreException {
         final RobotSuiteFile file = new RobotSuiteFileCreator().appendLine("*** Test Cases ***")
                 .appendLine("test")
-                .appendLine("  [Setup]  kw  %{foobar}")
-                .appendLine("  kw  %{foobar}")
+                .appendLine("    [Setup]  kw  %{foobar}")
+                .appendLine("    [Teardown]    kw    %{PATH}")
+                .appendLine("    [Tags]    tag_with_%{HOME}")
+                .appendLine("    kw    %{bar}")
                 .build();
 
         final KeywordEntity entity = newValidationKeywordEntity(KeywordScope.RESOURCE, "res", "kw",
