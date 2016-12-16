@@ -304,9 +304,7 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                             newArrayList(argToken), new VariableExtractor(), validationContext.getFile().getName());
 
                     for (final Entry<String, RobotToken> entry : usedVariables.entries()) {
-                        if (!unifiedDefinitionName.equals(entry.getKey()) && !VariableNamesSupport.isDefinedVariable(
-                                VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(entry.getKey()), "$",
-                                definedVariables)) {
+                        if (isInvalidVariableDeclaration(definedVariables, unifiedDefinitionName, entry)) {
                             final RobotProblem problem = RobotProblem.causedBy(VariablesProblem.UNDECLARED_VARIABLE_USE)
                                     .formatMessageWith(entry.getValue().getText());
                             final Map<String, Object> additional = ImmutableMap
@@ -320,6 +318,15 @@ class KeywordSettingsValidator implements ModelUnitValidator {
                 }
             }
         }
+    }
+
+    private boolean isInvalidVariableDeclaration(final Set<String> definedVariables, final String unifiedDefinitionName,
+            final Entry<String, RobotToken> entry) {
+        return !entry.getValue().getTypes().contains(RobotTokenType.VARIABLES_ENVIRONMENT_DECLARATION)
+                && !unifiedDefinitionName.equals(entry.getKey())
+                && !VariableNamesSupport.isDefinedVariable(
+                VariableNamesSupport.extractUnifiedVariableNameWithoutBrackets(entry.getKey()), "$",
+                definedVariables);
     }
 
     private boolean isDefaultArgument(final RobotToken argumentToken) {
