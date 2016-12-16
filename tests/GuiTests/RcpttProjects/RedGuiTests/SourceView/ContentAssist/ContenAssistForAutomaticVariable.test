@@ -1,13 +1,13 @@
 --- RCPTT testcase ---
 Format-Version: 1.0
-Contexts: _gDZSgMjzEeWPuqMw6GC70Q,_UKJR8MkGEeWPuqMw6GC70Q,_70F80MH6Eeat3OoBX2X2jQ
+Contexts: _gDZSgMjzEeWPuqMw6GC70Q,_UKJR8MkGEeWPuqMw6GC70Q,_cBeEIMN4Eeat3OoBX2X2jQ
 Element-Name: ContenAssistForAutomaticVariable
 Element-Type: testcase
 Element-Version: 3.0
 External-Reference: 
 Id: _-8FTwKSdEeW4l-rLhvMqpg
 Runtime-Version: 2.1.0.201606221726
-Save-Time: 12/15/16 5:36 PM
+Save-Time: 12/16/16 11:18 AM
 Testcase-Type: ecl
 
 ------=_.content-0a7243a0-75d3-3d5f-9791-539de0e5b7ac
@@ -111,7 +111,10 @@ get-editor "TestFile.robot" | get-text-viewer | set-caret-pos 17 1
 get-editor "TestFile.robot" | get-text-viewer | type-text "*** Variables ***\n"
     + "${newScalar}\t"
 wait 1000    
+
 open-content_assist -file_name "TestFile.robot" -row 18 -col 15 -set_char "$"
+get-window -from "CompletionProposalPopup.createProposalSelector()" | get-table | get-item "${newScalar}" 
+    | get-property index | equals 0 | verify-true
 check_common-automatic-variables -start_index 1
 close-content-assist -file_name "TestFile.robot" 
 
