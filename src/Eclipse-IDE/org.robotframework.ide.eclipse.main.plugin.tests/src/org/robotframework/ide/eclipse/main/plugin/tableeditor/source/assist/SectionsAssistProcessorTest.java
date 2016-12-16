@@ -97,12 +97,13 @@ public class SectionsAssistProcessorTest {
 
         final List<? extends ICompletionProposal> proposals = processor.computeProposals(viewer, 0);
         
-        assertThat(proposals).hasSize(3)
-            .haveExactly(3, proposalsWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
+        assertThat(proposals).hasSize(4).haveExactly(4,
+                proposalsWithImage(ImagesManager.getImage(RedImages.getRobotCasesFileSectionImage())));
         
         final List<IDocument> transformedDocuments = transform(proposals, byApplyingToDocument(document));
         assertThat(transformedDocuments).containsOnly(
                 new Document("*** Keywords ***", ""),
+                new Document("*** Test Cases ***", ""),
                 new Document("*** Variables ***", ""),
                 new Document("*** Settings ***", ""));
     }
