@@ -10,10 +10,8 @@ import static com.google.common.collect.Sets.newHashSet;
 import org.rf.ide.core.testdata.model.ModelType;
 import org.rf.ide.core.testdata.text.read.recognizer.RobotToken;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotCase;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotCasesSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotElement;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotKeywordCall;
-import org.robotframework.ide.eclipse.main.plugin.model.RobotSuiteFile;
 import org.robotframework.ide.eclipse.main.plugin.project.library.LibrarySpecification;
 
 import com.google.common.base.Optional;
@@ -34,19 +32,6 @@ public class AssistProposalPredicates {
             @Override
             public boolean apply(final T any) {
                 return false;
-            }
-        };
-    }
-
-    public static AssistProposalPredicate<String> testCaseSectionPredicate(final RobotSuiteFile model) {
-        return new AssistProposalPredicate<String>() {
-
-            @Override
-            public boolean apply(final String sectionName) {
-                if (RobotCasesSection.SECTION_NAME.equals(sectionName)) {
-                    return model.isSuiteFile();
-                }
-                return true;
             }
         };
     }

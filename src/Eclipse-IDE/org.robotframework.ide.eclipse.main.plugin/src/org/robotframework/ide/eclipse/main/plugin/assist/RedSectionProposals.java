@@ -18,7 +18,6 @@ import org.robotframework.ide.eclipse.main.plugin.model.RobotSettingsSection;
 import org.robotframework.ide.eclipse.main.plugin.model.RobotVariablesSection;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 public class RedSectionProposals {
 
@@ -27,15 +26,12 @@ public class RedSectionProposals {
 
     private final ProposalMatcher matcher;
 
-    private final Predicate<String> sectionPredicate;
-
-    public RedSectionProposals(final Predicate<String> sectionPredicate) {
-        this(ProposalMatchers.prefixesMatcher(), sectionPredicate);
+    public RedSectionProposals() {
+        this(ProposalMatchers.prefixesMatcher());
     }
 
-    public RedSectionProposals(final ProposalMatcher matcher, final Predicate<String> sectionPredicate) {
+    public RedSectionProposals(final ProposalMatcher matcher) {
         this.matcher = matcher;
-        this.sectionPredicate = sectionPredicate;
     }
 
     public List<? extends AssistProposal> getSectionsProposals(final String userContent) {
@@ -48,12 +44,10 @@ public class RedSectionProposals {
         final List<RedSectionProposal> proposals = new ArrayList<>();
 
         for (final String sectionName : SECTION_NAMES) {
-            if (sectionPredicate.apply(sectionName)) {
-                final Optional<ProposalMatch> match = matcher.matches(userContent, "*** " + sectionName + " ***");
+            final Optional<ProposalMatch> match = matcher.matches(userContent, "*** " + sectionName + " ***");
 
-                if (match.isPresent()) {
-                    proposals.add(AssistProposals.createSectionProposal(sectionName, match.get()));
-                }
+            if (match.isPresent()) {
+                proposals.add(AssistProposals.createSectionProposal(sectionName, match.get()));
             }
         }
         proposals.sort(comparator);
